@@ -9,12 +9,9 @@ services:
     numInstances: 1
     dockerContext: .
     dockerfilePath: ./apps/api/Dockerfile
-    dockerCommand: >-
-      python manage.py migrate --noinput &&
-      python manage.py import_catalogue &&
-      python manage.py bootstrap_demo_account &&
-      python manage.py seed_demo &&
-      python manage.py runserver 0.0.0.0:${PORT:-10000}
+    # Render tokenizes this override as argv; it does not evaluate shell
+    # operators or parameter expansion. All control flow lives in-image.
+    dockerCommand: sh /workspace/apps/api/render-start.sh
     healthCheckPath: /health/
     autoDeployTrigger: checksPass
     envVars:

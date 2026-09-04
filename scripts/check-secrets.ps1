@@ -239,6 +239,27 @@ if ($IncludeDeployment) {
     } else {
         Write-Host "Scanned all $deploymentScanned deployment source file(s), including infra/render.yaml."
     }
+
+    # Render tokenizes dockerCommand as argv rather than evaluating shell
+    # control syntax. Keep the Blueprint command deliberately simple and
+    # delegate sequencing/PORT expansion to the in-image POSIX script.
+    $renderPath = Join-Path $RepoRoot "infra/render.yaml"
+    $renderText = Get-Content -LiteralPath $renderPath -Raw
+    $commandLines = @([regex]::Matches($renderText, "(?m)^\s*dockerCommand:\s*(.+?)\s*$"))
+    $expectedCommand = "sh /workspace/apps/api/render-start.sh"
+    if ($commandLines.Count -ne 1 -or $commandLines[0].Groups[1].Value -ne $expectedCommand) {
+        Write-Host "FAIL: infra/render.yaml must contain exactly 'dockerCommand: $expectedCommand'." -ForegroundColor Red
+        $ExitCode = 1
+    }
+    if ($commandLines.Count -eq 1 -and $commandLines[0].Groups[1].Value -match "&&|\$\{|sh\s+-c") {
+        Write-Host "FAIL: Render dockerCommand contains shell-control syntax that Render will tokenize as arguments." -ForegroundColor Red
+        $ExitCode = 1
+    }
+    $renderStartPath = Join-Path $RepoRoot "apps/api/render-start.sh"
+    if (-not (Test-Path $renderStartPath -PathType Leaf)) {
+        Write-Host "FAIL: apps/api/render-start.sh is missing." -ForegroundColor Red
+        $ExitCode = 1
+    }
 }
 
 # ---------------------------------------------------------------------------
