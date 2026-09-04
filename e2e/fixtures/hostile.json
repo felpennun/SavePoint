@@ -26,6 +26,16 @@
   "tamperedDataset": {
     "declaredSha256": "0000000000000000000000000000000000000000000000000000000000000000",
     "actualFixtureContent": "savepoint-intentionally-mismatched-hash"
+  },
+  "secretCanaries": {
+    "purpose": "Synthetic values shaped like real leaked-secret patterns, used only to self-test scripts/check-secrets.ps1 before it trusts a clean scan of the real tree. Never a real credential; the literal word CANARY makes that unmistakable.",
+    "awsAccessKeyId": "AKIACANARY1234567890",
+    "genericApiSecretKey": "sk-canary000000000000000000savepoint",
+    "privateKeyHeader": "-----BEGIN CANARY PRIVATE KEY-----",
+    "assignedSecretValue": "canary_password=\"CanarySecretValue1234!\"",
+    "bearerToken": "Bearer canary0000000000000000000000000000abcdefgh",
+    "nextPublicSensitiveName": "NEXT_PUBLIC_CANARY_SECRET_TOKEN=canary-should-be-detected",
+    "dockerArgSensitiveName": "ARG CANARY_API_SECRET_KEY=canary-should-be-detected"
   }
 }
 

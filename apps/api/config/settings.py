@@ -110,12 +110,43 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
-SESSION_COOKIE_SECURE = os.environ.get("DJANGO_SECURE_COOKIES", "false").lower() == "true"
 CSRF_COOKIE_SAMESITE = "Lax"
-CSRF_COOKIE_SECURE = SESSION_COOKIE_SECURE
 CSRF_TRUSTED_ORIGINS = [
     origin.strip()
     for origin in os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",")
     if origin.strip()
 ]
+
+# Fail-closed deploy profile (SEC-02/OPS-02): "local" is plain HTTP behind
+# Docker Compose with no TLS terminator, so `manage.py check --deploy`'s
+# HSTS/SSL-redirect/secure-cookie warnings are Django's own documented
+# guidance for exactly that case (silenced, not fixed, since forcing HTTPS
+# redirects here would break the working local demo). "production" instead
+# requires those protections and a real, sufficiently long secret key --
+# never a silent downgrade.
+DJANGO_DEPLOY_ENV = os.environ.get("DJANGO_DEPLOY_ENV", "local")
+if DJANGO_DEPLOY_ENV not in {"local", "production"}:
+    raise RuntimeError("DJANGO_DEPLOY_ENV must be 'local' or 'production'")
+
+if DJANGO_DEPLOY_ENV == "production":
+    if len(SECRET_KEY) < 50:
+        raise RuntimeError("DJANGO_SECRET_KEY must be at least 50 characters when DJANGO_DEPLOY_ENV=production")
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SILENCED_SYSTEM_CHECKS: list[str] = []
+else:
+    SECURE_SSL_REDIRECT = False
+    SECURE_HSTS_SECONDS = 0
+    SESSION_COOKIE_SECURE = os.environ.get("DJANGO_SECURE_COOKIES", "false").lower() == "true"
+    CSRF_COOKIE_SECURE = SESSION_COOKIE_SECURE
+    SILENCED_SYSTEM_CHECKS = [
+        "security.W004",  # SECURE_HSTS_SECONDS -- no TLS terminator locally
+        "security.W008",  # SECURE_SSL_REDIRECT -- plain HTTP locally
+        "security.W012",  # SESSION_COOKIE_SECURE -- plain HTTP locally
+        "security.W016",  # CSRF_COOKIE_SECURE -- plain HTTP locally
+    ]
 

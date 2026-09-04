@@ -25,8 +25,11 @@ services:
       dockerfile: apps/api/Dockerfile
     environment:
       DATABASE_URL: postgresql://savepoint_test:local_test_only@db:5432/savepoint_test
-      DJANGO_SECRET_KEY: local-development-only-not-a-secret
+      # 67 chars: long enough that Django's `check --deploy` W009 (predictable
+      # SECRET_KEY) never fires -- still explicitly not a secret (D-02).
+      DJANGO_SECRET_KEY: local-development-only-not-a-secret-please-set-a-real-one-in-deploy
       DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,testserver,api"
+      DJANGO_DEPLOY_ENV: local
       # Requests arrive via the Next.js same-origin proxy (next.config.ts):
       # the browser's Origin header says "localhost:3000" (the page's real
       # origin), but the Host header Django actually sees is "api:8000" (the
@@ -53,7 +56,26 @@ services:
     init: true
     ports:
       - "8000:8000"
-    command: python manage.py runserver 0.0.0.0:8000
+    # Fixed offline startup cycle (OPS-02/OPS-03): migrate, import the frozen
+    # local catalogue snapshot, bootstrap/rotate the demo account from
+    # runtime env, then load the deterministic seed interactions -- all four
+    # commands are idempotent and advisory-lock-guarded (01-06/01-15/01-16),
+    # so re-running this same chain on every `up` (including concurrent
+    # `docker compose up` invocations) never duplicates rows or leaves
+    # partial state. Nothing here downloads data or calls an external
+    # provider -- every input is already a local file under data/.
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+      python manage.py import_catalogue &&
+      python manage.py bootstrap_demo_account &&
+      python manage.py seed_demo &&
+      python manage.py runserver 0.0.0.0:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/', timeout=2)"]
+      interval: 3s
+      timeout: 3s
+      retries: 40
+      start_period: 30s
     # Local-development-only bind mounts (#dev-parity): the image built by
     # apps/api/Dockerfile only COPYs apps/api/ at build time, so without these
     # mounts every `docker compose run` sees whatever code existed at the last
@@ -82,7 +104,7 @@ services:
       db:
         condition: service_healthy
       api:
-        condition: service_started
+        condition: service_healthy
     security_opt:
       - no-new-privileges:true
     init: true
@@ -99,6 +121,12 @@ services:
     # development: run `pnpm --dir apps/web dev` directly on the host, or
     # `docker compose run --rm -p 3000:3000 web pnpm --dir apps/web dev`.
     command: sh -c "pnpm --dir apps/web exec next build && pnpm --dir apps/web exec next start --hostname 0.0.0.0 --port 3000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/es', r => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))"]
+      interval: 3s
+      timeout: 3s
+      retries: 60
+      start_period: 60s
     volumes:
       - ../apps/web:/workspace/apps/web
       - /workspace/apps/web/node_modules
