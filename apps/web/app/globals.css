@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens (D-17/D-18): a provisional, accessible dark palette,
+ * implemented as replaceable CSS custom properties -- future canonical
+ * visual references from a UI-phase pass swap these values, not the
+ * component markup that consumes them. Contrast ratios below are chosen
+ * to clear WCAG 2.2 AA (4.5:1 body text, 3:1 large text/UI components)
+ * against their paired background.
+ */
+@theme {
+  /* Surfaces, dark-first (D-17: dark, cover-led catalogue). */
+  --color-surface-base: #0d0d12;
+  --color-surface-raised: #17171f;
+  --color-surface-overlay: #1f1f2b;
+  --color-surface-border: #2c2c3a;
+
+  /* Text -- off-white on dark, never pure #fff/#000 (harsh contrast). */
+  --color-text-primary: #f2f2f5;
+  --color-text-secondary: #b8b8c4;
+  --color-text-muted: #8a8a99;
+
+  /* Accent -- interactive elements, links, focus-adjacent emphasis. */
+  --color-accent: #8b7cf6;
+  --color-accent-strong: #a394ff;
+  --color-accent-on: #16121f;
+
+  /* Status -- backlog states (D-14), each with a text-safe pairing. */
+  --color-status-pending: #f0b429;
+  --color-status-playing: #38bdf8;
+  --color-status-completed: #34d399;
+  --color-status-abandoned: #94a3b8;
+
+  /* Feedback. */
+  --color-danger: #f87171;
+  --color-success: #34d399;
+
+  /* Focus ring -- 2px, high-visibility, never suppressed (accessibility
+     acceptance checks require a visible focus indicator on every
+     interactive control). */
+  --color-focus-ring: #ffd166;
+
+  --radius-card: 0.75rem;
+  --radius-control: 0.5rem;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--color-surface-base);
+  color: var(--color-text-primary);
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  min-height: 100vh;
+}
+
+/* Visible 2px focus ring on every interactive element -- never hidden via
+   outline: none without an equivalent replacement (accessibility
+   acceptance checks: "visible name, role, state, focus indicator"). */
+:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* 44x44px minimum interactive target (WCAG 2.5.8), applied as a floor via
+   min-height/min-width on the shared control classes rather than forcing
+   every icon button to visually grow. */
+button,
+a,
+input,
+select,
+textarea {
+  min-height: 2.75rem;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Skip link: visually hidden until focused, then a real, visible, first
+   focusable element (accessibility acceptance: "skip link works"). */
+.skip-link {
+  position: absolute;
+  top: -3rem;
+  left: 0.5rem;
+  z-index: 50;
+  background-color: var(--color-accent);
+  color: var(--color-accent-on);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-control);
+}
+
+.skip-link:focus {
+  top: 0.5rem;
+}
