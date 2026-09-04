@@ -20,9 +20,19 @@ VALID_STATUSES = {choice.value for choice in BacklogStatus}
 
 
 class SetStatusView(APIView):
-    """POST /api/library/entries/<work_id>/status/ {"status": "playing"}"""
+    """GET/POST /api/library/entries/<work_id>/status/
+
+    GET returns the caller's current status for this work (None if never
+    set) -- the UI reads this back after every reload rather than trusting
+    client-side state, per the plan's prohibition on confirming a status
+    before the PostgreSQL commit actually lands."""
 
     permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request, work_id: str) -> Response:
+        work = get_object_or_404(GameWork, id=work_id, is_dlc=False)
+        entry = LibraryEntry.objects.filter(user=request.user, work=work).first()
+        return Response({"status": entry.current_status if entry else None})
 
     def post(self, request: Request, work_id: str) -> Response:
         new_status = request.data.get("status")

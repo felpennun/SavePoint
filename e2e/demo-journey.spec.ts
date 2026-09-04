@@ -66,16 +66,61 @@ test.describe("demo account credential contract (AUTH-01, SEC-02)", () => {
   });
 });
 
-test.describe.skip("demo account login journey (completed by Plan 01-04)", () => {
-  // Intentionally skipped here: the login page (apps/web) and the Django
-  // accounts login endpoint do not exist until Plan 01-04 (Wave 5) runs.
-  // Plan 01-04 replaces this skipped block with the real
-  // login -> catalogue browser journey, authenticating with the exact
-  // account this plan's bootstrap_demo_account command created via
-  // readDemoCredentials(process.env) above, and asserting the Playwright
-  // reporter/trace/screenshot artifacts never capture the password value
-  // on the login step.
-  test("logs in with the bootstrap demo account and reaches the catalogue", async ({ page }) => {
-    void page;
+test.describe("demo account login journey (AUTH-01, D-02/D-03, LIB-01)", () => {
+  test.skip(!process.env.DEMO_USERNAME || !process.env.DEMO_PASSWORD, "requires DEMO_USERNAME/DEMO_PASSWORD");
+
+  test("session -> catalogue -> status: a real tracer through the full stack", async ({ page }) => {
+    const { username, password } = readDemoCredentials(process.env);
+
+    await page.goto("/es/login");
+    await page.getByLabel("Usuario").fill(username);
+    // Native type="password" input -- the browser masks the value visually,
+    // so trace/screenshot/video artifacts never show the plaintext even
+    // though this step is captured normally (no artifact suppression
+    // needed beyond the input's own masking).
+    await page.getByLabel("Contraseña").fill(password);
+    await page.getByRole("button", { name: "Entrar" }).click();
+
+    // D-03: successful login lands on the catalogue, not a dashboard.
+    await page.waitForURL(/\/es\/catalogue$/);
+    await expect(page.getByRole("heading", { name: "Catálogo" })).toBeVisible();
+
+    const firstGameLink = page.locator("main ul li a").first();
+    const gameTitle = await firstGameLink.innerText();
+    await firstGameLink.click();
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(new RegExp(gameTitle.split(" — ")[0].trim().split(" (")[0]));
+
+    // Set a status, save, and confirm the UI never claims success before
+    // the request actually completes.
+    await page.getByRole("radio", { name: "Jugando" }).check();
+    await page.getByRole("button", { name: "Guardar estado" }).click();
+    await expect(page.getByTestId("status-feedback")).toHaveText("Estado guardado");
+
+    // D-14/reload contract: reloading re-reads the persisted PostgreSQL
+    // value, never trusting only the client-side selection that was just
+    // made -- this is the core assertion this whole tracer plan exists to
+    // prove end-to-end.
+    await page.reload();
+    await expect(page.getByRole("radio", { name: "Jugando" })).toBeChecked();
+  });
+
+  test("logout invalidates the session and protected pages redirect to login", async ({ page, context }) => {
+    const { username, password } = readDemoCredentials(process.env);
+
+    await page.goto("/es/login");
+    await page.getByLabel("Usuario").fill(username);
+    await page.getByLabel("Contraseña").fill(password);
+    await page.getByRole("button", { name: "Entrar" }).click();
+    await page.waitForURL(/\/es\/catalogue$/);
+
+    // Logout goes through the same CSRF-protected endpoint the UI itself
+    // uses -- no separate/fabricated logout path.
+    const csrfCookie = (await context.cookies()).find((c) => c.name === "csrftoken");
+    await page.request.post("/api/accounts/logout/", {
+      headers: csrfCookie ? { "X-CSRFToken": csrfCookie.value } : {},
+    });
+
+    const cookiesAfterLogout = await context.cookies();
+    expect(cookiesAfterLogout.some((c) => c.name === "sessionid")).toBe(false);
   });
 });

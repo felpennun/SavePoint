@@ -54,6 +54,36 @@ def test_set_status_persists_and_reloads(work, user_a) -> None:  # noqa: ANN001
 
 
 @pytest.mark.django_db
+def test_get_status_returns_none_before_any_status_is_set(work, user_a) -> None:  # noqa: ANN001
+    client = _client_for(user_a)
+    response = client.get(f"/api/library/entries/{work.id}/status/")
+    assert response.status_code == 200
+    assert response.json() == {"status": None}
+
+
+@pytest.mark.django_db
+def test_get_status_reflects_the_last_saved_value_after_reload(work, user_a) -> None:  # noqa: ANN001
+    client = _client_for(user_a)
+    client.post(f"/api/library/entries/{work.id}/status/", {"status": "playing"}, format="json")
+
+    # A fresh GET (simulating a page reload) must read the persisted
+    # PostgreSQL value, not any client-side optimistic guess.
+    reload_response = client.get(f"/api/library/entries/{work.id}/status/")
+    assert reload_response.status_code == 200
+    assert reload_response.json() == {"status": "playing"}
+
+
+@pytest.mark.django_db
+def test_get_status_is_scoped_to_the_requesting_user(work, user_a, user_b) -> None:  # noqa: ANN001
+    client_a = _client_for(user_a)
+    client_b = _client_for(user_b)
+    client_a.post(f"/api/library/entries/{work.id}/status/", {"status": "completed"}, format="json")
+
+    response_b = client_b.get(f"/api/library/entries/{work.id}/status/")
+    assert response_b.json() == {"status": None}
+
+
+@pytest.mark.django_db
 def test_identical_retry_does_not_duplicate_history(work, user_a) -> None:  # noqa: ANN001
     client = _client_for(user_a)
     client.post(f"/api/library/entries/{work.id}/status/", {"status": "playing"}, format="json")

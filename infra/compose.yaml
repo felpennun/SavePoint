@@ -27,6 +27,13 @@ services:
       DATABASE_URL: postgresql://savepoint_test:local_test_only@db:5432/savepoint_test
       DJANGO_SECRET_KEY: local-development-only-not-a-secret
       DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,testserver,api"
+      # Requests arrive via the Next.js same-origin proxy (next.config.ts):
+      # the browser's Origin header says "localhost:3000" (the page's real
+      # origin), but the Host header Django actually sees is "api:8000" (the
+      # proxy's HTTP client rewrites Host to match its destination) --
+      # Django's CSRF Origin check compares Origin against its own
+      # scheme+get_host() and rejects the mismatch (403) without this.
+      DJANGO_CSRF_TRUSTED_ORIGINS: "http://localhost:3000,http://127.0.0.1:3000"
       POSTGRES_DB: savepoint_test
       POSTGRES_USER: savepoint_test
       POSTGRES_PASSWORD: local_test_only
@@ -80,7 +87,17 @@ services:
     init: true
     ports:
       - "3000:3000"
-    command: pnpm --dir apps/web dev --hostname 0.0.0.0 --port 3000
+    # Production build+start, not `next dev`: dev mode's HMR WebSocket
+    # reproducibly failed the handshake in this environment
+    # (ERR_INVALID_HTTP_RESPONSE), which silently prevented React from
+    # finishing hydration -- the login form's onSubmit handler never
+    # attached, so a click fell through to the browser's native GET submit,
+    # putting the password in the URL query string. Also matches the
+    # project's own reproducibility principle (research A-note: "el mismo
+    # commit y lockfiles construye local y Render"). Live-reload for active
+    # development: run `pnpm --dir apps/web dev` directly on the host, or
+    # `docker compose run --rm -p 3000:3000 web pnpm --dir apps/web dev`.
+    command: sh -c "pnpm --dir apps/web exec next build && pnpm --dir apps/web exec next start --hostname 0.0.0.0 --port 3000"
     volumes:
       - ../apps/web:/workspace/apps/web
       - /workspace/apps/web/node_modules
