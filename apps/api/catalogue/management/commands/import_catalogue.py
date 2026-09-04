@@ -18,7 +18,6 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -28,6 +27,7 @@ from django.db import connection, transaction
 from django.utils.text import slugify
 
 from catalogue.models import AssetAttribution, GameAlias, GameRelease, GameWork, Platform, SourceRecord
+from catalogue.normalization import normalize_title
 
 # commands/ -> management/ -> catalogue/ -> api/ -> apps/ -> repo root
 REPO_ROOT = Path(__file__).resolve().parents[5]
@@ -43,12 +43,6 @@ IMPORT_LOCK_KEY = 725_01_06
 
 def _canonical_bytes(value: Any) -> bytes:
     return (json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode("utf-8")
-
-
-def normalize_title(value: str) -> str:
-    """Lowercase + Unicode NFKD + strip combining marks (Pattern 5, D-10/D-12)."""
-    decomposed = unicodedata.normalize("NFKD", value)
-    return "".join(ch for ch in decomposed if not unicodedata.combining(ch)).casefold()
 
 
 class Command(BaseCommand):
