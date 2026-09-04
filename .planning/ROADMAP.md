@@ -1,0 +1,146 @@
+# Roadmap: SavePoint
+
+## Overview
+
+SavePoint begins with a three-day, publicly deployed vertical demonstration, then replaces demo shortcuts with governed data, a frozen evaluation contract, complete collection workflows, resilient enrichment, reproducible experiment infrastructure, and progressively stronger recommenders. The final phase exposes immutable evidence through an accessible research panel and hardens the demonstrator for thesis assessment. Every phase is an MVP vertical slice and must leave contemporaneous thesis and agent-methodology evidence; documentation is an acceptance condition throughout, not an end-only activity.
+
+## Delivery Policy
+
+- **Mode:** mvp for every initial phase.
+- **Phase 1 deadline:** a visible public demonstration within three days.
+- **Demo-grade boundary:** Phase 1 may use controlled seeded accounts, a small lawful local catalogue, a simple popularity recommender, and narrowly scoped administration. It may not use client-side secrets, unlawful data, mutable research inputs, or undocumented setup.
+- **Hardening boundary:** Phases 2-8 expand data governance, evaluation validity, product depth, security, recovery, accessibility, and operational controls. Phase 1 is a coherent demonstrator, not evidence that these later guarantees are complete.
+- **Continuous evidence:** each phase records decisions, alternatives, tests, provenance, limitations, agent roles/prompts/configuration, automated verification, and explicit author decisions relevant to its scope.
+
+## Phases
+
+- [ ] **Phase 1: Three-Day Public Demo Slice** - Deploy a lawful, locally reproducible controlled demo with catalogue, backlog, rating, inventory, public profile, and popularity recommendations.
+- [ ] **Phase 2: Governed Corpus and Frozen Evaluation Contract** - Establish immutable research inputs, synthetic scenarios, and the protocol that later algorithm comparisons cannot redefine.
+- [ ] **Phase 3: Complete Collection Workflows and Portability** - Complete profiles, comments, lists, copy details, and safe deterministic import/export.
+- [ ] **Phase 4: Public Discovery and Resilient Enrichment** - Add public projections, catalogue discovery, and attributable live enrichment without contaminating research data.
+- [ ] **Phase 5: Reproducible Experiment Harness and Baselines** - Execute immutable, comparable baseline runs whose metrics and evidence can be independently recalculated.
+- [ ] **Phase 6: Explainable Content Recommendations** - Deliver personalized content recommendations, cold-start routing, exclusions, and faithful explanations.
+- [ ] **Phase 7: Collaborative and Hybrid Comparison** - Compare collaborative and hybrid methods under the already-frozen protocol and document bounded conclusions.
+- [ ] **Phase 8: Research Panel, Hardening, and Evidence Freeze** - Present thesis-ready comparisons and finish administration, security, recovery, accessibility, and reproducibility gates.
+
+## Phase Details
+
+### Phase 1: Three-Day Public Demo Slice
+**Mode:** mvp
+**Goal**: A tribunal visitor can use a visible, lawful SavePoint vertical slice online within three days, while the same controlled demo starts reproducibly offline.
+**Depends on**: Nothing (first phase)
+**Requirements**: AUTH-01, PROF-02, CAT-01, CAT-03, CAT-04, CAT-06, LIB-01, LIB-02, INV-01, INV-02, INV-05, DATA-01, DATA-02, REC-02, SEC-02, OPS-01, OPS-02, OPS-03, QUAL-03, DOC-01, AGENT-01, AGENT-02, AGENT-03
+**Success Criteria** (what must be TRUE):
+  1. A visitor can open the public deployment, sign into a controlled account, search a small lawful local catalogue, and inspect a game with source information even when external enrichment is unavailable.
+  2. A signed-in user can change backlog status, rate a game, and register multiple physical or digital copies while private ownership details remain absent from the public profile.
+  3. An authorised visitor can open a public profile and see a simple popularity recommendation produced from the demo data.
+  4. A clean machine can start the same demo from documented, pinned instructions without Internet/API dependency, and no secret appears in Git, browser assets, logs, images, or public artifacts.
+  5. The demo is keyboard-usable and responsive at desktop/mobile widths, and its source/legal record, architecture rationale, agent inputs/outputs, verification, limitations, and author decisions are captured as thesis evidence.
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 2: Governed Corpus and Frozen Evaluation Contract
+**Mode:** mvp
+**Goal**: Researchers can identify the immutable corpus and reproduce a predeclared, simulation-aware evaluation protocol before sophisticated recommenders are compared.
+**Depends on**: Phase 1
+**Requirements**: AUTH-02, DATA-03, EVAL-01, EVAL-02, EVAL-03, EVAL-09, EVAL-10, DOC-04, AGENT-04
+**Success Criteria** (what must be TRUE):
+  1. A researcher can verify the fixed corpus checksum, data dictionary, and missing-data/quality report independently of mutable enrichment.
+  2. The comparison protocol freezes relevance, K, users, candidates, exclusions, split manifests, metrics, seeds, tuning budget, and test isolation before advanced algorithms run.
+  3. Clearly labelled synthetic accounts can be regenerated from contrasting parameterized scenarios and independent seeds with the same histories and validation report.
+  4. Research evidence explicitly limits conclusions to synthetic simulation and records leakage, hallucination, bias, error, and information-exposure controls plus author decisions.
+**Plans**: TBD
+
+### Phase 3: Complete Collection Workflows and Portability
+**Mode:** mvp
+**Goal**: Controlled users can fully curate and safely move their profile, collection, commentary, and lists.
+**Depends on**: Phase 2
+**Requirements**: PROF-01, LIB-03, LIB-04, INV-03, INV-04, PORT-01, PORT-02, PORT-03, PORT-04, PRIV-01
+**Success Criteria** (what must be TRUE):
+  1. A user can edit profile details, create/edit/delete comments, and create and reorder custom lists.
+  2. A user can record purchase information for any copy and conservation/storage details for physical copies, while public responses expose only allowlisted fields.
+  3. A user can export versioned CSV and JSON and preview an import before applying it.
+  4. Invalid or duplicate import rows receive deterministic row-level outcomes, and exported spreadsheet cells cannot execute formulas.
+  5. The workflows have accessible UI verification and contemporaneous design, test, limitation, agent, and author-decision evidence.
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 4: Public Discovery and Resilient Enrichment
+**Mode:** mvp
+**Goal**: Visitors can discover and share rich public catalogue/profile views whose live metadata is attributable, resilient, and isolated from experiments.
+**Depends on**: Phase 3
+**Requirements**: PROF-03, PROF-04, CAT-02, CAT-05, DATA-04, DATA-05, DATA-06, DATA-07, DATA-08
+**Success Criteria** (what must be TRUE):
+  1. A visitor can filter/sort broad catalogue metadata and open shareable profile/list URLs that expose only permitted activity and statistics.
+  2. Enriched values display their source and retrieval date, degrade to lawful local placeholders on provider failure, and never change a completed experiment.
+  3. A researcher can inspect the provider comparison, lawful-use/redistribution record, identifier reconciliation, conflict rules, and limitations behind any displayed value.
+  4. Provider credentials remain server-side and refresh, quota, timeout, malformed-response, and stale-data behavior can be observed without breaking catalogue use.
+  5. Accessibility, security, thesis rationale, agent contribution, automated checks, and author decisions are recorded with the phase evidence.
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 5: Reproducible Experiment Harness and Baselines
+**Mode:** mvp
+**Goal**: Researchers can run fair random/popularity baselines and independently recalculate their immutable evaluation evidence.
+**Depends on**: Phase 4
+**Requirements**: REC-01, EVAL-04, EVAL-05, EVAL-06, EVAL-07, EVAL-08, EVAL-11, EVAL-12, QUAL-02
+**Success Criteria** (what must be TRUE):
+  1. A clean installation can run random and popularity baselines against the frozen protocol and reproduce versioned outputs.
+  2. Every run records code/environment/data/split/seed/parameter/model/metric identities, per-user outputs, timing, and resource consumption without mutable aliases.
+  3. Stored artifacts can recalculate accuracy/ranking, coverage, diversity, novelty, cohort, uncertainty, and justified statistical comparisons without rerunning models.
+  4. Multiple seeds and failed-run states are visible, comparable, and cannot silently yield partial published evidence.
+  5. Metric rationale, limitations, agent work, verification, and author interpretation are captured for direct thesis use.
+**Plans**: TBD
+
+### Phase 6: Explainable Content Recommendations
+**Mode:** mvp
+**Goal**: Users, including newcomers, receive useful content-based recommendations with reproducible evidence and understandable faithful reasons.
+**Depends on**: Phase 5
+**Requirements**: REC-03, REC-06, REC-07, REC-08, REC-09
+**Success Criteria** (what must be TRUE):
+  1. A user with history can request ranked content-based recommendations that exclude configured already-consumed games.
+  2. A zero- or sparse-history user receives an explicit popularity/onboarding/content fallback instead of an empty result.
+  3. Each result shows a deterministic, accessible explanation grounded in persisted features or model evidence rather than generated prose.
+  4. Published results retain model, feature, and input-data versions and reproduce from their immutable artifacts.
+  5. The algorithm theory, parameters, tests, accessibility, limitations, agent contributions, and author decisions remain inspectable as phase evidence.
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 7: Collaborative and Hybrid Comparison
+**Mode:** mvp
+**Goal**: Researchers can fairly compare collaborative and hybrid recommenders with prior baselines/content results and make simulation-bounded conclusions.
+**Depends on**: Phase 6
+**Requirements**: REC-04, REC-05, DOC-03
+**Success Criteria** (what must be TRUE):
+  1. The frozen harness produces collaborative recommendations for eligible cohorts using the same candidates, exclusions, splits, metrics, and tuning budget as earlier methods.
+  2. A documented hybrid combines content and collaborative evidence and transitions predictably for cold and sparse users.
+  3. Multi-seed results expose uncertainty, cohort trade-offs, diversity/novelty effects, timing, and sensitivity without tuning on the test set.
+  4. Each algorithm's theory, formulation, parameters, limitations, implementation evidence, agent contribution, and author interpretation are thesis-ready.
+**Plans**: TBD
+
+### Phase 8: Research Panel, Hardening, and Evidence Freeze
+**Mode:** mvp
+**Goal**: The deployed and offline demonstrator is securely operable and presents an accessible, immutable, thesis-ready comparison of the completed research.
+**Depends on**: Phase 7
+**Requirements**: EVAL-13, EVAL-14, ADMIN-01, ADMIN-02, SEC-01, SEC-03, SEC-04, SEC-05, SEC-06, SEC-07, SEC-08, PRIV-02, OPS-04, OPS-05, QUAL-01, QUAL-04, DOC-02, DOC-05, DOC-06, AGENT-05, AGENT-06
+**Success Criteria** (what must be TRUE):
+  1. A researcher can compare immutable runs, configurations, algorithms, cohorts, metrics, timings, provenance, and limitations through accessible tables/charts and export thesis-ready figures/data.
+  2. An authorised administrator can manage demo users/catalogue and supervise imports, jobs, and experiments without direct database edits; account deletion/anonymisation and non-secret audit events work.
+  3. Role/ownership, injection, XSS/CSRF, malicious-content, SSRF/redirect, rate-limit, header, error-handling, secret, dependency, and pipeline checks protect the deployed system and are evidenced by tests.
+  4. Structured non-sensitive logs expose job state, and tested PostgreSQL/artifact backup and recovery restore the demonstrator and immutable evidence.
+  5. A clean checkout reproduces the final evidence and accessible deployed/offline workflows; canonical thesis references, generated tables/figures, AI-use disclosure, costs, limitations, threats to validity, agent records, and author decisions are frozen together.
+**Plans**: TBD
+**UI hint**: yes
+
+## Progress
+
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 1. Three-Day Public Demo Slice | 0/TBD | Not started | - |
+| 2. Governed Corpus and Frozen Evaluation Contract | 0/TBD | Not started | - |
+| 3. Complete Collection Workflows and Portability | 0/TBD | Not started | - |
+| 4. Public Discovery and Resilient Enrichment | 0/TBD | Not started | - |
+| 5. Reproducible Experiment Harness and Baselines | 0/TBD | Not started | - |
+| 6. Explainable Content Recommendations | 0/TBD | Not started | - |
+| 7. Collaborative and Hybrid Comparison | 0/TBD | Not started | - |
+| 8. Research Panel, Hardening, and Evidence Freeze | 0/TBD | Not started | - |

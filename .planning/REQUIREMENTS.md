@@ -155,15 +155,102 @@
 
 ## Traceability
 
-Roadmap creation will map every v1 requirement to exactly one phase.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
+| AUTH-01 | Phase 1 | Pending |
+| PROF-02 | Phase 1 | Pending |
+| CAT-01 | Phase 1 | Pending |
+| CAT-03 | Phase 1 | Pending |
+| CAT-04 | Phase 1 | Pending |
+| CAT-06 | Phase 1 | Pending |
+| LIB-01 | Phase 1 | Pending |
+| LIB-02 | Phase 1 | Pending |
+| INV-01 | Phase 1 | Pending |
+| INV-02 | Phase 1 | Pending |
+| INV-05 | Phase 1 | Pending |
+| DATA-01 | Phase 1 | Pending |
+| DATA-02 | Phase 1 | Pending |
+| REC-02 | Phase 1 | Pending |
+| SEC-02 | Phase 1 | Pending |
+| OPS-01 | Phase 1 | Pending |
+| OPS-02 | Phase 1 | Pending |
+| OPS-03 | Phase 1 | Pending |
+| QUAL-03 | Phase 1 | Pending |
+| DOC-01 | Phase 1 | Pending |
+| AGENT-01 | Phase 1 | Pending |
+| AGENT-02 | Phase 1 | Pending |
+| AGENT-03 | Phase 1 | Pending |
+| AUTH-02 | Phase 2 | Pending |
+| DATA-03 | Phase 2 | Pending |
+| EVAL-01 | Phase 2 | Pending |
+| EVAL-02 | Phase 2 | Pending |
+| EVAL-03 | Phase 2 | Pending |
+| EVAL-09 | Phase 2 | Pending |
+| EVAL-10 | Phase 2 | Pending |
+| DOC-04 | Phase 2 | Pending |
+| AGENT-04 | Phase 2 | Pending |
+| PROF-01 | Phase 3 | Pending |
+| LIB-03 | Phase 3 | Pending |
+| LIB-04 | Phase 3 | Pending |
+| INV-03 | Phase 3 | Pending |
+| INV-04 | Phase 3 | Pending |
+| PORT-01 | Phase 3 | Pending |
+| PORT-02 | Phase 3 | Pending |
+| PORT-03 | Phase 3 | Pending |
+| PORT-04 | Phase 3 | Pending |
+| PRIV-01 | Phase 3 | Pending |
+| PROF-03 | Phase 4 | Pending |
+| PROF-04 | Phase 4 | Pending |
+| CAT-02 | Phase 4 | Pending |
+| CAT-05 | Phase 4 | Pending |
+| DATA-04 | Phase 4 | Pending |
+| DATA-05 | Phase 4 | Pending |
+| DATA-06 | Phase 4 | Pending |
+| DATA-07 | Phase 4 | Pending |
+| DATA-08 | Phase 4 | Pending |
+| REC-01 | Phase 5 | Pending |
+| EVAL-04 | Phase 5 | Pending |
+| EVAL-05 | Phase 5 | Pending |
+| EVAL-06 | Phase 5 | Pending |
+| EVAL-07 | Phase 5 | Pending |
+| EVAL-08 | Phase 5 | Pending |
+| EVAL-11 | Phase 5 | Pending |
+| EVAL-12 | Phase 5 | Pending |
+| QUAL-02 | Phase 5 | Pending |
+| REC-03 | Phase 6 | Pending |
+| REC-06 | Phase 6 | Pending |
+| REC-07 | Phase 6 | Pending |
+| REC-08 | Phase 6 | Pending |
+| REC-09 | Phase 6 | Pending |
+| REC-04 | Phase 7 | Pending |
+| REC-05 | Phase 7 | Pending |
+| DOC-03 | Phase 7 | Pending |
+| EVAL-13 | Phase 8 | Pending |
+| EVAL-14 | Phase 8 | Pending |
+| ADMIN-01 | Phase 8 | Pending |
+| ADMIN-02 | Phase 8 | Pending |
+| SEC-01 | Phase 8 | Pending |
+| SEC-03 | Phase 8 | Pending |
+| SEC-04 | Phase 8 | Pending |
+| SEC-05 | Phase 8 | Pending |
+| SEC-06 | Phase 8 | Pending |
+| SEC-07 | Phase 8 | Pending |
+| SEC-08 | Phase 8 | Pending |
+| PRIV-02 | Phase 8 | Pending |
+| OPS-04 | Phase 8 | Pending |
+| OPS-05 | Phase 8 | Pending |
+| QUAL-01 | Phase 8 | Pending |
+| QUAL-04 | Phase 8 | Pending |
+| DOC-02 | Phase 8 | Pending |
+| DOC-05 | Phase 8 | Pending |
+| DOC-06 | Phase 8 | Pending |
+| AGENT-05 | Phase 8 | Pending |
+| AGENT-06 | Phase 8 | Pending |
 
 **Coverage:**
 - v1 requirements: 89 total
-- Mapped to phases: 0
-- Unmapped: 89
+- Mapped to phases: 89
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-09-04*
