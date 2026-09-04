@@ -86,10 +86,10 @@ class Command(BaseCommand):
 
             for interaction in interactions:
                 try:
-                    work = GameWork.objects.get(id=interaction["work_id"])
+                    work = GameWork.objects.get(canonical_slug=interaction["work_slug"])
                 except GameWork.DoesNotExist as exc:
                     raise CommandError(
-                        f"Seed references unknown work {interaction['work_id']} -- "
+                        f"Seed references unknown work slug '{interaction['work_slug']}' -- "
                         "run import_catalogue before seed_demo."
                     ) from exc
 
@@ -101,14 +101,18 @@ class Command(BaseCommand):
 
         # Read-only verification of what was just committed, against the
         # manifest's own declared expectation -- catches data or
-        # popularity-formula drift immediately rather than silently.
+        # popularity-formula drift immediately rather than silently. Compared
+        # by slug, never by GameWork.id: that primary key is a random UUID
+        # assigned fresh by every independent import_catalogue run (Neon,
+        # local, CI...), so it can never be a portable, checksummed manifest
+        # value -- canonical_slug is the deterministic identity that is.
         expected = seed["expected_popularity_v1"]["results"]
-        expected_ids = {row["work_id"] for row in expected}
+        expected_slugs = {row["slug"] for row in expected}
         actual = rank_popularity_v1()
         actual_subset = [
-            {"work_id": row["work_id"], "slug": row["slug"], "score": row["score"]}
+            {"slug": row["slug"], "score": row["score"]}
             for row in actual["results"]
-            if row["work_id"] in expected_ids
+            if row["slug"] in expected_slugs
         ]
         if actual_subset != expected:
             raise CommandError(

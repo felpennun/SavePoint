@@ -101,12 +101,20 @@ def demo_account(db):  # noqa: ANN001
 
 @pytest.fixture
 def seeded_works(db):  # noqa: ANN001
-    """Create GameWork rows matching the manifest's referenced UUIDs."""
+    """Create GameWork rows matching the manifest's referenced slugs.
+
+    Deliberately lets GameWork.id take its normal random-uuid4 default
+    instead of pinning it -- a real import_catalogue run never produces the
+    same id twice across independent databases, so a test fixture that
+    hardcoded one would mask exactly the portability bug this behavior once
+    had (seed_demo used to look works up by id, which only worked locally
+    because the dev database happened to already contain those exact random
+    values from an earlier import).
+    """
     manifest = _load_manifest()
     works = []
     for interaction in manifest["interactions"]:
         work = GameWork.objects.create(
-            id=interaction["work_id"],
             canonical_slug=interaction["work_slug"],
             original_title=interaction["work_slug"],
         )
@@ -142,14 +150,14 @@ def test_seed_loads_and_matches_expected_popularity_exactly(demo_account, seeded
     from library.popularity import rank_popularity_v1
 
     actual = rank_popularity_v1()
-    expected_ids = [row["work_id"] for row in manifest["expected_popularity_v1"]["results"]]
-    actual_ids_in_order = [r["work_id"] for r in actual["results"] if r["work_id"] in set(expected_ids)]
-    assert actual_ids_in_order == expected_ids
+    expected_slugs = [row["slug"] for row in manifest["expected_popularity_v1"]["results"]]
+    actual_slugs_in_order = [r["slug"] for r in actual["results"] if r["slug"] in set(expected_slugs)]
+    assert actual_slugs_in_order == expected_slugs
 
-    expected_scores = {row["work_id"]: row["score"] for row in manifest["expected_popularity_v1"]["results"]}
+    expected_scores = {row["slug"]: row["score"] for row in manifest["expected_popularity_v1"]["results"]}
     for row in actual["results"]:
-        if row["work_id"] in expected_scores:
-            assert row["score"] == expected_scores[row["work_id"]]
+        if row["slug"] in expected_scores:
+            assert row["score"] == expected_scores[row["slug"]]
 
 
 @pytest.mark.django_db
