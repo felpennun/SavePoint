@@ -1,0 +1,47 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-09-04T21:05:16.782Z",
+  "phase": "01",
+  "phase_name": "Three-Day Public Demo Slice",
+  "phase_dir": ".planning/phases/01-three-day-public-demo-slice",
+  "plan": 12,
+  "task": 2,
+  "total_tasks": 2,
+  "status": "paused",
+  "completed_tasks": [
+    {"id": 1, "name": "Prepare secure public deployment contract", "status": "done", "commit": "efda1c5"},
+    {"id": 2, "name": "Prepare deployed smoke test", "status": "in_progress", "progress": "Neon production configured; Render Blueprint and argv-safe startup published; public URLs and green smoke still pending"}
+  ],
+  "remaining_tasks": [
+    {"id": 2, "name": "Finish Render and Vercel provisioning, run deployed smoke, record evidence", "status": "in_progress"},
+    {"id": 14, "name": "Run final human verification and sign off Phase 1", "status": "not_started"}
+  ],
+  "blockers": [
+    {"description": "Render must successfully deploy commit 17580cc and expose a green /health/ endpoint", "type": "human_action", "workaround": "Manual Deploy > Deploy latest commit, then inspect logs"},
+    {"description": "Vercel Hobby project and API_PROXY_TARGET are not yet finalized", "type": "human_action", "workaround": "Import apps/web after the Render HTTPS URL is known"},
+    {"description": "Public Playwright smoke has not run", "type": "external", "workaround": "Run after both provider URLs are configured"}
+  ],
+  "async_jobs": [],
+  "human_actions_pending": [
+    {"action": "Redeploy Render from commit 17580cc and confirm startup plus /health/", "context": "Previous deployments exposed Render dockerCommand parsing failures; the startup script fix is now published", "blocking": true},
+    {"action": "Create/configure Vercel Hobby project rooted at apps/web", "context": "Set server-only API_PROXY_TARGET to the final Render HTTPS origin", "blocking": true},
+    {"action": "Replace Render DJANGO_CSRF_TRUSTED_ORIGINS with the final Vercel production origin", "context": "Preserves the same-origin session and CSRF boundary", "blocking": true},
+    {"action": "Run deployed smoke and record URLs, commit and UTC result", "context": "Required to close OPS-01 and Plan 01-12", "blocking": true}
+  ],
+  "decisions": [
+    {"decision": "Docker Compose remains the canonical local environment", "rationale": "Reproducible offline tribunal demo with web, API and PostgreSQL", "phase": "01"},
+    {"decision": "Use Vercel Hobby + Render Free + Neon Free with no payment card", "rationale": "Zero-cost public demonstration while retaining the API Docker image", "phase": "01"},
+    {"decision": "Proxy /api/* and /health/ through Vercel", "rationale": "Keep browser-visible requests and Django session cookies same-origin", "phase": "01"},
+    {"decision": "Render receives Neon's direct/unpooled connection in DATABASE_URL", "rationale": "Migrations and advisory locks require a session-scoped direct connection", "phase": "01"}
+  ],
+  "uncommitted_files": [
+    ".planning/config.json",
+    ".agents/skills/neon*/",
+    ".claude/skills/",
+    ".gsd/",
+    ".planning/milestone.lock",
+    "skills-lock.json"
+  ],
+  "next_action": "In Render, deploy latest commit 17580cc and verify the logs progress through migrate, import_catalogue, bootstrap_demo_account, seed_demo, then bind the server and make /health/ green.",
+  "context_notes": "Neon project autumn-breeze-06234770 branch production is linked and reconciled. Secrets live only in ignored .env.local/provider UIs. Never paste connection strings or credentials into chat or Git. origin/main and local HEAD are 17580cc."
+}
