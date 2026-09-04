@@ -1,0 +1,80 @@
+{
+  "account_anchor_id": "00000000-0000-0000-0000-000000000001",
+  "cutoff": "2026-09-04T18:15:00Z",
+  "expected_popularity_v1": {
+    "algorithm_id": "popularity-v1",
+    "results": [
+      {
+        "score": 4.0,
+        "slug": "007-legends-q161192",
+        "work_id": "9229d748-def4-4a4d-8947-40986fd8dd73"
+      },
+      {
+        "score": 3.0,
+        "slug": "0-ad-q161234",
+        "work_id": "97c49a82-9246-4ee4-b813-8288dbb78c1a"
+      },
+      {
+        "score": 2.8,
+        "slug": "007-licence-to-kill-q55538",
+        "work_id": "76ebaeae-9d81-472f-9ccd-f6dd0f27407c"
+      },
+      {
+        "score": 2.0,
+        "slug": "1943-the-battle-of-midway-q55535",
+        "work_id": "987279f6-a504-48b4-bf86-8328cabd0e1f"
+      },
+      {
+        "score": 1.6,
+        "slug": "10th-frame-q55536",
+        "work_id": "9210eac6-5060-4c9c-847b-2a26ed2e93b3"
+      },
+      {
+        "score": 0.2,
+        "slug": "19-part-one-boot-camp-q55555",
+        "work_id": "52429201-5443-4eb8-b988-854a9f0fd1b6"
+      }
+    ]
+  },
+  "interactions": [
+    {
+      "rating_half_steps": 10,
+      "status": "completed",
+      "work_id": "9229d748-def4-4a4d-8947-40986fd8dd73",
+      "work_slug": "007-legends-q161192"
+    },
+    {
+      "rating_half_steps": null,
+      "status": "completed",
+      "work_id": "97c49a82-9246-4ee4-b813-8288dbb78c1a",
+      "work_slug": "0-ad-q161234"
+    },
+    {
+      "rating_half_steps": 8,
+      "status": "playing",
+      "work_id": "76ebaeae-9d81-472f-9ccd-f6dd0f27407c",
+      "work_slug": "007-licence-to-kill-q55538"
+    },
+    {
+      "rating_half_steps": null,
+      "status": "playing",
+      "work_id": "987279f6-a504-48b4-bf86-8328cabd0e1f",
+      "work_slug": "1943-the-battle-of-midway-q55535"
+    },
+    {
+      "rating_half_steps": 6,
+      "status": "pending",
+      "work_id": "9210eac6-5060-4c9c-847b-2a26ed2e93b3",
+      "work_slug": "10th-frame-q55536"
+    },
+    {
+      "rating_half_steps": 2,
+      "status": "abandoned",
+      "work_id": "52429201-5443-4eb8-b988-854a9f0fd1b6",
+      "work_slug": "19-part-one-boot-camp-q55555"
+    }
+  ],
+  "interactions_sha256": "6a8e21fca2530f8a975fcdb61f2b91f19ae062d19a1566293cf7dae67719cea5",
+  "schema_version": 1,
+  "seed_version": "seed-v1"
+}
