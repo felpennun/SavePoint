@@ -27,6 +27,38 @@ from library.serializers import (
 VALID_STATUSES = {choice.value for choice in BacklogStatus}
 
 
+class MyLibraryView(APIView):
+    """GET /api/library/entries/ -- the caller's own collection (Collection
+    page, D-13/D-14). Owner-scoped by construction: filtered to
+    request.user, never accepts a target user."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request) -> Response:
+        entries = (
+            LibraryEntry.objects.filter(user=request.user)
+            .exclude(current_status__isnull=True)
+            .select_related("work")
+            .prefetch_related("work__source_records")
+            .order_by("work__original_title", "id")
+        )
+        items = []
+        summary = {choice.value: 0 for choice in BacklogStatus}
+        for entry in entries:
+            summary[entry.current_status] += 1
+            items.append(
+                {
+                    "work_id": str(entry.work_id),
+                    "work_slug": entry.work.canonical_slug,
+                    "work_title": entry.work.title_en or entry.work.original_title,
+                    "status": entry.current_status,
+                    "rating_half_steps": entry.rating_half_steps,
+                    "owned_copy_count": OwnedCopy.objects.filter(user=request.user, work=entry.work).count(),
+                }
+            )
+        return Response({"items": items, "summary": summary})
+
+
 class SetStatusView(APIView):
     """GET/POST /api/library/entries/<work_id>/status/
 

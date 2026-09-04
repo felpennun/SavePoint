@@ -1,11 +1,8 @@
 import Link from "next/link";
 
+import { GameCard } from "@/components/GameCard";
+import { formatCount, getDictionary } from "@/i18n";
 import { fetchCatalogueList } from "@/lib/api";
-
-const COPY = {
-  es: { heading: "Catálogo", empty: "No encontramos juegos", searchLabel: "Buscar juegos" },
-  en: { heading: "Catalogue", empty: "No games found", searchLabel: "Search games" },
-} as const;
 
 export default async function CataloguePage({
   params,
@@ -16,33 +13,52 @@ export default async function CataloguePage({
 }) {
   const { locale: rawLocale } = await params;
   const locale = rawLocale === "en" ? "en" : "es";
-  const copy = COPY[locale];
+  const dict = getDictionary(locale);
   const { q, page } = await searchParams;
+  const currentPage = page ? Number(page) : 1;
 
-  const result = await fetchCatalogueList({ q, page: page ? Number(page) : undefined });
+  const result = await fetchCatalogueList({ q, page: currentPage });
 
   return (
     <main>
-      <h1>{copy.heading}</h1>
+      <h1>{dict.catalogue.heading}</h1>
       <form action={`/${locale}/catalogue`} method="get">
-        <label htmlFor="q">{copy.searchLabel}</label>
+        <label htmlFor="q">{dict.catalogue.searchLabel}</label>
         <input id="q" name="q" type="search" defaultValue={q ?? ""} />
-        <button type="submit">{copy.searchLabel}</button>
+        <button type="submit">{dict.catalogue.searchLabel}</button>
+        {q ? (
+          <Link href={`/${locale}/catalogue`}>{dict.catalogue.clearSearch}</Link>
+        ) : null}
       </form>
-      <p data-testid="result-count">{result.count}</p>
+      <p data-testid="result-count" role="status">
+        {formatCount(dict.catalogue.resultCount, result.count)}
+      </p>
       {result.results.length === 0 ? (
-        <p>{copy.empty}</p>
+        <div>
+          <p>{dict.catalogue.emptyHeading}</p>
+          <p>{dict.catalogue.emptyBody}</p>
+        </div>
       ) : (
-        <ul>
-          {result.results.map((game) => (
-            <li key={game.id}>
-              <Link href={`/${locale}/games/${game.slug}`}>
-                {game.title}
-                {game.year ? ` (${game.year})` : ""} — {game.platform_summary}
+        <>
+          <ul className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(144px, 1fr))" }}>
+            {result.results.map((game) => (
+              <GameCard key={game.id} game={game} locale={locale} />
+            ))}
+          </ul>
+          <nav aria-label={locale === "es" ? "Paginación" : "Pagination"}>
+            {currentPage > 1 ? (
+              <Link href={`/${locale}/catalogue?${new URLSearchParams({ ...(q ? { q } : {}), page: String(currentPage - 1) })}`}>
+                {locale === "es" ? "Anterior" : "Previous"}
               </Link>
-            </li>
-          ))}
-        </ul>
+            ) : null}
+            <span aria-current="page">{currentPage}</span>
+            {result.has_next ? (
+              <Link href={`/${locale}/catalogue?${new URLSearchParams({ ...(q ? { q } : {}), page: String(currentPage + 1) })}`}>
+                {locale === "es" ? "Siguiente" : "Next"}
+              </Link>
+            ) : null}
+          </nav>
+        </>
       )}
     </main>
   );

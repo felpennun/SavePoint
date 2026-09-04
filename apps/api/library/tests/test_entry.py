@@ -42,6 +42,37 @@ def _client_for(user) -> APIClient:  # noqa: ANN001
 
 
 @pytest.mark.django_db
+def test_my_library_lists_only_entries_with_a_status(work, user_a) -> None:  # noqa: ANN001
+    other_work = GameWork.objects.create(canonical_slug="untouched-game", original_title="Untouched Game")
+    GameWork.objects.create(canonical_slug="no-status-game", original_title="No Status Game")
+    LibraryEntry.objects.create(user=user_a, work=work, current_status="playing")
+    LibraryEntry.objects.create(user=user_a, work=other_work, current_status=None)  # never actioned
+
+    client = _client_for(user_a)
+    response = client.get("/api/library/entries/")
+    assert response.status_code == 200
+    body = response.json()
+    assert len(body["items"]) == 1
+    assert body["items"][0]["work_slug"] == "tracer-game"
+    assert body["summary"]["playing"] == 1
+    assert body["summary"]["pending"] == 0
+
+
+@pytest.mark.django_db
+def test_my_library_is_owner_scoped(work, user_a, user_b) -> None:  # noqa: ANN001
+    LibraryEntry.objects.create(user=user_a, work=work, current_status="completed")
+
+    response_b = _client_for(user_b).get("/api/library/entries/")
+    assert response_b.json()["items"] == []
+
+
+@pytest.mark.django_db
+def test_my_library_requires_authentication(work) -> None:  # noqa: ANN001
+    response = APIClient().get("/api/library/entries/")
+    assert response.status_code in (401, 403)
+
+
+@pytest.mark.django_db
 def test_set_status_persists_and_reloads(work, user_a) -> None:  # noqa: ANN001
     client = _client_for(user_a)
     response = client.post(f"/api/library/entries/{work.id}/status/", {"status": "playing"}, format="json")

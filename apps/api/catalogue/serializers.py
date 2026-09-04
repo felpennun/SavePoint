@@ -71,13 +71,15 @@ class ReleaseSerializer(serializers.Serializer):
     release_name = serializers.CharField()
     release_date = serializers.DateField(allow_null=True)
     platform = serializers.SerializerMethodField()
+    # id+name pairs, not just names -- the copy-creation form (D-15) needs
+    # a real edition_id to submit, not just a display label.
     editions = serializers.SerializerMethodField()
 
     def get_platform(self, release: GameRelease) -> str | None:
         return release.platform.name if release.platform_id else None
 
-    def get_editions(self, release: GameRelease) -> list[str]:
-        return [edition.name for edition in release.editions.all()]
+    def get_editions(self, release: GameRelease) -> list[dict]:
+        return [{"id": str(edition.id), "name": edition.name} for edition in release.editions.all()]
 
 
 class RelatedContentSerializer(serializers.Serializer):

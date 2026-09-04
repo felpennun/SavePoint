@@ -85,10 +85,13 @@ test.describe("demo account login journey (AUTH-01, D-02/D-03, LIB-01)", () => {
     await page.waitForURL(/\/es\/catalogue$/);
     await expect(page.getByRole("heading", { name: "Catálogo" })).toBeVisible();
 
+    // GameCard renders title and year/platform as separate paragraphs
+    // within the same link -- target the title paragraph specifically
+    // rather than the link's full (multi-line) innerText.
     const firstGameLink = page.locator("main ul li a").first();
-    const gameTitle = await firstGameLink.innerText();
+    const gameTitle = (await firstGameLink.locator("p").first().innerText()).trim();
     await firstGameLink.click();
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText(new RegExp(gameTitle.split(" — ")[0].trim().split(" (")[0]));
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(gameTitle);
 
     // Set a status, save, and confirm the UI never claims success before
     // the request actually completes.
@@ -102,6 +105,28 @@ test.describe("demo account login journey (AUTH-01, D-02/D-03, LIB-01)", () => {
     // prove end-to-end.
     await page.reload();
     await expect(page.getByRole("radio", { name: "Jugando" })).toBeChecked();
+
+    // Plan 01-09 acceptance criteria: save a 3.5-star rating (7 half-steps)
+    // and two owned copies, then confirm both survive a reload. Copy count
+    // is asserted as a delta, not an absolute number -- this suite runs
+    // against the persistent dev database (not an isolated per-run test
+    // DB), so a fixed "exactly N copies" assertion would break on any
+    // second run against the same environment.
+    const copyListLocator = page.locator("main").getByText(/^(Física|Digital)$/);
+    const copyCountBefore = await copyListLocator.count();
+
+    await page.locator("#rating-range").fill("7");
+    await page.getByRole("button", { name: "Guardar valoración" }).click();
+    await expect(page.getByTestId("rating-feedback")).toHaveText("Valoración guardada");
+
+    await page.getByRole("button", { name: "Añadir copia" }).click();
+    await expect(page.getByTestId("copy-feedback")).toHaveText("Copia añadida");
+    await page.getByRole("button", { name: "Añadir copia" }).click();
+    await expect(page.getByTestId("copy-feedback")).toHaveText("Copia añadida");
+
+    await page.reload();
+    await expect(page.locator("#rating-range")).toHaveValue("7");
+    await expect(page.locator("main").getByText(/^(Física|Digital)$/)).toHaveCount(copyCountBefore + 2);
   });
 
   test("logout invalidates the session and protected pages redirect to login", async ({ page, context }) => {

@@ -1,9 +1,9 @@
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 
-import { fetchGameDetail } from "@/lib/api";
-
-import StatusControl from "./StatusControl";
+import { LibraryControls } from "@/components/LibraryControls";
+import { RecommendationStrip } from "@/components/RecommendationStrip";
+import { fetchGameDetail, fetchPopularity } from "@/lib/api";
 
 const COPY = {
   es: { notAvailable: "No disponible", provenance: "Procedencia" },
@@ -27,6 +27,16 @@ export default async function GameDetailPage({
   const cookieStore = await cookies();
   const isAuthenticated = cookieStore.has("sessionid");
 
+  // Popularity is a secondary panel (UI-SPEC "partial" state contract):
+  // its own failure must never blank the page or hide the core record.
+  let popularityResults: Awaited<ReturnType<typeof fetchPopularity>>["results"] = [];
+  try {
+    const popularity = await fetchPopularity();
+    popularityResults = popularity.results.filter((r) => r.work_id !== game.id).slice(0, 5);
+  } catch {
+    popularityResults = [];
+  }
+
   return (
     <main>
       <h1>{game.title}</h1>
@@ -35,7 +45,7 @@ export default async function GameDetailPage({
       {game.cover.is_placeholder ? (
         <p data-testid="cover-placeholder">placeholder</p>
       ) : (
-        // eslint-disable-next-line @next/next/no-img-element -- Plan 01-08 (UI wave) replaces with next/image + UI-SPEC CoverImage component.
+        // eslint-disable-next-line @next/next/no-img-element -- lawful placeholder/cover, allowlisted host only
         <img src={game.cover.url ?? undefined} alt={game.cover.alt} width={280} height={373} />
       )}
 
@@ -44,7 +54,7 @@ export default async function GameDetailPage({
           {game.releases.map((release) => (
             <li key={release.id}>
               {release.platform ?? copy.notAvailable}
-              {release.editions.length > 0 ? ` — ${release.editions.join(", ")}` : ""}
+              {release.editions.length > 0 ? ` — ${release.editions.map((e) => e.name).join(", ")}` : ""}
             </li>
           ))}
         </ul>
@@ -63,7 +73,9 @@ export default async function GameDetailPage({
         </section>
       ) : null}
 
-      <StatusControl workId={game.id} locale={locale} isAuthenticated={isAuthenticated} />
+      <LibraryControls workId={game.id} locale={locale} isAuthenticated={isAuthenticated} releases={game.releases} />
+
+      <RecommendationStrip results={popularityResults} locale={locale} />
 
       {game.provenance ? (
         <section aria-label={copy.provenance}>

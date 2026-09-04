@@ -7,7 +7,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from catalogue.models import GameWork
+from catalogue.models import AssetAttribution, GameWork, SourceRecord
 from catalogue.search import DEFAULT_PAGE_SIZE, search_games
 from catalogue.serializers import GameCardSerializer, GameDetailSerializer
 
@@ -52,3 +52,28 @@ class GameDetailView(APIView):
             # Generic 404 -- never confirm/deny via a distinguishing message.
             return Response({"detail": "Not found."}, status=404)
         return Response(GameDetailSerializer(work).data)
+
+
+class SourcesView(APIView):
+    """GET /api/catalogue/sources/ -- dataset provenance summary for the
+    Sources & Methodology page (DATA-02, D-08). Derived from the already-
+    imported SourceRecord/AssetAttribution rows, not by re-reading raw
+    manifest files across a service boundary."""
+
+    def get(self, request: Request) -> Response:
+        record = SourceRecord.objects.order_by("-retrieved_at").first()
+        if record is None:
+            return Response({"detail": "Sources unavailable."}, status=503)
+
+        return Response(
+            {
+                "source": record.source,
+                "source_url": record.source_url,
+                "licence": record.licence,
+                "retrieved_at": record.retrieved_at,
+                "snapshot_sha256": record.snapshot_sha256,
+                "record_count": GameWork.objects.count(),
+                "approved_asset_count": AssetAttribution.objects.filter(display_allowed=True).count(),
+                "total_asset_candidate_count": AssetAttribution.objects.count(),
+            }
+        )

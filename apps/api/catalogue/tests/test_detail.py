@@ -22,7 +22,7 @@ def test_detail_includes_hierarchy_and_provenance() -> None:
     release = GameRelease.objects.create(
         work=work, platform=platform, release_name="The Base Game (PC)", release_date=date(2020, 5, 1)
     )
-    Edition.objects.create(release=release, name="Deluxe Edition")
+    edition = Edition.objects.create(release=release, name="Deluxe Edition")
     SourceRecord.objects.create(
         work=work,
         source="wikidata",
@@ -42,7 +42,7 @@ def test_detail_includes_hierarchy_and_provenance() -> None:
     assert body["year"] == 2020
     assert len(body["releases"]) == 1
     assert body["releases"][0]["platform"] == "PC"
-    assert body["releases"][0]["editions"] == ["Deluxe Edition"]
+    assert body["releases"][0]["editions"] == [{"id": str(edition.id), "name": "Deluxe Edition"}]
 
     provenance = body["provenance"]
     assert provenance["source"] == "wikidata"
