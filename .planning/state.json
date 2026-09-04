@@ -1,0 +1,53 @@
+{
+  "contract": "1.0.0",
+  "flavor": "core",
+  "milestone": null,
+  "phases": [
+    {
+      "number": "1",
+      "name": "Three-Day Public Demo Slice",
+      "status": "pending"
+    },
+    {
+      "number": "2",
+      "name": "Governed Corpus and Frozen Evaluation Contract",
+      "status": "pending"
+    },
+    {
+      "number": "3",
+      "name": "Complete Collection Workflows and Portability",
+      "status": "pending"
+    },
+    {
+      "number": "4",
+      "name": "Public Discovery and Resilient Enrichment",
+      "status": "pending"
+    },
+    {
+      "number": "5",
+      "name": "Reproducible Experiment Harness and Baselines",
+      "status": "pending"
+    },
+    {
+      "number": "6",
+      "name": "Explainable Content Recommendations",
+      "status": "pending"
+    },
+    {
+      "number": "7",
+      "name": "Collaborative and Hybrid Comparison",
+      "status": "pending"
+    },
+    {
+      "number": "8",
+      "name": "Research Panel, Hardening, and Evidence Freeze",
+      "status": "pending"
+    }
+  ],
+  "next": {
+    "command": "/gsd:progress --next",
+    "label": "Advance to the next step",
+    "reason": "Phase 1 of 8 · 0% · executing"
+  },
+  "updated_at": "2026-09-04T13:18:00.609Z"
+}
