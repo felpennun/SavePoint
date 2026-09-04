@@ -39,7 +39,7 @@ SavePoint begins with a three-day, publicly deployed vertical demonstration, the
   4. A clean machine can start the same demo from documented, pinned instructions without Internet/API dependency, and no secret appears in Git, browser assets, logs, images, or public artifacts.
   5. The demo is keyboard-usable and responsive at desktop/mobile widths, and its source/legal record, architecture rationale, agent inputs/outputs, verification, limitations, and author decisions are captured as thesis evidence.
 
-**Plans**: 1/16 plans executed
+**Plans**: 4/16 plans executed
 
 Plans:
 **Wave 1**
@@ -48,12 +48,12 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 01-02-PLAN.md — Crear Compose inicial y runners no vacíos
+- [x] 01-02-PLAN.md — Crear Compose inicial y runners no vacíos
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 01-03-PLAN.md — Verificar scaffold Django/Next/PostgreSQL
-- [ ] 01-05-PLAN.md — Adquirir y congelar corpus/assets
+- [x] 01-03-PLAN.md — Verificar scaffold Django/Next/PostgreSQL
+- [x] 01-05-PLAN.md — Adquirir y congelar corpus/assets
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
@@ -225,7 +225,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Three-Day Public Demo Slice | 1/16 | In Progress|  |
+| 1. Three-Day Public Demo Slice | 4/16 | In Progress|  |
 | 2. Governed Corpus and Frozen Evaluation Contract | 0/TBD | Not started | - |
 | 3. Complete Collection Workflows and Portability | 0/TBD | Not started | - |
 | 4. Public Discovery and Resilient Enrichment | 0/TBD | Not started | - |
