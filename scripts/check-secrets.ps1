@@ -28,7 +28,9 @@
 #>
 
 [CmdletBinding()]
-param()
+param(
+    [switch]$IncludeDeployment
+)
 
 # "Continue", not "Stop": every native docker/git call below is checked
 # explicitly via $LASTEXITCODE/output, and PowerShell 5.1 wraps a native
@@ -209,6 +211,27 @@ if ($gitScanned -eq 0) {
     $ExitCode = 1
 } else {
     Write-Host "Scanned $gitScanned Git-tracked file(s)."
+}
+
+if ($IncludeDeployment) {
+    Write-Host "`n== Phase 1b: deployment sources ==" -ForegroundColor Cyan
+    $deploymentPaths = @("infra/render.yaml", "docs/deployment/public-demo.md", "e2e/deployed-smoke.spec.ts")
+    $deploymentScanned = 0
+    foreach ($relPath in $deploymentPaths) {
+        $fullPath = Join-Path $RepoRoot $relPath
+        if (-not (Test-Path $fullPath -PathType Leaf)) { continue }
+        $text = Get-Content -LiteralPath $fullPath -Raw
+        $deploymentScanned++
+        $exempt = Get-ExemptPatternNames -RelPath $relPath
+        $hits = Test-Content -Text $text -Origin "deployment:$relPath" | Where-Object { $exempt -notcontains $_.Pattern }
+        foreach ($h in $hits) { $allHits.Add($h) }
+    }
+    if ($deploymentScanned -ne $deploymentPaths.Count) {
+        Write-Host "FAIL: deployment scan covered $deploymentScanned/$($deploymentPaths.Count) required file(s)." -ForegroundColor Red
+        $ExitCode = 1
+    } else {
+        Write-Host "Scanned all $deploymentScanned deployment source file(s), including infra/render.yaml."
+    }
 }
 
 # ---------------------------------------------------------------------------

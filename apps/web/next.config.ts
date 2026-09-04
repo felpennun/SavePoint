@@ -5,7 +5,11 @@ import type { NextConfig } from "next";
 // cookies Django sets stay same-origin and no CORS-with-credentials
 // configuration is needed (avoids the anti-pattern flagged in project
 // research: "Introducir CORS con cookies sin necesidad").
-const API_PROXY_TARGET = process.env.API_PROXY_TARGET ?? "http://127.0.0.1:8000";
+const rawApiProxyTarget = process.env.API_PROXY_TARGET ?? "http://127.0.0.1:8000";
+// Render's safe `fromService.property: hostport` is a private-network
+// host:port without a scheme. Compose supplies a complete URL. Accept both
+// forms without exposing the value to the browser bundle.
+const API_PROXY_TARGET = rawApiProxyTarget.includes("://") ? rawApiProxyTarget : `http://${rawApiProxyTarget}`;
 
 const nextConfig: NextConfig = {
   // Two fixes needed together for the Django proxy, both about the same
@@ -20,7 +24,12 @@ const nextConfig: NextConfig = {
   // stripping -- an infinite loop.
   skipTrailingSlashRedirect: true,
   async rewrites() {
-    return [{ source: "/api/:path*", destination: `${API_PROXY_TARGET}/api/:path*/` }];
+    return [
+      { source: "/api/:path*", destination: `${API_PROXY_TARGET}/api/:path*/` },
+      // Same-origin deployment evidence endpoint. The browser smoke never
+      // needs (or learns) the API service's separate provider hostname.
+      { source: "/health/", destination: `${API_PROXY_TARGET}/health/` },
+    ];
   },
 };
 

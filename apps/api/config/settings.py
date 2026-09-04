@@ -14,6 +14,11 @@ ALLOWED_HOSTS = [
     for host in os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,testserver").split(",")
     if host.strip()
 ]
+if render_hostname := os.environ.get("RENDER_EXTERNAL_HOSTNAME"):
+    # Provider-owned, non-user input: required because Render health checks
+    # use the public service hostname in Host even though application traffic
+    # from the web proxy arrives over the private network.
+    ALLOWED_HOSTS.append(render_hostname)
 
 INSTALLED_APPS = [
     "django.contrib.auth",
@@ -149,4 +154,3 @@ else:
         "security.W012",  # SESSION_COOKIE_SECURE -- plain HTTP locally
         "security.W016",  # CSRF_COOKIE_SECURE -- plain HTTP locally
     ]
-

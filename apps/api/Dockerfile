@@ -21,6 +21,10 @@ RUN groupadd --system --gid 10001 savepoint \
 WORKDIR /workspace
 COPY --from=dependencies --chown=savepoint:savepoint /workspace/.venv /workspace/.venv
 COPY --chown=savepoint:savepoint apps/api ./apps/api
+# The deployment pre-release import is intentionally offline. Compose mounts
+# this directory read-only in development; the immutable production image must
+# carry the same frozen inputs because no host bind mount exists on a PaaS.
+COPY --chown=savepoint:savepoint data ./data
 RUN ln -s /workspace/apps/api/manage.py /workspace/manage.py
 USER 10001:10001
 CMD ["pytest", "apps/api/tests", "-q"]
