@@ -63,5 +63,10 @@ export function middleware(request: NextRequest): NextResponse {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next|favicon.ico).*)"],
+  // health must be excluded alongside api: next.config.ts rewrites /health/
+  // straight to the API's own health check (the deployment smoke's revision
+  // marker), but that rewrite never runs if the middleware gets to it first
+  // -- "health" isn't a supported locale, so it was being 307-redirected to
+  // /es/health/ instead of proxied, breaking the health check itself.
+  matcher: ["/((?!api|health|_next|favicon.ico).*)"],
 };
