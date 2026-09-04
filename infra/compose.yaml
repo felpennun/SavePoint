@@ -26,17 +26,27 @@ services:
     environment:
       DATABASE_URL: postgresql://savepoint_test:local_test_only@db:5432/savepoint_test
       DJANGO_SECRET_KEY: local-development-only-not-a-secret
+      DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,testserver,api"
       POSTGRES_DB: savepoint_test
       POSTGRES_USER: savepoint_test
       POSTGRES_PASSWORD: local_test_only
       POSTGRES_HOST: db
       POSTGRES_PORT: "5432"
+      # Local-development-only demo credentials, same spirit as
+      # DJANGO_SECRET_KEY above -- not infrastructure secrets (D-02).
+      # Override with real values via `docker compose run -e` for anything
+      # beyond local dev.
+      DEMO_USERNAME: demo-visitor
+      DEMO_PASSWORD: SavePoint-Demo-2026-Visit!
     depends_on:
       db:
         condition: service_healthy
     security_opt:
       - no-new-privileges:true
     init: true
+    ports:
+      - "8000:8000"
+    command: python manage.py runserver 0.0.0.0:8000
     # Local-development-only bind mounts (#dev-parity): the image built by
     # apps/api/Dockerfile only COPYs apps/api/ at build time, so without these
     # mounts every `docker compose run` sees whatever code existed at the last
@@ -54,12 +64,23 @@ services:
     build:
       context: ..
       dockerfile: apps/web/Dockerfile
+    environment:
+      # Server-side only (never NEXT_PUBLIC_*) -- same-origin proxy target for
+      # the Next.js rewrite in next.config.ts, so the browser only ever talks
+      # to `web`'s own origin and the Django session/CSRF cookies stay
+      # same-origin (avoids needing CORS-with-credentials, per research A1).
+      API_PROXY_TARGET: http://api:8000
     depends_on:
       db:
         condition: service_healthy
+      api:
+        condition: service_started
     security_opt:
       - no-new-privileges:true
     init: true
+    ports:
+      - "3000:3000"
+    command: pnpm --dir apps/web dev --hostname 0.0.0.0 --port 3000
     volumes:
       - ../apps/web:/workspace/apps/web
       - /workspace/apps/web/node_modules
