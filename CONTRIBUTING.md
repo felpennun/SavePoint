@@ -15,12 +15,12 @@ Work beyond a trivial fix is tracked as a GitHub Issue on
 
 ### GSD planning → issue lifecycle
 
-- When a phase is planned (`gsd-plan-phase`), create one GitHub Issue per `<task>` block inside each
-  generated `*-PLAN.md` (a plan with Task 1 and Task 2 gets two issues), labelled with that phase and
-  added to the SavePoint project board.
-- During execution (`gsd-execute-phase` or manual), close each task's issue as it completes — normally
-  via a `Closes #N` trailer on the commit that finishes it (see below), or directly if there is no single
-  closing commit.
+- When a phase is planned (`gsd-plan-phase`), create one GitHub Issue per generated `*-PLAN.md` (not per
+  `<task>` block inside it — a plan with Task 1 and Task 2 is still a single issue), labelled with that
+  phase and added to the SavePoint project board.
+- During execution (`gsd-execute-phase` or manual), close each plan's issue once its `*-SUMMARY.md` is
+  written — normally via a `Closes #N` trailer on the commit that finishes the plan (see below), or
+  directly if there is no single closing commit.
 - The board should stay a live mirror of `.planning/` plan/task state, not a separate tracker that can
   drift out of sync with it.
 
