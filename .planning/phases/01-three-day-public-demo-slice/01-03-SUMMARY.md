@@ -64,3 +64,4 @@ Migration applied tables: `contenttypes`, `auth`, `sessions`, `catalogue.gamewor
 
 - **01-04**: Session/auth tracer — Django session middleware is already enabled; `LibraryEntry` and `GameWork` tables are migrated and ready for CRUD endpoints.
 - **01-05**: Curated corpus and manifests — catalogue schema is in place.
+

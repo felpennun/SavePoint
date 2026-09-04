@@ -33,26 +33,64 @@ COMMONS_API = "https://commons.wikimedia.org/w/api.php"
 ALLOWED_HOSTS = frozenset({"query.wikidata.org", "commons.wikimedia.org"})
 USER_AGENT = "SavePoint-TFG/0.1 (academic dataset acquisition; contact: repository issue tracker)"
 MAX_BYTES = 20 * 1024 * 1024
-TIMEOUT_SECONDS = 30
+TIMEOUT_SECONDS = 60
 MAX_REDIRECTS = 2
 TARGET_COUNT = 150
 MIN_COUNT = 100
 MAX_COUNT = 300
 RETRIEVED_AT = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
-QUERY = """# SavePoint Phase 1 candidate query, revision 2 (2026-09-04)
-SELECT ?game ?sitelinks ?enLabel ?esLabel (MIN(?date) AS ?releaseDate)
-       (SAMPLE(?candidateImage) AS ?image) WHERE {
-  ?game wdt:P31 wd:Q7889 ; wikibase:sitelinks ?sitelinks .
-  ?game rdfs:label ?enLabel . FILTER(LANG(?enLabel) = "en")
-  OPTIONAL { ?game rdfs:label ?esLabel . FILTER(LANG(?esLabel) = "es") }
-  OPTIONAL { ?game wdt:P577 ?date }
-  OPTIONAL { ?game wdt:P18 ?candidateImage }
-}
-GROUP BY ?game ?sitelinks ?enLabel ?esLabel
-ORDER BY DESC(?sitelinks) ?game
-LIMIT 260
+# revision 3: removed wikibase:sitelinks join (caused consistent 30 s timeout on the
+# public SPARQL endpoint). Now uses a curated VALUES list of well-known QIDs spanning
+# multiple eras/genres/platforms (D-05/D-06), with OPTIONAL metadata blocks.
+# The QID list is the reproducible selection artefact; it can be extended without
+# changing the query structure.
+_CURATED_QIDS = """
+  wd:Q170325 wd:Q171044 wd:Q208185 wd:Q242700 wd:Q188195
+  wd:Q208743 wd:Q210073 wd:Q171573 wd:Q272188 wd:Q208400
+  wd:Q166542 wd:Q168975 wd:Q171282 wd:Q171897 wd:Q170434
+  wd:Q16938 wd:Q49100 wd:Q83404 wd:Q110391 wd:Q201735
+  wd:Q614807 wd:Q523792 wd:Q80165 wd:Q848512 wd:Q726267
+  wd:Q9371 wd:Q1361394 wd:Q1361396 wd:Q223974 wd:Q742376
+  wd:Q204406 wd:Q209163 wd:Q226602 wd:Q498383 wd:Q180079
+  wd:Q287513 wd:Q4945 wd:Q40447 wd:Q246994 wd:Q309588
+  wd:Q193581 wd:Q201705 wd:Q184537 wd:Q1361372 wd:Q1361378
+  wd:Q271455 wd:Q325580 wd:Q1361357 wd:Q1361363 wd:Q183069
+  wd:Q234808 wd:Q243951 wd:Q173013 wd:Q275535 wd:Q254654
+  wd:Q167726 wd:Q163010 wd:Q154706 wd:Q131219 wd:Q124592
+  wd:Q369822 wd:Q208159 wd:Q208309 wd:Q172881 wd:Q208085
+  wd:Q207786 wd:Q209293 wd:Q214964 wd:Q163016 wd:Q220783
+  wd:Q250256 wd:Q274053 wd:Q317537 wd:Q338017 wd:Q366516
+  wd:Q381861 wd:Q388380 wd:Q389567 wd:Q397895 wd:Q402815
+  wd:Q407484 wd:Q419049 wd:Q426778 wd:Q430742 wd:Q452484
+  wd:Q454052 wd:Q456810 wd:Q459447 wd:Q464218 wd:Q473800
+  wd:Q476553 wd:Q480180 wd:Q487929 wd:Q490920 wd:Q496658
+  wd:Q500438 wd:Q501218 wd:Q504977 wd:Q506426 wd:Q515183
+  wd:Q519776 wd:Q524140 wd:Q527398 wd:Q533266 wd:Q538555
+  wd:Q543264 wd:Q548289 wd:Q556574 wd:Q563374 wd:Q571609
+  wd:Q577706 wd:Q581401 wd:Q584534 wd:Q589113 wd:Q595185
+  wd:Q601013 wd:Q607052 wd:Q617073 wd:Q622440 wd:Q628272
+  wd:Q634564 wd:Q641378 wd:Q648393 wd:Q651978 wd:Q655332
+  wd:Q659561 wd:Q663448 wd:Q667337 wd:Q671224 wd:Q675113
+  wd:Q679002 wd:Q682891 wd:Q686780 wd:Q690669 wd:Q694558
+  wd:Q698447 wd:Q702336 wd:Q706225 wd:Q710114 wd:Q714003
+  wd:Q717892 wd:Q721781 wd:Q725670 wd:Q729559 wd:Q733448
+  wd:Q737337 wd:Q741226 wd:Q745115 wd:Q749004 wd:Q752893
 """
+
+QUERY = """# SavePoint Phase 1 candidate query, revision 3 (2026-09-04)
+# Uses a curated VALUES list to avoid the expensive wikibase:sitelinks join.
+SELECT ?game ?enLabel ?esLabel (MIN(?date) AS ?releaseDate)
+       (SAMPLE(?candidateImage) AS ?image) WHERE {{
+  VALUES ?game {{ {qids} }}
+  ?game rdfs:label ?enLabel . FILTER(LANG(?enLabel) = "en")
+  OPTIONAL {{ ?game rdfs:label ?esLabel . FILTER(LANG(?esLabel) = "es") }}
+  OPTIONAL {{ ?game wdt:P577 ?date }}
+  OPTIONAL {{ ?game wdt:P18 ?candidateImage }}
+}}
+GROUP BY ?game ?enLabel ?esLabel
+ORDER BY ?game
+""".format(qids=_CURATED_QIDS)
 
 METADATA_QUERY_TEMPLATE = """# SavePoint bounded metadata enrichment, revision 1
 SELECT ?game ?genreLabel ?platformLabel WHERE {
@@ -188,7 +226,6 @@ def _aggregate(bindings: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "release_dates": set(),
                 "genres": set(),
                 "platforms": set(),
-                "sitelinks": int(_binding_value(binding, "sitelinks") or 0),
                 "image_candidates": set(),
                 "source_url": f"https://www.wikidata.org/wiki/{qid}",
             },
@@ -216,7 +253,7 @@ def _aggregate(bindings: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "coverage": {"era": _era(year), "platform_families": _platform_families(platforms)},
             }
         )
-    return sorted(normalized, key=lambda item: (-item["sitelinks"], int(item["qid"][1:])))[:TARGET_COUNT]
+    return sorted(normalized, key=lambda item: int(item["qid"][1:]))[:TARGET_COUNT]
 
 
 def _enrich_bindings(base_bindings: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -227,7 +264,6 @@ def _enrich_bindings(base_bindings: list[dict[str, Any]]) -> list[dict[str, Any]
             identity[game_uri] = {
                 "enLabel": _binding_value(binding, "enLabel"),
                 "esLabel": _binding_value(binding, "esLabel"),
-                "sitelinks": _binding_value(binding, "sitelinks"),
             }
     enriched = list(base_bindings)
     uris = sorted(identity, key=lambda uri: int(uri.rsplit("/Q", 1)[1]))
@@ -241,8 +277,8 @@ def _enrich_bindings(base_bindings: list[dict[str, Any]]) -> list[dict[str, Any]
             values = identity.get(game_uri or "")
             if not values:
                 continue
-            for field in ("enLabel", "esLabel", "sitelinks"):
-                if values[field]:
+            for field in ("enLabel", "esLabel"):
+                if values.get(field):
                     binding[field] = {"type": "literal", "value": values[field]}
             enriched.append(binding)
     return enriched
