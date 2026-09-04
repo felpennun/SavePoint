@@ -66,6 +66,7 @@ services:
       - ../apps/api:/workspace/apps/api
       - ../data:/workspace/data:ro
       - ../docs:/workspace/docs:ro
+      - ../e2e:/workspace/e2e:ro
 
   web:
     build:

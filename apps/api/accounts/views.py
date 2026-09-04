@@ -12,7 +12,7 @@ here too.
 
 from __future__ import annotations
 
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.utils.decorators import method_decorator
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
@@ -20,6 +20,10 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from accounts.serializers import build_public_profile
+
+User = get_user_model()
 
 # Uniform message for any invalid-credential outcome -- never reveal whether
 # the username exists.
@@ -74,3 +78,23 @@ class LogoutView(APIView):
     def post(self, request: Request) -> Response:
         logout(request)
         return Response({"detail": "ok"})
+
+
+class PublicProfileView(APIView):
+    """GET /api/accounts/profiles/<alias>/
+
+    PROF-02/INV-05: an unauthorized or nonexistent alias returns the exact
+    same 404 -- never reveal which case occurred. Phase 1 has no
+    public/private toggle (a small controlled demo where every account is
+    public by design; FLAGGED ASSUMPTION -- see plan 01-07), so today the
+    only 404 case is "no such user", but the response is built to stay
+    indistinguishable if a privacy toggle is added later.
+    """
+
+    permission_classes = [AllowAny]
+
+    def get(self, request: Request, alias: str) -> Response:
+        user = User.objects.filter(username=alias, is_active=True).first()
+        if user is None:
+            return Response({"detail": "Not found."}, status=404)
+        return Response(build_public_profile(user))
