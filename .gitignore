@@ -1,0 +1,16 @@
+# Local dependency and test caches
+.pnpm-store/
+node_modules/
+__pycache__/
+.pytest_cache/
+
+# Local runtime configuration and credentials
+.env
+.env.*
+!.env.example
+
+# Build and test output
+.next/
+test-results/
+playwright-report/
+
