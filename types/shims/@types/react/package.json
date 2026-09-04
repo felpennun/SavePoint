@@ -1,0 +1,5 @@
+{
+  "name": "@types/react",
+  "version": "19.2.7",
+  "types": "index.d.ts"
+}
