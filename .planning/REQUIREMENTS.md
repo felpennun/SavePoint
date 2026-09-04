@@ -97,7 +97,7 @@
 ### Operations, Quality, and Delivery
 
 - [ ] **OPS-01**: Application can be deployed to the Internet using documented configuration.
-- [ ] **OPS-02**: Project can be run locally through a reproducible documented process.
+- [x] **OPS-02**: Project can be run locally through a reproducible documented process.
 - [ ] **OPS-03**: A lawful offline demo mode works without the external API or Internet access.
 - [ ] **OPS-04**: PostgreSQL and experimental artifacts have tested backup and recovery procedures.
 - [ ] **OPS-05**: System emits structured logs and observable job states without sensitive data.
@@ -173,7 +173,7 @@
 | REC-02 | Phase 1 | Complete |
 | SEC-02 | Phase 1 | Pending |
 | OPS-01 | Phase 1 | Pending |
-| OPS-02 | Phase 1 | Pending |
+| OPS-02 | Phase 1 | Complete |
 | OPS-03 | Phase 1 | Pending |
 | QUAL-03 | Phase 1 | Pending |
 | DOC-01 | Phase 1 | Pending |

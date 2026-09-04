@@ -4,15 +4,15 @@ current_phase: 01
 current_phase_name: Three-Day Public Demo Slice
 status: executing
 stopped_at: Completed 01-09-PLAN.md
-last_updated: "2026-09-04T18:33:56.309Z"
+last_updated: "2026-09-04T18:49:43.187Z"
 last_activity: 2026-09-04
 last_activity_desc: Phase 01 execution started
-state_head: 9b4266a1d75539f2d466c80d341a6d3eee81b325
+state_head: 543195e888ed748b6ab91bf4abbe6afdd38db1a1
 progress:
   total_phases: 8
   completed_phases: 0
   total_plans: 16
-  completed_plans: 12
+  completed_plans: 13
   percent: 0
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-09-04)
 ## Current Position
 
 Phase: 01 (Three-Day Public Demo Slice) — EXECUTING
-Plan: 10 of 16
+Plan: 11 of 16
 Status: Ready to execute
 Last activity: 2026-09-04 — Phase 01 execution started
 
@@ -67,6 +67,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01 P16 | 8min | 2 tasks | 3 files |
 | Phase 01 P09 | 20min | 2 tasks | 22 files |
 | Phase 01 P10 | 10min | 1 tasks | 2 files |
+| Phase 01 P11 | 55min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -87,6 +88,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 01]: Found Tailwind CSS had been a devDependency since Plan 01-03 but was never actually wired up (no postcss.config.mjs anywhere) -- added it as part of building the design token system. Also found and fixed a completely unconfigured Vitest path alias. — Both were genuine blocking gaps for this plan's own deliverables (globals.css's first @import line, and the i18n parity test's own @/ imports), not scope creep -- discovered only because this plan was the first to actually exercise either piece of tooling.
 - [Phase 01]: Wired every UI-SPEC page (homepage, catalogue, detail, collection, profile, sources) to real backend data via GameCard/LibraryControls/RecommendationStrip, adding two new backend endpoints (MyLibraryView, SourcesView) the plan's file list didn't explicitly name but the pages genuinely needed to function. — Ten requirements (AUTH-01, PROF-02, CAT-01, CAT-03, CAT-06, LIB-01, LIB-02, INV-01, INV-02, REC-02) reached their last declaring plan here and are now marked complete -- the E2E suite proves rating and multi-copy persistence across a reload, not just the status field the earlier tracer plan covered, which is what closes out LIB-01/LIB-02/INV-01/INV-02 for real rather than by inference.
 - [Phase 01]: Injected axe-core's already-approved local bundle directly via page.addScriptTag instead of adding the @axe-core/playwright wrapper package — Avoids a new-dependency approval round for what is functionally one line of glue code around an already-approved devDependency
+- [Phase 01]: Introduced DJANGO_DEPLOY_ENV (local|production) to make check --deploy genuinely clean in each context via SILENCED_SYSTEM_CHECKS, instead of always showing expected-but-scary HTTP-only warnings — An explicit, required switch is auditable in a way that inferring the security profile from DEBUG or DATABASE_URL is not
+- [Phase 01]: check-secrets.ps1 exempts only e2e/fixtures/hostile.json (holds the self-test canaries) and test files (assigned-secret-value/bearer-token patterns only) by path, never any file by content — Synthetic, reviewed fixture credentials are a normal testing pattern; a narrow, documented path exemption keeps every other file -- including README.md and .env.example -- genuinely scanned
 
 ### Pending Todos
 
@@ -115,6 +118,6 @@ TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<ver
 
 ## Session Continuity
 
-Last session: 2026-09-04T18:33:56.269Z
+Last session: 2026-09-04T18:49:43.152Z
 Stopped at: Completed 01-09-PLAN.md
 Resume file: None
