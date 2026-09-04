@@ -12,6 +12,7 @@ RUN uv sync --frozen --group dev --no-install-project
 FROM python:3.13.7-slim@sha256:5f55cdf0c5d9dc1a415637a5ccc4a9e18663ad203673173b8cda8f8dcacef689 AS runner
 
 ENV PATH="/workspace/.venv/bin:${PATH}" \
+    PYTHONPATH="/workspace/apps/api" \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
@@ -20,6 +21,6 @@ RUN groupadd --system --gid 10001 savepoint \
 WORKDIR /workspace
 COPY --from=dependencies --chown=savepoint:savepoint /workspace/.venv /workspace/.venv
 COPY --chown=savepoint:savepoint apps/api ./apps/api
+RUN ln -s /workspace/apps/api/manage.py /workspace/manage.py
 USER 10001:10001
 CMD ["pytest", "apps/api/tests", "-q"]
-

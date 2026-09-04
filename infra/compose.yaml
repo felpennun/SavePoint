@@ -24,6 +24,8 @@ services:
       context: ..
       dockerfile: apps/api/Dockerfile
     environment:
+      DATABASE_URL: postgresql://savepoint_test:local_test_only@db:5432/savepoint_test
+      DJANGO_SECRET_KEY: local-development-only-not-a-secret
       POSTGRES_DB: savepoint_test
       POSTGRES_USER: savepoint_test
       POSTGRES_PASSWORD: local_test_only
@@ -49,4 +51,3 @@ services:
 
 volumes:
   postgres_data:
-
