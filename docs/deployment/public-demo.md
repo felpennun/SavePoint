@@ -20,6 +20,7 @@ Provider limits change. Recheck the linked official pages at creation time and r
 
 - Render documents that a free web service sleeps after 15 minutes without inbound traffic; waking can take about one minute. Monthly hours, bandwidth or pipeline quotas can suspend or disable it. Free services are not for production.
 - Render Free does not support `preDeployCommand`. `infra/render.yaml` therefore runs `migrate -> import_catalogue -> bootstrap_demo_account -> seed_demo` before starting the HTTP listener. Every data command is idempotent and advisory-lock guarded; `numInstances: 1` prevents multiple application instances from initializing concurrently. A failed step stops startup, so health never turns green on partial initialization.
+- Render's Docker command override receives this chain directly. Do not wrap the folded Blueprint value in another quoted `sh -c`: Render already evaluates the override as a shell command, and nested quoting turns the complete chain into one nonexistent executable name.
 - Neon Free has account-dependent compute-hour, storage, project and transfer limits and can suspend idle compute. Confirm the current values and retention in the Neon dashboard/docs; this runbook makes no durability or backup promise.
 - Compose remains available offline if any public free tier sleeps, changes terms or disappears.
 
