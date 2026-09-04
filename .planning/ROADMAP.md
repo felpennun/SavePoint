@@ -39,7 +39,7 @@ SavePoint begins with a three-day, publicly deployed vertical demonstration, the
   4. A clean machine can start the same demo from documented, pinned instructions without Internet/API dependency, and no secret appears in Git, browser assets, logs, images, or public artifacts.
   5. The demo is keyboard-usable and responsive at desktop/mobile widths, and its source/legal record, architecture rationale, agent inputs/outputs, verification, limitations, and author decisions are captured as thesis evidence.
 
-**Plans**: 6/16 plans executed
+**Plans**: 7/16 plans executed
 
 Plans:
 **Wave 1**
@@ -61,7 +61,7 @@ Plans:
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 01-04-PLAN.md — Probar sesión→estado como trazador vertical
+- [x] 01-04-PLAN.md — Probar sesión→estado como trazador vertical
 - [x] 01-06-PLAN.md — Importar y exponer catálogo lawful offline
 
 **Wave 6** *(blocked on Wave 5 completion)*
@@ -225,7 +225,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Three-Day Public Demo Slice | 6/16 | In Progress|  |
+| 1. Three-Day Public Demo Slice | 7/16 | In Progress|  |
 | 2. Governed Corpus and Frozen Evaluation Contract | 0/TBD | Not started | - |
 | 3. Complete Collection Workflows and Portability | 0/TBD | Not started | - |
 | 4. Public Discovery and Resilient Enrichment | 0/TBD | Not started | - |

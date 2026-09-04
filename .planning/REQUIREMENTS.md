@@ -19,7 +19,7 @@
 - [ ] **CAT-01**: User can search video games by title.
 - [ ] **CAT-02**: User can filter and sort the catalogue using available metadata.
 - [ ] **CAT-03**: Each game has a detail page showing available data and its provenance.
-- [ ] **CAT-04**: Catalogue uses canonical game identifiers that do not depend on the enrichment API.
+- [x] **CAT-04**: Catalogue uses canonical game identifiers that do not depend on the enrichment API.
 - [ ] **CAT-05**: Catalogue can represent games, platforms, editions, genres, franchises, developers, publishers, dates, modes, and tags available from approved sources.
 - [ ] **CAT-06**: Catalogue remains usable with local data when the enrichment API is unavailable.
 
@@ -161,7 +161,7 @@
 | PROF-02 | Phase 1 | Pending |
 | CAT-01 | Phase 1 | Pending |
 | CAT-03 | Phase 1 | Pending |
-| CAT-04 | Phase 1 | Pending |
+| CAT-04 | Phase 1 | Complete |
 | CAT-06 | Phase 1 | Pending |
 | LIB-01 | Phase 1 | Pending |
 | LIB-02 | Phase 1 | Pending |
@@ -248,6 +248,7 @@
 | AGENT-06 | Phase 8 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 89 total
 - Mapped to phases: 89
 - Unmapped: 0

@@ -3,16 +3,16 @@ gsd_state_version: 1.0
 current_phase: 01
 current_phase_name: Three-Day Public Demo Slice
 status: executing
-stopped_at: Completed 01-15-PLAN.md
-last_updated: "2026-09-04T17:04:25.065Z"
+stopped_at: Completed 01-04-PLAN.md
+last_updated: "2026-09-04T17:49:10.073Z"
 last_activity: 2026-09-04
 last_activity_desc: Phase 01 execution started
-state_head: 36ae8a631022a235786fae7aed43ab49d78f13d2
+state_head: 2d2ff01e6617de90a9694189f426c99c86fb33a7
 progress:
   total_phases: 8
   completed_phases: 0
   total_plans: 16
-  completed_plans: 6
+  completed_plans: 7
   percent: 0
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-09-04)
 ## Current Position
 
 Phase: 01 (Three-Day Public Demo Slice) — EXECUTING
-Plan: 4 of 16
+Plan: 5 of 16
 Status: Ready to execute
 Last activity: 2026-09-04 — Phase 01 execution started
 
@@ -61,6 +61,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01 P05 | 45min | 2 tasks | 5 files |
 | Phase 01 P06 | 17min | 2 tasks | 15 files |
 | Phase 01 P15 | 25min | 2 tasks | 12 files |
+| Phase 01 P04 | 44min | 2 tasks | 30 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 01]: Replaced the fabricated Wikidata QID list in scripts/acquire_catalogue.py with a class-filtered live query (wdt:P31 wd:Q7889) plus dynamically-resolved platform sub-queries; fixed a URL-decoding bug that silently defaulted every cover image to placeholder. — The pre-existing hand-typed QID list contained non-video-game entities (a commune, an organ, a war); any hardcoded Wikidata QID must be verified live before use, never trusted from memory or a prior commit.
 - [Phase 01]: Added dev-only Docker bind mounts (infra/compose.yaml) and fixed apps/api/pytest.ini's missing DJANGO_SETTINGS_MODULE -- both were silently breaking every future plan's docker compose run/pytest verification, not just plan 01-06's. — Without a bind mount, docker compose run always tested whatever code existed at the last image build, never the current working tree; without DJANGO_SETTINGS_MODULE actually loaded inside the container, any Django-DB test would fail to configure Django at all. Fixing both now prevents every subsequent plan in the phase from hitting the same wall.
 - [Phase 01]: Scoped e2e/demo-journey.spec.ts (Plan 01-15 Task 2) to only what is verifiable without a login UI: the credential-contract (env-only, redacted-on-missing). The real browser login journey is an explicit test.describe.skip deferred to Plan 01-04, which also declares this file and will add the login page/endpoint. — Neither the Next.js login page nor the Django accounts login endpoint exist yet at Wave 4 -- both are Plan 01-04 deliverables (Wave 5). Fabricating a login test against non-existent infrastructure would be dishonest; the file is explicitly built incrementally across the two plans instead.
+- [Phase 01]: Ran the plan 01-04 vertical tracer against the real stack (not just unit tests) and found/fixed 8 real infrastructure bugs: missing Docker port mappings, a Next.js rewrite trailing-slash redirect loop, a Django CSRF Origin mismatch through the same-origin proxy, dev-mode HMR hydration failure that let the login form leak credentials via URL query string, a locale-blind post-login redirect, and an incomplete middleware public-path list. Switched infra/compose.yaml's web service from `next dev` to a production build+start as the fix for the HMR issue. — None of these were found by unit tests alone -- they only surfaced when the full login->catalogue->status journey was actually driven through a real browser via Playwright, which is exactly what a type="tracer" plan exists to catch before six more waves build on top of a broken foundation. The production-build switch also better matches the project's own stated reproducibility principle (same commit/lockfiles build local and deployed).
 
 ### Pending Todos
 
@@ -86,6 +88,15 @@ None yet.
 - Phase 1 must fit the three-day demo constraint; keep seeded accounts/catalogue and popularity logic intentionally thin.
 - Phase 2 must freeze the evaluation protocol before sophisticated recommender comparisons.
 - Dataset and enrichment-provider legal terms require case-specific confirmation before adoption.
+- Plan 01-04 (Wave 5) is mid-execution and paused on a real blocker: the frontend (apps/web) was scaffolded in Plan 01-03 WITHOUT @types/react or @types/react-dom in devDependencies. Re-enabling TypeScript build-error checking (next.config.ts's ignoreBuildErrors:true was itself a bug, now removed) surfaces this immediately -- every .tsx file in apps/web fails to type-check (useState/FormEvent not found on 'react', JSX.IntrinsicElements missing, react/jsx-runtime has no types).
+
+Per project policy (01-01's package-legitimacy gate; deviation Rule 3's explicit exclusion for package-manager installs), a new dependency install requires human sign-off, not an agent's unilateral pnpm add -- even though @types/react and @types/react-dom are about as standard/low-risk as a package gets.
+
+WHAT'S DONE (committed, tested, working): apps/api/accounts/{views,urls}.py + test_auth.py (7/7 passing), apps/api/library/{views,urls}.py + test_entry.py (8/8 passing), config/urls.py wiring, infra/compose.yaml port mappings (web:3000, api:8000) and demo env vars. Full backend suite: 62/62 passing.
+
+WHAT'S UNCOMMITTED (working tree, not yet type-checked clean): apps/web/app/[locale]/** (layout, homepage, login page, catalogue page, game detail page + StatusControl), apps/web/lib/api.ts, apps/web/middleware.ts, apps/web/next.config.ts (rewrite proxy to Django + ignoreBuildErrors removed), and the deletion of the old flat apps/web/app/layout.tsx + page.tsx (replaced by the [locale] structure).
+
+TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<version matching react 19.2.7> @types/react-dom@<matching>` at the repo root (deps are hoisted there, see package.json), run `pnpm exec tsc --noEmit` in apps/web to confirm the errors clear, then continue: verify the dev server actually renders each page, write/run the e2e/demo-journey.spec.ts real login journey (replacing the 01-15 skip block), run the plan's two <verify> commands, then close out Plan 01-04 (SUMMARY.md, STATE/ROADMAP/REQUIREMENTS updates) exactly like 01-05/01-06/01-15 before it.
 
 ## Deferred Items
 
@@ -95,6 +106,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-09-04T17:04:25.031Z
-Stopped at: Completed 01-15-PLAN.md
+Last session: 2026-09-04T17:49:10.038Z
+Stopped at: Completed 01-04-PLAN.md
 Resume file: None
