@@ -1,6 +1,11 @@
 packages:
   - "apps/*"
 
+catalog:
+  '@types/node': 24.13.0
+  '@types/react': 19.2.18
+  '@types/react-dom': 19.2.7
+
 catalogMode: strict
 cleanupUnusedCatalogs: true
 linkWorkspacePackages: false

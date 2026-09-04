@@ -13,4 +13,5 @@ __pycache__/
 .next/
 test-results/
 playwright-report/
+*.tsbuildinfo
 
