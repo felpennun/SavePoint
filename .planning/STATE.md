@@ -3,16 +3,16 @@ gsd_state_version: 1.0
 current_phase: 01
 current_phase_name: Three-Day Public Demo Slice
 status: executing
-stopped_at: Completed 01-04-PLAN.md
-last_updated: "2026-09-04T17:49:10.073Z"
+stopped_at: Completed 01-07-PLAN.md
+last_updated: "2026-09-04T18:02:36.799Z"
 last_activity: 2026-09-04
 last_activity_desc: Phase 01 execution started
-state_head: 2d2ff01e6617de90a9694189f426c99c86fb33a7
+state_head: 7c3941fa217b7649c2923656ff4d45fd0ef352f4
 progress:
   total_phases: 8
   completed_phases: 0
   total_plans: 16
-  completed_plans: 7
+  completed_plans: 8
   percent: 0
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-09-04)
 ## Current Position
 
 Phase: 01 (Three-Day Public Demo Slice) — EXECUTING
-Plan: 5 of 16
+Plan: 6 of 16
 Status: Ready to execute
 Last activity: 2026-09-04 — Phase 01 execution started
 
@@ -62,6 +62,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01 P06 | 17min | 2 tasks | 15 files |
 | Phase 01 P15 | 25min | 2 tasks | 12 files |
 | Phase 01 P04 | 44min | 2 tasks | 30 files |
+| Phase 01 P07 | 20min | 3 tasks | 16 files |
 
 ## Accumulated Context
 
@@ -78,6 +79,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 01]: Added dev-only Docker bind mounts (infra/compose.yaml) and fixed apps/api/pytest.ini's missing DJANGO_SETTINGS_MODULE -- both were silently breaking every future plan's docker compose run/pytest verification, not just plan 01-06's. — Without a bind mount, docker compose run always tested whatever code existed at the last image build, never the current working tree; without DJANGO_SETTINGS_MODULE actually loaded inside the container, any Django-DB test would fail to configure Django at all. Fixing both now prevents every subsequent plan in the phase from hitting the same wall.
 - [Phase 01]: Scoped e2e/demo-journey.spec.ts (Plan 01-15 Task 2) to only what is verifiable without a login UI: the credential-contract (env-only, redacted-on-missing). The real browser login journey is an explicit test.describe.skip deferred to Plan 01-04, which also declares this file and will add the login page/endpoint. — Neither the Next.js login page nor the Django accounts login endpoint exist yet at Wave 4 -- both are Plan 01-04 deliverables (Wave 5). Fabricating a login test against non-existent infrastructure would be dishonest; the file is explicitly built incrementally across the two plans instead.
 - [Phase 01]: Ran the plan 01-04 vertical tracer against the real stack (not just unit tests) and found/fixed 8 real infrastructure bugs: missing Docker port mappings, a Next.js rewrite trailing-slash redirect loop, a Django CSRF Origin mismatch through the same-origin proxy, dev-mode HMR hydration failure that let the login form leak credentials via URL query string, a locale-blind post-login redirect, and an incomplete middleware public-path list. Switched infra/compose.yaml's web service from `next dev` to a production build+start as the fix for the HMR issue. — None of these were found by unit tests alone -- they only surfaced when the full login->catalogue->status journey was actually driven through a real browser via Playwright, which is exactly what a type="tracer" plan exists to catch before six more waves build on top of a broken foundation. The production-build switch also better matches the project's own stated reproducibility principle (same commit/lockfiles build local and deployed).
+- [Phase 01]: Resolved PROF-02's flagged assumption for Phase 1: every account is public by design (small controlled demo, no privacy toggle yet). The public profile serializer is a hand-built allowlist (never DRF ModelSerializer auto-introspection), verified by a recursive denylist scan plus hostile-fixture XSS tests. — Building the allowlist by hand means a new private model field requires an explicit decision to expose it, not an accidental one to hide it -- the opposite failure mode of auto-serialization. Phase 1's no-privacy-toggle choice keeps the "unauthorized vs nonexistent" indistinguishability requirement trivially satisfied (both cases collapse to the same 404 today) while leaving the response shape ready for a future toggle without a rewrite.
 
 ### Pending Todos
 
@@ -106,6 +108,6 @@ TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<ver
 
 ## Session Continuity
 
-Last session: 2026-09-04T17:49:10.038Z
-Stopped at: Completed 01-04-PLAN.md
+Last session: 2026-09-04T18:02:36.755Z
+Stopped at: Completed 01-07-PLAN.md
 Resume file: None

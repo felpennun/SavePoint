@@ -33,7 +33,7 @@
 - [ ] **INV-02**: Each copy can record physical or digital format, platform, and edition.
 - [ ] **INV-03**: Each copy can record purchase date, price, currency, and store.
 - [ ] **INV-04**: A physical copy can record conservation state and storage location.
-- [ ] **INV-05**: Private notes and purchase details never appear in public projections.
+- [x] **INV-05**: Private notes and purchase details never appear in public projections.
 - [ ] **PORT-01**: User can export their collection, ratings, and lists as versioned CSV and JSON.
 - [ ] **PORT-02**: User can preview and validate an import before applying it.
 - [ ] **PORT-03**: Import reports row-level errors and applies deterministic duplicate and conflict rules.
@@ -167,7 +167,7 @@
 | LIB-02 | Phase 1 | Pending |
 | INV-01 | Phase 1 | Pending |
 | INV-02 | Phase 1 | Pending |
-| INV-05 | Phase 1 | Pending |
+| INV-05 | Phase 1 | Complete |
 | DATA-01 | Phase 1 | Pending |
 | DATA-02 | Phase 1 | Pending |
 | REC-02 | Phase 1 | Pending |
