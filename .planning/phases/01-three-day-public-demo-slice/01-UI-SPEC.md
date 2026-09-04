@@ -353,7 +353,7 @@ The Phase 1 release is not acceptable until all checks below pass on homepage, l
 
 ## UI Considerations
 
-Applicable state considerations resolved: 8 covered, 0 backstop, 0 unresolved.
+Applicable state considerations resolved: 8 covered explicitly, 0 backstop, 0 unresolved. Element-kind classification was reviewed and confirmed for navigation, homepage, login, catalogue, game detail, collection/public profile, and sources/methodology surfaces on 2026-09-04.
 
 | Category | Element(s) | Status | Resolution / Reason |
 |----------|------------|--------|---------------------|
@@ -376,15 +376,15 @@ Do not render placeholders, disabled navigation, teaser cards, or “coming soon
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
-- [ ] Dimension 7 Inventory Provenance: PASS (not applicable because Tool is none)
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
+- [x] Dimension 7 Inventory Provenance: PASS (not applicable because Tool is none)
 
-**Approval:** pending
+**Approval:** verified after two copywriting revisions and final state-coverage confirmation on 2026-09-04.
 
 ## Decision Provenance
 
