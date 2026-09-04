@@ -1,0 +1,27 @@
+{
+  "name": "savepoint",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.25.0",
+  "engines": {
+    "node": "24.13.0"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "next": "16.3.4",
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.1",
+    "@tailwindcss/postcss": "4.3.3",
+    "@testing-library/react": "16.3.3",
+    "axe-core": "4.13.0",
+    "tailwindcss": "4.3.3",
+    "typescript": "6.0.3",
+    "vitest": "5.0.0"
+  }
+}
