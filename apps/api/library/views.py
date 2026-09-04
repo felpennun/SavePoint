@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.shortcuts import get_object_or_404
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -17,6 +17,7 @@ from rest_framework.views import APIView
 from catalogue.models import GameWork
 from library import services
 from library.models import BacklogStatus, LibraryEntry, OwnedCopy, StatusTransition
+from library.popularity import rank_popularity_v1
 from library.serializers import (
     CreateOwnedCopyRequestSerializer,
     RatingRequestSerializer,
@@ -127,3 +128,17 @@ class OwnedCopiesView(APIView):
             return Response({"detail": str(exc.message if hasattr(exc, "message") else exc)}, status=400)
 
         return Response({"copy": serialize_copy(copy), "created": created}, status=201 if created else 200)
+
+
+class PopularityView(APIView):
+    """GET /api/library/popularity/
+
+    Public (REC-02): the baseline is a demo-wide aggregate, not
+    personalized data, so it carries no owner-scoping. Always local
+    computation, never a live/external call.
+    """
+
+    permission_classes = [AllowAny]
+
+    def get(self, request: Request) -> Response:
+        return Response(rank_popularity_v1())
