@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
@@ -14,7 +15,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from catalogue.models import GameWork
-from library.models import BacklogStatus, LibraryEntry, StatusTransition
+from library import services
+from library.models import BacklogStatus, LibraryEntry, OwnedCopy, StatusTransition
+from library.serializers import (
+    CreateOwnedCopyRequestSerializer,
+    RatingRequestSerializer,
+    serialize_copy,
+)
 
 VALID_STATUSES = {choice.value for choice in BacklogStatus}
 
@@ -66,3 +73,57 @@ class SetStatusView(APIView):
             # from the just-committed `entry`, not an optimistic guess.
 
         return Response({"status": entry.current_status, "changed": True})
+
+
+class SetRatingView(APIView):
+    """GET/POST /api/library/entries/<work_id>/rating/ {"rating_half_steps": 7|null}"""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request, work_id: str) -> Response:
+        work = get_object_or_404(GameWork, id=work_id, is_dlc=False)
+        entry = LibraryEntry.objects.filter(user=request.user, work=work).first()
+        return Response({"rating_half_steps": entry.rating_half_steps if entry else None})
+
+    def post(self, request: Request, work_id: str) -> Response:
+        serializer = RatingRequestSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({"detail": "Invalid rating.", "errors": serializer.errors}, status=400)
+
+        work = get_object_or_404(GameWork, id=work_id, is_dlc=False)
+        entry = services.set_rating(
+            user=request.user, work=work, rating_half_steps=serializer.validated_data["rating_half_steps"]
+        )
+        return Response({"rating_half_steps": entry.rating_half_steps})
+
+
+class OwnedCopiesView(APIView):
+    """GET/POST /api/library/entries/<work_id>/copies/"""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request, work_id: str) -> Response:
+        work = get_object_or_404(GameWork, id=work_id, is_dlc=False)
+        copies = OwnedCopy.objects.filter(user=request.user, work=work)
+        return Response({"copies": [serialize_copy(copy) for copy in copies]})
+
+    def post(self, request: Request, work_id: str) -> Response:
+        serializer = CreateOwnedCopyRequestSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({"detail": "Invalid copy request.", "errors": serializer.errors}, status=400)
+
+        work = get_object_or_404(GameWork, id=work_id, is_dlc=False)
+        data = serializer.validated_data
+        try:
+            copy, created = services.create_owned_copy(
+                user=request.user,
+                work=work,
+                release_id=str(data["release_id"]),
+                edition_id=str(data["edition_id"]) if data.get("edition_id") else None,
+                format=data["format"],
+                idempotency_key=data["idempotency_key"],
+            )
+        except ValidationError as exc:
+            return Response({"detail": str(exc.message if hasattr(exc, "message") else exc)}, status=400)
+
+        return Response({"copy": serialize_copy(copy), "created": created}, status=201 if created else 200)
