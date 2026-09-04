@@ -1,73 +1,84 @@
 # Public demo deployment runbook
 
-This runbook prepares a reversible deployment of the same Docker build context used locally. It does **not** authorize or prove that a public deployment exists. Creating paid resources is a blocking human decision.
+This runbook prepares the owner-approved, zero-cost/no-card public topology. It does **not** claim that accounts or resources already exist. Docker Compose (`web` + `api` + PostgreSQL) remains the canonical reproducible environment.
 
-## Proposed Render topology
+## Approved topology and parity boundary
 
-`infra/render.yaml` declares two Docker web services and one managed PostgreSQL database in Frankfurt. The browser contacts only `savepoint-web`; its server-side `API_PROXY_TARGET` points to `savepoint-api`, preserving the application's same-origin cookie model. The API runs the idempotent chain `migrate -> import_catalogue -> bootstrap_demo_account -> seed_demo` as its pre-deploy command, then serves `/health/`. PostgreSQL has an empty public IP allowlist.
+| Surface | Public host | Contract |
+|---|---|---|
+| Browser UI | Vercel Hobby | Builds the locked Next.js workspace natively; proxies `/api/*` and `/health/` server-side to Render. |
+| API | Render Free | Builds `apps/api/Dockerfile`, including the frozen local catalogue, and exposes `/health/`. |
+| Database | Neon Free | Supplies a PostgreSQL `DATABASE_URL` to Render as a runtime secret. |
 
-The Blueprint deliberately selects the smallest currently documented paid compute IDs (`0.5c-512mb` for each web service and `0.1c-256mb` for PostgreSQL), because Render documents `preDeployCommand` as a paid-service feature. Prices, taxes, quotas and regional availability are **not** encoded here and must be checked in the account's confirmation screen immediately before creation. As checked on 2026-09-04, Render documents Frankfurt as available, but regions cannot be changed in place.
+The browser sees only the Vercel HTTPS origin. `API_PROXY_TARGET` exists only in the Next.js server environment, so Django session and CSRF cookies remain browser-visible same-origin. The public runtime is functionally and version equivalent to Compose, but it intentionally does **not** run the frontend Docker image. This is a documented deployment difference, not bit-for-bit image parity.
 
-Do not silently switch this Blueprint to `free`: Render currently documents that free web services suspend after 15 minutes idle and that free PostgreSQL expires after 30 days, has no backups, and can be restarted for maintenance. The local Compose environment remains the canonical reproducible fallback regardless of host behavior.
+No payment card may be entered and no paid feature or resource may be enabled. If any dashboard requests a card or shows a non-zero recurring price, stop and tear down the incomplete resources.
 
-Authoritative provider references:
+## Honest free-tier limitations
 
-- <https://render.com/docs/blueprint-spec>
-- <https://render.com/docs/deploys#pre-deploy-command>
-- <https://render.com/docs/compute-plans>
+Provider limits change. Recheck the linked official pages at creation time and record what the dashboards show.
+
+- Render documents that a free web service sleeps after 15 minutes without inbound traffic; waking can take about one minute. Monthly hours, bandwidth or pipeline quotas can suspend or disable it. Free services are not for production.
+- Render Free does not support `preDeployCommand`. `infra/render.yaml` therefore runs `migrate -> import_catalogue -> bootstrap_demo_account -> seed_demo` before starting the HTTP listener. Every data command is idempotent and advisory-lock guarded; `numInstances: 1` prevents multiple application instances from initializing concurrently. A failed step stops startup, so health never turns green on partial initialization.
+- Neon Free has account-dependent compute-hour, storage, project and transfer limits and can suspend idle compute. Confirm the current values and retention in the Neon dashboard/docs; this runbook makes no durability or backup promise.
+- Compose remains available offline if any public free tier sleeps, changes terms or disappears.
+
+Official references checked 2026-09-04:
+
 - <https://render.com/docs/free>
-- <https://render.com/docs/regions>
+- <https://render.com/docs/blueprint-spec>
+- <https://vercel.com/docs/plans/hobby>
+- <https://vercel.com/docs/rewrites>
+- <https://neon.com/docs/introduction/plans>
 
-## Security contract
+## Secret and trust-boundary contract
 
-- `DJANGO_SECRET_KEY` is provider-generated; database credentials come from `fromDatabase`.
-- `DEMO_USERNAME` and `DEMO_PASSWORD` are `sync: false`. Enter them only in Render's secret prompt. Never put them in Git, a build argument, logs, screenshots, chat, or test artifacts.
-- `DJANGO_CSRF_TRUSTED_ORIGINS` is also prompted with `sync: false` because Render Blueprints expose private `host`/`hostport`, not another service's public URL. Enter exactly the final `https://<web-host>` origin (no path).
-- Demo credentials are read server-side by Django only. The web service receives no credential variable, and no `NEXT_PUBLIC_*` secret exists.
-- Render supplies TLS for its public URLs. Record and test only the exact HTTPS web hostname; the deployed smoke rejects HTTP, credentials in URLs, redirects to another host, and a revision mismatch.
-- `autoDeployTrigger: checksPass` prevents unreviewed pushes from becoming the public demo automatically.
+- Neon `DATABASE_URL`, `DEMO_USERNAME`, `DEMO_PASSWORD` and `DJANGO_CSRF_TRUSTED_ORIGINS` are `sync: false` in Render and entered only in provider environment-variable UIs.
+- `DJANGO_SECRET_KEY` is generated by Render. No secret enters Git, a build argument, logs, screenshots, chat, or test artifacts.
+- On Render, set `DJANGO_CSRF_TRUSTED_ORIGINS` to the exact Vercel production origin, such as `https://example.vercel.app`, with no path.
+- On Vercel, set server-only `API_PROXY_TARGET` to the exact Render HTTPS origin. Never prefix it with `NEXT_PUBLIC_`.
+- Render supplies `RENDER_GIT_COMMIT`; `/health/` returns that non-secret revision through Vercel so the smoke can reject a stale deployment.
+- The smoke rejects HTTP, credentials/path/query in `BASE_URL`, cross-origin browser traffic, failed requests and a revision mismatch.
 
-## Authorization and creation
+## Manual creation order (blocking human action)
 
-Before creating anything, the owner must review the live Render confirmation screen and explicitly approve provider, region, monthly estimate, suspension/retention behavior and teardown responsibility.
+The order avoids circular public-origin configuration without weakening CSRF.
 
-1. Push the exact commit intended for the demo and ensure required repository checks are green.
-2. In Render, create a Blueprint from this repository and choose `infra/render.yaml` as the Blueprint path.
-3. Confirm all three proposed resources, their Frankfurt region and their displayed recurring cost. Abort if any differs from the reviewed contract.
-4. Supply strong, unique values for `DEMO_USERNAME` and `DEMO_PASSWORD`, plus the exact public web origin for `DJANGO_CSRF_TRUSTED_ORIGINS`, in the prompt. Do not copy credential values into this document.
-5. Wait for the database and API pre-deploy command, API healthcheck and web healthcheck to succeed.
-6. Record the non-secret evidence below, then run the smoke locally with secrets supplied through the process environment:
+1. Push the exact candidate commit and ensure repository checks are green.
+2. Create a Neon Free project without entering a card. Copy its pooled PostgreSQL connection string directly into a secure local password manager; never paste it into this repository or chat.
+3. In Render, create a Blueprint from `infra/render.yaml`. Confirm exactly one `free` web service in Frankfurt and zero price. Enter Neon `DATABASE_URL` and strong demo credentials. Save `DJANGO_CSRF_TRUSTED_ORIGINS` after step 4 provides the Vercel URL; do not deploy with incomplete configuration.
+4. Import the repository into Vercel Hobby without a card. Select `apps/web` as Root Directory and pnpm as detected from the committed lock/workspace files. Set `API_PROXY_TARGET` to the Render HTTPS origin for Production only. Record the assigned Vercel production URL.
+5. Return to Render, set `DJANGO_CSRF_TRUSTED_ORIGINS` to that exact Vercel origin, and deploy. The startup chain must finish and `/health/` must become green before continuing.
+6. Redeploy Vercel from the same Git commit so its rewrite target and frontend revision are fixed together.
+7. Run the smoke from a trusted local shell, passing secrets only as process environment variables:
 
 ```powershell
-$env:BASE_URL = "https://<approved-web-host>"
-$env:EXPECTED_COMMIT = "<full-deployed-commit-sha>"
+$env:BASE_URL = "https://<vercel-production-host>"
+$env:EXPECTED_COMMIT = "<full-render-git-commit-sha>"
 $env:DEMO_USERNAME = "<runtime-secret>"
 $env:DEMO_PASSWORD = "<runtime-secret>"
 corepack pnpm exec playwright test e2e/deployed-smoke.spec.ts --project=chromium
 ```
 
-Clear the four process variables after the run. Do not upload traces from a failed authentication run until they have been reviewed for sensitive request metadata.
+Clear those four variables immediately afterward. Do not upload a failed trace until its request metadata has been reviewed for secrets.
 
-## Deployment evidence (must be completed after authorization)
+## Deployment evidence (required to close OPS-01)
 
 | Field | Value |
 |---|---|
-| Provider | PENDING HUMAN AUTHORIZATION |
-| Public HTTPS URL | PENDING |
-| Allowlisted host | PENDING |
-| Deployed Git commit | PENDING |
-| UTC smoke time/result | PENDING |
+| Product decision | APPROVED: Vercel Hobby + Render Free + Neon Free; no card/paid resources |
+| Vercel HTTPS URL / allowlisted host | PENDING HUMAN SESSION |
+| Render API HTTPS URL | PENDING HUMAN SESSION |
+| Neon project/region (no connection string) | PENDING HUMAN SESSION |
+| Deployed Git commit | PENDING HUMAN SESSION |
+| UTC smoke time/result | PENDING HUMAN SESSION |
 
-Any `PENDING` field or a red smoke blocks completion of OPS-01 and the following wave.
+Any `PENDING` field or red smoke blocks completion of OPS-01.
 
 ## Rotation, rollback and teardown
 
-To rotate the demo identity, update `DEMO_USERNAME` and `DEMO_PASSWORD` in the API service's Environment page and choose a deploy option that reruns the pre-deploy chain. The bootstrap command updates the controlled demo account idempotently and never prints the values. Verify a fresh login, then invalidate any old operator-side copies.
+Rotate demo credentials in Render's Environment page, redeploy so the idempotent bootstrap runs, verify a fresh login, then delete operator-side copies. Rotate Neon credentials in Neon, replace `DATABASE_URL` in Render, redeploy, and revoke the old credential only after health is green.
 
-For an application regression, use Render's deploy history to roll back both services to the same known-good commit, verify that migrations remain backward-compatible, and rerun the deployed smoke with that commit as `EXPECTED_COMMIT`. If schema rollback is unsafe, restore into a new database from an owner-approved backup/export; never guess or run a destructive reverse migration against the only copy.
+For an application regression, redeploy the same known-good commit on Render and Vercel, ensure migrations are backward-compatible, and rerun the smoke with that SHA. Do not reverse a migration destructively against the only database. Neon restore/branch features must not be assumed available on Free; verify them before relying on them.
 
-For teardown, first export any evidence or data the thesis needs, then delete the web service, API service and database from the Blueprint/dashboard and verify billing has stopped. Disconnecting or deleting the Blueprint alone does not necessarily delete managed resources. Local Compose plus committed datasets remains the recovery path.
-
-## Equivalent-PaaS fallback
-
-Another Docker PaaS is acceptable only after an explicit owner decision and only if it supplies: managed TLS; two services built from these exact Dockerfiles and repository context; private or authenticated service-to-service routing; managed PostgreSQL; secret runtime variables; an ordered, fail-closed pre-release job; healthchecks; immutable commit identification; logs; rollback; and documented teardown/cost/retention. Record the provider-specific mapping and rerun the identical smoke. Architectural substitutions or a live external catalogue API are out of scope.
+For teardown, export only thesis evidence that is lawful and necessary, delete the Vercel project, Render service and Neon project, and verify every dashboard shows no resource and zero charge. Local Compose plus committed datasets is the recovery path.

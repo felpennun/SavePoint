@@ -1,35 +1,31 @@
-# SavePoint public-demo Blueprint. Creating these resources is intentionally a
-# human-gated operation; see docs/deployment/public-demo.md before applying.
+# Render Free hosts only the Django API. Vercel Hobby hosts Next.js and Neon
+# Free hosts PostgreSQL; all three resources remain a blocking human action.
 services:
   - type: web
     name: savepoint-api
     runtime: docker
     region: frankfurt
-    plan: 0.5c-512mb
+    plan: free
+    numInstances: 1
     dockerContext: .
     dockerfilePath: ./apps/api/Dockerfile
-    dockerCommand: sh -c "python manage.py runserver 0.0.0.0:${PORT:-10000}"
-    preDeployCommand: >-
-      python manage.py migrate --noinput &&
+    dockerCommand: >-
+      sh -c "python manage.py migrate --noinput &&
       python manage.py import_catalogue &&
       python manage.py bootstrap_demo_account &&
-      python manage.py seed_demo
+      python manage.py seed_demo &&
+      python manage.py runserver 0.0.0.0:${PORT:-10000}"
     healthCheckPath: /health/
     autoDeployTrigger: checksPass
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
-          name: savepoint-db
-          property: connectionString
+        sync: false
       - key: DJANGO_SECRET_KEY
         generateValue: true
       - key: DJANGO_DEPLOY_ENV
         value: production
       - key: DJANGO_ALLOWED_HOSTS
-        fromService:
-          type: web
-          name: savepoint-api
-          property: host
+        value: localhost
       - key: DJANGO_CSRF_TRUSTED_ORIGINS
         # Render does not expose another service's public URL as a Blueprint
         # property. Enter the exact https:// web origin during first creation.
@@ -38,28 +34,3 @@ services:
         sync: false
       - key: DEMO_PASSWORD
         sync: false
-
-  - type: web
-    name: savepoint-web
-    runtime: docker
-    region: frankfurt
-    plan: 0.5c-512mb
-    dockerContext: .
-    dockerfilePath: ./apps/web/Dockerfile
-    dockerCommand: sh -c "pnpm --dir apps/web exec next build && pnpm --dir apps/web exec next start --hostname 0.0.0.0 --port ${PORT:-10000}"
-    healthCheckPath: /es
-    autoDeployTrigger: checksPass
-    envVars:
-      - key: API_PROXY_TARGET
-        fromService:
-          type: web
-          name: savepoint-api
-          property: hostport
-
-databases:
-  - name: savepoint-db
-    region: frankfurt
-    plan: 0.1c-256mb
-    databaseName: savepoint
-    user: savepoint
-    ipAllowList: []

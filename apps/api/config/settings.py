@@ -142,6 +142,10 @@ if DJANGO_DEPLOY_ENV == "production":
     SECURE_HSTS_PRELOAD = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    # Render terminates public TLS before forwarding to the container. Trust
+    # only its conventional proxy-proto header so SECURE_SSL_REDIRECT and
+    # Django's CSRF secure-origin checks do not loop on internal HTTP.
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SILENCED_SYSTEM_CHECKS: list[str] = []
 else:
     SECURE_SSL_REDIRECT = False

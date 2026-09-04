@@ -215,7 +215,13 @@ if ($gitScanned -eq 0) {
 
 if ($IncludeDeployment) {
     Write-Host "`n== Phase 1b: deployment sources ==" -ForegroundColor Cyan
-    $deploymentPaths = @("infra/render.yaml", "docs/deployment/public-demo.md", "e2e/deployed-smoke.spec.ts")
+    $deploymentPaths = @(
+        "infra/render.yaml",
+        "apps/web/vercel.json",
+        "docs/deployment/public-demo.md",
+        "docs/adr/ADR-005-deployment-parity.md",
+        "e2e/deployed-smoke.spec.ts"
+    )
     $deploymentScanned = 0
     foreach ($relPath in $deploymentPaths) {
         $fullPath = Join-Path $RepoRoot $relPath
