@@ -19,6 +19,8 @@ services:
     autoDeployTrigger: checksPass
     envVars:
       - key: DATABASE_URL
+        # Supply Neon's direct DATABASE_URL_UNPOOLED value here. The startup
+        # chain performs migrations and session-scoped advisory locking.
         sync: false
       - key: DJANGO_SECRET_KEY
         generateValue: true

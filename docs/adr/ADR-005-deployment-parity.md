@@ -22,7 +22,9 @@ Compose sigue construyendo `web` y `api` desde Dockerfiles y orquesta PostgreSQL
 
 ## Evidencia y fuentes
 
-- `infra/compose.yaml`, `infra/render.yaml`, `apps/api/Dockerfile`, `apps/web/vercel.json`, locks y `.env.example`.
+- `infra/compose.yaml`, `infra/render.yaml`, `apps/api/Dockerfile`, `apps/web/vercel.json`, `neon.ts`, locks y `.env.example`.
+- Neon project `autumn-breeze-06234770`, branch `production`: enlazado y reconciliado mediante `neon deploy` sin diferencias; `.neon` y `.env.local` permanecen locales e ignorados.
+- `neon.ts` declara `auth: true` como política de infraestructura ya presente; SavePoint conserva autenticación Django y no integra Neon Auth en esta fase.
 - Plan 01-11 verificó Compose, healthchecks, import/seed idempotente y ausencia de llamadas externas runtime.
 - `scripts/check-secrets.ps1` analiza Git, bundle, imágenes, logs y fuentes de despliegue con canarios previos.
 

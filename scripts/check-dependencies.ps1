@@ -7,12 +7,17 @@ $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 
 $approvedNpm = [ordered]@{
+    "@neon/config" = "1.2.0"
+    "@neon/env" = "1.2.0"
     "next" = "16.3.4"
     "react" = "19.2.7"
     "react-dom" = "19.2.7"
     "@playwright/test" = "1.62.1"
     "@tailwindcss/postcss" = "4.3.3"
     "@testing-library/react" = "16.3.3"
+    "@types/node" = "24.13.0"
+    "@types/react" = "19.2.18"
+    "@types/react-dom" = "19.2.7"
     "axe-core" = "4.13.0"
     "tailwindcss" = "4.3.3"
     "typescript" = "6.0.3"
@@ -45,6 +50,13 @@ if ($CanaryPackage) {
 }
 
 $package = Get-Content -Raw (Join-Path $root "package.json") | ConvertFrom-Json
+$workspace = Get-Content -Raw (Join-Path $root "pnpm-workspace.yaml")
+function Get-CatalogVersion([string]$name) {
+    $escaped = [regex]::Escape($name)
+    $match = [regex]::Match($workspace, "(?m)^\s{2}'?$escaped'?:\s*([^\s#]+)\s*$")
+    if (-not $match.Success) { throw "Catalog dependency missing: $name" }
+    return $match.Groups[1].Value
+}
 $actualNpm = [ordered]@{}
 foreach ($section in @("dependencies", "devDependencies")) {
     foreach ($property in $package.$section.PSObject.Properties) {
@@ -53,7 +65,8 @@ foreach ($section in @("dependencies", "devDependencies")) {
 }
 foreach ($entry in $actualNpm.GetEnumerator()) {
     if (-not $approvedNpm.Contains($entry.Key)) { throw "Unapproved npm dependency: $($entry.Key)" }
-    if ($approvedNpm[$entry.Key] -ne $entry.Value -or -not (Test-ExactVersion $entry.Value)) {
+    $resolvedVersion = if ($entry.Value -eq "catalog:") { Get-CatalogVersion $entry.Key } else { $entry.Value }
+    if ($approvedNpm[$entry.Key] -ne $resolvedVersion -or -not (Test-ExactVersion $resolvedVersion)) {
         throw "npm dependency is not exactly approved: $($entry.Key)@$($entry.Value)"
     }
 }
@@ -79,7 +92,9 @@ $pnpmLock = Get-Content -Raw (Join-Path $root "pnpm-lock.yaml")
 foreach ($entry in $approvedNpm.GetEnumerator()) {
     $escapedName = [regex]::Escape($entry.Key)
     $escapedVersion = [regex]::Escape($entry.Value)
-    if ($pnpmLock -notmatch "(?ms)^\s{6}'?$escapedName'?:\s*\r?\n\s{8}specifier:\s*$escapedVersion\s*$") {
+    $declaredVersion = $actualNpm[$entry.Key]
+    $specifier = if ($declaredVersion -eq "catalog:") { "'catalog:'" } else { $escapedVersion }
+    if ($pnpmLock -notmatch "(?ms)^\s{6}'?$escapedName'?:\s*\r?\n\s{8}specifier:\s*$specifier\s*\r?\n\s{8}version:\s*$escapedVersion(?:\(|\s*$)") {
         throw "pnpm lock importer missing exact approved pin: $($entry.Key)@$($entry.Value)"
     }
 }
