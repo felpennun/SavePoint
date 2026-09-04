@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "timestamp": "2026-09-04T21:05:16.782Z",
+  "timestamp": "2026-09-05T00:07:44.396Z",
   "phase": "01",
   "phase_name": "Three-Day Public Demo Slice",
   "phase_dir": ".planning/phases/01-three-day-public-demo-slice",
@@ -10,29 +10,30 @@
   "status": "paused",
   "completed_tasks": [
     {"id": 1, "name": "Prepare secure public deployment contract", "status": "done", "commit": "efda1c5"},
-    {"id": 2, "name": "Prepare deployed smoke test", "status": "in_progress", "progress": "Neon production configured; Render Blueprint and argv-safe startup published; public URLs and green smoke still pending"}
+    {"id": 2, "name": "Prepare deployed smoke test", "status": "in_progress", "progress": "Render savepoint-api is deployed and green (commit 3d1976e confirmed via /health/); Vercel savepoint-web is deployed at https://save-point-orpin.vercel.app/ with API_PROXY_TARGET set; three real deploy bugs found and fixed this session (see decisions/blockers); DJANGO_CSRF_TRUSTED_ORIGINS still needs to be set to the Vercel origin in Render; deployed smoke has not run yet"}
   ],
   "remaining_tasks": [
-    {"id": 2, "name": "Finish Render and Vercel provisioning, run deployed smoke, record evidence", "status": "in_progress"},
+    {"id": 2, "name": "Finish Vercel/Render cross-config, run deployed smoke, record evidence", "status": "in_progress"},
     {"id": 14, "name": "Run final human verification and sign off Phase 1", "status": "not_started"}
   ],
   "blockers": [
-    {"description": "Render must successfully deploy commit 17580cc and expose a green /health/ endpoint", "type": "human_action", "workaround": "Manual Deploy > Deploy latest commit, then inspect logs"},
-    {"description": "Vercel Hobby project and API_PROXY_TARGET are not yet finalized", "type": "human_action", "workaround": "Import apps/web after the Render HTTPS URL is known"},
-    {"description": "Public Playwright smoke has not run", "type": "external", "workaround": "Run after both provider URLs are configured"}
+    {"description": "Render's DJANGO_CSRF_TRUSTED_ORIGINS is still the placeholder value, not https://save-point-orpin.vercel.app", "type": "human_action", "workaround": "Render dashboard -> savepoint-api -> Environment -> edit DJANGO_CSRF_TRUSTED_ORIGINS -> save (redeploys automatically)"},
+    {"description": "Not yet confirmed whether Vercel auto-redeployed from commit ff5aa2e (the /health/ middleware fix) -- last verified Vercel state was still on the commit that had the /health/ redirect bug", "type": "human_action", "workaround": "Check Vercel dashboard's latest deployment commit, or just curl https://save-point-orpin.vercel.app/health/ and confirm it returns JSON (not a redirect)"},
+    {"description": "Deployed smoke (e2e/deployed-smoke.spec.ts) has not been run against the real URLs yet", "type": "external", "workaround": "Run once CSRF origin is set and Vercel is confirmed on the latest commit -- see docs/deployment/public-demo.md step 7 for the exact command"}
   ],
   "async_jobs": [],
   "human_actions_pending": [
-    {"action": "Redeploy Render from commit 17580cc and confirm startup plus /health/", "context": "Previous deployments exposed Render dockerCommand parsing failures; the startup script fix is now published", "blocking": true},
-    {"action": "Create/configure Vercel Hobby project rooted at apps/web", "context": "Set server-only API_PROXY_TARGET to the final Render HTTPS origin", "blocking": true},
-    {"action": "Replace Render DJANGO_CSRF_TRUSTED_ORIGINS with the final Vercel production origin", "context": "Preserves the same-origin session and CSRF boundary", "blocking": true},
-    {"action": "Run deployed smoke and record URLs, commit and UTC result", "context": "Required to close OPS-01 and Plan 01-12", "blocking": true}
+    {"action": "Set Render DJANGO_CSRF_TRUSTED_ORIGINS to https://save-point-orpin.vercel.app and let it redeploy", "context": "Required so Django accepts CSRF-protected POSTs (login, etc.) coming through the Vercel proxy", "blocking": true},
+    {"action": "Confirm Vercel is running commit ff5aa2e or later (the /health/ middleware fix)", "context": "Without it, /health/ 307-redirects instead of returning the proxied Django health/commit JSON, which would fail the deployed smoke's revision-marker check", "blocking": true},
+    {"action": "Run e2e/deployed-smoke.spec.ts against https://save-point-orpin.vercel.app with the real DEMO_USERNAME/DEMO_PASSWORD, record URLs/commit/UTC time in docs/deployment/public-demo.md's evidence table", "context": "Required to close OPS-01, issue #5, and write 01-12-SUMMARY.md", "blocking": true},
+    {"action": "Close GitHub issues #3 (Vercel project) and #4 (CSRF origin) once each is actually confirmed done -- they are close but not yet verified/closed", "context": "Per CONTRIBUTING.md's plan-level issue policy", "blocking": false}
   ],
   "decisions": [
-    {"decision": "Docker Compose remains the canonical local environment", "rationale": "Reproducible offline tribunal demo with web, API and PostgreSQL", "phase": "01"},
-    {"decision": "Use Vercel Hobby + Render Free + Neon Free with no payment card", "rationale": "Zero-cost public demonstration while retaining the API Docker image", "phase": "01"},
-    {"decision": "Proxy /api/* and /health/ through Vercel", "rationale": "Keep browser-visible requests and Django session cookies same-origin", "phase": "01"},
-    {"decision": "Render receives Neon's direct/unpooled connection in DATABASE_URL", "rationale": "Migrations and advisory locks require a session-scoped direct connection", "phase": "01"}
+    {"decision": "Docker Compose remains canonical local; Vercel Hobby (web) + Render Free (api) + Neon Free (db) is the approved zero-cost public topology, no card", "rationale": "Matches the user's explicit no-payment constraint while keeping the same Django/Next.js images and same-origin proxy architecture", "phase": "01"},
+    {"decision": "GitHub Issues + a GitHub Projects board (https://github.com/users/felpennun/projects/1, \"SavePoint\") now track remaining work, one issue per PLAN.md (not per task), closed via `Closes #N` commit trailers", "rationale": "User explicitly requested a commit/issue policy this session; documented in full in CONTRIBUTING.md", "phase": "01"},
+    {"decision": "seed_demo.py and data/demo/seed-v1.json now key every lookup/comparison by GameWork.canonical_slug, never by GameWork.id", "rationale": "GameWork.id is models.UUIDField(default=uuid.uuid4) -- a fresh random value on every independent first import. The manifest's old hardcoded work_id values only ever matched by coincidence in the long-lived local dev DB; Neon's genuinely first import assigned different ids and broke seed_demo. canonical_slug is deterministic across any fresh import and was already present on every interaction as work_slug.", "phase": "01"},
+    {"decision": "apps/api/Dockerfile now COPYs docs/ into the image alongside data/", "rationale": "import_catalogue's fail-closed freeze check reads docs/verification/catalogue-freeze.md, which previously only existed via the local-only Compose bind mount -- every Render deploy failed at the first startup command until this was added.", "phase": "01"},
+    {"decision": "apps/web/middleware.ts's matcher now excludes /health/ alongside /api/, /_next/, favicon.ico", "rationale": "The locale-redirect logic was catching /health/ before next.config.ts's dedicated proxy rewrite could run, 307-redirecting it to /es/health/ instead of returning the proxied Django health/commit JSON -- this broke the deployment smoke's revision-marker check by construction, on every environment (never previously exercised via the web proxy locally either).", "phase": "01"}
   ],
   "uncommitted_files": [
     ".planning/config.json",
@@ -42,6 +43,6 @@
     ".planning/milestone.lock",
     "skills-lock.json"
   ],
-  "next_action": "In Render, deploy latest commit 17580cc and verify the logs progress through migrate, import_catalogue, bootstrap_demo_account, seed_demo, then bind the server and make /health/ green.",
-  "context_notes": "Neon project autumn-breeze-06234770 branch production is linked and reconciled. Secrets live only in ignored .env.local/provider UIs. Never paste connection strings or credentials into chat or Git. origin/main and local HEAD are 17580cc."
+  "next_action": "Ask the user whether they have set DJANGO_CSRF_TRUSTED_ORIGINS in Render yet and whether Vercel has redeployed past commit ff5aa2e. If both are done, run e2e/deployed-smoke.spec.ts against https://save-point-orpin.vercel.app (BASE_URL, EXPECTED_COMMIT=Render's current commit SHA, DEMO_USERNAME/DEMO_PASSWORD as ephemeral env vars) and record the evidence table in docs/deployment/public-demo.md.",
+  "context_notes": "Session found and fixed three real, previously-undetected deploy bugs by testing against genuinely fresh state (not the long-lived local dev Postgres volume, which was masking two of them): (1) docs/ missing from the API image, (2) seed_demo keying by a non-portable random UUID instead of the deterministic slug, (3) /health/ being redirected by Next.js middleware instead of proxied. All three are pushed to origin/main and verified locally against a truly fresh Postgres + no-bind-mount image before pushing -- do not re-litigate these, they are fixed. Render is confirmed green with commit 3d1976e (before the middleware fix, which doesn't affect Render). Vercel is deployed and serving pages correctly but its /health/ endpoint was last observed still 307-redirecting (pre-fix); this needs re-checking on resume. GitHub Issues #2 is closed; #3/#4/#5/#6 remain open on https://github.com/users/felpennun/projects/1. Never print DEMO_PASSWORD, DATABASE_URL, or any Neon/Render/Vercel credential into chat or logs -- a real Neon connection string was accidentally printed once earlier this session via `neon connection-string`; the user was told to rotate that password as a precaution. Use scripts/check-secrets.ps1's canary patterns as the reference for what counts as secret-shaped before printing anything provider-related."
 }
