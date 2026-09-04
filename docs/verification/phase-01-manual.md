@@ -2,6 +2,12 @@
 
 This protocol complements automated pytest, Vitest, Playwright, and axe checks. It is versioned so that a thesis reviewer can reproduce the same human observations. Never paste passwords, cookies, DSNs, API keys, or environment dumps into this document or screenshots.
 
+## Automated coverage (Plan 01-10, `e2e/a11y.spec.ts`)
+
+The following sections of this checklist are now exercised automatically, at commit `97d438e` and later: 26 tests, all green -- axe (critical/serious = 0) across homepage/login/catalogue/one game detail/sources, ES and EN, at 375x812 and 1280x800; the full keyboard-only journey (skip link → login → search → detail → status → collection → profile → sign-out); no horizontal overflow at 375px; `prefers-reduced-motion` renders without error. This is agent-generated automated evidence, not a human confirmation -- per Sign-off below, it does not by itself close the **Reflow at 400% zoom** or **Basic screen-reader pass** sections, which require an actual human at a real zoom level / with a real screen reader. Those two sections' checkboxes remain unchecked pending that human session; do not check them from automated output.
+
+
+
 ## Evidence header
 
 Record one row for every verification session.
