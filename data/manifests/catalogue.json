@@ -1,0 +1,40 @@
+{
+  "coverage": {
+    "bilingual_title_count": 89,
+    "distinct_genres": 77,
+    "eras": {
+      "1990s": 27,
+      "2000s": 39,
+      "2010s": 25,
+      "2020s": 12,
+      "pre-1990": 46,
+      "unknown": 1
+    },
+    "platform_families": {
+      "arcade-mobile-other": 40,
+      "nintendo": 42,
+      "other": 10,
+      "pc": 93,
+      "playstation": 21,
+      "sega": 13,
+      "xbox": 24
+    }
+  },
+  "cutoff": "2026-09-04T16:24:18Z",
+  "license": "CC0 1.0",
+  "license_url": "https://www.wikidata.org/wiki/Wikidata:Licensing",
+  "promotion": "blocked-until-human-freeze",
+  "query_revision": "savepoint-phase-01-v4",
+  "query_sha256": "58df9dad713cace856f54ff1254259530793e45d7707797a2f75f5c43026470d",
+  "record_count": 150,
+  "retrieved_at": "2026-09-04T16:24:18Z",
+  "runtime_network_dependency": false,
+  "schema_version": 1,
+  "snapshot": {
+    "path": "data/raw/wikidata-games.json",
+    "sha256": "a2b5d8d1f4388b21a03a5c3c983840e38db2c5e176613913985a5e38f7408159"
+  },
+  "source": "Wikidata structured data",
+  "source_url": "https://www.wikidata.org/",
+  "status": "candidate-not-approved"
+}

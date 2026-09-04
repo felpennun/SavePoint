@@ -15,12 +15,13 @@ import json
 import os
 import re
 import tempfile
+import time
 from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
-from urllib.parse import quote, urlencode, urlparse
+from urllib.parse import quote, unquote, urlencode, urlparse
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -33,64 +34,110 @@ COMMONS_API = "https://commons.wikimedia.org/w/api.php"
 ALLOWED_HOSTS = frozenset({"query.wikidata.org", "commons.wikimedia.org"})
 USER_AGENT = "SavePoint-TFG/0.1 (academic dataset acquisition; contact: repository issue tracker)"
 MAX_BYTES = 20 * 1024 * 1024
-TIMEOUT_SECONDS = 60
+TIMEOUT_SECONDS = 90
 MAX_REDIRECTS = 2
 TARGET_COUNT = 150
 MIN_COUNT = 100
 MAX_COUNT = 300
 RETRIEVED_AT = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
-# revision 3: removed wikibase:sitelinks join (caused consistent 30 s timeout on the
-# public SPARQL endpoint). Now uses a curated VALUES list of well-known QIDs spanning
-# multiple eras/genres/platforms (D-05/D-06), with OPTIONAL metadata blocks.
-# The QID list is the reproducible selection artefact; it can be extended without
-# changing the query structure.
-_CURATED_QIDS = """
-  wd:Q170325 wd:Q171044 wd:Q208185 wd:Q242700 wd:Q188195
-  wd:Q208743 wd:Q210073 wd:Q171573 wd:Q272188 wd:Q208400
-  wd:Q166542 wd:Q168975 wd:Q171282 wd:Q171897 wd:Q170434
-  wd:Q16938 wd:Q49100 wd:Q83404 wd:Q110391 wd:Q201735
-  wd:Q614807 wd:Q523792 wd:Q80165 wd:Q848512 wd:Q726267
-  wd:Q9371 wd:Q1361394 wd:Q1361396 wd:Q223974 wd:Q742376
-  wd:Q204406 wd:Q209163 wd:Q226602 wd:Q498383 wd:Q180079
-  wd:Q287513 wd:Q4945 wd:Q40447 wd:Q246994 wd:Q309588
-  wd:Q193581 wd:Q201705 wd:Q184537 wd:Q1361372 wd:Q1361378
-  wd:Q271455 wd:Q325580 wd:Q1361357 wd:Q1361363 wd:Q183069
-  wd:Q234808 wd:Q243951 wd:Q173013 wd:Q275535 wd:Q254654
-  wd:Q167726 wd:Q163010 wd:Q154706 wd:Q131219 wd:Q124592
-  wd:Q369822 wd:Q208159 wd:Q208309 wd:Q172881 wd:Q208085
-  wd:Q207786 wd:Q209293 wd:Q214964 wd:Q163016 wd:Q220783
-  wd:Q250256 wd:Q274053 wd:Q317537 wd:Q338017 wd:Q366516
-  wd:Q381861 wd:Q388380 wd:Q389567 wd:Q397895 wd:Q402815
-  wd:Q407484 wd:Q419049 wd:Q426778 wd:Q430742 wd:Q452484
-  wd:Q454052 wd:Q456810 wd:Q459447 wd:Q464218 wd:Q473800
-  wd:Q476553 wd:Q480180 wd:Q487929 wd:Q490920 wd:Q496658
-  wd:Q500438 wd:Q501218 wd:Q504977 wd:Q506426 wd:Q515183
-  wd:Q519776 wd:Q524140 wd:Q527398 wd:Q533266 wd:Q538555
-  wd:Q543264 wd:Q548289 wd:Q556574 wd:Q563374 wd:Q571609
-  wd:Q577706 wd:Q581401 wd:Q584534 wd:Q589113 wd:Q595185
-  wd:Q601013 wd:Q607052 wd:Q617073 wd:Q622440 wd:Q628272
-  wd:Q634564 wd:Q641378 wd:Q648393 wd:Q651978 wd:Q655332
-  wd:Q659561 wd:Q663448 wd:Q667337 wd:Q671224 wd:Q675113
-  wd:Q679002 wd:Q682891 wd:Q686780 wd:Q690669 wd:Q694558
-  wd:Q698447 wd:Q702336 wd:Q706225 wd:Q710114 wd:Q714003
-  wd:Q717892 wd:Q721781 wd:Q725670 wd:Q729559 wd:Q733448
-  wd:Q737337 wd:Q741226 wd:Q745115 wd:Q749004 wd:Q752893
-"""
-
-QUERY = """# SavePoint Phase 1 candidate query, revision 3 (2026-09-04)
-# Uses a curated VALUES list to avoid the expensive wikibase:sitelinks join.
+# revision 4: revision 3's hand-curated VALUES list was found (during a live acquisition
+# run) to contain QIDs that are not video games at all -- e.g. Q4945 (a French commune),
+# Q9371 (spleen, the organ), Q49100 (the Yom Kippur War) -- because the list was authored
+# without verifying each QID resolves to an actual game. Revision 4 replaces the fabricated
+# VALUES list with a `?game wdt:P31 wd:Q7889` ("instance of video game") class filter, run as
+# several small bounded queries instead of one broad query, so D-05/D-06 era/platform coverage
+# is guaranteed by construction rather than hoped for from whatever a single LIMIT happens to
+# return. Each query avoids the wikibase:sitelinks join that caused revision <3's timeout.
+_BASE_TEMPLATE = """# SavePoint Phase 1 candidate query, revision 4 ({label})
 SELECT ?game ?enLabel ?esLabel (MIN(?date) AS ?releaseDate)
        (SAMPLE(?candidateImage) AS ?image) WHERE {{
-  VALUES ?game {{ {qids} }}
+  ?game wdt:P31 wd:Q7889 .
+{extra}
   ?game rdfs:label ?enLabel . FILTER(LANG(?enLabel) = "en")
   OPTIONAL {{ ?game rdfs:label ?esLabel . FILTER(LANG(?esLabel) = "es") }}
   OPTIONAL {{ ?game wdt:P577 ?date }}
   OPTIONAL {{ ?game wdt:P18 ?candidateImage }}
 }}
 GROUP BY ?game ?enLabel ?esLabel
-ORDER BY ?game
-""".format(qids=_CURATED_QIDS)
+LIMIT {limit}
+"""
+
+# Platform sub-queries resolve target platform QIDs at runtime via Wikidata's own
+# search backend (see `_resolve_platform_qids`) rather than a hand-typed QID list --
+# revision 3's fabricated VALUES list is exactly the failure mode this avoids: a QID
+# typed from memory without verification can silently denote something else entirely
+# (a commune, an organ, a war). A raw `CONTAINS(LCASE(?platformLabel), "xbox")` scan
+# over every game's every platform was tried first and reliably 504-timed-out on the
+# public endpoint (it has no index to exploit); resolving a small set of verified
+# platform QIDs first, then joining games via `VALUES ?platform {...}`, is a bounded,
+# indexed lookup instead of a full scan.
+_PLATFORM_VALUES_EXTRA = """  ?game wdt:P400 ?platform .
+  VALUES ?platform {{ {platform_qids} }}
+"""
+
+
+def _resolve_platform_qids(search_term: str, limit: int = 8) -> dict[str, str]:
+    """Resolve real, verified platform QIDs for a search term via Wikidata's own
+    search index (SERVICE wikibase:mwapi), keeping only entities actually used as
+    the wdt:P400 platform of at least one real P31=Q7889 video game. Both the
+    search and the verification stay within ALLOWED_HOSTS (query.wikidata.org)."""
+    query = f"""SELECT DISTINCT ?item ?itemLabel WHERE {{
+  SERVICE wikibase:mwapi {{
+    bd:serviceParam wikibase:api "EntitySearch" .
+    bd:serviceParam wikibase:endpoint "www.wikidata.org" .
+    bd:serviceParam mwapi:search "{search_term}" .
+    bd:serviceParam mwapi:language "en" .
+    ?item wikibase:apiOutputItem mwapi:item .
+  }}
+  ?item rdfs:label ?itemLabel . FILTER(LANG(?itemLabel) = "en")
+  FILTER EXISTS {{ ?anygame wdt:P31 wd:Q7889 ; wdt:P400 ?item }}
+}}
+LIMIT {limit}
+"""
+    response = _fetch_json(WIKIDATA_ENDPOINT, {"query": query, "format": "json"})
+    bindings = response.get("results", {}).get("bindings") or []
+    resolved: dict[str, str] = {}
+    for binding in bindings:
+        uri = _binding_value(binding, "item")
+        label = _binding_value(binding, "itemLabel")
+        if uri and label:
+            resolved[_qid(uri)] = label
+    return resolved
+
+
+def _build_platform_query(label: str, search_terms: list[str], limit: int) -> tuple[str, str, int] | None:
+    """Resolve QIDs for every search term and build a bounded games sub-query.
+    Returns None (skip this sub-query) if nothing verifiable was found -- never
+    fabricate a fallback QID."""
+    resolved: dict[str, str] = {}
+    for term in search_terms:
+        resolved.update(_resolve_platform_qids(term))
+    if not resolved:
+        print(f"  platform resolution for '{label}': no verified QIDs found, skipping")
+        return None
+    print(f"  platform resolution for '{label}': {resolved}")
+    values = " ".join(f"wd:{qid}" for qid in resolved)
+    extra = _PLATFORM_VALUES_EXTRA.format(platform_qids=values)
+    return (label, extra, limit)
+
+
+# Bounded sub-queries: one broad sweep plus targeted eras/platforms known to be
+# under-represented in a random sample, so the required D-05/D-06 matrix is met
+# by construction. Coverage-critical queries run FIRST so `_aggregate`'s
+# insertion-order truncation (see its final `list(...)[:TARGET_COUNT]` step) keeps
+# them even when the broad sweep alone would already exceed TARGET_COUNT; the
+# broad sweep runs last and only fills whatever slots remain. Platform queries are
+# resolved dynamically (see `_build_platform_query`) so they carry no static list.
+STATIC_ACQUISITION_QUERIES: list[tuple[str, str, int]] = [
+    ("pre-1990 era", '  ?game wdt:P577 ?eraDate . FILTER(YEAR(?eraDate) < 1990)\n', 30),
+    ("2020s era", '  ?game wdt:P577 ?eraDate . FILTER(YEAR(?eraDate) >= 2020)\n', 30),
+]
+PLATFORM_SEARCH_TERMS: list[tuple[str, list[str], int]] = [
+    ("xbox platform", ["Xbox"], 20),
+    ("sega platform", ["Sega Genesis", "Sega Mega Drive", "Sega Saturn", "Sega Dreamcast", "Sega"], 20),
+]
+BROAD_SWEEP: tuple[str, str, int] = ("broad sweep", "", 220)
 
 METADATA_QUERY_TEMPLATE = """# SavePoint bounded metadata enrichment, revision 1
 SELECT ?game ?genreLabel ?platformLabel WHERE {
@@ -168,7 +215,12 @@ def _image_title(uri: str) -> str | None:
     marker = "/wiki/Special:FilePath/"
     if marker not in parsed.path:
         return None
-    return "File:" + parsed.path.split(marker, 1)[1].replace("_", " ")
+    # urlparse does not decode percent-escapes (e.g. "%27" for an apostrophe) --
+    # without unquoting, titles like "Assassin's Creed" survive as "Assassin%27s
+    # Creed" and never match a real Commons page, so every lookup below silently
+    # falls back to placeholder regardless of the file's actual licence.
+    raw_name = unquote(parsed.path.split(marker, 1)[1])
+    return "File:" + raw_name.replace("_", " ")
 
 
 def _year(value: str | None) -> int | None:
@@ -253,7 +305,12 @@ def _aggregate(bindings: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "coverage": {"era": _era(year), "platform_families": _platform_families(platforms)},
             }
         )
-    return sorted(normalized, key=lambda item: int(item["qid"][1:]))[:TARGET_COUNT]
+    # Truncate in insertion order first (coverage-critical sub-queries were merged
+    # ahead of the broad sweep in `_run_acquisition_queries`, so they survive this
+    # cut even if the broad sweep alone would exceed TARGET_COUNT), THEN sort the
+    # retained subset by QID for deterministic, reproducible output ordering.
+    selected = normalized[:TARGET_COUNT]
+    return sorted(selected, key=lambda item: int(item["qid"][1:]))
 
 
 def _enrich_bindings(base_bindings: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -380,11 +437,57 @@ def _validate_candidate(raw: dict[str, Any], catalogue: dict[str, Any], assets: 
                 raise ValueError("Incomplete asset metadata must resolve to placeholder")
 
 
+def _run_acquisition_queries() -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
+    """Run each bounded sub-query and merge bindings, deduplicated by QID.
+
+    Multiple sub-queries can return the same game (e.g. a 2020s Xbox title
+    appears in both the era and platform queries); the first occurrence wins
+    so later queries only contribute genuinely new candidates.
+    """
+    platform_queries = [
+        built
+        for label, terms, limit in PLATFORM_SEARCH_TERMS
+        if (built := _build_platform_query(label, terms, limit)) is not None
+    ]
+    queries = [*STATIC_ACQUISITION_QUERIES, *platform_queries, BROAD_SWEEP]
+
+    merged: dict[str, dict[str, Any]] = {}
+    executed: list[dict[str, str]] = []
+    for label, extra, limit in queries:
+        query_text = _BASE_TEMPLATE.format(label=label, extra=extra, limit=limit)
+        response = None
+        last_exc: RuntimeError | None = None
+        for attempt, backoff in enumerate((0, 5, 20), start=1):
+            if backoff:
+                time.sleep(backoff)
+            try:
+                response = _fetch_json(WIKIDATA_ENDPOINT, {"query": query_text, "format": "json"})
+                break
+            except RuntimeError as exc:
+                # Public WDQS is a shared, occasionally slow/rate-limited endpoint;
+                # conservative retries absorb transient timeouts without masking a
+                # genuinely broken query (all attempts failing still raises).
+                last_exc = exc
+                print(f"  query '{label}': attempt {attempt} failed ({exc}), retrying...")
+        if response is None:
+            assert last_exc is not None
+            raise last_exc
+        bindings = response.get("results", {}).get("bindings")
+        if not isinstance(bindings, list):
+            raise ValueError(f"Wikidata response for '{label}' query has no bindings")
+        executed.append({"label": label, "query": query_text, "row_count": str(len(bindings))})
+        new_count = 0
+        for binding in bindings:
+            game_uri = _binding_value(binding, "game")
+            if game_uri and game_uri not in merged:
+                merged[game_uri] = binding
+                new_count += 1
+        print(f"  query '{label}': {len(bindings)} rows, {new_count} new games")
+    return list(merged.values()), executed
+
+
 def acquire() -> None:
-    response = _fetch_json(WIKIDATA_ENDPOINT, {"query": QUERY, "format": "json"})
-    bindings = response.get("results", {}).get("bindings")
-    if not isinstance(bindings, list):
-        raise ValueError("Wikidata response has no bindings")
+    bindings, executed_queries = _run_acquisition_queries()
     games = _aggregate(_enrich_bindings(bindings))
     coverage = _coverage(games)
     raw = {
@@ -395,8 +498,8 @@ def acquire() -> None:
         "source_url": WIKIDATA_ENDPOINT,
         "source_license": "CC0 1.0",
         "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
-        "query_revision": "savepoint-phase-01-v2",
-        "query": QUERY,
+        "query_revision": "savepoint-phase-01-v4",
+        "queries": executed_queries,
         "metadata_query_template": METADATA_QUERY_TEMPLATE,
         "games": games,
     }
@@ -434,8 +537,10 @@ def acquire() -> None:
         "license_url": "https://www.wikidata.org/wiki/Wikidata:Licensing",
         "retrieved_at": RETRIEVED_AT,
         "cutoff": RETRIEVED_AT,
-        "query_revision": "savepoint-phase-01-v2",
-        "query_sha256": _sha256((QUERY + METADATA_QUERY_TEMPLATE).encode("utf-8")),
+        "query_revision": "savepoint-phase-01-v4",
+        "query_sha256": _sha256(
+            (json.dumps([q["query"] for q in raw["queries"]]) + METADATA_QUERY_TEMPLATE).encode("utf-8")
+        ),
         "record_count": len(games),
         "coverage": coverage,
         "snapshot": {"path": "data/raw/wikidata-games.json", "sha256": raw_hash},

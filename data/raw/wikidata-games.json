@@ -1,0 +1,5049 @@
+{
+  "games": [
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "multiple perspectives role-playing",
+        "real-time tactics"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "macOS",
+        "Microsoft Windows",
+        "Q10680",
+        "Q132020"
+      ],
+      "qid": "Q2387",
+      "release_dates": [
+        "2001-09-20T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q2387",
+      "titles": {
+        "en": "Commandos 2: Men of Courage",
+        "es": "Commandos 2: Men of Courage"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "real-time tactics",
+        "tactical role-playing game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows"
+      ],
+      "qid": "Q2440",
+      "release_dates": [
+        "2005-03-08T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q2440",
+      "titles": {
+        "en": "Freedom Force vs the 3rd Reich",
+        "es": "Freedom Force vs The 3rd Reich"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "turn-based strategy video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows"
+      ],
+      "qid": "Q2473",
+      "release_dates": [
+        "2007-10-12T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q2473",
+      "titles": {
+        "en": "Heroes of Might and Magic V: Tribes of the East",
+        "es": "Heroes of Might and Magic V: Tribes of the East"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "pc",
+          "playstation"
+        ]
+      },
+      "genres": [
+        "racing video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "PlayStation 3",
+        "PlayStation Portable",
+        "Q48263",
+        "Q48493",
+        "Q94",
+        "Symbian",
+        "Windows Mobile"
+      ],
+      "qid": "Q4104",
+      "release_dates": [
+        "2009-09-15T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q4104",
+      "titles": {
+        "en": "Need for Speed: Shift",
+        "es": "Need for Speed: Shift"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2010s",
+        "platform_families": [
+          "pc",
+          "playstation",
+          "nintendo",
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "puzzle-platformer"
+      ],
+      "image_candidates": [
+        "File:VVVVVV - The Tomb of Mad Carew.png"
+      ],
+      "platforms": [
+        "Commodore 64",
+        "macOS",
+        "Microsoft Windows",
+        "Nintendo 3DS",
+        "Ouya",
+        "Pandora",
+        "PlayStation Vita",
+        "Q19610114",
+        "Q388",
+        "Q48493",
+        "Q5014725",
+        "Q94"
+      ],
+      "qid": "Q5766",
+      "release_dates": [
+        "2010-01-11T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q5766",
+      "titles": {
+        "en": "VVVVVV",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "nintendo"
+        ]
+      },
+      "genres": [
+        "2D platform game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Nintendo Entertainment System"
+      ],
+      "qid": "Q11168",
+      "release_dates": [
+        "1985-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q11168",
+      "titles": {
+        "en": "Super Mario Bros.",
+        "es": "Super Mario Bros."
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "shooter game",
+        "stealth game",
+        "third-person shooter"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows"
+      ],
+      "qid": "Q13165",
+      "release_dates": [
+        "2007-10-16T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q13165",
+      "titles": {
+        "en": "Death to Spies",
+        "es": "Death to Spies"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2010s",
+        "platform_families": [
+          "playstation"
+        ]
+      },
+      "genres": [
+        "action-adventure game",
+        "platformer",
+        "third-person shooter"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "PlayStation 3"
+      ],
+      "qid": "Q17138",
+      "release_dates": [
+        "2011-11-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q17138",
+      "titles": {
+        "en": "Uncharted 3: Drake's Deception",
+        "es": "Uncharted 3: La traición de Drake"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "playstation"
+        ]
+      },
+      "genres": [
+        "action-adventure game",
+        "platformer",
+        "third-person shooter"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "PlayStation 3"
+      ],
+      "qid": "Q17150",
+      "release_dates": [
+        "2007-11-19T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q17150",
+      "titles": {
+        "en": "Uncharted: Drake's Fortune",
+        "es": "Uncharted: El tesoro de Drake"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2010s",
+        "platform_families": [
+          "pc",
+          "playstation",
+          "xbox"
+        ]
+      },
+      "genres": [
+        "action-adventure game",
+        "first-person shooter",
+        "simulation video game",
+        "third-person shooter"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "PlayStation 3",
+        "Q13361286",
+        "Q48263",
+        "Q5014725",
+        "Q63184502",
+        "Xbox Series X and Series S"
+      ],
+      "qid": "Q17452",
+      "release_dates": [
+        "2013-09-17T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q17452",
+      "titles": {
+        "en": "Grand Theft Auto V",
+        "es": "Grand Theft Auto V"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "card video game",
+        "fantasy video game",
+        "turn-based strategy video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "Q48493"
+      ],
+      "qid": "Q17724",
+      "release_dates": [
+        "2008-10-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q17724",
+      "titles": {
+        "en": "Spectromancer",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "1990s",
+        "platform_families": [
+          "pc",
+          "playstation",
+          "nintendo",
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "first-person shooter"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "3DO",
+        "Acorn Archimedes",
+        "Amiga 1200",
+        "AmigaOS",
+        "Apple II series",
+        "Apple IIGS",
+        "Atari Jaguar",
+        "Atari ST",
+        "Atari TOS",
+        "Classic Mac OS",
+        "IBM Personal Computer",
+        "Microsoft Windows",
+        "MorphOS",
+        "NEC PC-9800 series",
+        "PlayStation 3",
+        "Pocket PC",
+        "Q132020",
+        "Q188642",
+        "Q388",
+        "Q47604",
+        "Q48263",
+        "Q48493",
+        "Q94",
+        "RISC OS",
+        "Super Nintendo Entertainment System"
+      ],
+      "qid": "Q18940",
+      "release_dates": [
+        "1992-05-05T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q18940",
+      "titles": {
+        "en": "Wolfenstein 3D",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "pc",
+          "playstation"
+        ]
+      },
+      "genres": [
+        "first-person shooter",
+        "post-apocalyptic video game",
+        "science fiction video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "macOS",
+        "Microsoft Windows",
+        "PlayStation 3",
+        "Q388",
+        "Q48263"
+      ],
+      "qid": "Q18951",
+      "release_dates": [
+        "2006-06-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q18951",
+      "titles": {
+        "en": "Half-Life 2: Episode One",
+        "es": "Half-Life 2: Episode One"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "fantasy video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows"
+      ],
+      "qid": "Q19419",
+      "release_dates": [
+        "2006-11-03T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q19419",
+      "titles": {
+        "en": "Rappelz",
+        "es": "Rappelz"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2010s",
+        "platform_families": [
+          "pc",
+          "playstation"
+        ]
+      },
+      "genres": [
+        "science fiction video game",
+        "turn-based strategy video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "macOS",
+        "Microsoft Windows",
+        "PlayStation 3",
+        "Q388",
+        "Q48263",
+        "Q48493",
+        "Q94"
+      ],
+      "qid": "Q26097",
+      "release_dates": [
+        "2012-10-09T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q26097",
+      "titles": {
+        "en": "XCOM: Enemy Unknown",
+        "es": "XCOM: Enemy Unknown"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2010s",
+        "platform_families": [
+          "pc",
+          "playstation",
+          "xbox"
+        ]
+      },
+      "genres": [
+        "massively multiplayer online role-playing game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "PlayStation 3",
+        "Q13361286",
+        "Q19610114",
+        "Q5014725",
+        "Q63184502",
+        "Xbox Series X and Series S"
+      ],
+      "qid": "Q27107",
+      "release_dates": [
+        "2011-01-11T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q27107",
+      "titles": {
+        "en": "DC Universe Online",
+        "es": "DC Universe Online"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "nintendo"
+        ]
+      },
+      "genres": [
+        "platformer"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Famicom Disk System",
+        "Nintendo Entertainment System"
+      ],
+      "qid": "Q27296",
+      "release_dates": [
+        "1988-04-22T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q27296",
+      "titles": {
+        "en": "Bio Miracle Bokutte Upa",
+        "es": "Bio Miracle Bokutte Upa"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "pc",
+          "nintendo"
+        ]
+      },
+      "genres": [
+        "real-time strategy"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "Nintendo GameCube",
+        "Q10680"
+      ],
+      "qid": "Q28226",
+      "release_dates": [
+        "2002-03-28T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q28226",
+      "titles": {
+        "en": "Army Men: RTS",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "action role-playing game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows"
+      ],
+      "qid": "Q28258",
+      "release_dates": [
+        "2004-10-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q28258",
+      "titles": {
+        "en": "Restricted Area",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "1990s",
+        "platform_families": [
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "beat 'em up"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "arcade video game"
+      ],
+      "qid": "Q28276",
+      "release_dates": [
+        "1995-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q28276",
+      "titles": {
+        "en": "Guardians",
+        "es": "Guardians"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "real-time strategy",
+        "real-time tactics"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows"
+      ],
+      "qid": "Q28362",
+      "release_dates": [
+        "2005-04-15T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q28362",
+      "titles": {
+        "en": "Cossacks II: Napoleonic Wars",
+        "es": "Cossacks II: Napoleonic Wars"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "real-time strategy"
+      ],
+      "image_candidates": [
+        "File:3 cossacks european wars.JPG"
+      ],
+      "platforms": [
+        "Microsoft Windows"
+      ],
+      "qid": "Q28418",
+      "release_dates": [
+        "2001-04-24T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q28418",
+      "titles": {
+        "en": "Cossacks: European Wars",
+        "es": "Cossacks: European Wars"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "action-adventure game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Atari 2600"
+      ],
+      "qid": "Q29715",
+      "release_dates": [
+        "1979-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q29715",
+      "titles": {
+        "en": "Superman",
+        "es": "Superman"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "unknown",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "eroge",
+        "harem",
+        "visual novel"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "Q10680",
+        "Q184198"
+      ],
+      "qid": "Q31332",
+      "release_dates": [],
+      "source_url": "https://www.wikidata.org/wiki/Q31332",
+      "titles": {
+        "en": "Wind: A Breath of Heart",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2010s",
+        "platform_families": [
+          "other"
+        ]
+      },
+      "genres": [
+        "sim racing"
+      ],
+      "image_candidates": [
+        "File:E3 2011 - Forza Motorsport 4 (Xbox) (5822123385).jpg"
+      ],
+      "platforms": [
+        "Q48263"
+      ],
+      "qid": "Q31560",
+      "release_dates": [
+        "2011-10-11T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q31560",
+      "titles": {
+        "en": "Forza Motorsport 4",
+        "es": "Forza Motorsport 4"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "1990s",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "action-adventure game",
+        "space opera video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "Q10677",
+        "Q5014725"
+      ],
+      "qid": "Q54338",
+      "release_dates": [
+        "1999-04-30T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q54338",
+      "titles": {
+        "en": "Star Wars: Episode I – The Phantom Menace",
+        "es": "Star Wars Episodio I: La Amenaza Fantasma"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "pc",
+          "nintendo"
+        ]
+      },
+      "genres": [
+        "action-adventure game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "macOS",
+        "Microsoft Windows",
+        "Nintendo GameCube",
+        "Q10680",
+        "Q132020",
+        "Q188642"
+      ],
+      "qid": "Q55216",
+      "release_dates": [
+        "2005-03-29T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55216",
+      "titles": {
+        "en": "Lego Star Wars: The Video Game",
+        "es": "Lego Star Wars: The Video Game"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "1990s",
+        "platform_families": [
+          "pc",
+          "nintendo"
+        ]
+      },
+      "genres": [
+        "racing video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Classic Mac OS",
+        "Game Boy Color",
+        "Microsoft Windows",
+        "Nintendo 64",
+        "Q184198",
+        "Q5014725"
+      ],
+      "qid": "Q55217",
+      "release_dates": [
+        "1999-05-19T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55217",
+      "titles": {
+        "en": "Star Wars Episode I: Racer",
+        "es": "Star Wars Episodio I: Racer"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "nintendo"
+        ]
+      },
+      "genres": [
+        "action game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Nintendo GameCube",
+        "Q10680",
+        "Q5014725"
+      ],
+      "qid": "Q55219",
+      "release_dates": [
+        "2002-11-22T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55219",
+      "titles": {
+        "en": "Star Wars: Bounty Hunter",
+        "es": "Star Wars: Bounty Hunter"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "racing video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "arcade video game"
+      ],
+      "qid": "Q55223",
+      "release_dates": [
+        "2000-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55223",
+      "titles": {
+        "en": "Star Wars: Racer Arcade",
+        "es": "Star Wars: Racer Arcade"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "pc",
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "action game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "arcade video game",
+        "Microsoft Windows",
+        "Q10680",
+        "Q132020"
+      ],
+      "qid": "Q55225",
+      "release_dates": [
+        "2001-02-19T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55225",
+      "titles": {
+        "en": "Star Wars: Starfighter",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "other"
+        ]
+      },
+      "genres": [
+        "racing video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Q10680"
+      ],
+      "qid": "Q55227",
+      "release_dates": [
+        "2001-04-23T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55227",
+      "titles": {
+        "en": "Star Wars: Super Bombad Racing",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2010s",
+        "platform_families": [
+          "pc",
+          "playstation",
+          "nintendo"
+        ]
+      },
+      "genres": [
+        "action-adventure game",
+        "platformer"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "macOS",
+        "Microsoft Windows",
+        "Nintendo 3DS",
+        "Nintendo DS",
+        "PlayStation 3",
+        "PlayStation Portable",
+        "Q48263",
+        "Wii"
+      ],
+      "qid": "Q55228",
+      "release_dates": [
+        "2011-03-22T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55228",
+      "titles": {
+        "en": "Lego Star Wars III: The Clone Wars",
+        "es": "Lego Star Wars III: The Clone Wars"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "playstation"
+        ]
+      },
+      "genres": [
+        "action game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "PlayStation 3",
+        "Q10680",
+        "Q132020",
+        "Q5014725"
+      ],
+      "qid": "Q55229",
+      "release_dates": [
+        "2002-03-10T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55229",
+      "titles": {
+        "en": "Star Wars: Jedi Starfighter",
+        "es": "Star Wars Jedi Starfighter"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "other"
+        ]
+      },
+      "genres": [
+        "strategy video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "mobile phone"
+      ],
+      "qid": "Q55237",
+      "release_dates": [
+        "2005-08-30T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55237",
+      "titles": {
+        "en": "Star Wars: Republic Commando: Order 66",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "pc",
+          "playstation",
+          "nintendo"
+        ]
+      },
+      "genres": [
+        "action-adventure game",
+        "platformer"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "macOS",
+        "Microsoft Windows",
+        "Nintendo DS",
+        "Nintendo GameCube",
+        "PlayStation Portable",
+        "Q10680",
+        "Q132020",
+        "Q188642",
+        "Q48263"
+      ],
+      "qid": "Q55239",
+      "release_dates": [
+        "2006-09-11T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55239",
+      "titles": {
+        "en": "Lego Star Wars II: The Original Trilogy",
+        "es": "Lego Star Wars II: The Original Trilogy"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "pc",
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "action-adventure game",
+        "platformer"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Amstrad CPC",
+        "Commodore 64",
+        "DOS",
+        "Microsoft Windows",
+        "Q19610114",
+        "ZX Spectrum"
+      ],
+      "qid": "Q55533",
+      "release_dates": [
+        "1987-12-31T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55533",
+      "titles": {
+        "en": "Saboteur II: Avenging Angel",
+        "es": "Saboteur II: Avenging Angel"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "other"
+        ]
+      },
+      "genres": [
+        "arcade"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "ZX Spectrum"
+      ],
+      "qid": "Q55534",
+      "release_dates": [
+        "1985-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55534",
+      "titles": {
+        "en": "Cyclone",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "playstation",
+          "nintendo",
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "shoot 'em up"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Amstrad CPC",
+        "arcade video game",
+        "Atari ST",
+        "Commodore 64",
+        "Nintendo Entertainment System",
+        "PlayStation 3",
+        "Q100047",
+        "TurboGrafx-16",
+        "ZX Spectrum"
+      ],
+      "qid": "Q55535",
+      "release_dates": [
+        "1987-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55535",
+      "titles": {
+        "en": "1943: The Battle of Midway",
+        "es": "1943: The Battle of Midway"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "pc",
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "bowling video game",
+        "sports video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Amstrad CPC",
+        "Commodore 64",
+        "DOS",
+        "MSX",
+        "ZX Spectrum"
+      ],
+      "qid": "Q55536",
+      "release_dates": [
+        "1986-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55536",
+      "titles": {
+        "en": "10th Frame",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "pc",
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "shoot 'em up"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Amstrad CPC",
+        "Atari ST",
+        "BBC Micro",
+        "Commodore 64",
+        "DOS",
+        "MSX",
+        "Q100047",
+        "ZX Spectrum"
+      ],
+      "qid": "Q55538",
+      "release_dates": [
+        "1989-04-20T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55538",
+      "titles": {
+        "en": "007: Licence to Kill",
+        "es": "Licencia para matar"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "military education and training"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Commodore 64",
+        "ZX Spectrum"
+      ],
+      "qid": "Q55555",
+      "release_dates": [
+        "1988-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55555",
+      "titles": {
+        "en": "19 Part One: Boot Camp",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "other"
+        ]
+      },
+      "genres": [
+        "boxing video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "MSX"
+      ],
+      "qid": "Q55563",
+      "release_dates": [
+        "1984-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55563",
+      "titles": {
+        "en": "3D Knockout",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "other"
+        ]
+      },
+      "genres": [
+        "maze video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Amstrad CPC",
+        "ZX Spectrum"
+      ],
+      "qid": "Q55565",
+      "release_dates": [
+        "1984-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55565",
+      "titles": {
+        "en": "3-D Monster Chase",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "shoot 'em up"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "BBC Micro",
+        "Commodore 64",
+        "ZX Spectrum"
+      ],
+      "qid": "Q55566",
+      "release_dates": [
+        "1982-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55566",
+      "titles": {
+        "en": "3D Tanx",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "shoot 'em up"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Commodore 64",
+        "ZX Spectrum"
+      ],
+      "qid": "Q55587",
+      "release_dates": [
+        "1983-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55587",
+      "titles": {
+        "en": "3D Tunnel",
+        "es": "3D Tunel"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "pc",
+          "nintendo",
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "puzzle video game"
+      ],
+      "image_candidates": [
+        "File:Boulder Dash Cover Art 1984-1988.jpg"
+      ],
+      "platforms": [
+        "Amstrad CPC",
+        "Apple II series",
+        "Atari 8-bit family",
+        "Atari ST",
+        "ColecoVision",
+        "Commodore 64",
+        "FM-7",
+        "Game Boy",
+        "IBM Personal Computer",
+        "MSX",
+        "Nintendo Entertainment System",
+        "Q100047",
+        "Q48493",
+        "Q94",
+        "Super Cassette Vision",
+        "Windows Phone",
+        "ZX Spectrum"
+      ],
+      "qid": "Q55605",
+      "release_dates": [
+        "1984-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55605",
+      "titles": {
+        "en": "Boulder Dash",
+        "es": "Boulder Dash"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "other"
+        ]
+      },
+      "genres": [
+        "action-adventure game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "ZX Spectrum"
+      ],
+      "qid": "Q55608",
+      "release_dates": [
+        "1983-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55608",
+      "titles": {
+        "en": "Atic Atac",
+        "es": "Atic Atac"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "nintendo",
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "platformer"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Amstrad CPC",
+        "arcade video game",
+        "Commodore 64",
+        "Nintendo Entertainment System",
+        "Q19610114",
+        "ZX Spectrum"
+      ],
+      "qid": "Q55610",
+      "release_dates": [
+        "1986-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55610",
+      "titles": {
+        "en": "Athena",
+        "es": "Athena"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "pc",
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "action game",
+        "scrolling shooter"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Amstrad CPC",
+        "Atari ST",
+        "Commodore 64",
+        "DOS",
+        "MSX",
+        "Q100047",
+        "ZX Spectrum"
+      ],
+      "qid": "Q55611",
+      "release_dates": [
+        "1986-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55611",
+      "titles": {
+        "en": "Army Moves",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "pc",
+          "playstation",
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "simulation video game",
+        "vehicular combat game"
+      ],
+      "image_candidates": [
+        "File:Musée Mécanique 205.JPG"
+      ],
+      "platforms": [
+        "Atari 2600",
+        "Atari ST",
+        "Commodore 64",
+        "Commodore VIC-20",
+        "DOS",
+        "PlayStation Portable",
+        "ZX Spectrum"
+      ],
+      "qid": "Q55616",
+      "release_dates": [
+        "1980-11-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55616",
+      "titles": {
+        "en": "Battlezone",
+        "es": "Battlezone"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "pc",
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "platformer"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Amstrad CPC",
+        "Atari ST",
+        "Commodore 64",
+        "DOS",
+        "Q100047",
+        "ZX Spectrum"
+      ],
+      "qid": "Q55620",
+      "release_dates": [
+        "1987-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55620",
+      "titles": {
+        "en": "Bionic Commando",
+        "es": "Bionic Commando"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "nintendo"
+        ]
+      },
+      "genres": [
+        "Metroidvania"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Nintendo Entertainment System"
+      ],
+      "qid": "Q55622",
+      "release_dates": [
+        "1988-07-20T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55622",
+      "titles": {
+        "en": "Bionic Commando",
+        "es": "Bionic Commando"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "nintendo",
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "action game",
+        "skateboarding video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Amstrad CPC",
+        "Atari System 2",
+        "Commodore 64",
+        "Game Boy Color",
+        "Nintendo Entertainment System",
+        "ZX Spectrum"
+      ],
+      "qid": "Q88240",
+      "release_dates": [
+        "1986-12-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q88240",
+      "titles": {
+        "en": "720°",
+        "es": "720°"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "other"
+        ]
+      },
+      "genres": [
+        "racing video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Amstrad CPC",
+        "ZX Spectrum"
+      ],
+      "qid": "Q88255",
+      "release_dates": [
+        "1989-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q88255",
+      "titles": {
+        "en": "750cc Grand Prix",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "pc",
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "shooter game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Amstrad CPC",
+        "arcade video game",
+        "Commodore 64",
+        "DOS",
+        "Q19610114",
+        "Q5014725",
+        "ZX Spectrum"
+      ],
+      "qid": "Q88273",
+      "release_dates": [
+        "1987-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q88273",
+      "titles": {
+        "en": "A-Jax",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "quiz video game",
+        "sports video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Amstrad CPC",
+        "Atari ST",
+        "BBC Micro",
+        "Commodore 64",
+        "Q100047",
+        "ZX Spectrum"
+      ],
+      "qid": "Q88456",
+      "release_dates": [
+        "1988-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q88456",
+      "titles": {
+        "en": "A Question of Sport",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "pc",
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "action game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Amstrad CPC",
+        "Apple IIGS",
+        "Arcadia Systems",
+        "Atari ST",
+        "Classic Mac OS",
+        "Commodore 64",
+        "DOS",
+        "MSX",
+        "Q100047",
+        "ZX Spectrum"
+      ],
+      "qid": "Q88519",
+      "release_dates": [
+        "1987-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q88519",
+      "titles": {
+        "en": "Aaargh!",
+        "es": "Aaargh!"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "adventure video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Commodore 64",
+        "Q100047",
+        "ZX Spectrum"
+      ],
+      "qid": "Q88545",
+      "release_dates": [
+        "1984-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q88545",
+      "titles": {
+        "en": "Abyss",
+        "es": "Abyss"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "pc",
+          "nintendo",
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "action-adventure game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Amstrad CPC",
+        "Atari ST",
+        "Commodore 64",
+        "DOS",
+        "FM Towns",
+        "MSX",
+        "NEC PC-8800 series",
+        "NEC PC-9800 series",
+        "Nintendo Entertainment System",
+        "Q100047",
+        "Q209868",
+        "ZX Spectrum"
+      ],
+      "qid": "Q88582",
+      "release_dates": [
+        "1988-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q88582",
+      "titles": {
+        "en": "Heroes of the Lance",
+        "es": "Advanced Dungeons & Dragons: Heroes of the Lance"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "action-adventure game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Amstrad CPC",
+        "Commodore 64",
+        "ZX Spectrum"
+      ],
+      "qid": "Q91419",
+      "release_dates": [
+        "1985-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q91419",
+      "titles": {
+        "en": "Back to the Future",
+        "es": "Back to the Future"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "nintendo"
+        ]
+      },
+      "genres": [
+        "action-adventure game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Nintendo Entertainment System"
+      ],
+      "qid": "Q91501",
+      "release_dates": [
+        "1989-09-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q91501",
+      "titles": {
+        "en": "Back to the Future",
+        "es": "Back to the Future"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "1990s",
+        "platform_families": [
+          "pc",
+          "nintendo",
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "platformer",
+        "puzzle video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "3DO",
+        "Amiga 1200",
+        "Amiga CD32",
+        "Atari Falcon",
+        "Atari Jaguar",
+        "Atari Lynx",
+        "Atari ST",
+        "DOS",
+        "Game Boy",
+        "Q100047",
+        "Q10676",
+        "Super Nintendo Entertainment System"
+      ],
+      "qid": "Q93655",
+      "release_dates": [
+        "1992-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q93655",
+      "titles": {
+        "en": "The Humans",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2010s",
+        "platform_families": [
+          "pc",
+          "nintendo"
+        ]
+      },
+      "genres": [
+        "puzzle video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "macOS",
+        "Microsoft Windows",
+        "Q19610114",
+        "Q388",
+        "Q48493",
+        "Q94",
+        "Wii U"
+      ],
+      "qid": "Q93951",
+      "release_dates": [
+        "2012-11-18T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q93951",
+      "titles": {
+        "en": "Little Inferno",
+        "es": "Little Inferno"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2010s",
+        "platform_families": [
+          "pc",
+          "playstation",
+          "nintendo"
+        ]
+      },
+      "genres": [
+        "racing video game",
+        "third-person shooter"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "macOS",
+        "Microsoft Windows",
+        "Nintendo DS",
+        "PlayStation 3",
+        "PlayStation Portable",
+        "Q48263",
+        "Q48493",
+        "Wii"
+      ],
+      "qid": "Q94355",
+      "release_dates": [
+        "2011-06-21T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q94355",
+      "titles": {
+        "en": "Cars 2",
+        "es": "Cars 2"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "nintendo",
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "racing video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "arcade video game",
+        "NEC PC-8800 series",
+        "Nintendo Entertainment System",
+        "Q188642",
+        "Q19610114",
+        "Sharp X1",
+        "Wii",
+        "Wii U"
+      ],
+      "qid": "Q146124",
+      "release_dates": [
+        "1984-11-30T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q146124",
+      "titles": {
+        "en": "Excitebike",
+        "es": "Excitebike"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "nintendo"
+        ]
+      },
+      "genres": [
+        "platformer",
+        "role-playing video game"
+      ],
+      "image_candidates": [
+        "File:Nintendo 64 with Paper Mario.jpg"
+      ],
+      "platforms": [
+        "iQue Player",
+        "Nintendo 64",
+        "Q19610114",
+        "Wii",
+        "Wii U"
+      ],
+      "qid": "Q149998",
+      "release_dates": [
+        "2000-08-11T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q149998",
+      "titles": {
+        "en": "Paper Mario",
+        "es": "Paper Mario"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "1990s",
+        "platform_families": [
+          "nintendo"
+        ]
+      },
+      "genres": [
+        "tactical role-playing game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Nintendo 3DS",
+        "Nintendo Entertainment System",
+        "Q19610114",
+        "Wii",
+        "Wii U"
+      ],
+      "qid": "Q150146",
+      "release_dates": [
+        "1990-04-20T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q150146",
+      "titles": {
+        "en": "Fire Emblem: Shadow Dragon and the Blade of Light",
+        "es": "Fire Emblem: Ankoku Ryū to Hikari no Tsurugi"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "nintendo"
+        ]
+      },
+      "genres": [
+        "tactical role-playing game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Nintendo 3DS",
+        "Q188642",
+        "Q19610114",
+        "Wii U"
+      ],
+      "qid": "Q150169",
+      "release_dates": [
+        "2004-10-07T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q150169",
+      "titles": {
+        "en": "Fire Emblem: The Sacred Stones",
+        "es": "Fire Emblem: The Sacred Stones"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "nintendo"
+        ]
+      },
+      "genres": [
+        "tactical role-playing game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Q188642",
+        "Q19610114",
+        "Wii U"
+      ],
+      "qid": "Q150180",
+      "release_dates": [
+        "2003-04-25T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q150180",
+      "titles": {
+        "en": "Fire Emblem: The Blazing Blade",
+        "es": "Fire Emblem"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2010s",
+        "platform_families": [
+          "pc",
+          "playstation",
+          "nintendo"
+        ]
+      },
+      "genres": [
+        "first-person shooter"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "PlayStation 3",
+        "Q48263",
+        "Wii U"
+      ],
+      "qid": "Q161192",
+      "release_dates": [
+        "2012-10-16T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q161192",
+      "titles": {
+        "en": "007 Legends",
+        "es": "007 Legends"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "nintendo"
+        ]
+      },
+      "genres": [
+        "third-person shooter"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Nintendo GameCube",
+        "Q10680",
+        "Q132020"
+      ],
+      "qid": "Q161202",
+      "release_dates": [
+        "2004-02-17T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q161202",
+      "titles": {
+        "en": "James Bond 007: Everything or Nothing",
+        "es": "James Bond 007: Everything or Nothing"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2020s",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "historical video game",
+        "real-time strategy"
+      ],
+      "image_candidates": [
+        "File:0 A.D. Seleukiden-Stadt Ken Wood 23.png"
+      ],
+      "platforms": [
+        "Berkeley Software Distribution",
+        "macOS",
+        "Microsoft Windows",
+        "Q388"
+      ],
+      "qid": "Q161234",
+      "release_dates": [
+        "2021-02-21T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q161234",
+      "titles": {
+        "en": "0 A.D.",
+        "es": "0 A.D."
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "real-time strategy",
+        "shoot 'em up"
+      ],
+      "image_candidates": [
+        "File:Netrek-client-cow.png"
+      ],
+      "platforms": [
+        "macOS",
+        "Microsoft Windows",
+        "Q388"
+      ],
+      "qid": "Q162098",
+      "release_dates": [
+        "1988-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q162098",
+      "titles": {
+        "en": "Netrek",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "shoot 'em up"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Commodore 64"
+      ],
+      "qid": "Q163336",
+      "release_dates": [
+        "1986-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q163336",
+      "titles": {
+        "en": "Commando Libya",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "other"
+        ]
+      },
+      "genres": [
+        "real-time strategy"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Q10676",
+        "Q19610114"
+      ],
+      "qid": "Q164067",
+      "release_dates": [
+        "1989-12-15T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q164067",
+      "titles": {
+        "en": "Herzog Zwei",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "arcade"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "arcade video game",
+        "Atari 2600",
+        "Commodore 64"
+      ],
+      "qid": "Q164478",
+      "release_dates": [
+        "1977-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q164478",
+      "titles": {
+        "en": "Circus",
+        "es": "Circus"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "pc",
+          "playstation",
+          "nintendo",
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "maze video game"
+      ],
+      "image_candidates": [
+        "File:Pac-Man gameplay (1x pixel-perfect recreation).png"
+      ],
+      "platforms": [
+        "Apple II series",
+        "arcade video game",
+        "Atari 2600",
+        "Atari 5200",
+        "Atari 8-bit family",
+        "Commodore 64",
+        "Commodore VIC-20",
+        "DOS",
+        "Famicom Disk System",
+        "Game Boy Color",
+        "IBM Personal Computer",
+        "Intellivision",
+        "Microsoft Windows",
+        "MSX",
+        "Nintendo Entertainment System",
+        "PlayStation Portable",
+        "Q100047",
+        "Q13361286",
+        "Q14094",
+        "Q188642",
+        "Q1977455",
+        "Q388",
+        "Q48263",
+        "Q48493",
+        "Q5014725",
+        "Q751719",
+        "Q94",
+        "Super Nintendo Entertainment System",
+        "Texas Instruments TI-99/4A",
+        "Windows Phone",
+        "ZX Spectrum"
+      ],
+      "qid": "Q173626",
+      "release_dates": [
+        "1980-05-22T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q173626",
+      "titles": {
+        "en": "Pac-Man",
+        "es": "Pac-Man"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "nintendo"
+        ]
+      },
+      "genres": [
+        "action role-playing game",
+        "role-playing video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Famicom Disk System",
+        "Nintendo Entertainment System",
+        "Q188642",
+        "Wii U"
+      ],
+      "qid": "Q187339",
+      "release_dates": [
+        "1987-01-14T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q187339",
+      "titles": {
+        "en": "Zelda II: The Adventure of Link",
+        "es": "Zelda II: The Adventure of Link"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "pc",
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "horizontally scrolling shooter",
+        "shoot 'em up"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "arcade video game",
+        "macOS",
+        "Microsoft Windows",
+        "Q10676",
+        "Q388",
+        "TurboGrafx-16"
+      ],
+      "qid": "Q191965",
+      "release_dates": [
+        "1989-07-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q191965",
+      "titles": {
+        "en": "Zero Wing",
+        "es": "Zero Wing"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "pc",
+          "nintendo",
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "action game"
+      ],
+      "image_candidates": [
+        "File:Dig Dug (Taizo Hori) and Pooka characters.png"
+      ],
+      "platforms": [
+        "Atari 2600",
+        "Atari 5200",
+        "Atari 7800",
+        "Atari 8-bit family",
+        "Commodore 64",
+        "Commodore VIC-20",
+        "Famicom Disk System",
+        "Game Boy",
+        "Microsoft Windows",
+        "MSX",
+        "Nintendo Entertainment System",
+        "Q188642",
+        "Q48493"
+      ],
+      "qid": "Q204105",
+      "release_dates": [
+        "1982-04-19T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q204105",
+      "titles": {
+        "en": "Dig Dug",
+        "es": "Dig Dug"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2020s",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "first-person shooter",
+        "science fiction video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "Q388"
+      ],
+      "qid": "Q211229",
+      "release_dates": [
+        "2020-03-06T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q211229",
+      "titles": {
+        "en": "Black Mesa",
+        "es": "Black Mesa"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "pc",
+          "playstation"
+        ]
+      },
+      "genres": [
+        "action-adventure game",
+        "historical video game",
+        "stealth game",
+        "third-person shooter"
+      ],
+      "image_candidates": [
+        "File:Assassin's Creed II by Reindertot.jpg"
+      ],
+      "platforms": [
+        "macOS",
+        "Microsoft Windows",
+        "PlayStation 3",
+        "Q13361286",
+        "Q48263",
+        "Q5014725"
+      ],
+      "qid": "Q211735",
+      "release_dates": [
+        "2009-11-17T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q211735",
+      "titles": {
+        "en": "Assassin's Creed II",
+        "es": "Assassin's Creed II"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "1990s",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "cyberpunk video game",
+        "role-playing video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "Q10677",
+        "Q19610114",
+        "Q48493",
+        "Q5014725",
+        "Q94"
+      ],
+      "qid": "Q214232",
+      "release_dates": [
+        "1997-01-31T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q214232",
+      "titles": {
+        "en": "Final Fantasy VII",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "first-person shooter",
+        "post-apocalyptic video game",
+        "science fiction video game",
+        "survival horror"
+      ],
+      "image_candidates": [
+        "File:Stalkershot 2.jpg"
+      ],
+      "platforms": [
+        "Microsoft Windows"
+      ],
+      "qid": "Q215861",
+      "release_dates": [
+        "2007-03-20T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q215861",
+      "titles": {
+        "en": "S.T.A.L.K.E.R.: Shadow of Chernobyl",
+        "es": "S.T.A.L.K.E.R.: Shadow of Chernobyl"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "sports video game"
+      ],
+      "image_candidates": [
+        "File:Signed Pong Cabinet.jpg"
+      ],
+      "platforms": [
+        "arcade video game"
+      ],
+      "qid": "Q216293",
+      "release_dates": [
+        "1972-11-29T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q216293",
+      "titles": {
+        "en": "Pong",
+        "es": "Pong"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "1990s",
+        "platform_families": [
+          "nintendo"
+        ]
+      },
+      "genres": [
+        "3D platform game",
+        "collect-a-thon platformer"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Nintendo 64",
+        "Wii U"
+      ],
+      "qid": "Q216995",
+      "release_dates": [
+        "1996-06-23T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q216995",
+      "titles": {
+        "en": "Super Mario 64",
+        "es": "Super Mario 64"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "other"
+        ]
+      },
+      "genres": [
+        "third-person shooter"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Q10680"
+      ],
+      "qid": "Q217241",
+      "release_dates": [
+        "2006-02-28T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q217241",
+      "titles": {
+        "en": "24: The Game",
+        "es": "24: The Game"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "1990s",
+        "platform_families": [
+          "pc",
+          "xbox",
+          "nintendo"
+        ]
+      },
+      "genres": [
+        "first-person shooter",
+        "science fiction video game"
+      ],
+      "image_candidates": [
+        "File:Quake cover.png"
+      ],
+      "platforms": [
+        "Classic Mac OS",
+        "Microsoft Windows",
+        "Nintendo 64",
+        "Q100047",
+        "Q13361286",
+        "Q184198",
+        "Q19610114",
+        "Q200912",
+        "Q388",
+        "Q47604",
+        "Q5014725",
+        "Q63184502",
+        "Xbox Series X and Series S"
+      ],
+      "qid": "Q217423",
+      "release_dates": [
+        "1996-06-22T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q217423",
+      "titles": {
+        "en": "Quake",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "1990s",
+        "platform_families": [
+          "nintendo"
+        ]
+      },
+      "genres": [
+        "shoot 'em up"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Q10676",
+        "Super Nintendo Entertainment System"
+      ],
+      "qid": "Q219804",
+      "release_dates": [
+        "1993-09-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q219804",
+      "titles": {
+        "en": "Zombies Ate My Neighbors",
+        "es": "Zombies Ate My Neighbors"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "1990s",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "strategy video game"
+      ],
+      "image_candidates": [
+        "File:Xblast.jpg"
+      ],
+      "platforms": [
+        "Microsoft Windows"
+      ],
+      "qid": "Q219985",
+      "release_dates": [
+        "1993-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q219985",
+      "titles": {
+        "en": "XBlast",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "business simulation game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Classic Mac OS",
+        "macOS",
+        "Microsoft Windows"
+      ],
+      "qid": "Q220102",
+      "release_dates": [
+        "2001-10-17T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q220102",
+      "titles": {
+        "en": "Zoo Tycoon",
+        "es": "Zoo Tycoon"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "business simulation game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "macOS",
+        "Microsoft Windows"
+      ],
+      "qid": "Q220107",
+      "release_dates": [
+        "2004-11-09T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q220107",
+      "titles": {
+        "en": "Zoo Tycoon 2",
+        "es": "Zoo Tycoon 2"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "pc",
+          "playstation",
+          "nintendo",
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "shoot 'em up"
+      ],
+      "image_candidates": [
+        "File:Space Invaders - Midway's.JPG"
+      ],
+      "platforms": [
+        "arcade video game",
+        "Atari 2600",
+        "Atari 5200",
+        "calculator",
+        "Commodore 64",
+        "dedicated console",
+        "DOS",
+        "Game Boy",
+        "Game Boy Color",
+        "handheld electronic game",
+        "Microsoft Windows",
+        "mobile game",
+        "MSX",
+        "Nintendo 64",
+        "Nintendo Entertainment System",
+        "Pelican VG Pocket",
+        "PlayStation Portable",
+        "Q10677",
+        "Q188642",
+        "Q48493",
+        "SG-1000",
+        "Super Nintendo Entertainment System",
+        "watch",
+        "WonderSwan",
+        "ZX Spectrum"
+      ],
+      "qid": "Q220665",
+      "release_dates": [
+        "1978-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q220665",
+      "titles": {
+        "en": "Space Invaders",
+        "es": "Space Invaders"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "pc",
+          "nintendo"
+        ]
+      },
+      "genres": [
+        "tile-matching video game"
+      ],
+      "image_candidates": [
+        "File:Ksame.png"
+      ],
+      "platforms": [
+        "Classic Mac OS",
+        "Microsoft Windows",
+        "Q388",
+        "Q48493",
+        "Q94",
+        "Wii"
+      ],
+      "qid": "Q224905",
+      "release_dates": [
+        "1985-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q224905",
+      "titles": {
+        "en": "SameGame",
+        "es": "SameGame"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "fantasy video game",
+        "strategy video game",
+        "turn-based strategy video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Classic Mac OS",
+        "Microsoft Windows",
+        "Q388"
+      ],
+      "qid": "Q357431",
+      "release_dates": [
+        "2003-11-14T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q357431",
+      "titles": {
+        "en": "Dominions II: The Ascension Wars",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "1990s",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "post-apocalyptic video game",
+        "real-time strategy",
+        "science fiction video game",
+        "strategy video game"
+      ],
+      "image_candidates": [
+        "File:Warzone 2100 - base.jpg"
+      ],
+      "platforms": [
+        "FreeBSD",
+        "macOS",
+        "Microsoft Windows",
+        "Q10677",
+        "Q388",
+        "Unix-like operating system",
+        "web browser"
+      ],
+      "qid": "Q386632",
+      "release_dates": [
+        "1999-03-26T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q386632",
+      "titles": {
+        "en": "Warzone 2100",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "real-time strategy",
+        "strategy video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "ZX Spectrum"
+      ],
+      "qid": "Q478718",
+      "release_dates": [
+        "1983-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q478718",
+      "titles": {
+        "en": "Stonkers",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "pc",
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "action game",
+        "flight simulation video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Atari Lynx",
+        "Microsoft Windows"
+      ],
+      "qid": "Q729574",
+      "release_dates": [
+        "1989-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q729574",
+      "titles": {
+        "en": "Blue Lightning",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "pc",
+          "playstation"
+        ]
+      },
+      "genres": [
+        "action game",
+        "action-adventure game",
+        "adventure video game",
+        "hack and slash"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "PlayStation 3",
+        "PlayStation Vita",
+        "Q5014725"
+      ],
+      "qid": "Q730466",
+      "release_dates": [
+        "2009-09-29T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q730466",
+      "titles": {
+        "en": "Ninja Gaiden Sigma 2",
+        "es": "Ninja Gaiden Sigma 2"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "1990s",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "casual game",
+        "pinball video game",
+        "simulation video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Classic Mac OS",
+        "Microsoft Windows"
+      ],
+      "qid": "Q734911",
+      "release_dates": [
+        "1997-12-12T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q734911",
+      "titles": {
+        "en": "Balls of Steel",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "nintendo"
+        ]
+      },
+      "genres": [
+        "party video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Nintendo 64",
+        "Q19610114"
+      ],
+      "qid": "Q743187",
+      "release_dates": [
+        "2000-12-07T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q743187",
+      "titles": {
+        "en": "Mario Party 3",
+        "es": "Mario Party 3"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "racing video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows"
+      ],
+      "qid": "Q745427",
+      "release_dates": [
+        "2003-11-20T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q745427",
+      "titles": {
+        "en": "Big Rigs: Over the Road Racing",
+        "es": "Big Rigs: Over the Road Racing"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2010s",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "action-adventure game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "Q19610114",
+        "Q5014725"
+      ],
+      "qid": "Q765963",
+      "release_dates": [
+        "2018-11-22T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q765963",
+      "titles": {
+        "en": "Disaster Report 4 Plus: Summer Memories",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "pc",
+          "xbox"
+        ]
+      },
+      "genres": [
+        "action role-playing game",
+        "hack and slash",
+        "role-playing video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "macOS",
+        "Microsoft Windows",
+        "Q10680",
+        "Q132020",
+        "Q13361286",
+        "Q19610114",
+        "Q388",
+        "Q5014725",
+        "Xbox Series X and Series S"
+      ],
+      "qid": "Q804850",
+      "release_dates": [
+        "2004-01-20T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q804850",
+      "titles": {
+        "en": "Baldur's Gate: Dark Alliance II",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "pc",
+          "nintendo"
+        ]
+      },
+      "genres": [
+        "action role-playing game",
+        "hack and slash"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "macOS",
+        "Microsoft Windows",
+        "Nintendo GameCube",
+        "Q10680",
+        "Q132020",
+        "Q13361286",
+        "Q19610114",
+        "Q388",
+        "Q5014725"
+      ],
+      "qid": "Q804851",
+      "release_dates": [
+        "2001-12-03T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q804851",
+      "titles": {
+        "en": "Baldur's Gate: Dark Alliance",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "pc",
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "casual game",
+        "simulation video game",
+        "strategy video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Atari ST",
+        "Commodore 64",
+        "Microsoft Windows",
+        "Q100047",
+        "ZX Spectrum"
+      ],
+      "qid": "Q835761",
+      "release_dates": [
+        "1985-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q835761",
+      "titles": {
+        "en": "Kennedy Approach",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2020s",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "adult comics",
+        "adventure video game",
+        "eroge",
+        "harem",
+        "hentai",
+        "visual novel",
+        "yaoi"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows"
+      ],
+      "qid": "Q842468",
+      "release_dates": [
+        "2024-12-16T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q842468",
+      "titles": {
+        "en": "Night Shift Nurses",
+        "es": "Yakin Byoutou"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2010s",
+        "platform_families": [
+          "nintendo"
+        ]
+      },
+      "genres": [
+        "3D platform game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Q19610114",
+        "Wii",
+        "Wii U"
+      ],
+      "qid": "Q854487",
+      "release_dates": [
+        "2010-05-23T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q854487",
+      "titles": {
+        "en": "Super Mario Galaxy 2",
+        "es": "Super Mario Galaxy 2"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2010s",
+        "platform_families": [
+          "pc",
+          "playstation"
+        ]
+      },
+      "genres": [
+        "Japanese role-playing video game",
+        "role-playing video game",
+        "tactical role-playing game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "PlayStation Portable",
+        "PlayStation Vita",
+        "Q122761124",
+        "Q19610114",
+        "Q5014725",
+        "Q63184502"
+      ],
+      "qid": "Q860620",
+      "release_dates": [
+        "2010-09-30T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q860620",
+      "titles": {
+        "en": "The Legend of Heroes: Trails from Zero",
+        "es": "The Legend of Heroes: Trails from Zero"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "role-playing video game",
+        "strategy video game",
+        "tactical role-playing game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "Q10680"
+      ],
+      "qid": "Q868948",
+      "release_dates": [
+        "2007-02-15T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q868948",
+      "titles": {
+        "en": "Soul Nomad & the World Eaters",
+        "es": "Soul Nomad & the World Eaters"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "1990s",
+        "platform_families": [
+          "pc",
+          "sega"
+        ]
+      },
+      "genres": [
+        "beat 'em up"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "macOS",
+        "Mega Drive Mini",
+        "Microsoft Windows",
+        "Q10676",
+        "Q188642",
+        "Q388"
+      ],
+      "qid": "Q1114985",
+      "release_dates": [
+        "1995-07-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q1114985",
+      "titles": {
+        "en": "Comix Zone",
+        "es": "Comix Zone"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "nintendo"
+        ]
+      },
+      "genres": [
+        "real-time strategy"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Nintendo GameCube",
+        "Q19610114",
+        "Wii",
+        "Wii U"
+      ],
+      "qid": "Q1198484",
+      "release_dates": [
+        "2001-10-26T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q1198484",
+      "titles": {
+        "en": "Pikmin",
+        "es": "Pikmin"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "1990s",
+        "platform_families": [
+          "sega",
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "beat 'em up"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "arcade video game",
+        "Q10680",
+        "Q200912",
+        "Sega Titan Video"
+      ],
+      "qid": "Q1213291",
+      "release_dates": [
+        "1996-07-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q1213291",
+      "titles": {
+        "en": "Die Hard Arcade",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2010s",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "massively multiplayer online role-playing game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows"
+      ],
+      "qid": "Q1255555",
+      "release_dates": [
+        "2011-08-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q1255555",
+      "titles": {
+        "en": "Drakensang Online",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "1990s",
+        "platform_families": [
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "platformer"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "arcade video game",
+        "Q19610114",
+        "Q200912",
+        "Q5014725",
+        "TurboGrafx-16"
+      ],
+      "qid": "Q1436473",
+      "release_dates": [
+        "1990-08-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q1436473",
+      "titles": {
+        "en": "Liquid Kids",
+        "es": "Liquid Kids"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "1990s",
+        "platform_families": [
+          "nintendo",
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "action game",
+        "platformer"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Amstrad CPC",
+        "arcade video game",
+        "Atari ST",
+        "Commodore 64",
+        "Nintendo Entertainment System",
+        "Q100047",
+        "Q19610114",
+        "Q48493",
+        "Q5014725",
+        "ZX Spectrum"
+      ],
+      "qid": "Q1440134",
+      "release_dates": [
+        "1990-04-03T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q1440134",
+      "titles": {
+        "en": "Rod Land",
+        "es": "Rodland"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2000s",
+        "platform_families": [
+          "pc"
+        ]
+      },
+      "genres": [
+        "real-time strategy"
+      ],
+      "image_candidates": [
+        "File:Widelands-svn3311.jpg"
+      ],
+      "platforms": [
+        "macOS",
+        "Microsoft Windows",
+        "Q388"
+      ],
+      "qid": "Q1443443",
+      "release_dates": [
+        "2006-10-30T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q1443443",
+      "titles": {
+        "en": "Widelands",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "pc",
+          "nintendo",
+          "arcade-mobile-other"
+        ]
+      },
+      "genres": [
+        "vertically scrolling shooter"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Amstrad CPC",
+        "arcade video game",
+        "Atari ST",
+        "Commodore 64",
+        "DOS",
+        "FM Towns",
+        "macOS",
+        "Microsoft Windows",
+        "Nintendo Entertainment System",
+        "Q100047",
+        "Q19610114",
+        "Q388",
+        "Q5014725",
+        "Sharp X68000",
+        "ZX Spectrum"
+      ],
+      "qid": "Q1450279",
+      "release_dates": [
+        "1987-03-06T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q1450279",
+      "titles": {
+        "en": "Flying Shark",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "pre-1990",
+        "platform_families": [
+          "pc",
+          "nintendo",
+          "sega"
+        ]
+      },
+      "genres": [
+        "action role-playing game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Binary Runtime Environment for Wireless",
+        "DOS",
+        "i-αppli",
+        "Mega Drive Mini 2",
+        "Microsoft Windows",
+        "MSX 2",
+        "NEC PC-8800 series",
+        "NEC PC-9800 series",
+        "Q10676",
+        "Q184198",
+        "Q19610114",
+        "Q48493",
+        "S!Appli",
+        "Sharp X1",
+        "TurboGrafx-16",
+        "Wii"
+      ],
+      "qid": "Q2746704",
+      "release_dates": [
+        "1987-12-20T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q2746704",
+      "titles": {
+        "en": "Sorcerian",
+        "es": "Sorcerian"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "1990s",
+        "platform_families": [
+          "sega"
+        ]
+      },
+      "genres": [],
+      "image_candidates": [],
+      "platforms": [
+        "Mega Drive Mini",
+        "Q10676"
+      ],
+      "qid": "Q3094977",
+      "release_dates": [
+        "1995-06-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q3094977",
+      "titles": {
+        "en": "Game no Kanzume: Otokuyō",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "1990s",
+        "platform_families": [
+          "sega"
+        ]
+      },
+      "genres": [
+        "basketball video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Q10676",
+        "Q200912",
+        "Sega Titan Video"
+      ],
+      "qid": "Q3334214",
+      "release_dates": [
+        "1996-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q3334214",
+      "titles": {
+        "en": "NBA Action",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "1990s",
+        "platform_families": [
+          "pc",
+          "sega"
+        ]
+      },
+      "genres": [
+        "baseball video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "DOS",
+        "Mega Drive Mini"
+      ],
+      "qid": "Q3949411",
+      "release_dates": [
+        "1994-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q3949411",
+      "titles": {
+        "en": "HardBall IV",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "1990s",
+        "platform_families": [
+          "sega"
+        ]
+      },
+      "genres": [
+        "fighting game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Q200912",
+        "Sega Titan Video"
+      ],
+      "qid": "Q10290397",
+      "release_dates": [
+        "1995-02-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q10290397",
+      "titles": {
+        "en": "Golden Axe: The Duel",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2010s",
+        "platform_families": [
+          "pc",
+          "xbox"
+        ]
+      },
+      "genres": [
+        "rhythm game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "Q13361286",
+        "Q19610114",
+        "Q48493",
+        "Q5014725",
+        "Q94",
+        "Xbox Series X and Series S"
+      ],
+      "qid": "Q48755941",
+      "release_dates": [
+        "2014-06-25T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q48755941",
+      "titles": {
+        "en": "Musynx",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2010s",
+        "platform_families": [
+          "pc",
+          "xbox"
+        ]
+      },
+      "genres": [
+        "real-time strategy",
+        "role-playing video game",
+        "video game with LGBT character"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "Q13361286",
+        "Q5014725",
+        "Q63184502",
+        "Xbox Series X and Series S"
+      ],
+      "qid": "Q48851078",
+      "release_dates": [
+        "2017-12-07T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q48851078",
+      "titles": {
+        "en": "SpellForce 3",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2020s",
+        "platform_families": [
+          "pc",
+          "xbox"
+        ]
+      },
+      "genres": [
+        "adventure video game",
+        "biopunk",
+        "first-person shooter",
+        "survival horror"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "Q63184502",
+        "Xbox Series X and Series S"
+      ],
+      "qid": "Q48988603",
+      "release_dates": [
+        "2022-10-14T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q48988603",
+      "titles": {
+        "en": "Scorn",
+        "es": "Scorn"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2010s",
+        "platform_families": [
+          "pc",
+          "xbox"
+        ]
+      },
+      "genres": [
+        "sim racing"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "Q13361286",
+        "Q5014725",
+        "Q63184502",
+        "Xbox Series X and Series S"
+      ],
+      "qid": "Q50296420",
+      "release_dates": [
+        "2019-05-29T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q50296420",
+      "titles": {
+        "en": "Assetto Corsa Competizione",
+        "es": "Assetto Corsa Competizione"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2010s",
+        "platform_families": [
+          "pc",
+          "xbox"
+        ]
+      },
+      "genres": [
+        "adventure video game",
+        "Christmas video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "macOS",
+        "Microsoft Windows",
+        "Q13361286",
+        "Q19610114",
+        "Q388",
+        "Q5014725",
+        "Q63184502",
+        "Xbox Series X and Series S"
+      ],
+      "qid": "Q50296428",
+      "release_dates": [
+        "2017-07-27T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q50296428",
+      "titles": {
+        "en": "The Darkside Detective",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2010s",
+        "platform_families": [
+          "pc",
+          "xbox"
+        ]
+      },
+      "genres": [
+        "puzzle video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "Q13361286",
+        "Q19610114",
+        "Q48493",
+        "Q5014725",
+        "Q63184502",
+        "Xbox Series X and Series S"
+      ],
+      "qid": "Q51756888",
+      "release_dates": [
+        "2019-10-18T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q51756888",
+      "titles": {
+        "en": "Manifold Garden",
+        "es": "Manifold Garden"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2010s",
+        "platform_families": [
+          "pc",
+          "xbox"
+        ]
+      },
+      "genres": [
+        "puzzle video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "macOS",
+        "Microsoft Windows",
+        "Q13361286",
+        "Q19610114",
+        "Q48493",
+        "Q5014725",
+        "Q63184502",
+        "Q64350339",
+        "Q94",
+        "Xbox Series X and Series S"
+      ],
+      "qid": "Q54958986",
+      "release_dates": [
+        "2017-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q54958986",
+      "titles": {
+        "en": "The House of Da Vinci",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2020s",
+        "platform_families": [
+          "pc",
+          "xbox"
+        ]
+      },
+      "genres": [
+        "action role-playing game",
+        "post-apocalyptic video game",
+        "survival horror"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "Q13361286",
+        "Q19610114",
+        "Q5014725",
+        "Q63184502",
+        "Xbox Series X and Series S"
+      ],
+      "qid": "Q55004330",
+      "release_dates": [
+        "2022-02-04T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55004330",
+      "titles": {
+        "en": "Dying Light 2 Stay Human",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2010s",
+        "platform_families": [
+          "pc",
+          "xbox"
+        ]
+      },
+      "genres": [
+        "adventure video game",
+        "simulation video game",
+        "survival game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "Q63184502",
+        "Xbox Series X and Series S"
+      ],
+      "qid": "Q55084497",
+      "release_dates": [
+        "2018-03-23T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q55084497",
+      "titles": {
+        "en": "Raft",
+        "es": "Raft (videojuego)"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "1990s",
+        "platform_families": [
+          "sega"
+        ]
+      },
+      "genres": [
+        "fighting game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Q200912",
+        "Sega Titan Video"
+      ],
+      "qid": "Q65040607",
+      "release_dates": [
+        "1997-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q65040607",
+      "titles": {
+        "en": "Groove on Fight",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "1990s",
+        "platform_families": [
+          "sega"
+        ]
+      },
+      "genres": [
+        "winter sports video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Q200912",
+        "Sega Titan Video"
+      ],
+      "qid": "Q88218892",
+      "release_dates": [
+        "1997-11-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q88218892",
+      "titles": {
+        "en": "Winter Heat",
+        "es": "Winter Heat"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "1990s",
+        "platform_families": [
+          "sega"
+        ]
+      },
+      "genres": [
+        "fighting game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Q200912",
+        "Sega Titan Video"
+      ],
+      "qid": "Q89268198",
+      "release_dates": [
+        "1996-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q89268198",
+      "titles": {
+        "en": "Virtua Fighter Kids",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "1990s",
+        "platform_families": [
+          "sega"
+        ]
+      },
+      "genres": [
+        "3D fighting game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Q200912",
+        "Sega Titan Video"
+      ],
+      "qid": "Q89656761",
+      "release_dates": [
+        "1995-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q89656761",
+      "titles": {
+        "en": "Virtua Fighter Remix",
+        "es": "Virtua Fighter Remix"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "1990s",
+        "platform_families": [
+          "sega"
+        ]
+      },
+      "genres": [
+        "fighting game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Q200912",
+        "Sega Titan Video"
+      ],
+      "qid": "Q94507925",
+      "release_dates": [
+        "1997-10-23T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q94507925",
+      "titles": {
+        "en": "All Japan Pro Wrestling featuring Virtua",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2010s",
+        "platform_families": [
+          "pc",
+          "xbox"
+        ]
+      },
+      "genres": [
+        "point-and-click adventure"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "macOS",
+        "Microsoft Windows",
+        "Q13361286",
+        "Q19610114",
+        "Q5014725",
+        "Q63184502",
+        "Xbox One S",
+        "Xbox One X",
+        "Xbox Series X and Series S"
+      ],
+      "qid": "Q96623682",
+      "release_dates": [
+        "2019-05-31T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q96623682",
+      "titles": {
+        "en": "Smile for Me",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2020s",
+        "platform_families": [
+          "pc",
+          "xbox"
+        ]
+      },
+      "genres": [
+        "adventure video game",
+        "cyberpunk video game",
+        "science fiction video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "macOS",
+        "Microsoft Windows",
+        "Q13361286",
+        "Q19610114",
+        "Q20965967",
+        "Q388",
+        "Q48493",
+        "Q5014725",
+        "Q63184502",
+        "Q64350339",
+        "Xbox Series X and Series S"
+      ],
+      "qid": "Q96740602",
+      "release_dates": [
+        "2020-06-25T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q96740602",
+      "titles": {
+        "en": "Beyond a Steel Sky",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2020s",
+        "platform_families": [
+          "pc",
+          "xbox"
+        ]
+      },
+      "genres": [
+        "battle royale game",
+        "cyberpunk video game",
+        "first-person shooter",
+        "science fiction video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "Q13361286",
+        "Q5014725",
+        "Q63184502",
+        "Xbox Series X and Series S"
+      ],
+      "qid": "Q96873691",
+      "release_dates": [
+        "2020-08-11T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q96873691",
+      "titles": {
+        "en": "Hyper Scape",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2020s",
+        "platform_families": [
+          "pc",
+          "xbox"
+        ]
+      },
+      "genres": [
+        "action-adventure game",
+        "first-person shooter"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "Q13361286",
+        "Q5014725",
+        "Q63184502",
+        "Xbox Series X and Series S"
+      ],
+      "qid": "Q97120062",
+      "release_dates": [
+        "2021-10-07T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q97120062",
+      "titles": {
+        "en": "Far Cry 6",
+        "es": "Far Cry 6"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2020s",
+        "platform_families": [
+          "pc",
+          "xbox"
+        ]
+      },
+      "genres": [
+        "adventure video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "Q13361286",
+        "Q19610114",
+        "Q5014725",
+        "Q63184502",
+        "Xbox Series X and Series S"
+      ],
+      "qid": "Q97341493",
+      "release_dates": [
+        "2022-04-22T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q97341493",
+      "titles": {
+        "en": "Skábma",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2010s",
+        "platform_families": [
+          "pc",
+          "xbox"
+        ]
+      },
+      "genres": [
+        "platformer"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "macOS",
+        "Microsoft Windows",
+        "Q13361286",
+        "Q19610114",
+        "Q388",
+        "Xbox Series X and Series S"
+      ],
+      "qid": "Q97362119",
+      "release_dates": [
+        "2018-02-22T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q97362119",
+      "titles": {
+        "en": "Vagante",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2010s",
+        "platform_families": [
+          "pc",
+          "xbox"
+        ]
+      },
+      "genres": [
+        "turn-based strategy video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "macOS",
+        "Microsoft Windows",
+        "Q13361286",
+        "Q388",
+        "Xbox Series X and Series S"
+      ],
+      "qid": "Q97362241",
+      "release_dates": [
+        "2017-03-16T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q97362241",
+      "titles": {
+        "en": "Codex of Victory",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2010s",
+        "platform_families": [
+          "pc",
+          "xbox"
+        ]
+      },
+      "genres": [
+        "adventure video game",
+        "survival horror"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "Q13361286",
+        "Xbox Series X and Series S"
+      ],
+      "qid": "Q97372652",
+      "release_dates": [
+        "2019-10-17T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q97372652",
+      "titles": {
+        "en": "The Beast Inside",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2020s",
+        "platform_families": [
+          "pc",
+          "xbox"
+        ]
+      },
+      "genres": [
+        "adventure video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "Q13361286",
+        "Q19610114",
+        "Q5014725",
+        "Xbox Series X and Series S"
+      ],
+      "qid": "Q97372853",
+      "release_dates": [
+        "2020-02-19T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q97372853",
+      "titles": {
+        "en": "The Suicide of Rachel Foster",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2020s",
+        "platform_families": [
+          "pc",
+          "xbox"
+        ]
+      },
+      "genres": [
+        "roguelike"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "Q13361286",
+        "Q19610114",
+        "Xbox Series X and Series S"
+      ],
+      "qid": "Q97381809",
+      "release_dates": [
+        "2022-03-17T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q97381809",
+      "titles": {
+        "en": "Curious Expedition 2",
+        "es": null
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "2020s",
+        "platform_families": [
+          "pc",
+          "xbox"
+        ]
+      },
+      "genres": [
+        "association football video game"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Microsoft Windows",
+        "Q13361286",
+        "Q48493",
+        "Q5014725",
+        "Q63184502",
+        "Q94",
+        "Xbox Series X and Series S"
+      ],
+      "qid": "Q97388790",
+      "release_dates": [
+        "2021-09-30T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q97388790",
+      "titles": {
+        "en": "eFootball",
+        "es": "eFootball"
+      }
+    },
+    {
+      "aliases": {
+        "en": [],
+        "es": []
+      },
+      "coverage": {
+        "era": "1990s",
+        "platform_families": [
+          "sega"
+        ]
+      },
+      "genres": [
+        "multidirectional shooter"
+      ],
+      "image_candidates": [],
+      "platforms": [
+        "Q200912",
+        "Sega Titan Video"
+      ],
+      "qid": "Q128811885",
+      "release_dates": [
+        "1998-01-01T00:00:00Z"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Q128811885",
+      "titles": {
+        "en": "Guardian Force",
+        "es": null
+      }
+    }
+  ],
+  "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "metadata_query_template": "# SavePoint bounded metadata enrichment, revision 1\nSELECT ?game ?genreLabel ?platformLabel WHERE {\n  VALUES ?game { %s }\n  OPTIONAL { ?game wdt:P136 ?genre }\n  OPTIONAL { ?game wdt:P400 ?platform }\n  SERVICE wikibase:label {\n    bd:serviceParam wikibase:language \"en\" .\n    ?genre rdfs:label ?genreLabel .\n    ?platform rdfs:label ?platformLabel .\n  }\n}\nORDER BY ?game ?genreLabel ?platformLabel\n",
+  "queries": [
+    {
+      "label": "pre-1990 era",
+      "query": "# SavePoint Phase 1 candidate query, revision 4 (pre-1990 era)\nSELECT ?game ?enLabel ?esLabel (MIN(?date) AS ?releaseDate)\n       (SAMPLE(?candidateImage) AS ?image) WHERE {\n  ?game wdt:P31 wd:Q7889 .\n  ?game wdt:P577 ?eraDate . FILTER(YEAR(?eraDate) < 1990)\n\n  ?game rdfs:label ?enLabel . FILTER(LANG(?enLabel) = \"en\")\n  OPTIONAL { ?game rdfs:label ?esLabel . FILTER(LANG(?esLabel) = \"es\") }\n  OPTIONAL { ?game wdt:P577 ?date }\n  OPTIONAL { ?game wdt:P18 ?candidateImage }\n}\nGROUP BY ?game ?enLabel ?esLabel\nLIMIT 30\n",
+      "row_count": "30"
+    },
+    {
+      "label": "2020s era",
+      "query": "# SavePoint Phase 1 candidate query, revision 4 (2020s era)\nSELECT ?game ?enLabel ?esLabel (MIN(?date) AS ?releaseDate)\n       (SAMPLE(?candidateImage) AS ?image) WHERE {\n  ?game wdt:P31 wd:Q7889 .\n  ?game wdt:P577 ?eraDate . FILTER(YEAR(?eraDate) >= 2020)\n\n  ?game rdfs:label ?enLabel . FILTER(LANG(?enLabel) = \"en\")\n  OPTIONAL { ?game rdfs:label ?esLabel . FILTER(LANG(?esLabel) = \"es\") }\n  OPTIONAL { ?game wdt:P577 ?date }\n  OPTIONAL { ?game wdt:P18 ?candidateImage }\n}\nGROUP BY ?game ?enLabel ?esLabel\nLIMIT 30\n",
+      "row_count": "30"
+    },
+    {
+      "label": "xbox platform",
+      "query": "# SavePoint Phase 1 candidate query, revision 4 (xbox platform)\nSELECT ?game ?enLabel ?esLabel (MIN(?date) AS ?releaseDate)\n       (SAMPLE(?candidateImage) AS ?image) WHERE {\n  ?game wdt:P31 wd:Q7889 .\n  ?game wdt:P400 ?platform .\n  VALUES ?platform { wd:Q49612 wd:Q30700179 wd:Q98967383 wd:Q15941410 wd:Q17048762 wd:Q98973368 }\n\n  ?game rdfs:label ?enLabel . FILTER(LANG(?enLabel) = \"en\")\n  OPTIONAL { ?game rdfs:label ?esLabel . FILTER(LANG(?esLabel) = \"es\") }\n  OPTIONAL { ?game wdt:P577 ?date }\n  OPTIONAL { ?game wdt:P18 ?candidateImage }\n}\nGROUP BY ?game ?enLabel ?esLabel\nLIMIT 20\n",
+      "row_count": "20"
+    },
+    {
+      "label": "sega platform",
+      "query": "# SavePoint Phase 1 candidate query, revision 4 (sega platform)\nSELECT ?game ?enLabel ?esLabel (MIN(?date) AS ?releaseDate)\n       (SAMPLE(?candidateImage) AS ?image) WHERE {\n  ?game wdt:P31 wd:Q7889 .\n  ?game wdt:P400 ?platform .\n  VALUES ?platform { wd:Q62603091 wd:Q112224827 wd:Q1067380 }\n\n  ?game rdfs:label ?enLabel . FILTER(LANG(?enLabel) = \"en\")\n  OPTIONAL { ?game rdfs:label ?esLabel . FILTER(LANG(?esLabel) = \"es\") }\n  OPTIONAL { ?game wdt:P577 ?date }\n  OPTIONAL { ?game wdt:P18 ?candidateImage }\n}\nGROUP BY ?game ?enLabel ?esLabel\nLIMIT 20\n",
+      "row_count": "13"
+    },
+    {
+      "label": "broad sweep",
+      "query": "# SavePoint Phase 1 candidate query, revision 4 (broad sweep)\nSELECT ?game ?enLabel ?esLabel (MIN(?date) AS ?releaseDate)\n       (SAMPLE(?candidateImage) AS ?image) WHERE {\n  ?game wdt:P31 wd:Q7889 .\n\n  ?game rdfs:label ?enLabel . FILTER(LANG(?enLabel) = \"en\")\n  OPTIONAL { ?game rdfs:label ?esLabel . FILTER(LANG(?esLabel) = \"es\") }\n  OPTIONAL { ?game wdt:P577 ?date }\n  OPTIONAL { ?game wdt:P18 ?candidateImage }\n}\nGROUP BY ?game ?enLabel ?esLabel\nLIMIT 220\n",
+      "row_count": "220"
+    }
+  ],
+  "query_revision": "savepoint-phase-01-v4",
+  "retrieved_at": "2026-09-04T16:24:18Z",
+  "schema_version": 1,
+  "source": "Wikidata Query Service",
+  "source_license": "CC0 1.0",
+  "source_url": "https://query.wikidata.org/sparql",
+  "status": "candidate-not-approved"
+}
