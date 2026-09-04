@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Synthetic security fixtures; never use real accounts, secrets, or provider data.",
+  "users": {
+    "ownerA": {
+      "publicAlias": "fixture-owner-a",
+      "syntheticId": "00000000-0000-4000-8000-00000000000a"
+    },
+    "visitorB": {
+      "publicAlias": "fixture-visitor-b",
+      "syntheticId": "00000000-0000-4000-8000-00000000000b"
+    }
+  },
+  "untrustedText": [
+    "<script>globalThis.__savepoint_xss = true</script>",
+    "<img src=x onerror=alert('synthetic-xss')>",
+    "</textarea><svg onload=alert('synthetic-xss')>"
+  ],
+  "untrustedUrls": [
+    "javascript:alert('synthetic-url')",
+    "data:text/html,<script>alert('synthetic-url')</script>",
+    "file:///etc/passwd",
+    "http://127.0.0.1:5432/",
+    "https://trusted.example.invalid@attacker.example.invalid/"
+  ],
+  "tamperedDataset": {
+    "declaredSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "actualFixtureContent": "savepoint-intentionally-mismatched-hash"
+  }
+}
+

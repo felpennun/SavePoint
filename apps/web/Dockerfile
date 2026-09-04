@@ -14,9 +14,7 @@ ENV COREPACK_HOME=/opt/corepack \
 WORKDIR /workspace
 RUN corepack enable && corepack prepare pnpm@11.25.0 --activate
 COPY --from=dependencies --chown=node:node /workspace/node_modules ./node_modules
-COPY --from=dependencies --chown=node:node /workspace/apps/web/node_modules ./apps/web/node_modules
 COPY --chown=node:node package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY --chown=node:node apps/web ./apps/web
 USER node
 CMD ["pnpm", "--dir", "apps/web", "test", "--run"]
-

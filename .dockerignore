@@ -1,0 +1,17 @@
+.git
+.gitignore
+.planning
+.codex
+.agents
+.pnpm-store
+node_modules
+**/node_modules
+**/__pycache__
+**/.pytest_cache
+.env
+.env.*
+!.env.example
+.next
+test-results
+playwright-report
+
