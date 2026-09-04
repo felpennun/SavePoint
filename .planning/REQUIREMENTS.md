@@ -7,30 +7,30 @@
 
 ### Accounts and Profiles
 
-- [ ] **AUTH-01**: User can sign in to and sign out of a controlled account.
+- [x] **AUTH-01**: User can sign in to and sign out of a controlled account.
 - [ ] **AUTH-02**: System can load synthetic users that are clearly identified as simulated accounts.
 - [ ] **PROF-01**: User can edit their alias, avatar, and biography.
-- [ ] **PROF-02**: An authorised visitor can view a public profile.
+- [x] **PROF-02**: An authorised visitor can view a public profile.
 - [ ] **PROF-03**: Public profile shows only permitted games, lists, ratings, comments, and statistics.
 - [ ] **PROF-04**: User can obtain a shareable URL for their public profile and public lists.
 
 ### Catalogue
 
-- [ ] **CAT-01**: User can search video games by title.
+- [x] **CAT-01**: User can search video games by title.
 - [ ] **CAT-02**: User can filter and sort the catalogue using available metadata.
-- [ ] **CAT-03**: Each game has a detail page showing available data and its provenance.
+- [x] **CAT-03**: Each game has a detail page showing available data and its provenance.
 - [x] **CAT-04**: Catalogue uses canonical game identifiers that do not depend on the enrichment API.
 - [ ] **CAT-05**: Catalogue can represent games, platforms, editions, genres, franchises, developers, publishers, dates, modes, and tags available from approved sources.
-- [ ] **CAT-06**: Catalogue remains usable with local data when the enrichment API is unavailable.
+- [x] **CAT-06**: Catalogue remains usable with local data when the enrichment API is unavailable.
 
 ### Backlog, Lists, and Inventory
 
-- [ ] **LIB-01**: User can mark a game as pending, playing, completed, or abandoned.
-- [ ] **LIB-02**: User can rate a game using a consistent rating scale.
+- [x] **LIB-01**: User can mark a game as pending, playing, completed, or abandoned.
+- [x] **LIB-02**: User can rate a game using a consistent rating scale.
 - [ ] **LIB-03**: User can create, edit, and delete their own comments.
 - [ ] **LIB-04**: User can create and order custom game lists.
-- [ ] **INV-01**: User can register multiple owned copies of the same game.
-- [ ] **INV-02**: Each copy can record physical or digital format, platform, and edition.
+- [x] **INV-01**: User can register multiple owned copies of the same game.
+- [x] **INV-02**: Each copy can record physical or digital format, platform, and edition.
 - [ ] **INV-03**: Each copy can record purchase date, price, currency, and store.
 - [ ] **INV-04**: A physical copy can record conservation state and storage location.
 - [x] **INV-05**: Private notes and purchase details never appear in public projections.
@@ -53,7 +53,7 @@
 ### Recommendations
 
 - [ ] **REC-01**: System produces a random recommendation baseline.
-- [ ] **REC-02**: System produces a popularity recommendation baseline.
+- [x] **REC-02**: System produces a popularity recommendation baseline.
 - [ ] **REC-03**: System implements a content-based recommender.
 - [ ] **REC-04**: System implements at least one collaborative-filtering method.
 - [ ] **REC-05**: System implements a hybrid recommender.
@@ -157,20 +157,20 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1 | Pending |
-| PROF-02 | Phase 1 | Pending |
-| CAT-01 | Phase 1 | Pending |
-| CAT-03 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Complete |
+| PROF-02 | Phase 1 | Complete |
+| CAT-01 | Phase 1 | Complete |
+| CAT-03 | Phase 1 | Complete |
 | CAT-04 | Phase 1 | Complete |
-| CAT-06 | Phase 1 | Pending |
-| LIB-01 | Phase 1 | Pending |
-| LIB-02 | Phase 1 | Pending |
-| INV-01 | Phase 1 | Pending |
-| INV-02 | Phase 1 | Pending |
+| CAT-06 | Phase 1 | Complete |
+| LIB-01 | Phase 1 | Complete |
+| LIB-02 | Phase 1 | Complete |
+| INV-01 | Phase 1 | Complete |
+| INV-02 | Phase 1 | Complete |
 | INV-05 | Phase 1 | Complete |
 | DATA-01 | Phase 1 | Pending |
 | DATA-02 | Phase 1 | Pending |
-| REC-02 | Phase 1 | Pending |
+| REC-02 | Phase 1 | Complete |
 | SEC-02 | Phase 1 | Pending |
 | OPS-01 | Phase 1 | Pending |
 | OPS-02 | Phase 1 | Pending |

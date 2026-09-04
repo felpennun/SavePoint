@@ -3,16 +3,16 @@ gsd_state_version: 1.0
 current_phase: 01
 current_phase_name: Three-Day Public Demo Slice
 status: executing
-stopped_at: Completed 01-16-PLAN.md
-last_updated: "2026-09-04T18:12:51.839Z"
+stopped_at: Completed 01-09-PLAN.md
+last_updated: "2026-09-04T18:26:49.772Z"
 last_activity: 2026-09-04
 last_activity_desc: Phase 01 execution started
-state_head: d3506f7f41690d3c016aaa12eb901e5051e2fc3a
+state_head: ae2da6b5131e6f4256ae72e2fff60127006a0c19
 progress:
   total_phases: 8
   completed_phases: 0
   total_plans: 16
-  completed_plans: 10
+  completed_plans: 11
   percent: 0
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-09-04)
 ## Current Position
 
 Phase: 01 (Three-Day Public Demo Slice) — EXECUTING
-Plan: 8 of 16
+Plan: 9 of 16
 Status: Ready to execute
 Last activity: 2026-09-04 — Phase 01 execution started
 
@@ -65,6 +65,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01 P07 | 20min | 3 tasks | 16 files |
 | Phase 01 P08 | 15min | 1 tasks | 10 files |
 | Phase 01 P16 | 8min | 2 tasks | 3 files |
+| Phase 01 P09 | 20min | 2 tasks | 22 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 01]: Ran the plan 01-04 vertical tracer against the real stack (not just unit tests) and found/fixed 8 real infrastructure bugs: missing Docker port mappings, a Next.js rewrite trailing-slash redirect loop, a Django CSRF Origin mismatch through the same-origin proxy, dev-mode HMR hydration failure that let the login form leak credentials via URL query string, a locale-blind post-login redirect, and an incomplete middleware public-path list. Switched infra/compose.yaml's web service from `next dev` to a production build+start as the fix for the HMR issue. — None of these were found by unit tests alone -- they only surfaced when the full login->catalogue->status journey was actually driven through a real browser via Playwright, which is exactly what a type="tracer" plan exists to catch before six more waves build on top of a broken foundation. The production-build switch also better matches the project's own stated reproducibility principle (same commit/lockfiles build local and deployed).
 - [Phase 01]: Resolved PROF-02's flagged assumption for Phase 1: every account is public by design (small controlled demo, no privacy toggle yet). The public profile serializer is a hand-built allowlist (never DRF ModelSerializer auto-introspection), verified by a recursive denylist scan plus hostile-fixture XSS tests. — Building the allowlist by hand means a new private model field requires an explicit decision to expose it, not an accidental one to hide it -- the opposite failure mode of auto-serialization. Phase 1's no-privacy-toggle choice keeps the "unauthorized vs nonexistent" indistinguishability requirement trivially satisfied (both cases collapse to the same 404 today) while leaving the response shape ready for a future toggle without a rewrite.
 - [Phase 01]: Found Tailwind CSS had been a devDependency since Plan 01-03 but was never actually wired up (no postcss.config.mjs anywhere) -- added it as part of building the design token system. Also found and fixed a completely unconfigured Vitest path alias. — Both were genuine blocking gaps for this plan's own deliverables (globals.css's first @import line, and the i18n parity test's own @/ imports), not scope creep -- discovered only because this plan was the first to actually exercise either piece of tooling.
+- [Phase 01]: Wired every UI-SPEC page (homepage, catalogue, detail, collection, profile, sources) to real backend data via GameCard/LibraryControls/RecommendationStrip, adding two new backend endpoints (MyLibraryView, SourcesView) the plan's file list didn't explicitly name but the pages genuinely needed to function. — Ten requirements (AUTH-01, PROF-02, CAT-01, CAT-03, CAT-06, LIB-01, LIB-02, INV-01, INV-02, REC-02) reached their last declaring plan here and are now marked complete -- the E2E suite proves rating and multi-copy persistence across a reload, not just the status field the earlier tracer plan covered, which is what closes out LIB-01/LIB-02/INV-01/INV-02 for real rather than by inference.
 
 ### Pending Todos
 
@@ -111,6 +113,6 @@ TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<ver
 
 ## Session Continuity
 
-Last session: 2026-09-04T18:12:51.798Z
-Stopped at: Completed 01-16-PLAN.md
+Last session: 2026-09-04T18:26:49.730Z
+Stopped at: Completed 01-09-PLAN.md
 Resume file: None
