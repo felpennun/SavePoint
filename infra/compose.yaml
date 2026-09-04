@@ -37,6 +37,18 @@ services:
     security_opt:
       - no-new-privileges:true
     init: true
+    # Local-development-only bind mounts (#dev-parity): the image built by
+    # apps/api/Dockerfile only COPYs apps/api/ at build time, so without these
+    # mounts every `docker compose run` sees whatever code existed at the last
+    # build, not the current working tree -- makemigrations/pytest would
+    # silently operate on stale source. This never affects the deployed image
+    # itself (Render builds fresh from the same Dockerfile, no compose.yaml
+    # involved); /workspace/.venv from the image layer is left un-mounted so
+    # installed dependencies are unaffected.
+    volumes:
+      - ../apps/api:/workspace/apps/api
+      - ../data:/workspace/data:ro
+      - ../docs:/workspace/docs:ro
 
   web:
     build:
@@ -48,6 +60,10 @@ services:
     security_opt:
       - no-new-privileges:true
     init: true
+    volumes:
+      - ../apps/web:/workspace/apps/web
+      - /workspace/apps/web/node_modules
+      - /workspace/apps/web/.next
 
 volumes:
   postgres_data:
