@@ -196,6 +196,44 @@ export async function fetchMyLibrary(cookieHeader: string): Promise<MyLibraryRes
   return (await response.json()) as MyLibraryResult;
 }
 
+export interface RecommendationShelfData {
+  genre: string;
+  genre_slug: string;
+  collection_count: number;
+  items: GameCard[];
+}
+
+export interface RecommendationsResult {
+  shelves: RecommendationShelfData[];
+  /** True when the user has too little rated/completed history for the
+   * heuristic to produce shelves. */
+  insufficient_history: boolean;
+}
+
+/**
+ * Genre recommendations (REC-10). The heuristic endpoint is built in Plan
+ * 05/09; until it exists this resolves to `null` and the page renders its
+ * insufficient-history state. `401` -> caller redirects to login.
+ */
+export async function fetchRecommendations(
+  cookieHeader: string,
+): Promise<RecommendationsResult | "unauthorized" | null> {
+  const url = new URL("/api/library/recommendations/", API_BASE);
+  let response: Response;
+  try {
+    response = await fetch(url, { cache: "no-store", headers: { Cookie: cookieHeader } });
+  } catch {
+    return null;
+  }
+  if (response.status === 401 || response.status === 403) return "unauthorized";
+  if (!response.ok) return null;
+  try {
+    return (await response.json()) as RecommendationsResult;
+  } catch {
+    return null;
+  }
+}
+
 export interface SourcesSummary {
   source: string;
   source_url: string;
