@@ -23,6 +23,7 @@ Provider limits change. Recheck the linked official pages at creation time and r
 - Do not put `&&`, `${...}` or nested `sh -c` syntax back into `dockerCommand`: Render does not evaluate that field as shell source. The deployment source scan protects the Blueprint boundary, while `apps/api/tests/test_render_startup.py` checks the script's fail-closed order.
 - Neon Free has account-dependent compute-hour, storage, project and transfer limits and can suspend idle compute. Confirm the current values and retention in the Neon dashboard/docs; this runbook makes no durability or backup promise.
 - Compose remains available offline if any public free tier sleeps, changes terms or disappears.
+- Vercel Hobby on a **private** repository only auto-deploys commits whose Git author email GitHub links to the project owner's own account. A commit authored with an email verified under a *different* GitHub account is silently blocked ("the commit author did not have contributing access... Hobby Plan does not support collaboration for private repositories"), even when the committer's display name matches. Fix: set the local `user.email` to the owner account's GitHub-issued noreply address (`<user-id>+<username>@users.noreply.github.com`, always verified and unique to that account, from `gh api users/<username> --jq .id`) rather than a personal email that might be verified elsewhere.
 
 Official references checked 2026-09-04:
 
