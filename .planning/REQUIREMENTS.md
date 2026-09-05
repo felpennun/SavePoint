@@ -41,8 +41,8 @@
 
 ### Data and Provenance
 
-- [ ] **DATA-01**: Project uses a stable, citable dataset that is legally suitable for its experiments.
-- [ ] **DATA-02**: Dataset records its version, licence, source URL, retrieval date, and checksum.
+- [x] **DATA-01**: Project uses a stable, citable dataset that is legally suitable for its experiments.
+- [x] **DATA-02**: Dataset records its version, licence, source URL, retrieval date, and checksum.
 - [ ] **DATA-03**: Project generates a data dictionary and a quality/missing-fields report for the fixed corpus.
 - [ ] **DATA-04**: Enrichment API is selected through a documented comparison of coverage, platforms, licence, attribution, quotas, stability, and cost.
 - [ ] **DATA-05**: Each enriched value retains its source and retrieval date.
@@ -170,8 +170,8 @@
 | INV-01 | Phase 1 | Complete |
 | INV-02 | Phase 1 | Complete |
 | INV-05 | Phase 1 | Complete |
-| DATA-01 | Phase 1 | Pending |
-| DATA-02 | Phase 1 | Pending |
+| DATA-01 | Phase 1 | Complete |
+| DATA-02 | Phase 1 | Complete |
 | REC-02 | Phase 1 | Complete |
 | SEC-02 | Phase 1 | Complete |
 | OPS-01 | Phase 1 | Complete |
