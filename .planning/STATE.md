@@ -3,11 +3,11 @@ gsd_state_version: 1.0
 current_phase: 01.1
 current_phase_name: Real-Scale Catalogue and Product Experience
 status: executing
-stopped_at: "Plan 01.1-02 in progress — importer built (Tasks 1-2 committed in worktree), full-scale import PROVEN on a fresh disposable DB (312,443 primary works > floor 281,176); acceptance rerun running for clean evidence + convergence; Task 3 commit + SUMMARY + merge to main still pending"
-last_updated: "2026-09-05T19:12:00.000Z"
+stopped_at: "Phase 01.1: 01.1-UI-SPEC.md approved (7/7 dimensions, light+dark theme author-ratified); 01.1-02 import finalizing in background"
+last_updated: "2026-09-05T17:37:37.603Z"
 last_activity: 2026-09-05
-last_activity_desc: "Plan 01.1-02 — IGDB import verified at 312k scale on a fresh DB; finalizing"
-state_head: efbbbf610167ca1ab0c89d613a04f0abf4630f66
+last_activity_desc: Plan 01.1-02 — IGDB import verified at 312k scale on a fresh DB; finalizing
+state_head: fc0d29968ecc0f89d83bc6db063e39044700aa63
 progress:
   total_phases: 9
   completed_phases: 1
@@ -125,7 +125,9 @@ TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<ver
 
 ## Session Continuity
 
-Last session: 2026-09-05T19:12:00.000Z
+**Stopped at:** Phase 01.1: 01.1-UI-SPEC.md approved (7/7 dimensions, light+dark theme author-ratified); 01.1-02 import finalizing in background
+
+Last session: 2026-09-05T17:37:37.346Z
 
 ### CHECKPOINT — Plan 01.1-02 (IGDB import) status, 2026-09-05 ~19:10 UTC
 
@@ -137,6 +139,6 @@ Last session: 2026-09-05T19:12:00.000Z
 - **Watcher armed:** background task `bzc3o5dk9` fires one notification when the rerun's throwaway container is torn down (or stalls/times out).
 - **Open gap for later:** the disposable-DB proof does NOT populate the real dev/prod catalogue DB (`savepoint-db-1`). Whether the persistent catalogue is populated by re-running `import_igdb_catalogue` against it (and when — here, or a follow-on before Plans 03/05/06 consume the catalogue) is unresolved and should be decided explicitly.
 
-**Meanwhile:** orchestrator is doing Wave 3 prep — `01.1-UI-SPEC.md` design contract for the product redesign (plan 01.1-06).
+**Wave 3 prep DONE:** `01.1-UI-SPEC.md` written, checker-VERIFIED 7/7 (twice — once after the author-ratified light-theme revision), `status: approved`, commits `ea95d2a` + `fc0d299`. Author ratified: light+dark theme with a no-flash SSR cookie toggle (D-UI-1 overridden), comfortable ~156px grid no list-toggle (D-UI-2), tiered colored ScorePill + gold personal stars (D-UI-3), genre-grouped horizontal shelves for REC-10 (D-UI-4). Non-binding HTML mockups in `mockups/`. Ready for plan 01.1-06 once 01.1-02 merges.
 
-Resume file: none — 01.1-02 finalization is agent-driven (see above); after it lands, next is the Wave 3 checkpoint (01.1-06).
+Resume file: .planning/phases/01.1-real-scale-catalogue-and-product-experience/01.1-UI-SPEC.md
