@@ -104,7 +104,7 @@
 - [ ] **OPS-05**: System emits structured logs and observable job states without sensitive data.
 - [ ] **QUAL-01**: Project has unit, integration, and browser tests for critical workflows.
 - [ ] **QUAL-02**: A clean installation can reproduce experiments and their evidence.
-- [ ] **QUAL-03**: Core workflows are responsive and verifiable against WCAG 2.2 AA.
+- [x] **QUAL-03**: Core workflows are responsive and verifiable against WCAG 2.2 AA.
 - [ ] **QUAL-04**: Charts and visualisations provide accessible textual or tabular alternatives.
 - [ ] **QUAL-05**: Interface presents a professional, product-grade visual design comparable to established cataloguing applications (density, typography, imagery treatment), not a minimal utilitarian layout.
 
@@ -177,7 +177,7 @@
 | OPS-01 | Phase 1 | Complete |
 | OPS-02 | Phase 1 | Complete |
 | OPS-03 | Phase 1 | Complete |
-| QUAL-03 | Phase 1 | Pending |
+| QUAL-03 | Phase 1 | Complete |
 | DOC-01 | Phase 1 | Complete |
 | AGENT-01 | Phase 1 | Complete |
 | AGENT-02 | Phase 1 | Complete |

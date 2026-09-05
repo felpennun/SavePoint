@@ -14,7 +14,7 @@ SavePoint begins with a three-day, publicly deployed vertical demonstration, the
 
 ## Phases
 
-- [ ] **Phase 1: Three-Day Public Demo Slice** - Deploy a lawful, locally reproducible controlled demo with catalogue, backlog, rating, inventory, public profile, and popularity recommendations.
+- [x] **Phase 1: Three-Day Public Demo Slice** - Deploy a lawful, locally reproducible controlled demo with catalogue, backlog, rating, inventory, public profile, and popularity recommendations. (completed 2026-09-05)
 - [ ] **Phase 2: Governed Corpus and Frozen Evaluation Contract** - Establish immutable research inputs, synthetic scenarios, and the protocol that later algorithm comparisons cannot redefine.
 - [ ] **Phase 3: Complete Collection Workflows and Portability** - Complete profiles, comments, lists, copy details, and safe deterministic import/export.
 - [ ] **Phase 4: Public Discovery and Resilient Enrichment** - Add public projections, catalogue discovery, and attributable live enrichment without contaminating research data.
@@ -112,6 +112,7 @@ Plans:
 **Goal:** The demo grows from a small curated 150-game corpus into a real-scale catalogue (hundreds of thousands of titles via IGDB) with a product-grade visual redesign, catalogue sorting/filtering, multiple working preloaded accounts, and a dedicated genre-based recommendations page -- author-requested immediately after Phase 1's sign-off, prioritized ahead of Phase 2's evaluation-protocol work.
 
 **Author's priority order for this phase** (recorded 2026-09-05, from `docs/verification/phase-01-signoff.md`):
+
 1. Mass catalogue import (IGDB) + interface redesign
 2. Real login system with multiple preloaded accounts
 3. Catalogue sorting/filtering and search filters
@@ -253,7 +254,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Three-Day Public Demo Slice | 16/16 | In Progress|  |
+| 1. Three-Day Public Demo Slice | 16/16 | Complete    | 2026-09-05 |
 | 2. Governed Corpus and Frozen Evaluation Contract | 0/TBD | Not started | - |
 | 3. Complete Collection Workflows and Portability | 0/TBD | Not started | - |
 | 4. Public Discovery and Resilient Enrichment | 0/TBD | Not started | - |

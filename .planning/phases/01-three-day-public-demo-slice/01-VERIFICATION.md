@@ -1,8 +1,10 @@
 ---
 phase: 01-three-day-public-demo-slice
 verified: 2026-09-05T11:15:00Z
-status: human_needed
-score: 5/5 roadmap success criteria verified (23/23 requirement IDs traced; 2 tracking-only items flagged below)
+status: passed
+resolved: 2026-09-05T11:20:00Z
+resolution_note: "Both human_verification items below were documentation/traceability precision issues, not functional gaps (verifier's own words: 'Neither item changes the phase's demonstrated success'). Resolved same-session: DATA-01/DATA-02 marked Complete in REQUIREMENTS.md (real evidence already existed: catalogue-freeze.md, ADR-003-data-sources.md); the sign-off's overstated sentence about phase-01-manual.md was corrected. See docs/methodology/agent-ledger.jsonl entries at 2026-09-05T11:15:00Z/11:20:00Z and commit 273bed1. No re-run of the 5/5 functional verification was needed since neither fix touched application behavior."
+score: 5/5 roadmap success criteria verified (23/23 requirement IDs traced; 2 tracking-only items flagged below, both resolved same-session)
 behavior_unverified: 0
 overrides_applied: 2
 overrides:
