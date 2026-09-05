@@ -507,3 +507,63 @@ textarea {
   text-align: center;
   margin-top: var(--space-lg);
 }
+
+/* Filter bar: inline on desktop, a <details> disclosure on mobile
+   (01.1-UI-SPEC Screen Contract 2). The DOM order is identical at every
+   width -- only the summary visibility and forced-open behaviour change. */
+.sp-filterbar {
+  margin: var(--space-xl) 0;
+}
+
+.sp-filterbar > summary {
+  display: none;
+}
+
+.sp-filterbar-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-md);
+  align-items: end;
+}
+
+.sp-filterbar-actions {
+  display: flex;
+  gap: var(--space-ctl);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.sp-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin: var(--space-md) 0 var(--space-sm);
+}
+
+@media (min-width: 721px) {
+  /* Desktop: always expanded regardless of the [open] toggle state. */
+  .sp-filterbar .sp-filterbar-body {
+    display: grid !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .sp-filterbar > summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    min-height: 2.75rem;
+    font-size: var(--text-meta);
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    list-style: none;
+  }
+  .sp-filterbar > summary::-webkit-details-marker {
+    display: none;
+  }
+  .sp-filterbar-body {
+    grid-template-columns: 1fr 1fr;
+    margin-top: var(--space-md);
+  }
+}
