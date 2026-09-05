@@ -290,6 +290,58 @@ def test_reimport_is_idempotent_and_convergent() -> None:
 
 
 @pytest.mark.django_db
+def test_import_coexists_with_preexisting_wikidata_platform_colliding_on_slug() -> None:
+    """Regression (Plan 01.1-02 follow-up): the IGDB import must reconcile a
+    shared lookup entity (Platform) on its natural key against a row that
+    already exists from the Phase 1 Wikidata corpus.
+
+    The Wikidata importer keys platforms on ``name`` and slugifies its
+    lowercase label, producing ``name="web browser"`` / ``slug="web-browser"``.
+    IGDB spells the same hardware "Web browser" -- same slug, different name.
+    A blind ``get_or_create(name=...)`` misses the existing row and its INSERT
+    trips ``catalogue_platform_slug_key``, aborting the whole run. The fix
+    matches on ``slug`` first and reuses whatever row exists.
+    """
+    from django.utils.text import slugify
+
+    # Exactly how import_catalogue (Wikidata) would have created it.
+    wikidata_platform, _ = Platform.objects.get_or_create(
+        name="web browser",
+        defaults={"slug": slugify("web browser")[:150] or "platform"},
+    )
+    assert wikidata_platform.slug == "web-browser"
+
+    pages = [[
+        _game(501, "Browser Quest", platforms=((82, "Web browser"),)),
+        _game(502, "Idle Tabs", platforms=((82, "Web browser"),)),
+    ]]
+
+    # No IntegrityError / CommandError may escape.
+    _run_import(FakeIgdbClient(pages, eligible=2))
+
+    run = IgdbImportRun.objects.get(source="igdb", query_identity="game_type=0")
+    assert run.status == IgdbImportRun.Status.COMPLETE
+
+    # The pre-existing platform row is reused, never duplicated.
+    assert Platform.objects.filter(slug="web-browser").count() == 1
+    assert Platform.objects.get(slug="web-browser").pk == wikidata_platform.pk
+
+    # Both IGDB games link their release to that same platform row.
+    for work_slug in ("browser-quest", "idle-tabs"):
+        work = GameWork.objects.get(canonical_slug=work_slug)
+        assert list(work.releases.values_list("platform__slug", flat=True)) == ["web-browser"]
+
+    # A re-run stays idempotent: still one platform row, still convergent.
+    checksum = run.checksum
+    _run_import(FakeIgdbClient(pages, eligible=2))
+    run.refresh_from_db()
+    assert run.status == IgdbImportRun.Status.COMPLETE
+    assert run.checksum == checksum
+    assert Platform.objects.filter(slug="web-browser").count() == 1
+    assert GameRelease.objects.filter(platform__slug="web-browser").count() == 2
+
+
+@pytest.mark.django_db
 def test_slug_collision_produces_distinct_canonical_slugs() -> None:
     pages = [[
         _game(101, "Portal", slug="portal"),
