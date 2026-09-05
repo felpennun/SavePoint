@@ -61,6 +61,7 @@
 - [ ] **REC-07**: Recommendations exclude already-consumed games according to configured rules.
 - [ ] **REC-08**: Each recommendation presents a deterministic explanation grounded in actual model evidence.
 - [ ] **REC-09**: Published recommendation results retain the model, feature, and input-data versions used.
+- [ ] **REC-10**: A dedicated recommendations page exposes genre-oriented suggestions reflecting the signed-in user's own recorded tastes, distinct from the public popularity baseline.
 
 ### Experimentation and Evaluation
 
@@ -96,7 +97,7 @@
 
 ### Operations, Quality, and Delivery
 
-- [ ] **OPS-01**: Application can be deployed to the Internet using documented configuration.
+- [x] **OPS-01**: Application can be deployed to the Internet using documented configuration.
 - [x] **OPS-02**: Project can be run locally through a reproducible documented process.
 - [x] **OPS-03**: A lawful offline demo mode works without the external API or Internet access.
 - [ ] **OPS-04**: PostgreSQL and experimental artifacts have tested backup and recovery procedures.
@@ -105,18 +106,19 @@
 - [ ] **QUAL-02**: A clean installation can reproduce experiments and their evidence.
 - [ ] **QUAL-03**: Core workflows are responsive and verifiable against WCAG 2.2 AA.
 - [ ] **QUAL-04**: Charts and visualisations provide accessible textual or tabular alternatives.
+- [ ] **QUAL-05**: Interface presents a professional, product-grade visual design comparable to established cataloguing applications (density, typography, imagery treatment), not a minimal utilitarian layout.
 
 ### Thesis and Agent-Assisted Methodology
 
-- [ ] **DOC-01**: Architecture and technology decisions record alternatives and rationale.
+- [x] **DOC-01**: Architecture and technology decisions record alternatives and rationale.
 - [ ] **DOC-02**: Dataset, API, data model, and normalisation processes are documented.
 - [ ] **DOC-03**: Each algorithm documents its theory, formulation, parameters, and limitations.
 - [ ] **DOC-04**: Experimental protocol, metrics, results, and threats to validity are documented.
 - [ ] **DOC-05**: Thesis tables and figures are generated from immutable experiment artifacts.
 - [ ] **DOC-06**: Future example theses, formatting rules, and lecturer annotations are registered as canonical project references.
-- [ ] **AGENT-01**: Project records the roles and responsibilities of agents used.
-- [ ] **AGENT-02**: Project retains relevant protocols or prompts, configuration, models, tools, and generated artifacts.
-- [ ] **AGENT-03**: Evidence distinguishes agent proposals, automated verification, and author decisions.
+- [x] **AGENT-01**: Project records the roles and responsibilities of agents used.
+- [x] **AGENT-02**: Project retains relevant protocols or prompts, configuration, models, tools, and generated artifacts.
+- [x] **AGENT-03**: Evidence distinguishes agent proposals, automated verification, and author decisions.
 - [ ] **AGENT-04**: Methodology documents controls against hallucination, bias, error, and information exposure.
 - [ ] **AGENT-05**: Methodology analyses reproducibility, costs, limitations, and threats to validity of agent-assisted work.
 - [ ] **AGENT-06**: AI use is disclosed according to future university rules and lecturer guidance.
@@ -172,15 +174,19 @@
 | DATA-02 | Phase 1 | Pending |
 | REC-02 | Phase 1 | Complete |
 | SEC-02 | Phase 1 | Complete |
-| OPS-01 | Phase 1 | Pending |
+| OPS-01 | Phase 1 | Complete |
 | OPS-02 | Phase 1 | Complete |
 | OPS-03 | Phase 1 | Complete |
 | QUAL-03 | Phase 1 | Pending |
-| DOC-01 | Phase 1 | Pending |
-| AGENT-01 | Phase 1 | Pending |
-| AGENT-02 | Phase 1 | Pending |
-| AGENT-03 | Phase 1 | Pending |
-| AUTH-02 | Phase 2 | Pending |
+| DOC-01 | Phase 1 | Complete |
+| AGENT-01 | Phase 1 | Complete |
+| AGENT-02 | Phase 1 | Complete |
+| AGENT-03 | Phase 1 | Complete |
+| CAT-02 | Phase 01.1 | Pending |
+| AUTH-02 | Phase 01.1 | Pending |
+| DATA-04 | Phase 01.1 | Pending |
+| REC-10 | Phase 01.1 | Pending |
+| QUAL-05 | Phase 01.1 | Pending |
 | DATA-03 | Phase 2 | Pending |
 | EVAL-01 | Phase 2 | Pending |
 | EVAL-02 | Phase 2 | Pending |

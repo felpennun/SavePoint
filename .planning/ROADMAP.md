@@ -39,7 +39,7 @@ SavePoint begins with a three-day, publicly deployed vertical demonstration, the
   4. A clean machine can start the same demo from documented, pinned instructions without Internet/API dependency, and no secret appears in Git, browser assets, logs, images, or public artifacts.
   5. The demo is keyboard-usable and responsive at desktop/mobile widths, and its source/legal record, architecture rationale, agent inputs/outputs, verification, limitations, and author decisions are captured as thesis evidence.
 
-**Plans**: 15/16 plans executed
+**Plans**: 16/16 plans executed
 
 Plans:
 **Wave 1**
@@ -92,7 +92,7 @@ Plans:
 
 **Wave 12** *(blocked on Wave 11 completion)*
 
-- [ ] 01-14-PLAN.md — Firmar aceptación humana
+- [x] 01-14-PLAN.md — Firmar aceptación humana
 
 **Cross-cutting constraints:**
 
@@ -106,6 +106,34 @@ Plans:
 - long-text — explicit: Titles wrap, prose reflows, cards clamp only redundant title previews, and acceptance includes 30% expansion plus 400% zoom.
 
 **UI hint**: yes
+
+### Phase 01.1: Real-Scale Catalogue and Product Experience (INSERTED)
+
+**Goal:** The demo grows from a small curated 150-game corpus into a real-scale catalogue (hundreds of thousands of titles via IGDB) with a product-grade visual redesign, catalogue sorting/filtering, multiple working preloaded accounts, and a dedicated genre-based recommendations page -- author-requested immediately after Phase 1's sign-off, prioritized ahead of Phase 2's evaluation-protocol work.
+
+**Author's priority order for this phase** (recorded 2026-09-05, from `docs/verification/phase-01-signoff.md`):
+1. Mass catalogue import (IGDB) + interface redesign
+2. Real login system with multiple preloaded accounts
+3. Catalogue sorting/filtering and search filters
+4. An independent recommendations page (by genre / user taste)
+
+**Author's data-source decision:** IGDB, chosen over RAWG and scaling the existing Wikidata pipeline. Complete cover-image coverage across the full catalogue matters to the author and may be delivered incrementally after the initial import, without blocking the rest of this phase. Rationale to be elaborated in this phase's own ADR once planned (DATA-04).
+
+**Requirements**: CAT-02, AUTH-02, DATA-04, REC-10, QUAL-05
+**Depends on:** Phase 01
+**Plans:** 0 plans
+
+**Success Criteria** (what must be TRUE):
+
+  1. A visitor can browse a real-scale IGDB-sourced catalogue (not the 150-game demo corpus), with its licence/attribution terms and dataset provenance documented the same way the Phase 1 corpus was.
+  2. A visitor can sort and filter the catalogue by platform, genre, and other available metadata.
+  3. Multiple distinct preloaded accounts can each sign in and out independently (not just the single Phase 1 demo account).
+  4. The interface's visual density, typography, and imagery treatment read as a professional cataloguing product (author's reference points: Goodreads, OpenCritic), not a minimal utilitarian layout.
+  5. A signed-in user can open a dedicated recommendations page showing genre-oriented suggestions reflecting their own recorded activity, distinct from the existing public popularity baseline.
+
+Plans:
+
+- [ ] TBD (run /gsd-plan-phase 01.1 to break down)
 
 ### Phase 2: Governed Corpus and Frozen Evaluation Contract
 
@@ -225,7 +253,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Three-Day Public Demo Slice | 15/16 | In Progress|  |
+| 1. Three-Day Public Demo Slice | 16/16 | In Progress|  |
 | 2. Governed Corpus and Frozen Evaluation Contract | 0/TBD | Not started | - |
 | 3. Complete Collection Workflows and Portability | 0/TBD | Not started | - |
 | 4. Public Discovery and Resilient Enrichment | 0/TBD | Not started | - |
