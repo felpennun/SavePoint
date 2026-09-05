@@ -76,6 +76,10 @@ class Command(BaseCommand):
     # without exposing it as a CLI flag.
     stealth_options = ("client",)
 
+    # Offline data command: skip the system-check pass so `--evidence-json -`
+    # keeps stdout to pure JSON (no "System check identified no issues" line).
+    requires_system_checks: list = []
+
     def add_arguments(self, parser: Any) -> None:
         parser.add_argument("--query-identity", default="game_type=0")
         parser.add_argument("--where", default="game_type = 0")
