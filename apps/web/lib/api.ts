@@ -173,6 +173,12 @@ export interface MyLibraryItem {
   status: string;
   rating_half_steps: number | null;
   owned_copy_count: number;
+  /** Cover/year/platform enrichment is wired by Plan 03; absent -> the
+   * card renders the first-party placeholder. */
+  year?: number | null;
+  platform_summary?: string;
+  cover?: Cover;
+  updated_at?: string;
 }
 
 export interface MyLibraryResult {
