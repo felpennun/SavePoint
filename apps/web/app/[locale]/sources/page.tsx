@@ -40,8 +40,8 @@ export default async function SourcesPage({ params }: { params: Promise<{ locale
 
   if (!sources) {
     return (
-      <main>
-        <h1>{copy.heading}</h1>
+      <main className="sp-page">
+        <h1 className="sp-h1">{copy.heading}</h1>
         <p role="alert">{copy.unavailable}</p>
         <a href={`/${locale}/sources`}>{copy.reload}</a>
       </main>
