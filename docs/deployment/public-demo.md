@@ -70,13 +70,15 @@ Clear those four variables immediately afterward. Do not upload a failed trace u
 | Field | Value |
 |---|---|
 | Product decision | APPROVED: Vercel Hobby + Render Free + Neon Free; no card/paid resources |
-| Vercel HTTPS URL / allowlisted host | PENDING HUMAN SESSION |
-| Render API HTTPS URL | PENDING HUMAN SESSION |
+| Vercel HTTPS URL / allowlisted host | `https://save-point-orpin.vercel.app` |
+| Render API HTTPS URL | `https://savepoint-api-37nz.onrender.com` |
 | Neon project/branch (no connection string) | `autumn-breeze-06234770` / `production`; linked and reconciled successfully, 2026-09-04 |
-| Deployed Git commit | PENDING HUMAN SESSION |
-| UTC smoke time/result | PENDING HUMAN SESSION |
+| Deployed Git commit | `ff5aa2ee7ae460f780187f1fc13298bfb2e12fbe` (confirmed identical on both Render `/health/` and Vercel `/health/` via the same-origin proxy) |
+| UTC smoke time/result | 2026-09-05T10:00Z, PASS — `e2e/deployed-smoke.spec.ts` green against the URLs above |
 
-Any `PENDING` field or red smoke blocks completion of OPS-01.
+Three real deploy-path bugs were found and fixed while reaching a green smoke, in order: (1) `apps/api/Dockerfile` was missing `docs/` (the freeze-doc check import_catalogue depends on), (2) `data/demo/seed-v1.json` hardcoded a non-portable random `GameWork.id` instead of the deterministic `canonical_slug`, (3) `apps/web/middleware.ts`'s locale matcher was redirecting `/health/` instead of letting the proxy rewrite handle it. A fourth issue was a Vercel-Hobby-specific gotcha (see "Honest free-tier limitations" above), not a code bug. All are committed on `main` between `c7d5d26` and `ff5aa2e`.
+
+Any `PENDING` field or red smoke blocks completion of OPS-01. None remain.
 
 ## Rotation, rollback and teardown
 
