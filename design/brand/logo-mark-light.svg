@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">SavePoint — Cristal</title>
+  <desc id="desc">Símbolo de cristal. Variante light, fondo transparente.</desc>
+  <!-- Geometría original trazada a mano. Wordmark dibujado como contornos; sin fuentes ni recursos externos. -->
+  <path d="M32 4 L52 28 L32 52 L12 28 Z M32 16 L22 28 L32 40 L42 28 Z M20 56 H44 V60 H20 Z" fill="#17171f" fill-rule="evenodd" transform="translate(0 0) scale(1)"/>
+  <path d="M32 22 L38 28 L32 34 L26 28 Z" fill="#6d5cd6" fill-rule="evenodd" transform="translate(0 0) scale(1)"/>
+</svg>
