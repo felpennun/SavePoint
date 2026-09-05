@@ -42,10 +42,23 @@ class GameWork(models.Model):
     title_en = models.CharField(max_length=300, blank=True)
     title_es = models.CharField(max_length=300, blank=True)
     is_dlc = models.BooleanField(default=False)
+    # Denormalised IGDB primary-work scalars (CAT-02 filter/sort). Kept on the
+    # work itself so the year-range and rating filters/sorts are a single
+    # indexed btree scan instead of a GROUP BY over 300k+ releases (threat
+    # T-01.1-06, aggregate-filter DoS). ``first_release_date`` mirrors
+    # ``min(releases.release_date)``; ``total_rating`` is IGDB ``total_rating``
+    # on a 0-100 scale (null = unrated).
+    first_release_date = models.DateField(null=True, blank=True)
+    total_rating = models.FloatField(null=True, blank=True)
     genres = models.ManyToManyField(Genre, blank=True, related_name="works")
 
     class Meta:
         ordering = ("original_title", "id")
+        indexes = [
+            models.Index(fields=["original_title"], name="catalogue_work_title_idx"),
+            models.Index(fields=["first_release_date"], name="catalogue_work_release_idx"),
+            models.Index(fields=["total_rating"], name="catalogue_work_rating_idx"),
+        ]
 
     def __str__(self) -> str:
         return self.original_title
@@ -83,6 +96,9 @@ class GameRelease(models.Model):
                 fields=("work", "release_name"),
                 name="catalogue_unique_release_name_per_work",
             )
+        ]
+        indexes = [
+            models.Index(fields=["release_date"], name="catalogue_release_date_idx"),
         ]
 
     def __str__(self) -> str:

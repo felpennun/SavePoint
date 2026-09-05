@@ -144,8 +144,9 @@ def test_list_endpoint_no_external_network_call(monkeypatch: pytest.MonkeyPatch)
 
 
 def _genre(name: str, igdb_id: int) -> Genre:
-    slug = name.lower().replace(" ", "-").replace("/", "-").replace("'", "")
-    return Genre.objects.create(igdb_id=igdb_id, name=name, slug=slug)
+    from django.utils.text import slugify
+
+    return Genre.objects.create(igdb_id=igdb_id, name=name, slug=slugify(name))
 
 
 def _work(

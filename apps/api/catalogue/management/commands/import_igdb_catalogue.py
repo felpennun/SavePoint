@@ -117,6 +117,11 @@ class Command(BaseCommand):
         if isinstance(ts, (int, float)):
             release_date = datetime.fromtimestamp(int(ts), tz=timezone.utc).date()
 
+        total_rating = None
+        rating = row.get("total_rating")
+        if isinstance(rating, (int, float)):
+            total_rating = round(float(rating), 4)
+
         genres = []
         for g in row.get("genres") or []:
             if isinstance(g, dict) and g.get("id") and g.get("name"):
@@ -138,6 +143,7 @@ class Command(BaseCommand):
             "base_slug": base_slug,
             "source_url": str(row.get("url") or f"https://www.igdb.com/games/{slugify(slug_source)}"),
             "release_date": release_date,
+            "total_rating": total_rating,
             "genres": genres,
             "platforms": sorted(set(platforms)),
             "cover_url": cover_url,
@@ -150,6 +156,7 @@ class Command(BaseCommand):
             "slug": norm["canonical_slug"],
             "title": norm["name"],
             "first_release_date": norm["release_date"].isoformat() if norm["release_date"] else None,
+            "total_rating": norm["total_rating"],
             "genres": sorted(gid for gid, _ in norm["genres"]),
             "platforms": norm["platforms"],
             "cover": norm["cover_url"],
@@ -239,13 +246,26 @@ class Command(BaseCommand):
             work.original_title = norm["name"]
             work.title_en = norm["name"]
             work.is_dlc = False
-            work.save(update_fields=["canonical_slug", "original_title", "title_en", "is_dlc"])
+            work.first_release_date = norm["release_date"]
+            work.total_rating = norm["total_rating"]
+            work.save(
+                update_fields=[
+                    "canonical_slug",
+                    "original_title",
+                    "title_en",
+                    "is_dlc",
+                    "first_release_date",
+                    "total_rating",
+                ]
+            )
             outcome = "updated"
         else:
             work = GameWork.objects.create(
                 canonical_slug=norm["canonical_slug"],
                 original_title=norm["name"],
                 title_en=norm["name"],
+                first_release_date=norm["release_date"],
+                total_rating=norm["total_rating"],
             )
             outcome = "created"
 
