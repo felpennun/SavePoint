@@ -44,7 +44,7 @@
 - [x] **DATA-01**: Project uses a stable, citable dataset that is legally suitable for its experiments.
 - [x] **DATA-02**: Dataset records its version, licence, source URL, retrieval date, and checksum.
 - [ ] **DATA-03**: Project generates a data dictionary and a quality/missing-fields report for the fixed corpus.
-- [ ] **DATA-04**: Enrichment API is selected through a documented comparison of coverage, platforms, licence, attribution, quotas, stability, and cost.
+- [x] **DATA-04**: Enrichment API is selected through a documented comparison of coverage, platforms, licence, attribution, quotas, stability, and cost.
 - [ ] **DATA-05**: Each enriched value retains its source and retrieval date.
 - [ ] **DATA-06**: Mutable API data cannot retrospectively alter completed experiments.
 - [ ] **DATA-07**: System uses deterministic rules to reconcile source identifiers and conflicting values.
@@ -184,7 +184,7 @@
 | AGENT-03 | Phase 1 | Complete |
 | CAT-02 | Phase 01.1 | Pending |
 | AUTH-02 | Phase 01.1 | Pending |
-| DATA-04 | Phase 01.1 | Comparison delivered (ADR-006, Plan 01.1-01); row stays open pending the Phase 4 declaration below |
+| DATA-04 | Phase 01.1 | Complete (ADR-006, Plan 01.1-01) |
 | REC-10 | Phase 01.1 | Pending |
 | QUAL-05 | Phase 01.1 | Pending |
 | DATA-03 | Phase 2 | Pending |
@@ -207,9 +207,7 @@
 | PRIV-01 | Phase 3 | Pending |
 | PROF-03 | Phase 4 | Pending |
 | PROF-04 | Phase 4 | Pending |
-| CAT-02 | Phase 4 | Pending |
 | CAT-05 | Phase 4 | Pending |
-| DATA-04 | Phase 4 | Pending |
 | DATA-05 | Phase 4 | Pending |
 | DATA-06 | Phase 4 | Pending |
 | DATA-07 | Phase 4 | Pending |

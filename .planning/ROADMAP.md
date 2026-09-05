@@ -182,7 +182,8 @@ Plans (execution order follows the author's locked D-01 -> D-02 -> D-03 -> D-04 
 **Mode:** mvp
 **Goal**: Visitors can discover and share rich public catalogue/profile views whose live metadata is attributable, resilient, and isolated from experiments.
 **Depends on**: Phase 3
-**Requirements**: PROF-03, PROF-04, CAT-02, CAT-05, DATA-04, DATA-05, DATA-06, DATA-07, DATA-08
+**Requirements**: PROF-03, PROF-04, CAT-05, DATA-05, DATA-06, DATA-07, DATA-08
+**Note**: CAT-02 and DATA-04 were reprioritized by the author into Phase 01.1 (INSERTED) and are owned there; the earlier duplicate rows here were leftover bookkeeping from that insertion.
 **Success Criteria** (what must be TRUE):
 
   1. A visitor can filter/sort broad catalogue metadata and open shareable profile/list URLs that expose only permitted activity and statistics.
