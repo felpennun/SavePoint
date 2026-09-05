@@ -244,20 +244,22 @@ def test_interrupted_import_resumes_from_last_committed_id_without_duplicates() 
 
 
 @pytest.mark.django_db
-def test_malformed_page_rolls_back_only_its_own_batch() -> None:
+def test_malformed_record_is_skipped_not_fatal(tmp_path) -> None:
+    import json
+
     pages = _two_full_pages()
-    pages[1][0]["name"] = ""  # malformed record in the second batch
-    client = FakeIgdbClient(pages, eligible=4)
+    pages[1][0]["name"] = ""  # one unusable record in the second batch (id 30)
+    out = tmp_path / "ev.json"
+    _run_import(FakeIgdbClient(pages, eligible=4), evidence_json=str(out))
 
-    with pytest.raises(CommandError):
-        _run_import(client)
-
-    # First batch survived; the malformed batch left nothing behind.
-    assert set(SourceRecord.objects.values_list("source_id", flat=True)) == {"10", "20"}
+    # The poison row is skipped; every other row on both pages still imports,
+    # and the run completes rather than wedging on the bad record.
+    assert set(SourceRecord.objects.values_list("source_id", flat=True)) == {"10", "20", "40"}
     assert not GameWork.objects.filter(canonical_slug="gamma").exists()
     run = IgdbImportRun.objects.get(source="igdb", query_identity="game_type=0")
-    assert run.status == IgdbImportRun.Status.FAILED
-    assert run.last_committed_igdb_id == 20
+    assert run.status == IgdbImportRun.Status.COMPLETE
+    assert run.last_committed_igdb_id == 40  # cursor advances past the whole page
+    assert json.loads(out.read_text())["malformed_skipped_this_pass"] == 1
 
 
 @pytest.mark.django_db

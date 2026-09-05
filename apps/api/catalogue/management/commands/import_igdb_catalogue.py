@@ -273,7 +273,9 @@ class Command(BaseCommand):
             digest.update(b"\n")
         return digest.hexdigest()
 
-    def _build_evidence(self, run: IgdbImportRun, pass_start: int, created: int, updated: int) -> dict:
+    def _build_evidence(
+        self, run: IgdbImportRun, pass_start: int, created: int, updated: int, skipped: int = 0
+    ) -> dict:
         igdb_works = GameWork.objects.filter(source_records__source="igdb").distinct()
         year_hist = Counter(
             d.year
@@ -325,6 +327,7 @@ class Command(BaseCommand):
             "primary_works_imported": igdb_works.count(),
             "works_created_this_pass": created,
             "works_updated_this_pass": updated,
+            "malformed_skipped_this_pass": skipped,
             "genres": genres,
             "platform_top20": platforms,
             "release_year_histogram": {str(y): n for y, n in sorted(year_hist.items())},
@@ -366,16 +369,21 @@ class Command(BaseCommand):
         if dry_run:
             cursor = 0
             seen = 0
+            skipped = 0
             while True:
                 rows = client.fetch_page(cursor, page_size=page_size, where=where)
                 if not rows:
                     break
                 for row in rows:
-                    self._normalize(row)  # validates, writes nothing
+                    try:
+                        self._normalize(row)  # validates, writes nothing
+                    except MalformedRecord:
+                        skipped += 1
                 seen += len(rows)
                 cursor = int(rows[-1]["id"])
             self.stderr.write(
-                f"[dry-run] eligible={eligible} would process ~{seen} rows from id 0; no writes made"
+                f"[dry-run] eligible={eligible} would process ~{seen} rows from id 0 "
+                f"({skipped} malformed skipped); no writes made"
             )
             return
 
@@ -405,31 +413,40 @@ class Command(BaseCommand):
         cursor = pass_start
         created_total = 0
         updated_total = 0
+        skipped_total = 0
         batches = 0
         try:
             while True:
                 rows = client.fetch_page(cursor, page_size=page_size, where=where)
                 if not rows:
                     break
+                page_last_id = max(int(r.get("id", cursor) or cursor) for r in rows)
                 with transaction.atomic():
                     with connection.cursor() as cur:
                         cur.execute("SELECT pg_advisory_xact_lock(%s)", [IMPORT_LOCK_KEY])
                     batch_last_id = cursor
                     batch_created = 0
                     batch_updated = 0
+                    batch_skipped = 0
                     for row in rows:
                         try:
                             norm = self._normalize(row)
                         except MalformedRecord as exc:
-                            raise CommandError(
-                                f"malformed IGDB record in batch after id {cursor}: {redact(str(exc))}"
-                            ) from None
+                            # One unusable row must never wedge a 300k resumable
+                            # import: skip and count it, keep the batch alive.
+                            batch_skipped += 1
+                            self.stderr.write(f"  skipped malformed record: {redact(str(exc))}")
+                            continue
                         outcome = self._upsert(norm, now)
                         if outcome == "created":
                             batch_created += 1
                         else:
                             batch_updated += 1
                         batch_last_id = max(batch_last_id, norm["igdb_id"])
+
+                    # Advance past the whole page even if its trailing rows were
+                    # all skipped, so the cursor cannot stall on a poison tail.
+                    batch_last_id = max(batch_last_id, page_last_id)
 
                     run.last_committed_igdb_id = max(run.last_committed_igdb_id, batch_last_id)
                     run.batches_committed = batches + 1
@@ -446,6 +463,7 @@ class Command(BaseCommand):
                     )
                 created_total += batch_created
                 updated_total += batch_updated
+                skipped_total += batch_skipped
                 batches += 1
                 cursor = batch_last_id
                 if max_batches and batches >= max_batches:
@@ -490,11 +508,14 @@ class Command(BaseCommand):
         self.stderr.write(
             self.style.SUCCESS(
                 f"IGDB import complete: {total_works} primary works "
-                f"(+{created_total} new / ~{updated_total} refreshed this pass), "
+                f"(+{created_total} new / ~{updated_total} refreshed / {skipped_total} skipped this pass), "
                 f"covers {covers_present} present / {run.covers_fallback} fallback, "
                 f"checksum {run.checksum[:12]}..., eligible_live={eligible}"
             )
         )
 
         if evidence_json:
-            self._emit_evidence(evidence_json, self._build_evidence(run, pass_start, created_total, updated_total))
+            self._emit_evidence(
+                evidence_json,
+                self._build_evidence(run, pass_start, created_total, updated_total, skipped_total),
+            )
