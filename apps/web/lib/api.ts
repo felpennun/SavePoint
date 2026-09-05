@@ -29,6 +29,8 @@ export interface GameCard {
   year: number | null;
   platform_summary: string;
   cover: Cover;
+  /** IGDB total_rating (0-100). Wired by Plan 03; absent -> no ScorePill. */
+  total_rating?: number | null;
 }
 
 export interface CatalogueListResult {
@@ -68,6 +70,11 @@ export interface Provenance {
   snapshot_sha256: string;
 }
 
+export interface GenreRef {
+  slug: string;
+  name: string;
+}
+
 export interface GameDetail {
   id: string;
   slug: string;
@@ -81,6 +88,10 @@ export interface GameDetail {
   releases: Release[];
   related_content: RelatedContentItem[];
   provenance: Provenance | null;
+  /** Wired by Plan 03; absent -> the genres row is omitted. */
+  genres?: GenreRef[];
+  /** IGDB total_rating (0-100). Wired by Plan 03; absent -> no ScorePill. */
+  total_rating?: number | null;
 }
 
 export async function fetchCatalogueList(params: { q?: string; page?: number } = {}): Promise<CatalogueListResult> {

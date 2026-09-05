@@ -413,6 +413,10 @@ textarea {
   font-weight: 600;
 }
 
+.sp-score-pill--inline {
+  position: static;
+}
+
 .sp-score-strong {
   color: var(--color-score-strong);
 }
@@ -506,6 +510,44 @@ textarea {
   padding: var(--space-2xl) var(--space-lg);
   text-align: center;
   margin-top: var(--space-lg);
+}
+
+/* Game detail: two columns on >= md, stacked on mobile (01.1-UI-SPEC
+   Screen Contract 3). */
+.sp-detail-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: var(--space-2xl);
+  align-items: start;
+}
+
+.sp-cover-hero {
+  width: 280px;
+  max-width: 100%;
+}
+
+@media (max-width: 820px) {
+  .sp-detail-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+  .sp-cover-hero {
+    width: 200px;
+  }
+}
+
+.sp-kv {
+  font-size: var(--text-body);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.sp-provenance {
+  margin-top: var(--space-xl);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-surface-border);
+  font-size: var(--text-meta);
+  color: var(--color-text-muted);
 }
 
 /* Filter bar: inline on desktop, a <details> disclosure on mobile
