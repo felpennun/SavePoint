@@ -22,6 +22,11 @@ export interface Cover {
   attribution?: CoverAttribution;
 }
 
+export interface GenreRef {
+  slug: string;
+  name: string;
+}
+
 export interface GameCard {
   id: string;
   slug: string;
@@ -29,8 +34,33 @@ export interface GameCard {
   year: number | null;
   platform_summary: string;
   cover: Cover;
-  /** IGDB total_rating (0-100). Wired by Plan 03; absent -> no ScorePill. */
+  /** IGDB total_rating (0-100). Absent -> no ScorePill. */
   total_rating?: number | null;
+  /** IGDB genres for this work (CAT-02). */
+  genres?: GenreRef[];
+}
+
+export interface FacetOption {
+  slug: string;
+  name: string;
+  count: number;
+}
+
+export interface CatalogueFacets {
+  platforms: FacetOption[];
+  genres: FacetOption[];
+  year_range: { min: number | null; max: number | null };
+}
+
+export interface CatalogueListParams {
+  q?: string;
+  page?: number;
+  platform?: string;
+  genre?: string;
+  year_from?: string;
+  year_to?: string;
+  min_rating?: string;
+  sort?: string;
 }
 
 export interface CatalogueListResult {
@@ -39,6 +69,10 @@ export interface CatalogueListResult {
   page: number;
   page_size: number;
   has_next: boolean;
+  /** The sort key the server actually applied (relevance may fall back). */
+  sort: string;
+  /** Filter facet options + counts for the current text-scoped result set. */
+  facets: CatalogueFacets;
 }
 
 export interface EditionOption {
@@ -70,11 +104,6 @@ export interface Provenance {
   snapshot_sha256: string;
 }
 
-export interface GenreRef {
-  slug: string;
-  name: string;
-}
-
 export interface GameDetail {
   id: string;
   slug: string;
@@ -94,10 +123,16 @@ export interface GameDetail {
   total_rating?: number | null;
 }
 
-export async function fetchCatalogueList(params: { q?: string; page?: number } = {}): Promise<CatalogueListResult> {
+export async function fetchCatalogueList(params: CatalogueListParams = {}): Promise<CatalogueListResult> {
   const url = new URL("/api/catalogue/games/", API_BASE);
   if (params.q) url.searchParams.set("q", params.q);
   if (params.page) url.searchParams.set("page", String(params.page));
+  if (params.platform) url.searchParams.set("platform", params.platform);
+  if (params.genre) url.searchParams.set("genre", params.genre);
+  if (params.year_from) url.searchParams.set("year_from", params.year_from);
+  if (params.year_to) url.searchParams.set("year_to", params.year_to);
+  if (params.min_rating) url.searchParams.set("min_rating", params.min_rating);
+  if (params.sort) url.searchParams.set("sort", params.sort);
 
   const response = await fetch(url, { cache: "no-store" });
   if (!response.ok) {

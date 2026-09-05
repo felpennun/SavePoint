@@ -1,10 +1,9 @@
 import { getDictionary } from "@/i18n";
 import {
-  GENRE_OPTIONS,
   MIN_RATING_OPTIONS,
-  PLATFORM_OPTIONS,
   SORT_KEYS,
   type CatalogueFilters,
+  type FilterOption,
 } from "@/lib/catalogue-filters";
 
 /**
@@ -20,12 +19,20 @@ export function FilterBar({
   locale,
   basePath,
   activeCount,
+  platformOptions,
+  genreOptions,
+  yearMin = 1958,
+  yearMax,
   optionsUnavailable = false,
 }: {
   filters: CatalogueFilters;
   locale: string;
   basePath: string;
   activeCount: number;
+  platformOptions: FilterOption[];
+  genreOptions: FilterOption[];
+  yearMin?: number;
+  yearMax?: number;
   optionsUnavailable?: boolean;
 }) {
   const dict = getDictionary(locale);
@@ -39,9 +46,10 @@ export function FilterBar({
     release_oldest: s.releaseOldest,
     rating_desc: s.ratingDesc,
   };
-  const platformsUnavailable = optionsUnavailable || PLATFORM_OPTIONS.length === 0;
-  const genresUnavailable = optionsUnavailable || GENRE_OPTIONS.length === 0;
+  const platformsUnavailable = optionsUnavailable || platformOptions.length === 0;
+  const genresUnavailable = optionsUnavailable || genreOptions.length === 0;
   const currentYear = new Date().getUTCFullYear();
+  const yearCeiling = yearMax ?? currentYear + 2;
 
   return (
     <details className="sp-filterbar sp-surface" open>
@@ -58,7 +66,7 @@ export function FilterBar({
           <label htmlFor="platform">{f.platform}</label>
           <select id="platform" name="platform" defaultValue={filters.platform ?? ""} disabled={platformsUnavailable}>
             <option value="">{f.anyOption}</option>
-            {PLATFORM_OPTIONS.map((o) => (
+            {platformOptions.map((o) => (
               <option key={o.value} value={o.value}>
                 {o.label}
               </option>
@@ -70,7 +78,7 @@ export function FilterBar({
           <label htmlFor="genre">{f.genre}</label>
           <select id="genre" name="genre" defaultValue={filters.genre ?? ""} disabled={genresUnavailable}>
             <option value="">{f.anyOption}</option>
-            {GENRE_OPTIONS.map((o) => (
+            {genreOptions.map((o) => (
               <option key={o.value} value={o.value}>
                 {o.label}
               </option>
@@ -80,12 +88,12 @@ export function FilterBar({
 
         <div className="sp-field">
           <label htmlFor="year_from">{f.yearFrom}</label>
-          <input id="year_from" name="year_from" type="number" min={1958} max={currentYear + 2} defaultValue={filters.year_from ?? ""} />
+          <input id="year_from" name="year_from" type="number" min={yearMin} max={yearCeiling} defaultValue={filters.year_from ?? ""} />
         </div>
 
         <div className="sp-field">
           <label htmlFor="year_to">{f.yearTo}</label>
-          <input id="year_to" name="year_to" type="number" min={1958} max={currentYear + 2} defaultValue={filters.year_to ?? ""} />
+          <input id="year_to" name="year_to" type="number" min={yearMin} max={yearCeiling} defaultValue={filters.year_to ?? ""} />
         </div>
 
         <div className="sp-field">
