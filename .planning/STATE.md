@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 current_phase: 01.1
 current_phase_name: Real-Scale Catalogue and Product Experience
 status: executing
-stopped_at: "Plans 01.1-02 + 01.1-06 merged (069f422). Redesign live in apps/web (build+tests green). savepoint-db-1 catalogue load running in background. Next: Wave 4 (01.1-04 simulated accounts)."
+stopped_at: "Plans 01.1-01/02/06/04 merged. Catalogue loaded (312,483 IGDB works). Autonomous run through Waves 4-9; next Wave 5 = 01.1-08 controlled registration API. Stop at Wave 10 (01.1-07 checkpoint)."
 last_updated: "2026-09-05T23:25:00.000Z"
 last_activity: 2026-09-05
 last_activity_desc: "Plans 01.1-02 + 01.1-06 merged — importer proven + full apps/web redesign live"
@@ -12,7 +12,7 @@ progress:
   total_phases: 9
   completed_phases: 1
   total_plans: 26
-  completed_plans: 19
+  completed_plans: 20
   percent: 12
 ---
 
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-09-04)
 ## Current Position
 
 Phase: 01.1 (Real-Scale Catalogue and Product Experience) — EXECUTING
-Plan: 3 of 10 complete (01.1-01 decision, 01.1-02 importer, 01.1-06 redesign). Next: 01.1-04 (Wave 4 — plural simulated accounts).
+Plan: 4 of 10 complete (01.1-01/02/06 + 01.1-04 accounts). Next: 01.1-08 (Wave 5 — controlled registration API).
 Status: Executing Phase 01.1 — Wave 3 done, next Wave 4
 Last activity: 2026-09-05 — Plans 01.1-02 + 01.1-06 merged (069f422)
 
-Progress: [███░░░░░░░] 30% (3 of 10 plans)
+Progress: [████░░░░░░] 40% (4 of 10 plans)
 
 ## Performance Metrics
 
