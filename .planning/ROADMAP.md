@@ -122,7 +122,7 @@ Plans:
 
 **Requirements**: CAT-02, AUTH-02, DATA-04, REC-10, QUAL-05
 **Depends on:** Phase 01
-**Plans:** 7 plans
+**Plans:** 10 plans
 
 **Success Criteria** (what must be TRUE):
 
@@ -137,10 +137,13 @@ Plans (execution order follows the author's locked D-01 -> D-02 -> D-03 -> D-04 
 - [ ] 01.1-01-PLAN.md (Wave 1) — Approve and probe IGDB, then freeze the provider ADR and dependency pin
 - [ ] 01.1-02-PLAN.md (Wave 2) — Build resumable ingestion and prove a full-scale import on fresh PostgreSQL
 - [ ] 01.1-06-PLAN.md (Wave 3) — Approve and implement the product redesign milestone before account work
-- [ ] 01.1-04-PLAN.md (Wave 4) — Add plural simulated accounts and controlled functional registration
-- [ ] 01.1-03-PLAN.md (Wave 5) — Add validated catalogue filters, sorting, facets, and shareable controls
-- [ ] 01.1-05-PLAN.md (Wave 6) — Deliver deterministic personal genre recommendations and complete journey evidence
-- [ ] 01.1-07-PLAN.md (Wave 7) — Record the author's separate product-quality verdict
+- [ ] 01.1-04-PLAN.md (Wave 4) — Add plural, clearly labeled simulated accounts
+- [ ] 01.1-08-PLAN.md (Wave 5) — Add controlled functional registration without opening AUTH-03
+- [ ] 01.1-03-PLAN.md (Wave 6) — Add validated catalogue filters, sorting, facets, and shareable controls
+- [ ] 01.1-05-PLAN.md (Wave 7) — Deliver deterministic personal genre recommendation service and API
+- [ ] 01.1-09-PLAN.md (Wave 8) — Wire the personalized page and authenticated navigation
+- [ ] 01.1-10-PLAN.md (Wave 9) — Produce complete Playwright, axe, viewport, and screenshot evidence
+- [ ] 01.1-07-PLAN.md (Wave 10) — Record the author's separate post-evidence product-quality verdict
 
 ### Phase 2: Governed Corpus and Frozen Evaluation Contract
 
