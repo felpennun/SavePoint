@@ -41,7 +41,7 @@ from pathlib import Path
 from typing import Any
 
 from django.core.management.base import BaseCommand, CommandError
-from django.db import connection, transaction
+from django.db import IntegrityError, connection, transaction
 from django.db.models import Count
 from django.utils.text import slugify
 
@@ -174,6 +174,40 @@ class Command(BaseCommand):
             suffix += 1
         return candidate
 
+    @staticmethod
+    def _platform_for(pname: str) -> Platform:
+        """Reconcile a platform on its natural key against ANY existing row,
+        whatever its origin (Wikidata or IGDB).
+
+        The Wikidata importer keys platforms on ``name`` and slugifies its
+        (often lowercase) label; IGDB spells the same hardware differently in
+        case/punctuation ("Web browser" vs Wikidata's "web browser"), so two
+        spellings collapse to one ``slug``. A blind ``get_or_create(name=...)``
+        then misses the pre-existing Wikidata row and its INSERT trips
+        ``catalogue_platform_slug_key``, poisoning the whole batch transaction
+        and aborting the run. Match on ``slug`` first, then ``name``; only
+        INSERT when neither exists, inside a savepoint so even a concurrent
+        writer racing the same slug cannot abort the batch.
+        """
+        slug = slugify(pname)[:150] or "platform"
+        platform = (
+            Platform.objects.filter(slug=slug).first()
+            or Platform.objects.filter(name=pname).first()
+        )
+        if platform is not None:
+            return platform
+        try:
+            with transaction.atomic():
+                return Platform.objects.create(name=pname, slug=slug)
+        except IntegrityError:
+            existing = (
+                Platform.objects.filter(slug=slug).first()
+                or Platform.objects.filter(name=pname).first()
+            )
+            if existing is None:
+                raise
+            return existing
+
     def _genre_for(self, gid: int, gname: str) -> Genre:
         genre = Genre.objects.filter(igdb_id=gid).first()
         base = slugify(gname)[:120] or f"genre-{gid}"
@@ -231,9 +265,7 @@ class Command(BaseCommand):
 
         if norm["platforms"]:
             for pname in norm["platforms"]:
-                platform, _ = Platform.objects.get_or_create(
-                    name=pname, defaults={"slug": slugify(pname)[:150] or "platform"}
-                )
+                platform = self._platform_for(pname)
                 GameRelease.objects.update_or_create(
                     work=work,
                     release_name=f"{norm['name']} ({pname})",
