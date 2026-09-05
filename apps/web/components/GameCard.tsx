@@ -24,6 +24,7 @@ export function GameCard({
   ratingHalfSteps,
   ownedCopyCount,
   coverVariant = "grid",
+  evidence,
 }: {
   game: GameCardData;
   locale: string;
@@ -32,6 +33,9 @@ export function GameCard({
   ratingHalfSteps?: number | null;
   ownedCopyCount?: number;
   coverVariant?: "grid" | "shelf";
+  /** Plain-language reason this card is here (e.g. the genre-overlap
+   * evidence on the recommendations shelf). Rendered under the meta line. */
+  evidence?: string;
 }) {
   const dict = getDictionary(locale);
   const { width, height } = coverVariant === "shelf" ? { width: 120, height: 160 } : { width: 156, height: 208 };
@@ -69,6 +73,7 @@ export function GameCard({
         {ownedCopyCount != null && ownedCopyCount > 0 ? (
           <span className="sp-copies-chip">{formatCount(dict.collection.ownedCopyCount, ownedCopyCount)}</span>
         ) : null}
+        {evidence ? <p className="sp-card-evidence">{evidence}</p> : null}
       </Link>
     </li>
   );

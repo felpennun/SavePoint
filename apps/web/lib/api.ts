@@ -237,42 +237,122 @@ export async function fetchMyLibrary(cookieHeader: string): Promise<MyLibraryRes
   return (await response.json()) as MyLibraryResult;
 }
 
-export interface RecommendationShelfData {
-  genre: string;
-  genre_slug: string;
-  collection_count: number;
-  items: GameCard[];
+/** Per-item genre-overlap evidence from the genre-taste-v1 heuristic: a
+ * genre the recommended work shares with the signed-in user's own rated /
+ * status-tracked library, plus that genre's accumulated taste weight. */
+export interface RecommendationMatchedGenre {
+  slug: string;
+  name: string;
+  weight: number;
 }
 
-export interface RecommendationsResult {
-  shelves: RecommendationShelfData[];
-  /** True when the user has too little rated/completed history for the
-   * heuristic to produce shelves. */
+/** One ranked catalogue work from `GET /api/recommendations/genre-taste/`.
+ * The endpoint returns a flat, score-ordered list; the page groups it into
+ * per-genre shelves for display (D-UI-4). */
+export interface PersonalRecommendationItem {
+  work_id: string;
+  slug: string;
+  title: string;
+  score: number;
+  matched_genres: RecommendationMatchedGenre[];
+}
+
+/** The allowlisted DTO of the authenticated genre-taste recommender
+ * (REC-10, Plan 01.1-05). `algorithm_id` + `limitation` are surfaced
+ * verbatim on the page so this personal heuristic can never be confused
+ * with the public popularity baseline (REC-02) or the Phase 6 research
+ * recommender (REC-03). `insufficient_history: true` is a distinct shape
+ * with `results: []` and its own `limitation` string -- it never falls
+ * back to popularity (D-09). */
+export interface PersonalRecommendationsResult {
+  algorithm_id: string;
+  generated_at: string;
+  input_snapshot_sha256: string;
   insufficient_history: boolean;
+  limitation: string;
+  results: PersonalRecommendationItem[];
+}
+
+export type PersonalRecommendationsResponse =
+  | { kind: "ok"; data: PersonalRecommendationsResult }
+  | { kind: "unauthorized" }
+  | { kind: "error" };
+
+/** A genre-grouped shelf built from the flat DTO for display. */
+export interface PersonalRecommendationShelf {
+  /** Display name of the taste genre this shelf is built around. */
+  genre: string;
+  genreSlug: string;
+  /** The user's accumulated taste weight for this genre (shelf ordering). */
+  tasteWeight: number;
+  items: PersonalRecommendationItem[];
 }
 
 /**
- * Genre recommendations (REC-10). The heuristic endpoint is built in Plan
- * 05/09; until it exists this resolves to `null` and the page renders its
- * insufficient-history state. `401` -> caller redirects to login.
+ * Personalized genre-taste recommendations (REC-10). Server-side only: a
+ * Server Component's own `fetch()` does not carry the visitor's cookies,
+ * so the session cookie read from the incoming request must be forwarded
+ * explicitly (same pattern as `fetchMyLibrary`). The endpoint is
+ * `IsAuthenticated`; a `401`/`403` is surfaced as `"unauthorized"` so the
+ * caller can redirect to login without leaking that the resource exists.
  */
-export async function fetchRecommendations(
+export async function getPersonalRecommendations(
   cookieHeader: string,
-): Promise<RecommendationsResult | "unauthorized" | null> {
-  const url = new URL("/api/library/recommendations/", API_BASE);
+  limit?: number,
+): Promise<PersonalRecommendationsResponse> {
+  const url = new URL("/api/recommendations/genre-taste/", API_BASE);
+  if (limit != null) url.searchParams.set("limit", String(limit));
   let response: Response;
   try {
     response = await fetch(url, { cache: "no-store", headers: { Cookie: cookieHeader } });
   } catch {
-    return null;
+    return { kind: "error" };
   }
-  if (response.status === 401 || response.status === 403) return "unauthorized";
-  if (!response.ok) return null;
+  if (response.status === 401 || response.status === 403) return { kind: "unauthorized" };
+  if (!response.ok) return { kind: "error" };
   try {
-    return (await response.json()) as RecommendationsResult;
+    return { kind: "ok", data: (await response.json()) as PersonalRecommendationsResult };
   } catch {
-    return null;
+    return { kind: "error" };
   }
+}
+
+/**
+ * Reshape the flat, score-ordered DTO into genre-grouped shelves (D-UI-4):
+ * one shelf per top taste genre, ordered by the user's own genre-taste
+ * weight (descending, `slug` ascending tie-break for determinism), capped
+ * at `maxShelves`. A work that overlaps several taste genres appears on
+ * each of those shelves. Within a shelf the DTO's score order is
+ * preserved. Returns `[]` for the insufficient-history shape.
+ */
+export function groupRecommendationsByGenre(
+  result: PersonalRecommendationsResult,
+  { maxShelves = 4, maxItemsPerShelf = 12 }: { maxShelves?: number; maxItemsPerShelf?: number } = {},
+): PersonalRecommendationShelf[] {
+  if (result.insufficient_history || result.results.length === 0) return [];
+
+  const genres = new Map<string, { name: string; weight: number }>();
+  for (const item of result.results) {
+    for (const genre of item.matched_genres) {
+      const existing = genres.get(genre.slug);
+      if (!existing || genre.weight > existing.weight) {
+        genres.set(genre.slug, { name: genre.name, weight: genre.weight });
+      }
+    }
+  }
+
+  return [...genres.entries()]
+    .sort(([slugA, a], [slugB, b]) => b.weight - a.weight || slugA.localeCompare(slugB))
+    .slice(0, maxShelves)
+    .map(([slug, { name, weight }]) => ({
+      genre: name,
+      genreSlug: slug,
+      tasteWeight: weight,
+      items: result.results
+        .filter((item) => item.matched_genres.some((genre) => genre.slug === slug))
+        .slice(0, maxItemsPerShelf),
+    }))
+    .filter((shelf) => shelf.items.length > 0);
 }
 
 export interface AccountMe {

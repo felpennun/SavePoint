@@ -98,12 +98,13 @@ export const en: Dictionary = {
     intro:
       "Built from the genres of the games you've rated and completed. Not the demo popularity ranking.",
     excludedNote: "Games already in your collection are not shown.",
+    methodHeading: "How these are generated",
+    methodAlgorithm:
+      "Algorithm: {id} — a deterministic genre-frequency heuristic, not the demo popularity ranking and not a trained model.",
     shelfHeading: "Because you play a lot of {genre}",
-    shelfExplainer: {
-      zero: "0 games in your collection are {genre}.",
-      one: "1 game in your collection is {genre}.",
-      many: (count) => `${count} games in your collection are {genre}.`,
-    },
+    shelfEvidence:
+      "These games share the {genre} genre with titles you've rated or set a status on.",
+    cardEvidence: "Shares your genres: {genres}",
     emptyHeading: "Not enough activity yet",
     emptyBody: "Rate or complete a few games and genre suggestions will appear here.",
     emptyCta: "Browse the catalogue",
