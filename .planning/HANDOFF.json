@@ -1,0 +1,83 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-09-05T12:28:48.068Z",
+  "phase": "01.1",
+  "phase_name": "Real-Scale Catalogue and Product Experience",
+  "phase_dir": ".planning/phases/01.1-real-scale-catalogue-and-product-experience",
+  "plan": "01",
+  "task": 1,
+  "total_tasks": 3,
+  "status": "paused",
+  "completed_tasks": [
+    {
+      "id": "issue-sync",
+      "name": "Create and map GitHub Issues for all ten Phase 01.1 plans",
+      "status": "done",
+      "commit": "d4843cd"
+    },
+    {
+      "id": 1,
+      "name": "Provide IGDB credentials and approve the exact requests pin",
+      "status": "in_progress",
+      "progress": "requests==2.34.2 official PyPI provenance was reviewed; dependency mutation has not started; IGDB_CLIENT_ID and IGDB_CLIENT_SECRET were absent from the current process environment at the checkpoint."
+    }
+  ],
+  "remaining_tasks": [
+    {
+      "id": 1,
+      "name": "Configure IGDB_CLIENT_ID and IGDB_CLIENT_SECRET privately and explicitly approve requests==2.34.2",
+      "status": "in_progress"
+    },
+    {
+      "id": 2,
+      "name": "Run the authenticated redacted IGDB probe",
+      "status": "not_started"
+    },
+    {
+      "id": 3,
+      "name": "Record ADR-006 and pin the approved requests dependency",
+      "status": "not_started"
+    }
+  ],
+  "blockers": [
+    {
+      "description": "Plan 01.1-01 cannot continue until both IGDB environment variables are present and the author approves requests==2.34.2.",
+      "type": "human_action",
+      "workaround": "Configure the variables locally without placing their values in chat, tracked files, Issues, commits, or logs; then send the documented resume signal."
+    }
+  ],
+  "async_jobs": [],
+  "human_actions_pending": [
+    {
+      "action": "Create or select a Twitch Developer application with IGDB access and configure IGDB_CLIENT_ID and IGDB_CLIENT_SECRET in the local execution environment.",
+      "context": "The authenticated probe must measure current IGDB behavior and terms before import code or cover-storage assumptions are implemented.",
+      "blocking": true
+    },
+    {
+      "action": "Approve or reject the exact dependency requests==2.34.2 after reviewing its official PyPI provenance.",
+      "context": "Project policy requires explicit author approval before any direct dependency or lockfile mutation.",
+      "blocking": true
+    }
+  ],
+  "decisions": [
+    {
+      "decision": "GitHub Issues #7 through #16 map one-to-one to Phase 01.1 plans and each PLAN frontmatter records github_issue.",
+      "rationale": "CONTRIBUTING.md requires the board to mirror GSD planning and commits to use Refs/Closes trailers.",
+      "phase": "01.1"
+    },
+    {
+      "decision": "No IGDB credential value may appear in chat, tracked files, Issues, commits, PRs, or diagnostic output.",
+      "rationale": "A live provider connection string was exposed previously; secret presence must be checked by name only.",
+      "phase": "01.1"
+    }
+  ],
+  "uncommitted_files": [
+    ".planning/config.json",
+    ".agents/skills/neon*/",
+    ".claude/skills/",
+    ".gsd/",
+    "skills-lock.json"
+  ],
+  "next_action": "Verify only the presence of IGDB_CLIENT_ID and IGDB_CLIENT_SECRET without printing values. Require the exact response 'Credenciales IGDB configuradas; requests 2.34.2 aprobado' before running uv or any authenticated probe. Then execute Plan 01.1-01 Tasks 2 and 3 and close GitHub Issue #7 with the SUMMARY commit.",
+  "context_notes": "Execution started inline at Plan 01.1-01 Task 1 and intentionally paused at the blocking human-action gate. No Phase 01.1 production files, dependencies, or lockfiles have been modified. Official PyPI evidence confirms requests 2.34.2 is Apache-2.0, supports Python >=3.10, and was published with Trusted Publishing."
+}
