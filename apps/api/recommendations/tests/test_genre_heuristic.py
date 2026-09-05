@@ -12,6 +12,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 from django.contrib.auth import get_user_model
+from rest_framework.test import APIClient
 
 from catalogue.models import GameWork, Genre
 from library.models import LibraryEntry
@@ -289,3 +290,102 @@ def test_service_snapshot_filters_activity_after_the_generated_at_cutoff(user_a,
     assert rank_genre_taste_v1(user_a, limit=10, generated_at=past_cutoff)["insufficient_history"] is False
     # Everything is before `future_cutoff`, so the ranking is still produced.
     assert rank_genre_taste_v1(user_a, limit=10, generated_at=future_cutoff)["insufficient_history"] is False
+
+
+# --------------------------------------------------------------------------- #
+# Endpoint: GET /api/recommendations/genre-taste/                             #
+# --------------------------------------------------------------------------- #
+_ENDPOINT = "/api/recommendations/genre-taste/"
+_DTO_KEYS = {
+    "algorithm_id",
+    "generated_at",
+    "input_snapshot_sha256",
+    "insufficient_history",
+    "limitation",
+    "results",
+}
+_ITEM_KEYS = {"work_id", "slug", "title", "score", "matched_genres"}
+
+
+@pytest.mark.django_db
+def test_endpoint_returns_current_users_ranking_with_allowlisted_dto(user_a, genres) -> None:  # noqa: ANN001
+    _own(user_a, _work("owned-rpg", genres["rpg"]), status="completed", rating=10)
+    _work("unseen-rpg", genres["rpg"])
+
+    client = APIClient()
+    client.force_authenticate(user=user_a)
+    response = client.get(_ENDPOINT)
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["algorithm_id"] == "genre-taste-v1"
+    assert "phase 6" in body["limitation"].lower()
+    assert set(body) == _DTO_KEYS
+    assert [item["slug"] for item in body["results"]] == ["unseen-rpg"]
+    assert set(body["results"][0]) == _ITEM_KEYS
+
+
+@pytest.mark.django_db
+def test_endpoint_isolates_taste_between_authenticated_users(user_a, user_b, genres) -> None:  # noqa: ANN001
+    _own(user_a, _work("a-owned-rpg", genres["rpg"]), status="completed", rating=10)
+    _own(user_b, _work("b-owned-shooter", genres["shooter"]), status="completed", rating=10)
+    _work("unseen-rpg", genres["rpg"])
+    _work("unseen-shooter", genres["shooter"])
+
+    client = APIClient()
+    client.force_authenticate(user=user_a)
+    body_a = client.get(_ENDPOINT).json()
+
+    client.force_authenticate(user=user_b)
+    body_b = client.get(_ENDPOINT).json()
+
+    assert [item["slug"] for item in body_a["results"]] == ["unseen-rpg"]
+    assert [item["slug"] for item in body_b["results"]] == ["unseen-shooter"]
+    assert body_a["input_snapshot_sha256"] != body_b["input_snapshot_sha256"]
+
+
+@pytest.mark.django_db
+def test_endpoint_denies_anonymous_requests_without_leaking_taste_data() -> None:
+    response = APIClient().get(_ENDPOINT)
+
+    assert response.status_code == 403
+    assert "results" not in response.json()
+
+
+@pytest.mark.django_db
+def test_endpoint_rejects_non_integer_limit(user_a) -> None:  # noqa: ANN001
+    client = APIClient()
+    client.force_authenticate(user=user_a)
+    response = client.get(_ENDPOINT, {"limit": "abc"})
+
+    assert response.status_code == 400
+    assert "results" not in response.json()
+
+
+@pytest.mark.django_db
+def test_endpoint_clamps_out_of_range_limit(user_a, genres) -> None:  # noqa: ANN001
+    _own(user_a, _work("owned-rpg", genres["rpg"]), status="completed", rating=10)
+    for idx in range(3):
+        _work(f"unseen-rpg-{idx}", genres["rpg"])
+
+    client = APIClient()
+    client.force_authenticate(user=user_a)
+
+    small = client.get(_ENDPOINT, {"limit": "0"})
+    assert small.status_code == 200
+    assert len(small.json()["results"]) == 1
+
+    big = client.get(_ENDPOINT, {"limit": "9999"})
+    assert big.status_code == 200
+    assert len(big.json()["results"]) <= 50
+
+
+@pytest.mark.django_db
+def test_endpoint_reports_insufficient_history_without_falling_back(user_a) -> None:  # noqa: ANN001
+    client = APIClient()
+    client.force_authenticate(user=user_a)
+    body = client.get(_ENDPOINT).json()
+
+    assert body["insufficient_history"] is True
+    assert body["results"] == []
+    assert "popularity" not in body["limitation"].lower()
