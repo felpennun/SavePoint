@@ -13,6 +13,28 @@ from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 
 
+class Genre(models.Model):
+    """A catalogue genre facet (CAT-02 filter/sort, REC-10 heuristic input).
+
+    Deliberately minimal: Franchise / Developer / Publisher / GameMode / Tag
+    are CAT-05 scope, assigned to Phase 4 in ROADMAP.md, and are NOT added
+    here (01.1-RESEARCH.md Architecture Pattern 3). Identity is the stable
+    upstream IGDB genre id, never the internal UUID, so the facet can be
+    re-pointed at a different provider later without renumbering.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    igdb_id = models.PositiveIntegerField(unique=True)
+    name = models.CharField(max_length=120, unique=True)
+    slug = models.SlugField(max_length=120, unique=True)
+
+    class Meta:
+        ordering = ("name",)
+
+    def __str__(self) -> str:
+        return self.name
+
+
 class GameWork(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     canonical_slug = models.SlugField(max_length=200, unique=True)
@@ -20,6 +42,7 @@ class GameWork(models.Model):
     title_en = models.CharField(max_length=300, blank=True)
     title_es = models.CharField(max_length=300, blank=True)
     is_dlc = models.BooleanField(default=False)
+    genres = models.ManyToManyField(Genre, blank=True, related_name="works")
 
     class Meta:
         ordering = ("original_title", "id")
@@ -169,6 +192,58 @@ class SourceRecord(models.Model):
 
     def __str__(self) -> str:
         return f"{self.source}:{self.source_id}"
+
+
+class IgdbImportRun(models.Model):
+    """Durable, resumable checkpoint for the batched IGDB catalogue import
+    (01.1-RESEARCH.md Architecture Patterns 1-2).
+
+    One row per (source, query_identity). ``query_identity`` records the
+    *non-secret* Apicalypse boundary (e.g. ``game_type=0``) -- never a token
+    or connection string. ``last_committed_igdb_id`` is the id-cursor: it is
+    written inside the same transaction that commits its batch, and a
+    database trigger forbids it from ever moving backwards, so an interrupted
+    run always resumes forward from real committed progress.
+    """
+
+    class Status(models.TextChoices):
+        RUNNING = "running", "Running"
+        INTERRUPTED = "interrupted", "Interrupted"
+        COMPLETE = "complete", "Complete"
+        FAILED = "failed", "Failed"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    source = models.CharField(max_length=50, default="igdb")
+    query_identity = models.CharField(max_length=200)
+    last_committed_igdb_id = models.BigIntegerField(default=0)
+    batches_committed = models.PositiveIntegerField(default=0)
+    works_imported = models.PositiveIntegerField(default=0)
+    works_updated = models.PositiveIntegerField(default=0)
+    genres_seen = models.PositiveIntegerField(default=0)
+    covers_present = models.PositiveIntegerField(default=0)
+    covers_fallback = models.PositiveIntegerField(default=0)
+    eligible_count_live = models.BigIntegerField(null=True, blank=True)
+    checksum = models.CharField(max_length=64, blank=True)
+    status = models.CharField(max_length=16, choices=Status.choices, default=Status.RUNNING)
+    error_summary = models.TextField(blank=True)
+    started_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ("-started_at",)
+        constraints = [
+            models.UniqueConstraint(
+                fields=("source", "query_identity"),
+                name="catalogue_unique_igdb_import_identity",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(last_committed_igdb_id__gte=0),
+                name="catalogue_igdb_cursor_non_negative",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.source}:{self.query_identity}@{self.last_committed_igdb_id} ({self.status})"
 
 
 class AssetAttribution(models.Model):
