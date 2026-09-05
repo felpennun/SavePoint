@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "timestamp": "2026-09-05T12:28:48.068Z",
+  "timestamp": "2026-09-05T12:48:51.774Z",
   "phase": "01.1",
   "phase_name": "Real-Scale Catalogue and Product Experience",
   "phase_dir": ".planning/phases/01.1-real-scale-catalogue-and-product-experience",
@@ -19,13 +19,13 @@
       "id": 1,
       "name": "Provide IGDB credentials and approve the exact requests pin",
       "status": "in_progress",
-      "progress": "requests==2.34.2 official PyPI provenance was reviewed; dependency mutation has not started; IGDB_CLIENT_ID and IGDB_CLIENT_SECRET were absent from the current process environment at the checkpoint."
+      "progress": "IGDB_CLIENT_ID and IGDB_CLIENT_SECRET are both present in the current Codex process (boolean presence verified without reading or printing values). requests==2.34.2 official PyPI provenance was reviewed; dependency mutation has not started because explicit approval remains pending."
     }
   ],
   "remaining_tasks": [
     {
       "id": 1,
-      "name": "Configure IGDB_CLIENT_ID and IGDB_CLIENT_SECRET privately and explicitly approve requests==2.34.2",
+      "name": "Explicitly approve or reject requests==2.34.2",
       "status": "in_progress"
     },
     {
@@ -41,18 +41,13 @@
   ],
   "blockers": [
     {
-      "description": "Plan 01.1-01 cannot continue until both IGDB environment variables are present and the author approves requests==2.34.2.",
+      "description": "Plan 01.1-01 cannot continue until the author explicitly approves requests==2.34.2. Both IGDB environment variables are already present.",
       "type": "human_action",
-      "workaround": "Configure the variables locally without placing their values in chat, tracked files, Issues, commits, or logs; then send the documented resume signal."
+      "workaround": "Send the documented approval signal without including credential values."
     }
   ],
   "async_jobs": [],
   "human_actions_pending": [
-    {
-      "action": "Create or select a Twitch Developer application with IGDB access and configure IGDB_CLIENT_ID and IGDB_CLIENT_SECRET in the local execution environment.",
-      "context": "The authenticated probe must measure current IGDB behavior and terms before import code or cover-storage assumptions are implemented.",
-      "blocking": true
-    },
     {
       "action": "Approve or reject the exact dependency requests==2.34.2 after reviewing its official PyPI provenance.",
       "context": "Project policy requires explicit author approval before any direct dependency or lockfile mutation.",
@@ -78,6 +73,6 @@
     ".gsd/",
     "skills-lock.json"
   ],
-  "next_action": "Verify only the presence of IGDB_CLIENT_ID and IGDB_CLIENT_SECRET without printing values. Require the exact response 'Credenciales IGDB configuradas; requests 2.34.2 aprobado' before running uv or any authenticated probe. Then execute Plan 01.1-01 Tasks 2 and 3 and close GitHub Issue #7 with the SUMMARY commit.",
-  "context_notes": "Execution started inline at Plan 01.1-01 Task 1 and intentionally paused at the blocking human-action gate. No Phase 01.1 production files, dependencies, or lockfiles have been modified. Official PyPI evidence confirms requests 2.34.2 is Apache-2.0, supports Python >=3.10, and was published with Trusted Publishing."
+  "next_action": "Credentials are already present. Require the exact response 'Credenciales IGDB configuradas; requests 2.34.2 aprobado' before running uv or any authenticated probe. Then execute Plan 01.1-01 Tasks 2 and 3 and close GitHub Issue #7 with the SUMMARY commit.",
+  "context_notes": "Execution started inline at Plan 01.1-01 Task 1 and intentionally paused at the blocking human-approval gate. Boolean-only verification on 2026-09-05 confirmed both IGDB environment variables are present in the Codex process. No Phase 01.1 production files, dependencies, lockfiles, tokens, or probe artifacts have been modified or generated. Official PyPI evidence confirms requests 2.34.2 is Apache-2.0, supports Python >=3.10, and was published with Trusted Publishing."
 }
