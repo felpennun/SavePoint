@@ -1,0 +1,4415 @@
+{
+ "total_igdb_works": 312483,
+ "step": 1041,
+ "sample_size": 300,
+ "ordering": "IGDB source_id ascending, every step-th",
+ "generated_utc": "2026-09-05T22:03:04.249978Z",
+ "records": [
+  {
+   "igdb_id": 1,
+   "canonical_slug": "thief-ii-the-metal-age",
+   "title": "Thief II: The Metal Age",
+   "year": 2000,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Shooter",
+    "Simulator"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 101047,
+   "canonical_slug": "assassin-vs-mummies-match-3",
+   "title": "Assassin vs. Mummies: Match 3",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 102051,
+   "canonical_slug": "boxing-live-2014",
+   "title": "Boxing Live 2014",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 103092,
+   "canonical_slug": "talking-tom-jetski-2",
+   "title": "Talking Tom Jetski 2",
+   "year": 2018,
+   "is_dlc": false,
+   "genres": [
+    "Arcade",
+    "Simulator"
+   ],
+   "platforms": [
+    "iOS"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 104144,
+   "canonical_slug": "under-the-war",
+   "title": "Under the War",
+   "year": 2018,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie",
+    "Strategy"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 105169,
+   "canonical_slug": "full-metal-renegade",
+   "title": "Full Metal Renegade",
+   "year": 2018,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [
+    "Mac",
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 106216,
+   "canonical_slug": "pixel-bro-endless-runner",
+   "title": "Pixel Bro: Endless Runner",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Arcade"
+   ],
+   "platforms": [],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 107287,
+   "canonical_slug": "snake-dash-color-blocks",
+   "title": "Snake Dash Color Blocks",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 108300,
+   "canonical_slug": "the-spy-who-shrunk-me",
+   "title": "The Spy Who Shrunk Me",
+   "year": 2018,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)",
+    "SteamVR"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 109330,
+   "canonical_slug": "wuxia-archive-crisis-escape",
+   "title": "Wuxia archive: Crisis escape",
+   "year": 2018,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 110407,
+   "canonical_slug": "minitary-girls",
+   "title": "Minitary Girls",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 111478,
+   "canonical_slug": "deathdays-end",
+   "title": "Deathdays End",
+   "year": 2018,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie"
+   ],
+   "platforms": [
+    "Mac",
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 112550,
+   "canonical_slug": "superlite-1500-makikou",
+   "title": "SuperLite 1500: Makikou",
+   "year": 2001,
+   "is_dlc": false,
+   "genres": [
+    "Adventure"
+   ],
+   "platforms": [
+    "PlayStation"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 113646,
+   "canonical_slug": "codename-nemesis",
+   "title": "Codename Nemesis",
+   "year": 2022,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Role-playing (RPG)",
+    "Strategy",
+    "Tactical"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 114689,
+   "canonical_slug": "kuura-in-the-snowglobe",
+   "title": "Kuura in the Snowglobe",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 115760,
+   "canonical_slug": "darkprison",
+   "title": "DarkPrison",
+   "year": 2019,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Fighting",
+    "Point-and-click"
+   ],
+   "platforms": [
+    "Android",
+    "iOS"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 116845,
+   "canonical_slug": "romans-from-mars-free-to-play",
+   "title": "Romans from Mars (Free-to-Play)",
+   "year": 2013,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 117921,
+   "canonical_slug": "peanut",
+   "title": "Peanut",
+   "year": 2019,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie",
+    "Platform"
+   ],
+   "platforms": [
+    "Linux",
+    "Mac",
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 119043,
+   "canonical_slug": "transporter-truck-simulator",
+   "title": "Transporter Truck Simulator",
+   "year": 2019,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Racing",
+    "Simulator",
+    "Sport"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 12015,
+   "canonical_slug": "crack-down",
+   "title": "Crack Down",
+   "year": 1989,
+   "is_dlc": false,
+   "genres": [
+    "Shooter"
+   ],
+   "platforms": [
+    "Amiga",
+    "Amstrad CPC",
+    "Arcade",
+    "Atari ST/STE",
+    "Commodore C64/128/MAX",
+    "DOS",
+    "Linux",
+    "Mac"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 121236,
+   "canonical_slug": "super-wiloo-demake",
+   "title": "Super Wiloo Demake",
+   "year": 2019,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Arcade",
+    "Indie",
+    "Platform"
+   ],
+   "platforms": [
+    "Nintendo Switch",
+    "PC (Microsoft Windows)",
+    "PlayStation 4",
+    "PlayStation Vita",
+    "Xbox One"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 122332,
+   "canonical_slug": "the-climate-trail",
+   "title": "The Climate Trail",
+   "year": 2019,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie",
+    "Simulator",
+    "Strategy",
+    "Visual Novel"
+   ],
+   "platforms": [
+    "Linux",
+    "Mac",
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 123401,
+   "canonical_slug": "ritual",
+   "title": "Ritual",
+   "year": 2021,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 124411,
+   "canonical_slug": "simple-ds-series-vol-18-the-soukou-kihei-gun-ground",
+   "title": "Simple DS Series Vol. 18: The Soukou Kihei Gun Ground",
+   "year": 2007,
+   "is_dlc": false,
+   "genres": [
+    "Shooter"
+   ],
+   "platforms": [
+    "Nintendo DS"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 125640,
+   "canonical_slug": "angel-beats-operation-wars",
+   "title": "Angel Beats! Operation Wars",
+   "year": 2014,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Card & Board Game",
+    "Music",
+    "Puzzle"
+   ],
+   "platforms": [
+    "Android",
+    "iOS"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 12668,
+   "canonical_slug": "lords-of-chaos",
+   "title": "Lords of Chaos",
+   "year": 1990,
+   "is_dlc": false,
+   "genres": [
+    "Role-playing (RPG)",
+    "Strategy",
+    "Tactical"
+   ],
+   "platforms": [
+    "Amiga",
+    "Amstrad CPC",
+    "Atari ST/STE",
+    "Commodore C64/128/MAX",
+    "ZX Spectrum"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 12778,
+   "canonical_slug": "starglider",
+   "title": "Starglider",
+   "year": 1986,
+   "is_dlc": false,
+   "genres": [
+    "Shooter",
+    "Simulator"
+   ],
+   "platforms": [
+    "Amiga",
+    "Amstrad CPC",
+    "Apple II",
+    "Atari ST/STE",
+    "Commodore C64/128/MAX",
+    "DOS",
+    "Mac",
+    "ZX Spectrum"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 128916,
+   "canonical_slug": "chroma-bloom-and-blight",
+   "title": "Chroma: Bloom and Blight",
+   "year": 2021,
+   "is_dlc": false,
+   "genres": [
+    "Card & Board Game",
+    "Indie",
+    "Simulator",
+    "Strategy"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 130047,
+   "canonical_slug": "cyber-cycle",
+   "title": "Cyber Cycle",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Racing"
+   ],
+   "platforms": [],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 131097,
+   "canonical_slug": "maze-1",
+   "title": "Maze",
+   "year": 1984,
+   "is_dlc": false,
+   "genres": [
+    "Shooter"
+   ],
+   "platforms": [
+    "BBC Microcomputer System"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 132361,
+   "canonical_slug": "party-arena",
+   "title": "Party Arena",
+   "year": 2020,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Strategy"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 133444,
+   "canonical_slug": "quest-adventure",
+   "title": "Quest Adventure",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 134615,
+   "canonical_slug": "exclusion-zone-shadow-island",
+   "title": "Exclusion Zone: Shadow Island",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 135798,
+   "canonical_slug": "combat-arms-the-classic",
+   "title": "Combat Arms: the Classic",
+   "year": 2020,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Shooter"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 137094,
+   "canonical_slug": "scooby-doo-mystery-1",
+   "title": "Scooby-Doo Mystery",
+   "year": 1995,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Point-and-click",
+    "Puzzle"
+   ],
+   "platforms": [
+    "Sega Mega Drive/Genesis"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 138196,
+   "canonical_slug": "jurassic-world-evolution-complete-edition",
+   "title": "Jurassic World Evolution: Complete Edition",
+   "year": 2020,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Simulator",
+    "Strategy"
+   ],
+   "platforms": [
+    "Nintendo Switch"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 139374,
+   "canonical_slug": "paint-school",
+   "title": "Paint School",
+   "year": 1990,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [
+    "Philips CD-i"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 140584,
+   "canonical_slug": "weinende-rose",
+   "title": "Weinende Rose",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Platform"
+   ],
+   "platforms": [],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 141850,
+   "canonical_slug": "la-corona-encantada",
+   "title": "La Corona Encantada",
+   "year": 2009,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Platform"
+   ],
+   "platforms": [
+    "MSX",
+    "ZX Spectrum"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 143067,
+   "canonical_slug": "topgolf-with-pro-putt",
+   "title": "Topgolf with Pro Putt",
+   "year": 2020,
+   "is_dlc": false,
+   "genres": [
+    "Simulator",
+    "Sport"
+   ],
+   "platforms": [
+    "Meta Quest 2",
+    "Oculus Quest",
+    "Oculus VR"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 14427,
+   "canonical_slug": "allied-general",
+   "title": "Allied General",
+   "year": 1996,
+   "is_dlc": false,
+   "genres": [
+    "Turn-based strategy (TBS)"
+   ],
+   "platforms": [
+    "Mac",
+    "PC (Microsoft Windows)",
+    "PlayStation"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 145670,
+   "canonical_slug": "monster-milktruck",
+   "title": "Monster Milktruck!",
+   "year": 2014,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie"
+   ],
+   "platforms": [
+    "web browser"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 146897,
+   "canonical_slug": "stone-age-taxi",
+   "title": "Stone Age Taxi",
+   "year": 2004,
+   "is_dlc": false,
+   "genres": [
+    "Arcade"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 148020,
+   "canonical_slug": "reussir-galops-1-a-7",
+   "title": "Réussir: Galops 1 à 7",
+   "year": 2021,
+   "is_dlc": false,
+   "genres": [
+    "Sport"
+   ],
+   "platforms": [
+    "Nintendo Switch",
+    "PlayStation 4"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 149206,
+   "canonical_slug": "jungleknight",
+   "title": "JungleKnight",
+   "year": 2020,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie",
+    "Strategy"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 150298,
+   "canonical_slug": "cinnamon-fight",
+   "title": "Cinnamon fight",
+   "year": 2020,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Sport",
+    "Strategy"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 151387,
+   "canonical_slug": "las-aventuras-de-chocu-el-videojuego",
+   "title": "Las Aventuras de Chocu: El Videojuego",
+   "year": 2019,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie",
+    "Platform"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 152551,
+   "canonical_slug": "cantaloper",
+   "title": "Cantaloper",
+   "year": 2021,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Platform"
+   ],
+   "platforms": [
+    "Mac",
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 153791,
+   "canonical_slug": "paramonsters-and-the-haunted-escape-room",
+   "title": "ParaMonsters and the Haunted Escape Room",
+   "year": 2020,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Visual Novel"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 155275,
+   "canonical_slug": "sylphine",
+   "title": "Sylphine",
+   "year": 2021,
+   "is_dlc": false,
+   "genres": [
+    "Indie"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 156797,
+   "canonical_slug": "vrandish",
+   "title": "VRandish",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 158048,
+   "canonical_slug": "ninja-leagues-masters-of-the-mystic-arts",
+   "title": "Ninja Leagues: Masters of The Mystic Arts",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Sport"
+   ],
+   "platforms": [],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 159297,
+   "canonical_slug": "crayons",
+   "title": "Crayons",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [
+    "Playdate"
+   ],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 161367,
+   "canonical_slug": "wet-waifu",
+   "title": "Wet Waifu",
+   "year": 2021,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie",
+    "Simulator"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 163838,
+   "canonical_slug": "pirate-story",
+   "title": "Pirate Story",
+   "year": 2021,
+   "is_dlc": false,
+   "genres": [
+    "Indie"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 165365,
+   "canonical_slug": "uno-7",
+   "title": "Uno",
+   "year": 1999,
+   "is_dlc": false,
+   "genres": [
+    "Card & Board Game"
+   ],
+   "platforms": [
+    "Game Boy Color"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 166733,
+   "canonical_slug": "brain-test",
+   "title": "Brain Test",
+   "year": 2020,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Simulator",
+    "Strategy"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 168338,
+   "canonical_slug": "brambles-in-the-mist",
+   "title": "Brambles in the Mist",
+   "year": 2021,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Strategy"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 169928,
+   "canonical_slug": "finding-brenda-episode-1",
+   "title": "Finding Brenda: Episode 1",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Adventure"
+   ],
+   "platforms": [],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 171779,
+   "canonical_slug": "sniper-and-spotter-serving-the-motherland",
+   "title": "Sniper and Spotter Serving the Motherland",
+   "year": 2017,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Point-and-click",
+    "Puzzle"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 173119,
+   "canonical_slug": "cyberpunk-2077-vincent-sin-edition",
+   "title": "Cyberpunk 2077: Vincent Sin Edition",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Role-playing (RPG)",
+    "Shooter"
+   ],
+   "platforms": [],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 174618,
+   "canonical_slug": "dreamy-goat",
+   "title": "Dreamy Goat",
+   "year": 2012,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [
+    "iOS"
+   ],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 175643,
+   "canonical_slug": "tatuball",
+   "title": "TatuBall",
+   "year": 2021,
+   "is_dlc": false,
+   "genres": [
+    "Puzzle"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 176693,
+   "canonical_slug": "hot-and-lovely",
+   "title": "Hot and Lovely",
+   "year": 2020,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Strategy"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 17771,
+   "canonical_slug": "airport-simulator-2015",
+   "title": "Airport Simulator 2015",
+   "year": 2015,
+   "is_dlc": false,
+   "genres": [
+    "Simulator"
+   ],
+   "platforms": [
+    "Mac",
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 178836,
+   "canonical_slug": "june-20th",
+   "title": "June 20th",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Adventure"
+   ],
+   "platforms": [],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 179934,
+   "canonical_slug": "evil-god-korone",
+   "title": "Evil God Korone",
+   "year": 2021,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie"
+   ],
+   "platforms": [
+    "Nintendo Switch",
+    "PC (Microsoft Windows)",
+    "PlayStation 4"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 181039,
+   "canonical_slug": "maverta",
+   "title": "Maverta",
+   "year": 2021,
+   "is_dlc": false,
+   "genres": [
+    "Indie"
+   ],
+   "platforms": [
+    "Mac",
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 182078,
+   "canonical_slug": "scrap-boy",
+   "title": "Scrap Boy",
+   "year": 2020,
+   "is_dlc": false,
+   "genres": [
+    "Platform"
+   ],
+   "platforms": [
+    "web browser"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 183193,
+   "canonical_slug": "guillotine-earrings",
+   "title": "Guillotine Earrings",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Role-playing (RPG)"
+   ],
+   "platforms": [],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 184196,
+   "canonical_slug": "nemesisters",
+   "title": "Nemesisters",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 18519,
+   "canonical_slug": "strange-odyssey",
+   "title": "Strange Odyssey",
+   "year": 1979,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Puzzle"
+   ],
+   "platforms": [
+    "Acorn Electron",
+    "Apple II",
+    "Atari 8-bit",
+    "BBC Microcomputer System",
+    "Commodore 16",
+    "Commodore C64/128/MAX",
+    "Commodore Plus/4",
+    "Dragon 32/64"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 186316,
+   "canonical_slug": "mixx-island-remix-vol-2",
+   "title": "Mixx Island: Remix Vol. 2",
+   "year": 2022,
+   "is_dlc": false,
+   "genres": [
+    "Indie"
+   ],
+   "platforms": [
+    "Nintendo Switch",
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 187523,
+   "canonical_slug": "johns-tombstone",
+   "title": "John's Tombstone",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie"
+   ],
+   "platforms": [
+    "Linux",
+    "Mac",
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 188661,
+   "canonical_slug": "mlb-the-show-22",
+   "title": "MLB The Show 22",
+   "year": 2022,
+   "is_dlc": false,
+   "genres": [
+    "Simulator",
+    "Sport"
+   ],
+   "platforms": [
+    "Nintendo Switch",
+    "PlayStation 4",
+    "PlayStation 5",
+    "Xbox One",
+    "Xbox Series X|S"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 189996,
+   "canonical_slug": "valkyrie-profile-niffynee",
+   "title": "Valkyrie Profile Niffynee",
+   "year": 2021,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 191184,
+   "canonical_slug": "banish",
+   "title": "Banish",
+   "year": 2022,
+   "is_dlc": false,
+   "genres": [
+    "Indie"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 19252,
+   "canonical_slug": "cyber-troopers-virtual-on-marz",
+   "title": "Cyber Troopers Virtual-On Marz",
+   "year": 2003,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Fighting",
+    "Shooter"
+   ],
+   "platforms": [
+    "PlayStation 2",
+    "PlayStation 3"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 193672,
+   "canonical_slug": "escape-the-darkness-1",
+   "title": "Escape the Darkness",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 194873,
+   "canonical_slug": "red-2",
+   "title": "Red",
+   "year": 2006,
+   "is_dlc": false,
+   "genres": [
+    "Arcade",
+    "Shooter"
+   ],
+   "platforms": [
+    "web browser"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 19598,
+   "canonical_slug": "boxboxboy",
+   "title": "BoxBoxBoy!",
+   "year": 2016,
+   "is_dlc": false,
+   "genres": [
+    "Platform",
+    "Puzzle",
+    "Strategy"
+   ],
+   "platforms": [
+    "Nintendo 3DS"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 197246,
+   "canonical_slug": "puzzle-putt",
+   "title": "Puzzle Putt",
+   "year": 2015,
+   "is_dlc": false,
+   "genres": [
+    "Puzzle"
+   ],
+   "platforms": [
+    "iOS"
+   ],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 19850,
+   "canonical_slug": "lumo",
+   "title": "Lumo",
+   "year": 2016,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie",
+    "Platform",
+    "Puzzle"
+   ],
+   "platforms": [
+    "Linux",
+    "Mac",
+    "Nintendo Switch",
+    "PC (Microsoft Windows)",
+    "PlayStation 4",
+    "PlayStation Vita",
+    "Xbox One"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 199792,
+   "canonical_slug": "tony-hawks-vert",
+   "title": "Tony Hawk's Vert",
+   "year": 2009,
+   "is_dlc": false,
+   "genres": [
+    "Arcade",
+    "Sport"
+   ],
+   "platforms": [
+    "Legacy Mobile Device"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 20104,
+   "canonical_slug": "four-sided-fantasy",
+   "title": "Four Sided Fantasy",
+   "year": 2016,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Platform",
+    "Puzzle",
+    "Strategy"
+   ],
+   "platforms": [
+    "Mac",
+    "PC (Microsoft Windows)",
+    "PlayStation 4",
+    "Wii U",
+    "Xbox One"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 202240,
+   "canonical_slug": "august-31",
+   "title": "August 31",
+   "year": 2014,
+   "is_dlc": false,
+   "genres": [
+    "Adventure"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 203569,
+   "canonical_slug": "infinity-dungeons",
+   "title": "Infinity Dungeons",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 20474,
+   "canonical_slug": "crisis-in-the-kremlin",
+   "title": "Crisis in the Kremlin",
+   "year": 1991,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Simulator",
+    "Strategy"
+   ],
+   "platforms": [
+    "DOS"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 206261,
+   "canonical_slug": "choose-your-own-nightmare-the-curse-of-the-mummy",
+   "title": "Choose Your Own Nightmare: The Curse of the Mummy",
+   "year": 2000,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [
+    "DVD Player"
+   ],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 207519,
+   "canonical_slug": "courage-2",
+   "title": "Courage",
+   "year": 2022,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 208626,
+   "canonical_slug": "nobunaga-no-yabou-oretachi-no-sengoku",
+   "title": "Nobunaga no Yabou: Oretachi no Sengoku",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Simulator"
+   ],
+   "platforms": [
+    "Android"
+   ],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 209805,
+   "canonical_slug": "god-of-war-ragnarok-collectors-edition",
+   "title": "God of War Ragnarök: Collector's Edition",
+   "year": 2022,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Hack and slash/Beat 'em up",
+    "Role-playing (RPG)"
+   ],
+   "platforms": [
+    "PlayStation 4",
+    "PlayStation 5"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 211106,
+   "canonical_slug": "warrior-souls",
+   "title": "Warrior Souls",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Indie"
+   ],
+   "platforms": [],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 212124,
+   "canonical_slug": "molar-maul",
+   "title": "Molar Maul",
+   "year": 1983,
+   "is_dlc": false,
+   "genres": [
+    "Arcade"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)",
+    "ZX Spectrum"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 213336,
+   "canonical_slug": "backyard-hoops",
+   "title": "BackYard Hoops",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 214545,
+   "canonical_slug": "paddles",
+   "title": "Paddles",
+   "year": 2022,
+   "is_dlc": false,
+   "genres": [
+    "Arcade"
+   ],
+   "platforms": [
+    "Nintendo Switch"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 215852,
+   "canonical_slug": "shutokou-battle-online",
+   "title": "Shutokou Battle Online",
+   "year": 2003,
+   "is_dlc": false,
+   "genres": [
+    "Racing"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 21698,
+   "canonical_slug": "funky-barn",
+   "title": "Funky Barn",
+   "year": 2012,
+   "is_dlc": false,
+   "genres": [
+    "Puzzle",
+    "Simulator",
+    "Strategy"
+   ],
+   "platforms": [
+    "Wii U"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 218155,
+   "canonical_slug": "duck-duck-swap",
+   "title": "Duck Duck Swap",
+   "year": 2022,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie",
+    "Racing"
+   ],
+   "platforms": [
+    "Mac",
+    "PC (Microsoft Windows)",
+    "web browser"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 219579,
+   "canonical_slug": "super-galaxy-ball",
+   "title": "Super Galaxy Ball",
+   "year": 2022,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Racing"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 220654,
+   "canonical_slug": "protect-harem-city",
+   "title": "Protect Harem City",
+   "year": 2023,
+   "is_dlc": false,
+   "genres": [
+    "Strategy"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 222003,
+   "canonical_slug": "buta-san-quest",
+   "title": "Buta-san Quest",
+   "year": 1994,
+   "is_dlc": false,
+   "genres": [
+    "Role-playing (RPG)"
+   ],
+   "platforms": [
+    "Sharp X68000"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 223393,
+   "canonical_slug": "oylinder",
+   "title": "Oylinder",
+   "year": 2022,
+   "is_dlc": false,
+   "genres": [
+    "Arcade",
+    "Indie",
+    "Platform"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 224777,
+   "canonical_slug": "candy-maid",
+   "title": "Candy Maid",
+   "year": 2022,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Puzzle"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 226194,
+   "canonical_slug": "black-cycle",
+   "title": "Black Cycle",
+   "year": 2022,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 227879,
+   "canonical_slug": "cuana",
+   "title": "Cuana",
+   "year": 2022,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 2292,
+   "canonical_slug": "20-000-leagues-under-the-sea",
+   "title": "20,000 Leagues Under the Sea",
+   "year": 1988,
+   "is_dlc": false,
+   "genres": [
+    "Adventure"
+   ],
+   "platforms": [
+    "Amiga",
+    "Amstrad CPC",
+    "Atari ST/STE",
+    "DOS"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 230545,
+   "canonical_slug": "forge-of-freedom-the-american-civil-war-1861-1865",
+   "title": "Forge of Freedom: The American Civil War 1861-1865",
+   "year": 2006,
+   "is_dlc": false,
+   "genres": [
+    "Strategy"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 231856,
+   "canonical_slug": "digital-exorcist",
+   "title": "Digital Exorcist",
+   "year": 2023,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Visual Novel"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 232970,
+   "canonical_slug": "boomsweeper-vr",
+   "title": "BoomSweeper VR",
+   "year": 2023,
+   "is_dlc": false,
+   "genres": [
+    "Puzzle"
+   ],
+   "platforms": [
+    "SteamVR"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 234111,
+   "canonical_slug": "waifu-packer",
+   "title": "Waifu Packer",
+   "year": 2022,
+   "is_dlc": false,
+   "genres": [
+    "Puzzle"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 235357,
+   "canonical_slug": "strato-breaker",
+   "title": "Strato Breaker",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 236366,
+   "canonical_slug": "tales-of-vogar-lost-descendants",
+   "title": "Tales of Vogar: Lost Descendants",
+   "year": 2023,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie",
+    "Role-playing (RPG)"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 237510,
+   "canonical_slug": "muggo",
+   "title": "Muggo!",
+   "year": 1992,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [
+    "Arcade"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 238989,
+   "canonical_slug": "slope-car",
+   "title": "Slope Car",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Arcade",
+    "Racing"
+   ],
+   "platforms": [
+    "iOS"
+   ],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 240280,
+   "canonical_slug": "pekko-robot-1",
+   "title": "Pekko Robot",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Platform"
+   ],
+   "platforms": [],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 241641,
+   "canonical_slug": "genius-quiz-9",
+   "title": "Genius Quiz 9",
+   "year": 2016,
+   "is_dlc": false,
+   "genres": [
+    "Quiz/Trivia"
+   ],
+   "platforms": [
+    "Android"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 242964,
+   "canonical_slug": "ascendants-roguelike",
+   "title": "Ascendant's Roguelike",
+   "year": 2023,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Role-playing (RPG)"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 244268,
+   "canonical_slug": "diets-and-deities",
+   "title": "Diets and Deities",
+   "year": 2024,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 245308,
+   "canonical_slug": "killer-karaoke-el-juego",
+   "title": "Killer Karaoke: el juego",
+   "year": 2013,
+   "is_dlc": false,
+   "genres": [
+    "Music",
+    "Strategy"
+   ],
+   "platforms": [
+    "Android",
+    "iOS"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 246462,
+   "canonical_slug": "imp-and-cubes",
+   "title": "Imp and Cubes",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [
+    "Plug & Play"
+   ],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 247776,
+   "canonical_slug": "kemono-friends-opening-day",
+   "title": "Kemono Friends: Opening Day",
+   "year": 2023,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie"
+   ],
+   "platforms": [
+    "Linux",
+    "Mac",
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 249202,
+   "canonical_slug": "dimraeth",
+   "title": "Dimraeth",
+   "year": 2026,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie",
+    "Role-playing (RPG)"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 250437,
+   "canonical_slug": "wildlife-hunter-survival",
+   "title": "Wildlife Hunter: Survival",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Adventure"
+   ],
+   "platforms": [],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 251717,
+   "canonical_slug": "holehole",
+   "title": "HoleHole",
+   "year": 2023,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 252992,
+   "canonical_slug": "prince-of-persia-the-lost-crown-deluxe-edition",
+   "title": "Prince of Persia: The Lost Crown - Deluxe Edition",
+   "year": 2024,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Platform"
+   ],
+   "platforms": [
+    "Nintendo Switch",
+    "PC (Microsoft Windows)",
+    "PlayStation 4",
+    "PlayStation 5",
+    "Xbox One",
+    "Xbox Series X|S"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 254195,
+   "canonical_slug": "tanked",
+   "title": "Tanked!",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Adventure"
+   ],
+   "platforms": [],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 255620,
+   "canonical_slug": "tsubasa-no-oka-no-hime-a-red-and-blue-moon-finite-loop",
+   "title": "Tsubasa no Oka no Hime: A Red and Blue Moon Finite Loop",
+   "year": 2011,
+   "is_dlc": false,
+   "genres": [
+    "Visual Novel"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 257013,
+   "canonical_slug": "skyformer-1",
+   "title": "Skyformer",
+   "year": 2026,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie",
+    "Simulator",
+    "Strategy"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 258313,
+   "canonical_slug": "artifice",
+   "title": "Artifice",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Role-playing (RPG)"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 25947,
+   "canonical_slug": "icarus-dot-1",
+   "title": "Icarus.1",
+   "year": 2016,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Puzzle"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 260771,
+   "canonical_slug": "bird-legend",
+   "title": "Bird Legend",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Arcade",
+    "Puzzle"
+   ],
+   "platforms": [],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 26226,
+   "canonical_slug": "celeste",
+   "title": "Celeste",
+   "year": 2018,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie",
+    "Platform"
+   ],
+   "platforms": [
+    "Google Stadia",
+    "Linux",
+    "Mac",
+    "Nintendo Switch",
+    "PC (Microsoft Windows)",
+    "PlayStation 4",
+    "Xbox One"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 263790,
+   "canonical_slug": "joe-biden-escape-from-maga",
+   "title": "Joe Biden: Escape From MAGA",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Visual Novel"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 265044,
+   "canonical_slug": "edd-the-duck-2-back-with-a-quack",
+   "title": "Edd the Duck 2: Back with a Quack!",
+   "year": 1992,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [
+    "Amiga"
+   ],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 266199,
+   "canonical_slug": "harry-potter-and-the-deathly-hallows-part-2-the-mobile-game",
+   "title": "Harry Potter and the Deathly Hallows: Part 2 - The Mobile Game",
+   "year": 2011,
+   "is_dlc": false,
+   "genres": [
+    "Adventure"
+   ],
+   "platforms": [
+    "Legacy Mobile Device"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 267454,
+   "canonical_slug": "sudoku-pro-plus",
+   "title": "Sudoku Pro+",
+   "year": 2021,
+   "is_dlc": false,
+   "genres": [
+    "Puzzle"
+   ],
+   "platforms": [
+    "Android",
+    "PC (Microsoft Windows)",
+    "Xbox One",
+    "Xbox Series X|S"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 268932,
+   "canonical_slug": "vivaland-dream-house",
+   "title": "Vivaland: Dream House",
+   "year": 2024,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Simulator"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 270208,
+   "canonical_slug": "happyfunland-souvenir-edition",
+   "title": "HappyFunland: Souvenir Edition",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [
+    "PlayStation 5"
+   ],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 27177,
+   "canonical_slug": "the-dragon-judge-rhadamanthus",
+   "title": "The Dragon Judge Rhadamanthus",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 273389,
+   "canonical_slug": "umbral-1",
+   "title": "Umbral",
+   "year": 2024,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie",
+    "Puzzle"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 274793,
+   "canonical_slug": "new-america",
+   "title": "New America",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 27618,
+   "canonical_slug": "the-fate",
+   "title": "The Fate",
+   "year": 2002,
+   "is_dlc": false,
+   "genres": [
+    "Role-playing (RPG)"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 277659,
+   "canonical_slug": "car-hunt",
+   "title": "Car Hunt",
+   "year": 1980,
+   "is_dlc": false,
+   "genres": [
+    "Arcade",
+    "Racing"
+   ],
+   "platforms": [
+    "Arcade"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 279003,
+   "canonical_slug": "saving-mrs-hinako",
+   "title": "Saving Mrs. Hinako",
+   "year": 2024,
+   "is_dlc": false,
+   "genres": [
+    "Visual Novel"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 280422,
+   "canonical_slug": "suika-world",
+   "title": "Suika World",
+   "year": 2023,
+   "is_dlc": false,
+   "genres": [
+    "Arcade",
+    "Puzzle"
+   ],
+   "platforms": [
+    "web browser"
+   ],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 28202,
+   "canonical_slug": "smashthem",
+   "title": "SmashThem",
+   "year": 2017,
+   "is_dlc": false,
+   "genres": [
+    "Arcade"
+   ],
+   "platforms": [
+    "Android"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 28340,
+   "canonical_slug": "like-vampire-like-son",
+   "title": "Like vampire like son",
+   "year": 2013,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Point-and-click"
+   ],
+   "platforms": [
+    "web browser"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 284844,
+   "canonical_slug": "bara-to-tsubaki-to-fata-morgana",
+   "title": "Bara to Tsubaki to Fata Morgana",
+   "year": 2014,
+   "is_dlc": false,
+   "genres": [
+    "Fighting"
+   ],
+   "platforms": [
+    "Mac",
+    "PC (Microsoft Windows)",
+    "web browser"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 286061,
+   "canonical_slug": "shadow-1",
+   "title": "Shadow",
+   "year": 2024,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 287324,
+   "canonical_slug": "picoracer-2048",
+   "title": "Picoracer-2048",
+   "year": 2015,
+   "is_dlc": false,
+   "genres": [
+    "Racing"
+   ],
+   "platforms": [
+    "web browser"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 288591,
+   "canonical_slug": "tiny-gnome-game",
+   "title": "Tiny Gnome Game",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie"
+   ],
+   "platforms": [],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 289865,
+   "canonical_slug": "the-land-of-the-magnates",
+   "title": "The Land of the Magnates",
+   "year": 2024,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Role-playing (RPG)"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 29105,
+   "canonical_slug": "supercluster-void",
+   "title": "SuperCluster: Void",
+   "year": 2017,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie",
+    "Role-playing (RPG)"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 292184,
+   "canonical_slug": "contract-and-control",
+   "title": "Contract & Control",
+   "year": 2026,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Role-playing (RPG)"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 2933,
+   "canonical_slug": "kingdom-hearts-iii",
+   "title": "Kingdom Hearts III",
+   "year": 2019,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Hack and slash/Beat 'em up",
+    "Role-playing (RPG)"
+   ],
+   "platforms": [
+    "Nintendo Switch 2",
+    "PC (Microsoft Windows)",
+    "PlayStation 4",
+    "PlayStation 5",
+    "Xbox One",
+    "Xbox Series X|S"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 294509,
+   "canonical_slug": "tiny-tires",
+   "title": "Tiny Tires",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Arcade",
+    "Racing"
+   ],
+   "platforms": [
+    "Linux",
+    "Mac",
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 295758,
+   "canonical_slug": "the-anomalous-hour",
+   "title": "The Anomalous Hour",
+   "year": 2024,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie",
+    "Simulator"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 29696,
+   "canonical_slug": "rest-house",
+   "title": "Rest House",
+   "year": 2017,
+   "is_dlc": false,
+   "genres": [
+    "Adventure"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 298162,
+   "canonical_slug": "pixel-town-akanemachi-sideshow",
+   "title": "Pixel Town: Akanemachi Sideshow",
+   "year": 2024,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie",
+    "Role-playing (RPG)",
+    "Visual Novel"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 299407,
+   "canonical_slug": "cluck-avengers",
+   "title": "Cluck Avengers",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [
+    "Android"
+   ],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 301090,
+   "canonical_slug": "zenatria",
+   "title": "Zenatria",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Strategy"
+   ],
+   "platforms": [],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 302319,
+   "canonical_slug": "underground-world-war",
+   "title": "Underground: World War",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Indie"
+   ],
+   "platforms": [],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 303515,
+   "canonical_slug": "eoeonline",
+   "title": "EOEOnline",
+   "year": 2024,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Role-playing (RPG)"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 304724,
+   "canonical_slug": "pocket-kickball",
+   "title": "Pocket Kickball",
+   "year": 2024,
+   "is_dlc": false,
+   "genres": [
+    "Sport"
+   ],
+   "platforms": [
+    "iOS"
+   ],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 306028,
+   "canonical_slug": "mahjong-8",
+   "title": "Mahjong",
+   "year": 2023,
+   "is_dlc": false,
+   "genres": [
+    "Card & Board Game",
+    "Puzzle"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 307464,
+   "canonical_slug": "project-muse",
+   "title": "Project: Muse",
+   "year": 2016,
+   "is_dlc": false,
+   "genres": [
+    "Music"
+   ],
+   "platforms": [
+    "Android",
+    "iOS"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 309052,
+   "canonical_slug": "uncover-the-triad-of-terror",
+   "title": "Uncover the Triad of Terror",
+   "year": 2024,
+   "is_dlc": false,
+   "genres": [
+    "Puzzle"
+   ],
+   "platforms": [
+    "Nintendo Switch"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 31025,
+   "canonical_slug": "razortron-2000",
+   "title": "Razortron 2000",
+   "year": 2016,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Racing"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 311453,
+   "canonical_slug": "final-night",
+   "title": "Final Night",
+   "year": 2024,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 312657,
+   "canonical_slug": "a-beavers-tale",
+   "title": "A Beaver's Tale",
+   "year": 2024,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Simulator"
+   ],
+   "platforms": [
+    "Linux",
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 314314,
+   "canonical_slug": "lemon",
+   "title": "Lemon",
+   "year": 2024,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Simulator",
+    "Strategy"
+   ],
+   "platforms": [
+    "Linux",
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 315746,
+   "canonical_slug": "the-games-of-escape",
+   "title": "The Games of Escape",
+   "year": 2015,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Point-and-click"
+   ],
+   "platforms": [
+    "web browser"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 317057,
+   "canonical_slug": "auto-pirates-captains-cup",
+   "title": "Auto Pirates: Captains Cup",
+   "year": 2024,
+   "is_dlc": false,
+   "genres": [
+    "Strategy"
+   ],
+   "platforms": [
+    "Android"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 318422,
+   "canonical_slug": "my-direct-damag-7-trillion",
+   "title": "My Direct Damag 7 Trillion",
+   "year": 2024,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 319657,
+   "canonical_slug": "kapamilya-deal-or-no-deal",
+   "title": "Kapamilya Deal or No Deal",
+   "year": 2006,
+   "is_dlc": false,
+   "genres": [
+    "Arcade"
+   ],
+   "platforms": [
+    "web browser"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 320818,
+   "canonical_slug": "haunting-record-sins-of-lust",
+   "title": "Haunting Record: Sins of Lust",
+   "year": 2024,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie",
+    "Simulator"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 322241,
+   "canonical_slug": "tsuki-no-hikari",
+   "title": "Tsuki no Hikari",
+   "year": 2016,
+   "is_dlc": false,
+   "genres": [
+    "Visual Novel"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 323508,
+   "canonical_slug": "cold-sweat-1",
+   "title": "Cold Sweat",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 324878,
+   "canonical_slug": "eyes-that-hypnotise",
+   "title": "Eyes That Hypnotise",
+   "year": 2025,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Puzzle"
+   ],
+   "platforms": [
+    "Mac",
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 326227,
+   "canonical_slug": "pixel-frenzy",
+   "title": "Pixel Frenzy",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Indie"
+   ],
+   "platforms": [],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 327457,
+   "canonical_slug": "reverex-dx",
+   "title": "REVEREX: DX",
+   "year": 2024,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 328791,
+   "canonical_slug": "the-smurfs-colorful-stories-goty-edition",
+   "title": "The Smurfs: Colorful Stories - GOTY Edition",
+   "year": 2024,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [
+    "Nintendo Switch"
+   ],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 330217,
+   "canonical_slug": "hill-climb-on-a-motorcycle",
+   "title": "Hill Climb on a Motorcycle",
+   "year": 2025,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Arcade",
+    "Platform",
+    "Racing",
+    "Simulator"
+   ],
+   "platforms": [
+    "Nintendo Switch",
+    "PlayStation 4"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 33160,
+   "canonical_slug": "the-orphan-dreams",
+   "title": "The Orphan Dreams",
+   "year": 2016,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie",
+    "Role-playing (RPG)"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 332991,
+   "canonical_slug": "disguised-blessing",
+   "title": "Disguised Blessing",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Indie"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 334175,
+   "canonical_slug": "apothecurse",
+   "title": "Apothecurse",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Indie"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 335389,
+   "canonical_slug": "mrak-1",
+   "title": "!mrak",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 336736,
+   "canonical_slug": "nullspace",
+   "title": "Nullspace",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Real Time Strategy (RTS)",
+    "Strategy"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 33786,
+   "canonical_slug": "buriedtown",
+   "title": "BuriedTown",
+   "year": 2016,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie",
+    "Role-playing (RPG)",
+    "Strategy"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 339059,
+   "canonical_slug": "alien-cat-story",
+   "title": "Alien Cat Story",
+   "year": 2024,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Platform",
+    "Puzzle"
+   ],
+   "platforms": [
+    "Nintendo Switch",
+    "PC (Microsoft Windows)",
+    "PlayStation 4",
+    "PlayStation 5",
+    "Xbox One",
+    "Xbox Series X|S"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 340236,
+   "canonical_slug": "forgotten-lands-online",
+   "title": "Forgotten Lands: Online",
+   "year": 2024,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie",
+    "Role-playing (RPG)"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 341349,
+   "canonical_slug": "my-dear-delirium",
+   "title": "My Dear Delirium",
+   "year": 2024,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 34261,
+   "canonical_slug": "galaxy-admirals",
+   "title": "Galaxy Admirals",
+   "year": 2017,
+   "is_dlc": false,
+   "genres": [
+    "Strategy"
+   ],
+   "platforms": [
+    "Linux",
+    "Mac",
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 343864,
+   "canonical_slug": "monster-battles",
+   "title": "Monster Battles",
+   "year": 2025,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Strategy"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 345053,
+   "canonical_slug": "alfons-world",
+   "title": "Alfons World",
+   "year": 2026,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Role-playing (RPG)"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 346249,
+   "canonical_slug": "swooshcat",
+   "title": "SwooshCat",
+   "year": 2025,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Fighting",
+    "Platform",
+    "Puzzle",
+    "Role-playing (RPG)"
+   ],
+   "platforms": [
+    "Nintendo Switch",
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 347358,
+   "canonical_slug": "chronominion-idler",
+   "title": "Chronominion Idler",
+   "year": 2026,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie",
+    "Role-playing (RPG)",
+    "Strategy"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 348448,
+   "canonical_slug": "the-tumor",
+   "title": "The Tumor",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 349504,
+   "canonical_slug": "ffff-you-machine",
+   "title": "Ffff You Machine",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Shooter"
+   ],
+   "platforms": [
+    "Mac",
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 350806,
+   "canonical_slug": "the-silent-witness",
+   "title": "The Silent Witness",
+   "year": 2025,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Role-playing (RPG)"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 352392,
+   "canonical_slug": "the-pixotron-49",
+   "title": "The Pixotron 49",
+   "year": 2025,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Simulator"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 354864,
+   "canonical_slug": "bearplane",
+   "title": "Bearplane",
+   "year": 2025,
+   "is_dlc": false,
+   "genres": [
+    "Indie"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 356609,
+   "canonical_slug": "unshuffle",
+   "title": "Unshuffle",
+   "year": 2025,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Puzzle"
+   ],
+   "platforms": [
+    "Playdate"
+   ],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 358272,
+   "canonical_slug": "hellbound-inc",
+   "title": "Hellbound, Inc.",
+   "year": 2026,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Platform"
+   ],
+   "platforms": [
+    "Mac",
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 359653,
+   "canonical_slug": "fizz-flow-factory-management",
+   "title": "Fizz Flow: Factory Management",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Simulator",
+    "Strategy"
+   ],
+   "platforms": [],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 361037,
+   "canonical_slug": "kai-unearthed",
+   "title": "Kai UnEarthed",
+   "year": 2025,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 362702,
+   "canonical_slug": "indiepocalypse-number-54",
+   "title": "Indiepocalypse #54",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Fighting",
+    "Indie",
+    "Role-playing (RPG)",
+    "Visual Novel"
+   ],
+   "platforms": [],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 364340,
+   "canonical_slug": "der-rauber-hotzenplotz",
+   "title": "Der Räuber Hotzenplotz",
+   "year": 2004,
+   "is_dlc": false,
+   "genres": [
+    "Point-and-click",
+    "Puzzle"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 365553,
+   "canonical_slug": "nicktoons-and-the-dice-of-destiny-deluxe-edition",
+   "title": "Nicktoons & The Dice of Destiny: Deluxe Edition",
+   "year": 2025,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Role-playing (RPG)"
+   ],
+   "platforms": [
+    "Nintendo Switch"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 366916,
+   "canonical_slug": "linkedin-or-interpol-1",
+   "title": "LinkedIn or Interpol",
+   "year": 2025,
+   "is_dlc": false,
+   "genres": [
+    "Quiz/Trivia"
+   ],
+   "platforms": [
+    "web browser"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 368057,
+   "canonical_slug": "spine-lasher",
+   "title": "Spine Lasher",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Platform"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 36919,
+   "canonical_slug": "erebus",
+   "title": "Erebus",
+   "year": 1986,
+   "is_dlc": false,
+   "genres": [
+    "Arcade",
+    "Shooter"
+   ],
+   "platforms": [
+    "Commodore C64/128/MAX"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 370399,
+   "canonical_slug": "terrafarmers-inc",
+   "title": "Terrafarmers Inc.",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie",
+    "Simulator"
+   ],
+   "platforms": [
+    "Mac",
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 371712,
+   "canonical_slug": "honto-ni-atta-noroi-no-choujou-genshou-chousa-sha",
+   "title": "Honto ni Atta! Noroi no Choujou Genshou Chousa-sha",
+   "year": 2023,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Fighting",
+    "Indie",
+    "Visual Novel"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 372922,
+   "canonical_slug": "obfuscation",
+   "title": "Obfuscation",
+   "year": 2025,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 374004,
+   "canonical_slug": "cat-vs-slime",
+   "title": "Cat vs. Slime",
+   "year": 2026,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Strategy"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 375223,
+   "canonical_slug": "zaetherfall",
+   "title": "Zaetherfall",
+   "year": 2026,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 376778,
+   "canonical_slug": "insane-bundle-with-21-games",
+   "title": "Insane Bundle with 21 Games",
+   "year": 2025,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Platform",
+    "Puzzle"
+   ],
+   "platforms": [
+    "Nintendo Switch"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 37802,
+   "canonical_slug": "super-nichibutsu-mahjong-3-yoshimoto-gekijou-hen",
+   "title": "Super Nichibutsu Mahjong 3: Yoshimoto Gekijou-hen",
+   "year": 1994,
+   "is_dlc": false,
+   "genres": [
+    "Card & Board Game",
+    "Sport"
+   ],
+   "platforms": [
+    "Super Famicom"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 37937,
+   "canonical_slug": "mahjong-hishou-den-shin-naki-no-ryuu",
+   "title": "Mahjong Hishou-den: Shin Naki no Ryuu",
+   "year": 1995,
+   "is_dlc": false,
+   "genres": [
+    "Card & Board Game",
+    "Quiz/Trivia",
+    "Sport"
+   ],
+   "platforms": [
+    "Satellaview",
+    "Super Famicom"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 380446,
+   "canonical_slug": "navit",
+   "title": "Navit",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 381711,
+   "canonical_slug": "unholy-adventure-mystery",
+   "title": "Unholy Adventure: Mystery",
+   "year": 2025,
+   "is_dlc": false,
+   "genres": [
+    "Adventure"
+   ],
+   "platforms": [
+    "Nintendo Switch"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 383098,
+   "canonical_slug": "be-not-afraid-threads-of-light",
+   "title": "Be Not Afraid: Threads of Light",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Visual Novel"
+   ],
+   "platforms": [],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 384320,
+   "canonical_slug": "streets-of-rage-4-classic-edition",
+   "title": "Streets of Rage 4 Classic Edition",
+   "year": 2020,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [
+    "Nintendo Switch",
+    "PlayStation 4"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 385483,
+   "canonical_slug": "cosmic-free-fire",
+   "title": "Cosmic Free Fire",
+   "year": 1983,
+   "is_dlc": false,
+   "genres": [
+    "Shooter"
+   ],
+   "platforms": [
+    "Handheld Electronic LCD"
+   ],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 386631,
+   "canonical_slug": "epitome",
+   "title": "Epitome",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Role-playing (RPG)"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 387969,
+   "canonical_slug": "snekromancy",
+   "title": "Snekromancy",
+   "year": 2026,
+   "is_dlc": false,
+   "genres": [
+    "Indie"
+   ],
+   "platforms": [
+    "Linux",
+    "Mac",
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 38947,
+   "canonical_slug": "pool-live-pro",
+   "title": "Pool Live Pro",
+   "year": 2016,
+   "is_dlc": false,
+   "genres": [
+    "Sport"
+   ],
+   "platforms": [
+    "Android"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 390521,
+   "canonical_slug": "donnies-delicious-nuclear-funeral",
+   "title": "Donnie's Delicious Nuclear Funeral",
+   "year": 2026,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie",
+    "Visual Novel"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 391601,
+   "canonical_slug": "days-with-girlfriends-iii",
+   "title": "Days With Girlfriends Ⅲ",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Role-playing (RPG)",
+    "Simulator"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 392751,
+   "canonical_slug": "roguepool",
+   "title": "RoguePool",
+   "year": 2026,
+   "is_dlc": false,
+   "genres": [
+    "Sport"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 394163,
+   "canonical_slug": "tsukumo-reikos-summer-holidays",
+   "title": "Tsukumo Reiko's Summer Holidays",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Visual Novel"
+   ],
+   "platforms": [],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 395660,
+   "canonical_slug": "pengilo",
+   "title": "Pengilo",
+   "year": 2026,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Platform",
+    "Puzzle"
+   ],
+   "platforms": [
+    "Nintendo Switch"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 39716,
+   "canonical_slug": "majestic-twelve-the-space-invaders-part-iv",
+   "title": "Majestic Twelve: The Space Invaders Part IV",
+   "year": 1990,
+   "is_dlc": false,
+   "genres": [
+    "Shooter"
+   ],
+   "platforms": [
+    "Arcade"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 398541,
+   "canonical_slug": "abraham-link-coln-on-dessert-island",
+   "title": "Abraham Link Coln on Dessert Island",
+   "year": 2019,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie"
+   ],
+   "platforms": [
+    "web browser"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 399943,
+   "canonical_slug": "the-grimwood-hex",
+   "title": "The Grimwood Hex",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Card & Board Game",
+    "Indie",
+    "Strategy",
+    "Turn-based strategy (TBS)"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 401332,
+   "canonical_slug": "carnholt",
+   "title": "Carnholt",
+   "year": 2026,
+   "is_dlc": false,
+   "genres": [
+    "Card & Board Game",
+    "Indie",
+    "Strategy"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 402818,
+   "canonical_slug": "holybattle",
+   "title": "HolyBattle",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Card & Board Game"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 40425,
+   "canonical_slug": "super-doubles-tennis",
+   "title": "Super Doubles Tennis",
+   "year": 1983,
+   "is_dlc": false,
+   "genres": [
+    "Sport"
+   ],
+   "platforms": [
+    "Arcade"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 405698,
+   "canonical_slug": "rituals-of-demons",
+   "title": "Rituals of Demons",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Puzzle"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 406954,
+   "canonical_slug": "get-the-ball-away",
+   "title": "Get The Ball Away!",
+   "year": 2026,
+   "is_dlc": false,
+   "genres": [
+    "Strategy"
+   ],
+   "platforms": [
+    "web browser"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 40840,
+   "canonical_slug": "european-soccer-challenge",
+   "title": "European Soccer Challenge",
+   "year": 1993,
+   "is_dlc": false,
+   "genres": [
+    "Sport"
+   ],
+   "platforms": [
+    "Atari Lynx"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 410006,
+   "canonical_slug": "supernova-4",
+   "title": "SuperNova",
+   "year": 2026,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Puzzle"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 41144,
+   "canonical_slug": "tai-chi-tortoise",
+   "title": "Tai Chi Tortoise",
+   "year": 1991,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [
+    "Commodore C64/128/MAX"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 412875,
+   "canonical_slug": "threat-ops",
+   "title": "Threat Ops",
+   "year": 2024,
+   "is_dlc": false,
+   "genres": [
+    "Indie"
+   ],
+   "platforms": [
+    "Playdate"
+   ],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 414270,
+   "canonical_slug": "handlebar",
+   "title": "Handlebar",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Arcade",
+    "Indie",
+    "Racing",
+    "Sport"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 415877,
+   "canonical_slug": "se3-protocol-last-drop",
+   "title": "SE3 Protocol: Last Drop",
+   "year": 2026,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie",
+    "Puzzle",
+    "Role-playing (RPG)"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 42385,
+   "canonical_slug": "koryuu-no-mimi",
+   "title": "Koryuu no Mimi",
+   "year": 1995,
+   "is_dlc": false,
+   "genres": [
+    "Fighting",
+    "Hack and slash/Beat 'em up"
+   ],
+   "platforms": [
+    "Super Famicom"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 43563,
+   "canonical_slug": "warriors-of-might-and-magic",
+   "title": "Warriors of Might and Magic",
+   "year": 2000,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Hack and slash/Beat 'em up",
+    "Role-playing (RPG)"
+   ],
+   "platforms": [
+    "Game Boy Color",
+    "PlayStation",
+    "PlayStation 2"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 44747,
+   "canonical_slug": "knockout-kings-2001",
+   "title": "Knockout Kings 2001",
+   "year": 2000,
+   "is_dlc": false,
+   "genres": [
+    "Sport"
+   ],
+   "platforms": [
+    "PlayStation",
+    "PlayStation 2"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 45976,
+   "canonical_slug": "puyo-puyo-tsuu-1",
+   "title": "Puyo Puyo Tsuu",
+   "year": 1994,
+   "is_dlc": false,
+   "genres": [
+    "Puzzle"
+   ],
+   "platforms": [
+    "Arcade",
+    "Sega Saturn"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 47132,
+   "canonical_slug": "xminutes-wings",
+   "title": "XMinutes: Wings",
+   "year": 2017,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Arcade",
+    "Indie",
+    "Shooter"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 48327,
+   "canonical_slug": "moeru-onii-san",
+   "title": "Moeru! Onii-san",
+   "year": 1989,
+   "is_dlc": false,
+   "genres": [
+    "Adventure"
+   ],
+   "platforms": [
+    "Family Computer"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 49475,
+   "canonical_slug": "math-patrol-the-kleptoid-threat",
+   "title": "Math Patrol: The Kleptoid Threat",
+   "year": 2007,
+   "is_dlc": false,
+   "genres": [
+    "Puzzle",
+    "Shooter"
+   ],
+   "platforms": [
+    "Game Boy Advance"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 50606,
+   "canonical_slug": "hasbro-family-game-night-2",
+   "title": "Hasbro Family Game Night 2",
+   "year": 2009,
+   "is_dlc": false,
+   "genres": [
+    "Puzzle",
+    "Quiz/Trivia"
+   ],
+   "platforms": [
+    "Wii"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 51789,
+   "canonical_slug": "circuit-dude",
+   "title": "Circuit Dude",
+   "year": 2016,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Puzzle",
+    "Strategy"
+   ],
+   "platforms": [
+    "Arduboy",
+    "Linux",
+    "Mac",
+    "Nintendo Switch",
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 53018,
+   "canonical_slug": "vr-invaders-complete-edition",
+   "title": "VR Invaders: Complete Edition",
+   "year": 2017,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [
+    "PlayStation 4"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 54284,
+   "canonical_slug": "pool-house",
+   "title": "Pool House",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 55347,
+   "canonical_slug": "oswalds-adventure",
+   "title": "Oswald's Adventure",
+   "year": 2017,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Indie",
+    "Role-playing (RPG)"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 56373,
+   "canonical_slug": "japanese-rail-sim-3d-journey-in-suburbs-number-1",
+   "title": "Japanese Rail Sim 3D Journey in Suburbs #1",
+   "year": 2015,
+   "is_dlc": false,
+   "genres": [
+    "Simulator"
+   ],
+   "platforms": [
+    "Nintendo 3DS"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 5744,
+   "canonical_slug": "battlestar-galactica",
+   "title": "Battlestar Galactica",
+   "year": 2003,
+   "is_dlc": false,
+   "genres": [
+    "Shooter",
+    "Simulator"
+   ],
+   "platforms": [
+    "PlayStation 2",
+    "Xbox"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 58457,
+   "canonical_slug": "pictoparty",
+   "title": "PictoParty",
+   "year": 2015,
+   "is_dlc": false,
+   "genres": [
+    "Card & Board Game"
+   ],
+   "platforms": [
+    "Android",
+    "Wii U"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 5951,
+   "canonical_slug": "nba-live-07",
+   "title": "NBA Live 07",
+   "year": 2006,
+   "is_dlc": false,
+   "genres": [
+    "Simulator",
+    "Sport"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)",
+    "PlayStation 3",
+    "Xbox 360"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 60544,
+   "canonical_slug": "doraemon-nobita-no-himitsu-dougu-hakubutsukan",
+   "title": "Doraemon: Nobita no Himitsu Dougu Hakubutsukan",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [
+    "Nintendo 3DS"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 61567,
+   "canonical_slug": "the-mandate",
+   "title": "The Mandate",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Racing",
+    "Real Time Strategy (RTS)",
+    "Strategy",
+    "Turn-based strategy (TBS)"
+   ],
+   "platforms": [],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 62592,
+   "canonical_slug": "nicole",
+   "title": "Nicole",
+   "year": 2013,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Role-playing (RPG)",
+    "Simulator",
+    "Strategy",
+    "Visual Novel"
+   ],
+   "platforms": [
+    "Linux",
+    "Mac",
+    "Nintendo Switch",
+    "PC (Microsoft Windows)",
+    "PlayStation 4",
+    "PlayStation Vita",
+    "Xbox One"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 63626,
+   "canonical_slug": "simple-ds-series-vol-25-the-koushounin",
+   "title": "Simple DS Series Vol. 25: The Koushounin",
+   "year": 2007,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [
+    "Nintendo DS"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 64669,
+   "canonical_slug": "ronnie-osullivans-snooker",
+   "title": "Ronnie O'Sullivan's Snooker",
+   "year": 2012,
+   "is_dlc": false,
+   "genres": [
+    "Sport"
+   ],
+   "platforms": [
+    "PlayStation 3",
+    "PlayStation Portable"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 65710,
+   "canonical_slug": "crimson-steam-pirates",
+   "title": "Crimson: Steam Pirates",
+   "year": 2011,
+   "is_dlc": false,
+   "genres": [
+    "Strategy",
+    "Turn-based strategy (TBS)"
+   ],
+   "platforms": [
+    "iOS",
+    "web browser"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 6682,
+   "canonical_slug": "w-i-t-c-h",
+   "title": "W.I.T.C.H.",
+   "year": 2005,
+   "is_dlc": false,
+   "genres": [
+    "Platform"
+   ],
+   "platforms": [
+    "Game Boy Advance"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 68039,
+   "canonical_slug": "yu-gi-oh-7-trials-to-glory-world-championship-tournament-2005",
+   "title": "Yu-Gi-Oh! 7 Trials to Glory: World Championship Tournament 2005",
+   "year": 2004,
+   "is_dlc": false,
+   "genres": [
+    "Card & Board Game",
+    "Strategy",
+    "Turn-based strategy (TBS)"
+   ],
+   "platforms": [
+    "Game Boy Advance"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 69133,
+   "canonical_slug": "psychic-force-puzzle-taisen",
+   "title": "Psychic Force Puzzle Taisen",
+   "year": 1997,
+   "is_dlc": false,
+   "genres": [
+    "Puzzle"
+   ],
+   "platforms": [
+    "PlayStation"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 70186,
+   "canonical_slug": "the-shield-the-game",
+   "title": "The Shield: The Game",
+   "year": 2007,
+   "is_dlc": false,
+   "genres": [
+    "Shooter"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)",
+    "PlayStation 2"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 7125,
+   "canonical_slug": "operation-darkness",
+   "title": "Operation Darkness",
+   "year": 2007,
+   "is_dlc": false,
+   "genres": [
+    "Role-playing (RPG)",
+    "Strategy",
+    "Tactical"
+   ],
+   "platforms": [
+    "Xbox 360"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 72330,
+   "canonical_slug": "nightdawn",
+   "title": "Nightdawn",
+   "year": 1989,
+   "is_dlc": false,
+   "genres": [
+    "Arcade",
+    "Tactical"
+   ],
+   "platforms": [
+    "Amiga",
+    "Atari ST/STE",
+    "Commodore C64/128/MAX"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 73426,
+   "canonical_slug": "dance-dance-revolution-3rdmix",
+   "title": "Dance Dance Revolution 3rdMix",
+   "year": 1999,
+   "is_dlc": false,
+   "genres": [
+    "Arcade",
+    "Music",
+    "Puzzle"
+   ],
+   "platforms": [
+    "Arcade",
+    "PlayStation"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 74457,
+   "canonical_slug": "board-games-vr",
+   "title": "Board Games VR",
+   "year": 2017,
+   "is_dlc": false,
+   "genres": [
+    "Card & Board Game",
+    "Indie"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 75537,
+   "canonical_slug": "acucalypse",
+   "title": "Acucalypse",
+   "year": 2018,
+   "is_dlc": false,
+   "genres": [
+    "Indie",
+    "Simulator",
+    "Strategy"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 76643,
+   "canonical_slug": "taiko-no-tatsujin-drum-session",
+   "title": "Taiko no Tatsujin: Drum Session",
+   "year": 2017,
+   "is_dlc": false,
+   "genres": [
+    "Music"
+   ],
+   "platforms": [
+    "PlayStation 4"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 77809,
+   "canonical_slug": "exteel-1",
+   "title": "Exteel",
+   "year": 2007,
+   "is_dlc": false,
+   "genres": [
+    "Shooter"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 79048,
+   "canonical_slug": "the-idolmaster-gravure-for-you-vol-7",
+   "title": "The Idolmaster: Gravure for You! Vol. 7",
+   "year": 2012,
+   "is_dlc": false,
+   "genres": [
+    "Music",
+    "Simulator"
+   ],
+   "platforms": [
+    "PlayStation 3"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 80242,
+   "canonical_slug": "quadrox-2",
+   "title": "QuadroX-2",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 8154,
+   "canonical_slug": "jackie-chan-adventures",
+   "title": "Jackie Chan Adventures",
+   "year": 2004,
+   "is_dlc": false,
+   "genres": [
+    "Fighting",
+    "Hack and slash/Beat 'em up",
+    "Platform",
+    "Sport"
+   ],
+   "platforms": [
+    "PlayStation 2",
+    "PlayStation Portable"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 82700,
+   "canonical_slug": "lewdtrap-mansion-escape-of-the-captive-girl-elena",
+   "title": "LewdTrap Mansion: Escape of the Captive Girl Elena",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 83911,
+   "canonical_slug": "bill-and-teds-excellent-adventure-the-computer-game",
+   "title": "Bill & Ted's Excellent Adventure: The Computer Game!",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [
+    "Amiga",
+    "Commodore C64/128/MAX",
+    "DOS"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 85016,
+   "canonical_slug": "cake-ninja",
+   "title": "Cake Ninja",
+   "year": 2011,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [
+    "Nintendo DSi"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 8614,
+   "canonical_slug": "digimon-world",
+   "title": "Digimon World",
+   "year": 1999,
+   "is_dlc": false,
+   "genres": [
+    "Adventure",
+    "Role-playing (RPG)",
+    "Simulator"
+   ],
+   "platforms": [
+    "PlayStation"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 87229,
+   "canonical_slug": "klondike-planet",
+   "title": "Klondike Planet",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 88269,
+   "canonical_slug": "mystery-case-files-shadow-lake-collectors-edition",
+   "title": "Mystery Case Files: Shadow Lake - Collector's Edition",
+   "year": 2012,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 89327,
+   "canonical_slug": "rig-or-skill-pc-brawl",
+   "title": "Rig or Skill: PC Brawl",
+   "year": 2018,
+   "is_dlc": false,
+   "genres": [
+    "Indie"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 90357,
+   "canonical_slug": "playeronegame",
+   "title": "PlayerONeGame",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 91453,
+   "canonical_slug": "dennis-og-bellini-onkel-bellinis-hemmeligheder",
+   "title": "Dennis og Bellini: Onkel Bellinis hemmeligheder",
+   "year": 2000,
+   "is_dlc": false,
+   "genres": [
+    "Point-and-click"
+   ],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 92478,
+   "canonical_slug": "islandia",
+   "title": "Islandia",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 93506,
+   "canonical_slug": "bulletasylum",
+   "title": "BulletAsylum",
+   "year": 2012,
+   "is_dlc": false,
+   "genres": [
+    "Arcade",
+    "Shooter"
+   ],
+   "platforms": [
+    "Windows Phone"
+   ],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 94598,
+   "canonical_slug": "druid-soccer",
+   "title": "Druid Soccer",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [
+    "PC (Microsoft Windows)"
+   ],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 95660,
+   "canonical_slug": "clearit",
+   "title": "ClearIt",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [],
+   "cover": "present"
+  },
+  {
+   "igdb_id": 96703,
+   "canonical_slug": "max-craft-2-new-world-hd",
+   "title": "Max Craft 2: New World HD",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 97694,
+   "canonical_slug": "ohimesama-jiku-wo-koeru",
+   "title": "Ohimesama: Jiku wo Koeru",
+   "year": null,
+   "is_dlc": false,
+   "genres": [],
+   "platforms": [],
+   "cover": "fallback"
+  },
+  {
+   "igdb_id": 98713,
+   "canonical_slug": "hell-in-paradise",
+   "title": "Hell in Paradise",
+   "year": null,
+   "is_dlc": false,
+   "genres": [
+    "Indie"
+   ],
+   "platforms": [],
+   "cover": "fallback"
+  }
+ ]
+}

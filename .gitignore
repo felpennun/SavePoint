@@ -16,3 +16,4 @@ playwright-report/
 *.tsbuildinfo
 
 .neon
+data/snapshots/

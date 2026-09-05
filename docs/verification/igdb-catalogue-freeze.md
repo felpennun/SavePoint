@@ -1,6 +1,6 @@
 # IGDB catalogue import — aggregate freeze evidence
 
-**Estado:** VERIFIED — full-scale fresh-database acceptance run completed 2026-09-05 (Plan 01.1-02 Task 3). Deterministic sample manifest deferred to the persistent-DB load (see *Measured evidence › Sample-review manifest*).
+**Estado:** VERIFIED — full-scale fresh-database acceptance run completed 2026-09-05 (Plan 01.1-02 Task 3); persistent dev-DB catalogue load completed 2026-09-06 with the deterministic sample manifest attached (see *Persistent dev-DB load* + *Sampled-review manifest*).
 **Requirement:** DATA-04, CAT-02 · **GitHub issue:** #8 · **ADR:** [ADR-006](../adr/ADR-006-igdb-source.md)
 
 This document is the aggregate evidence contract for the real-scale IGDB
@@ -95,16 +95,33 @@ A second full `import_igdb_catalogue` pass (fresh scan from `id = 0`) re-process
 **Deviation — canonical verify path.** The plan's `<verify>` is `powershell -ExecutionPolicy Bypass -File scripts/verify-igdb-fresh-import.ps1`. The execution harness categorically blocks `powershell`/`pwsh` for worktree-isolated agents, so the acceptance run was driven by a bash-equivalent of that script producing the same genuine evidence. `scripts/verify-igdb-fresh-import.ps1` is committed as the canonical runner for a reviewer to execute from the main checkout (it re-does the full ~1h acceptance run against its own throwaway DB).
 <!-- MEASURED-EVIDENCE-END -->
 
+## Persistent dev-DB load (2026-09-06)
+
+The fresh-DB acceptance run above proved the mechanism on a *disposable* database. The
+real dev database (`savepoint_test` in `savepoint-db-1`), which already held the Phase 1
+150-game `source="wikidata"` corpus + demo accounts + seed library, was then populated for
+real so Plans 01.1-03 / 05 / 09 have a real-scale catalogue to build against.
+
+| Field | Value |
+|---|---|
+| Command | `python manage.py import_igdb_catalogue` (single clean pass — no interrupt/resume choreography) against `savepoint_test` |
+| Completed (UTC) | 2026-09-06 ~03:15 |
+| Repo commit | `66ca284` (post the Platform-slug coexistence fix) |
+| Live eligible count (`game_type = 0`, re-measured) | 312,467 |
+| IGDB primary works imported | **312,483** (0 skipped; grew past the re-measured eligible count because live IGDB added rows during the ~50-min run) |
+| Coexistence | Wikidata corpus untouched — `savepoint_test` now holds 312,633 works = 312,483 IGDB + 150 Wikidata; 288 platforms (Wikidata + IGDB reconciled on `slug`), 23 genres |
+| Covers present / first-party fallback | 268,679 / 43,804 |
+| Content checksum (`sha256`) | `ff3d67525c92…` (differs from the disposable-run checksum only because both runs captured IGDB at different, live moments — see acceptance-run Deviation 1) |
+| `IgdbImportRun` | `status = complete`, `last_committed_igdb_id = 416486` |
+| Prerequisite fix | `fix(01.1-02): reconcile IGDB Platform on slug` — the first attempt aborted on `catalogue_platform_slug_key` (IGDB "Web browser" vs Wikidata "web browser"); the importer now matches `slug → name → insert` inside a savepoint. |
+| Reusable snapshot | `pg_dump -Fc` → `data/snapshots/savepoint_test-igdb-catalogue-20260906.dump` (93 MB, **gitignored** — ADR-006 §4 bars committing a bulk dump; restore with `pg_restore` in minutes instead of re-pulling from IGDB). |
+
 ### Sampled-review manifest
 
-**Deferred.** The deterministic ≤300-record sample manifest
-(`docs/verification/igdb-catalogue-freeze.sample.json`) was **not captured** on the
-fresh-database acceptance run: a bash-driver `cp1252` vs `UTF-8` encoding fault corrupted
-the machine-readable evidence JSON *after* the import itself had succeeded, and a follow-up
-single-pass capture run's output likewise did not survive. The aggregate content checksum,
-counts and coverage figures above stand as the freeze evidence for the acceptance run.
-
-The sample manifest will be generated deterministically against the **persistent dev
-database** during the catalogue load (Plan 01.1-02 close-out / pre-Plan-03), where the
-same `import_igdb_catalogue --evidence-json` path runs without the disposable-container
-bind-mount and encoding faults. See `01.1-02-SUMMARY.md` → *Deviations*.
+**Attached** — `docs/verification/igdb-catalogue-freeze.sample.json` (generated 2026-09-06
+against the persistent dev-DB load above; the fresh-DB acceptance run's own manifest was
+lost to a `cp1252`/`UTF-8` encoding fault after the import succeeded). Deterministic: the
+312,483 IGDB works ordered by `source_id` ascending, every 1,041st taken, 300 records.
+Each record carries `igdb_id`, `canonical_slug`, `title`, earliest release `year`,
+`is_dlc`, `genres`, `platforms` (≤8), and `cover` (`present` / `fallback`) for a human
+spot-check of normalization correctness.
