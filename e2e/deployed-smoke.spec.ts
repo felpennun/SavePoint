@@ -24,6 +24,15 @@ if (!/^[0-9a-f]{40}$/i.test(expectedCommit)) {
 
 test.use({ baseURL: expectedOrigin });
 
+// Cover images are intentionally external (data provenance/licensing: URLs
+// with attribution, never mirrored -- see catalogue/serializers.py and
+// docs/verification/catalogue-freeze.md's per-asset licensing table), so a
+// game detail page legitimately fetches from Wikimedia Commons. This is the
+// only allowlisted exception to the same-origin check below; any other host
+// still fails the test (T-07-02: redirect/asset-injection to an unexpected
+// domain).
+const ALLOWLISTED_ASSET_HOSTS = new Set(["upload.wikimedia.org", "commons.wikimedia.org"]);
+
 test("public revision: health -> homepage -> login -> catalogue -> detail", async ({ page }) => {
   const username = requiredEnv("DEMO_USERNAME");
   const password = requiredEnv("DEMO_PASSWORD");
@@ -33,7 +42,9 @@ test("public revision: health -> homepage -> login -> catalogue -> detail", asyn
   page.on("request", (request) => {
     const requestUrl = new URL(request.url());
     if (requestUrl.protocol === "http:" || requestUrl.protocol === "https:") {
-      if (requestUrl.origin !== expectedOrigin) unexpectedHosts.add(requestUrl.host);
+      if (requestUrl.origin !== expectedOrigin && !ALLOWLISTED_ASSET_HOSTS.has(requestUrl.host)) {
+        unexpectedHosts.add(requestUrl.host);
+      }
     }
   });
   page.on("requestfailed", (request) => {
