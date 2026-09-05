@@ -29,6 +29,8 @@ export interface GameCard {
   year: number | null;
   platform_summary: string;
   cover: Cover;
+  /** IGDB total_rating (0-100). Wired by Plan 03; absent -> no ScorePill. */
+  total_rating?: number | null;
 }
 
 export interface CatalogueListResult {
@@ -68,6 +70,11 @@ export interface Provenance {
   snapshot_sha256: string;
 }
 
+export interface GenreRef {
+  slug: string;
+  name: string;
+}
+
 export interface GameDetail {
   id: string;
   slug: string;
@@ -81,6 +88,10 @@ export interface GameDetail {
   releases: Release[];
   related_content: RelatedContentItem[];
   provenance: Provenance | null;
+  /** Wired by Plan 03; absent -> the genres row is omitted. */
+  genres?: GenreRef[];
+  /** IGDB total_rating (0-100). Wired by Plan 03; absent -> no ScorePill. */
+  total_rating?: number | null;
 }
 
 export async function fetchCatalogueList(params: { q?: string; page?: number } = {}): Promise<CatalogueListResult> {
@@ -162,6 +173,12 @@ export interface MyLibraryItem {
   status: string;
   rating_half_steps: number | null;
   owned_copy_count: number;
+  /** Cover/year/platform enrichment is wired by Plan 03; absent -> the
+   * card renders the first-party placeholder. */
+  year?: number | null;
+  platform_summary?: string;
+  cover?: Cover;
+  updated_at?: string;
 }
 
 export interface MyLibraryResult {
@@ -183,6 +200,65 @@ export async function fetchMyLibrary(cookieHeader: string): Promise<MyLibraryRes
     throw new Error(`Failed to load collection (status ${response.status})`);
   }
   return (await response.json()) as MyLibraryResult;
+}
+
+export interface RecommendationShelfData {
+  genre: string;
+  genre_slug: string;
+  collection_count: number;
+  items: GameCard[];
+}
+
+export interface RecommendationsResult {
+  shelves: RecommendationShelfData[];
+  /** True when the user has too little rated/completed history for the
+   * heuristic to produce shelves. */
+  insufficient_history: boolean;
+}
+
+/**
+ * Genre recommendations (REC-10). The heuristic endpoint is built in Plan
+ * 05/09; until it exists this resolves to `null` and the page renders its
+ * insufficient-history state. `401` -> caller redirects to login.
+ */
+export async function fetchRecommendations(
+  cookieHeader: string,
+): Promise<RecommendationsResult | "unauthorized" | null> {
+  const url = new URL("/api/library/recommendations/", API_BASE);
+  let response: Response;
+  try {
+    response = await fetch(url, { cache: "no-store", headers: { Cookie: cookieHeader } });
+  } catch {
+    return null;
+  }
+  if (response.status === 401 || response.status === 403) return "unauthorized";
+  if (!response.ok) return null;
+  try {
+    return (await response.json()) as RecommendationsResult;
+  } catch {
+    return null;
+  }
+}
+
+export interface AccountMe {
+  username: string;
+}
+
+/**
+ * The signed-in simulated account's own identity. The endpoint is wired
+ * by Plan 04/08; until then this resolves to `null` and callers degrade
+ * to an alias-free greeting.
+ */
+export async function fetchAccountMe(cookieHeader: string): Promise<AccountMe | null> {
+  const url = new URL("/api/accounts/me/", API_BASE);
+  try {
+    const response = await fetch(url, { cache: "no-store", headers: { Cookie: cookieHeader } });
+    if (!response.ok) return null;
+    const body = (await response.json()) as { username?: unknown };
+    return typeof body.username === "string" ? { username: body.username } : null;
+  } catch {
+    return null;
+  }
 }
 
 export interface SourcesSummary {

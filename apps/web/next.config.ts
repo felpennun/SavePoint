@@ -12,6 +12,12 @@ const rawApiProxyTarget = process.env.API_PROXY_TARGET ?? "http://127.0.0.1:8000
 const API_PROXY_TARGET = rawApiProxyTarget.includes("://") ? rawApiProxyTarget : `http://${rawApiProxyTarget}`;
 
 const nextConfig: NextConfig = {
+  // ADR-006 cover delivery: IGDB covers are hotlinked (not mirrored) from
+  // images.igdb.com only -- the single approved CDN host. No other remote
+  // image host is allowed (threat T-01.1-12: approved CDN only).
+  images: {
+    remotePatterns: [{ protocol: "https", hostname: "images.igdb.com" }],
+  },
   // Two fixes needed together for the Django proxy, both about the same
   // trailing-slash mismatch: (1) skipTrailingSlashRedirect stops Next's own
   // "canonical URL" redirect response for incoming /api/* requests -- without

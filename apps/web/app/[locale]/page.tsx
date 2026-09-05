@@ -1,30 +1,29 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 
+import { BrandLockup } from "@/components/BrandLockup";
 import { GameCard } from "@/components/GameCard";
+import { RecommendationStrip } from "@/components/RecommendationStrip";
 import { getDictionary } from "@/i18n";
-import { fetchCatalogueList } from "@/lib/api";
+import { fetchAccountMe, fetchCatalogueList, fetchMyLibrary, fetchPopularity } from "@/lib/api";
 
-const COPY = {
-  es: {
-    valueProposition: "Catálogo de videojuegos personal, controlado y reproducible, con recomendaciones explicables.",
-    sampleHeading: "Una muestra del catálogo",
-    sampleFailure: "No se pudo cargar la muestra del catálogo. Puedes abrir el catálogo completo.",
-  },
-  en: {
-    valueProposition: "A controlled, reproducible personal video-game catalogue, with explainable recommendations.",
-    sampleHeading: "A catalogue sample",
-    sampleFailure: "We couldn't load the catalogue sample. You can open the full catalogue.",
-  },
-} as const;
-
-/** D-01/D-04: a realistic homepage with branding, value proposition,
- * representative content, and a visible login entry -- no guided tour;
- * actions and states are self-explanatory. */
+/** Home (01.1-UI-SPEC Screen Contract 1). Logged-out: wordmark + value
+ * proposition + CTA row + catalogue sample + quieter popularity strip.
+ * Signed-in: greeting + "pick up where you left off" + genre-
+ * recommendations CTA, popularity strip still below as the demo baseline.
+ * Home was not in the plan's files_modified -- redesigned here as a scope
+ * addition so the whole journey reads as one product. */
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: rawLocale } = await params;
   const locale = rawLocale === "en" ? "en" : "es";
   const dict = getDictionary(locale);
-  const copy = COPY[locale];
+
+  const cookieStore = await cookies();
+  const signedIn = cookieStore.has("sessionid");
+  const cookieHeader = cookieStore
+    .getAll()
+    .map((c) => `${c.name}=${c.value}`)
+    .join("; ");
 
   let sample: Awaited<ReturnType<typeof fetchCatalogueList>>["results"] = [];
   let sampleFailed = false;
@@ -35,31 +34,113 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     sampleFailed = true;
   }
 
-  return (
-    <main>
-      <h1>SavePoint</h1>
-      <p>{copy.valueProposition}</p>
-      <nav>
-        <Link href={`/${locale}/login`}>{dict.nav.login}</Link>
-        {" · "}
-        <Link href={`/${locale}/catalogue`}>{dict.nav.catalogue}</Link>
-      </nav>
+  let popularity: Awaited<ReturnType<typeof fetchPopularity>>["results"] = [];
+  try {
+    popularity = (await fetchPopularity()).results.slice(0, 5);
+  } catch {
+    popularity = [];
+  }
 
-      <section aria-label={copy.sampleHeading}>
-        <h2>{copy.sampleHeading}</h2>
-        {sampleFailed ? (
-          <div>
-            <p role="alert">{copy.sampleFailure}</p>
-            <Link href={`/${locale}/catalogue`}>{dict.errors.openFullCatalogue}</Link>
+  let continueItems: Awaited<ReturnType<typeof fetchMyLibrary>>["items"] = [];
+  let alias: string | null = null;
+  if (signedIn) {
+    const [me, lib] = await Promise.all([
+      fetchAccountMe(cookieHeader),
+      fetchMyLibrary(cookieHeader).catch(() => null),
+    ]);
+    alias = me?.username ?? null;
+    continueItems = lib?.items.slice(0, 6) ?? [];
+  }
+
+  return (
+    <main className="sp-page">
+      {signedIn ? (
+        <>
+          <h1 className="sp-h1">
+            {alias ? dict.home.signedIn.greeting.replace("{alias}", alias) : dict.home.signedIn.continueHeading}
+          </h1>
+          {alias ? (
+            <p className="sp-meta">{dict.account.switcher.current.replace("{alias}", alias)}</p>
+          ) : null}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-ctl)", alignItems: "center", margin: "var(--space-lg) 0" }}>
+            <Link href={`/${locale}/recommendations`} className="sp-btn-primary">
+              {dict.home.signedIn.recommendationsCta}
+            </Link>
+            <Link href={`/${locale}/collection`} className="sp-link">
+              {dict.nav.collection}
+            </Link>
           </div>
-        ) : (
-          <ul className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(144px, 1fr))" }}>
-            {sample.map((game) => (
-              <GameCard key={game.id} game={game} locale={locale} />
-            ))}
-          </ul>
-        )}
-      </section>
+
+          <h2 className="sp-h2">{dict.home.signedIn.continueHeading}</h2>
+          {continueItems.length === 0 ? (
+            <p className="sp-lead">
+              {dict.collection.emptyBody}{" "}
+              <Link href={`/${locale}/catalogue`} className="sp-link">
+                {dict.collection.emptyCta}
+              </Link>
+            </p>
+          ) : (
+            <ul className="sp-grid">
+              {continueItems.map((item) => (
+                <GameCard
+                  key={item.work_id}
+                  game={{
+                    id: item.work_id,
+                    slug: item.work_slug,
+                    title: item.work_title,
+                    year: item.year ?? null,
+                    platform_summary: item.platform_summary ?? "",
+                    cover: item.cover ?? { url: null, is_placeholder: true, alt: item.work_title },
+                  }}
+                  locale={locale}
+                  ratingHalfSteps={item.rating_half_steps}
+                />
+              ))}
+            </ul>
+          )}
+        </>
+      ) : (
+        <>
+          <div style={{ color: "var(--color-text-primary)", marginBottom: "var(--space-sm)" }}>
+            <BrandLockup />
+          </div>
+          <h1 className="sp-h1">SavePoint</h1>
+          <p className="sp-lead">{dict.home.valueProposition}</p>
+          <nav style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-ctl)", alignItems: "center", margin: "var(--space-lg) 0" }}>
+            <Link href={`/${locale}/login`} className="sp-btn-primary">
+              {dict.home.loggedOut.primaryCta}
+            </Link>
+            <Link href={`/${locale}/catalogue`} className="sp-link">
+              {dict.home.loggedOut.secondaryCta}
+            </Link>
+            <Link href={`/${locale}/register`} className="sp-link">
+              {dict.home.loggedOut.registerCta}
+            </Link>
+          </nav>
+
+          <section aria-label={dict.home.sampleHeading}>
+            <h2 className="sp-h2">{dict.home.sampleHeading}</h2>
+            {sampleFailed ? (
+              <div>
+                <p role="alert">{dict.errors.homepageSampleFailure}</p>
+                <Link href={`/${locale}/catalogue`} className="sp-link">
+                  {dict.errors.openFullCatalogue}
+                </Link>
+              </div>
+            ) : (
+              <ul className="sp-grid">
+                {sample.map((game) => (
+                  <GameCard key={game.id} game={game} locale={locale} score={game.total_rating} />
+                ))}
+              </ul>
+            )}
+          </section>
+        </>
+      )}
+
+      <div style={{ marginTop: "var(--space-2xl)", paddingTop: "var(--space-lg)", borderTop: "1px solid var(--color-surface-border)" }}>
+        <RecommendationStrip results={popularity} locale={locale} />
+      </div>
     </main>
   );
 }

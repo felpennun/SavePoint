@@ -4,6 +4,11 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { AccountSwitcher } from "@/components/AccountSwitcher";
+import { BrandLockup } from "@/components/BrandLockup";
+import { DemoAccountBanner } from "@/components/DemoAccountBanner";
+import { LoginIconButton } from "@/components/LoginIconButton";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { getDictionary, type Dictionary } from "@/i18n";
 
 interface NavItem {
@@ -18,6 +23,7 @@ function buildNavItems(dict: Dictionary, locale: string, isAuthenticated: boolea
   ];
   if (isAuthenticated) {
     base.push({ href: `/${locale}/collection`, label: dict.nav.collection });
+    base.push({ href: `/${locale}/recommendations`, label: dict.nav.recommendations });
   }
   base.push({ href: `/${locale}/sources`, label: dict.nav.sources });
   return base;
@@ -34,10 +40,20 @@ export function TopNavigation({ items, locale }: { items: NavItem[]; locale: str
   const pathname = usePathname();
   return (
     <nav aria-label={locale === "es" ? "Principal" : "Main"} className="hidden md:block">
-      <ul className="flex items-center gap-6">
+      <ul className="flex items-center gap-6" style={{ listStyle: "none", margin: 0, padding: 0 }}>
         {items.map((item) => (
           <li key={item.href}>
-            <Link href={item.href} aria-current={isCurrent(pathname, item.href) ? "page" : undefined}>
+            <Link
+              href={item.href}
+              aria-current={isCurrent(pathname, item.href) ? "page" : undefined}
+              style={{
+                color: isCurrent(pathname, item.href) ? "var(--color-text-primary)" : "var(--color-text-secondary)",
+                textDecoration: "none",
+                fontWeight: isCurrent(pathname, item.href) ? 600 : 400,
+                borderBottom: isCurrent(pathname, item.href) ? "2px solid var(--color-accent)" : "2px solid transparent",
+                paddingBottom: "2px",
+              }}
+            >
               {item.label}
             </Link>
           </li>
@@ -64,9 +80,7 @@ export function MobileMenu({ items, dict }: { items: NavItem[]; dict: Dictionary
     if (!open) return;
 
     const dialogNode = dialogRef.current;
-    const focusables = dialogNode?.querySelectorAll<HTMLElement>(
-      'a[href], button:not([disabled])'
-    );
+    const focusables = dialogNode?.querySelectorAll<HTMLElement>('a[href], button:not([disabled])');
     focusables?.[0]?.focus();
 
     function handleKeyDown(event: KeyboardEvent) {
@@ -98,6 +112,7 @@ export function MobileMenu({ items, dict }: { items: NavItem[]; dict: Dictionary
       <button
         ref={triggerRef}
         type="button"
+        className="sp-btn-secondary"
         aria-expanded={open}
         aria-controls="mobile-menu"
         onClick={() => setOpen((value) => !value)}
@@ -105,8 +120,16 @@ export function MobileMenu({ items, dict }: { items: NavItem[]; dict: Dictionary
         {open ? dict.nav.closeMenu : dict.nav.openMenu}
       </button>
       {open ? (
-        <div id="mobile-menu" ref={dialogRef} role="dialog" aria-modal="true" aria-label={dict.nav.openMenu}>
-          <ul>
+        <div
+          id="mobile-menu"
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label={dict.nav.openMenu}
+          className="sp-surface"
+          style={{ position: "absolute", left: "var(--space-md)", right: "var(--space-md)", zIndex: 40, marginTop: "var(--space-sm)" }}
+        >
+          <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: "var(--space-sm)" }}>
             {items.map((item) => (
               <li key={item.href}>
                 <Link href={item.href} onClick={() => setOpen(false)}>
@@ -138,15 +161,33 @@ export function AppShell({
       <a href="#main-content" className="skip-link">
         {dict.nav.skipToContent}
       </a>
-      <header className="border-b" style={{ borderColor: "var(--color-surface-border)" }}>
+      <header className="border-b" style={{ borderColor: "var(--color-surface-border)", background: "var(--color-surface-raised)", position: "relative" }}>
         <div className="flex items-center justify-between gap-4 px-4 py-3">
-          <Link href={`/${locale}`} className="font-semibold">
-            SavePoint
+          <Link href={`/${locale}`} aria-label={dict.nav.home} style={{ color: "var(--color-text-primary)", display: "inline-flex", alignItems: "center" }}>
+            <BrandLockup />
           </Link>
-          <TopNavigation items={items} locale={locale} />
-          <MobileMenu items={items} dict={dict} />
+          <div className="flex items-center gap-4">
+            <TopNavigation items={items} locale={locale} />
+            <ThemeToggle labels={dict.theme.toggle} />
+            {isAuthenticated ? (
+              <AccountSwitcher
+                locale={locale}
+                labels={{
+                  label: dict.account.switcher.label,
+                  change: dict.account.switcher.change,
+                  current: dict.account.switcher.current,
+                  logout: dict.nav.logout,
+                  listHeading: dict.account.list.heading,
+                }}
+              />
+            ) : (
+              <LoginIconButton locale={locale} label={dict.nav.loginAria} />
+            )}
+            <MobileMenu items={items} dict={dict} />
+          </div>
         </div>
       </header>
+      {isAuthenticated ? <DemoAccountBanner text={dict.account.banner} /> : null}
       <div id="main-content">{children}</div>
     </>
   );

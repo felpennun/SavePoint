@@ -1,26 +1,31 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 
 const COPY = {
   es: {
     heading: "Iniciar sesión",
+    intro: "Inicia sesión en una cuenta simulada de la demo.",
     username: "Usuario",
     password: "Contraseña",
     submit: "Entrar",
     pending: "Entrando…",
     invalid: "El nombre de usuario o la contraseña no son correctos. Comprueba los datos e inténtalo de nuevo.",
     generic: "No se pudo iniciar sesión. Inténtalo de nuevo.",
+    noAccount: "¿No tienes cuenta? Crear una cuenta simulada",
   },
   en: {
     heading: "Log in",
+    intro: "Sign in to a simulated demo account.",
     username: "Username",
     password: "Password",
     submit: "Log in",
     pending: "Logging in…",
     invalid: "The username or password is incorrect. Check the details and try again.",
     generic: "We couldn't log you in. Try again.",
+    noAccount: "No account yet? Create a simulated account",
   },
 } as const;
 
@@ -65,13 +70,8 @@ export default function LoginPage() {
       }
 
       const body = (await response.json()) as { next: string };
-      // Django's LoginView is locale-unaware (it has no concept of the
-      // [locale] route segment) -- its own default is a bare "/catalogue".
-      // Only trust its returned `next` when we actually sent an explicit,
-      // already-locale-prefixed value (the middleware always constructs
-      // `next` that way when redirecting an unauthenticated visitor);
-      // otherwise construct the locale-aware default ourselves rather than
-      // relying on the backend's locale-blind fallback.
+      // Django's LoginView is locale-unaware; only trust its returned
+      // `next` when we sent an explicit, already-locale-prefixed value.
       router.push(requestedNext ? body.next : `/${locale}/catalogue`);
     } catch {
       setError(copy.generic);
@@ -81,15 +81,19 @@ export default function LoginPage() {
   }
 
   return (
-    <main>
-      <h1>{copy.heading}</h1>
-      {/* method="post" is a defense-in-depth fallback: if a click ever
-          reaches the browser before React finishes hydrating and attaching
-          onSubmit, the native submission still can't leak the password into
-          a URL query string via a GET -- it POSTs to this same page (which
-          has no POST handler) and safely no-ops instead. */}
-      <form onSubmit={handleSubmit} method="post">
-        <div>
+    <main className="sp-page" style={{ maxWidth: "420px" }}>
+      <h1 className="sp-h1">{copy.heading}</h1>
+      <p className="sp-lead">{copy.intro}</p>
+      {/* method="post" is defense-in-depth: a pre-hydration click POSTs to
+          this same page (no POST handler) instead of leaking the password
+          into a GET query string. */}
+      <form
+        onSubmit={handleSubmit}
+        method="post"
+        className="sp-surface"
+        style={{ display: "flex", flexDirection: "column", gap: "var(--space-md)" }}
+      >
+        <div className="sp-field">
           <label htmlFor="username">{copy.username}</label>
           <input
             id="username"
@@ -98,10 +102,11 @@ export default function LoginPage() {
             autoComplete="username"
             value={username}
             onChange={(event) => setUsername(event.target.value)}
+            aria-describedby={error ? "login-error" : undefined}
             required
           />
         </div>
-        <div>
+        <div className="sp-field">
           <label htmlFor="password">{copy.password}</label>
           <input
             id="password"
@@ -110,18 +115,25 @@ export default function LoginPage() {
             autoComplete="current-password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
+            aria-describedby={error ? "login-error" : undefined}
             required
           />
         </div>
         {error ? (
-          <p role="alert" data-testid="login-error">
+          <p id="login-error" role="alert" data-testid="login-error" style={{ color: "var(--color-danger)", margin: 0 }}>
             {error}
           </p>
         ) : null}
-        <button type="submit" disabled={pending}>
+        <button type="submit" className="sp-btn-primary" disabled={pending}>
           {pending ? copy.pending : copy.submit}
         </button>
       </form>
+
+      <p className="sp-muted" style={{ marginTop: "var(--space-md)", textAlign: "center" }}>
+        <Link href={`/${locale}/register`} className="sp-link">
+          {copy.noAccount}
+        </Link>
+      </p>
     </main>
   );
 }
