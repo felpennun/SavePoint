@@ -105,6 +105,17 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+# Only throttle rates are declared here -- DEFAULT_THROTTLE_CLASSES stays
+# empty so throttling applies solely to views that opt in explicitly. The
+# controlled-demo registration endpoint (AUTH-02, D-08) uses a scoped
+# per-IP anonymous ceiling: high enough for a real demo visitor, low enough
+# to blunt automated account-creation abuse (threat T-01.1-07).
+REST_FRAMEWORK = {
+    "DEFAULT_THROTTLE_RATES": {
+        "registration": "5/hour",
+    },
+}
+
 LANGUAGE_CODE = "es"
 TIME_ZONE = "UTC"
 USE_I18N = True
