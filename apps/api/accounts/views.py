@@ -13,12 +13,16 @@ here too.
 from __future__ import annotations
 
 from django.contrib.auth import authenticate, get_user_model, login, logout
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db import IntegrityError, transaction
 from django.utils.decorators import method_decorator
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from accounts.serializers import build_public_profile
@@ -28,6 +32,15 @@ User = get_user_model()
 # Uniform message for any invalid-credential outcome -- never reveal whether
 # the username exists.
 INVALID_CREDENTIALS_MESSAGE = "Invalid username or password."
+
+# Registration outcome messages. Kept generic -- the client maps each HTTP
+# status to its own localized copy row; these strings are only a fallback.
+REGISTRATION_INVALID_MESSAGE = "Enter a username and a password."
+REGISTRATION_WEAK_PASSWORD_MESSAGE = "Choose a stronger password and try again."
+REGISTRATION_DUPLICATE_MESSAGE = "That username is already taken."
+
+# Django's built-in User.username max_length.
+USERNAME_MAX_LENGTH = 150
 
 
 @method_decorator(ensure_csrf_cookie, name="dispatch")
@@ -70,6 +83,73 @@ class LoginView(APIView):
             safe_next = requested_next
 
         return Response({"detail": "ok", "next": safe_next})
+
+
+@method_decorator(csrf_protect, name="dispatch")
+class RegisterView(APIView):
+    """Controlled-demo self-registration (AUTH-02, D-08).
+
+    D-08's middle path: a genuinely functional account-creation flow that
+    still lives entirely inside the controlled academic demo boundary. A
+    created account is a real, active user with a hashed password and an
+    immediate logged-in session -- but it is *not* a simulated account
+    (the ``DemoAccountIdentity`` marker is stamped only by the seed-time
+    ``bootstrap_demo_accounts`` command, never here).
+
+    Explicitly excluded: email verification, social auth, and any widening
+    of the deployment's scope beyond the controlled demo it already is.
+
+    Mirrors ``LoginView``: DRF's ``APIView`` is csrf_exempt at the Django
+    middleware layer, so ``csrf_protect`` is re-applied here to enforce the
+    get-cookie-then-post-token flow for this anonymous endpoint. A scoped
+    per-IP anonymous throttle blunts automated abuse -- a throttled request
+    is rejected before any user is created.
+    """
+
+    authentication_classes: list = []
+    permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "registration"
+
+    def post(self, request: Request) -> Response:
+        username = request.data.get("username")
+        password = request.data.get("password")
+
+        if not isinstance(username, str) or not isinstance(password, str):
+            return Response({"detail": REGISTRATION_INVALID_MESSAGE}, status=400)
+
+        username = username.strip()
+        if not username or not password:
+            return Response({"detail": REGISTRATION_INVALID_MESSAGE}, status=400)
+        if len(username) > USERNAME_MAX_LENGTH:
+            return Response({"detail": REGISTRATION_INVALID_MESSAGE}, status=400)
+
+        # Case-insensitive so near-duplicate aliases ("Alice" vs "alice")
+        # can't both exist and confuse the demo.
+        if User.objects.filter(username__iexact=username).exists():
+            return Response({"detail": REGISTRATION_DUPLICATE_MESSAGE}, status=409)
+
+        # Django's configured AUTH_PASSWORD_VALIDATORS (length, common,
+        # numeric, similarity-to-username).
+        try:
+            validate_password(password, user=User(username=username))
+        except DjangoValidationError:
+            return Response({"detail": REGISTRATION_WEAK_PASSWORD_MESSAGE}, status=400)
+
+        try:
+            with transaction.atomic():
+                user = User.objects.create_user(username=username, password=password)
+        except IntegrityError:
+            # Lost a race against a concurrent identical registration.
+            return Response({"detail": REGISTRATION_DUPLICATE_MESSAGE}, status=409)
+
+        # Log the new session in via the same mechanism LoginView uses;
+        # Django rotates the session key here to prevent fixation.
+        login(request, user)
+
+        # D-03: a freshly registered visitor lands on the catalogue. The
+        # client owns the locale prefix, so this stays a bare relative path.
+        return Response({"detail": "ok", "next": "/catalogue"}, status=201)
 
 
 class LogoutView(APIView):
