@@ -48,6 +48,13 @@ test("public revision: health -> homepage -> login -> catalogue -> detail", asyn
     }
   });
   page.on("requestfailed", (request) => {
+    // net::ERR_ABORTED is Chromium's cancellation code for a request the
+    // browser itself gave up on -- almost always a Next.js <Link> background
+    // prefetch (nav bar, catalogue cards) that was still in flight when the
+    // page navigated away, not a real network/server failure. Recording only
+    // genuine failures keeps this check meaningful instead of permanently
+    // red on every run against a real client-side-routed app.
+    if (request.failure()?.errorText === "net::ERR_ABORTED") return;
     // Record only method and URL origin/path; never headers, cookies or body.
     const url = new URL(request.url());
     failedRequests.push(`${request.method()} ${url.origin}${url.pathname}`);
