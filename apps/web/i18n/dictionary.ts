@@ -14,10 +14,13 @@ export interface Dictionary {
     home: string;
     catalogue: string;
     collection: string;
+    recommendations: string;
     profile: string;
     sources: string;
     login: string;
+    loginAria: string;
     logout: string;
+    account: string;
     skipToContent: string;
     openMenu: string;
     closeMenu: string;
@@ -29,13 +32,140 @@ export interface Dictionary {
     emptyHeading: string;
     emptyBody: string;
     resultCount: CountCopy;
+    gamesCount: CountCopy;
+    filteredCount: CountCopy;
+    viewFull: string;
+    filters: {
+      heading: string;
+      platform: string;
+      genre: string;
+      yearFrom: string;
+      yearTo: string;
+      minRating: string;
+      anyOption: string;
+      apply: string;
+      clearAll: string;
+      mobileToggle: string;
+      unavailable: string;
+      activeLabel: CountCopy;
+      emptyHeading: string;
+      emptyBody: string;
+    };
+    sort: {
+      label: string;
+      relevance: string;
+      titleAsc: string;
+      titleDesc: string;
+      releaseNewest: string;
+      releaseOldest: string;
+      ratingDesc: string;
+    };
+  };
+  card: {
+    score: {
+      aria: string;
+      none: string;
+    };
+    rating: {
+      aria: string;
+    };
+  };
+  detail: {
+    igdbRating: string;
+    genres: string;
+    platforms: string;
+    releaseDate: string;
+    addToCollection: string;
+    inCollection: string;
+    attribution: string;
+    seeSources: string;
+  };
+  recommendations: {
+    nav: string;
+    heading: string;
+    intro: string;
+    excludedNote: string;
+    shelfHeading: string;
+    shelfExplainer: CountCopy;
+    emptyHeading: string;
+    emptyBody: string;
+    emptyCta: string;
+    error: string;
   };
   collection: {
     heading: string;
+    subheading: string;
     emptyHeading: string;
     emptyBody: string;
+    emptyCta: string;
+    count: CountCopy;
+    filterByStatus: string;
+    allStatuses: string;
+    statusEmptyGroup: string;
+    showAll: string;
     statusSummaryCount: CountCopy;
     ownedCopyCount: CountCopy;
+    sort: {
+      label: string;
+      recentlyUpdated: string;
+      ratingDesc: string;
+      titleAsc: string;
+      releaseYear: string;
+    };
+  };
+  account: {
+    switcher: {
+      label: string;
+      change: string;
+      current: string;
+    };
+    banner: string;
+    list: {
+      heading: string;
+      intro: string;
+    };
+  };
+  register: {
+    heading: string;
+    intro: string;
+    username: string;
+    password: string;
+    confirmPassword: string;
+    submit: string;
+    pending: string;
+    haveAccount: string;
+    errorDuplicate: string;
+    errorWeakPassword: string;
+    errorGeneric: string;
+    errorRateLimited: string;
+  };
+  home: {
+    valueProposition: string;
+    sampleHeading: string;
+    signedIn: {
+      greeting: string;
+      continueHeading: string;
+      recommendationsCta: string;
+    };
+    loggedOut: {
+      primaryCta: string;
+      secondaryCta: string;
+      registerCta: string;
+    };
+  };
+  theme: {
+    toggle: {
+      label: string;
+      dark: string;
+      light: string;
+      switchToDark: string;
+      switchToLight: string;
+    };
+  };
+  common: {
+    retry: string;
+    showMore: string;
+    coverMissing: string;
   };
   status: {
     legend: string;
