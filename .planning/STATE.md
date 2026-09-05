@@ -3,11 +3,11 @@ gsd_state_version: 1.0
 current_phase: 01.1
 current_phase_name: Real-Scale Catalogue and Product Experience
 status: executing
-stopped_at: "Phase 01.1 Plan 01 complete (ADR-006, IGDB probe, requests==2.34.2 pinned); ready for Plan 01.1-02"
-last_updated: "2026-09-05T15:05:00.000Z"
+stopped_at: "Plan 01.1-02 in progress — importer built (Tasks 1-2 committed in worktree), full-scale import PROVEN on a fresh disposable DB (312,443 primary works > floor 281,176); acceptance rerun running for clean evidence + convergence; Task 3 commit + SUMMARY + merge to main still pending"
+last_updated: "2026-09-05T19:12:00.000Z"
 last_activity: 2026-09-05
-last_activity_desc: "Plan 01.1-01 executed — IGDB source decision gate closed"
-state_head: 137762e36c995a223609751471ba855871d0c676
+last_activity_desc: "Plan 01.1-02 — IGDB import verified at 312k scale on a fresh DB; finalizing"
+state_head: efbbbf610167ca1ab0c89d613a04f0abf4630f66
 progress:
   total_phases: 9
   completed_phases: 1
@@ -23,14 +23,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-09-04)
 
 **Core value:** Users receive useful and explainable video-game recommendations from a well-organised collection, while every algorithmic result remains reproducible and defensible in the thesis.
-**Current focus:** Phase 01 — Three-Day Public Demo Slice
+**Current focus:** Phase 01.1 — Real-Scale Catalogue and Product Experience
 
 ## Current Position
 
 Phase: 01.1 (Real-Scale Catalogue and Product Experience) — EXECUTING
-Plan: 01 of 10 complete — IGDB source decision gate (ADR-006). Next: 01.1-02 (resumable IGDB importer).
-Status: Ready to execute Plan 01.1-02 (Wave 2)
-Last activity: 2026-09-05 — Plan 01.1-01 executed
+Plan: 1 of 10
+Status: Executing Phase 01.1
+Last activity: 2026-09-05 — Phase 01.1 execution started
 
 Progress: [█░░░░░░░░░] 10% (1 of 10 plans)
 
@@ -125,6 +125,18 @@ TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<ver
 
 ## Session Continuity
 
-Last session: 2026-09-05T15:05:00.000Z
-Stopped at: Plan 01.1-01 complete — ADR-006 accepted, IGDB probe evidence recorded, requests==2.34.2 pinned, GitHub issue #7 closed. Full Docker stack was brought up for the check-secrets gate and is currently running.
-Resume file: none — next action is /gsd-execute-phase 01.1 (Plan 01.1-02, Wave 2)
+Last session: 2026-09-05T19:12:00.000Z
+
+### CHECKPOINT — Plan 01.1-02 (IGDB import) status, 2026-09-05 ~19:10 UTC
+
+**Games ARE importable at real scale — proven, not yet persisted.**
+
+- **Tasks 1–2 committed** on worktree branch `worktree-agent-a6fce1bcb4d1040e1` (5 commits `9ca931b`..`c214787`): `Genre` model + `GameWork.genres` M2M + `IgdbImportRun` durable checkpoint (DB trigger enforces monotonic cursor); `IgdbClient` (id-cursor pages, 429/5xx backoff, credential redaction) + `import_igdb_catalogue` management command (per-batch `transaction.atomic` + advisory lock, checkpoint-after-commit, ADR-006 normalization, deterministic checksum, cover fallback accounting). 17 scoped + 129 full API tests green.
+- **Task 3 — full-scale import VERIFIED on a genuinely fresh, disposable PostgreSQL** (no named volume, unique container name, torn down after): **312,443 primary works imported** (live eligible re-measured 312,418; acceptance floor `max(100000, 0.90×eligible)=281,176` cleared), covers 268,656 present + 43,787 first-party fallback = 312,443 (accounting balances), SIGKILL-interrupt → resume-from-committed-checkpoint chain verified with no duplicates.
+- **NOT yet done:** the first acceptance run crashed on an `/out` bind-mount permission issue and lost its evidence JSON. A **second full acceptance run is in progress** (evidence streamed on stdout; also proves rerun-convergence). When it finishes: agent `a6fce1bcb4d1040e1` fills `docs/verification/igdb-catalogue-freeze.md`, commits Task 3 (`Refs #8`), writes `01.1-02-SUMMARY.md`; then the orchestrator merges the worktree to `main` and updates STATE/ROADMAP.
+- **Watcher armed:** background task `bzc3o5dk9` fires one notification when the rerun's throwaway container is torn down (or stalls/times out).
+- **Open gap for later:** the disposable-DB proof does NOT populate the real dev/prod catalogue DB (`savepoint-db-1`). Whether the persistent catalogue is populated by re-running `import_igdb_catalogue` against it (and when — here, or a follow-on before Plans 03/05/06 consume the catalogue) is unresolved and should be decided explicitly.
+
+**Meanwhile:** orchestrator is doing Wave 3 prep — `01.1-UI-SPEC.md` design contract for the product redesign (plan 01.1-06).
+
+Resume file: none — 01.1-02 finalization is agent-driven (see above); after it lands, next is the Wave 3 checkpoint (01.1-06).
