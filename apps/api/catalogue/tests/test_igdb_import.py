@@ -12,10 +12,22 @@ Task 2 appends the importer/client behaviour tests to the same file.
 
 from __future__ import annotations
 
+from io import StringIO
+
 import pytest
+from django.core.management import CommandError, call_command
 from django.db import DatabaseError, IntegrityError, transaction
 
-from catalogue.models import Genre, GameWork, IgdbImportRun
+from catalogue.igdb import IgdbClient, IgdbClientError, redact
+from catalogue.models import (
+    AssetAttribution,
+    GameRelease,
+    GameWork,
+    Genre,
+    IgdbImportRun,
+    Platform,
+    SourceRecord,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -96,3 +108,318 @@ def test_import_run_cursor_cannot_be_created_negative() -> None:
             IgdbImportRun.objects.create(
                 source="igdb", query_identity="neg", last_committed_igdb_id=-1
             )
+
+
+# ---------------------------------------------------------------------------
+# Task 2 -- id-cursor batched import, client retry/redaction, freeze evidence
+# ---------------------------------------------------------------------------
+
+
+def _game(
+    igdb_id: int,
+    name: str,
+    *,
+    slug: str | None = None,
+    genres: tuple[tuple[int, str], ...] = (),
+    platforms: tuple[tuple[int, str], ...] = (),
+    cover: str | None = None,
+    first_release_date: int | None = None,
+) -> dict:
+    row: dict = {"id": igdb_id, "name": name, "slug": slug or name.lower().replace(" ", "-")}
+    row["url"] = f"https://www.igdb.com/games/{row['slug']}"
+    if genres:
+        row["genres"] = [{"id": gid, "name": gname} for gid, gname in genres]
+    if platforms:
+        row["platforms"] = [{"id": pid, "name": pname} for pid, pname in platforms]
+    if cover:
+        row["cover"] = {"image_id": cover}
+    if first_release_date is not None:
+        row["first_release_date"] = first_release_date
+    return row
+
+
+class FakeIgdbClient:
+    """In-memory IGDB stand-in: serves fixed pages by id-cursor, can be told
+    to raise on a given page index to simulate an interruption/rate limit."""
+
+    def __init__(
+        self,
+        pages: list[list[dict]],
+        *,
+        eligible: int | None = None,
+        fail_on_page: int | None = None,
+        error: Exception | None = None,
+    ) -> None:
+        self._pages = pages
+        self._eligible = eligible if eligible is not None else sum(len(p) for p in pages)
+        self._fail_on_page = fail_on_page
+        self._error = error or IgdbClientError("simulated IGDB failure")
+        self.page_calls = 0
+
+    def count_eligible(self, where: str = "game_type = 0") -> int:
+        return self._eligible
+
+    def fetch_page(self, after_id: int, page_size: int = 500, where: str = "game_type = 0") -> list[dict]:
+        for idx, page in enumerate(self._pages):
+            if page and page[0]["id"] > after_id:
+                if self._fail_on_page == idx:
+                    raise self._error
+                self.page_calls += 1
+                return page
+        return []
+
+
+def _run_import(client: FakeIgdbClient, **kwargs) -> str:
+    err = StringIO()
+    call_command("import_igdb_catalogue", client=client, stderr=err, **kwargs)
+    return err.getvalue()
+
+
+def _two_full_pages() -> list[list[dict]]:
+    return [
+        [
+            _game(10, "Alpha", genres=((12, "RPG"),), platforms=((6, "PC"), (48, "PS4")),
+                  cover="cov10", first_release_date=1_500_000_000),
+            _game(20, "Beta", genres=((12, "RPG"), (31, "Adventure")), platforms=((6, "PC"),)),
+        ],
+        [
+            _game(30, "Gamma", platforms=((130, "Switch"),), cover="cov30",
+                  first_release_date=1_600_000_000),
+            _game(40, "Delta", genres=((31, "Adventure"),)),
+        ],
+    ]
+
+
+@pytest.mark.django_db
+def test_import_builds_catalogue_with_genres_platforms_and_cover_accounting() -> None:
+    client = FakeIgdbClient(_two_full_pages(), eligible=4)
+    _run_import(client)
+
+    assert GameWork.objects.count() == 4
+    assert SourceRecord.objects.filter(source="igdb").count() == 4
+    assert set(SourceRecord.objects.values_list("source_id", flat=True)) == {"10", "20", "30", "40"}
+
+    alpha = GameWork.objects.get(canonical_slug="alpha")
+    assert set(alpha.genres.values_list("name", flat=True)) == {"RPG"}
+    assert Platform.objects.filter(name="PC").exists()
+    assert GameRelease.objects.filter(work=alpha).count() == 2
+
+    run = IgdbImportRun.objects.get(source="igdb", query_identity="game_type=0")
+    assert run.status == IgdbImportRun.Status.COMPLETE
+    assert run.eligible_count_live == 4
+    assert run.works_imported == 4
+    assert run.checksum and len(run.checksum) == 64
+    # Every work has exactly one cover-accounting row; present + fallback == total.
+    assert AssetAttribution.objects.filter(work__in=GameWork.objects.all()).count() == 4
+    assert run.covers_present == 2
+    assert run.covers_fallback == 2
+    assert run.covers_present + run.covers_fallback == run.works_imported
+
+
+@pytest.mark.django_db
+def test_interrupted_import_resumes_from_last_committed_id_without_duplicates() -> None:
+    interrupted = FakeIgdbClient(_two_full_pages(), eligible=4, fail_on_page=1)
+    with pytest.raises(CommandError):
+        _run_import(interrupted)
+
+    run = IgdbImportRun.objects.get(source="igdb", query_identity="game_type=0")
+    assert run.status == IgdbImportRun.Status.FAILED
+    assert run.last_committed_igdb_id == 20  # only the first page's batch committed
+    assert GameWork.objects.count() == 2
+
+    resumed = FakeIgdbClient(_two_full_pages(), eligible=4)
+    _run_import(resumed)
+
+    run.refresh_from_db()
+    assert run.status == IgdbImportRun.Status.COMPLETE
+    assert run.last_committed_igdb_id == 40
+    assert GameWork.objects.count() == 4
+    assert SourceRecord.objects.filter(source="igdb").count() == 4
+
+    # Checksum of a resumed-to-completion run equals a single clean full run.
+    resumed_checksum = run.checksum
+    call_command("import_igdb_catalogue", client=FakeIgdbClient(_two_full_pages(), eligible=4), stderr=StringIO())
+    run.refresh_from_db()
+    assert run.checksum == resumed_checksum
+
+
+@pytest.mark.django_db
+def test_malformed_page_rolls_back_only_its_own_batch() -> None:
+    pages = _two_full_pages()
+    pages[1][0]["name"] = ""  # malformed record in the second batch
+    client = FakeIgdbClient(pages, eligible=4)
+
+    with pytest.raises(CommandError):
+        _run_import(client)
+
+    # First batch survived; the malformed batch left nothing behind.
+    assert set(SourceRecord.objects.values_list("source_id", flat=True)) == {"10", "20"}
+    assert not GameWork.objects.filter(canonical_slug="gamma").exists()
+    run = IgdbImportRun.objects.get(source="igdb", query_identity="game_type=0")
+    assert run.status == IgdbImportRun.Status.FAILED
+    assert run.last_committed_igdb_id == 20
+
+
+@pytest.mark.django_db
+def test_reimport_is_idempotent_and_convergent() -> None:
+    client = FakeIgdbClient(_two_full_pages(), eligible=4)
+    _run_import(client)
+    run = IgdbImportRun.objects.get(source="igdb", query_identity="game_type=0")
+    first = (
+        GameWork.objects.count(),
+        SourceRecord.objects.count(),
+        Genre.objects.count(),
+        GameRelease.objects.count(),
+        AssetAttribution.objects.count(),
+        run.checksum,
+    )
+
+    _run_import(FakeIgdbClient(_two_full_pages(), eligible=4))
+    run.refresh_from_db()
+    second = (
+        GameWork.objects.count(),
+        SourceRecord.objects.count(),
+        Genre.objects.count(),
+        GameRelease.objects.count(),
+        AssetAttribution.objects.count(),
+        run.checksum,
+    )
+    assert first == second
+
+
+@pytest.mark.django_db
+def test_slug_collision_produces_distinct_canonical_slugs() -> None:
+    pages = [[
+        _game(101, "Portal", slug="portal"),
+        _game(202, "Portal", slug="portal"),
+    ]]
+    _run_import(FakeIgdbClient(pages, eligible=2))
+
+    slugs = set(GameWork.objects.values_list("canonical_slug", flat=True))
+    assert len(slugs) == 2
+    assert "portal" in slugs
+    assert any(s.startswith("portal-") for s in slugs)
+    # Both remain resolvable by slug (never by UUID).
+    assert GameWork.objects.get(canonical_slug="portal").source_records.get().source_id in {"101", "202"}
+
+
+@pytest.mark.django_db
+def test_missing_cover_falls_back_to_first_party_placeholder() -> None:
+    pages = [[_game(7, "NoCover"), _game(8, "HasCover", cover="cov8")]]
+    _run_import(FakeIgdbClient(pages, eligible=2))
+
+    nocover = GameWork.objects.get(canonical_slug="nocover")
+    asset = nocover.assets.get()
+    assert asset.file_url == ""
+    assert asset.display_allowed is False
+
+    run = IgdbImportRun.objects.get(source="igdb", query_identity="game_type=0")
+    assert run.covers_present == 1
+    assert run.covers_fallback == 1
+    assert run.covers_present + run.covers_fallback == run.works_imported
+
+
+@pytest.mark.django_db
+def test_dry_run_writes_nothing() -> None:
+    _run_import(FakeIgdbClient(_two_full_pages(), eligible=4), dry_run=True)
+    assert GameWork.objects.count() == 0
+    assert SourceRecord.objects.count() == 0
+    assert not IgdbImportRun.objects.filter(status=IgdbImportRun.Status.COMPLETE).exists()
+
+
+@pytest.mark.django_db
+def test_evidence_json_is_emitted_with_measurements(tmp_path) -> None:
+    import json
+
+    out = tmp_path / "evidence.json"
+    _run_import(FakeIgdbClient(_two_full_pages(), eligible=4), evidence_json=str(out))
+    payload = json.loads(out.read_text(encoding="utf-8"))
+
+    assert payload["query_identity"] == "game_type=0"
+    assert payload["eligible_count_live"] == 4
+    assert payload["primary_works_imported"] == 4
+    assert payload["covers_present"] + payload["covers_fallback"] == 4
+    assert len(payload["checksum_sha256"]) == 64
+    assert payload["id_cursor_boundary"]["last_committed"] == 40
+    assert payload["sampled_review_manifest"]  # deterministic, non-empty
+
+
+# -- client-level behaviour: retry/backoff + redaction ---------------------
+
+
+class _FakeResponse:
+    def __init__(self, status_code: int, payload: dict | None = None, text: str = "") -> None:
+        self.status_code = status_code
+        self._payload = payload or {}
+        self.text = text
+
+    def json(self) -> dict:
+        return self._payload
+
+
+class _FakeSession:
+    def __init__(self, responses: list) -> None:
+        self._responses = list(responses)
+        self.calls: list[str] = []
+
+    def post(self, url, **kwargs):  # noqa: ANN001, ANN003
+        self.calls.append(url)
+        nxt = self._responses.pop(0)
+        if isinstance(nxt, Exception):
+            raise nxt
+        return nxt
+
+
+def test_client_retries_rate_limit_then_succeeds_with_capped_backoff() -> None:
+    sleeps: list[float] = []
+    session = _FakeSession([
+        _FakeResponse(200, {"access_token": "tok", "expires_in": 5000}),  # token
+        _FakeResponse(429, text="Too Many Requests"),
+        _FakeResponse(429, text="Too Many Requests"),
+        _FakeResponse(200, {"count": 312418}),
+    ])
+    client = IgdbClient("cid", "csecret", session=session, sleep=lambda s: sleeps.append(s))
+
+    assert client.count_eligible() == 312418
+    backoffs = [s for s in sleeps if s >= 1.0]
+    assert backoffs == [1.0, 2.0]  # exponential, and never exceeds the 60s cap
+
+
+def test_client_error_messages_never_leak_credentials() -> None:
+    boom = __import__("requests").ConnectionError(
+        "failed connecting to id.twitch.tv/oauth2/token?client_id=cid&client_secret=SUPERSECRETVALUE "
+        "with header Authorization: Bearer abc.def.ghi"
+    )
+    session = _FakeSession([boom, boom, boom, boom, boom])
+    client = IgdbClient("cid", "SUPERSECRETVALUE", session=session, sleep=lambda _s: None)
+
+    with pytest.raises(IgdbClientError) as excinfo:
+        client.count_eligible()
+
+    message = str(excinfo.value)
+    assert "SUPERSECRETVALUE" not in message
+    assert "client_secret=***" in message
+    assert "Bearer ***" in message
+
+
+def test_redact_helper_scrubs_known_shapes() -> None:
+    raw = 'client_id=abc&client_secret=xyz "access_token": "t0ken" Authorization: Bearer h.e.a.d'
+    scrubbed = redact(raw)
+    assert "xyz" not in scrubbed
+    assert "t0ken" not in scrubbed
+    assert "client_secret=***" in scrubbed
+    assert "Bearer ***" in scrubbed
+
+
+def test_client_reuses_token_across_pages() -> None:
+    session = _FakeSession([
+        _FakeResponse(200, {"access_token": "tok", "expires_in": 5000}),
+        _FakeResponse(200, [{"id": 1, "name": "A", "slug": "a"}]),
+        _FakeResponse(200, [{"id": 2, "name": "B", "slug": "b"}]),
+    ])
+    client = IgdbClient("cid", "csecret", session=session, sleep=lambda _s: None)
+
+    client.fetch_page(0)
+    client.fetch_page(1)
+
+    assert session.calls.count(TOKEN_URL := "https://id.twitch.tv/oauth2/token") == 1
