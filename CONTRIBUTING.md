@@ -23,6 +23,10 @@ Work beyond a trivial fix is tracked as a GitHub Issue on
   directly if there is no single closing commit.
 - The board should stay a live mirror of `.planning/` plan/task state, not a separate tracker that can
   drift out of sync with it.
+- This synchronization is an automatic closing gate of `gsd-plan-phase`: every active plan must carry
+  `github_issue: <number>` in its frontmatter and have a matching board item before planning is reported
+  complete. Re-running the synchronization reconciles existing `Plan <id>:` titles instead of creating
+  duplicates.
 
 ## Commit message format
 

@@ -212,6 +212,15 @@ Use these entry points:
 - `$gsd-execute-phase` for planned phase work
 
 Do not make direct repo edits outside a GSD workflow unless the user explicitly asks to bypass it.
+
+## Automatic GitHub Issue Synchronization
+
+Follow `CONTRIBUTING.md` as a required GSD lifecycle gate:
+
+- After `$gsd-plan-phase` passes verification, automatically create or reconcile one GitHub Issue per active `*-PLAN.md`, add it to the SavePoint project board, apply the phase label, and write `github_issue: <number>` into that plan's frontmatter.
+- Do not consider phase planning fully closed while an active plan lacks `github_issue` or its corresponding board item.
+- During `$gsd-execute-phase`, use `Refs #<github_issue>` on partial commits and `Closes #<github_issue>` on the plan-closing metadata commit after its `*-SUMMARY.md` exists.
+- Never place credentials, tokens, connection strings, cookies, secret fragments, or unchecked logs/screenshots in Issues, project items, commits, or PR bodies.
 <!-- GSD:workflow-end -->
 
 <!-- GSD:profile-start -->
