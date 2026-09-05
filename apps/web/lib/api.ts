@@ -240,6 +240,27 @@ export async function fetchRecommendations(
   }
 }
 
+export interface AccountMe {
+  username: string;
+}
+
+/**
+ * The signed-in simulated account's own identity. The endpoint is wired
+ * by Plan 04/08; until then this resolves to `null` and callers degrade
+ * to an alias-free greeting.
+ */
+export async function fetchAccountMe(cookieHeader: string): Promise<AccountMe | null> {
+  const url = new URL("/api/accounts/me/", API_BASE);
+  try {
+    const response = await fetch(url, { cache: "no-store", headers: { Cookie: cookieHeader } });
+    if (!response.ok) return null;
+    const body = (await response.json()) as { username?: unknown };
+    return typeof body.username === "string" ? { username: body.username } : null;
+  } catch {
+    return null;
+  }
+}
+
 export interface SourcesSummary {
   source: string;
   source_url: string;
