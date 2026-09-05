@@ -184,7 +184,7 @@
 | AGENT-03 | Phase 1 | Complete |
 | CAT-02 | Phase 01.1 | Pending |
 | AUTH-02 | Phase 01.1 | Pending |
-| DATA-04 | Phase 01.1 | Pending |
+| DATA-04 | Phase 01.1 | Comparison delivered (ADR-006, Plan 01.1-01); row stays open pending the Phase 4 declaration below |
 | REC-10 | Phase 01.1 | Pending |
 | QUAL-05 | Phase 01.1 | Pending |
 | DATA-03 | Phase 2 | Pending |

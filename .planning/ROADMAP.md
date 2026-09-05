@@ -134,7 +134,7 @@ Plans:
 
 Plans (execution order follows the author's locked D-01 -> D-02 -> D-03 -> D-04 priority):
 
-- [ ] 01.1-01-PLAN.md (Wave 1) — Approve and probe IGDB, then freeze the provider ADR and dependency pin
+- [x] 01.1-01-PLAN.md (Wave 1) — Approve and probe IGDB, then freeze the provider ADR and dependency pin — ADR-006, IGDB probe evidence, `requests==2.34.2` pinned (2026-09-05)
 - [ ] 01.1-02-PLAN.md (Wave 2) — Build resumable ingestion and prove a full-scale import on fresh PostgreSQL
 - [ ] 01.1-06-PLAN.md (Wave 3) — Approve and implement the product redesign milestone before account work
 - [ ] 01.1-04-PLAN.md (Wave 4) — Add plural, clearly labeled simulated accounts

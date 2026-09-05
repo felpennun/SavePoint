@@ -3,16 +3,16 @@ gsd_state_version: 1.0
 current_phase: 01.1
 current_phase_name: Real-Scale Catalogue and Product Experience
 status: executing
-stopped_at: "Paused at Phase 01.1 Plan 01 Task 1: IGDB credentials present, awaiting requests==2.34.2 approval"
-last_updated: "2026-09-05T12:49:37.046Z"
+stopped_at: "Phase 01.1 Plan 01 complete (ADR-006, IGDB probe, requests==2.34.2 pinned); ready for Plan 01.1-02"
+last_updated: "2026-09-05T15:05:00.000Z"
 last_activity: 2026-09-05
-last_activity_desc: Phase 01 complete, transitioned to Phase 01.1
+last_activity_desc: "Plan 01.1-01 executed — IGDB source decision gate closed"
 state_head: 137762e36c995a223609751471ba855871d0c676
 progress:
   total_phases: 9
   completed_phases: 1
   total_plans: 26
-  completed_plans: 16
+  completed_plans: 17
   percent: 11
 ---
 
@@ -27,12 +27,12 @@ See: .planning/PROJECT.md (updated 2026-09-04)
 
 ## Current Position
 
-Phase: 01.1 (Real-Scale Catalogue and Product Experience) — READY TO EXECUTE
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-09-05 — Phase 01 complete, transitioned to Phase 01.1
+Phase: 01.1 (Real-Scale Catalogue and Product Experience) — EXECUTING
+Plan: 01 of 10 complete — IGDB source decision gate (ADR-006). Next: 01.1-02 (resumable IGDB importer).
+Status: Ready to execute Plan 01.1-02 (Wave 2)
+Last activity: 2026-09-05 — Plan 01.1-01 executed
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█░░░░░░░░░] 10% (1 of 10 plans)
 
 ## Performance Metrics
 
@@ -96,6 +96,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 01]: Found and fixed three real deploy-path bugs (missing docs/ in the API image, non-portable random GameWork.id in the demo seed, /health/ redirected by Next.js middleware) plus a Vercel Hobby private-repo commit-author gotcha, each only visible against genuinely fresh infrastructure — The long-lived local dev Postgres volume masked two of these for the whole session; testing against a throwaway fresh container before every push is now the standing verification pattern for any fresh-database code path
 - [Phase 01]: Deliberately left QUAL-03 open despite the tool reporting it structurally ready to mark complete -- the sign-off document explicitly states 400% zoom reflow and a screen-reader pass are still unverified manual checklist items — Marking a requirement complete when its own sign-off evidence names an open gap would misrepresent the actual state; readiness-to-mark-complete is structural (all declaring plans have summaries), not a substitute for checking the requirement's real acceptance criteria
 - [Phase 01]: Phase 1 (Three-Day Public Demo Slice) ACCEPTED by the author, 2026-09-05, against commit 1af981e at https://save-point-orpin.vercel.app — All five ROADMAP success criteria linked to evidence in docs/verification/phase-01-signoff.md; two named open limitations (400% zoom, screen reader) stated rather than hidden
+- [Phase 01.1]: IGDB v4 chosen as the real-scale catalogue source (ADR-006, DATA-04), over RAWG and scaled Wikidata, from a live authenticated probe (2026-09-05): 374,555 total games, 312,418 primary (game_type = 0), no monthly quota, 4 req/s + 8 concurrent. Import boundary is game_type = 0 only; covers are hotlinked to images.igdb.com (not mirrored) with the Phase 1 first-party placeholder as fallback; Phase 1's Wikidata offline corpus and the no-runtime-provider rule are retained. `requests==2.34.2` pinned (author-approved, PyPI-verified real release); django-allauth/dj-rest-auth explicitly rejected. The Twitch DSA (24h cache, no redistribution) is reconciled against IGDB's own API FAQ (store + serve permitted, keep after termination) treated as the "written authorization otherwise" the DSA contemplates — a reasoned position recorded verbatim for the thesis, not legal advice.
 
 ### Pending Todos
 
@@ -105,7 +106,7 @@ None yet.
 
 - Phase 1 must fit the three-day demo constraint; keep seeded accounts/catalogue and popularity logic intentionally thin.
 - Phase 2 must freeze the evaluation protocol before sophisticated recommender comparisons.
-- Dataset and enrichment-provider legal terms require case-specific confirmation before adoption.
+- Dataset and enrichment-provider legal terms require case-specific confirmation before adoption. — IGDB terms captured verbatim and reconciled in ADR-006 / docs/verification/igdb-api-probe.md §5 (2026-09-05). The FAQ-vs-DSA reading is a reasoned position for the author to accept, not legal advice; RAWG/Wikidata terms remain as previously recorded.
 - Plan 01-04 (Wave 5) is mid-execution and paused on a real blocker: the frontend (apps/web) was scaffolded in Plan 01-03 WITHOUT @types/react or @types/react-dom in devDependencies. Re-enabling TypeScript build-error checking (next.config.ts's ignoreBuildErrors:true was itself a bug, now removed) surfaces this immediately -- every .tsx file in apps/web fails to type-check (useState/FormEvent not found on 'react', JSX.IntrinsicElements missing, react/jsx-runtime has no types).
 
 Per project policy (01-01's package-legitimacy gate; deviation Rule 3's explicit exclusion for package-manager installs), a new dependency install requires human sign-off, not an agent's unilateral pnpm add -- even though @types/react and @types/react-dom are about as standard/low-risk as a package gets.
@@ -124,6 +125,6 @@ TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<ver
 
 ## Session Continuity
 
-Last session: 2026-09-05T12:49:36.864Z
-Stopped at: Paused at Phase 01.1 Plan 01 Task 1: IGDB credentials present, awaiting requests==2.34.2 approval
-Resume file: .planning/phases/01.1-real-scale-catalogue-and-product-experience/.continue-here.md
+Last session: 2026-09-05T15:05:00.000Z
+Stopped at: Plan 01.1-01 complete — ADR-006 accepted, IGDB probe evidence recorded, requests==2.34.2 pinned, GitHub issue #7 closed. Full Docker stack was brought up for the check-secrets gate and is currently running.
+Resume file: none — next action is /gsd-execute-phase 01.1 (Plan 01.1-02, Wave 2)
