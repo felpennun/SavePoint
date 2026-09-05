@@ -13,6 +13,14 @@
     --radius-card:.75rem; --radius-control:.5rem;
     --text-meta:.8125rem; --text-body:1rem; --text-heading:1.25rem; --text-display:1.75rem;
   }
+  [data-theme=light]{
+    --surface-base:#f4f4f7; --surface-raised:#ffffff; --surface-overlay:#ececf1; --surface-border:#d9d9e0;
+    --text-primary:#1b1b22; --text-secondary:#4a4a57; --text-muted:#6c6c7a;
+    --accent:#6d5cd6; --accent-strong:#5a49c0; --accent-on:#ffffff;
+    --status-playing:#0e7490; --rating:#b0730f; --score-strong:#047857;
+    --danger:#c62828; --focus-ring:#8a5a00;
+  }
+  html{color-scheme:dark} html[data-theme=light]{color-scheme:light}
   *{box-sizing:border-box}
   body{margin:0;background:var(--surface-base);color:var(--text-primary);
     font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
@@ -22,6 +30,11 @@
     padding:12px 24px;background:var(--surface-raised);border-bottom:1px solid var(--surface-border)}
   .brand{font-weight:600}
   nav.main a{color:var(--text-secondary);text-decoration:none;margin-left:24px}
+  .navgroup{display:flex;align-items:center;gap:24px}
+  .theme-toggle{min-height:2.75rem;display:inline-flex;align-items:center;gap:6px;
+    background:var(--surface-overlay);color:var(--text-secondary);border:1px solid var(--surface-border);
+    border-radius:var(--radius-control);padding:0 12px;font-size:var(--text-meta);font-weight:600;cursor:pointer}
+  .theme-toggle:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
   .demobar{background:var(--surface-overlay);color:var(--text-secondary);font-size:var(--text-meta);
     padding:8px 24px;border-bottom:1px solid var(--surface-border)}
   main{max-width:1180px;margin:0 auto;padding:32px 24px 64px;
@@ -62,10 +75,16 @@
 <div class="note">Non-binding sketch derived from <code>01.1-UI-SPEC.md</code>.</div>
 <header class="appbar">
   <span class="brand">SavePoint</span>
-  <nav class="main">
-    <a href="home.html">Home</a><a href="catalogue.html">Catalogue</a>
-    <a href="#">Collection</a><a href="recommendations.html">Recommendations</a><a href="#">Sources</a>
-  </nav>
+  <div class="navgroup">
+    <nav class="main">
+      <a href="home.html">Home</a><a href="catalogue.html">Catalogue</a>
+      <a href="#">Collection</a><a href="recommendations.html">Recommendations</a><a href="#">Sources</a>
+    </nav>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false"
+      aria-label="Switch to light theme" onclick="toggleTheme()">
+      <span aria-hidden="true">◐</span> <span id="themeWord">Dark</span>
+    </button>
+  </div>
 </header>
 <div class="demobar">Simulated account — this is a controlled demo, not a real user account.</div>
 <main>
@@ -118,5 +137,23 @@
     </div>
   </div>
 </main>
+<script>
+  function toggleTheme(){
+    var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    var next = isLight ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    var btn = document.getElementById('themeToggle');
+    btn.setAttribute('aria-pressed', String(next === 'light'));
+    btn.setAttribute('aria-label', next === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
+    document.getElementById('themeWord').textContent = next === 'light' ? 'Light' : 'Dark';
+    try{ document.cookie = 'sp-theme=' + next + ';path=/;max-age=31536000;SameSite=Lax'; }catch(e){}
+  }
+  (function(){
+    var m = document.cookie.match(/(?:^|; )sp-theme=(light|dark)/);
+    if(m && m[1] === 'light'){ document.documentElement.setAttribute('data-theme','light');
+      var b=document.getElementById('themeToggle'); b.setAttribute('aria-pressed','true');
+      b.setAttribute('aria-label','Switch to dark theme'); document.getElementById('themeWord').textContent='Light'; }
+  })();
+</script>
 </body>
 </html>
