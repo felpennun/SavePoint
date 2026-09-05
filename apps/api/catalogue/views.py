@@ -8,7 +8,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from catalogue.models import AssetAttribution, GameWork, SourceRecord
-from catalogue.search import DEFAULT_PAGE_SIZE, search_games
+from catalogue.search import (
+    DEFAULT_PAGE_SIZE,
+    FilterValidationError,
+    parse_catalogue_query,
+    search_games,
+)
 from catalogue.serializers import GameCardSerializer, GameDetailSerializer
 
 
@@ -21,12 +26,23 @@ def _parse_page(raw: str | None) -> int:
 
 
 class GameListView(APIView):
-    """List/search games. GET /api/catalogue/games/?q=&page="""
+    """List/search/filter games.
+
+    GET /api/catalogue/games/?q=&page=&platform=&genre=&year_from=&year_to=
+        &min_rating=&sort=
+
+    Filters intersect. ``sort`` is a fixed allowlist key (never interpolated
+    into ``order_by``). An unknown ``sort`` or an out-of-range / non-numeric
+    ``year_*`` / ``min_rating`` is a bounded 400 (CAT-02, threat T-01.1-05).
+    """
 
     def get(self, request: Request) -> Response:
-        query = request.query_params.get("q")
+        try:
+            cq = parse_catalogue_query(request.query_params)
+        except FilterValidationError as exc:
+            return Response({"detail": str(exc), "code": exc.code}, status=400)
         page = _parse_page(request.query_params.get("page"))
-        result = search_games(query, page=page, page_size=DEFAULT_PAGE_SIZE)
+        result = search_games(cq.q, page=page, page_size=DEFAULT_PAGE_SIZE, cq=cq)
         return Response(
             {
                 "results": GameCardSerializer(result["results"], many=True).data,
@@ -34,6 +50,8 @@ class GameListView(APIView):
                 "page": result["page"],
                 "page_size": result["page_size"],
                 "has_next": result["has_next"],
+                "sort": result["sort"],
+                "facets": result["facets"],
             }
         )
 
@@ -45,7 +63,9 @@ class GameDetailView(APIView):
         try:
             work = (
                 GameWork.objects.select_related()
-                .prefetch_related("releases__platform", "releases__editions", "assets", "source_records")
+                .prefetch_related(
+                    "releases__platform", "releases__editions", "assets", "source_records", "genres"
+                )
                 .get(canonical_slug=slug)
             )
         except GameWork.DoesNotExist:

@@ -13,8 +13,17 @@ def _display_title(work: GameWork) -> str:
 
 
 def _release_year(work: GameWork) -> int | None:
+    # Prefer the denormalised scalar (one indexed column, no join); fall back
+    # to the releases for rows imported before it was populated.
+    frd = getattr(work, "first_release_date", None)
+    if frd:
+        return frd.year
     dated = [r.release_date for r in work.releases.all() if r.release_date]
     return min(d.year for d in dated) if dated else None
+
+
+def _genres(work: GameWork) -> list[dict]:
+    return [{"slug": g.slug, "name": g.name} for g in work.genres.all()]
 
 
 def _platform_summary(work: GameWork) -> str:
@@ -52,6 +61,8 @@ class GameCardSerializer(serializers.Serializer):
     year = serializers.SerializerMethodField()
     platform_summary = serializers.SerializerMethodField()
     cover = serializers.SerializerMethodField()
+    total_rating = serializers.FloatField(allow_null=True)
+    genres = serializers.SerializerMethodField()
 
     def get_title(self, work: GameWork) -> str:
         return _display_title(work)
@@ -64,6 +75,9 @@ class GameCardSerializer(serializers.Serializer):
 
     def get_cover(self, work: GameWork) -> dict:
         return _cover(work)
+
+    def get_genres(self, work: GameWork) -> list[dict]:
+        return _genres(work)
 
 
 class ReleaseSerializer(serializers.Serializer):
@@ -115,6 +129,8 @@ class GameDetailSerializer(serializers.Serializer):
     original_title = serializers.CharField()
     is_dlc = serializers.BooleanField()
     year = serializers.SerializerMethodField()
+    total_rating = serializers.FloatField(allow_null=True)
+    genres = serializers.SerializerMethodField()
     cover = serializers.SerializerMethodField()
     releases = serializers.SerializerMethodField()
     related_content = serializers.SerializerMethodField()
@@ -125,6 +141,9 @@ class GameDetailSerializer(serializers.Serializer):
 
     def get_year(self, work: GameWork) -> int | None:
         return _release_year(work)
+
+    def get_genres(self, work: GameWork) -> list[dict]:
+        return _genres(work)
 
     def get_cover(self, work: GameWork) -> dict:
         return _cover(work)

@@ -6,8 +6,7 @@ import { GameCard } from "@/components/GameCard";
 import { formatCount, getDictionary } from "@/i18n";
 import { fetchCatalogueList } from "@/lib/api";
 import {
-  GENRE_OPTIONS,
-  PLATFORM_OPTIONS,
+  type FilterOption,
   buildQuery,
   countActiveFilters,
   parseFilters,
@@ -21,11 +20,11 @@ function first(v: string | string[] | undefined): string | undefined {
 
 /**
  * Catalogue (01.1-UI-SPEC Screen Contract 2, CAT-02). Server component,
- * searchParams-driven, all controls GET so every filtered view is a
- * shareable URL. The server-side query wiring for platform/genre/year/
- * rating/sort is Plan 03; today those params are validated, echoed as
- * removable chips, and preserved across pagination while the result set
- * still comes from the q + page endpoint.
+ * searchParams-driven, every control submits via GET so each filtered view
+ * is a shareable/bookmarkable URL — no client-only filter state. The
+ * platform/genre `<select>` options and the year-input bounds come from the
+ * API `facets` payload; if that payload is unavailable the FilterBar
+ * degrades to search-only. Pagination carries the full query string.
  */
 export default async function CataloguePage({
   params,
@@ -52,18 +51,40 @@ export default async function CataloguePage({
   let result: Awaited<ReturnType<typeof fetchCatalogueList>> | null = null;
   let failed = false;
   try {
-    result = await fetchCatalogueList({ q: filters.q, page: currentPage });
+    result = await fetchCatalogueList({
+      q: filters.q,
+      page: currentPage,
+      platform: filters.platform,
+      genre: filters.genre,
+      year_from: filters.year_from,
+      year_to: filters.year_to,
+      min_rating: filters.min_rating,
+      sort: filters.sort,
+    });
   } catch {
     failed = true;
   }
 
-  const platformLabel = PLATFORM_OPTIONS.find((o) => o.value === filters.platform)?.label;
-  const genreLabel = GENRE_OPTIONS.find((o) => o.value === filters.genre)?.label;
+  const platformOptions: FilterOption[] =
+    result?.facets.platforms.map((p) => ({ value: p.slug, label: p.name })) ?? [];
+  const genreOptions: FilterOption[] =
+    result?.facets.genres.map((g) => ({ value: g.slug, label: g.name })) ?? [];
+  const platformLabels = new Map(platformOptions.map((o) => [o.value, o.label]));
+  const genreLabels = new Map(genreOptions.map((o) => [o.value, o.label]));
+  const yearRange = result?.facets.year_range;
 
   const chips: { key: string; label: string }[] = [];
   if (filters.q) chips.push({ key: "q", label: `${dict.catalogue.searchLabel}: ${filters.q}` });
-  if (platformLabel) chips.push({ key: "platform", label: `${dict.catalogue.filters.platform}: ${platformLabel}` });
-  if (genreLabel) chips.push({ key: "genre", label: `${dict.catalogue.filters.genre}: ${genreLabel}` });
+  if (filters.platform)
+    chips.push({
+      key: "platform",
+      label: `${dict.catalogue.filters.platform}: ${platformLabels.get(filters.platform) ?? filters.platform}`,
+    });
+  if (filters.genre)
+    chips.push({
+      key: "genre",
+      label: `${dict.catalogue.filters.genre}: ${genreLabels.get(filters.genre) ?? filters.genre}`,
+    });
   if (filters.year_from) chips.push({ key: "year_from", label: `${dict.catalogue.filters.yearFrom}: ${filters.year_from}` });
   if (filters.year_to) chips.push({ key: "year_to", label: `${dict.catalogue.filters.yearTo}: ${filters.year_to}` });
   if (filters.min_rating) chips.push({ key: "min_rating", label: `IGDB ${filters.min_rating}+` });
@@ -78,7 +99,17 @@ export default async function CataloguePage({
     <main className="sp-page">
       <h1 className="sp-h1">{dict.catalogue.heading}</h1>
 
-      <FilterBar filters={filters} locale={locale} basePath={basePath} activeCount={activeCount} />
+      <FilterBar
+        filters={filters}
+        locale={locale}
+        basePath={basePath}
+        activeCount={activeCount}
+        platformOptions={platformOptions}
+        genreOptions={genreOptions}
+        yearMin={yearRange?.min ?? 1958}
+        yearMax={yearRange?.max ?? currentYear + 2}
+        optionsUnavailable={failed}
+      />
 
       {chips.length > 0 ? (
         <div className="sp-chip-row" aria-label={dict.catalogue.filters.heading}>
@@ -137,7 +168,7 @@ export default async function CataloguePage({
             <>
               <ul className="sp-grid" style={{ marginTop: "var(--space-md)" }}>
                 {result.results.map((game) => (
-                  <GameCard key={game.id} game={game} locale={locale} />
+                  <GameCard key={game.id} game={game} locale={locale} score={game.total_rating ?? null} />
                 ))}
               </ul>
               <nav aria-label={locale === "es" ? "Paginación" : "Pagination"} style={{ display: "flex", gap: "var(--space-md)", alignItems: "center", justifyContent: "center", marginTop: "var(--space-xl)" }}>
