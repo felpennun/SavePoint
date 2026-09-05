@@ -122,7 +122,7 @@ Plans:
 
 **Requirements**: CAT-02, AUTH-02, DATA-04, REC-10, QUAL-05
 **Depends on:** Phase 01
-**Plans:** 0 plans
+**Plans:** 7 plans
 
 **Success Criteria** (what must be TRUE):
 
@@ -134,7 +134,13 @@ Plans:
 
 Plans:
 
-- [ ] TBD (run /gsd-plan-phase 01.1 to break down)
+- [ ] 01.1-01-PLAN.md — Approve and probe IGDB, then freeze the provider ADR and dependency pin
+- [ ] 01.1-02-PLAN.md — Build resumable ingestion and prove a full-scale import on fresh PostgreSQL
+- [ ] 01.1-03-PLAN.md — Add validated catalogue filters, sorting, facets, and shareable controls
+- [ ] 01.1-04-PLAN.md — Add plural simulated accounts and controlled functional registration
+- [ ] 01.1-05-PLAN.md — Deliver deterministic personal genre recommendations
+- [ ] 01.1-06-PLAN.md — Gate on an approved UI-SPEC, implement it, and capture automated product evidence
+- [ ] 01.1-07-PLAN.md — Record the author's separate product-quality verdict
 
 ### Phase 2: Governed Corpus and Frozen Evaluation Contract
 
