@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 current_phase: 01.1
 current_phase_name: Real-Scale Catalogue and Product Experience
 status: executing
-stopped_at: "Phase 01.1: 01.1-UI-SPEC.md approved (7/7 dimensions, light+dark theme author-ratified); 01.1-02 import finalizing in background"
-last_updated: "2026-09-05T17:37:37.603Z"
+stopped_at: "Plan 01.1-02 merged to main (507f876); starting Wave 3 (plan 01.1-06 redesign, author pre-approved) + loading savepoint-db-1 with the IGDB catalogue in the background"
+last_updated: "2026-09-05T21:05:00.000Z"
 last_activity: 2026-09-05
-last_activity_desc: Plan 01.1-02 — IGDB import verified at 312k scale on a fresh DB; finalizing
-state_head: fc0d29968ecc0f89d83bc6db063e39044700aa63
+last_activity_desc: "Plan 01.1-02 merged — resumable IGDB importer proven on a fresh DB (312,463 works)"
+state_head: 507f876
 progress:
   total_phases: 9
   completed_phases: 1
   total_plans: 26
-  completed_plans: 17
-  percent: 11
+  completed_plans: 18
+  percent: 12
 ---
 
 # Project State
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-09-04)
 ## Current Position
 
 Phase: 01.1 (Real-Scale Catalogue and Product Experience) — EXECUTING
-Plan: 1 of 10
-Status: Executing Phase 01.1
-Last activity: 2026-09-05 — Phase 01.1 execution started
+Plan: 2 of 10 complete (01.1-01 IGDB decision, 01.1-02 resumable importer). Next: 01.1-06 (Wave 3 redesign).
+Status: Executing Phase 01.1 — Wave 3
+Last activity: 2026-09-05 — Plan 01.1-02 merged (507f876)
 
-Progress: [█░░░░░░░░░] 10% (1 of 10 plans)
+Progress: [██░░░░░░░░] 20% (2 of 10 plans)
 
 ## Performance Metrics
 
@@ -125,22 +125,22 @@ TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<ver
 
 ## Session Continuity
 
-**Stopped at:** Phase 01.1: 01.1-UI-SPEC.md approved (7/7 dimensions, light+dark theme author-ratified); 01.1-02 import finalizing in background
+**Stopped at:** Plan 01.1-02 merged to `main` (`507f876`, pushed; issue #8 closed; worktree removed; 39 catalogue tests green post-merge). Now: Wave 3 = plan 01.1-06 (redesign, author pre-approved) + a background load of `savepoint-db-1` with the IGDB catalogue.
 
-Last session: 2026-09-05T17:37:37.346Z
+**Author is remote (on mobile), at-the-helm delegation in effect.** Pre-approvals recorded below in this section's history and in `.continue-here.md`. Stop for the author only on: a genuine 01.1-06 design ambiguity, the deploy phase, anything destructive, or a failure. Mobile push is OFF in the author's /config — leave decision messages in the conversation.
 
-### CHECKPOINT — Plan 01.1-02 (IGDB import) status, 2026-09-05 ~19:10 UTC
+### Pre-approved, in flight
 
-**Games ARE importable at real scale — proven, not yet persisted.**
+- **A — Plan 01.1-06 (Wave 3 redesign):** approved to run now. Task 1 (checkpoint "approve the UI-SPEC") is satisfied — `01.1-UI-SPEC.md` is checker-VERIFIED 7/7 ×3, `status: approved`. Before Task 2, ADD a per-surface coverage matrix to the UI-SPEC (rows: catalogue / detail / registration / recommendations, each naming desktop + mobile + accessibility + an explicit "approved" verdict) — the plan's Task 1 `<verify>` PowerShell gate greps for exactly that and the current spec lacks it. Then Task 2: implement across `apps/web` (globals.css tokens light+dark, AppShell navbar w/ ThemeToggle + login icon, GameCard w/ StatusPill/ScorePill/StarRating, catalogue, detail, NEW recommendations page, NEW register page visual/form-only) + collection + login per the post-approval additions (note the scope addition in the SUMMARY — they are not in the plan's `files_modified`). Verify: `pnpm --dir apps/web run build` passes. Brand assets are staged at `design/brand/` — wire per `design/brand/README.md` checklist (favicon route, AppShell brand, opengraph-image, drop the "02 / CRISTAL" round label).
+- **B — Persistent catalogue load:** approved. Run the now-merged `import_igdb_catalogue` against the real dev DB `savepoint-db-1` in the background (~1–1.5h; must coexist with the existing 150-game `source="wikidata"` corpus + demo accounts/library — watch for coexistence bugs), then `pg_dump` a reusable snapshot (NOT a committed bulk file — ADR-006). This load also produces the deferred deterministic sample manifest for `igdb-catalogue-freeze.md`. Deployed Neon load deferred to the deploy phase (check free-tier size for ~312k rows then).
 
-- **Tasks 1–2 committed** on worktree branch `worktree-agent-a6fce1bcb4d1040e1` (5 commits `9ca931b`..`c214787`): `Genre` model + `GameWork.genres` M2M + `IgdbImportRun` durable checkpoint (DB trigger enforces monotonic cursor); `IgdbClient` (id-cursor pages, 429/5xx backoff, credential redaction) + `import_igdb_catalogue` management command (per-batch `transaction.atomic` + advisory lock, checkpoint-after-commit, ADR-006 normalization, deterministic checksum, cover fallback accounting). 17 scoped + 129 full API tests green.
-- **Task 3 — full-scale import VERIFIED on a genuinely fresh, disposable PostgreSQL** (no named volume, unique container name, torn down after): **312,443 primary works imported** (live eligible re-measured 312,418; acceptance floor `max(100000, 0.90×eligible)=281,176` cleared), covers 268,656 present + 43,787 first-party fallback = 312,443 (accounting balances), SIGKILL-interrupt → resume-from-committed-checkpoint chain verified with no duplicates.
-- **NOT yet done:** the first acceptance run crashed on an `/out` bind-mount permission issue and lost its evidence JSON. A **second full acceptance run is in progress** (evidence streamed on stdout; also proves rerun-convergence). When it finishes: agent `a6fce1bcb4d1040e1` fills `docs/verification/igdb-catalogue-freeze.md`, commits Task 3 (`Refs #8`), writes `01.1-02-SUMMARY.md`; then the orchestrator merges the worktree to `main` and updates STATE/ROADMAP.
-- **Watcher armed:** background task `bzc3o5dk9` fires one notification when the rerun's throwaway container is torn down (or stalls/times out).
-- **Open gap for later:** the disposable-DB proof does NOT populate the real dev/prod catalogue DB (`savepoint-db-1`). Whether the persistent catalogue is populated by re-running `import_igdb_catalogue` against it (and when — here, or a follow-on before Plans 03/05/06 consume the catalogue) is unresolved and should be decided explicitly.
+Last session: 2026-09-05T21:05:00Z
 
-**Wave 3 prep DONE:** `01.1-UI-SPEC.md` written, checker-VERIFIED 7/7 **three times** (after the light-theme revision, then after the Collection + navbar-login additions), `status: approved`, commits `ea95d2a` + `fc0d299` + `124855f`. Author ratified: light+dark theme with a no-flash SSR cookie toggle (D-UI-1 overridden), comfortable ~156px grid no list-toggle (D-UI-2), tiered colored ScorePill + gold personal stars (D-UI-3), genre-grouped horizontal shelves for REC-10 (D-UI-4). Author-directed post-approval additions: Collection screen contract (auth-gated library view, distinct from recs page + public profile) and a navbar right-end login affordance (person icon → dedicated `/[locale]/login` when logged out, `AccountSwitcher` when logged in). 6 non-binding HTML mockups in `mockups/` (home, catalogue, game-detail, recommendations, collection, login), all with a working dark/light toggle. Ready for plan 01.1-06 once 01.1-02 merges.
+### Done this session (all merged + pushed to `origin/main` through `507f876`)
 
-**FULL RESUME CHECKPOINT (2026-09-05 ~21:20 UTC, user low on tokens):** `.planning/phases/01.1-real-scale-catalogue-and-product-experience/.continue-here.md` — complete state of all threads, the two session-local background tasks (import watcher `bzc3o5dk9`, executor agent `a6fce1bcb4d1040e1`), next actions in order, and open decisions. Read that first on resume. Everything is committed and pushed to `origin/main` through `1db88d0`.
+- **01.1-01** — ADR-006 (IGDB source, DATA-04), authenticated probe evidence, `requests==2.34.2` pinned; issue #7 closed; DATA-04 + CAT-02 Phase-4 duplicate traceability rows removed (author-confirmed leftovers). Also fixed the Windows GSD hook-shell bug.
+- **01.1-02** — `Genre` model + `GameWork.genres` M2M + `IgdbImportRun` monotonic-cursor checkpoint; `IgdbClient` + `import_igdb_catalogue` (id-cursor batched atomic + advisory lock, checkpoint-after-commit, ADR-006 normalization, content checksum, cover accounting); fresh disposable-DB acceptance run — **312,463 primary works**, floor 281,200 cleared, SIGKILL interrupt + resume + idempotent convergence proven, aggregate freeze evidence in `docs/verification/igdb-catalogue-freeze.md`. Issue #8 closed. 39 catalogue tests green post-merge. The gsd-executor was stopped mid-finalization; the orchestrator completed Task 3 evidence + SUMMARY from the agent's reported values. **Sample-review manifest deferred** to the persistent-DB load (encoding fault ate the disposable-run JSON).
+- **Wave 3 prep** — `01.1-UI-SPEC.md` checker-VERIFIED 7/7 ×3, `status: approved`; 4 design decisions author-ratified (light+dark theme w/ SSR cookie toggle; ~156px grid no list-toggle; tiered ScorePill + gold personal stars; genre shelves for REC-10); Collection screen + navbar person-icon login added on author direction; 6 mockups in `mockups/`.
+- **Brand** — author's "Cristal" identity staged at `design/brand/` (mark/lockup/favicon/OG-banner × dark+light + mono; mojibake repaired). NOT wired to the app; `design/brand/README.md` has the 01.1-06 integration checklist.
 
-Resume file: .planning/phases/01.1-real-scale-catalogue-and-product-experience/.continue-here.md
+Resume file: `.planning/phases/01.1-real-scale-catalogue-and-product-experience/.continue-here.md` (full state + the A/B pre-approvals + ordered next actions).
