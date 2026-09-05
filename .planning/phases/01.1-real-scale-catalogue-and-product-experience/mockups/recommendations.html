@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SavePoint — Recommendations (mockup)</title>
+<style>
+  :root{
+    --surface-base:#0d0d12; --surface-raised:#17171f; --surface-overlay:#1f1f2b; --surface-border:#2c2c3a;
+    --text-primary:#f2f2f5; --text-secondary:#b8b8c4; --text-muted:#8a8a99;
+    --accent:#8b7cf6; --accent-strong:#a394ff; --accent-on:#16121f;
+    --rating:#f5b544; --score-strong:#34d399; --score-fair:#f0b429;
+    --radius-card:.75rem; --radius-control:.5rem;
+    --text-meta:.8125rem; --text-body:1rem; --text-heading:1.25rem; --text-display:1.75rem;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--surface-base);color:var(--text-primary);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+  a{color:var(--accent-strong)}
+  .note{background:#2a2340;color:#d8d0ff;font-size:var(--text-meta);padding:8px 16px;text-align:center}
+  header.appbar{display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:12px 24px;background:var(--surface-raised);border-bottom:1px solid var(--surface-border)}
+  .brand{font-weight:600}
+  nav.main a{color:var(--text-secondary);text-decoration:none;margin-left:24px}
+  nav.main a[aria-current=page]{color:var(--text-primary);border-bottom:2px solid var(--accent)}
+  .demobar{background:var(--surface-overlay);color:var(--text-secondary);font-size:var(--text-meta);
+    padding:8px 24px;border-bottom:1px solid var(--surface-border)}
+  main{max-width:1180px;margin:0 auto;padding:32px 24px 64px}
+  h1{font-size:var(--text-display);font-weight:600;line-height:1.2;margin:0 0 8px}
+  .intro{color:var(--text-secondary);max-width:64ch;margin:0 0 8px}
+  .excluded{font-size:var(--text-meta);color:var(--text-muted);margin:0 0 32px}
+  .shelf{margin-bottom:48px}
+  .shelf h2{font-size:var(--text-heading);font-weight:600;line-height:1.25;margin:0 0 4px}
+  .shelf .explainer{font-size:var(--text-meta);color:var(--text-muted);margin:0 0 16px}
+  .track{display:flex;gap:16px;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x proximity}
+  .card{flex:0 0 120px;text-decoration:none;color:inherit;scroll-snap-align:start}
+  .cover{position:relative;aspect-ratio:3/4;border-radius:var(--radius-card);overflow:hidden;
+    background:linear-gradient(150deg,#3a2f5c,#1c2a44)}
+  .cover.c2{background:linear-gradient(150deg,#5c2f3a,#3a1c24)}
+  .cover.c3{background:linear-gradient(150deg,#2f5c44,#1c3a2a)}
+  .cover.c4{background:linear-gradient(150deg,#5c522f,#3a341c)}
+  .scorepill{position:absolute;top:6px;right:6px;background:var(--surface-overlay);
+    border:1px solid currentColor;border-radius:999px;padding:1px 6px;font-size:.75rem;font-weight:600}
+  .s-strong{color:var(--score-strong)} .s-fair{color:var(--score-fair)}
+  .card .title{font-size:var(--text-meta);font-weight:600;margin:6px 0 2px;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .card .why{font-size:.75rem;color:var(--text-secondary);margin:0}
+  .baseline{margin-top:16px;padding-top:24px;border-top:1px solid var(--surface-border)}
+  .baseline h2{font-size:var(--text-heading);margin:0 0 8px}
+  .baseline p{font-size:var(--text-meta);color:var(--text-muted)}
+  .baseline ol{color:var(--text-secondary)}
+</style>
+</head>
+<body>
+<div class="note">Non-binding sketch derived from <code>01.1-UI-SPEC.md</code>. Auth-gated page; shown here in its populated state.</div>
+<header class="appbar">
+  <span class="brand">SavePoint</span>
+  <nav class="main">
+    <a href="home.html">Home</a><a href="catalogue.html">Catalogue</a>
+    <a href="#">Collection</a><a href="#" aria-current="page">Recommendations</a><a href="#">Sources</a>
+  </nav>
+</header>
+<div class="demobar">Simulated account — this is a controlled demo, not a real user account.</div>
+<main>
+  <h1>Recommended by your genres</h1>
+  <p class="intro">Built from the genres of the games you've rated and completed. Not the demo popularity ranking.</p>
+  <p class="excluded">Games already in your collection are not shown.</p>
+
+  <section class="shelf">
+    <h2>Because you play a lot of Role-playing (RPG)</h2>
+    <p class="explainer">8 games in your collection are Role-playing (RPG).</p>
+    <div class="track">
+      <a class="card" href="game-detail.html"><div class="cover"><span class="scorepill s-strong">95</span></div><p class="title">Elden Ring</p><p class="why">RPG · Adventure</p></a>
+      <a class="card" href="game-detail.html"><div class="cover c2"><span class="scorepill s-strong">94</span></div><p class="title">Baldur's Gate 3</p><p class="why">RPG</p></a>
+      <a class="card" href="game-detail.html"><div class="cover c4"><span class="scorepill s-strong">90</span></div><p class="title">Divinity: Original Sin 2</p><p class="why">RPG · Strategy</p></a>
+      <a class="card" href="game-detail.html"><div class="cover c3"><span class="scorepill s-fair">86</span></div><p class="title">Pillars of Eternity</p><p class="why">RPG</p></a>
+      <a class="card" href="game-detail.html"><div class="cover"><span class="scorepill s-fair">84</span></div><p class="title">Pathfinder: Kingmaker</p><p class="why">RPG</p></a>
+      <a class="card" href="game-detail.html"><div class="cover c2"><span class="scorepill s-strong">92</span></div><p class="title">Final Fantasy XIV</p><p class="why">RPG</p></a>
+    </div>
+  </section>
+
+  <section class="shelf">
+    <h2>Because you play a lot of Indie</h2>
+    <p class="explainer">6 games in your collection are Indie.</p>
+    <div class="track">
+      <a class="card" href="game-detail.html"><div class="cover c3"><span class="scorepill s-fair">88</span></div><p class="title">Celeste</p><p class="why">Indie · Platform</p></a>
+      <a class="card" href="game-detail.html"><div class="cover c4"><span class="scorepill s-strong">91</span></div><p class="title">Outer Wilds</p><p class="why">Indie · Adventure</p></a>
+      <a class="card" href="game-detail.html"><div class="cover"><span class="scorepill s-fair">88</span></div><p class="title">Slay the Spire</p><p class="why">Indie · Strategy</p></a>
+      <a class="card" href="game-detail.html"><div class="cover c2"><span class="scorepill s-strong">90</span></div><p class="title">Tunic</p><p class="why">Indie · Adventure</p></a>
+      <a class="card" href="game-detail.html"><div class="cover c3"><span class="scorepill s-fair">85</span></div><p class="title">Dead Cells</p><p class="why">Indie · Platform</p></a>
+    </div>
+  </section>
+
+  <section class="shelf">
+    <h2>Because you play a lot of Adventure</h2>
+    <p class="explainer">5 games in your collection are Adventure.</p>
+    <div class="track">
+      <a class="card" href="game-detail.html"><div class="cover c4"><span class="scorepill s-strong">92</span></div><p class="title">Disco Elysium</p><p class="why">Adventure · RPG</p></a>
+      <a class="card" href="game-detail.html"><div class="cover"><span class="scorepill s-strong">89</span></div><p class="title">Return of the Obra Dinn</p><p class="why">Adventure · Puzzle</p></a>
+      <a class="card" href="game-detail.html"><div class="cover c2"><span class="scorepill s-fair">83</span></div><p class="title">Oxenfree</p><p class="why">Adventure</p></a>
+      <a class="card" href="game-detail.html"><div class="cover c3"><span class="scorepill s-strong">90</span></div><p class="title">What Remains of Edith Finch</p><p class="why">Adventure</p></a>
+    </div>
+  </section>
+
+  <div class="baseline">
+    <h2>Not this — the demo baseline</h2>
+    <p>For contrast: the site-wide "Popular in this demo" strip is a single flat list, not personalised, and looks like this:</p>
+    <ol><li>Elden Ring</li><li>Stardew Valley</li><li>Hollow Knight</li><li>Hades</li></ol>
+  </div>
+</main>
+</body>
+</html>

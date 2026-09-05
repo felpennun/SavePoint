@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SavePoint — Home (mockup)</title>
+<style>
+  :root{
+    --surface-base:#0d0d12; --surface-raised:#17171f; --surface-overlay:#1f1f2b; --surface-border:#2c2c3a;
+    --text-primary:#f2f2f5; --text-secondary:#b8b8c4; --text-muted:#8a8a99;
+    --accent:#8b7cf6; --accent-strong:#a394ff; --accent-on:#16121f;
+    --rating:#f5b544; --score-strong:#34d399; --score-fair:#f0b429;
+    --radius-card:.75rem; --radius-control:.5rem;
+    --text-meta:.8125rem; --text-body:1rem; --text-heading:1.25rem; --text-display:1.75rem;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--surface-base);color:var(--text-primary);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+  a{color:var(--accent-strong)}
+  .note{background:#2a2340;color:#d8d0ff;font-size:var(--text-meta);padding:8px 16px;text-align:center}
+  header.appbar{display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:12px 24px;background:var(--surface-raised);border-bottom:1px solid var(--surface-border)}
+  .brand{font-weight:600}
+  nav.main a{color:var(--text-secondary);text-decoration:none;margin-left:24px}
+  nav.main a[aria-current=page]{color:var(--text-primary);border-bottom:2px solid var(--accent)}
+  .demobar{background:var(--surface-overlay);color:var(--text-secondary);font-size:var(--text-meta);
+    padding:8px 24px;border-bottom:1px solid var(--surface-border)}
+  main{max-width:1180px;margin:0 auto;padding:32px 24px 64px}
+  h1{font-size:var(--text-display);font-weight:600;line-height:1.2;margin:0 0 8px}
+  h2{font-size:var(--text-heading);font-weight:600;line-height:1.25;margin:32px 0 16px}
+  .sub{color:var(--text-secondary);font-size:var(--text-meta);margin:0 0 8px}
+  .lead{color:var(--text-secondary);max-width:60ch}
+  .cta-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:24px 0}
+  .btn-primary{min-height:2.75rem;display:inline-flex;align-items:center;background:var(--accent);
+    color:var(--accent-on);font-weight:600;border:0;border-radius:var(--radius-control);
+    padding:0 20px;font-size:var(--text-body);text-decoration:none}
+  .btn-primary:hover{background:var(--accent-strong)}
+  ul.grid{list-style:none;margin:0;padding:0;display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(156px,1fr));gap:16px}
+  .card{display:block;text-decoration:none;color:inherit}
+  .cover{position:relative;aspect-ratio:3/4;border-radius:var(--radius-card);overflow:hidden;
+    background:linear-gradient(150deg,#3a2f5c,#1c2a44)}
+  .cover.c2{background:linear-gradient(150deg,#5c2f3a,#3a1c24)}
+  .cover.c3{background:linear-gradient(150deg,#2f5c44,#1c3a2a)}
+  .cover.c4{background:linear-gradient(150deg,#5c522f,#3a341c)}
+  .scorepill{position:absolute;top:8px;right:8px;background:var(--surface-overlay);
+    border:1px solid currentColor;border-radius:999px;padding:2px 8px;font-size:var(--text-meta);font-weight:600}
+  .s-strong{color:var(--score-strong)} .s-fair{color:var(--score-fair)}
+  .card .title{font-size:var(--text-body);font-weight:600;margin:8px 0 2px;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .card .meta{font-size:var(--text-meta);color:var(--text-secondary);margin:0}
+  .baseline{margin-top:48px;padding-top:24px;border-top:1px solid var(--surface-border)}
+  .baseline h2{font-size:var(--text-heading);margin-top:0}
+  .baseline p{font-size:var(--text-meta);color:var(--text-muted);max-width:60ch}
+  .baseline ol{color:var(--text-secondary);font-size:var(--text-body)}
+  .toggle{display:flex;gap:8px;margin-bottom:24px}
+  .toggle button{min-height:2.75rem;background:var(--surface-overlay);color:var(--text-secondary);
+    border:1px solid var(--surface-border);border-radius:var(--radius-control);padding:0 14px;cursor:pointer}
+  .toggle button[aria-pressed=true]{color:var(--text-primary);border-color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="note">Non-binding sketch derived from <code>01.1-UI-SPEC.md</code>. Toggle shows the two home states.</div>
+<header class="appbar">
+  <span class="brand">SavePoint</span>
+  <nav class="main">
+    <a href="#" aria-current="page">Home</a>
+    <a href="catalogue.html">Catalogue</a>
+    <a href="#">Collection</a>
+    <a href="recommendations.html">Recommendations</a>
+    <a href="#">Sources</a>
+  </nav>
+</header>
+<div class="demobar" id="demobar" hidden>Simulated account — this is a controlled demo, not a real user account.</div>
+<main>
+  <div class="toggle" role="group" aria-label="Preview state">
+    <button id="b-out" aria-pressed="true" onclick="setState('out')">Logged-out visitor</button>
+    <button id="b-in" aria-pressed="false" onclick="setState('in')">Signed-in user</button>
+  </div>
+
+  <section id="state-out">
+    <h1>SavePoint</h1>
+    <p class="lead">A controlled, reproducible personal video-game catalogue, with explainable recommendations.</p>
+    <div class="cta-row">
+      <a class="btn-primary" href="#">Log in</a>
+      <a href="catalogue.html">Browse the catalogue</a>
+      <span aria-hidden="true" style="color:var(--text-muted)">·</span>
+      <a href="#">Create a simulated account</a>
+    </div>
+    <h2>A catalogue sample</h2>
+    <ul class="grid">
+      <li><a class="card" href="game-detail.html"><div class="cover"><span class="scorepill s-strong">95</span></div><p class="title">Elden Ring</p><p class="meta">2022 · PC, PS5, Switch</p></a></li>
+      <li><a class="card" href="game-detail.html"><div class="cover c2"><span class="scorepill s-strong">94</span></div><p class="title">Baldur's Gate 3</p><p class="meta">2023 · PC, PS5</p></a></li>
+      <li><a class="card" href="game-detail.html"><div class="cover c3"><span class="scorepill s-strong">93</span></div><p class="title">The Witcher 3: Wild Hunt</p><p class="meta">2015 · PC, PS4, Switch</p></a></li>
+      <li><a class="card" href="game-detail.html"><div class="cover c4"><span class="scorepill s-strong">91</span></div><p class="title">Hades</p><p class="meta">2020 · PC, Switch</p></a></li>
+      <li><a class="card" href="game-detail.html"><div class="cover c3"><span class="scorepill s-strong">90</span></div><p class="title">Hollow Knight</p><p class="meta">2017 · PC, Switch</p></a></li>
+      <li><a class="card" href="game-detail.html"><div class="cover c2"><span class="scorepill s-strong">95</span></div><p class="title">Portal 2</p><p class="meta">2011 · PC, PS3, X360</p></a></li>
+      <li><a class="card" href="game-detail.html"><div class="cover c4"><span class="scorepill s-strong">91</span></div><p class="title">Outer Wilds</p><p class="meta">2019 · PC, PS4, XONE</p></a></li>
+      <li><a class="card" href="game-detail.html"><div class="cover"><span class="scorepill s-fair">88</span></div><p class="title">Celeste</p><p class="meta">2018 · PC, Switch</p></a></li>
+    </ul>
+  </section>
+
+  <section id="state-in" hidden>
+    <h1>Welcome back, alex_demo</h1>
+    <p class="sub">Signed in as alex_demo (simulated)</p>
+    <div class="cta-row">
+      <a class="btn-primary" href="recommendations.html">See your genre recommendations</a>
+      <a href="#">Open your collection</a>
+    </div>
+    <h2>Pick up where you left off</h2>
+    <ul class="grid">
+      <li><a class="card" href="game-detail.html"><div class="cover c3"><span class="scorepill s-strong">93</span></div><p class="title">The Witcher 3: Wild Hunt</p><p class="meta">Playing · updated 2 days ago</p></a></li>
+      <li><a class="card" href="game-detail.html"><div class="cover"><span class="scorepill s-strong">91</span></div><p class="title">Hades</p><p class="meta">Completed · ★★★★☆</p></a></li>
+      <li><a class="card" href="game-detail.html"><div class="cover c4"><span class="scorepill s-strong">92</span></div><p class="title">Disco Elysium</p><p class="meta">Pending</p></a></li>
+      <li><a class="card" href="game-detail.html"><div class="cover c2"><span class="scorepill s-strong">89</span></div><p class="title">Return of the Obra Dinn</p><p class="meta">Completed · ★★★★★</p></a></li>
+    </ul>
+  </section>
+
+  <section class="baseline">
+    <h2>Popular in this demo</h2>
+    <p>Order calculated from aggregate interactions in this demo. Not a personalized recommendation.</p>
+    <ol>
+      <li>Elden Ring</li><li>Stardew Valley</li><li>Hollow Knight</li><li>Hades</li><li>The Witcher 3: Wild Hunt</li>
+    </ol>
+  </section>
+</main>
+<script>
+  function setState(s){
+    document.getElementById('state-out').hidden = s!=='out';
+    document.getElementById('state-in').hidden = s!=='in';
+    document.getElementById('demobar').hidden = s!=='in';
+    document.getElementById('b-out').setAttribute('aria-pressed', s==='out');
+    document.getElementById('b-in').setAttribute('aria-pressed', s==='in');
+  }
+</script>
+</body>
+</html>
