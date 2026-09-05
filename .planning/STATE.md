@@ -4,15 +4,15 @@ current_phase: 01
 current_phase_name: Three-Day Public Demo Slice
 status: executing
 stopped_at: Completed 01-09-PLAN.md
-last_updated: "2026-09-04T18:49:43.187Z"
+last_updated: "2026-09-05T10:03:45.452Z"
 last_activity: 2026-09-04
 last_activity_desc: Phase 01 execution started
-state_head: 543195e888ed748b6ab91bf4abbe6afdd38db1a1
+state_head: b8200780eb05adae5553ad769e6477c9cdcedc3a
 progress:
   total_phases: 8
   completed_phases: 0
   total_plans: 16
-  completed_plans: 13
+  completed_plans: 15
   percent: 0
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-09-04)
 ## Current Position
 
 Phase: 01 (Three-Day Public Demo Slice) — EXECUTING
-Plan: 11 of 16
+Plan: 12 of 16
 Status: Ready to execute
 Last activity: 2026-09-04 — Phase 01 execution started
 
@@ -68,6 +68,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01 P09 | 20min | 2 tasks | 22 files |
 | Phase 01 P10 | 10min | 1 tasks | 2 files |
 | Phase 01 P11 | 55min | 2 tasks | 6 files |
+| Phase 01 P12 | 2 sessions | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -90,6 +91,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 01]: Injected axe-core's already-approved local bundle directly via page.addScriptTag instead of adding the @axe-core/playwright wrapper package — Avoids a new-dependency approval round for what is functionally one line of glue code around an already-approved devDependency
 - [Phase 01]: Introduced DJANGO_DEPLOY_ENV (local|production) to make check --deploy genuinely clean in each context via SILENCED_SYSTEM_CHECKS, instead of always showing expected-but-scary HTTP-only warnings — An explicit, required switch is auditable in a way that inferring the security profile from DEBUG or DATABASE_URL is not
 - [Phase 01]: check-secrets.ps1 exempts only e2e/fixtures/hostile.json (holds the self-test canaries) and test files (assigned-secret-value/bearer-token patterns only) by path, never any file by content — Synthetic, reviewed fixture credentials are a normal testing pattern; a narrow, documented path exemption keeps every other file -- including README.md and .env.example -- genuinely scanned
+- [Phase 01]: Pivoted the deployment topology mid-plan from a single-PaaS assumption to Vercel Hobby (web) + Render Free (api) + Neon Free (db), no card — Render Free's Docker-only model does not host two independently-scaled services plus a managed Postgres for free; the pivot keeps the same same-origin-proxy security architecture across two separately-hosted services
+- [Phase 01]: Found and fixed three real deploy-path bugs (missing docs/ in the API image, non-portable random GameWork.id in the demo seed, /health/ redirected by Next.js middleware) plus a Vercel Hobby private-repo commit-author gotcha, each only visible against genuinely fresh infrastructure — The long-lived local dev Postgres volume masked two of these for the whole session; testing against a throwaway fresh container before every push is now the standing verification pattern for any fresh-database code path
 
 ### Pending Todos
 
@@ -118,6 +121,6 @@ TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<ver
 
 ## Session Continuity
 
-Last session: 2026-09-04T18:49:43.152Z
+Last session: 2026-09-05T10:03:45.416Z
 Stopped at: Completed 01-09-PLAN.md
 Resume file: None

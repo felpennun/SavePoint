@@ -84,7 +84,7 @@
 - [ ] **ADMIN-01**: Authorised administrator can manage demo users and catalogue data.
 - [ ] **ADMIN-02**: Authorised administrator can supervise imports, jobs, and experiments without directly editing the database.
 - [ ] **SEC-01**: Server validates every permission and tests access by role and ownership.
-- [ ] **SEC-02**: No secret or API key is present in Git, browser bundles, logs, public images, or public artifacts.
+- [x] **SEC-02**: No secret or API key is present in Git, browser bundles, logs, public images, or public artifacts.
 - [ ] **SEC-03**: Database access uses an ORM or parameterised queries and is tested against SQL injection.
 - [ ] **SEC-04**: Inputs and outputs are validated and protected against XSS, CSRF, and malicious content.
 - [ ] **SEC-05**: External URLs and requests are constrained against SSRF, unsafe redirects, and URL manipulation.
@@ -98,7 +98,7 @@
 
 - [ ] **OPS-01**: Application can be deployed to the Internet using documented configuration.
 - [x] **OPS-02**: Project can be run locally through a reproducible documented process.
-- [ ] **OPS-03**: A lawful offline demo mode works without the external API or Internet access.
+- [x] **OPS-03**: A lawful offline demo mode works without the external API or Internet access.
 - [ ] **OPS-04**: PostgreSQL and experimental artifacts have tested backup and recovery procedures.
 - [ ] **OPS-05**: System emits structured logs and observable job states without sensitive data.
 - [ ] **QUAL-01**: Project has unit, integration, and browser tests for critical workflows.
@@ -171,10 +171,10 @@
 | DATA-01 | Phase 1 | Pending |
 | DATA-02 | Phase 1 | Pending |
 | REC-02 | Phase 1 | Complete |
-| SEC-02 | Phase 1 | Pending |
+| SEC-02 | Phase 1 | Complete |
 | OPS-01 | Phase 1 | Pending |
 | OPS-02 | Phase 1 | Complete |
-| OPS-03 | Phase 1 | Pending |
+| OPS-03 | Phase 1 | Complete |
 | QUAL-03 | Phase 1 | Pending |
 | DOC-01 | Phase 1 | Pending |
 | AGENT-01 | Phase 1 | Pending |
