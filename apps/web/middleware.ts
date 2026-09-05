@@ -8,7 +8,7 @@ export const DEFAULT_LOCALE: Locale = "es";
 // without an authenticated Django session. Per UI-SPEC, only Collection
 // (and any future purely-private page) requires auth -- homepage, login,
 // catalogue, game detail, and sources are all public browsing surfaces.
-const PUBLIC_PATHS = ["/", "/login", "/sources", "/catalogue", "/games", "/profiles"];
+const PUBLIC_PATHS = ["/", "/login", "/register", "/sources", "/catalogue", "/games", "/profiles"];
 
 function isSupportedLocale(value: string): value is Locale {
   return (SUPPORTED_LOCALES as readonly string[]).includes(value);
