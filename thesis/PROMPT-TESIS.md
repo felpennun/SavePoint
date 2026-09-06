@@ -115,14 +115,17 @@ LaTeX). Conserva **sin cambios de fondo**:
   (`\hyphenpenalty=10000`), `\parindent .75cm`, el estilo `listingstyle` para `lstlisting`,
   `\renewcommand{\lstlistingname}{Extracto de código}`, los comandos `\setTitle`,
   `\setAuthor`, etc. para la portada.
-- `sections/00_portada.tex` y su mecanismo de variables. Rellena en `TFG.tex`:
-  - `\setTitle{SavePoint: catálogo personal de videojuegos y banco de pruebas reproducible para sistemas de recomendación}` (ajústalo si el autor prefiere otro título; deja también un `% alternativa:` comentada).
+- `sections/00_portada.tex` y su mecanismo de variables. Datos confirmados por el autor
+  (2026-09); rellena en `TFG.tex` exactamente así:
+  - `\setTitle{SavePoint: una plataforma de catalogación de videojuegos como banco de pruebas de algoritmos de recomendación}`
   - `\setAuthor{Felipe Peña Núñez}`
   - `\setDegree{Grado en Ingeniería Informática - Ingeniería del Software}`
-  - `\setSupervisor{` + tutor, si el autor lo facilita; si no, `Por asignar` con un `% TODO`.
-  - `\setDepartment{Lenguajes y Sistemas Informáticos}` (o el que corresponda; `% TODO` si no consta).
-  - `\setMonth{...}` y `\setYear{...}` con `% TODO: convocatoria`.
-  - `\setDedication{...}` opcional; si no hay, comenta la línea.
+  - `\setSupervisor{José Enrique Sánchez López \\ Aitor Rodríguez Dueñas}`
+  - `\setDepartment{Lenguajes y Sistemas Informáticos}`
+  - `\setMonth{...}` y `\setYear{...}` → `% TODO: convocatoria` (pendiente del autor: mes
+    junio / julio / diciembre y curso, p. ej. 2026/27).
+  - `\setDedication{...}` opcional; pendiente del autor. Si no lo da, comenta la línea.
+  - Universidad: Universidad de Sevilla, ETSII.
 - El orden de material preliminar de la plantilla: portada, agradecimientos, resumen
   (palabras clave), abstract (keywords), y luego `\tableofcontents`, `\listoffigures`,
   `\listoftables`, `\lstlistoflistings`.
