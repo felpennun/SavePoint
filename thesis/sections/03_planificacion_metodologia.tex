@@ -290,12 +290,20 @@ El proyecto se planificó por fases, no por un calendario cerrado de tareas. La 
 una restricción explícita de tres días para una demostración pública visible. Se organizó en
 dieciséis planes agrupados en doce oleadas de ejecución, cada oleada dependiente de la
 anterior. La Fase 01.1, insertada después, se organizó en diez planes en diez oleadas,
-siguiendo el orden de prioridad fijado por el autor. La Tabla~\ref{tab:hitos} recoge los
-hitos alcanzados con su fecha.
+siguiendo el orden de prioridad fijado por el autor. La hoja de ruta se reestructuró el 6 de
+septiembre de 2026, pasando de ocho fases a siete: la Fase 2 ampliada absorbió la
+gobernanza del corpus, las valoraciones externas, el protocolo de evaluación congelado y un
+primer recomendador avanzado, mientras que las antiguas fases de banco de experimentos y de
+recomendación de contenido se fundieron en una sola. La Fase 2, todavía sin ejecutar, está
+sin embargo planificada por completo con el mismo proceso gobernado que las fases anteriores
+(discutir, investigar, fijar el contrato de diseño de interfaz, planificar y verificar el
+plan de forma independiente): trece planes ejecutables repartidos en seis oleadas. Las fases
+3 a 7 quedan pendientes de planificación. La Tabla~\ref{tab:hitos} recoge los hitos
+alcanzados con su fecha.
 
 \begin{table}[htp]
 \centering
-\begin{tabular}{ | l | c | c | }
+\begin{tabular}{ | p{7.5cm} | c | c | }
     \hline
     \textbf{Hito} & \textbf{Planes} & \textbf{Fecha} \\
     \hline
@@ -303,7 +311,9 @@ hitos alcanzados con su fecha.
     \hline
     Fase 01.1 cerrada y firmada por el autor & 10 & 6 de septiembre de 2026 \\
     \hline
-    Fase 2 y siguientes & Por planificar & Pendiente \\
+    Fase 2 planificada por completo (13 planes en 6 oleadas), pendiente de ejecución & 13 & 6 de septiembre de 2026 \\
+    \hline
+    Fases 3 a 7 & Por planificar & Pendiente \\
     \hline
 \end{tabular}
 \caption{Hitos alcanzados en esta primera entrega.}
@@ -390,6 +400,18 @@ explícito como inserción en la hoja de ruta. Durante su planificación, la inv
 conflicto real de alcance con el registro abierto de producción, reservado a la versión 2. Se
 resolvió con una vía intermedia: un formulario de registro funcional dentro de la frontera de
 demostración controlada, sin abrir el registro de producción.
+
+La segunda desviación de calado es la reestructuración de la hoja de ruta del 6 de septiembre
+de 2026, decidida por el autor tras la revisión de producto de la Fase 01.1. La antigua Fase
+2, limitada al corpus gobernado y al contrato de evaluación, se amplió para absorber el
+enriquecimiento de valoraciones externas de usuarios con su instantánea inmutable, la
+corrección de la búsqueda tolerante, los filtros de selección múltiple, una pasada adicional
+de interfaz y un primer recomendador basado en contenido evaluado bajo el protocolo ya
+congelado. En paralelo, las antiguas fases de banco de experimentos y de recomendación de
+contenido se comprimieron en una sola. El conjunto pasó de ocho fases a siete y los
+requisitos afectados se reasignaron en \texttt{REQUIREMENTS.md} sin cambiar sus
+identificadores. La Fase 2 resultante quedó planificada por completo con el proceso habitual,
+en trece planes ejecutables.
 
 Otras desviaciones menores, todas registradas en los resúmenes de plan, incluyen el cambio de
 la topología de despliegue de un único proveedor a tres servicios gratuitos, además de la
