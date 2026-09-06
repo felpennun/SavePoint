@@ -101,12 +101,13 @@ export const es: Dictionary = {
     intro:
       "Generado a partir de los géneros de los juegos que has valorado y completado. No es el ranking de popularidad de la demo.",
     excludedNote: "No se muestran los juegos que ya están en tu colección.",
+    methodHeading: "Cómo se generan",
+    methodAlgorithm:
+      "Algoritmo: {id} — una heurística determinista de frecuencia de géneros, no el ranking de popularidad de la demo ni un modelo entrenado.",
     shelfHeading: "Porque juegas mucho a {genre}",
-    shelfExplainer: {
-      zero: "0 juegos de tu colección son de {genre}.",
-      one: "1 juego de tu colección es de {genre}.",
-      many: (count) => `${count} juegos de tu colección son de {genre}.`,
-    },
+    shelfEvidence:
+      "Estos juegos comparten el género {genre} con títulos que has valorado o a los que has puesto un estado.",
+    cardEvidence: "Comparte tus géneros: {genres}",
     emptyHeading: "Aún no hay suficiente actividad",
     emptyBody: "Valora o completa algunos juegos y aquí aparecerán sugerencias por género.",
     emptyCta: "Explorar el catálogo",

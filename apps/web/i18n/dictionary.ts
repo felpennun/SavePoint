@@ -85,8 +85,16 @@ export interface Dictionary {
     heading: string;
     intro: string;
     excludedNote: string;
+    /** Heading for the algorithm_id + limitation disclosure block. */
+    methodHeading: string;
+    /** "{id}" -> the DTO's algorithm_id, so this heuristic is never
+     * confused with popularity (REC-02) or the Phase 6 recommender. */
+    methodAlgorithm: string;
     shelfHeading: string;
-    shelfExplainer: CountCopy;
+    /** "{genre}" -> the taste genre; per-shelf plain-language explainer. */
+    shelfEvidence: string;
+    /** "{genres}" -> the comma-joined overlap genres; per-card evidence. */
+    cardEvidence: string;
     emptyHeading: string;
     emptyBody: string;
     emptyCta: string;
