@@ -122,10 +122,20 @@ LaTeX). Conserva **sin cambios de fondo**:
   - `\setDegree{Grado en Ingeniería Informática - Ingeniería del Software}`
   - `\setSupervisor{José Enrique Sánchez López \\ Aitor Rodríguez Dueñas}`
   - `\setDepartment{Lenguajes y Sistemas Informáticos}`
-  - `\setMonth{...}` y `\setYear{...}` → `% TODO: convocatoria` (pendiente del autor: mes
-    junio / julio / diciembre y curso, p. ej. 2026/27).
-  - `\setDedication{...}` opcional; pendiente del autor. Si no lo da, comenta la línea.
+  - `\setMonth{octubre}` y `\setYear{2025/2026}` (convocatoria confirmada por el autor).
+  - `\setDedication{}` con un marcador de pendiente: deja la página de dedicatoria activa
+    pero con texto provisional visible, por ejemplo `\tfgDedication` = "Por redactar."
+    y un `\todo[inline]{Dedicatoria pendiente de redactar por el autor}` cerca. No la
+    comentes: el autor quiere que quede escrito como tarea futura, no que desaparezca.
   - Universidad: Universidad de Sevilla, ETSII.
+
+**Agradecimientos y dedicatoria — pendientes explícitos.** El autor los redactará más
+adelante. En `sections/00_agradecimientos.tex` deja un párrafo provisional breve ("Esta
+sección se completará antes de la entrega final.") y un `\todo[inline]{Agradecimientos
+pendientes: el autor añadirá tutores, familia, compañeros}`. Igual para la dedicatoria.
+Ambos deben aparecer en el PDF como secciones existentes con marca de pendiente, nunca
+omitidos ni olvidados. Inclúyelos también en la lista final de `% TODO` que necesitan al
+autor (sección 10.6).
 - El orden de material preliminar de la plantilla: portada, agradecimientos, resumen
   (palabras clave), abstract (keywords), y luego `\tableofcontents`, `\listoffigures`,
   `\listoftables`, `\lstlistoflistings`.
