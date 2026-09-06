@@ -1,0 +1,76 @@
+% Plantilla TFG LaTeX LSI por:
+%   Agustín Borrego <borrego@us.es>
+%   Inma Hernández <inmahernandez@us.es>
+% Su uso y modificación es libre.
+
+% Memoria del Trabajo Fin de Grado del proyecto SavePoint.
+% Autor: Felipe Peña Núñez. Escuela Técnica Superior de Ingeniería Informática,
+% Universidad de Sevilla. Convocatoria de octubre, curso 2025/2026.
+
+\documentclass[12pt]{report}
+
+% Paquetes LaTeX y estilos globales
+\input{etc/pkgs}
+\input{etc/style}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Variables para la portada
+\setTitle{SavePoint: una plataforma de catalogación de videojuegos como banco de pruebas de algoritmos de recomendación}
+\setAuthor{Felipe Peña Núñez}
+\setDegree{Grado en Ingeniería Informática - Ingeniería del Software}
+\setSupervisor{José Enrique Sánchez López \\ Aitor Rodríguez Dueñas}
+\setDepartment{Lenguajes y Sistemas Informáticos}
+\setMonth{octubre}
+\setYear{2025/2026}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Dedicatoria del trabajo. Se mantiene la página activa con texto provisional:
+% el autor la redactará antes de la entrega final (ver sections/00_agradecimientos.tex).
+\setDedication{Por redactar.}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Comienzo del documento
+\begin{document}
+
+    % Portada y secciones no numeradas
+    \input{sections/00_portada}
+    \input{sections/00_agradecimientos}
+    \input{sections/00_resumen}
+    \input{sections/00_abstract}
+    \input{sections/00_acronimos}
+
+    % Índice del documento y de figuras
+    \begingroup
+        % Los enlaces son normalmente azules, pero en los índices se configuran a negro para que no aparezca todo azul
+        \hypersetup{linkcolor=black}
+        \tableofcontents
+        \listoffigures
+        \listoftables
+        \lstlistoflistings
+    \endgroup
+
+    % Cambia el estilo de números de página de romanos a normal
+    \clearpage\pagenumbering{arabic}
+
+    % Capítulos del trabajo
+    \input{sections/01_introduccion}
+    \input{sections/02_estado_del_arte}
+    \input{sections/03_planificacion_metodologia}
+    \input{sections/04_analisis_requisitos}
+    \input{sections/05_diseno}
+    \input{sections/06_datos}
+    \input{sections/07_implementacion}
+    \input{sections/08_pruebas_verificacion}
+    \input{sections/09_despliegue}
+    \input{sections/10_conclusiones}
+
+    % Bibliografía
+    \bibliographystyle{unsrtnat}
+    \bibliography{bibliografia.bib}
+
+
+% Fin del documento
+\end{document}

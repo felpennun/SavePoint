@@ -1,0 +1,36 @@
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+SavePoint is a web application for cataloguing a personal video game collection, inspired by
+Goodreads and Letterboxd, that also serves as the academic platform for this final degree
+project. The project has a twofold goal. It gives a user an orderly way to record played and
+pending games, rate them, inventory physical and digital copies together with their
+provenance, and expose a public profile. It also builds a reproducible testbed on which
+later phases will implement and compare content based, collaborative filtering and hybrid
+recommendation algorithms, using synthetic users, explainable results and documented data
+provenance.
+
+This document describes the first delivery of the project, covering two phases that are
+already closed and verified. The first phase built a complete vertical slice, deployed on
+the internet at zero cost, with a lawful catalogue of one hundred and fifty games taken from
+Wikidata under a public domain dedication. The second phase grew that catalogue to more than
+three hundred thousand works imported from the IGDB database through a resumable importer, it
+redesigned the interface with a product grade intent, and it added catalogue sorting and
+filtering, several simulated demonstration accounts and a genre affinity recommendations
+page driven by each user's own recorded activity.
+
+The work pays particular attention to two aspects. The first is evidentiary rigour: every
+architectural decision is recorded in a decision document, every phase has an independent
+goal verification and an author acceptance sign off, and the figures reported here come from
+that evidence rather than from estimates. The second is the methodology of engineering
+assisted by artificial intelligence agents, governed through a specification driven
+development method, applied phase by phase and versioned in the repository itself, so that
+the engineering process is as inspectable and reproducible by third parties as the product.
+The recommender comparison work is presented as planned future work, not as an achieved
+result.
+
+\vspace{.5cm}
+
+\textbf{Keywords:} video game cataloguing, recommender systems, reproducible testbed, data
+provenance, agent assisted software engineering, specification driven development, Django,
+Next.js.
