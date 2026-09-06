@@ -9,6 +9,11 @@
       "status": "complete"
     },
     {
+      "number": "01.1",
+      "name": "Real-Scale Catalogue and Product Experience",
+      "status": "complete"
+    },
+    {
       "number": "2",
       "name": "Governed Corpus and Frozen Evaluation Contract",
       "status": "pending"
@@ -47,7 +52,7 @@
   "next": {
     "command": "/gsd:progress --next",
     "label": "Advance to the next step",
-    "reason": "Phase 1 of 9 · 11% · executing"
+    "reason": "Phases 1 and 01.1 of 9 complete · 22% · Phase 2 not started (author decision pending)"
   },
-  "updated_at": "2026-09-05T12:09:13.796Z"
+  "updated_at": "2026-09-06T04:30:00.000Z"
 }

@@ -62,6 +62,11 @@ class LoginView(APIView):
     def post(self, request: Request) -> Response:
         username = request.data.get("username")
         password = request.data.get("password")
+        # Mirror RegisterView: a crafted JSON body can make these a dict/list,
+        # which slips past the truthiness guard and can raise deep in the auth
+        # backend (500 instead of a clean 401).
+        if not isinstance(username, str) or not isinstance(password, str):
+            return Response({"detail": INVALID_CREDENTIALS_MESSAGE}, status=401)
         if not username or not password:
             return Response({"detail": INVALID_CREDENTIALS_MESSAGE}, status=401)
 

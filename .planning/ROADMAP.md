@@ -265,6 +265,7 @@ Plans (execution order follows the author's locked D-01 -> D-02 -> D-03 -> D-04 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Three-Day Public Demo Slice | 16/16 | Complete    | 2026-09-05 |
+| 01.1. Real-Scale Catalogue and Product Experience (inserted) | 10/10 | Complete    | 2026-09-06 |
 | 2. Governed Corpus and Frozen Evaluation Contract | 0/TBD | Not started | - |
 | 3. Complete Collection Workflows and Portability | 0/TBD | Not started | - |
 | 4. Public Discovery and Resilient Enrichment | 0/TBD | Not started | - |

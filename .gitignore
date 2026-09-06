@@ -17,3 +17,10 @@ playwright-report/
 
 .neon
 data/snapshots/
+
+# Editor / agent tooling state (machine- and session-local, not project source)
+.gsd/
+.planning/milestone.lock
+skills-lock.json
+.agents/skills/neon*/
+.claude/skills/
