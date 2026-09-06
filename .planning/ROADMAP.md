@@ -161,8 +161,41 @@ Plans (execution order follows the author's locked D-01 -> D-02 -> D-03 -> D-04 
   5. A signed-in user receives a ranked recommendation from a first ratings-aware recommender that combines their own recorded genre affinity with the aggregate external ratings of comparable games, excludes already-consumed titles, shows a deterministic explanation grounded in persisted features, records the model, feature, and input-data versions of every published result, and gives a sparse-history user an explicit cold-start fallback instead of an empty list; a random baseline is available as the comparison floor.
   6. The phase records the dataset, API, data-model, and normalisation documentation, the protocol, metrics, and threats to validity, and the controls against leakage, hallucination, bias, error, and information exposure, plus the author decisions behind them.
 
-**Plans**: TBD
+**Plans**: 13 plans (6 waves)
 **UI hint**: yes
+
+Plans:
+
+**Wave 1**
+
+- [ ] 02-01-PLAN.md — Esquema de corpus gobernado + comando `govern_corpus` (checksum, diccionario, informe de calidad — DATA-03)
+- [ ] 02-07-PLAN.md — Tokens de pulido compartidos en `globals.css` + fix de overflow de la nav autenticada <430px
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 02-02-PLAN.md — Campos de rating de usuario de IGDB, re-import + alias, snapshot inmutable `CorpusRatingSnapshot`, ADR-008
+- [ ] 02-08-PLAN.md — Protocolo de evaluación congelado (`protocol.json`) + métricas de ranking + split leave-one-out
+
+**Wave 3** *(blocked on Wave 2)*
+
+- [ ] 02-03-PLAN.md — Búsqueda tolerante (backfill de `GameAlias`) + filtros multi-selección backend
+- [ ] 02-05-PLAN.md — API de catálogo para el pase de UI: serializer, `NewReleasesView` (D-24), `OwnedGamesDlcView` (D-15), `display_rating` (D-09)
+- [ ] 02-09-PLAN.md — Usuarios sintéticos reproducibles por semilla + aislamiento del baseline de popularidad + informe de validación
+- [ ] 02-10-PLAN.md — Baseline aleatorio `rank_random_v1` (REC-01) + modelo de features de contenido + caché `WorkFeatureVector`
+
+**Wave 4** *(blocked on Wave 3)*
+
+- [ ] 02-04-PLAN.md — UI de filtros multi-selección (`FacetMenu`) + densidad product-grade del catálogo
+- [ ] 02-11-PLAN.md — Variantes con nombre del recomendador de contenido, explicación determinista, arranque en frío, `ContentRecsView`
+
+**Wave 5** *(blocked on Wave 4)*
+
+- [ ] 02-06-PLAN.md — Ficha de juego product-grade (sinopsis, rating relabelado) + estantes "Novedades" y "Para tus juegos"
+- [ ] 02-13-PLAN.md — Primera comparación completa `run_evaluation` (EVAL-01) + controles metodológicos (AGENT-04) + reconciliación (DATA-07)
+
+**Wave 6** *(blocked on Wave 5)*
+
+- [ ] 02-12-PLAN.md — Página de recomendaciones: 3 secciones etiquetadas que coexisten (contenido / género / DLC)
 
 ### Phase 3: Explainable Content Recommenders and Baseline Comparison
 
@@ -253,7 +286,7 @@ Plans (execution order follows the author's locked D-01 -> D-02 -> D-03 -> D-04 
 |-------|----------------|--------|-----------|
 | 1. Three-Day Public Demo Slice | 16/16 | Complete    | 2026-09-05 |
 | 01.1. Real-Scale Catalogue and Product Experience (inserted) | 10/10 | Complete    | 2026-09-06 |
-| 2. Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender | 0/TBD | Not started | - |
+| 2. Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender | 0/13 | Not started | - |
 | 3. Explainable Content Recommenders and Baseline Comparison | 0/TBD | Not started | - |
 | 4. Collaborative and Hybrid Comparison | 0/TBD | Not started | - |
 | 5. Complete Collection Workflows and Portability | 0/TBD | Not started | - |
