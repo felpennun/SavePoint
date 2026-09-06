@@ -82,6 +82,10 @@ export default async function CollectionPage({
     items.sort((a, b) => (b.rating_half_steps ?? -1) - (a.rating_half_steps ?? -1));
   } else if (activeSort === "release_year") {
     items.sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
+  } else if (activeSort === "recently_updated") {
+    // Default sort -- MyLibraryView returns `updated_at`; fall back to a
+    // stable no-op only if an older API response omits it.
+    items.sort((a, b) => (b.updated_at ?? "").localeCompare(a.updated_at ?? ""));
   }
 
   const pageCount = Math.max(1, Math.ceil(items.length / PAGE_SIZE));

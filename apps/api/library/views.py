@@ -54,6 +54,12 @@ class MyLibraryView(APIView):
                     "status": entry.current_status,
                     "rating_half_steps": entry.rating_half_steps,
                     "owned_copy_count": OwnedCopy.objects.filter(user=request.user, work=entry.work).count(),
+                    # Enough for the Collection page's client-side sorts
+                    # (recently_updated / release_year) to actually work; the
+                    # richer cover/platform enrichment is still Plan 03
+                    # (repo-review 2026-09-06 L-07).
+                    "year": entry.work.first_release_date.year if entry.work.first_release_date else None,
+                    "updated_at": entry.updated_at.isoformat(),
                 }
             )
         return Response({"items": items, "summary": summary})
