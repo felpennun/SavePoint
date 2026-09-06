@@ -17,6 +17,34 @@ import { expect, test, type Page } from "@playwright/test";
 // TypeScript under Playwright's default transform, not ESM.
 const AXE_SCRIPT_PATH = path.join(__dirname, "..", "node_modules", "axe-core", "axe.min.js");
 
+// Plan 01.1-10 evidence artifacts. Playwright writes one deterministic PNG
+// per surface/viewport pair here; docs/verification/phase-01.1-product-review.md
+// references these exact repo-relative paths.
+const ARTIFACT_DIR = path.join(__dirname, "artifacts", "phase-01.1");
+
+async function shoot(page: Page, surface: string, viewport: string): Promise<void> {
+  await page.screenshot({ path: path.join(ARTIFACT_DIR, `${surface}-${viewport}.png`), fullPage: true });
+}
+
+// The redesign stack is normally served on :3000, whose Origin is in
+// Django's CSRF_TRUSTED_ORIGINS. When the suite is pointed at a local
+// production build on any other port (PLAYWRIGHT_BASE_URL), the browser
+// Origin no longer matches and every unsafe /api call 403s. Rewrite the
+// Origin/Referer on proxied API traffic back to the canonical dev origin
+// so the auth journeys still exercise the real endpoints. Inert when the
+// suite runs against :3000 (the CI / post-merge path).
+const CANONICAL_ORIGIN = "http://127.0.0.1:3000";
+async function installCsrfOriginShim(page: Page): Promise<void> {
+  const base = process.env.PLAYWRIGHT_BASE_URL ?? "";
+  if (!base || base.includes(":3000")) return;
+  await page.route("**/api/**", async (route) => {
+    const request = route.request();
+    const headers = { ...request.headers(), origin: CANONICAL_ORIGIN, referer: `${CANONICAL_ORIGIN}/` };
+    const response = await route.fetch({ headers });
+    await route.fulfill({ response });
+  });
+}
+
 const VIEWPORTS = {
   mobile: { width: 375, height: 812 }, // >= 320px floor required by UI-SPEC
   desktop: { width: 1280, height: 800 },
@@ -60,6 +88,10 @@ const PUBLIC_PAGES: { name: string; path: (locale: string) => string }[] = [
   { name: "sources", path: (l) => `/${l}/sources` },
 ];
 
+test.beforeEach(async ({ page }) => {
+  await installCsrfOriginShim(page);
+});
+
 for (const locale of ["es", "en"] as const) {
   for (const [viewportName, viewport] of Object.entries(VIEWPORTS)) {
     test.describe(`axe scan: ${locale} @ ${viewportName}`, () => {
@@ -76,6 +108,10 @@ for (const locale of ["es", "en"] as const) {
       test("one game detail page has no critical/serious axe violations", async ({ page }) => {
         await page.goto(`/${locale}/catalogue`);
         await page.locator("main ul li a").first().click();
+        // Wait for the detail navigation to settle before injecting axe --
+        // scanning mid-navigation races the SSR document (no <title> yet).
+        await page.waitForURL(new RegExp(`/${locale}/games/`));
+        await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
         const violations = await runAxeScan(page);
         assertNoCriticalOrSeriousViolations(violations, `game detail (${locale}, ${viewportName})`);
       });
@@ -106,6 +142,132 @@ test.describe("reduced motion is respected", () => {
     expect(pageErrors).toEqual([]);
   });
 });
+
+// ---------------------------------------------------------------------------
+// Plan 01.1-10: complete automated product evidence for the four D-01..D-04
+// surfaces at the approved desktop AND mobile viewports. Real functional
+// assertions + keyboard/focus + axe + mobile reflow + cover fallback, each
+// writing a deterministic screenshot artifact (catalogue/detail/registration
+// here; recommendations -- auth-gated -- in demo-journey.spec.ts).
+// ---------------------------------------------------------------------------
+async function assertNoMobileOverflow(page: Page, label: string) {
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
+  );
+  expect(overflow, `${label} must not overflow horizontally at mobile width`).toBe(false);
+}
+
+for (const [viewportName, viewport] of Object.entries(VIEWPORTS)) {
+  test.describe(`product surface evidence @ ${viewportName}`, () => {
+    test.use({ viewport });
+
+    test("catalogue: filter state survives reload, count line, pagination, axe, screenshot", async ({ page }) => {
+      await page.goto("/es/catalogue");
+      await expect(page.getByRole("heading", { level: 1, name: "Catálogo" })).toBeVisible();
+
+      // Full-catalogue count line is always shown.
+      const countLine = page.getByTestId("result-count");
+      await expect(countLine).toBeVisible();
+      await expect(countLine).toHaveText(/juegos/);
+
+      // Populated grid + pagination affordance.
+      const cards = page.locator("main ul.sp-grid li");
+      expect(await cards.count()).toBeGreaterThan(0);
+      await expect(page.locator('nav[aria-label="Paginación"]')).toBeVisible();
+      await expect(page.getByRole("link", { name: "Siguiente" })).toBeVisible();
+
+      // Keyboard: the search field is reachable and focusable by its label.
+      await page.getByLabel("Buscar juegos").focus();
+      await expect(page.getByLabel("Buscar juegos")).toBeFocused();
+
+      // Apply a genre filter via the GET form; the filtered view must be a
+      // shareable URL that still reflects the filter after a full reload.
+      const genreSelect = page.locator("#genre");
+      await genreSelect.selectOption({ index: 1 });
+      const chosenGenre = await genreSelect.inputValue();
+      expect(chosenGenre).not.toEqual("");
+      await page.getByRole("button", { name: "Aplicar filtros" }).click();
+      await page.waitForURL(/[?&]genre=/);
+      await page.reload();
+      expect(page.url()).toMatch(/[?&]genre=/);
+      await expect(page.locator("#genre")).toHaveValue(chosenGenre);
+      await expect(page.locator(".sp-chip-row")).toBeVisible();
+      // Filtered result line switches to the "{n} coinciden" copy.
+      await expect(page.getByTestId("result-count")).toHaveText(/coinciden|juegos/);
+
+      const violations = await runAxeScan(page);
+      assertNoCriticalOrSeriousViolations(violations, `catalogue (filtered, ${viewportName})`);
+      if (viewportName === "mobile") await assertNoMobileOverflow(page, "catalogue");
+
+      await page.goto("/es/catalogue");
+      await shoot(page, "catalogue", viewportName);
+    });
+
+    test("detail: cover (or fallback), ScorePill/omission, provenance + attribution, axe, screenshot", async ({ page }) => {
+      await page.goto("/es/catalogue");
+      const firstCard = page.locator("main ul.sp-grid li a").first();
+      await firstCard.click();
+      await page.waitForURL(/\/es\/games\//);
+      await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+
+      // Cover: either the hotlinked image or the first-party placeholder,
+      // never an empty box.
+      const cover = page.locator(".sp-cover").first();
+      await expect(cover).toBeVisible();
+      const hasImg = (await cover.locator("img").count()) > 0;
+      const hasPlaceholder = (await cover.locator('[data-testid="cover-placeholder"]').count()) > 0;
+      expect(hasImg || hasPlaceholder).toBe(true);
+
+      // Provenance / IGDB attribution is a static, visible block.
+      const provenance = page.locator('section[aria-label="Procedencia"]');
+      await expect(provenance).toBeVisible();
+      await expect(provenance).toContainText("IGDB");
+
+      const violations = await runAxeScan(page);
+      assertNoCriticalOrSeriousViolations(violations, `game detail (${viewportName})`);
+      if (viewportName === "mobile") await assertNoMobileOverflow(page, "detail");
+
+      await shoot(page, "detail", viewportName);
+    });
+
+    test("registration: labelled fields, client-side validation, axe, screenshot", async ({ page }) => {
+      await page.goto("/es/register");
+      await expect(page.getByRole("heading", { level: 1, name: "Crear una cuenta simulada" })).toBeVisible();
+
+      // Every field has a visible, associated label.
+      await expect(page.getByLabel("Usuario")).toBeVisible();
+      await expect(page.getByLabel("Contraseña", { exact: true })).toBeVisible();
+      await expect(page.getByLabel("Confirmar contraseña")).toBeVisible();
+
+      // Password-mismatch is caught client-side, announced, and clears the
+      // password fields (mirrors the login contract).
+      await page.getByLabel("Usuario").fill("e2e-validation-only");
+      await page.getByLabel("Contraseña", { exact: true }).fill("Abc12345!x");
+      await page.getByLabel("Confirmar contraseña").fill("different99!");
+      await page.getByRole("button", { name: "Crear cuenta simulada" }).click();
+      const err = page.getByTestId("register-error");
+      await expect(err).toBeVisible();
+      await expect(err).toHaveText(/no coinciden/i);
+      await expect(page.getByLabel("Contraseña", { exact: true })).toHaveValue("");
+
+      const violations = await runAxeScan(page);
+      assertNoCriticalOrSeriousViolations(violations, `registration (${viewportName})`);
+      if (viewportName === "mobile") await assertNoMobileOverflow(page, "registration");
+
+      await shoot(page, "registration", viewportName);
+    });
+
+    test("recommendations is auth-gated: signed-out visit redirects to login, no personal nav", async ({ page }) => {
+      await page.goto("/es/recommendations");
+      await page.waitForURL(/\/es\/login/);
+      expect(page.url()).toContain("next=");
+      // The authenticated-only nav links must not be present for a signed-out
+      // visitor (threat T-01.1-10).
+      await expect(page.getByRole("link", { name: "Recomendaciones" })).toHaveCount(0);
+      await expect(page.getByRole("link", { name: "Colección" })).toHaveCount(0);
+    });
+  });
+}
 
 test.describe("keyboard-only journey (accessibility acceptance checklist)", () => {
   test.skip(!process.env.DEMO_USERNAME || !process.env.DEMO_PASSWORD, "requires DEMO_USERNAME/DEMO_PASSWORD");

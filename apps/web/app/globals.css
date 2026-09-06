@@ -308,6 +308,11 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
+  /* Grid items default to min-width: auto, which lets a <select> with long
+     option labels or a number <input> force its track wider than 1fr and
+     blow the filter grid past the viewport at mobile widths. Pin to 0 so
+     the auto-fit / 1fr tracks actually constrain (01.1-10 reflow gate). */
+  min-width: 0;
 }
 
 .sp-field label {
@@ -319,6 +324,8 @@ textarea {
 .sp-field input,
 .sp-field select {
   min-height: 2.75rem;
+  min-width: 0;
+  max-width: 100%;
   background: var(--color-surface-overlay);
   color: var(--color-text-primary);
   border: 1px solid var(--color-surface-border);
