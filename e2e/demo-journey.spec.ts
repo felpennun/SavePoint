@@ -1,4 +1,54 @@
-import { expect, test } from "@playwright/test";
+import path from "node:path";
+
+import { expect, test, type Page } from "@playwright/test";
+
+// Plan 01.1-10 evidence artifacts (recommendations surface -- auth-gated, so
+// its screenshots live in this suite alongside the controlled-account
+// journey; catalogue/detail/registration are in a11y.spec.ts).
+const ARTIFACT_DIR = path.join(__dirname, "artifacts", "phase-01.1");
+const AXE_SCRIPT_PATH = path.join(__dirname, "..", "node_modules", "axe-core", "axe.min.js");
+
+async function shoot(page: Page, surface: string, viewport: string): Promise<void> {
+  await page.screenshot({ path: path.join(ARTIFACT_DIR, `${surface}-${viewport}.png`), fullPage: true });
+}
+
+// See a11y.spec.ts for the rationale: rewrite the Origin/Referer of proxied
+// /api traffic to the canonical dev origin so unsafe requests still clear
+// Django's CSRF origin check when the suite runs against a local production
+// build on a non-3000 port. Inert on :3000.
+const CANONICAL_ORIGIN = "http://127.0.0.1:3000";
+async function installCsrfOriginShim(page: Page): Promise<void> {
+  const base = process.env.PLAYWRIGHT_BASE_URL ?? "";
+  if (!base || base.includes(":3000")) return;
+  await page.route("**/api/**", async (route) => {
+    const request = route.request();
+    const headers = { ...request.headers(), origin: CANONICAL_ORIGIN, referer: `${CANONICAL_ORIGIN}/` };
+    const response = await route.fetch({ headers });
+    await route.fulfill({ response });
+  });
+}
+
+interface AxeViolation {
+  id: string;
+  impact: string | null;
+  help: string;
+  nodes: { target: string[] }[];
+}
+
+async function axeBlocking(page: Page): Promise<AxeViolation[]> {
+  await page.addScriptTag({ path: AXE_SCRIPT_PATH });
+  const results = await page.evaluate(async () => {
+    // @ts-expect-error -- axe is injected globally by the script tag above
+    return window.axe.run(document, { resultTypes: ["violations"] });
+  });
+  return ((results as { violations: AxeViolation[] }).violations).filter(
+    (v) => v.impact === "critical" || v.impact === "serious",
+  );
+}
+
+test.beforeEach(async ({ page }) => {
+  await installCsrfOriginShim(page);
+});
 
 /**
  * Plan 01-15 Task 2 scope note: this file is built incrementally across two
@@ -87,11 +137,14 @@ test.describe("demo account login journey (AUTH-01, D-02/D-03, LIB-01)", () => {
 
     // GameCard renders title and year/platform as separate paragraphs
     // within the same link -- target the title paragraph specifically
-    // rather than the link's full (multi-line) innerText.
+    // rather than the link's full (multi-line) innerText. The detail <h1>
+    // deliberately appends the release year in a span (01.1-UI-SPEC Screen
+    // Contract 3: "release year beside it"), which the card title omits, so
+    // this is a containment check, not an exact-text match.
     const firstGameLink = page.locator("main ul li a").first();
     const gameTitle = (await firstGameLink.locator("p").first().innerText()).trim();
     await firstGameLink.click();
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText(gameTitle);
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(gameTitle);
 
     // Set a status, save, and confirm the UI never claims success before
     // the request actually completes.
@@ -147,5 +200,144 @@ test.describe("demo account login journey (AUTH-01, D-02/D-03, LIB-01)", () => {
 
     const cookiesAfterLogout = await context.cookies();
     expect(cookiesAfterLogout.some((c) => c.name === "sessionid")).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Plan 01.1-10: the complete controlled-account journey (D-01 -> D-04) plus
+// the auth-gated recommendations surface evidence at desktop AND mobile.
+// ---------------------------------------------------------------------------
+test.describe("controlled-account journey + authenticated recommendations (D-01..D-04)", () => {
+  // D-01 / AUTH-02: a genuinely functional self-service registration. The
+  // endpoint is per-IP rate limited (5/hour, 01.1-08). On a fresh
+  // environment this drives the real register -> session -> catalogue ->
+  // own (empty) collection journey; when the IP budget is already spent the
+  // test instead asserts the localized rate-limit error state, which is
+  // itself a required UI-SPEC Screen Contract 5d state. Either way the
+  // registration form is exercised end-to-end against the live endpoint.
+  test("fresh simulated account: real registration journey, or the rate-limit state", async ({ page }) => {
+    const stamp = `${Date.now().toString(36)}${Math.floor(Math.random() * 1e6).toString(36)}`;
+    const freshUsername = `e2e-visitor-${stamp}`;
+    // Distinct randomness from the username so Django's
+    // UserAttributeSimilarityValidator never trips; still an obviously
+    // generated, validator-passing value (length, mixed case, digit).
+    const freshPassword = `Journ3y-${Math.random().toString(36).slice(2, 12)}-Qx`;
+
+    await page.goto("/es/register");
+    await page.getByLabel("Usuario").fill(freshUsername);
+    await page.getByLabel("Contraseña", { exact: true }).fill(freshPassword);
+    await page.getByLabel("Confirmar contraseña").fill(freshPassword);
+
+    const [registerResponse] = await Promise.all([
+      page.waitForResponse((r) => r.url().includes("/api/accounts/register/")),
+      page.getByRole("button", { name: "Crear cuenta simulada" }).click(),
+    ]);
+    const status = registerResponse.status();
+    expect([201, 429]).toContain(status);
+
+    if (status === 429) {
+      // Rate-limit state: localized message, username preserved, password
+      // cleared (mirrors the login contract).
+      await expect(page.getByTestId("register-error")).toHaveText(/demasiados intentos/i);
+      await expect(page.getByLabel("Usuario")).toHaveValue(freshUsername);
+      await expect(page.getByLabel("Contraseña", { exact: true })).toHaveValue("");
+      test.info().annotations.push({
+        type: "note",
+        description: "registration endpoint IP budget exhausted (429); full register->session journey deferred to an un-throttled run",
+      });
+      return;
+    }
+
+    // D-03: a successful registration establishes a session and lands on the
+    // catalogue. The redirect is a client-side push, so a reload lets the
+    // server layout re-read the new sessionid cookie and render the
+    // authenticated chrome (what a real visitor sees on their next
+    // server-rendered navigation).
+    await page.waitForURL(/\/es\/catalogue$/);
+    await page.reload();
+    await expect(page.getByRole("heading", { level: 1, name: "Catálogo" })).toBeVisible();
+
+    // AUTH-02: the account is visibly simulated and the authenticated-only
+    // nav links appear now that a session exists.
+    await expect(page.getByRole("note")).toBeVisible();
+    const collectionLink = page.getByRole("link", { name: "Colección" });
+    await expect(collectionLink).toBeVisible();
+    await expect(page.getByRole("link", { name: "Recomendaciones" })).toBeVisible();
+
+    // D-02: the fresh account's own library is empty -- deterministic empty
+    // state, reached through the nav link.
+    await collectionLink.click();
+    await page.waitForURL(/\/es\/collection$/);
+    await expect(page.getByRole("heading", { level: 1, name: "Colección" })).toBeVisible();
+    await expect(page.getByText("Tu colección está vacía")).toBeVisible();
+
+    // D-04: personalized recommendations navigation from the authenticated nav.
+    await page.getByRole("link", { name: "Recomendaciones" }).click();
+    await page.waitForURL(/\/es\/recommendations$/);
+    await expect(page.locator("section.sp-disclosure")).toContainText("genre-taste-v1");
+  });
+
+  // D-02 / D-03 / D-04 + the recommendations screenshot evidence, via the
+  // pre-provisioned demo account. Login is not rate limited, so this is the
+  // reliable source of the recommendations/desktop + recommendations/mobile
+  // artifacts and the per-viewport axe / reflow evidence.
+  test.describe("demo session authenticated surfaces", () => {
+    test.skip(!process.env.DEMO_USERNAME || !process.env.DEMO_PASSWORD, "requires DEMO_USERNAME/DEMO_PASSWORD");
+
+    test("collection + recommendations: disclosure, shelves-or-onboarding, axe clean, desktop + mobile", async ({ page }) => {
+      const { username, password } = readDemoCredentials(process.env);
+      await page.goto("/es/login");
+      await page.getByLabel("Usuario").fill(username);
+      await page.getByLabel("Contraseña").fill(password);
+      await page.getByRole("button", { name: "Entrar" }).click();
+      await page.waitForURL(/\/es\/catalogue$/);
+
+      for (const [viewportName, size] of [
+        ["desktop", { width: 1280, height: 800 }],
+        ["mobile", { width: 375, height: 812 }],
+      ] as const) {
+        await page.setViewportSize(size);
+
+        // Collection: the signed-in user's own library view renders (grid or
+        // its documented empty state), auth-gated behind the session.
+        await page.goto("/es/collection");
+        await expect(page.getByRole("heading", { level: 1, name: "Colección" })).toBeVisible();
+        const hasGrid = (await page.locator("main ul.sp-grid li").count()) > 0;
+        const hasEmpty = (await page.getByText("Tu colección está vacía").count()) > 0;
+        expect(hasGrid || hasEmpty).toBe(true);
+
+        // Recommendations: D-09 disclosure (algorithm_id + limitation) is
+        // always present; the body is either genre shelves or the explicit
+        // insufficient-history onboarding state -- never a silent fallback to
+        // the popularity baseline.
+        await page.goto("/es/recommendations");
+        await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+        const disclosure = page.locator("section.sp-disclosure");
+        await expect(disclosure).toBeVisible();
+        await expect(disclosure).toContainText("genre-taste-v1");
+        const shelfCount = await page.locator('section h2:has-text("Porque juegas mucho a")').count();
+        const onboardingCount = await page.getByText("Aún no hay suficiente actividad").count();
+        expect(shelfCount + onboardingCount).toBeGreaterThan(0);
+
+        if (viewportName === "mobile") {
+          // The recommendations content region must reflow with no horizontal
+          // scroll at the mobile floor. (The shared authenticated header is a
+          // separate, pre-existing chrome concern tracked in deferred-items.md
+          // -- it is not part of any single surface's contract.)
+          const mainOverflow = await page.evaluate(() => {
+            const main = document.querySelector("main");
+            return main ? main.scrollWidth > main.clientWidth + 1 : true;
+          });
+          expect(mainOverflow, "recommendations content must not overflow horizontally at mobile width").toBe(false);
+        }
+
+        const blocking = await axeBlocking(page);
+        expect(
+          blocking,
+          `axe critical/serious on recommendations (${viewportName}): ${blocking.map((v) => v.id).join(", ")}`,
+        ).toEqual([]);
+        await shoot(page, "recommendations", viewportName);
+      }
+    });
   });
 });

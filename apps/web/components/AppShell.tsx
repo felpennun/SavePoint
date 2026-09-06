@@ -162,11 +162,11 @@ export function AppShell({
         {dict.nav.skipToContent}
       </a>
       <header className="border-b" style={{ borderColor: "var(--color-surface-border)", background: "var(--color-surface-raised)", position: "relative" }}>
-        <div className="flex items-center justify-between gap-4 px-4 py-3">
+        <div className="flex items-center justify-between gap-2 md:gap-4 px-3 md:px-4 py-3">
           <Link href={`/${locale}`} aria-label={dict.nav.home} style={{ color: "var(--color-text-primary)", display: "inline-flex", alignItems: "center" }}>
             <BrandLockup />
           </Link>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
             <TopNavigation items={items} locale={locale} />
             <ThemeToggle labels={dict.theme.toggle} />
             {isAuthenticated ? (
