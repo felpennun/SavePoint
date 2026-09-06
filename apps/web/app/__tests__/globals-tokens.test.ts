@@ -37,7 +37,8 @@ describe("shared product polish tokens", () => {
     const theme = block(css, "@theme");
     expect(value(theme, "--color-skeleton-base")).toBe("var(--color-surface-overlay)");
     expect(value(theme, "--color-skeleton-sheen")).toBe("var(--color-surface-raised)");
-    expect(value(block(css, ".sp-skeleton"), "background")).toBe("var(--color-skeleton-base)");
+    const utilities = css.slice(css.indexOf("/* Phase 2 product polish utilities"));
+    expect(value(block(utilities, ".sp-skeleton"), "background")).toBe("var(--color-skeleton-base)");
   });
 
   it("explicitly disables skeleton animation with reduced motion", () => {

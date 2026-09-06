@@ -21,6 +21,10 @@
   --color-surface-overlay: #1f1f2b;
   --color-surface-border: #2c2c3a;
 
+  --shadow-overlay: 0 6px 20px -4px rgba(0, 0, 0, 0.45);
+  --color-skeleton-base: var(--color-surface-overlay);
+  --color-skeleton-sheen: var(--color-surface-raised);
+
   /* Text -- off-white on dark, never pure #fff/#000 (harsh contrast). */
   --color-text-primary: #f2f2f5;
   --color-text-secondary: #b8b8c4;
@@ -91,6 +95,8 @@
   --color-surface-raised: #ffffff;
   --color-surface-overlay: #ececf1;
   --color-surface-border: #d9d9e0;
+
+  --shadow-overlay: 0 6px 20px -4px rgba(20, 20, 30, 0.18);
 
   --color-text-primary: #1b1b22;
   --color-text-secondary: #4a4a57;
@@ -184,6 +190,14 @@ textarea {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .sp-skeleton {
+    animation: none !important;
+  }
+  .sp-skeleton::after {
+    animation: none !important;
+    display: none;
+  }
+
   *,
   *::before,
   *::after {
@@ -622,6 +636,127 @@ textarea {
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: var(--space-md);
   align-items: end;
+}
+
+/* Phase 2 product polish utilities. Skeleton consumers supply the final
+   geometry and aria-hidden="true"; one status region belongs to the parent. */
+.sp-skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-skeleton-base);
+  border-radius: var(--radius-control);
+}
+
+.sp-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, var(--color-skeleton-sheen), transparent);
+  transform: translateX(-100%);
+  animation: sp-skeleton-sweep 1.6s ease-in-out infinite;
+}
+
+@keyframes sp-skeleton-sweep {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.sp-facet {
+  position: relative;
+  min-width: 0;
+}
+
+.sp-facet > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: 2.75rem;
+  list-style: none;
+  cursor: pointer;
+  font-size: var(--text-meta);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.sp-facet > summary::-webkit-details-marker {
+  display: none;
+}
+
+.sp-facet-chevron {
+  display: inline-block;
+  flex-shrink: 0;
+  transition: transform 150ms ease;
+}
+
+.sp-facet[open] > summary .sp-facet-chevron {
+  transform: rotate(180deg);
+}
+
+.sp-facet > .sp-surface {
+  margin-top: var(--space-xs);
+  max-width: 100%;
+  max-height: 20rem;
+  overflow: auto;
+}
+
+@media (min-width: 48rem) {
+  .sp-facet > .sp-surface {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 20rem;
+    max-width: min(20rem, calc(100vw - var(--space-2xl)));
+    z-index: 30;
+    box-shadow: var(--shadow-overlay);
+  }
+}
+
+/* Semantic table: row header, aria-hidden bar cell, then a text value.
+   Bar consumers set the fill width from their numeric contribution. */
+.sp-contrib-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 var(--space-md);
+  font-size: var(--text-body);
+  color: var(--color-text-secondary);
+}
+
+.sp-contrib-table th,
+.sp-contrib-table td {
+  padding: 0;
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+}
+
+.sp-contrib-table th {
+  text-align: left;
+  font-size: var(--text-meta);
+  font-weight: 600;
+}
+
+.sp-contrib-table td[aria-hidden="true"] {
+  width: 40%;
+  padding: 0 var(--space-md);
+}
+
+.sp-contrib-table td:last-child {
+  text-align: right;
+  color: var(--color-text-primary);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.sp-contrib-track {
+  background: var(--color-surface-overlay);
+  border-radius: var(--radius-control);
+  overflow: hidden;
+}
+
+.sp-contrib-fill {
+  height: var(--space-sm);
+  background: var(--color-text-secondary);
 }
 
 .sp-filterbar-actions {
