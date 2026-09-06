@@ -1,7 +1,7 @@
 ---
 gsd_state_version: 1.0
 status: in_progress
-stopped_at: "Phase 2 plan-phase mid-flight — CONTEXT + UI-SPEC + RESEARCH + VALIDATION + PATTERNS done and committed; gsd-planner was running in a background agent (dies with the session) and had not yet written the 02-*-PLAN.md files. Resume: /gsd-resume-work → it picks up .planning/phases/02-.../.continue-here.md → re-run /gsd-plan-phase 2 (init reports has_plans; if true go to gsd-plan-checker, if false re-spawn planner)."
+stopped_at: "Phase 2 planner hit the session rate limit (429) before writing any PLAN.md; resets 20:50 Europe/Paris. 02-COVERAGE.md rescued. Resume after reset: /gsd-resume-work -> /gsd-plan-phase 2 (re-spawns planner, has_plans:false, all inputs committed). See .planning/phases/02-.../.continue-here.md"
 last_updated: "2026-09-06T15:40:00.000Z"
 state_head: f56f7a6
 progress:
@@ -16,7 +16,7 @@ next_phase_name: Governed Corpus, External Ratings, Evaluation Contract, and Fir
 next_action: /gsd-resume-work
 current_phase: 2
 current_phase_name: Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender
-last_activity_desc: "Fase 2: discuss + UI-SPEC (7/7) + research + validation + pattern-map hechos; planner corriendo. Ver .planning/phases/02-.../.continue-here.md"
+last_activity_desc: "Fase 2: discuss+UI-SPEC+research+validation+pattern-map+COVERAGE hechos; planner cayo por rate limit (reset 20:50 Paris), 0 PLAN.md. Retomar tras el reset."
 ---
 
 # Project State
