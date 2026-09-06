@@ -43,34 +43,37 @@ function Need {
 Write-Host "== verify-igdb-adr: $AdrPath ==" -ForegroundColor Cyan
 
 # --- Three candidates -------------------------------------------------------
+# ADR-006 prose is Spanish (project convention: thesis docs in Spanish, code in
+# English); these patterns match the Spanish text. Language-neutral tokens
+# (numbers, IDs, URLs, code) are matched verbatim.
 Need "Candidate: IGDB"            'IGDB'
 Need "Candidate: RAWG"            'RAWG'
 Need "Candidate: scaled Wikidata" '(?i)scaled Wikidata'
 
 # --- Seven DATA-04 axes, each present AS A TABLE ROW LABEL ----------------
-Need "Axis: Coverage"    '\|\s*\*\*Coverage\*\*\s*\|'
-Need "Axis: Platforms"   '\|\s*\*\*Platforms\*\*\s*\|'
-Need "Axis: Licence"     '\|\s*\*\*Licence\*\*\s*\|'
-Need "Axis: Attribution" '\|\s*\*\*Attribution\*\*\s*\|'
-Need "Axis: Quotas"      '\|\s*\*\*Quotas\*\*\s*\|'
-Need "Axis: Stability"   '\|\s*\*\*Stability\*\*\s*\|'
-Need "Axis: Cost"        '\|\s*\*\*Cost\*\*\s*\|'
+Need "Axis: Coverage"    '\|\s*\*\*Cobertura\*\*\s*\|'
+Need "Axis: Platforms"   '\|\s*\*\*Plataformas\*\*\s*\|'
+Need "Axis: Licence"     '\|\s*\*\*Licencia\*\*\s*\|'
+Need "Axis: Attribution" '\|\s*\*\*Atribución\*\*\s*\|'
+Need "Axis: Quotas"      '\|\s*\*\*Cuotas\*\*\s*\|'
+Need "Axis: Stability"   '\|\s*\*\*Estabilidad\*\*\s*\|'
+Need "Axis: Cost"        '\|\s*\*\*Coste\*\*\s*\|'
 
 # --- Axes carry recorded values, not empty cells -------------------------
-Need "Coverage row has measured counts"      '(?m)^\|\s*\*\*Coverage\*\*.*374,555.*312,418'
-Need "Quotas row has the rate-limit numbers" '(?m)^\|\s*\*\*Quotas\*\*.*4 requests/second.*8 concurrent'
-Need "Cost row is stated for all candidates" '(?m)^\|\s*\*\*Cost\*\*.*\|.*\|.*\|.*\|'
+Need "Coverage row has measured counts"      '(?m)^\|\s*\*\*Cobertura\*\*.*374,555.*312,418'
+Need "Quotas row has the rate-limit numbers" '(?m)^\|\s*\*\*Cuotas\*\*.*4 requests/second.*8 concurrent'
+Need "Cost row is stated for all candidates" '(?m)^\|\s*\*\*Coste\*\*.*\|.*\|.*\|.*\|'
 
 # --- Decision content ---------------------------------------------------
-Need "Chooses IGDB per D-05"                 '(?i)Adopt IGDB v4 as the real-scale catalogue source'
+Need "Chooses IGDB per D-05"                 '(?i)Adoptar IGDB v4 como la fuente del catálogo a escala real'
 Need "Link to the authenticated probe"       '\.\./verification/igdb-api-probe\.md'
-Need "Eligible-category boundary stated"     '(?i)Eligible-category boundary.*game_type\s*=\s*0.*312,418'
-Need "game_type 1-14 excluded"               '(?i)game_type.{0,6}1.{0,4}14.*(excluded|non-primary)'
-Need "Cover delivery/storage rule"           '(?i)Cover delivery / storage rule.*hotlinked'
+Need "Eligible-category boundary stated"     '(?i)Frontera de categoría elegible.*game_type\s*=\s*0.*312,418'
+Need "game_type 1-14 excluded"               '(?i)game_type.{0,6}1.{0,6}14.*(exclu|no primari)'
+Need "Cover delivery/storage rule"           '(?i)Regla de entrega / almacenamiento de portadas.*hotlink'
 Need "Cover URL construction recorded"       'images\.igdb\.com/igdb/image/upload/t_\{size\}/\{hash\}\.jpg'
-Need "Placeholder fallback for covers"       '(?i)first-party placeholder'
-Need "Phase 1 offline corpus preserved"      '(?i)Preserve the Phase 1 offline corpus.*retained unchanged'
-Need "Request-time no-provider rule kept"    '(?i)CAT-06.*OPS-03.*no provider is called at request time'
+Need "Placeholder fallback for covers"       '(?i)placeholder de primera parte'
+Need "Phase 1 offline corpus preserved"      '(?i)Preservar el corpus offline de la Fase 1.*conservan sin cambios'
+Need "Request-time no-provider rule kept"    '(?i)CAT-06.*OPS-03.*no se llama a ningún proveedor en tiempo de petición'
 Need "Exact requests pin recorded"           'requests==2\.34\.2'
 Need "allauth / dj-rest-auth explicitly rejected" '(?i)Do not\*\*? add .*django-allauth.*dj-rest-auth'
 

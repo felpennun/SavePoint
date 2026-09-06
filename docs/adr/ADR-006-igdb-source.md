@@ -1,73 +1,73 @@
-# ADR-006: IGDB as the real-scale catalogue source, and cover delivery
+# ADR-006: IGDB como fuente del catálogo a escala real, y entrega de portadas
 
-- **Status:** Accepted
-- **Date:** 2026-09-05
-- **Decision author:** Felipe (`requests 2.34.2 aprobado` — explicit approval of the dependency and the source decision gate)
-- **Drafting / evidence:** execution agent; automated verification (`scripts/verify-igdb-adr.ps1`, `scripts/verify-igdb-probe.ps1`, `scripts/check-dependencies.ps1`) and the human decision are kept separate.
-- **Phase / Plan:** 01.1 / 01.1-01 Task 3 · **Requirement:** DATA-04 (also unblocks CAT-02, REC-10 catalogue work) · **GitHub issue:** #7
-- **Supersedes for the real-scale catalogue:** the "no runtime provider, Wikidata-only" position of [ADR-003](ADR-003-data-sources.md) — see *Consequences › Relationship to ADR-003*.
+- **Estado:** Aceptado
+- **Fecha:** 2026-09-05
+- **Autor de la decisión:** Felipe (`requests 2.34.2 aprobado` — aprobación explícita de la dependencia y del gate de decisión de fuente)
+- **Redacción / evidencia:** agente de ejecución; la verificación automática (`scripts/verify-igdb-adr.ps1`, `scripts/verify-igdb-probe.ps1`, `scripts/check-dependencies.ps1`) y la decisión humana se mantienen separadas.
+- **Fase / Plan:** 01.1 / 01.1-01 Tarea 3 · **Requisito:** DATA-04 (también desbloquea el trabajo de catálogo de CAT-02, REC-10) · **Issue de GitHub:** #7
+- **Sustituye, para el catálogo a escala real:** la posición "sin proveedor en runtime, solo Wikidata" de [ADR-003](ADR-003-data-sources.md) — ver *Consecuencias › Relación con ADR-003*.
 
-## Context
+## Contexto
 
-Phase 1 shipped a 150-game curated Wikidata snapshot ([ADR-003](ADR-003-data-sources.md)). Phase 01.1 grows the catalogue to real product scale (D-01, D-05). DATA-04 requires the enrichment source to be selected through a **documented comparison of coverage, platforms, licence, attribution, quotas, stability, and cost**, and the author asked for that comparison to be recorded for the thesis.
+La Fase 1 entregó un snapshot curado de 150 juegos de Wikidata ([ADR-003](ADR-003-data-sources.md)). La Fase 01.1 hace crecer el catálogo a escala de producto real (D-01, D-05). DATA-04 exige que la fuente de enriquecimiento se seleccione mediante una **comparación documentada de cobertura, plataformas, licencia, atribución, cuotas, estabilidad y coste**, y el autor pidió que esa comparación quedara registrada para la tesis.
 
-The comparison below is grounded in a live, authenticated probe of the IGDB v4 API — [`docs/verification/igdb-api-probe.md`](../verification/igdb-api-probe.md), probe run **2026-09-05T14:56:27Z**. RAWG and scaled-Wikidata rows are from secondary sources and Phase 1's own direct experience, and are labelled as such.
+La comparación de abajo se apoya en un sondeo autenticado en vivo de la API v4 de IGDB — [`docs/verification/igdb-api-probe.md`](../verification/igdb-api-probe.md), sondeo ejecutado el **2026-09-05T14:56:27Z**. Las filas de RAWG y de Wikidata-escalado provienen de fuentes secundarias y de la experiencia directa de la Fase 1, y se etiquetan como tales.
 
-## Candidates considered
+## Alternativas consideradas
 
-Three candidates: **IGDB** (Twitch/Amazon), **RAWG** (rawg.io), and **scaled Wikidata** (extending the Phase 1 SPARQL pipeline).
+Tres candidatos: **IGDB** (Twitch/Amazon), **RAWG** (rawg.io) y **scaled Wikidata** (extender la tubería SPARQL de la Fase 1).
 
-## DATA-04 comparison
+### Comparación DATA-04
 
-| Axis | IGDB (chosen) | RAWG | Scaled Wikidata |
+| Eje | IGDB (elegido) | RAWG | Wikidata escalado |
 |---|---|---|---|
-| **Coverage** | 374,555 total game entries; **312,418** primary games (`game_type = 0`). 336,568 covers, 23 genres, 220 platforms. Measured live, 2026-09-05. | ~350,000–500,000 games claimed (secondary source, not probed). Broad, includes storefront metadata. | Sparse and uneven for games: no reliable genre/platform modelling, cover art only via per-file Wikimedia Commons entries. Phase 1 needed hand-curation to reach 150 usable rows. |
-| **Platforms** | First-class `platforms` entity (220 rows), dot-expandable as `platforms.name`; confirmed live. | First-class platform metadata (secondary source). | Platform data present but inconsistent; requires bespoke sub-queries and normalisation (Phase 1 experience). |
-| **Licence** | API "free for both non-commercial and commercial projects", governed by the **Twitch Developer Services Agreement**; code samples are "Program Materials". Verbatim sources in the probe evidence §5. | Free tier for non-commercial use under RAWG API ToS; commercial use requires a paid plan and a revenue-share/attribution arrangement (secondary source). | Structured data is **CC0** (public domain) — the cleanest licence of the three. Commons media is per-file (CC-BY / CC-BY-SA / PD), needing individual review — see ADR-003. |
-| **Attribution** | IGDB expects "fair attribution … visible to your users and located in a static location". SavePoint adds visible static IGDB.com attribution (sources page + footer) despite being non-commercial. | Mandatory attribution **and a backlink to rawg.io** on every page using the data (secondary source) — heavier and more prescriptive than IGDB's. | CC0 structured data needs no attribution; Commons media requires per-file author + licence credit (ADR-003 model). |
-| **Quotas** | **No monthly request quota.** Documented limit: **4 requests/second, 8 concurrent open requests**; `429` on breach; multiquery capped at 10 sub-queries (all observed live). No rate-limit headers returned. | **20,000 requests/month** on the free tier (secondary source) — a hard monthly ceiling that would constrain a multi-hundred-thousand-row import. | No quota, no auth (public SPARQL endpoint), but subject to endpoint timeouts and fair-use throttling on large queries. |
-| **Stability** | Backed by Twitch/Amazon; stable v4 API since the 2020 Twitch migration; OAuth token lifetime ~57 days observed. Dataset mutates under long pulls → id-cursor pagination required (RESEARCH.md Pattern 1). | Independent operator (rawg.io); smaller organisation, higher discontinuation/pricing-change risk (secondary source). | Wikidata/Wikimedia is very stable institutionally, but the *game* data depends on volunteer editing — coverage and modelling change unpredictably and are not import-stable. |
-| **Cost** | **€0.** Free for this use; new Python dependency is `requests==2.34.2` only. | €0 within 20k req/month; a full-catalogue import would likely exceed the free tier and require a paid plan. | €0. |
+| **Cobertura** | 374,555 entradas de juego totales; **312,418** juegos primarios (`game_type = 0`). 336,568 portadas, 23 géneros, 220 plataformas. Medido en vivo, 2026-09-05. | ~350,000–500,000 juegos declarados (fuente secundaria, no sondeada). Amplio, incluye metadatos de tienda. | Escaso y desigual para juegos: sin modelado fiable de género/plataforma, arte de portada solo vía entradas por archivo de Wikimedia Commons. La Fase 1 necesitó curación manual para llegar a 150 filas usables. |
+| **Plataformas** | Entidad `platforms` de primera clase (220 filas), expandible por punto como `platforms.name`; confirmado en vivo. | Metadatos de plataforma de primera clase (fuente secundaria). | Datos de plataforma presentes pero inconsistentes; requiere subconsultas y normalización a medida (experiencia de la Fase 1). |
+| **Licencia** | La API es "free for both non-commercial and commercial projects", regida por el **Twitch Developer Services Agreement**; los ejemplos de código son "Program Materials". Fuentes textuales en la evidencia del sondeo §5. | Tier gratuito para uso no comercial bajo los ToS de la API de RAWG; el uso comercial exige un plan de pago y un acuerdo de reparto de ingresos/atribución (fuente secundaria). | Los datos estructurados son **CC0** (dominio público) — la licencia más limpia de las tres. Los medios de Commons son por archivo (CC-BY / CC-BY-SA / PD), requieren revisión individual — ver ADR-003. |
+| **Atribución** | IGDB espera "fair attribution … visible to your users and located in a static location". SavePoint añade atribución estática y visible a IGDB.com (página de fuentes + pie) pese a ser no comercial. | Atribución obligatoria **y un backlink a rawg.io** en cada página que use los datos (fuente secundaria) — más pesada y prescriptiva que la de IGDB. | Los datos estructurados CC0 no necesitan atribución; los medios de Commons requieren crédito por archivo de autor + licencia (modelo de ADR-003). |
+| **Cuotas** | **Sin cuota mensual de peticiones.** Límite documentado: **4 requests/second, 8 concurrent open requests**; `429` al exceder; multiquery limitada a 10 subconsultas (todo observado en vivo). No devuelve cabeceras de rate-limit. | **20,000 requests/month** en el tier gratuito (fuente secundaria) — un techo mensual duro que limitaría una importación de varios cientos de miles de filas. | Sin cuota, sin auth (endpoint SPARQL público), pero sujeto a timeouts del endpoint y throttling por uso razonable en consultas grandes. |
+| **Estabilidad** | Respaldado por Twitch/Amazon; API v4 estable desde la migración a Twitch de 2020; vida del token OAuth ~57 días observada. El dataset muta durante pulls largos → paginación por cursor de id requerida (RESEARCH.md Patrón 1). | Operador independiente (rawg.io); organización más pequeña, mayor riesgo de discontinuación/cambio de precios (fuente secundaria). | Wikidata/Wikimedia es muy estable institucionalmente, pero los datos de *juegos* dependen de edición voluntaria — la cobertura y el modelado cambian de forma impredecible y no son estables para importar. |
+| **Coste** | **0 €.** Gratis para este uso; la nueva dependencia de Python es solo `requests==2.34.2`. | 0 € dentro de 20k req/mes; una importación de catálogo completo probablemente excedería el tier gratuito y requeriría un plan de pago. | 0 €. |
 
-## Decision
+## Decisión
 
-1. **Adopt IGDB v4 as the real-scale catalogue source** (D-05). It is the only candidate that combines real coverage, first-class genre/platform/cover modelling, **no monthly quota**, zero cost, and an operator-published permission to store and serve the data — at the price of a heavier attribution obligation than CC0 Wikidata and a licence that is an agreement rather than a public-domain dedication.
-2. **Eligible-category boundary (D-06):** the SavePoint catalogue imports IGDB **`game_type = 0` (main games) — 312,418 rows at probe time**. `game_type` 1–14 (DLC, expansion, bundle, standalone_expansion, mod, episode, season, remake, remaster, expanded_game, port, fork, pack, update) are non-primary and are **excluded** from the primary catalogue, consistent with the existing `RelatedContent` / `is_dlc` precedent in `apps/api/catalogue/models.py`. Plan 01.1-02 re-measures the eligible count immediately before import and must import ≥ 90% of that fresh measurement and **> 100,000 primary works**.
-3. **Cover delivery / storage rule (D-06):** covers are **hotlinked**, not mirrored, in Phase 01.1. Build URLs as `https://images.igdb.com/igdb/image/upload/t_{size}/{hash}.jpg` where `{hash}` is `cover.image_id` (e.g. `t_cover_big`, `t_cover_small`, append `_2x` for retina). IGDB documents a 30-day retention window for removed/replaced images — acceptable for hotlinking, and the reason local mirroring is deferred (it would inherit that reconciliation burden and lean hardest on the storage permission for image "Twitch Content"). A missing or failing cover falls back to the **Phase 1 first-party placeholder** (D-06, and D-07 of `01-CONTEXT.md`). Local mirroring of covers is revisited only if hotlink reliability proves inadequate.
-4. **Caching / redistribution rule:** SavePoint stores IGDB structured metadata (games, genres, platforms) in its own PostgreSQL database and serves it to its own end users. It does **not** re-syndicate or bulk-redistribute the dataset — no public data dump, no third-party data sharing, no API that re-serves IGDB rows in bulk. The operative written permission of record is the IGDB API documentation FAQ (Q3 "we prefer if you store and serve the data to your end users", Q5 "you are allowed to keep all data you retrieve"), which stands as the "prior written authorization … otherwise" contemplated by the Twitch Developer Services Agreement's storage carve-out. Verbatim sources: [`igdb-api-probe.md`](../verification/igdb-api-probe.md) §5.
-5. **Attribution:** a visible, static "Data from IGDB.com" attribution is shown on the sources page and the site footer.
-6. **Preserve the Phase 1 offline corpus:** the Wikidata snapshot, its manifests, `docs/verification/catalogue-freeze.md`, and the ADR-003 freeze are **retained unchanged**. The 150-game CC0 corpus and its per-asset Commons review stay valid, citable evidence; the IGDB import is additive and keyed on `SourceRecord(source="igdb", source_id=<igdb id>)` alongside the existing `source="wikidata"` rows. `CAT-06` / `OPS-03` still hold: no provider is called at request time — IGDB access is confined to the offline, resumable management command.
-7. **HTTP client dependency:** add exactly **`requests==2.34.2`** (Apache-2.0, `requires-python >=3.10`, PyPI-verified — real `psf/requests` release uploaded 2026-05-14, not yanked) via `uv add`, pinned in `pyproject.toml` and `uv.lock`. Its approved-dependency row is added to `scripts/check-dependencies.ps1` and `docs/verification/dependency-legitimacy.md`. **Do not** add `django-allauth` or `dj-rest-auth` — the hand-rolled `accounts` app is extended instead (RESEARCH.md *Alternatives Considered*).
+1. **Adoptar IGDB v4 como la fuente del catálogo a escala real** (D-05). Es el único candidato que combina cobertura real, modelado de primera clase de género/plataforma/portada, **sin cuota mensual**, coste cero y un permiso publicado por el operador para almacenar y servir los datos — a cambio de una obligación de atribución más pesada que la de Wikidata CC0 y de una licencia que es un acuerdo en vez de una dedicación al dominio público.
+2. **Frontera de categoría elegible (D-06):** el catálogo de SavePoint importa IGDB **`game_type = 0` (juegos principales) — 312,418 filas en el momento del sondeo**. `game_type` 1–14 (DLC, expansion, bundle, standalone_expansion, mod, episode, season, remake, remaster, expanded_game, port, fork, pack, update) son no primarios y quedan **excluidos** del catálogo primario, coherente con el precedente existente `RelatedContent` / `is_dlc` en `apps/api/catalogue/models.py`. El Plan 01.1-02 vuelve a medir el conteo elegible inmediatamente antes de importar y debe importar ≥ 90% de esa medición fresca y **> 100,000 obras primarias**.
+3. **Regla de entrega / almacenamiento de portadas (D-06):** las portadas se sirven por **hotlink**, no se replican, en la Fase 01.1. Se construyen las URL como `https://images.igdb.com/igdb/image/upload/t_{size}/{hash}.jpg` donde `{hash}` es `cover.image_id` (p. ej. `t_cover_big`, `t_cover_small`, añadir `_2x` para retina). IGDB documenta una ventana de retención de 30 días para imágenes eliminadas/reemplazadas — aceptable para hotlinking, y la razón por la que se difiere el mirroring local (heredaría esa carga de reconciliación y se apoyaría con más fuerza en el permiso de almacenamiento para imágenes "Twitch Content"). Una portada ausente o que falla cae de vuelta al **placeholder de primera parte de la Fase 1** (D-06, y D-07 de `01-CONTEXT.md`). El mirroring local de portadas solo se revisa si la fiabilidad del hotlink resulta inadecuada.
+4. **Regla de caché / redistribución:** SavePoint almacena metadatos estructurados de IGDB (juegos, géneros, plataformas) en su propia base de datos PostgreSQL y los sirve a sus propios usuarios finales. **No** re-sindica ni redistribuye el dataset en bloque — sin dump público de datos, sin compartir datos con terceros, sin una API que re-sirva filas de IGDB en bloque. El permiso escrito operativo de referencia es la FAQ de la documentación de la API de IGDB (Q3 "we prefer if you store and serve the data to your end users", Q5 "you are allowed to keep all data you retrieve"), que actúa como la "prior written authorization … otherwise" contemplada por el carve-out de almacenamiento del Twitch Developer Services Agreement. Fuentes textuales: [`igdb-api-probe.md`](../verification/igdb-api-probe.md) §5.
+5. **Atribución:** se muestra una atribución estática y visible "Data from IGDB.com" en la página de fuentes y en el pie del sitio.
+6. **Preservar el corpus offline de la Fase 1:** el snapshot de Wikidata, sus manifiestos, `docs/verification/catalogue-freeze.md` y la congelación de ADR-003 se **conservan sin cambios**. El corpus CC0 de 150 juegos y su revisión de Commons por asset siguen siendo evidencia válida y citable; la importación de IGDB es aditiva y se indexa por `SourceRecord(source="igdb", source_id=<id de igdb>)` junto a las filas existentes `source="wikidata"`. `CAT-06` / `OPS-03` siguen vigentes: no se llama a ningún proveedor en tiempo de petición — el acceso a IGDB queda confinado al comando de gestión offline y reanudable.
+7. **Dependencia de cliente HTTP:** añadir exactamente **`requests==2.34.2`** (Apache-2.0, `requires-python >=3.10`, verificada en PyPI — release real de `psf/requests` subida el 2026-05-14, no yanked) vía `uv add`, fijada en `pyproject.toml` y `uv.lock`. Su fila de dependencia aprobada se añade a `scripts/check-dependencies.ps1` y a `docs/verification/dependency-legitimacy.md`. **Do not** add `django-allauth` ni `dj-rest-auth` — en su lugar se extiende la app `accounts` hecha a mano (RESEARCH.md *Alternatives Considered*).
 
-## Evidence and sources
+## Evidencia y fuentes
 
-- **Authenticated probe:** [`docs/verification/igdb-api-probe.md`](../verification/igdb-api-probe.md) — probe run 2026-09-05T14:56:27Z; counts, field-name confirmation, rate-limit behaviour, and verbatim terms quotations.
-- **Primary terms sources:** `https://api-docs.igdb.com/` (Getting Started, License, Business FAQ, Images); `https://legal.twitch.com/legal/developer-agreement/` (Program Materials — storage/redistribution).
-- **Dependency:** `https://pypi.org/project/requests/2.34.2/` — Apache-2.0, `requires-python >=3.10`, wheel + sdist uploaded 2026-05-14, `yanked: false`; source repo `github.com/psf/requests`.
-- **Research:** [`.planning/phases/01.1-real-scale-catalogue-and-product-experience/01.1-RESEARCH.md`](../../.planning/phases/01.1-real-scale-catalogue-and-product-experience/01.1-RESEARCH.md) — assumptions A1 (no monthly quota) and A3 (field names) are now **confirmed** by the probe; A5 (catalogue size) is measured at 374,555 total / 312,418 primary.
-- RAWG and scaled-Wikidata rows are secondary-source / Phase 1 direct experience, explicitly not independently probed this plan.
+- **Sondeo autenticado:** [`docs/verification/igdb-api-probe.md`](../verification/igdb-api-probe.md) — sondeo ejecutado el 2026-09-05T14:56:27Z; conteos, confirmación de nombres de campo, comportamiento de rate-limit y citas textuales de los términos.
+- **Fuentes primarias de términos:** `https://api-docs.igdb.com/` (Getting Started, License, Business FAQ, Images); `https://legal.twitch.com/legal/developer-agreement/` (Program Materials — almacenamiento/redistribución).
+- **Dependencia:** `https://pypi.org/project/requests/2.34.2/` — Apache-2.0, `requires-python >=3.10`, wheel + sdist subidos el 2026-05-14, `yanked: false`; repositorio de origen `github.com/psf/requests`.
+- **Investigación:** [`.planning/phases/01.1-real-scale-catalogue-and-product-experience/01.1-RESEARCH.md`](../../.planning/phases/01.1-real-scale-catalogue-and-product-experience/01.1-RESEARCH.md) — los supuestos A1 (sin cuota mensual) y A3 (nombres de campo) quedan ahora **confirmados** por el sondeo; A5 (tamaño del catálogo) se mide en 374,555 total / 312,418 primarios.
+- Las filas de RAWG y de Wikidata-escalado son de fuente secundaria / experiencia directa de la Fase 1, explícitamente no sondeadas de forma independiente en este plan.
 
-## Consequences
+## Consecuencias
 
-**Positive**
-- Real-scale catalogue (100k+ primary works) becomes reachable at zero cost with no monthly ceiling.
-- First-class genre and platform data unblocks CAT-02 filtering/sorting and REC-10's genre heuristic.
-- Storage + serve permission is explicit in the operator's own documentation, recorded verbatim for thesis defensibility (DATA-08).
+**Positivas**
+- El catálogo a escala real (100k+ obras primarias) pasa a ser alcanzable a coste cero y sin techo mensual.
+- Los datos de género y plataforma de primera clase desbloquean el filtrado/ordenación de CAT-02 y el heurístico de géneros de REC-10.
+- El permiso de almacenar + servir es explícito en la propia documentación del operador, registrado textualmente para defensibilidad en la tesis (DATA-08).
 
-**Negative / limits**
-- The licence is an **agreement** (Twitch DSA), not a public-domain dedication; it can change, and the FAQ-vs-DSA reconciliation in point 4 is a reasoned reading, not legal advice.
-- Attribution is now an ongoing obligation on the UI.
-- Import must respect 4 req/s + 8 concurrent and be resumable over a long run (RESEARCH.md Patterns 1–2).
-- Hotlinked covers move image availability to a third-party CDN outside SavePoint's control; the 30-day removal window means some covers will 404 over time and fall back to the placeholder.
-- One new runtime dependency (`requests`) plus its transitive tree (`certifi`, `charset-normalizer`, `idna`, `urllib3`).
+**Negativas / límites**
+- La licencia es un **acuerdo** (Twitch DSA), no una dedicación al dominio público; puede cambiar, y la reconciliación FAQ-vs-DSA del punto 4 es una lectura razonada, no asesoramiento legal.
+- La atribución es ahora una obligación continua sobre la interfaz.
+- La importación debe respetar 4 req/s + 8 concurrentes y ser reanudable a lo largo de una ejecución larga (RESEARCH.md Patrones 1–2).
+- Las portadas por hotlink mueven la disponibilidad de imagen a un CDN de terceros fuera del control de SavePoint; la ventana de eliminación de 30 días significa que algunas portadas darán 404 con el tiempo y caerán al placeholder.
+- Una dependencia de runtime nueva (`requests`) más su árbol transitivo (`certifi`, `charset-normalizer`, `idna`, `urllib3`).
 
-**Relationship to ADR-003**
-ADR-003's Wikidata freeze and its "no runtime provider" rule remain in force for the Phase 1 corpus and for request-time behaviour. ADR-006 narrows ADR-003's alternative-2 rejection of "RAWG/IGDB … credentials, quotas, terms and drift": those risks are now measured and mitigated (no quota, terms recorded, id-cursor import, offline-only access) rather than avoided, specifically for the real-scale catalogue Phase 01.1 requires.
+**Relación con ADR-003**
+La congelación de Wikidata de ADR-003 y su regla "sin proveedor en runtime" siguen vigentes para el corpus de la Fase 1 y para el comportamiento en tiempo de petición. ADR-006 acota el rechazo de la alternativa 2 de ADR-003 sobre "RAWG/IGDB … credentials, quotas, terms and drift": esos riesgos ahora están medidos y mitigados (sin cuota, términos registrados, importación por cursor de id, acceso solo offline) en vez de evitados, específicamente para el catálogo a escala real que la Fase 01.1 requiere.
 
-## Reversibility
+## Reversibilidad
 
-The IGDB corpus is keyed on `SourceRecord(source="igdb", …)` and can be dropped without touching the Wikidata rows. Switching sources later means a new fetch, a new freeze, and a new human decision. The `requests` pin is reversible via `uv remove`.
+El corpus de IGDB se indexa por `SourceRecord(source="igdb", …)` y puede eliminarse sin tocar las filas de Wikidata. Cambiar de fuente más adelante implica un nuevo fetch, una nueva congelación y una nueva decisión humana. El pin de `requests` es reversible vía `uv remove`.
 
-## Approval and review
+## Aprobación y revisión
 
-**Accepted.** Any change to the source, the eligible-category boundary, the cover delivery rule, or the `requests` pin invalidates this decision and requires a new human decision gate and a re-run of the verification scripts.
+**Aceptado.** Cualquier cambio en la fuente, en la frontera de categoría elegible, en la regla de entrega de portadas o en el pin de `requests` invalida esta decisión y requiere un nuevo gate de decisión humana y una nueva ejecución de los scripts de verificación.

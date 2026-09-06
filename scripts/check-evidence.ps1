@@ -39,7 +39,16 @@ function Test-LedgerRecord($record, [switch]$Canary) {
         if (-not $Canary) {
             $full = Join-Path $repoRoot ([string]$artifact.path)
             if (-not (Test-Path -LiteralPath $full -PathType Leaf)) { throw "Artifact does not exist: $($artifact.path)" }
-            $actual = (Get-FileHash -LiteralPath $full -Algorithm SHA256).Hash.ToLowerInvariant()
+            # Hash the content with CR bytes stripped, i.e. the LF form Git
+            # stores and the form these ledger hashes were computed against.
+            # Without this, every text artifact mismatches on a Windows
+            # checkout where core.autocrlf has rewritten LF -> CRLF on disk.
+            $raw = [System.IO.File]::ReadAllBytes($full)
+            $lf = [byte[]]($raw | Where-Object { $_ -ne 13 })
+            $sha = [System.Security.Cryptography.SHA256]::Create()
+            try {
+                $actual = ([System.BitConverter]::ToString($sha.ComputeHash($lf)) -replace '-', '').ToLowerInvariant()
+            } finally { $sha.Dispose() }
             if ($actual -ne $artifact.sha256) { throw "Artifact hash mismatch: $($artifact.path)" }
         }
     }
