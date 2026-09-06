@@ -1,157 +1,87 @@
-# Phase 01.1 — Product Surface Verification (pre-review evidence)
+# Fase 01.1 — Verificación de superficies de producto (evidencia pre-revisión)
 
-Automated evidence for the four Phase 01.1 product surfaces (catalogue,
-detail, registration, recommendations) at the approved desktop and mobile
-viewports. Produced by Plan 01.1-10; consumed by Plan 01.1-07 (human author
-review). Requirements in scope: QUAL-05, CAT-02, AUTH-02, REC-10.
+Evidencia automática para las cuatro superficies de producto de la Fase 01.1 (catálogo, detalle, registro, recomendaciones) en los viewports de escritorio y móvil aprobados. Producida por el Plan 01.1-10; consumida por el Plan 01.1-07 (revisión humana del autor). Requisitos en alcance: QUAL-05, CAT-02, AUTH-02, REC-10.
 
-## Playwright Results
+## Resultados de Playwright
 
-Command (verify gate 1, executed from the worktree root):
+Comando (gate de verificación 1, ejecutado desde la raíz del worktree):
 
     corepack pnpm exec playwright test e2e/a11y.spec.ts e2e/demo-journey.spec.ts --project=chromium
 
-Environment: Chromium (Playwright 1.62.1). Target: a local production build
-(`next build && next start`) of this worktree, `PLAYWRIGHT_BASE_URL` set to
-that build; `DEMO_USERNAME` / `DEMO_PASSWORD` supplied from the runtime
-environment (values withheld by design). API traffic proxied to the running
-`infra/compose.yaml` Django stack.
+Entorno: Chromium (Playwright 1.62.1). Objetivo: un build de producción local (`next build && next start`) de este worktree, con `PLAYWRIGHT_BASE_URL` apuntando a ese build; `DEMO_USERNAME` / `DEMO_PASSWORD` suministrados desde el entorno de runtime (valores ocultados por diseño). Tráfico de API proxeado al stack Django de `infra/compose.yaml` en ejecución.
 
-Totals: 41 tests in 2 files — 41 passed, 0 failed, 0 skipped. Two
-consecutive green runs (stability check). Exit code 0.
+Totales: 41 tests en 2 ficheros — 41 pasados, 0 fallidos, 0 saltados. Dos ejecuciones consecutivas en verde (comprobación de estabilidad). Código de salida 0.
 
-Per-file:
+Por fichero:
 
-- `e2e/a11y.spec.ts` — 34 tests. Public-page axe scans (es/en x desktop/mobile),
-  320–375px horizontal-overflow gate, reduced-motion, the keyboard-only
-  acceptance journey, plus the new per-surface product-evidence block:
-  catalogue (filter state survives reload, full-catalogue count line,
-  pagination, keyboard focus on search), detail (cover or first-party
-  fallback, ScorePill present-or-omitted, static IGDB provenance +
-  attribution), registration (labelled fields, client-side mismatch
-  validation with password clearing), and the recommendations auth gate
-  (signed-out visit redirects to `/login?next=`, no personal nav links).
-  Each surface runs at both `desktop` (1280x800) and `mobile` (375x812).
-- `e2e/demo-journey.spec.ts` — 7 tests. The demo credential contract, the
-  demo login tracer (session -> catalogue -> status -> rating -> copies,
-  reload-persistence), logout invalidation, the fresh-account registration
-  journey (real `POST /api/accounts/register/`; on a spent per-IP rate
-  budget it asserts the localized rate-limit state instead — itself a
-  required UI-SPEC state), and the authenticated demo-session surfaces test
-  that exercises collection + recommendations at `desktop` and `mobile`
-  (disclosure, shelves-or-onboarding, mobile content reflow, axe).
+- `e2e/a11y.spec.ts` — 34 tests. Escaneos axe de páginas públicas (es/en x escritorio/móvil), gate de overflow horizontal a 320–375px, movimiento reducido, el recorrido de aceptación solo con teclado, más el nuevo bloque de evidencia de producto por superficie: catálogo (el estado de filtro sobrevive al recargar, línea de conteo del catálogo completo, paginación, foco de teclado en la búsqueda), detalle (portada o fallback de primera parte, ScorePill presente-u-omitida, procedencia + atribución estática de IGDB), registro (campos etiquetados, validación de discrepancia en cliente con borrado de contraseña) y el gate de auth de recomendaciones (la visita sin sesión redirige a `/login?next=`, sin enlaces de navegación personal). Cada superficie corre en `desktop` (1280x800) y `mobile` (375x812).
+- `e2e/demo-journey.spec.ts` — 7 tests. El contrato de credenciales demo, el trazador de login demo (sesión -> catálogo -> estado -> valoración -> copias, persistencia tras recarga), la invalidación de logout, el recorrido de registro de cuenta fresca (`POST /api/accounts/register/` real; con el presupuesto de rate por IP agotado, en su lugar afirma el estado localizado de rate-limit — que es a su vez un estado requerido por la UI-SPEC) y el test de superficies de sesión demo autenticada que ejercita colección + recomendaciones en `desktop` y `mobile` (disclosure, estanterías-u-onboarding, reflow de contenido móvil, axe).
 
-Viewport labels used throughout: `desktop` = 1280x800, `mobile` = 375x812
-(>= the 320px UI-SPEC floor).
+Etiquetas de viewport usadas en todo el documento: `desktop` = 1280x800, `mobile` = 375x812 (>= el suelo de 320px de la UI-SPEC).
 
-Playwright verdict: PASS
+Veredicto de Playwright: PASS
 
-## axe Results
+## Resultados de axe
 
-axe-core 4.13.0 injected via the existing local-bundle `addScriptTag`
-pattern (no `@axe-core/playwright` dependency added). Gate: zero
-critical/serious violations. Results by surface:
+axe-core 4.13.0 inyectado vía el patrón `addScriptTag` de bundle local existente (sin añadir dependencia de `@axe-core/playwright`). Gate: cero violaciones critical/serious. Resultados por superficie:
 
-- catalogue — PASS. Scanned unfiltered (es/en x desktop/mobile, existing
-  suite) and filtered (genre applied, desktop + mobile, new block). No
-  critical/serious violations.
-- detail — PASS. One representative game detail page scanned es/en x
-  desktop/mobile (existing suite, now waiting for the detail navigation to
-  settle before injecting axe) and desktop + mobile in the new block. No
-  critical/serious violations.
-- registration — PASS. `/es/register` scanned desktop + mobile with a
-  surfaced validation error present. No critical/serious violations.
-- recommendations — PASS. Authenticated `/es/recommendations` (demo
-  session) scanned desktop + mobile with the algorithm/limitation
-  disclosure and onboarding state rendered. No critical/serious violations.
-- supporting context — homepage, login, sources scanned es/en x
-  desktop/mobile: no critical/serious violations.
+- catálogo — PASS. Escaneado sin filtrar (es/en x escritorio/móvil, suite existente) y filtrado (género aplicado, escritorio + móvil, bloque nuevo). Sin violaciones critical/serious.
+- detalle — PASS. Una página de detalle de juego representativa escaneada es/en x escritorio/móvil (suite existente, ahora esperando a que la navegación de detalle se asiente antes de inyectar axe) y escritorio + móvil en el bloque nuevo. Sin violaciones critical/serious.
+- registro — PASS. `/es/register` escaneado escritorio + móvil con un error de validación mostrado presente. Sin violaciones critical/serious.
+- recomendaciones — PASS. `/es/recommendations` autenticado (sesión demo) escaneado escritorio + móvil con la disclosure de algoritmo/limitación y el estado de onboarding renderizados. Sin violaciones critical/serious.
+- contexto de apoyo — homepage, login, fuentes escaneados es/en x escritorio/móvil: sin violaciones critical/serious.
 
-axe verdict: PASS
+Veredicto de axe: PASS
 
-## Screenshot Artifacts
+## Artefactos de captura
 
-Every pair below was written by Playwright during the gate-1 run; each path
-is repository-relative and points to a committed PNG.
+Cada par de abajo lo escribió Playwright durante la ejecución del gate 1; cada ruta es relativa al repositorio y apunta a un PNG commiteado.
 
-| Surface | Viewport | Screenshot artifact |
+| Superficie | Viewport | Artefacto de captura |
 | --- | --- | --- |
-| catalogue | desktop | e2e/artifacts/phase-01.1/catalogue-desktop.png |
-| catalogue | mobile | e2e/artifacts/phase-01.1/catalogue-mobile.png |
-| detail | desktop | e2e/artifacts/phase-01.1/detail-desktop.png |
-| detail | mobile | e2e/artifacts/phase-01.1/detail-mobile.png |
-| registration | desktop | e2e/artifacts/phase-01.1/registration-desktop.png |
-| registration | mobile | e2e/artifacts/phase-01.1/registration-mobile.png |
-| recommendations | desktop | e2e/artifacts/phase-01.1/recommendations-desktop.png |
-| recommendations | mobile | e2e/artifacts/phase-01.1/recommendations-mobile.png |
+| catálogo | desktop | e2e/artifacts/phase-01.1/catalogue-desktop.png |
+| catálogo | mobile | e2e/artifacts/phase-01.1/catalogue-mobile.png |
+| detalle | desktop | e2e/artifacts/phase-01.1/detail-desktop.png |
+| detalle | mobile | e2e/artifacts/phase-01.1/detail-mobile.png |
+| registro | desktop | e2e/artifacts/phase-01.1/registration-desktop.png |
+| registro | mobile | e2e/artifacts/phase-01.1/registration-mobile.png |
+| recomendaciones | desktop | e2e/artifacts/phase-01.1/recommendations-desktop.png |
+| recomendaciones | mobile | e2e/artifacts/phase-01.1/recommendations-mobile.png |
 
-## Surface Coverage
+## Cobertura de superficies
 
-Desktop + mobile + accessibility roll-up per surface (see 01.1-UI-SPEC
-`## Per-Surface Coverage Matrix`). Each row: functional assertions +
-screenshot at both viewports, axe clean, mobile reflow checked.
+Roll-up de escritorio + móvil + accesibilidad por superficie (ver 01.1-UI-SPEC `## Per-Surface Coverage Matrix`). Cada fila: aserciones funcionales + captura en ambos viewports, axe limpio, reflow móvil comprobado.
 
-| Surface | Viewports | Accessibility | Reflow | Verdict |
+| Superficie | Viewports | Accesibilidad | Reflow | Veredicto |
 | --- | --- | --- | --- | --- |
-| catalogue | desktop + mobile | axe PASS | no horizontal scroll at 375px PASS | PASS |
-| detail | desktop + mobile | axe PASS | mobile single-column, no horizontal scroll PASS | PASS |
-| registration | desktop + mobile | axe PASS | no horizontal scroll at 375px PASS | PASS |
-| recommendations | desktop + mobile | axe PASS | content region no horizontal scroll at 375px PASS | PASS |
+| catálogo | desktop + mobile | axe PASS | sin scroll horizontal a 375px PASS | PASS |
+| detalle | desktop + mobile | axe PASS | móvil una columna, sin scroll horizontal PASS | PASS |
+| registro | desktop + mobile | axe PASS | sin scroll horizontal a 375px PASS | PASS |
+| recomendaciones | desktop + mobile | axe PASS | región de contenido sin scroll horizontal a 375px PASS | PASS |
 
-Notes carried to Plan 01.1-07 / follow-up:
+Notas trasladadas al Plan 01.1-07 / seguimiento:
 
-- Genre recommendation shelves could not be shown with real data: both the
-  demo account and freshly registered accounts return
-  `insufficient_history` from `GET /api/recommendations/genre-taste/` in the
-  seeded dev environment, so the recommendations evidence captures the
-  algorithm/limitation disclosure + the explicit onboarding state. The
-  shelf-grouping logic itself is unit-tested in Plan 01.1-09. The test
-  asserts "shelves OR onboarding" so a history-bearing environment is also
-  covered.
-- The shared authenticated top navigation (brand + theme toggle +
-  account switcher + mobile menu button) overflows horizontally below
-  ~430px. This is chrome shared by every authenticated page, not a
-  property of any single surface's content region (each surface's `<main>`
-  reflows cleanly at 375px), and needs a design decision on mobile chrome
-  density. Logged in
-  `.planning/phases/01.1-real-scale-catalogue-and-product-experience/deferred-items.md`.
+- Las estanterías de recomendación por género no pudieron mostrarse con datos reales: tanto la cuenta demo como las cuentas recién registradas devuelven `insufficient_history` de `GET /api/recommendations/genre-taste/` en el entorno de desarrollo con seed, así que la evidencia de recomendaciones captura la disclosure de algoritmo/limitación + el estado de onboarding explícito. La lógica de agrupación en estanterías está unit-testeada en el Plan 01.1-09. El test afirma "estanterías O onboarding", así que un entorno con historial también queda cubierto.
+- La navegación superior autenticada compartida (marca + toggle de tema + selector de cuenta + botón de menú móvil) hace overflow horizontal por debajo de ~430px. Esto es chrome compartido por toda página autenticada, no una propiedad de la región de contenido de ninguna superficie concreta (el `<main>` de cada superficie hace reflow limpio a 375px), y necesita una decisión de diseño sobre densidad del chrome móvil. Registrado en `.planning/phases/01.1-real-scale-catalogue-and-product-experience/deferred-items.md`.
 
-## Author Review
+## Revisión del autor
 
-Review date: 2026-09-06
-Reviewed commit: 490dcf6
-Author verdict: APPROVED
+Fecha de revisión: 2026-09-06
+Commit revisado: 490dcf6
+Veredicto del autor: APROBADO
 
-**Nature of this approval — advance / conditional, recorded by author instruction.**
-The author gave an explicit advance approval for the Phase 01.1 product-quality gate
-on 2026-09-06 (before going offline), conditioned on the automated evidence above
-passing — which it did: 41 Playwright tests green (3 consecutive runs), axe zero
-critical/serious on every surface at desktop and mobile, all eight surface/viewport
-screenshot artifacts present. The approval was made against the in-session screenshots
-(home, catalogue, game detail, recommendations, login, register — dark and light — plus
-mobile catalogue and the full-catalogue views) rather than a full live per-viewport
-walkthrough of all four surfaces. A full live review by the author is **deferred** and
-does not block phase completion; the author's stated intent is to focus on design
-refinement in a later pass once functionality is complete, and expects UI changes
-regardless.
+**Naturaleza de esta aprobación — anticipada / condicional, registrada por instrucción del autor.**
+El autor dio una aprobación anticipada explícita para el gate de calidad de producto de la Fase 01.1 el 2026-09-06 (antes de desconectarse), condicionada a que la evidencia automática de arriba pasara — cosa que hizo: 41 tests de Playwright en verde (3 ejecuciones consecutivas), axe cero critical/serious en cada superficie en escritorio y móvil, los ocho artefactos de captura superficie/viewport presentes. La aprobación se hizo contra las capturas en sesión (home, catálogo, detalle de juego, recomendaciones, login, registro — oscuro y claro — más catálogo móvil y las vistas de catálogo completo) en vez de un recorrido en vivo completo por viewport de las cuatro superficies. Una revisión en vivo completa por el autor queda **diferida** y no bloquea la finalización de fase; la intención declarada del autor es centrarse en el refinamiento de diseño en una pasada posterior una vez la funcionalidad esté completa, y espera cambios de UI en cualquier caso.
 
-catalogue verdict: APPROVED
-detail verdict: APPROVED
-registration verdict: APPROVED
-recommendations verdict: APPROVED
+Veredicto de catálogo: APROBADO
+Veredicto de detalle: APROBADO
+Veredicto de registro: APROBADO
+Veredicto de recomendaciones: APROBADO
 
-### Deferred polish (not blockers — logged for a future design pass)
+### Pulido diferido (no bloqueantes — registrados para una pasada de diseño futura)
 
-- **Game detail** reads a little sparse: genre chips render only when the work
-  carries genres, and the cover could be larger / more dominant per the OpenCritic
-  density reference in `01.1-CONTEXT.md` D-07. Cosmetic, not a defect.
-- **Authenticated top navigation** overflows horizontally below ~430px (shared
-  chrome, not a single surface). Needs a mobile-chrome-density design decision —
-  see `deferred-items.md`.
-- **Genre recommendation shelves** shown as the onboarding/insufficient-history
-  state because demo + fresh accounts lack enough library activity in the seeded
-  dev DB; the algorithm + disclosure are evidenced and unit-tested (Plan 01.1-09).
-  A history-bearing account would render populated shelves.
+- **Detalle de juego** se lee un poco escaso: los chips de género se renderizan solo cuando la obra lleva géneros, y la portada podría ser más grande / más dominante según la referencia de densidad de OpenCritic en `01.1-CONTEXT.md` D-07. Cosmético, no un defecto.
+- **Navegación superior autenticada** hace overflow horizontal por debajo de ~430px (chrome compartido, no una sola superficie). Necesita una decisión de diseño sobre densidad del chrome móvil — ver `deferred-items.md`.
+- **Estanterías de recomendación por género** mostradas como el estado de onboarding/historial-insuficiente porque las cuentas demo + frescas carecen de suficiente actividad de librería en la BD de desarrollo con seed; el algoritmo + la disclosure están evidenciados y unit-testeados (Plan 01.1-09). Una cuenta con historial renderizaría estanterías pobladas.
 
-These are captured as backlog items for a dedicated design-refinement pass; none
-were treated as blocking the QUAL-05 verdict for this progress milestone.
+Estos se capturan como ítems de backlog para una pasada dedicada de refinamiento de diseño; ninguno se trató como bloqueante del veredicto QUAL-05 para este hito de progreso.

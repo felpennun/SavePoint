@@ -1,95 +1,94 @@
-# Phase 1 manual verification protocol
+# Protocolo de verificación manual de la Fase 1
 
-This protocol complements automated pytest, Vitest, Playwright, and axe checks. It is versioned so that a thesis reviewer can reproduce the same human observations. Never paste passwords, cookies, DSNs, API keys, or environment dumps into this document or screenshots.
+Este protocolo complementa los checks automáticos de pytest, Vitest, Playwright y axe. Está versionado para que un revisor de la tesis pueda reproducir las mismas observaciones humanas. Nunca pegues contraseñas, cookies, DSNs, claves de API ni volcados de entorno en este documento ni en capturas.
 
-## Automated coverage (Plan 01-10, `e2e/a11y.spec.ts`)
+## Cobertura automática (Plan 01-10, `e2e/a11y.spec.ts`)
 
-The following sections of this checklist are now exercised automatically, at commit `97d438e` and later: 26 tests, all green -- axe (critical/serious = 0) across homepage/login/catalogue/one game detail/sources, ES and EN, at 375x812 and 1280x800; the full keyboard-only journey (skip link → login → search → detail → status → collection → profile → sign-out); no horizontal overflow at 375px; `prefers-reduced-motion` renders without error. This is agent-generated automated evidence, not a human confirmation -- per Sign-off below, it does not by itself close the **Reflow at 400% zoom** or **Basic screen-reader pass** sections, which require an actual human at a real zoom level / with a real screen reader. Those two sections' checkboxes remain unchecked pending that human session; do not check them from automated output.
+Las siguientes secciones de esta checklist se ejercitan ahora automáticamente, en el commit `97d438e` y posteriores: 26 tests, todos en verde -- axe (critical/serious = 0) en homepage/login/catálogo/un detalle de juego/fuentes, ES e EN, a 375x812 y 1280x800; el recorrido completo solo con teclado (skip link → login → búsqueda → detalle → estado → colección → perfil → sign-out); sin overflow horizontal a 375px; `prefers-reduced-motion` renderiza sin error. Esto es evidencia automática generada por agente, no una confirmación humana -- según *Firma* más abajo, no cierra por sí sola las secciones de **Reflow al 400% de zoom** ni de **Pasada básica con lector de pantalla**, que requieren un humano real a un nivel de zoom real / con un lector de pantalla real. Las casillas de esas dos secciones siguen sin marcar a la espera de esa sesión humana; no las marques a partir de la salida automática.
 
 
 
-## Evidence header
+## Cabecera de evidencia
 
-Record one row for every verification session.
+Registra una fila por cada sesión de verificación.
 
-| UTC date | Git commit | Environment/URL | Browser and version | OS | Reviewer | Result |
+| Fecha UTC | Commit de Git | Entorno/URL | Navegador y versión | SO | Revisor | Resultado |
 |---|---|---|---|---|---|---|
-| _pending_ | _pending_ | local or public URL, without credentials | _pending_ | _pending_ | _pending_ | PASS / FAIL |
+| _pendiente_ | _pendiente_ | URL local o pública, sin credenciales | _pendiente_ | _pendiente_ | _pendiente_ | PASS / FAIL |
 
-For failures, record only the page, observable behavior, expected behavior, and a non-sensitive screenshot reference. Link the fixing commit and repeat the entire affected section.
+Para los fallos, registra solo la página, el comportamiento observable, el comportamiento esperado y una referencia a captura no sensible. Enlaza el commit que lo arregla y repite toda la sección afectada.
 
-## Preconditions
+## Precondiciones
 
-- Use the immutable local catalogue and synthetic demo users only.
-- Verify Spanish and English independently; switching locale must preserve route and form input.
-- Exercise homepage, login, catalogue, one game detail, collection, public profile, and sources/methodology.
-- Open developer tools only to inspect DOM/network field names. Redact cookies and authorization-related headers from all evidence.
-- Confirm external-provider access can be disabled without losing the catalogue journey.
+- Usa solo el catálogo local inmutable y los usuarios demo sintéticos.
+- Verifica español e inglés de forma independiente; cambiar de locale debe preservar la ruta y la entrada de formulario.
+- Ejercita homepage, login, catálogo, un detalle de juego, colección, perfil público y fuentes/metodología.
+- Abre las herramientas de desarrollo solo para inspeccionar nombres de campo del DOM/red. Redacta las cookies y las cabeceras relacionadas con autorización de toda la evidencia.
+- Confirma que el acceso a proveedores externos puede deshabilitarse sin perder el recorrido del catálogo.
 
-## Keyboard-only journey
+## Recorrido solo con teclado
 
-- [ ] The skip link is first, is visible on focus, and moves focus to `main`.
-- [ ] Tab order follows reading order; every focus indicator is visible and unclipped.
-- [ ] Homepage → login → catalogue is achievable without a pointer.
-- [ ] Search submits with Enter, moves focus to the result heading, and announces the count once.
-- [ ] Mobile menu reports its expanded state, closes with Escape, and returns focus to its trigger.
-- [ ] Status can be saved using native keyboard interaction; success is announced once.
-- [ ] A 3.5/5 rating can be selected and saved without relying on colour or star shape.
-- [ ] Two distinct copies can be added; format, platform, and edition remain understandable.
-- [ ] Collection and public profile are reachable and sign-out is an explicit action.
-- [ ] Failed form submissions preserve safe user input and focus a linked error summary.
-- [ ] No primary action or information is available only on hover.
+- [ ] El skip link es lo primero, es visible al enfocar y mueve el foco a `main`.
+- [ ] El orden de tabulación sigue el orden de lectura; todo indicador de foco es visible y no queda recortado.
+- [ ] Homepage → login → catálogo es alcanzable sin puntero.
+- [ ] La búsqueda se envía con Enter, mueve el foco al encabezado de resultados y anuncia el conteo una vez.
+- [ ] El menú móvil informa de su estado expandido, se cierra con Escape y devuelve el foco a su disparador.
+- [ ] El estado puede guardarse usando la interacción nativa de teclado; el éxito se anuncia una vez.
+- [ ] Se puede seleccionar y guardar una valoración de 3.5/5 sin depender del color ni de la forma de la estrella.
+- [ ] Se pueden añadir dos copias distintas; formato, plataforma y edición siguen siendo comprensibles.
+- [ ] La colección y el perfil público son alcanzables y el sign-out es una acción explícita.
+- [ ] Los envíos de formulario fallidos preservan la entrada de usuario segura y enfocan un resumen de errores enlazado.
+- [ ] Ninguna acción o información primaria está disponible solo al hacer hover.
 
-## Reflow at 320 CSS pixels
+## Reflow a 320 píxeles CSS
 
-Set the viewport to 320 CSS pixels wide at 100% zoom, then visit every required page in ES and EN.
+Fija el viewport a 320 píxeles CSS de ancho al 100% de zoom, luego visita cada página requerida en ES e EN.
 
-- [ ] There is no horizontal page scrolling.
-- [ ] Navigation, forms, buttons, cards, provenance, and copy rows remain fully reachable.
-- [ ] Controls retain a usable 44×44 CSS pixel target or a documented inline exception.
-- [ ] Titles, translated labels, source names, URLs, and error messages wrap without clipping.
-- [ ] Cover frames retain a 3:4 ratio without shifting adjacent content.
-- [ ] DOM order and visual order match; no mobile-only information replaces desktop content.
+- [ ] No hay scroll horizontal de página.
+- [ ] Navegación, formularios, botones, tarjetas, procedencia y filas de copia siguen siendo totalmente alcanzables.
+- [ ] Los controles conservan un objetivo usable de 44×44 píxeles CSS o una excepción inline documentada.
+- [ ] Títulos, etiquetas traducidas, nombres de fuente, URLs y mensajes de error hacen wrap sin recortarse.
+- [ ] Los marcos de portada conservan una proporción 3:4 sin desplazar el contenido adyacente.
+- [ ] El orden del DOM y el orden visual coinciden; ninguna información solo-móvil reemplaza el contenido de escritorio.
 
-## Reflow at 400% zoom
+## Reflow al 400% de zoom
 
-Use a desktop viewport of at least 1280×800, set browser zoom to 400%, and repeat the required pages in ES and EN.
+Usa un viewport de escritorio de al menos 1280×800, fija el zoom del navegador al 400% y repite las páginas requeridas en ES e EN.
 
-- [ ] Content reflows to one dimension without horizontal page scrolling.
-- [ ] Focused controls are not hidden by sticky elements, dialogs, or viewport edges.
-- [ ] Form errors, live regions, menus, and modal content remain perceivable and operable.
-- [ ] Text is not truncated, overlapped, or replaced with icons.
+- [ ] El contenido hace reflow a una dimensión sin scroll horizontal de página.
+- [ ] Los controles enfocados no quedan ocultos por elementos sticky, diálogos ni bordes del viewport.
+- [ ] Los errores de formulario, las live regions, los menús y el contenido modal siguen siendo perceptibles y operables.
+- [ ] El texto no se trunca, no se solapa ni se reemplaza con iconos.
 
-## Basic screen-reader pass
+## Pasada básica con lector de pantalla
 
-Use NVDA with Firefox/Chrome on Windows or VoiceOver with Safari on macOS. Record the combination in the evidence header.
+Usa NVDA con Firefox/Chrome en Windows o VoiceOver con Safari en macOS. Registra la combinación en la cabecera de evidencia.
 
-- [ ] Page title, language, one `h1`, landmarks, and navigation purpose are announced.
-- [ ] Links and buttons have specific localized names; icons and duplicate cover images do not repeat noise.
-- [ ] Form labels, required state, descriptions, errors, selected status, and numeric rating are announced.
-- [ ] Loading, result counts, and mutation outcomes are announced once without reading the whole grid.
-- [ ] Public-profile unavailable state does not reveal whether a private account exists.
-- [ ] Sources/provenance are understandable and external link destinations are evident.
+- [ ] El título de página, el idioma, un `h1`, los landmarks y el propósito de la navegación se anuncian.
+- [ ] Enlaces y botones tienen nombres localizados específicos; los iconos y las imágenes de portada duplicadas no repiten ruido.
+- [ ] Las etiquetas de formulario, el estado requerido, las descripciones, los errores, el estado seleccionado y la valoración numérica se anuncian.
+- [ ] La carga, los conteos de resultados y los resultados de mutación se anuncian una vez sin leer toda la rejilla.
+- [ ] El estado de perfil público no disponible no revela si existe una cuenta privada.
+- [ ] Las fuentes/procedencia son comprensibles y los destinos de los enlaces externos son evidentes.
 
-## Hostile fixture and privacy review
+## Fixture hostil y revisión de privacidad
 
-Use `e2e/fixtures/hostile.json`; it contains only synthetic identifiers and hostile strings.
+Usa `e2e/fixtures/hostile.json`; contiene solo identificadores sintéticos y cadenas hostiles.
 
-- [ ] Every `untrustedText` value renders as inert text; no element, event handler, style, or script is created.
-- [ ] Every `untrustedUrls` value is rejected; no navigation, redirect, server fetch, or link is produced.
-- [ ] Owner A can access only A-owned copy data; visitor B cannot infer or mutate it by changing an identifier.
-- [ ] The deliberately incorrect dataset hash blocks import and reports no raw record content.
-- [ ] Public-profile DOM, HTML/RSC payloads, accessibility tree, and network responses contain no email, owned-copy detail, internal ID, note, purchase field, cookie, or credential.
-- [ ] Browser bundles, source maps, container history, logs, screenshots, and generated reports contain no infrastructure secret or provider key.
+- [ ] Todo valor `untrustedText` renderiza como texto inerte; no se crea ningún elemento, manejador de evento, estilo ni script.
+- [ ] Todo valor `untrustedUrls` se rechaza; no se produce ninguna navegación, redirección, fetch al servidor ni enlace.
+- [ ] El propietario A solo puede acceder a datos de copia propiedad de A; el visitante B no puede inferirlos ni mutarlos cambiando un identificador.
+- [ ] El hash de dataset deliberadamente incorrecto bloquea la importación y no reporta contenido de registro en crudo.
+- [ ] El DOM del perfil público, los payloads HTML/RSC, el árbol de accesibilidad y las respuestas de red no contienen ningún email, detalle de copia poseída, ID interno, nota, campo de compra, cookie ni credencial.
+- [ ] Los bundles del navegador, los source maps, el historial del contenedor, los logs, las capturas y los reportes generados no contienen ningún secreto de infraestructura ni clave de proveedor.
 
-## Visual and motion observations
+## Observaciones visuales y de movimiento
 
-- [ ] Token colors meet the required contrast and do not convey status alone.
-- [ ] Reduced-motion preference removes all non-essential transition motion.
-- [ ] Missing/unlicensed covers use the first-party placeholder and preserve attribution boundaries.
-- [ ] Spanish and English have no raw translation keys, mixed-language states, or clipping under approximately 30% text expansion.
+- [ ] Los colores de token cumplen el contraste requerido y no transmiten estado por sí solos.
+- [ ] La preferencia de movimiento reducido elimina todo movimiento de transición no esencial.
+- [ ] Las portadas ausentes/sin licencia usan el placeholder de primera parte y preservan las fronteras de atribución.
+- [ ] Español e inglés no tienen claves de traducción en crudo, estados en idioma mezclado ni recortes con aproximadamente un 30% de expansión de texto.
 
-## Sign-off
+## Firma
 
-The session passes only when all applicable boxes are checked, automated checks for the same commit are green, and every failure has been corrected and re-tested. The reviewer signs with name/initials and UTC date; agent-generated observations must be labelled as automated proposals until a human confirms them.
-
+La sesión pasa solo cuando todas las casillas aplicables están marcadas, los checks automáticos para el mismo commit están en verde y todo fallo ha sido corregido y re-testeado. El revisor firma con nombre/iniciales y fecha UTC; las observaciones generadas por agente deben etiquetarse como propuestas automáticas hasta que un humano las confirme.

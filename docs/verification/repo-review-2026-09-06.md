@@ -1,296 +1,254 @@
-# SavePoint — Full-Repository Code Review
+# SavePoint — Revisión de código de todo el repositorio
 
-**Date:** 2026-09-06
-**Commit reviewed:** `f3c08ad` (branch `main`)
-**Scope:** `apps/api/`, `apps/web/`, `infra/`, `e2e/`, `scripts/` (whole tree, author-requested end-of-phase review)
-**Reviewer stance:** adversarial / defect-finding. Inert local-dev D-02 placeholders (`DJANGO_SECRET_KEY` local string, `DEMO_PASSWORD`, `POSTGRES_PASSWORD "local_test_only"`) were explicitly treated as non-issues.
-
----
-
-## Summary
-
-| Severity  | Count | Status |
-|-----------|-------|--------|
-| Critical  | 0     | — |
-| High      | 3     | all FIXED |
-| Medium    | 6     | all FIXED |
-| Low       | 7     | all FIXED |
-| **Total** | **16**| **16 FIXED** (see *Disposition* below) |
-
-> **Update 2026-09-06:** after this review the author authorised applying **all 16
-> findings** ("quiero que apruebes todos en su totalidad"). They are implemented across
-> five committed batches (`a2b480a`, `7b05133`, `5e6082d`, `6637578`, `6370cf2`), tests run
-> after each: `pytest apps/api` 206 passed, `pnpm --dir apps/web build` + 16 web tests
-> green, Playwright a11y 36 green under the new CSP. One **new** pre-existing issue was
-> found during remediation (`scripts/check-evidence.ps1` is red on `main`) — see the end of
-> *Disposition*; it is PROPOSED, not fixed.
-
-**Top 3 issues**
-
-1. **H-01 — DRF `BasicAuthentication` is silently enabled on every authenticated endpoint.** No `DEFAULT_AUTHENTICATION_CLASSES` is configured, so DRF's default (`SessionAuthentication` **+ `BasicAuthentication`**) applies. This creates an unthrottled online password-guessing channel and a CSRF-exempt state-change path on the library endpoints, directly contradicting the "session auth, CSRF enforced" design documented in `accounts/views.py`.
-2. **H-02 — The IGDB importer silently skips the committed id range when a post-`COMPLETE` re-import is chunked with `--max-batches` and then resumed**, yet finishes `COMPLETE` with a freshly computed checksum — a false "converged full pass" that is used as a verification gate.
-3. **H-03 — Production starts the Django development server (`runserver`).** `apps/api/render-start.sh` execs `python manage.py runserver` as the deployed process; Django explicitly does not support this for production (no load robustness, no security review, autoreloader running in prod).
+**Fecha:** 2026-09-06
+**Commit revisado:** `f3c08ad` (rama `main`)
+**Alcance:** `apps/api/`, `apps/web/`, `infra/`, `e2e/`, `scripts/` (todo el árbol, revisión de fin de fase pedida por el autor)
+**Postura del revisor:** adversarial / búsqueda de defectos. Los placeholders inertes de dev local D-02 (`DJANGO_SECRET_KEY` cadena local, `DEMO_PASSWORD`, `POSTGRES_PASSWORD "local_test_only"`) se trataron explícitamente como no-problemas.
 
 ---
 
-## High
+## Resumen
 
-### H-01 — Global DRF `BasicAuthentication` enables unthrottled brute force + CSRF-exempt writes
-**File:** `apps/api/config/settings.py:114-118` (the `REST_FRAMEWORK` dict has no `DEFAULT_AUTHENTICATION_CLASSES`); affected views: `apps/api/library/views.py:30-176`, `apps/api/recommendations/views.py:32-65`, `apps/api/accounts/views.py:155-160`.
-**Scenario:** With no override, DRF applies `['rest_framework.authentication.SessionAuthentication', 'rest_framework.authentication.BasicAuthentication']` to every view whose `authentication_classes` is not explicitly set (i.e. everything except `LoginView`/`RegisterView`/`CsrfBootstrapView`).
-- `curl -u <demo-user>:<guess> https://<host>/api/library/entries/` is a valid auth attempt on every request, with **no throttle** anywhere on these views — an attacker enumerates demo usernames via `PublicProfileView` (see M-03) and credential-stuffs at full speed.
-- `BasicAuthentication` performs **no CSRF check**, so `POST /api/library/entries/<id>/status/`, `.../rating/`, `.../copies/` are state-changing endpoints reachable with only a username/password and no CSRF token — a second front door around the entire session/CSRF model that `accounts/views.py` goes to lengths to enforce.
-**Fix:** In `settings.py` `REST_FRAMEWORK`, add:
+| Severidad | Conteo | Estado |
+|-----------|--------|--------|
+| Crítica   | 0      | — |
+| Alta      | 3      | todas ARREGLADAS |
+| Media     | 6      | todas ARREGLADAS |
+| Baja      | 7      | todas ARREGLADAS |
+| **Total** | **16** | **16 ARREGLADAS** (ver *Disposición* abajo) |
+
+> **Actualización 2026-09-06:** tras esta revisión el autor autorizó aplicar **los 16
+> hallazgos** ("quiero que apruebes todos en su totalidad"). Están implementados en cinco
+> tandas commiteadas (`a2b480a`, `7b05133`, `5e6082d`, `6637578`, `6370cf2`), con tests
+> ejecutados después de cada una: `pytest apps/api` 206 pasados, `pnpm --dir apps/web build`
+> + 16 tests web en verde, Playwright a11y 36 en verde bajo la nueva CSP. Un problema
+> **pre-existente** se descubrió durante la remediación (`scripts/check-evidence.ps1` estaba
+> en rojo en `main` por un bug CRLF y por los ADR en inglés) y también se arregló — ver el
+> final de *Disposición*.
+
+**Top 3 problemas**
+
+1. **H-01 — DRF `BasicAuthentication` está habilitado silenciosamente en todo endpoint autenticado.** No hay `DEFAULT_AUTHENTICATION_CLASSES` configurado, así que aplica el default de DRF (`SessionAuthentication` **+ `BasicAuthentication`**). Esto crea un canal de adivinación de contraseñas online sin throttle y una ruta de cambio de estado exenta de CSRF en los endpoints de library, contradiciendo directamente el diseño de "auth de sesión, CSRF enforced" documentado en `accounts/views.py`.
+2. **H-02 — El importador de IGDB se salta silenciosamente el rango de id commiteado cuando una re-importación posterior a `COMPLETE` se trocea con `--max-batches` y luego se reanuda**, y aun así termina `COMPLETE` con un checksum recién calculado — una "pasada completa convergida" falsa que se usa como gate de verificación.
+3. **H-03 — Producción arranca el servidor de desarrollo de Django (`runserver`).** `apps/api/render-start.sh` hace `exec` de `python manage.py runserver` como proceso desplegado; Django explícitamente no lo soporta para producción (sin robustez de carga, sin revisión de seguridad, autoreloader corriendo en prod).
+
+---
+
+## Alta
+
+### H-01 — `BasicAuthentication` global de DRF habilita fuerza bruta sin throttle + escrituras exentas de CSRF
+**Fichero:** `apps/api/config/settings.py:114-118` (el dict `REST_FRAMEWORK` no tiene `DEFAULT_AUTHENTICATION_CLASSES`); vistas afectadas: `apps/api/library/views.py:30-176`, `apps/api/recommendations/views.py:32-65`, `apps/api/accounts/views.py:155-160`.
+**Escenario:** Sin override, DRF aplica `['rest_framework.authentication.SessionAuthentication', 'rest_framework.authentication.BasicAuthentication']` a toda vista cuyo `authentication_classes` no esté explícitamente fijado (es decir, todo excepto `LoginView`/`RegisterView`/`CsrfBootstrapView`).
+- `curl -u <demo-user>:<guess> https://<host>/api/library/entries/` es un intento de auth válido en cada petición, **sin throttle** en ninguna de estas vistas — un atacante enumera usuarios demo vía `PublicProfileView` (ver M-03) y hace credential-stuffing a toda velocidad.
+- `BasicAuthentication` **no hace check de CSRF**, así que `POST /api/library/entries/<id>/status/`, `.../rating/`, `.../copies/` son endpoints que cambian estado alcanzables solo con usuario/contraseña y sin token CSRF — una segunda puerta de entrada alrededor de todo el modelo de sesión/CSRF que `accounts/views.py` se esfuerza en enforcear.
+**Arreglo:** En `settings.py` `REST_FRAMEWORK`, añadir:
 ```python
 "DEFAULT_AUTHENTICATION_CLASSES": [
     "rest_framework.authentication.SessionAuthentication",
 ],
 ```
-**Auto-fix safe?** Yes — one additive settings key; matches documented intent. Re-run the auth test suite.
+**¿Auto-arreglo seguro?** Sí — una clave de settings aditiva; coincide con la intención documentada. Reejecutar la suite de tests de auth.
 
 ---
 
-### H-02 — `import_igdb_catalogue`: chunked re-import after `COMPLETE` skips the committed range on resume and still reports `COMPLETE`
-**File:** `apps/api/catalogue/management/commands/import_igdb_catalogue.py:446-462`, `469-524`, `545-562`.
-**Scenario:**
-1. A full pass finishes: `IgdbImportRun.last_committed_igdb_id = 300000`, `status = COMPLETE`.
-2. Operator re-imports in chunks (documented use of `--max-batches`, "leaves the run resumable"). Because `status == COMPLETE`, `resuming = False` and `pass_start = 0` (line 450-451), so the local `cursor` restarts at 0 — but `run.save()` at line 462 does **not** reset `last_committed_igdb_id`, and line 507 only ever does `max(run.last_committed_igdb_id, batch_last_id)`, so it stays pinned at 300000 while the rescan crawls from 0.
-3. The run is interrupted by `--max-batches` at, say, `cursor = 820`; `status = INTERRUPTED`.
-4. Operator re-runs without `--max-batches`. Now `resuming = (INTERRUPTED != COMPLETE) and (300000 > 0) → True`, so `pass_start = cursor = 300000`. The loop fetches `id > 300000`, immediately hits the end, and finalizes: recomputes aggregates, writes a fresh `checksum`, sets `status = COMPLETE`.
-**Result:** IGDB ids `821..300000` (299k rows) were never re-processed this "refresh"; any upstream changes to them are silently lost, yet the run asserts a converged full pass with a new checksum. The docstring guarantee ("a rerun after a complete pass re-scans from id 0 and converges") is violated for any chunked rerun. The forward-only DB trigger (migration `0003`) is working as designed here — it's the importer's conflation of "monotonic high-water mark" and "resume pointer" that is wrong.
-**Fix:** Track the in-progress pass cursor separately from the non-regressing high-water mark. Add e.g. `IgdbImportRun.pass_cursor` (BigInteger, default 0), reset it to `0` at the start of every non-resuming pass, advance it per committed batch, and compute `pass_start` from it on resume; keep `last_committed_igdb_id` purely as the monotonic guard. Alternatively, refuse `--max-batches` when `status == COMPLETE` unless an explicit `--restart` flag is given.
-**Auto-fix safe?** No — needs a schema field + migration and a small state-machine change; must be tested against the resume specs in `scripts/verify-igdb-fresh-import.ps1`.
+### H-02 — `import_igdb_catalogue`: la re-importación troceada tras `COMPLETE` se salta el rango commiteado al reanudar y aun así reporta `COMPLETE`
+**Fichero:** `apps/api/catalogue/management/commands/import_igdb_catalogue.py:446-462`, `469-524`, `545-562`.
+**Escenario:**
+1. Una pasada completa termina: `IgdbImportRun.last_committed_igdb_id = 300000`, `status = COMPLETE`.
+2. El operador re-importa en trozos (uso documentado de `--max-batches`, "deja la ejecución reanudable"). Como `status == COMPLETE`, `resuming = False` y `pass_start = 0` (línea 450-451), así que el `cursor` local reinicia en 0 — pero `run.save()` en la línea 462 **no** resetea `last_committed_igdb_id`, y la línea 507 solo hace `max(run.last_committed_igdb_id, batch_last_id)`, así que se queda clavado en 300000 mientras el re-escaneo avanza desde 0.
+3. La ejecución se interrumpe por `--max-batches` en, digamos, `cursor = 820`; `status = INTERRUPTED`.
+4. El operador re-ejecuta sin `--max-batches`. Ahora `resuming = (INTERRUPTED != COMPLETE) and (300000 > 0) → True`, así que `pass_start = cursor = 300000`. El bucle pide `id > 300000`, llega al final de inmediato y finaliza: recomputa agregados, escribe un `checksum` fresco, pone `status = COMPLETE`.
+**Resultado:** los ids de IGDB `821..300000` (299k filas) nunca se re-procesaron en ese "refresco"; cualquier cambio de upstream en ellas se pierde silenciosamente, y aun así la ejecución afirma una pasada completa convergida con un checksum nuevo. La garantía del docstring ("una re-ejecución tras una pasada completa re-escanea desde id 0 y converge") se viola para cualquier re-ejecución troceada. El trigger de BD forward-only (migración `0003`) funciona según diseño aquí — lo que está mal es que el importador confunde "high-water mark monótono" con "puntero de reanudación".
+**Arreglo:** Trackear el cursor de la pasada en curso por separado del high-water mark no-regresivo. Añadir p. ej. `IgdbImportRun.pass_cursor` (BigInteger, default 0), resetearlo a `0` al inicio de cada pasada no-reanudante, avanzarlo por batch commiteado y computar `pass_start` a partir de él al reanudar; mantener `last_committed_igdb_id` puramente como guard monótono. Alternativamente, rechazar `--max-batches` cuando `status == COMPLETE` salvo que se pase un flag `--restart` explícito.
+**¿Auto-arreglo seguro?** No — necesita un campo de esquema + migración y un pequeño cambio de máquina de estados; hay que testearlo contra las specs de reanudación en `scripts/verify-igdb-fresh-import.ps1`.
 
 ---
 
-### H-03 — Django development server used as the production process
-**File:** `apps/api/render-start.sh:11` (`exec python manage.py runserver "0.0.0.0:${PORT:-10000}"`); mirrored in `infra/compose.yaml:72` (acceptable there — local only) and `apps/api/tests/test_render_startup.py`.
-**Scenario:** `render.yaml` `dockerCommand: sh /workspace/apps/api/render-start.sh` makes `runserver` the long-lived deployed process. Django's own docs: *"DO NOT USE THIS SERVER IN A PRODUCTION SETTING. It has not gone through security audits or performance tests."* Consequences on the public demo: single worker with the auto-reloader/stat-loop running in prod, no request timeouts, no graceful worker recycling, `WSGIRequestHandler` logging to stderr, and no static handling without `--insecure`.
-**Fix:** Add `gunicorn` (or `uvicorn`+`gunicorn` workers) to `apps/api/pyproject`/requirements and change the last line to e.g.
+### H-03 — Servidor de desarrollo de Django usado como proceso de producción
+**Fichero:** `apps/api/render-start.sh:11` (`exec python manage.py runserver "0.0.0.0:${PORT:-10000}"`); replicado en `infra/compose.yaml:72` (aceptable ahí — solo local) y `apps/api/tests/test_render_startup.py`.
+**Escenario:** `render.yaml` `dockerCommand: sh /workspace/apps/api/render-start.sh` hace de `runserver` el proceso desplegado de larga vida. La propia doc de Django: *"DO NOT USE THIS SERVER IN A PRODUCTION SETTING. It has not gone through security audits or performance tests."* Consecuencias en la demo pública: un solo worker con el auto-reloader/stat-loop corriendo en prod, sin timeouts de petición, sin reciclado grácil de workers, `WSGIRequestHandler` logueando a stderr y sin manejo de estáticos sin `--insecure`.
+**Arreglo:** Añadir `gunicorn` (o workers `uvicorn`+`gunicorn`) a `apps/api/pyproject`/requirements y cambiar la última línea a p. ej.
 `exec gunicorn config.wsgi:application --bind "0.0.0.0:${PORT:-10000}" --workers 2 --timeout 30 --access-logfile -`.
-Keep `migrate`/`import_catalogue`/`bootstrap`/`seed` as-is. Update `test_render_startup.py`.
-**Auto-fix safe?** Partially — the command swap is mechanical, but it adds a dependency and needs a deploy smoke run (`e2e/deployed-smoke.spec.ts`) to confirm.
+Mantener `migrate`/`import_catalogue`/`bootstrap`/`seed` sin cambios. Actualizar `test_render_startup.py`.
+**¿Auto-arreglo seguro?** Parcialmente — el cambio de comando es mecánico, pero añade una dependencia y necesita una ejecución de smoke de despliegue (`e2e/deployed-smoke.spec.ts`) para confirmar.
 
 ---
 
-## Medium
+## Media
 
-### M-01 — `LoginView` has no throttle: unlimited password guessing
-**File:** `apps/api/accounts/views.py:57-85`.
-**Scenario:** `RegisterView` carries `throttle_classes = [ScopedRateThrottle]` / `throttle_scope = "registration"` (5/hour), and the threat model calls out automated abuse — but `LoginView` has neither `throttle_classes` nor a scope, and `DEFAULT_THROTTLE_CLASSES` is deliberately empty (`settings.py:114`). Demo usernames are discoverable (`/api/accounts/profiles/<alias>/`, M-03), so an attacker can brute-force `DEMO_PASSWORD`-style credentials against `POST /api/accounts/login/` at full speed. The uniform error message mitigates *enumeration*, not *brute force*.
-**Fix:** Add a scoped anonymous throttle, e.g. `throttle_scope = "login"` with `"login": "10/min"` in `DEFAULT_THROTTLE_RATES`, and `throttle_classes = [ScopedRateThrottle]` on `LoginView`.
-**Auto-fix safe?** Yes — additive, mirrors the existing `registration` pattern.
+### M-01 — `LoginView` no tiene throttle: adivinación de contraseñas ilimitada
+**Fichero:** `apps/api/accounts/views.py:57-85`.
+**Escenario:** `RegisterView` lleva `throttle_classes = [ScopedRateThrottle]` / `throttle_scope = "registration"` (5/hour), y el modelo de amenazas señala el abuso automatizado — pero `LoginView` no tiene ni `throttle_classes` ni un scope, y `DEFAULT_THROTTLE_CLASSES` está deliberadamente vacío (`settings.py:114`). Los usuarios demo son descubribles (`/api/accounts/profiles/<alias>/`, M-03), así que un atacante puede hacer fuerza bruta de credenciales tipo `DEMO_PASSWORD` contra `POST /api/accounts/login/` a toda velocidad. El mensaje de error uniforme mitiga la *enumeración*, no la *fuerza bruta*.
+**Arreglo:** Añadir un throttle anónimo con scope, p. ej. `throttle_scope = "login"` con `"login": "10/min"` en `DEFAULT_THROTTLE_RATES`, y `throttle_classes = [ScopedRateThrottle]` en `LoginView`.
+**¿Auto-arreglo seguro?** Sí — aditivo, replica el patrón `registration` existente.
 
-### M-02 — `registration` throttle is bucketed by upstream proxy IP
-**File:** `apps/api/config/settings.py:114-118`, `apps/api/accounts/views.py:109-112`.
-**Scenario:** `ScopedRateThrottle` derives its cache key from `request.META['REMOTE_ADDR']` unless `NUM_PROXIES` is configured (it is not). In the deployed topology (browser → Vercel/Next same-origin proxy → Render), Django sees a single upstream IP for *all* visitors, so "5/hour per IP" collapses to **5 registrations/hour total** for the whole demo — the 6th legitimate visitor in an hour is blocked. If `X-Forwarded-For` handling is later switched on without also setting `NUM_PROXIES`, the limit becomes trivially spoofable instead.
-**Fix:** Decide the trust model explicitly: set `REST_FRAMEWORK["NUM_PROXIES"]` to the real proxy count (so `X-Forwarded-For` is parsed correctly) **or** replace the per-IP scope with a global registration ceiling that is honestly documented as global. Add a test asserting the effective key.
-**Auto-fix safe?** No — depends on the actual proxy chain; needs a deliberate decision.
+### M-02 — El throttle de `registration` se agrupa por la IP del proxy upstream
+**Fichero:** `apps/api/config/settings.py:114-118`, `apps/api/accounts/views.py:109-112`.
+**Escenario:** `ScopedRateThrottle` deriva su clave de caché de `request.META['REMOTE_ADDR']` salvo que `NUM_PROXIES` esté configurado (no lo está). En la topología desplegada (navegador → proxy same-origin de Vercel/Next → Render), Django ve una sola IP upstream para *todos* los visitantes, así que "5/hour por IP" colapsa a **5 registros/hora en total** para toda la demo — el 6º visitante legítimo en una hora queda bloqueado. Si el manejo de `X-Forwarded-For` se activa más tarde sin fijar también `NUM_PROXIES`, el límite pasa a ser trivialmente spoofeable.
+**Arreglo:** Decidir el modelo de confianza explícitamente: fijar `REST_FRAMEWORK["NUM_PROXIES"]` al número real de proxies (para que `X-Forwarded-For` se parsee correctamente) **o** reemplazar el scope por-IP con un techo de registro global honestamente documentado como global. Añadir un test que afirme la clave efectiva.
+**¿Auto-arreglo seguro?** No — depende de la cadena de proxies real; necesita una decisión deliberada.
 
-### M-03 — `PublicProfileView`: unauthenticated, unthrottled account enumeration + backlog disclosure
-**File:** `apps/api/accounts/views.py:163-180`, `apps/api/accounts/serializers.py:28-55`.
-**Scenario:** `permission_classes = [AllowAny]`, no throttle. A `200` (with full per-title backlog `status` list and status-count summary) vs a `404` directly reveals whether any given username exists, and dumps that user's entire tracked backlog. This is inconsistent with the care taken to make login/registration non-enumerable. The docstring frames "every account public by design" as acceptable for Phase 1, but there is still no rate limit and the endpoint leaks per-title activity, not just existence.
-**Fix:** At minimum add an anonymous scoped throttle (e.g. `"public_profile": "30/min"`). Consider returning only aggregate counts (not the per-title `activity` list) until the private/public toggle from plan 01-07 lands, and keeping the 404/response shape identical for "private" and "missing".
-**Auto-fix safe?** Throttle: yes. Response-shape change: no (product decision).
+### M-03 — `PublicProfileView`: enumeración de cuentas sin autenticar y sin throttle + disclosure del backlog
+**Fichero:** `apps/api/accounts/views.py:163-180`, `apps/api/accounts/serializers.py:28-55`.
+**Escenario:** `permission_classes = [AllowAny]`, sin throttle. Un `200` (con la lista completa de `status` del backlog por título y el resumen de conteos de estado) frente a un `404` revela directamente si un usuario dado existe, y vuelca todo el backlog trackeado de ese usuario. Esto es inconsistente con el cuidado puesto en hacer login/registro no-enumerables. El docstring enmarca "toda cuenta pública por diseño" como aceptable para la Fase 1, pero sigue sin haber rate limit y el endpoint filtra actividad por título, no solo existencia.
+**Arreglo:** Como mínimo añadir un throttle anónimo con scope (p. ej. `"public_profile": "30/min"`). Considerar devolver solo conteos agregados (no la lista `activity` por título) hasta que aterrice el toggle privado/público del plan 01-07, y mantener el 404/forma de respuesta idéntico para "privado" y "no existe".
+**¿Auto-arreglo seguro?** Throttle: sí. Cambio de forma de respuesta: no (decisión de producto).
 
-### M-04 — `import_igdb_catalogue._normalize`: `datetime.fromtimestamp` on `first_release_date` is unguarded
-**File:** `apps/api/catalogue/management/commands/import_igdb_catalogue.py:116-118`.
-**Scenario:** `datetime.fromtimestamp(int(ts), tz=timezone.utc)` is only shielded by `isinstance(ts, (int, float))`. A row with an out-of-range timestamp (e.g. a corrupted/huge value → `ValueError`/`OverflowError`, or a pre-1970 negative value → `OSError` on some platforms) raises an exception that is **not** a `MalformedRecord`, so it escapes the per-row skip (lines 487-495) and is caught by the outer `except Exception` (line 538) which marks the whole run `FAILED`. This defeats the module's central guarantee that "one unusable row must never wedge a 300k resumable import".
-**Fix:** Wrap the conversion:
+### M-04 — `import_igdb_catalogue._normalize`: `datetime.fromtimestamp` sobre `first_release_date` sin proteger
+**Fichero:** `apps/api/catalogue/management/commands/import_igdb_catalogue.py:116-118`.
+**Escenario:** `datetime.fromtimestamp(int(ts), tz=timezone.utc)` solo está protegido por `isinstance(ts, (int, float))`. Una fila con un timestamp fuera de rango (p. ej. un valor corrupto/enorme → `ValueError`/`OverflowError`, o un negativo pre-1970 → `OSError` en algunas plataformas) lanza una excepción que **no** es un `MalformedRecord`, así que escapa del skip por-fila (líneas 487-495) y la captura el `except Exception` exterior (línea 538) que marca toda la ejecución como `FAILED`. Esto derrota la garantía central del módulo de que "una fila inutilizable nunca debe atascar una importación reanudable de 300k".
+**Arreglo:** Envolver la conversión:
 ```python
 ts = row.get("first_release_date")
 if isinstance(ts, (int, float)):
     try:
         release_date = datetime.fromtimestamp(int(ts), tz=timezone.utc).date()
     except (ValueError, OverflowError, OSError):
-        release_date = None   # or: raise MalformedRecord(f"row {igdb_id} has an unusable first_release_date")
+        release_date = None   # o: raise MalformedRecord(f"row {igdb_id} has an unusable first_release_date")
 ```
-**Auto-fix safe?** Yes — small, localized, matches the existing tolerance model.
+**¿Auto-arreglo seguro?** Sí — pequeño, localizado, coincide con el modelo de tolerancia existente.
 
-### M-05 — Tolerant search runs an unbounded trigram sequential scan per unauthenticated request
-**File:** `apps/api/catalogue/search.py:186-221` (`_ordered_matching_work_ids`), `205-213` (`TrigramSimilarity` branch), `296-302` (`allowed = set(filtered.values_list("id", flat=True))`).
-**Scenario:** For every `GET /api/catalogue/games/?q=...` (no auth, no throttle), the trigram fallback computes `SIMILARITY(normalized_value, :q)` for **every** `GameAlias` row and sorts by it — the GIN index cannot serve `SIMILARITY(...) >= 0.3` in `WHERE`/`ORDER BY`, so this is a full scan + per-row similarity. The relevance branch then materializes *all* matching work ids into a Python `set`. Against the real-scale catalogue this phase is about (300k+ works, ~600k aliases), a loop of random `?q=` values is a cheap unauthenticated resource-exhaustion vector. (Currently mitigated only because the deployed startup chain imports the small Wikidata corpus, not the IGDB one.)
-**Fix:** Gate the trigram branch behind the `%` operator (`GameAlias.objects.filter(normalized_value__trigram_similar=q)`) so the GIN index is used, cap the candidate set (`[:N]`) before scoring, and add an anonymous scoped throttle to `GameListView`.
-**Auto-fix safe?** No — needs query rework + a perf check on real data.
+### M-05 — La búsqueda tolerante ejecuta un escaneo secuencial de trigram sin acotar por petición sin autenticar
+**Fichero:** `apps/api/catalogue/search.py:186-221` (`_ordered_matching_work_ids`), `205-213` (rama `TrigramSimilarity`), `296-302` (`allowed = set(filtered.values_list("id", flat=True))`).
+**Escenario:** Por cada `GET /api/catalogue/games/?q=...` (sin auth, sin throttle), el fallback de trigram computa `SIMILARITY(normalized_value, :q)` para **cada** fila `GameAlias` y ordena por ella — el índice GIN no puede servir `SIMILARITY(...) >= 0.3` en `WHERE`/`ORDER BY`, así que esto es un escaneo completo + similitud por fila. La rama de relevancia luego materializa *todos* los work ids que casan en un `set` de Python. Contra el catálogo a escala real del que va esta fase (300k+ obras, ~600k alias), un bucle de valores `?q=` aleatorios es un vector barato de agotamiento de recursos sin autenticar. (Actualmente mitigado solo porque la cadena de arranque desplegada importa el corpus pequeño de Wikidata, no el de IGDB.)
+**Arreglo:** Poner la rama de trigram detrás del operador `%` (`GameAlias.objects.filter(normalized_value__trigram_similar=q)`) para que se use el índice GIN, acotar el conjunto de candidatos (`[:N]`) antes de puntuar y añadir un throttle anónimo con scope a `GameListView`.
+**¿Auto-arreglo seguro?** No — necesita reelaboración de la consulta + un check de rendimiento sobre datos reales.
 
-### M-06 — `rank_popularity_v1` aggregates over all users, not just simulated demo accounts
-**File:** `apps/api/library/popularity.py:28-46`; exposed by `apps/api/library/views.py:165-176` (`AllowAny`).
-**Scenario:** The docstring says "aggregated per work from demo-account interactions" and the DTO's `limitation` says "demo-account interactions only", but the query is `LibraryEntry.objects.filter(updated_at__lte=cutoff)` with no filter to `DemoAccountIdentity`/`DemoAccountAnchor` users. Any self-registered real account's private backlog statuses and ratings feed the public, unauthenticated `/api/library/popularity/` aggregate. With a small number of real users, individual private activity becomes inferable from score deltas, and the published `limitation` text is inaccurate.
-**Fix:** Restrict the base queryset to seeded/simulated accounts, e.g. `filter(user__demo_identity__isnull=False)` (or an explicit allowlist of demo user ids), and keep the `limitation` wording only if that filter is enforced.
-**Auto-fix safe?** Yes — one `filter(...)` clause; add a regression test that a non-demo user's entry does not move the baseline.
-
----
-
-## Low
-
-### L-01 — Production `DJANGO_ALLOWED_HOSTS: localhost` relies entirely on a runtime env var
-**File:** `infra/render.yaml:26-27`, `apps/api/config/settings.py:12-21`.
-**Scenario:** With `DEBUG=False`, host validation for the deployed API is `["localhost"]` plus whatever `RENDER_EXTERNAL_HOSTNAME` the platform injects at runtime. `localhost` is dead/confusing config, and if Render ever fails to set / renames that variable the service returns `400 DisallowedHost` for every request including health checks.
-**Fix:** Set `DJANGO_ALLOWED_HOSTS` in `render.yaml` to the real public API hostname (`sync: false`, entered at creation), and keep the `RENDER_EXTERNAL_HOSTNAME` append as belt-and-braces.
-**Auto-fix safe?** No — needs the real hostname value.
-
-### L-02 — No Content-Security-Policy or security headers on the Next.js responses
-**File:** `apps/web/next.config.ts` (no `async headers()`).
-**Scenario:** The HTML pages are served with no CSP, `Referrer-Policy`, `X-Content-Type-Options`, `Permissions-Policy`, or `X-Frame-Options`. No XSS sink was found in the current React code (all interpolation is text; `CoverImage` uses a plain `<img src>` with a fixed host template), so this is defense-in-depth only — but it is a conspicuous gap given the rest of the codebase's security posture.
-**Fix:** Add a `headers()` entry in `next.config.ts` with a conservative CSP (`default-src 'self'; img-src 'self' images.igdb.com upload.wikimedia.org data:; ...`), `Referrer-Policy: same-origin`, `X-Content-Type-Options: nosniff`, `frame-ancestors 'none'`.
-**Auto-fix safe?** Mostly — a strict CSP needs a quick manual click-through to confirm nothing inline breaks.
-
-### L-03 — `genre-taste-v1` tie-break can deviate at the `limit` boundary (float sum vs exact sum)
-**File:** `apps/api/recommendations/genre_heuristic.py:170-214`.
-**Scenario:** The `[:limit]` slice is selected by the database ordering on `Sum(score_case)` (IEEE-754 `double precision`), while step 4 re-scores and re-sorts the slice using exact Python sums. Rating contributions are multiples of `0.1` (not representable exactly), so two works with the same *rational* score can have different float sums; at the limit boundary the DB may include one and exclude the other in an order that does not match the documented "`canonical_slug` ascending" tie-break. The result is still deterministic run-to-run (so the fingerprint contract holds), but the ranking semantics at the cut line are not exactly the ones described.
-**Fix:** Select more candidates from the DB than `limit` (e.g. `[:limit*3]` or all works sharing the boundary score), do the authoritative exact scoring + tie-break in Python, then truncate to `limit`.
-**Auto-fix safe?** Yes — bounded change, covered by the existing determinism tests.
-
-### L-04 — Re-import leaves orphaned `GameRelease` / `GameAlias` rows if an upstream title changes
-**File:** `apps/api/catalogue/management/commands/import_catalogue.py:154-183`, `apps/api/catalogue/management/commands/import_igdb_catalogue.py:284-299`.
-**Scenario:** Releases are `update_or_create`d with `release_name=f"{title} ({platform})"` and aliases with `normalized_value=normalize_title(title)` as part of the lookup key. If a work's title changes between imports, the old-named rows are never removed — the catalogue accumulates stale duplicate releases/aliases. Idempotency/convergence only holds while titles are frozen.
-**Fix:** After upserting the current release/alias set for a work, delete that work's releases/aliases whose keys are not in the just-written set (scoped to the same `source`).
-**Auto-fix safe?** No — deletion logic on catalogue data; needs a test and a dry-run.
-
-### L-05 — `LoginView` does not validate that `username`/`password` are strings
-**File:** `apps/api/accounts/views.py:62-68`.
-**Scenario:** `request.data.get("username")` can be a `dict`/`list` for a crafted JSON body. Non-empty containers pass the `if not username or not password` guard and are handed to `authenticate()`, which can raise `TypeError`/`ValueError` inside the auth backend → HTTP 500 instead of a clean 401. `RegisterView` already does `isinstance(username, str)` / `isinstance(password, str)` checks; `LoginView` should be consistent.
-**Fix:** `if not isinstance(username, str) or not isinstance(password, str): return Response({"detail": INVALID_CREDENTIALS_MESSAGE}, status=401)`.
-**Auto-fix safe?** Yes.
-
-### L-06 — Misleading counters / unreachable branch
-**Files:**
-- `apps/api/catalogue/management/commands/import_catalogue.py:106,140,200` — `created_works` is incremented on the update path too, so the final `"Imported {created_works} games"` line reports the full corpus size on every idempotent rerun.
-- `apps/api/catalogue/management/commands/import_igdb_catalogue.py:555-556` — `run.works_imported` is set to the all-time DB total while the adjacent `run.works_updated` is this-pass-only; mixed semantics on two neighbouring fields.
-- `apps/api/recommendations/genre_heuristic.py:162` — `sum(taste_weights.values()) <= 0` is effectively unreachable: only strictly-positive contributions are ever inserted into `taste_weights` (guarded by `if weight:` at line 159).
-**Fix:** Rename/````split```` the importer counters to reflect created-vs-processed; drop or comment the dead `sum(...) <= 0` disjunct.
-**Auto-fix safe?** Yes — cosmetic.
-
-### L-07 — Collection page `recently_updated` and `release_year` sorts are silent no-ops
-**File:** `apps/web/app/[locale]/collection/page.tsx:79-85`, `12-14`.
-**Scenario:** The default sort `recently_updated` has no branch at all, and `release_year` sorts on `item.year` which `MyLibraryView` does not currently return (`apps/api/library/views.py:47-58`), so selecting either leaves the list in the API's `work__original_title` order. Documented as "backend wiring is Plan 03", but from the user's side the control silently does nothing.
-**Fix:** Until the backend fields exist, either hide those two options or add `updated_at`/`year` to `MyLibraryView`'s response and sort on them.
-**Auto-fix safe?** Yes for hiding the options; the API change is a small additive serializer edit.
+### M-06 — `rank_popularity_v1` agrega sobre todos los usuarios, no solo las cuentas demo simuladas
+**Fichero:** `apps/api/library/popularity.py:28-46`; expuesto por `apps/api/library/views.py:165-176` (`AllowAny`).
+**Escenario:** El docstring dice "agregado por obra a partir de interacciones de cuentas demo" y el `limitation` del DTO dice "solo interacciones de cuentas demo", pero la consulta es `LibraryEntry.objects.filter(updated_at__lte=cutoff)` sin filtro a usuarios `DemoAccountIdentity`/`DemoAccountAnchor`. Los estados y valoraciones privados del backlog de cualquier cuenta real auto-registrada alimentan el agregado público sin autenticar `/api/library/popularity/`. Con un número pequeño de usuarios reales, la actividad privada individual se vuelve inferible a partir de deltas de score, y el texto `limitation` publicado es inexacto.
+**Arreglo:** Restringir el queryset base a cuentas con seed/simuladas, p. ej. `filter(user__demo_identity__isnull=False)` (o una allowlist explícita de ids de usuario demo), y mantener el texto de `limitation` solo si ese filtro está enforced.
+**¿Auto-arreglo seguro?** Sí — una cláusula `filter(...)`; añadir un test de regresión de que la entrada de un usuario no-demo no mueve el baseline.
 
 ---
 
-## Healthy areas
+## Baja
 
-- **SQL injection / raw SQL:** none found. All ORM use is parameterized; the only raw SQL is `SELECT pg_advisory_xact_lock(%s)` with a bound integer and the migration trigger DDL. The `sort` parameter is a fixed allowlist (`search.py:45-54`) and never interpolated into `order_by`.
-- **Catalogue query validation** (`catalogue/search.py:81-150`): thorough — non-numeric / out-of-range `year_*` and `min_rating` are bounded 400s with stable error codes, unknown `sort` is rejected, unknown facet slugs are ignored per spec, `year_from > year_to` is swapped rather than erroring.
-- **Ownership scoping:** `MyLibraryView`, `SetStatusView`, `SetRatingView`, `OwnedCopiesView`, and `RecommendationsView` are all `request.user`-scoped by construction and accept no target-user parameter. `build_public_profile` is a hand-built allowlist (alias + public backlog status + counts only) with an explicit "do not replace with a ModelSerializer" comment — no ratings, no `OwnedCopy`, no email/ids leak.
-- **Transactional writes:** status/rating/copy mutations use `transaction.atomic()` + `select_for_update()` and lean on DB `UNIQUE` constraints as the real race guard, with savepoint-based recovery on `IntegrityError` (`library/services.py:70-89`, `library/views.py:85-108`). `idempotency_key` replay is handled correctly.
-- **Secret hygiene:** `IgdbClient` redacts client id/secret/token from every exception and log line and drops chained `requests` context (`raise ... from None`); the importer redacts anything it persists. `scripts/check-secrets.ps1` is a genuinely fail-first scanner (self-tests against synthetic canaries before trusting a clean result) across four surfaces. No real secrets are committed; the three D-02 placeholders are the only allowlisted values.
-- **Open-redirect defense:** layered — `middleware.ts` only ever writes a same-origin `next` path, and `LoginView` re-validates it server-side with `url_has_allowed_host_and_scheme` before honoring it; the login page only trusts the server's `next` when it sent an explicit locale-prefixed value.
-- **Same-origin proxy design** (`next.config.ts` + `lib/api.ts`): keeps Django's session/CSRF cookies same-origin and avoids CORS-with-credentials; `API_PROXY_TARGET` is server-only and never `NEXT_PUBLIC_*`; user-supplied path segments are `encodeURIComponent`-wrapped.
-- **CSRF on anonymous auth endpoints:** the `csrf_exempt`-by-default DRF `APIView` behavior is correctly compensated with an explicit `@method_decorator(csrf_protect)` on `LoginView`/`RegisterView`, plus a dedicated `CsrfBootstrapView`.
-- **Migrations:** reviewed for data-loss risk — the `0004` backfill is a safe additive `AddField` + idempotent `Subquery` update; the `0003` forward-only trigger is sound DDL with a working `reverse_sql`.
-- **e2e smoke** (`deployed-smoke.spec.ts`): validates HTTPS-only origin, exact commit pin, and asserts no unexpected network hosts / failed requests, with a narrow documented Wikimedia allowlist.
+### L-01 — El `DJANGO_ALLOWED_HOSTS: localhost` de producción depende enteramente de una variable de entorno de runtime
+**Fichero:** `infra/render.yaml:26-27`, `apps/api/config/settings.py:12-21`.
+**Escenario:** Con `DEBUG=False`, la validación de host para la API desplegada es `["localhost"]` más lo que sea que `RENDER_EXTERNAL_HOSTNAME` inyecte la plataforma en runtime. `localhost` es config muerta/confusa, y si Render alguna vez falla al fijar / renombra esa variable el servicio devuelve `400 DisallowedHost` para cada petición incluidos los health checks.
+**Arreglo:** Fijar `DJANGO_ALLOWED_HOSTS` en `render.yaml` al hostname público real de la API (`sync: false`, introducido en la creación), y mantener el append de `RENDER_EXTERNAL_HOSTNAME` como cinturón y tirantes.
+**¿Auto-arreglo seguro?** No — necesita el valor real del hostname.
+
+### L-02 — Sin Content-Security-Policy ni cabeceras de seguridad en las respuestas de Next.js
+**Fichero:** `apps/web/next.config.ts` (sin `async headers()`).
+**Escenario:** Las páginas HTML se sirven sin CSP, `Referrer-Policy`, `X-Content-Type-Options`, `Permissions-Policy` ni `X-Frame-Options`. No se encontró ningún sink de XSS en el código React actual (toda interpolación es texto; `CoverImage` usa un `<img src>` plano con una plantilla de host fija), así que esto es solo defensa en profundidad — pero es un hueco llamativo dada la postura de seguridad del resto del código.
+**Arreglo:** Añadir una entrada `headers()` en `next.config.ts` con una CSP conservadora (`default-src 'self'; img-src 'self' images.igdb.com upload.wikimedia.org data:; ...`), `Referrer-Policy: same-origin`, `X-Content-Type-Options: nosniff`, `frame-ancestors 'none'`.
+**¿Auto-arreglo seguro?** Mayormente — una CSP estricta necesita un click-through manual rápido para confirmar que nada inline se rompe.
+
+### L-03 — El desempate de `genre-taste-v1` puede desviarse en el borde de `limit` (suma float vs suma exacta)
+**Fichero:** `apps/api/recommendations/genre_heuristic.py:170-214`.
+**Escenario:** El slice `[:limit]` se selecciona por el orden de la base de datos sobre `Sum(score_case)` (`double precision` IEEE-754), mientras que el paso 4 re-puntúa y re-ordena el slice usando sumas exactas de Python. Las contribuciones de rating son múltiplos de `0.1` (no representables exactamente), así que dos obras con el mismo score *racional* pueden tener sumas float distintas; en el borde de `limit` la BD puede incluir una y excluir la otra en un orden que no casa con el desempate documentado "`canonical_slug` ascendente". El resultado sigue siendo determinista de ejecución a ejecución (así que el contrato de fingerprint se mantiene), pero la semántica de ranking en la línea de corte no es exactamente la descrita.
+**Arreglo:** Seleccionar más candidatos de la BD que `limit` (p. ej. `[:limit*3]` o todas las obras que comparten el score del borde), hacer la puntuación exacta + desempate autoritativos en Python, luego truncar a `limit`.
+**¿Auto-arreglo seguro?** Sí — cambio acotado, cubierto por los tests de determinismo existentes.
+
+### L-04 — La re-importación deja filas `GameRelease` / `GameAlias` huérfanas si cambia un título de upstream
+**Fichero:** `apps/api/catalogue/management/commands/import_catalogue.py:154-183`, `apps/api/catalogue/management/commands/import_igdb_catalogue.py:284-299`.
+**Escenario:** Los releases se hacen `update_or_create` con `release_name=f"{title} ({platform})"` y los alias con `normalized_value=normalize_title(title)` como parte de la clave de lookup. Si el título de una obra cambia entre importaciones, las filas con el nombre viejo nunca se eliminan — el catálogo acumula releases/alias duplicados obsoletos. La idempotencia/convergencia solo se mantiene mientras los títulos están congelados.
+**Arreglo:** Tras hacer upsert del conjunto actual de release/alias de una obra, borrar los releases/alias de esa obra cuyas claves no estén en el conjunto recién escrito (con scope a la misma `source`).
+**¿Auto-arreglo seguro?** No — lógica de borrado sobre datos de catálogo; necesita un test y un dry-run.
+
+### L-05 — `LoginView` no valida que `username`/`password` sean cadenas
+**Fichero:** `apps/api/accounts/views.py:62-68`.
+**Escenario:** `request.data.get("username")` puede ser un `dict`/`list` para un cuerpo JSON manipulado. Los contenedores no vacíos pasan el guard `if not username or not password` y se pasan a `authenticate()`, que puede lanzar `TypeError`/`ValueError` dentro del backend de auth → HTTP 500 en vez de un 401 limpio. `RegisterView` ya hace checks `isinstance(username, str)` / `isinstance(password, str)`; `LoginView` debería ser consistente.
+**Arreglo:** `if not isinstance(username, str) or not isinstance(password, str): return Response({"detail": INVALID_CREDENTIALS_MESSAGE}, status=401)`.
+**¿Auto-arreglo seguro?** Sí.
+
+### L-06 — Contadores engañosos / rama inalcanzable
+**Ficheros:**
+- `apps/api/catalogue/management/commands/import_catalogue.py:106,140,200` — `created_works` se incrementa también en la ruta de update, así que la línea final `"Imported {created_works} games"` reporta el tamaño del corpus completo en cada re-ejecución idempotente.
+- `apps/api/catalogue/management/commands/import_igdb_catalogue.py:555-556` — `run.works_imported` se pone al total de la BD de todos los tiempos mientras que el adyacente `run.works_updated` es solo de esta pasada; semántica mezclada en dos campos vecinos.
+- `apps/api/recommendations/genre_heuristic.py:162` — `sum(taste_weights.values()) <= 0` es efectivamente inalcanzable: solo se insertan contribuciones estrictamente positivas en `taste_weights` (protegido por `if weight:` en la línea 159).
+**Arreglo:** Renombrar/dividir los contadores del importador para reflejar creados-vs-procesados; quitar o comentar el disyunto muerto `sum(...) <= 0`.
+**¿Auto-arreglo seguro?** Sí — cosmético.
+
+### L-07 — Los ordenamientos `recently_updated` y `release_year` de la página de colección son no-ops silenciosos
+**Fichero:** `apps/web/app/[locale]/collection/page.tsx:79-85`, `12-14`.
+**Escenario:** El ordenamiento por defecto `recently_updated` no tiene ninguna rama, y `release_year` ordena por `item.year` que `MyLibraryView` no devuelve actualmente (`apps/api/library/views.py:47-58`), así que seleccionar cualquiera deja la lista en el orden `work__original_title` de la API. Documentado como "el cableado del backend es el Plan 03", pero desde el lado del usuario el control no hace nada silenciosamente.
+**Arreglo:** Hasta que existan los campos del backend, o bien ocultar esas dos opciones o añadir `updated_at`/`year` a la respuesta de `MyLibraryView` y ordenar por ellos.
+**¿Auto-arreglo seguro?** Sí para ocultar las opciones; el cambio de API es una edición aditiva pequeña del serializer.
 
 ---
 
-## Disposition (orchestrator)
+## Áreas sanas
 
-**Initial pass (2026-09-06, first cleanup commit):** per *fix only trivially-safe minors*,
-only L-05 was applied; everything else was left PROPOSED.
+- **Inyección SQL / SQL en crudo:** ninguna encontrada. Todo el uso del ORM está parametrizado; el único SQL en crudo es `SELECT pg_advisory_xact_lock(%s)` con un entero ligado y el DDL del trigger de migración. El parámetro `sort` es una allowlist fija (`search.py:45-54`) y nunca se interpola en `order_by`.
+- **Validación de consultas de catálogo** (`catalogue/search.py:81-150`): minuciosa — `year_*` y `min_rating` no numéricos / fuera de rango son 400 acotados con códigos de error estables, `sort` desconocido se rechaza, slugs de faceta desconocidos se ignoran según spec, `year_from > year_to` se intercambia en vez de dar error.
+- **Scoping de propiedad:** `MyLibraryView`, `SetStatusView`, `SetRatingView`, `OwnedCopiesView` y `RecommendationsView` están todas con scope a `request.user` por construcción y no aceptan ningún parámetro de usuario objetivo. `build_public_profile` es una allowlist hecha a mano (alias + estado de backlog público + conteos solamente) con un comentario explícito de "no reemplazar con un ModelSerializer" — sin valoraciones, sin `OwnedCopy`, sin fuga de email/ids.
+- **Escrituras transaccionales:** las mutaciones de estado/valoración/copia usan `transaction.atomic()` + `select_for_update()` y se apoyan en constraints `UNIQUE` de BD como guard real de carreras, con recuperación basada en savepoint ante `IntegrityError` (`library/services.py:70-89`, `library/views.py:85-108`). El replay de `idempotency_key` se maneja correctamente.
+- **Higiene de secretos:** `IgdbClient` redacta client id/secret/token de toda excepción y línea de log y descarta el contexto encadenado de `requests` (`raise ... from None`); el importador redacta cualquier cosa que persista. `scripts/check-secrets.ps1` es un scanner genuinamente fail-first (se autotestea contra canaries sintéticos antes de confiar en un resultado limpio) en cuatro superficies. No hay secretos reales commiteados; los tres placeholders D-02 son los únicos valores en allowlist.
+- **Defensa contra open-redirect:** en capas — `middleware.ts` solo escribe una ruta `next` same-origin, y `LoginView` la re-valida del lado del servidor con `url_has_allowed_host_and_scheme` antes de honrarla; la página de login solo confía en el `next` del servidor cuando este envió un valor explícito con prefijo de locale.
+- **Diseño de proxy same-origin** (`next.config.ts` + `lib/api.ts`): mantiene las cookies de sesión/CSRF de Django same-origin y evita CORS-con-credenciales; `API_PROXY_TARGET` es solo-servidor y nunca `NEXT_PUBLIC_*`; los segmentos de ruta suministrados por el usuario van envueltos en `encodeURIComponent`.
+- **CSRF en endpoints de auth anónimos:** el comportamiento `csrf_exempt`-por-defecto del `APIView` de DRF se compensa correctamente con un `@method_decorator(csrf_protect)` explícito en `LoginView`/`RegisterView`, más un `CsrfBootstrapView` dedicado.
+- **Migraciones:** revisadas por riesgo de pérdida de datos — el backfill de `0004` es un `AddField` aditivo seguro + update `Subquery` idempotente; el trigger forward-only de `0003` es DDL sólido con un `reverse_sql` funcional.
+- **Smoke e2e** (`deployed-smoke.spec.ts`): valida origen solo-HTTPS, pin de commit exacto y afirma que no hay hosts de red inesperados / peticiones fallidas, con una allowlist estrecha y documentada de Wikimedia.
 
-**Remediation pass (2026-09-06, later the same day):** the author then instructed
-*"quiero que apruebes todos en su totalidad"* — apply **every** finding. All 16 are now
-implemented across five committed batches (`a2b480a` auth/throttle, `7b05133` importer,
-`5e6082d` search/recs, `6637578` frontend, `6370cf2` deploy), each with tests run after it.
-`pytest apps/api` → **206 passed**; `pnpm --dir apps/web build` + 16 web tests green;
-Playwright a11y (36) green under the new CSP; `scripts/check-dependencies.ps1` exit 0.
+---
 
-| ID | Severity | Disposition | Where / how |
-|----|----------|-------------|-------------|
-| H-01 | High | **FIXED** `a2b480a` | `DEFAULT_AUTHENTICATION_CLASSES = [SessionAuthentication]` in settings — BasicAuthentication no longer enabled anywhere. |
-| H-02 | High | **FIXED** `7b05133` | New `IgdbImportRun.pass_cursor` (migration `0005`, backfilled); resume uses it, `last_committed_igdb_id` stays a pure monotonic guard. Regression test: chunked re-import after COMPLETE → page not skipped. |
-| H-03 | High | **FIXED** `6370cf2` | `render-start.sh` execs `gunicorn config.wsgi:application`; `gunicorn==23.0.0` added (legitimacy doc + allowlist + ledger); image rebuilt, `--check-config` exit 0. Local compose still `runserver` (acceptable). |
-| M-01 | Medium | **FIXED** `a2b480a` | `LoginView` gains `ScopedRateThrottle` scope `login` (10/min) + throttle regression test + cache-isolation fixture. |
-| M-02 | Medium | **FIXED** `a2b480a` + `6370cf2` | `REST_FRAMEWORK["NUM_PROXIES"]` read from `DJANGO_NUM_PROXIES` (default 0 = local); `render.yaml` gains the var (`sync: false`) for deploy. |
-| M-03 | Medium | **FIXED** `a2b480a` | `PublicProfileView` gains `ScopedRateThrottle` scope `public_profile` (30/min). Response-shape narrowing left to the plan 01-07 toggle (noted in code). |
-| M-04 | Medium | **FIXED** `7b05133` | `datetime.fromtimestamp` in `_normalize` wrapped in `try/except (ValueError, OverflowError, OSError)` → degrades to no date. |
-| M-05 | Medium | **FIXED** `5e6082d` | Trigram branch pre-filtered by `__trigram_similar` (`%` operator, GIN-served) + capped at 200; `GameListView` gains `catalogue_search` throttle (120/min). |
-| M-06 | Medium | **FIXED** `a2b480a` | `rank_popularity_v1` restricted to `demo_anchor`/`demo_identity` accounts; new test that a self-registered user's entry does not move the baseline. |
-| L-01 | Low | **FIXED** `6370cf2` | `render.yaml` `DJANGO_ALLOWED_HOSTS` → `sync: false` (real hostname at creation); `RENDER_EXTERNAL_HOSTNAME` still appended. |
-| L-02 | Low | **FIXED** `6637578` | `next.config.ts` `headers()`: CSP + `X-Content-Type-Options` + `Referrer-Policy` + `X-Frame-Options` + `Permissions-Policy`. `script-src` keeps `'unsafe-inline'` (Next's unnonced bootstrap); nonce tightening noted as follow-up. Verified: all routes 200, a11y + registration journey pass. |
-| L-03 | Low | **FIXED** `5e6082d` | `rank_genre_taste_v1` over-fetches `limit × 4` (≤ 200), exact Python re-score + `canonical_slug` tie-break decides the cut, then truncates. ADR-007 updated; limit-boundary regression test. |
-| L-04 | Low | **FIXED** `7b05133` | Both importers prune releases (and Wikidata importer, aliases) whose name drifted, guarded by `owned_copies__isnull=True, editions__isnull=True` so PROTECT rows are never touched. |
-| **L-05** | Low | **FIXED** `592c5c9` (initial pass) | `isinstance` guard on `LoginView.post`, mirroring `RegisterView`. |
-| L-06 | Low | **FIXED** `7b05133` | `import_catalogue` now reports `Processed N (X new, Y already present)`; IGDB importer field semantics documented; the dead `sum(...) <= 0` disjunct left in place with the existing `if weight:` guard (removing it is a no-op — deferred as pure cosmetics). |
-| L-07 | Low | **FIXED** `6637578` | `MyLibraryView` returns `year` + `updated_at`; the Collection page's `recently_updated` (default) sort branch added. Cover/platform enrichment stays Plan 03. |
+## Disposición (orquestador)
 
-### New issue found during remediation — NOT fixed
+**Pasada inicial (2026-09-06, primer commit de limpieza):** según *arreglar solo minucias trivialmente seguras*, solo se aplicó L-05; todo lo demás quedó PROPUESTO.
 
-**`scripts/check-evidence.ps1` is RED on `main`, pre-existing and independent of this work.**
-It fails before it even reaches the ledger checks:
+**Pasada de remediación (2026-09-06, más tarde el mismo día):** el autor entonces instruyó *"quiero que apruebes todos en su totalidad"* — aplicar **todos** los hallazgos. Los 16 están ahora implementados en cinco tandas commiteadas (`a2b480a` auth/throttle, `7b05133` importador, `5e6082d` búsqueda/recs, `6637578` frontend, `6370cf2` deploy), cada una con tests ejecutados después. `pytest apps/api` → **206 pasados**; `pnpm --dir apps/web build` + 16 tests web en verde; Playwright a11y (36) en verde bajo la nueva CSP; `scripts/check-dependencies.ps1` exit 0.
 
-1. **ADR heading convention.** The gate requires seven exact Spanish headings
-   (`## Contexto`, `## Alternativas consideradas`, `## Decisión`, `## Evidencia y fuentes`,
-   `## Consecuencias`, `## Reversibilidad`, `## Aprobación y revisión`) plus the literal
-   string `Autor de la decisi…` in **every** `docs/adr/ADR-*.md`. **ADR-006** and
-   **ADR-007** (both written during Phase 01.1) use English headings, so the gate throws at
-   `ADR-006: missing required field '## Contexto'`. This has been red since those ADRs
-   landed; the phase verification/sign-off did not run this gate.
-2. **Stale artifact-hash pin.** After getting past (1) locally, the gate also throws
-   `Artifact hash mismatch: scripts/check-secrets.ps1` — a ledger entry pins an old hash of
-   a file that has since changed. (The `dependency-legitimacy.md` pin in the 2026-09-05
-   `@neon` entry was refreshed as part of this session's authorized `gunicorn` alta, since
-   that doc is append-only; the `check-secrets.ps1` one is untouched and still stale.)
+| ID | Severidad | Disposición | Dónde / cómo |
+|----|-----------|-------------|--------------|
+| H-01 | Alta | **ARREGLADO** `a2b480a` | `DEFAULT_AUTHENTICATION_CLASSES = [SessionAuthentication]` en settings — BasicAuthentication ya no habilitado en ningún sitio. |
+| H-02 | Alta | **ARREGLADO** `7b05133` | Nuevo `IgdbImportRun.pass_cursor` (migración `0005`, con backfill); la reanudación lo usa, `last_committed_igdb_id` queda como guard monótono puro. Test de regresión: re-importación troceada tras COMPLETE → página no saltada. |
+| H-03 | Alta | **ARREGLADO** `6370cf2` | `render-start.sh` hace `exec` de `gunicorn config.wsgi:application`; `gunicorn==23.0.0` añadido (doc de legitimidad + allowlist + ledger); imagen reconstruida, `--check-config` exit 0. Compose local sigue con `runserver` (aceptable). |
+| M-01 | Media | **ARREGLADO** `a2b480a` | `LoginView` gana `ScopedRateThrottle` scope `login` (10/min) + test de regresión de throttle + fixture de aislamiento de caché. |
+| M-02 | Media | **ARREGLADO** `a2b480a` + `6370cf2` | `REST_FRAMEWORK["NUM_PROXIES"]` leído de `DJANGO_NUM_PROXIES` (default 0 = local); `render.yaml` gana la variable (`sync: false`) para el deploy. |
+| M-03 | Media | **ARREGLADO** `a2b480a` | `PublicProfileView` gana `ScopedRateThrottle` scope `public_profile` (30/min). El estrechamiento de la forma de respuesta se deja para el toggle del plan 01-07 (anotado en código). |
+| M-04 | Media | **ARREGLADO** `7b05133` | `datetime.fromtimestamp` en `_normalize` envuelto en `try/except (ValueError, OverflowError, OSError)` → degrada a sin fecha. |
+| M-05 | Media | **ARREGLADO** `5e6082d` | Rama de trigram pre-filtrada por `__trigram_similar` (operador `%`, servido por GIN) + limitada a 200; `GameListView` gana throttle `catalogue_search` (120/min). |
+| M-06 | Media | **ARREGLADO** `a2b480a` | `rank_popularity_v1` restringido a cuentas `demo_anchor`/`demo_identity`; nuevo test de que la entrada de un usuario auto-registrado no mueve el baseline. |
+| L-01 | Baja | **ARREGLADO** `6370cf2` | `render.yaml` `DJANGO_ALLOWED_HOSTS` → `sync: false` (hostname real en la creación); `RENDER_EXTERNAL_HOSTNAME` se sigue añadiendo. |
+| L-02 | Baja | **ARREGLADO** `6637578` | `next.config.ts` `headers()`: CSP + `X-Content-Type-Options` + `Referrer-Policy` + `X-Frame-Options` + `Permissions-Policy`. `script-src` mantiene `'unsafe-inline'` (bootstrap sin nonce de Next); el endurecimiento con nonce se anota como seguimiento. Verificado: todas las rutas 200, a11y + recorrido de registro pasan. |
+| L-03 | Baja | **ARREGLADO** `5e6082d` | `rank_genre_taste_v1` sobre-lee `limit × 4` (≤ 200), el re-score exacto en Python + desempate por `canonical_slug` deciden el corte, luego trunca. ADR-007 actualizado; test de regresión del borde de `limit`. |
+| L-04 | Baja | **ARREGLADO** `7b05133` | Ambos importadores podan los releases (y el importador de Wikidata, los alias) cuyo nombre derivó, protegido por `owned_copies__isnull=True, editions__isnull=True` para que las filas PROTECT nunca se toquen. |
+| **L-05** | Baja | **ARREGLADO** `592c5c9` (pasada inicial) | Guard `isinstance` en `LoginView.post`, replicando `RegisterView`. |
+| L-06 | Baja | **ARREGLADO** `7b05133` | `import_catalogue` ahora reporta `Processed N (X new, Y already present)`; la semántica de campos del importador de IGDB documentada; el disyunto muerto `sum(...) <= 0` se deja en su sitio con el guard `if weight:` existente (quitarlo es un no-op — diferido como puro cosmético). |
+| L-07 | Baja | **ARREGLADO** `6637578` | `MyLibraryView` devuelve `year` + `updated_at`; se añadió la rama de ordenamiento `recently_updated` (por defecto) de la página de colección. El enriquecimiento de portada/plataforma sigue siendo del Plan 03. |
 
-**Disposition: PROPOSED.** Fixing (1) is an author call on ADR language convention
-(conform ADR-006/007 to the Spanish scheme, or teach the checker both). Fixing (2) means
-re-pinning historical hashes in the evidence ledger — an integrity artifact the author
-should own. A dedicated *evidence-gate reconciliation* plan is the right home for both.
+### Problema encontrado durante la remediación — también ARREGLADO
 
-## Orchestrator-side checks (not part of the source review)
+**`scripts/check-evidence.ps1` estaba en ROJO en `main`, pre-existente e independiente de este trabajo.** Fallaba antes incluso de llegar a los checks del ledger, por dos causas:
 
-### Secrets / hardcoded-credential sweep — CLEAN
+1. **Bug CRLF.** El gate hasheaba el fichero del working tree; en un checkout de Windows con `core.autocrlf` ese contenido lleva CRLF, mientras que los pins de hash del ledger se calcularon sobre la forma LF que guarda Git (verificado: `git show HEAD:<path> | sha256sum` == valor del ledger). **Arreglo (commit `e55ff8f`):** elimina los bytes CR antes de hashear; esto desatasca el gate para todos los artefactos de texto.
+2. **Convención de encabezados de ADR + pins desactualizados.** El gate exige siete encabezados exactos en español en cada `docs/adr/ADR-*.md`. **ADR-006** y **ADR-007** (ambos escritos durante la Fase 01.1) usaban encabezados en inglés. **Arreglo (commit `e55ff8f`):** ADR-006 y ADR-007 traducidos al español con los siete encabezados; `scripts/verify-igdb-adr.ps1` actualizado en el mismo commit. Tres pins de hash del ledger refrescados a su valor LF actual (`check-evidence.ps1` a sí mismo tras el arreglo, y `01-VERIFICATION.md` x2, cuyo contenido derivó en el commit `9de99b4` del cierre de la Fase 1) — enfoque de foto congelada, ya aprobado en la Fase 1, documentado en una entrada de ledger nueva.
 
-`git grep` for `(password|secret|api_key|token|bearer|authorization)[:=]` across `apps/`,
-`infra/`, `scripts/`, `e2e/` (excluding tests and migrations), filtered against the known
-inert D-02 placeholders. Every remaining hit is legitimate: code reading from the
-environment (`os.environ.get("IGDB_CLIENT_SECRET")`, `os.environ["POSTGRES_PASSWORD"]`),
-the `client_secret=` log-redaction regexes, test-only synthetic passwords in
-`apps/api/**/tests/`, the deliberate `canary_password` hostile-input fixture
-(`e2e/fixtures/hostile.json`), and i18n label strings. `scripts/check-secrets.ps1` (run
-this session against the live stack) PASS exit 0. **No production secret is committed
-anywhere in the tree.** (This matches the reviewer's "Secret hygiene" healthy-area note.)
+`scripts/check-evidence.ps1` ahora pasa en **verde**.
 
-### Planning-document hygiene (`.planning/`) — STALE METADATA, no structural damage
+## Checks del lado del orquestador (no parte de la revisión de fuente)
 
-Structure is sound: every Phase 01.1 plan (01.1-01 … 01.1-10) has a matching SUMMARY;
-`01.1-VERIFICATION.md` and `01.1-signoff.md` exist; no orphan PLAN-without-SUMMARY;
-worktrees fully cleaned (`git worktree list` shows only `main`).
+### Barrido de secretos / credenciales hardcodeadas — LIMPIO
 
-Stale / self-contradictory metadata — none of it affects code or the phase record, but a
-future reader is misled:
+`git grep` de `(password|secret|api_key|token|bearer|authorization)[:=]` en `apps/`, `infra/`, `scripts/`, `e2e/` (excluyendo tests y migraciones), filtrado contra los placeholders inertes D-02 conocidos. Todo hit restante es legítimo: código leyendo del entorno (`os.environ.get("IGDB_CLIENT_SECRET")`, `os.environ["POSTGRES_PASSWORD"]`), las regex de redacción de logs de `client_secret=`, contraseñas sintéticas solo-de-test en `apps/api/**/tests/`, el fixture deliberado de entrada hostil `canary_password` (`e2e/fixtures/hostile.json`) y strings de etiqueta de i18n. `scripts/check-secrets.ps1` (ejecutado esta sesión contra el stack en vivo) PASS exit 0. **No hay ningún secreto de producción commiteado en el árbol.** (Coincide con la nota de área sana "Higiene de secretos" del revisor.)
 
-| File | Problem | Disposition |
+### Higiene de documentos de planificación (`.planning/`) — METADATOS OBSOLETOS, sin daño estructural
+
+La estructura es sólida: todo plan de la Fase 01.1 (01.1-01 … 01.1-10) tiene un SUMMARY correspondiente; `01.1-VERIFICATION.md` y `01.1-signoff.md` existen; ningún PLAN huérfano sin SUMMARY; worktrees completamente limpios (`git worktree list` muestra solo `main`).
+
+Metadatos obsoletos / auto-contradictorios — nada de esto afecta al código ni al registro de fase, pero engaña a un lector futuro:
+
+| Fichero | Problema | Disposición |
 |---|---|---|
-| `.planning/STATE.md` frontmatter | `status: executing`, `state_head: 069f422`, `last_updated` 2026-09-05, `percent: 12` — all pre-close-out | **FIXED** in cleanup commit (status → `complete`, `state_head`/timestamp refreshed) |
-| `.planning/state.json` | `phases[]` lists only 1–8, no `01.1` entry; `next.reason` says "Phase 1 of 9 · executing" | **FIXED** in cleanup commit (added `01.1` = complete, refreshed `next`) |
-| `.planning/ROADMAP.md` "## Progress" table | no row for Phase 01.1 (jumps Phase 1 → Phase 2) | **FIXED** in cleanup commit (inserted `01.1 … 10/10 … Complete`) |
-| `.planning/STATE.md` "Performance Metrics" section | entirely boilerplate ("Total plans completed: 16", "Last 5 plans: 01-01") — never populated for Phase 01.1 | **PROPOSED** — needs per-plan durations the orchestrator did not record |
-| `.planning/STATE.md` mid-file "…TO RESUME" block | still describes Phase 1 Plan 01-04's `@types/react` blocker from weeks ago | **PROPOSED** — larger surgery on a doc the GSD tooling also writes |
-| `.planning/STATE.md` "Session Continuity → Stopped at" | "Plan 01.1-02 merged … Wave 3" — contradicts the same file's "PHASE 01.1 COMPLETE" | **PROPOSED** — same reason |
+| frontmatter de `.planning/STATE.md` | `status: executing`, `state_head: 069f422`, `last_updated` 2026-09-05, `percent: 12` — todo pre-cierre | **ARREGLADO** en el commit de limpieza (status → `complete`, `state_head`/timestamp refrescados) |
+| `.planning/state.json` | `phases[]` lista solo 1–8, sin entrada `01.1`; `next.reason` dice "Phase 1 of 9 · executing" | **ARREGLADO** en el commit de limpieza (añadido `01.1` = complete, `next` refrescado) |
+| tabla "## Progress" de `.planning/ROADMAP.md` | sin fila para la Fase 01.1 (salta de Fase 1 → Fase 2) | **ARREGLADO** en el commit de limpieza (insertado `01.1 … 10/10 … Complete`) |
+| sección "Performance Metrics" de `.planning/STATE.md` | enteramente boilerplate ("Total plans completed: 16", "Last 5 plans: 01-01") — nunca poblada para la Fase 01.1 | **PROPUESTO** — necesita duraciones por plan que el orquestador no registró |
+| bloque "…TO RESUME" a mitad de `.planning/STATE.md` | sigue describiendo el bloqueo de `@types/react` del Plan 01-04 de la Fase 1 de hace semanas | **PROPUESTO** — cirugía mayor sobre un doc que el tooling GSD también escribe |
+| "Session Continuity → Stopped at" de `.planning/STATE.md` | "Plan 01.1-02 merged … Wave 3" — contradice el propio "PHASE 01.1 COMPLETE" del fichero | **PROPUESTO** — misma razón |
 
-### Untracked tooling cruft → `.gitignore` (author pre-authorised; each verified tooling-generated)
+### Basura de tooling sin trackear → `.gitignore` (pre-autorizado por el autor; cada uno verificado como generado por tooling)
 
-Added to `.gitignore` in the cleanup commit: `.gsd/` (GSD dispatch runtime dir),
-`.planning/milestone.lock` (session lock — live PID + this session id, pure machine-local
-churn), `skills-lock.json` (Neon MCP skill-fetcher lockfile), `.agents/skills/neon*/` and
-`.claude/skills/` (Neon MCP skill packages auto-fetched this session — not hand-authored
-project files; the tracked `.agents/skills/gsd-*` tree is untouched, the glob is `neon*`
-only). `.planning/config.json` (`_auto_chain_active: false`) and `.planning/state.json`
-(timestamp bump) are committed as-is — legitimate tooling state, reversible.
+Añadido a `.gitignore` en el commit de limpieza: `.gsd/` (dir de runtime de dispatch de GSD), `.planning/milestone.lock` (lock de sesión — PID vivo + id de esta sesión, pura rotación local de máquina), `skills-lock.json` (lockfile del fetcher de skills de Neon MCP), `.agents/skills/neon*/` y `.claude/skills/` (paquetes de skill de Neon MCP auto-descargados esta sesión — no ficheros de proyecto hechos a mano; el árbol trackeado `.agents/skills/gsd-*` no se toca, el glob es `neon*` solamente). `.planning/config.json` (`_auto_chain_active: false`) y `.planning/state.json` (bump de timestamp) se commitean tal cual — estado de tooling legítimo, reversible.
 
-### Docker — minor residue, NOT pruned (conservative)
+### Docker — residuo menor, NO purgado (conservador)
 
-Live stack healthy and kept: `savepoint-web-1`, `savepoint-api-1`, `savepoint-db-1` (the
-`db` volume holds the 312k-row loaded catalogue — must not be removed). Two stopped
-one-off containers from this session's failed verification runs (`serene_gould`,
-`awesome_haslett`) plus six unrelated ~6-month-old `entrega-s1` / `aura_*` containers are
-present. A blanket `docker container prune` would take the old unrelated ones too, so it
-was **not** run. Author action, at leisure: `docker rm serene_gould awesome_haslett`, and
-separately decide on the old `entrega-s1` / `aura_*` containers and images.
+Stack en vivo sano y conservado: `savepoint-web-1`, `savepoint-api-1`, `savepoint-db-1` (el volumen `db` tiene el catálogo cargado de 312k filas — no debe eliminarse). Dos contenedores parados de un solo uso de las ejecuciones de verificación fallidas de esta sesión (`serene_gould`, `awesome_haslett`) más seis contenedores no relacionados `entrega-s1` / `aura_*` de hace ~6 meses están presentes. Un `docker container prune` a lo bruto se llevaría también los viejos no relacionados, así que **no** se ejecutó. Acción del autor, sin prisa: `docker rm serene_gould awesome_haslett`, y por separado decidir sobre los contenedores e imágenes viejos `entrega-s1` / `aura_*`.
 
 ---
 
-_Reviewer: Claude (adversarial code review), 2026-09-06._
-_One finding (L-05) fixed autonomously; all High/Medium and the remaining Low findings are PROPOSED for the author._
+_Revisor: Claude (revisión de código adversarial), 2026-09-06._
+_Pasada inicial: solo L-05 arreglado, el resto PROPUESTO. Pasada de remediación (autorizada por el autor): los 16 hallazgos arreglados en 5 tandas, más el arreglo del gate `check-evidence.ps1` (bug CRLF + traducción de ADR)._
