@@ -50,6 +50,11 @@ class GameWork(models.Model):
     # on a 0-100 scale (null = unrated).
     first_release_date = models.DateField(null=True, blank=True)
     total_rating = models.FloatField(null=True, blank=True)
+    # Governed-corpus state is deliberately additive and reversible. The
+    # source catalogue remains intact for later discovery phases.
+    in_corpus = models.BooleanField(default=False)
+    corpus_version = models.CharField(max_length=32, blank=True)
+    summary = models.TextField(blank=True)
     genres = models.ManyToManyField(Genre, blank=True, related_name="works")
 
     class Meta:
@@ -58,6 +63,10 @@ class GameWork(models.Model):
             models.Index(fields=["original_title"], name="catalogue_work_title_idx"),
             models.Index(fields=["first_release_date"], name="catalogue_work_release_idx"),
             models.Index(fields=["total_rating"], name="catalogue_work_rating_idx"),
+            models.Index(
+                fields=["in_corpus", "first_release_date"],
+                name="catalogue_work_corpus_idx",
+            ),
         ]
 
     def __str__(self) -> str:
@@ -208,6 +217,38 @@ class SourceRecord(models.Model):
 
     def __str__(self) -> str:
         return f"{self.source}:{self.source_id}"
+
+
+class CorpusRatingSnapshot(models.Model):
+    """Immutable external rating observation attached to a corpus version."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    work = models.ForeignKey(
+        GameWork, on_delete=models.CASCADE, related_name="rating_snapshots"
+    )
+    corpus_version = models.CharField(max_length=32)
+    source = models.CharField(max_length=16)
+    rating = models.FloatField(null=True, blank=True)
+    rating_count = models.PositiveIntegerField(default=0)
+    retrieved_at = models.DateTimeField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=("work", "corpus_version", "source"),
+                name="catalogue_unique_rating_snapshot",
+            )
+        ]
+
+
+class CorpusVersion(models.Model):
+    """Metadata for one governed-corpus ruleset and its active view."""
+
+    version = models.CharField(max_length=32, primary_key=True)
+    ruleset_sha256 = models.CharField(max_length=64)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=False)
+    governed_count = models.PositiveIntegerField(default=0)
 
 
 class IgdbImportRun(models.Model):
