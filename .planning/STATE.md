@@ -1,8 +1,8 @@
 ---
 gsd_state_version: 1.0
 status: in_progress
-stopped_at: "Phase 2 PLANNED and VERIFIED — 13 plans / 6 waves, gsd-plan-checker 0 blockers (both advisory warnings closed: W1 254f999, W2 9ad347b). Ready to execute. Next: /gsd-execute-phase 2 (stops at 5 author ratification checkpoints: platform allowlist, RAWG in/out, frozen protocol params, synthetic archetypes, numpy). Detail: .planning/phases/02-.../.continue-here.md"
-last_updated: "2026-09-06T15:40:00.000Z"
+stopped_at: "Fase 2, ola 1 en curso. 02-01 tarea 1 ratificada (39 plataformas); 02-07 en ejecución. Checkpoints por tarea en el directorio de fase."
+last_updated: "2026-09-07T00:00:00+02:00"
 state_head: f56f7a6
 progress:
   total_phases: 8
@@ -10,13 +10,13 @@ progress:
   total_plans: 26
   completed_plans: 26
   percent: 25
-last_activity: 2026-09-06
+last_activity: 2026-09-07
 next_phase: 2
 next_phase_name: Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender
 next_action: /gsd-execute-phase 2
 current_phase: 2
 current_phase_name: Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender
-last_activity_desc: "Fase 2 planificada y verificada (13 planes, 6 olas, 0 blockers). Lista para /gsd-execute-phase 2."
+last_activity_desc: "Ola 1 iniciada; D-01 ratificada, consolas actuales primero en filtros; tablero sincronizado (13 issues)."
 ---
 
 # Project State
@@ -26,11 +26,11 @@ last_activity_desc: "Fase 2 planificada y verificada (13 planes, 6 olas, 0 block
 See: .planning/PROJECT.md (updated 2026-09-04)
 
 **Core value:** Users receive useful and explainable video-game recommendations from a well-organised collection, while every algorithmic result remains reproducible and defensible in the thesis.
-**Current focus:** Fase 01.1 CERRADA. Roadmap reestructurado el 2026-09-06: la Fase 2 se amplía (corpus gobernado, ratings externos, contrato de evaluación, primer recomendador avanzado, búsqueda y filtros, pase de UI); antiguas fases 5 y 6 fundidas, 3/4/7/8 renumeradas a 5/6/4/7. Siguiente: planificar la Fase 2 ampliada, sin planificar.
+**Current focus:** Fase 2 en ejecución, ola 1. Registro vigente: `.planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/02-EXECUTION-CHECKPOINT.md`.
 
 ## Current Position
 
-Fase 01.1 CERRADA (firma ACEPTADA 2026-09-06). **Fase 2 PLANIFICADA y VERIFICADA — lista para ejecutar.**
+Fase 01.1 CERRADA. **Fase 2 en ejecución: ola 1, con checkpoints después de cada tarea.** D-01 ratificada por el autor el 2026-09-07 (39 plataformas). 02-07 en ejecución; 02-01 continúa por la tarea 2 al liberar el ejecutor. La preferencia de consolas actuales primero está registrada en 02-04.
 
 Hecho y commiteado esta sesión (2026-09-06):
 - Corrección post-cierre de la 01.1 (tanda 1): login fuera de la home, motivos reales de contraseña, login case-insensitive, `GET /api/accounts/me/` — `2bfbfe2`.
@@ -132,7 +132,7 @@ TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<ver
 |----------|------|--------|-------------|-----------|
 | Hardening | Production-strength controls beyond the Phase 1 demo boundary | Planned | Roadmap creation | v1 |
 
-## Session Continuity
+## Registro histórico de sesiones (prevalece el checkpoint de ejecución actual)
 
 **Stopped at:** Phase 2 planning — inputs all done and committed; `gsd-planner` died on the account session rate limit (HTTP 429, reset 20:50 Europe/Paris) before writing any `02-*-PLAN.md`. 0 PLAN.md on disk, nothing to clean up.
 
