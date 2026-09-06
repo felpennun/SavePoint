@@ -1,0 +1,6 @@
+{
+  "artifact": "corpus-governance-freeze",
+  "generated_by": "python manage.py govern_corpus --evidence-json docs/verification/corpus-governance-freeze.json",
+  "status": "template",
+  "note": "Regenerar contra la base de datos gobernada antes de publicar resultados de escala."
+}
