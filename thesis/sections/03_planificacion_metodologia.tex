@@ -1,3 +1,411 @@
 \chapter{Planificación y metodología de trabajo}\label{cap:metodologia}
 
-\todo[inline]{Capítulo por redactar en la siguiente iteración.}
+Este capítulo describe cómo se ha organizado el trabajo. Empieza por los objetivos de
+gestión y por el método de desarrollo por fases. Después detalla la metodología de ingeniería
+asistida por agentes de inteligencia artificial, que el planteamiento del trabajo pide tratar
+como una aportación observable y no como una nota al margen. Termina con la planificación
+temporal, la estimación de esfuerzo, los riesgos, las desviaciones sufridas y las
+convenciones de commits y de idioma.
+
+\section{Objetivos de gestión}\label{sec:met-objetivos-gestion}
+
+La gestión del proyecto persigue cuatro objetivos. El primero es entregar valor de forma
+incremental, con cada fase como un incremento vertical utilizable y verificado, en lugar de
+una integración final de riesgo. El segundo es que toda afirmación de la memoria tenga
+respaldo: una decisión registrada, una verificación independiente o una firma del autor. El
+tercero es mantener el alcance bajo control a lo largo de varias fases, sin que el trabajo de
+una contamine el de otra. El cuarto es que el proceso de ingeniería quede documentado con el
+mismo rigor que el producto, de modo que un tercero pueda reconstruir no solo el sistema,
+sino la secuencia de decisiones que lo produjo.
+
+\section{Método de desarrollo por fases}\label{sec:met-fases}
+
+El ciclo de vida del proyecto se gobierna mediante el método \textit{Get Stuff Done}
+(GSD)~\cite{gsd}, un sistema de desarrollo dirigido por especificación pensado para agentes de
+código, versionado en el propio repositorio. GSD descompone el proyecto en hitos, cada hito
+en fases y cada fase en un ciclo ordenado de cuatro pasos que la Figura~\ref{fig:ciclo-gsd}
+resume: discutir, planificar, ejecutar y verificar. Cada paso produce un artefacto escrito
+que actúa como fuente de verdad del siguiente. Lo que sobrevive a los límites de sesión es la
+especificación escrita, no el historial de la conversación con el agente.
+
+\begin{figure}[htp]
+    \centering
+    \missingfigure[figwidth=0.85\textwidth]{Diagrama del ciclo GSD: idea, hoja de ruta, discutir, contrato de interfaz, planificar, ejecutar, verificar y revisar; con los artefactos que produce cada paso en el árbol .planning/. Pendiente de dibujar.}
+    \caption{Ciclo de una fase en el método GSD y los artefactos que produce cada paso.}
+    \label{fig:ciclo-gsd}
+\end{figure}
+% PENDIENTE: sustituir el \missingfigure por un diagrama real del ciclo GSD (figures/ciclo-gsd.pdf).
+
+En la práctica, cada fase se abre con una discusión que fija por escrito sus decisiones y
+supuestos. Si la fase tiene interfaz, se establece además un contrato de diseño con sus
+componentes y estados. A continuación se investiga y se redacta el plan de la fase, que la
+descompone en tareas atómicas con criterios de aceptación y se comprueba antes de tocar
+código. La ejecución implementa ese plan, confirma los cambios en el control de versiones y
+registra en un resumen lo realmente hecho y las desviaciones. Por último, la verificación
+comprueba, de forma independiente, que el objetivo de la fase se ha alcanzado. Una revisión
+de código somete después los cambios a un análisis de seguridad, rendimiento y corrección con
+un contexto distinto del que los escribió. Cada fase termina con una firma de aceptación del
+autor.
+
+Las órdenes de este flujo se usaron de verdad durante el proyecto: \texttt{discuss-phase},
+\texttt{ui-phase}, \texttt{plan-phase}, \texttt{execute-phase}, \texttt{verify-work},
+\texttt{code-review}, además de \texttt{pause-work} y \texttt{resume-work} para suspender y
+retomar el trabajo entre sesiones sin perder el hilo.
+
+\section{Planificación viva: el árbol \texttt{.planning/}}\label{sec:met-planning}
+
+GSD sustituye los documentos de planificación estáticos por un árbol de ficheros en formato
+Markdown, versionados, que evolucionan con el proyecto. En \texttt{.planning/} conviven la
+definición del producto (\texttt{PROJECT.md}), los requisitos operativos
+(\texttt{REQUIREMENTS.md}), la hoja de ruta por fases (\texttt{ROADMAP.md}) y una instantánea
+del estado actual (\texttt{STATE.md}) que cualquier agente o persona lee antes de actuar.
+Cada fase se descompone en \texttt{.planning/phases/} en pares de plan y resumen: el plan
+fija el alcance y los criterios de aceptación antes de implementar, mientras que el resumen
+registra lo ejecutado, las desviaciones y las evidencias al cerrar. Junto a ellos viven los
+documentos de contexto, investigación, contrato de interfaz, verificación e ítems diferidos
+de cada fase.
+
+La Tabla~\ref{tab:planning-arbol} enumera los artefactos principales del árbol y su función.
+
+\begin{table}[htp]
+\centering
+\begin{tabular}{ | l | p{9.5cm} | }
+    \hline
+    \textbf{Artefacto} & \textbf{Función} \\
+    \hline
+    \texttt{PROJECT.md} & Definición del producto, valor central, requisitos activos y fuera de alcance. \\
+    \hline
+    \texttt{REQUIREMENTS.md} & Catálogo de requisitos con identificador estable y matriz de trazabilidad a fase. \\
+    \hline
+    \texttt{ROADMAP.md} & Fases, objetivos, criterios de éxito y progreso. \\
+    \hline
+    \texttt{STATE.md} & Estado actual, posición, decisiones acumuladas y continuidad de sesión. \\
+    \hline
+    \texttt{phases/<fase>/<plan>-PLAN.md} & Alcance y criterios de aceptación de un plan, antes de implementar. \\
+    \hline
+    \texttt{phases/<fase>/<plan>-SUMMARY.md} & Lo realmente ejecutado, desviaciones y evidencias, al cerrar el plan. \\
+    \hline
+    \texttt{phases/<fase>/<fase>-VERIFICATION.md} & Verificación independiente del objetivo de fase. \\
+    \hline
+    \texttt{phases/<fase>/deferred-items.md} & Hallazgos fuera de alcance, enrutados a una fase posterior. \\
+    \hline
+\end{tabular}
+\caption{Artefactos principales del árbol \texttt{.planning/}.}
+\label{tab:planning-arbol}
+\end{table}
+
+\section{Trazabilidad de tareas, requisitos y evidencias}\label{sec:met-trazabilidad}
+
+La trazabilidad se apoya en tres mecanismos. El primero es la matriz de
+\texttt{REQUIREMENTS.md}, que asigna cada requisito a una fase y registra su estado, de modo
+que cualquier requisito se puede seguir hasta la fase que lo entrega y hasta la evidencia que
+lo cierra. El segundo es la correspondencia entre planes e incidencias: cada plan tiene un
+issue de GitHub asociado, que se cierra a medida que la ejecución avanza, lo que enlaza el
+seguimiento externo con el árbol de planificación. El tercero es el registro de agentes
+descrito en la Sección~\ref{sec:met-ledger}, que ata cada artefacto a la acción que lo
+produjo mediante un hash de contenido. Entre los tres, una decisión de la memoria se puede
+recorrer hacia atrás hasta su plan, su requisito y su discusión; hacia delante llega hasta la
+prueba y la firma que la verifican.
+
+\section{Agentes de inteligencia artificial y skills}\label{sec:met-agentes}
+
+El proyecto se desarrolló con asistencia sistemática de agentes de inteligencia artificial.
+Conviene delimitar desde el principio el reparto de responsabilidades, que la
+Sección~\ref{sec:met-encuadre} retoma: los agentes ejecutan, mientras que la definición de
+las fases, los criterios de aceptación, la revisión de cada entrega y la decisión final son
+del autor. El uso de agentes se describe aquí como una metodología de trabajo que el autor
+diseñó, dirigió y evaluó, no como una coautoría.
+
+\subsection{El problema que resuelve el enfoque}\label{sec:met-context-rot}
+
+El obstáculo práctico del trabajo prolongado con un agente es la degradación del contexto: la
+ventana de contexto se satura de historial y la calidad de las respuestas decae hasta
+contradecir decisiones anteriores~\cite{anthropic-context}. La respuesta adoptada es el
+aislamiento del contexto. El trabajo se descompone en tareas atómicas, cada una se ejecuta en
+una instancia nueva del agente con la ventana limpia. La información viaja entre tareas a
+través de los ficheros de memoria persistentes del árbol \texttt{.planning/} en lugar de a
+través del historial de la conversación. El efecto es que una interrupción, un límite de
+sesión o un cambio de día no hacen perder el hilo: la sesión siguiente relee el estado y
+continúa.
+
+\subsection{Subagentes especializados}\label{sec:met-subagentes}
+
+El flujo emplea instancias del agente con papeles distintos, resumidas en la
+Tabla~\ref{tab:subagentes}. La separación es deliberada. Quien planifica, quien implementa y
+quien verifica son instancias independientes, de modo que la verificación no hereda la
+confianza del código recién escrito. Esta división reproduce, con agentes, la separación
+entre desarrollo y revisión propia de un equipo humano.
+
+\begin{table}[htp]
+\centering
+\begin{tabular}{ | l | p{9cm} | }
+    \hline
+    \textbf{Rol} & \textbf{Responsabilidad y límite} \\
+    \hline
+    \texttt{gsd-phase-researcher} & Recopila y sintetiza evidencia para planificar una fase. Propone; etiqueta fuente, evidencia o supuesto. \\
+    \hline
+    \texttt{gsd-ui-researcher} / \texttt{gsd-ui-checker} & Convierten los requisitos en un contrato de diseño y lo validan. La comprobación automática de accesibilidad no sustituye la revisión humana. \\
+    \hline
+    \texttt{gsd-planner} & Divide el alcance en tareas verificables. Propone secuencia y gates; no declara terminado el producto. \\
+    \hline
+    \texttt{gsd-executor} & Implementa, prueba y registra correcciones en una copia de trabajo aislada, con commits atómicos. No se presenta como verificación independiente. \\
+    \hline
+    \texttt{gsd-verifier} & Verifica el objetivo de fase de forma independiente y escribe el informe de verificación. \\
+    \hline
+    \texttt{gsd-code-reviewer} & Revisa todo el repositorio en busca de defectos con un contexto propio, distinto del de la implementación. \\
+    \hline
+\end{tabular}
+\caption{Subagentes empleados y su responsabilidad.}
+\label{tab:subagentes}
+\end{table}
+
+\subsection{Aislamiento a nivel de sistema de ficheros}\label{sec:met-worktrees}
+
+Cada ejecución de un plan se realiza sobre una copia de trabajo aislada de Git, un
+\textit{worktree}, con su propia rama. El ciclo es crear el worktree, ejecutar el plan en él
+con commits atómicos, integrarlo en la rama principal con una fusión sin avance rápido y
+limpiar la copia. Así, un plan a medias nunca deja el árbol principal en un estado
+inconsistente. La integración de cada plan queda registrada como un punto único en el
+historial.
+
+\subsection{Skills}\label{sec:met-skills}
+
+Las \textit{skills}, conjuntos de instrucciones reutilizables que un agente invoca durante el
+desarrollo, se versionan junto al código en el repositorio. De este modo, el entorno de
+trabajo del agente forma parte del entregable: un tercero que clone el repositorio obtiene
+tanto el sistema como las instrucciones con las que se construyó.
+
+\subsection{El contrato de contexto del repositorio}\label{sec:met-contrato-contexto}
+
+El repositorio define un contrato de contexto común que toda herramienta lee al empezar cada
+sesión. Los ficheros \texttt{AGENTS.md}, \texttt{CLAUDE.md} y
+\texttt{.github/copilot-instructions.md} reúnen la arquitectura, las convenciones y el
+protocolo obligatorio para Claude, Codex, GitHub Copilot u otra herramienta. El documento
+canónico de convenciones es \texttt{CONVENTIONS.md}, que prevalece sobre cualquier otra
+instrucción en conflicto. Un ejemplo de regla transversal es la convención de idioma, vigente
+desde el 6 de septiembre de 2026: la documentación de la tesis y la prosa nueva de
+planificación se escriben en español, mientras que el código, con sus identificadores,
+comentarios, mensajes de commit y nombres de rama, se mantiene en inglés. Las citas legales
+textuales conservan su idioma original para no perder valor probatorio.
+
+\subsection{Memoria persistente y reglas derivadas}\label{sec:met-memoria}
+
+Los ficheros de memoria del agente sobreviven entre sesiones. Cuando un error del agente o
+una corrección del autor tiene valor general, se destila en una regla que se relee al iniciar
+cada tarea, de modo que el fallo no se repite. El proyecto acumuló varias reglas de este
+tipo a partir de incidencias reales:
+
+\begin{itemize}
+    \item La lista de identificadores de Wikidata escrita a mano en el guion de adquisición
+    contenía entidades que no eran videojuegos. La regla derivada obliga a verificar en vivo
+    cualquier identificador de Wikidata antes de usarlo, sin confiar en la memoria ni en un
+    commit anterior.
+    \item El primer intento de cargar el catálogo de IGDB junto al corpus de Wikidata abortó
+    por una colisión de \textit{slug} de plataforma. La corrección \texttt{fix(01.1-02)}
+    enseñó al importador a reconciliar una plataforma existente por \textit{slug}, nombre e
+    inserción dentro de un savepoint, en lugar de fallar. El mismo patrón de convivir con
+    estado preexistente resolvió más tarde el criterio de cuentas simuladas plurales, cuando
+    el comando de arranque adoptó la cuenta primaria heredada bajo una clave de anclaje en
+    lugar de abortar por colisión.
+    \item Los enganches de GSD fallaban en Windows por un problema de shell. La corrección se
+    aplicó al principio de la Fase 01.1 para que el resto de la fase no tropezara con lo
+    mismo.
+    \item Sin un montaje enlazado de Docker y sin cargar el módulo de configuración de Django
+    dentro del contenedor, toda verificación posterior habría probado una imagen obsoleta o
+    habría fallado al arrancar. Corregir ambos al detectarlos evitó que cada plan siguiente
+    chocara con la misma pared.
+\end{itemize}
+
+\subsection{El registro de agentes}\label{sec:met-ledger}
+
+El componente más distintivo del proceso es el registro de agentes,
+\texttt{docs/methodology/agent-ledger.jsonl}, un fichero de solo anexado con un objeto por
+línea. Cada entrada lleva una marca de tiempo, un tipo, el actor, el objetivo, las entradas y
+salidas referenciadas por ruta relativa y hash SHA-256, las herramientas empleadas sin sus
+secretos, el resultado y las limitaciones declaradas. El tipo es uno de tres:
+\texttt{proposal} para una propuesta de agente, \texttt{automated-check} para una
+comprobación determinista y \texttt{author-decision} para una decisión humana, que siempre
+identifica al actor como persona. Al cierre de esta entrega el registro contiene veinte
+entradas. El gate \texttt{scripts/check-evidence.ps1} valida su esquema, sus tipos, sus
+actores, sus rutas, sus hashes y su cobertura, probando primero con entradas inválidas antes
+de dar por buena una ejecución limpia.
+
+El registro es una convención auditable, no un almacén criptográficamente inmutable: Git
+conserva las revisiones y el gate detecta corrupción de referencias en el estado actual, pero
+un actor con permiso de escritura podría reescribir el historial. Para la evidencia final se
+firma o etiqueta el commit correspondiente. El registro es honesto sobre sus propios huecos:
+donde un artefacto histórico resultó irrecuperable, la entrada lo declara en sus campos de
+entradas no verificables y de limitaciones en lugar de ocultarlo o falsearlo. También registra
+que el proyecto usó más de un entorno de agente, la familia \texttt{gpt-5} sobre Codex en la
+Fase 1 y Claude en trabajos posteriores, con la advertencia de que un nombre de modelo no
+basta para reproducir una salida probabilística: la evidencia reproducible son los artefactos
+versionados, los hashes, los comandos y las decisiones humanas.
+
+\subsection{Beneficios observados}\label{sec:met-beneficios}
+
+El enfoque produjo beneficios concretos y observables en el proyecto. El alcance se mantuvo
+bajo control a lo largo de dos fases y veintiséis planes, sin que el trabajo de una fase se
+filtrara en otra. Cada cambio quedó trazado hasta su plan, su requisito y su evidencia. Las
+revisiones de código con contexto independiente encontraron dieciséis hallazgos reales al
+cierre de la Fase 01.1, descritos en el Capítulo~\ref{cap:pruebas}, que se corrigieron por
+completo. El trabajo se pudo reanudar sin pérdida de hilo tras interrupciones y límites de
+sesión, porque el estado vivía en ficheros y no en una conversación. Y el proceso quedó
+reproducible, no solo el producto: un tercero puede clonar el repositorio y reconstruir la
+historia de decisiones.
+
+\subsection{Limitaciones y riesgos}\label{sec:met-limitaciones}
+
+El enfoque tiene límites que conviene declarar. Depende de la calidad de la especificación
+escrita: un plan ambiguo produce una ejecución ambigua. Mantener la disciplina de
+planificación, verificación y registro tiene un coste de tiempo notable para un TFG
+individual. Los agentes cometieron errores que hubo que detectar y corregir, algunos de ellos
+recogidos en la Sección~\ref{sec:met-memoria}. Las revisiones de código encontraron defectos
+de seguridad reales en trabajo ya dado por bueno. Un agente no es un evaluador independiente
+de su propia propuesta, del mismo modo que un hash prueba identidad de bytes, no veracidad ni
+calidad. Por último, el enfoque no sustituye el juicio del autor sobre arquitectura, alcance
+y aceptación, sino que lo enmarca. Existe un informe de uso de inteligencia artificial
+independiente y posterior que cubre la transparencia de la herramienta; esta memoria ni lo
+suple ni lo contradice.
+
+\subsection{Encuadre}\label{sec:met-encuadre}
+
+El proceso de ingeniería asistido por agentes es, en este trabajo, tan inspeccionable,
+auditable y reproducible por terceros como el propio producto. El árbol de planificación, los
+registros de decisión, el registro de agentes y los gates de evidencia permiten a un revisor
+seguir cada cambio desde su motivación hasta su verificación. Esa reproducibilidad del
+proceso, no solo la del producto, es una de las aportaciones del trabajo.
+
+\section{Registro de incidencias y decisiones}\label{sec:met-incidencias}
+
+Además del registro de agentes, el proyecto conserva dos registros de decisión. Los ítems
+diferidos de cada fase, en \texttt{deferred-items.md}, recogen los hallazgos fuera de alcance
+descubiertos durante la ejecución, con su motivo y su destino. Los registros de decisión de
+arquitectura, en \texttt{docs/adr/}, documentan cada decisión material con su contexto, sus
+alternativas, su decisión, su evidencia, sus consecuencias y su reversibilidad. El
+Capítulo~\ref{cap:diseno} resume los siete registros de decisión de arquitectura vigentes.
+
+\section{Planificación temporal por fases e hitos}\label{sec:met-temporal}
+
+El proyecto se planificó por fases, no por un calendario cerrado de tareas. La Fase 1 tenía
+una restricción explícita de tres días para una demostración pública visible. Se organizó en
+dieciséis planes agrupados en doce oleadas de ejecución, cada oleada dependiente de la
+anterior. La Fase 01.1, insertada después, se organizó en diez planes en diez oleadas,
+siguiendo el orden de prioridad fijado por el autor. La Tabla~\ref{tab:hitos} recoge los
+hitos alcanzados con su fecha.
+
+\begin{table}[htp]
+\centering
+\begin{tabular}{ | l | c | c | }
+    \hline
+    \textbf{Hito} & \textbf{Planes} & \textbf{Fecha} \\
+    \hline
+    Fase 1 cerrada y firmada por el autor & 16 & 5 de septiembre de 2026 \\
+    \hline
+    Fase 01.1 cerrada y firmada por el autor & 10 & 6 de septiembre de 2026 \\
+    \hline
+    Fase 2 y siguientes & Por planificar & Pendiente \\
+    \hline
+\end{tabular}
+\caption{Hitos alcanzados en esta primera entrega.}
+\label{tab:hitos}
+\end{table}
+
+\todo[inline]{Añadir un diagrama de Gantt o una línea de tiempo con las fechas reales de inicio y fin de cada fase cuando el autor consolide el registro temporal.}
+% PENDIENTE: cronograma detallado (figures/cronograma.pdf) con fechas reales por fase.
+
+\section{Estimación de esfuerzo y presupuesto}\label{sec:met-presupuesto}
+
+El proyecto no llevó un registro sistemático de horas por tarea, de modo que la estimación de
+esfuerzo que sigue es aproximada y debe entenderse como tal. Tomando como unidad el plan
+ejecutado y verificado, la primera entrega comprende veintiséis planes repartidos entre
+análisis y diseño, infraestructura reproducible, implementación de backend y de frontend,
+adquisición de datos, pruebas y despliegue. La Tabla~\ref{tab:presupuesto} presenta una
+estimación de coste por bloque, calculada con una tarifa por hora de un perfil junior tomada
+como cota conservadora. Las cifras son una estimación, no una medición.
+
+\begin{table}[htp]
+\centering
+\begin{tabular}{ | l | c | c | }
+    \hline
+    \textbf{Bloque} & \textbf{Horas estimadas} & \textbf{Coste estimado (\euro{})} \\
+    \hline
+    Análisis, requisitos y diseño & PENDIENTE & PENDIENTE \\
+    \hline
+    Infraestructura reproducible y despliegue & PENDIENTE & PENDIENTE \\
+    \hline
+    Implementación de backend y frontend & PENDIENTE & PENDIENTE \\
+    \hline
+    Adquisición y congelación de datos & PENDIENTE & PENDIENTE \\
+    \hline
+    Pruebas, verificación y revisión & PENDIENTE & PENDIENTE \\
+    \hline
+    \textbf{Total} & \textbf{PENDIENTE} & \textbf{PENDIENTE} \\
+    \hline
+\end{tabular}
+\caption{Estimación de esfuerzo y presupuesto de la primera entrega.}
+\label{tab:presupuesto}
+\end{table}
+
+\todo[inline]{El autor debe consolidar el registro temporal (horas por bloque) y una tarifa de referencia citada para completar la Tabla \ref{tab:presupuesto}. La tarifa de la Junta de Andalucía de 2018 usada por la referencia BarGAIN es una opción; conviene una fuente actualizada si existe.}
+% PENDIENTE: rellenar horas y coste reales en la Tabla \ref{tab:presupuesto}.
+
+\section{Riesgos y mitigaciones}\label{sec:met-riesgos}
+
+La Tabla~\ref{tab:riesgos} recoge los riesgos que se identificaron y cómo se mitigaron o se
+mantienen bajo vigilancia.
+
+\begin{table}[htp]
+\centering
+\begin{tabular}{ | p{4.2cm} | p{9cm} | }
+    \hline
+    \textbf{Riesgo} & \textbf{Mitigación} \\
+    \hline
+    Restricción de tres días de la Fase 1 & Alcance de demostración deliberadamente estrecho: catálogo pequeño, una cuenta y recomendación por popularidad. \\
+    \hline
+    Términos legales de las fuentes de datos & Confirmación caso por caso: corpus de Wikidata bajo dominio público, términos de IGDB registrados textualmente y reconciliados en un registro de decisión. \\
+    \hline
+    Volumen de IGDB en una importación larga & Importador reanudable por cursor de identificador, con checkpoint tras cada lote y resistencia probada a una interrupción. \\
+    \hline
+    Portadas por enlace directo a un tercero & Ventana de retención de treinta días asumida; ausencia o fallo de una portada cae a un marcador propio. \\
+    \hline
+    La Fase 2 debe congelar el protocolo antes de comparar & El heurístico de géneros de la Fase 01.1 se declara explícitamente fuera de esa comparación. \\
+    \hline
+    Errores del agente en trabajo dado por bueno & Verificación independiente por fase y revisión de código de todo el repositorio con contexto propio. \\
+    \hline
+    Despliegue no conectado a datos reales & Decisión registrada del autor de posponer esa conexión al final del proyecto; el entorno local reproducible es la vía de demostración. \\
+    \hline
+\end{tabular}
+\caption{Riesgos identificados y sus mitigaciones.}
+\label{tab:riesgos}
+\end{table}
+
+\section{Desviaciones y replanificación}\label{sec:met-desviaciones}
+
+La desviación más relevante es la inserción de la Fase 01.1. Tras la firma de la Fase 1, el
+autor pidió una fase de seguimiento inmediata, con un orden de prioridad propio: importación
+masiva del catálogo y rediseño de la interfaz, sistema de acceso real con varias cuentas
+precargadas, ordenación y filtrado del catálogo, más una página de recomendaciones
+independiente. Esa fase se priorizó por delante de la Fase 2, ya planificada, con registro
+explícito como inserción en la hoja de ruta. Durante su planificación, la investigación detectó un
+conflicto real de alcance con el registro abierto de producción, reservado a la versión 2. Se
+resolvió con una vía intermedia: un formulario de registro funcional dentro de la frontera de
+demostración controlada, sin abrir el registro de producción.
+
+Otras desviaciones menores, todas registradas en los resúmenes de plan, incluyen el cambio de
+la topología de despliegue de un único proveedor a tres servicios gratuitos, además de la
+corrección de un gate de evidencia que estaba en rojo en la rama principal por un problema de
+fin de línea y por registros de decisión escritos en inglés antes de fijarse la convención de
+idioma.
+
+\section{Convenciones de commits y de idioma}\label{sec:met-convenciones}
+
+Los mensajes de commit siguen el estilo de \textit{Conventional Commits} y se escriben en
+inglés. Toda dependencia directa nueva o cambio de versión exige aprobación humana explícita,
+una fila en el registro de legitimidad de dependencias, una fila en el gate correspondiente y
+una entrada en el registro de agentes. La convención de idioma descrita en la
+Sección~\ref{sec:met-contrato-contexto} separa la documentación, en español, del código, en
+inglés, con las citas legales textuales conservadas en su idioma original.
+
+Este capítulo ha descrito el método de trabajo y, con detalle, la metodología asistida por
+agentes que lo sostiene. Los capítulos siguientes aplican ese método al análisis, al diseño y
+a la construcción del sistema.
