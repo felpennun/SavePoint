@@ -135,22 +135,17 @@ TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<ver
 
 ## Session Continuity
 
-**Stopped at:** Phase 2 UI-SPEC approved
+**Stopped at:** Phase 2 planning — inputs all done and committed; `gsd-planner` died on the account session rate limit (HTTP 429, reset 20:50 Europe/Paris) before writing any `02-*-PLAN.md`. 0 PLAN.md on disk, nothing to clean up.
 
-**Author is remote (on mobile), at-the-helm delegation in effect.** Pre-approvals recorded below in this section's history and in `.continue-here.md`. Stop for the author only on: a genuine 01.1-06 design ambiguity, the deploy phase, anything destructive, or a failure. Mobile push is OFF in the author's /config — leave decision messages in the conversation.
+**Resume (after the rate-limit reset):** `/gsd-plan-phase 2` re-spawns the planner from scratch. All inputs are committed: `02-CONTEXT.md`, `02-UI-SPEC.md` (verified 7/7), `02-RESEARCH.md`, `02-VALIDATION.md`, `02-PATTERNS.md`, `02-COVERAGE.md`. Then `gsd-plan-checker` → revision loop → present → `/gsd-execute-phase 2`. Full detail in `.planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/.continue-here.md`.
 
-### Pre-approved, in flight
+Last session: 2026-09-06
 
-- **A — Plan 01.1-06 (Wave 3 redesign):** approved to run now. Task 1 (checkpoint "approve the UI-SPEC") is satisfied — `01.1-UI-SPEC.md` is checker-VERIFIED 7/7 ×3, `status: approved`. Before Task 2, ADD a per-surface coverage matrix to the UI-SPEC (rows: catalogue / detail / registration / recommendations, each naming desktop + mobile + accessibility + an explicit "approved" verdict) — the plan's Task 1 `<verify>` PowerShell gate greps for exactly that and the current spec lacks it. Then Task 2: implement across `apps/web` (globals.css tokens light+dark, AppShell navbar w/ ThemeToggle + login icon, GameCard w/ StatusPill/ScorePill/StarRating, catalogue, detail, NEW recommendations page, NEW register page visual/form-only) + collection + login per the post-approval additions (note the scope addition in the SUMMARY — they are not in the plan's `files_modified`). Verify: `pnpm --dir apps/web run build` passes. Brand assets are staged at `design/brand/` — wire per `design/brand/README.md` checklist (favicon route, AppShell brand, opengraph-image, drop the "02 / CRISTAL" round label).
-- **B — Persistent catalogue load:** approved. Run the now-merged `import_igdb_catalogue` against the real dev DB `savepoint-db-1` in the background (~1–1.5h; must coexist with the existing 150-game `source="wikidata"` corpus + demo accounts/library — watch for coexistence bugs), then `pg_dump` a reusable snapshot (NOT a committed bulk file — ADR-006). This load also produces the deferred deterministic sample manifest for `igdb-catalogue-freeze.md`. Deployed Neon load deferred to the deploy phase (check free-tier size for ~312k rows then).
+### Done this session (2026-09-06, all committed on `main`)
 
-Last session: 2026-09-06T15:19:29.622Z
+- **01.1 post-close correction (batch 1)** — `2bfbfe2`: login CTA removed from the home hero; registration returns the concrete `password_errors` list; login username matching made case-insensitive; new `GET /api/accounts/me/` (`MeView`). 80 accounts tests + 16 web tests + tsc green. `deferred-items.md` updated, D-01.1-13-b resolved.
+- **TFG LaTeX draft** — `4f10914`: 10 chapters + front matter + bibliography + 18 app screenshots + code listings, merged from a worktree agent. Follows the author/supervisor rules and the professor style rules. Pending author items marked with `\todo` and listed in `thesis/README.md`. Overleaf zip sent (now OBSOLETE — regenerate after Phase 2 with its algorithms + decisions folded in). Tag `demo-estable` = frozen demoable version.
+- **Roadmap restructure** — `85e98ba`: Phase 2 enlarged (governed corpus + external ratings + evaluation contract + first advanced recommender + search/filters + UI pass); former phases 5+6 merged; 3/4/7/8 renumbered to 5/6/4/7. Requirement coverage 91/91.
+- **Phase 2 planning inputs** — `02-CONTEXT.md` `f5d65e7` (discuss-phase, D-01..D-24), `02-UI-SPEC.md` `e548a2e` (ui-phase, checker 7/7, `## UI Considerations` 45 explicit + 10 backstop), `02-RESEARCH.md` `a78510f`, `02-VALIDATION.md` `53b173f`, `02-PATTERNS.md` `df45a33`, `02-COVERAGE.md` `15006b3` (rescued from the rate-limited planner).
 
-### Done this session (all merged + pushed to `origin/main` through `507f876`)
-
-- **01.1-01** — ADR-006 (IGDB source, DATA-04), authenticated probe evidence, `requests==2.34.2` pinned; issue #7 closed; DATA-04 + CAT-02 Phase-4 duplicate traceability rows removed (author-confirmed leftovers). Also fixed the Windows GSD hook-shell bug.
-- **01.1-02** — `Genre` model + `GameWork.genres` M2M + `IgdbImportRun` monotonic-cursor checkpoint; `IgdbClient` + `import_igdb_catalogue` (id-cursor batched atomic + advisory lock, checkpoint-after-commit, ADR-006 normalization, content checksum, cover accounting); fresh disposable-DB acceptance run — **312,463 primary works**, floor 281,200 cleared, SIGKILL interrupt + resume + idempotent convergence proven, aggregate freeze evidence in `docs/verification/igdb-catalogue-freeze.md`. Issue #8 closed. 39 catalogue tests green post-merge. The gsd-executor was stopped mid-finalization; the orchestrator completed Task 3 evidence + SUMMARY from the agent's reported values. **Sample-review manifest deferred** to the persistent-DB load (encoding fault ate the disposable-run JSON).
-- **Wave 3 prep** — `01.1-UI-SPEC.md` checker-VERIFIED 7/7 ×3, `status: approved`; 4 design decisions author-ratified (light+dark theme w/ SSR cookie toggle; ~156px grid no list-toggle; tiered ScorePill + gold personal stars; genre shelves for REC-10); Collection screen + navbar person-icon login added on author direction; 6 mockups in `mockups/`.
-- **Brand** — author's "Cristal" identity staged at `design/brand/` (mark/lockup/favicon/OG-banner × dark+light + mono; mojibake repaired). NOT wired to the app; `design/brand/README.md` has the 01.1-06 integration checklist.
-
-Resume file: .planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/02-UI-SPEC.md
+Resume file: .planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/.continue-here.md
