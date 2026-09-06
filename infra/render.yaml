@@ -24,7 +24,17 @@ services:
       - key: DJANGO_DEPLOY_ENV
         value: production
       - key: DJANGO_ALLOWED_HOSTS
-        value: localhost
+        # The real public API hostname, entered at first creation (repo-review
+        # 2026-09-06 L-01). "localhost" was dead config and left host
+        # validation entirely dependent on RENDER_EXTERNAL_HOSTNAME being set;
+        # settings.py still appends that variable as belt-and-braces.
+        sync: false
+      - key: DJANGO_NUM_PROXIES
+        # Number of proxy hops in front of Django (browser -> Vercel rewrite
+        # -> Render -> app). Required for the per-IP rate throttles to key on
+        # the real client instead of one upstream address (repo-review
+        # 2026-09-06 M-02). Set to the actual chain length at creation.
+        sync: false
       - key: DJANGO_CSRF_TRUSTED_ORIGINS
         # Render does not expose another service's public URL as a Blueprint
         # property. Enter the exact https:// web origin during first creation.

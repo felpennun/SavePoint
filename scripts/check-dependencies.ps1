@@ -26,6 +26,7 @@ $approvedNpm = [ordered]@{
 $approvedPython = [ordered]@{
     "Django" = "5.2.17"
     "djangorestframework" = "3.18.0"
+    "gunicorn" = "23.0.0"
     "psycopg[binary]" = "3.3.5"
     "requests" = "2.34.2"
     "pytest" = "9.1.1"
