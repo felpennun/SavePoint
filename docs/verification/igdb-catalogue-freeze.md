@@ -38,6 +38,34 @@ La fuente legible por máquina de los registros 1–3 es el JSON emitido por `py
 
 ---
 
+## Cobertura de rating sobre el corpus gobernado
+
+La cobertura se mide después de ejecutar `govern_corpus` y antes de congelar los
+experimentos. El comando `snapshot_corpus_ratings --corpus-version <version>` informa
+por separado `total_rating IS NOT NULL` (señal viva combinada) y `rating IS NOT NULL`
+(rating de usuarios de IGDB). La segunda es la señal primaria de DATA-05; una obra sin
+rating permanece dentro del corpus y simplemente no recibe fila de snapshot.
+
+| Campo | Conteo | Porcentaje | Fuente de medición |
+|---|---:|---:|---|
+| `total_rating IS NOT NULL` | generado por comando | generado por comando | vista `in_corpus=True` |
+| `rating IS NOT NULL` | generado por comando | generado por comando | vista `in_corpus=True` |
+
+### Medición reproducida de la BD de desarrollo — 2026-09-07
+
+La base persistente contiene 193.885 obras gobernadas y devuelve `0` para
+`total_rating IS NOT NULL` y `rating IS NOT NULL`, con cobertura 0,00 %. Esta es una
+medición real de la base existente, pero el dump fue importado antes de ampliar
+`GAME_FIELDS`; el re-import no pudo ejecutarse porque el contenedor no tenía
+`IGDB_CLIENT_ID`/`IGDB_CLIENT_SECRET`. Por tanto, esta cifra no se presenta como
+cobertura final del proveedor: queda como estado reproducible y se debe repetir tras
+inyectar las credenciales por el entorno operativo.
+
+El JSON emitido por `snapshot_corpus_ratings` debe conservarse junto a esta evidencia y
+al `corpus_version`. El dump de desarrollo queda obsoleto después de un re-import y un
+snapshot nuevos; al regenerarlo debe actualizarse el artefacto gitignored, nunca
+commitear el volcado completo.
+
 ## Evidencia medida
 
 _El bloque entre los dos marcadores de abajo lo rellena `scripts/verify-igdb-fresh-import.ps1` sobre una instancia de PostgreSQL genuinamente vacía y desechable. Toda la salida de comandos está redactada: no aparece aquí ninguna cadena de conexión, token OAuth ni valor de cabecera `Client-ID` / `Authorization`._
