@@ -30,14 +30,19 @@ See: .planning/PROJECT.md (updated 2026-09-04)
 
 ## Current Position
 
-Fase: 01.1 (Real-Scale Catalogue and Product Experience) — **CERRADA** (firma ACEPTADA 2026-09-06).
-Planes: 10/10. Verificación 5/5 (SC3 re-verificado). QUAL-05 confirmado por revisión remota de capturas.
-4 ítems cosméticos → pulido diferido para una pasada de diseño posterior (no bloquean).
-NO desplegada — decisión de despliegue diferida a fin de proyecto.
-Siguiente: **Fase 2** — `/gsd-plan-phase 2` cuando se quiera empezar.
-Última actividad: 2026-09-06 — cierre de fase, remediación de la revisión de repo, docs/ al español, SC3.
+Fase 01.1 CERRADA (firma ACEPTADA 2026-09-06). **Fase 2 en planificación, a medias.**
 
-Progress: [██████████] 100% (10 of 10 plans) — FASE 01.1 CERRADA
+Hecho y commiteado esta sesión (2026-09-06):
+- Corrección post-cierre de la 01.1 (tanda 1): login fuera de la home, motivos reales de contraseña, login case-insensitive, `GET /api/accounts/me/` — `2bfbfe2`.
+- Borrador LaTeX del TFG (10 capítulos + portada + biblio + figuras) fusionado — `4f10914`. Tag `demo-estable` = versión demostrable congelada. Zip de Overleaf enviado (queda OBSOLETO tras la Fase 2).
+- Roadmap reestructurado (Fase 2 ampliada; antiguas 5+6 fundidas; 3/4/7/8 → 5/6/4/7; trazabilidad 91/91) — `85e98ba`.
+- Fase 2: `02-CONTEXT.md` (`f5d65e7`), `02-UI-SPEC.md` verificado 7/7 (`e548a2e`), `02-RESEARCH.md` (`a78510f`), `02-VALIDATION.md` (`53b173f`), `02-PATTERNS.md` (`df45a33`), `02-COVERAGE.md` (`15006b3`).
+
+Bloqueo actual: el `gsd-planner` cayó por rate limit de sesión (429) sin escribir ningún PLAN.md. **Reset 20:50 Europe/Paris.**
+
+**Retomar tras el reset:** `/gsd-resume-work` → detecta `.planning/phases/02-.../.continue-here.md` → `/gsd-plan-phase 2` (re-lanza el planner; `has_plans:false`; todas las entradas commiteadas).
+
+Progreso global: 2/8 fases (25%).
 
 ## Performance Metrics
 
