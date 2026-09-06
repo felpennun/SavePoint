@@ -30,17 +30,16 @@ See: .planning/PROJECT.md (updated 2026-09-04)
 
 ## Current Position
 
-Fase 01.1 CERRADA (firma ACEPTADA 2026-09-06). **Fase 2 en planificación, a medias.**
+Fase 01.1 CERRADA (firma ACEPTADA 2026-09-06). **Fase 2 PLANIFICADA y VERIFICADA — lista para ejecutar.**
 
 Hecho y commiteado esta sesión (2026-09-06):
 - Corrección post-cierre de la 01.1 (tanda 1): login fuera de la home, motivos reales de contraseña, login case-insensitive, `GET /api/accounts/me/` — `2bfbfe2`.
 - Borrador LaTeX del TFG (10 capítulos + portada + biblio + figuras) fusionado — `4f10914`. Tag `demo-estable` = versión demostrable congelada. Zip de Overleaf enviado (queda OBSOLETO tras la Fase 2).
 - Roadmap reestructurado (Fase 2 ampliada; antiguas 5+6 fundidas; 3/4/7/8 → 5/6/4/7; trazabilidad 91/91) — `85e98ba`.
-- Fase 2: `02-CONTEXT.md` (`f5d65e7`), `02-UI-SPEC.md` verificado 7/7 (`e548a2e`), `02-RESEARCH.md` (`a78510f`), `02-VALIDATION.md` (`53b173f`), `02-PATTERNS.md` (`df45a33`), `02-COVERAGE.md` (`15006b3`).
+- Planificación completa de la Fase 2: `02-CONTEXT.md` `f5d65e7`, `02-UI-SPEC.md` verificado 7/7 `e548a2e`, `02-RESEARCH.md` `a78510f`, `02-VALIDATION.md` `53b173f`, `02-PATTERNS.md` `df45a33`, `02-COVERAGE.md` `15006b3`.
+- **13 PLAN.md en 6 olas** `8429926`/`86f4a68`; `gsd-plan-checker` iteración 1 (1 blocker + 5 warnings) → revisión `15c1d4e`/`54d9cca` → iteración 2 **0 blockers**; 2 warnings advisory cerrados (`254f999`, `9ad347b`).
 
-Bloqueo actual: el `gsd-planner` cayó por rate limit de sesión (429) sin escribir ningún PLAN.md. **Reset 20:50 Europe/Paris.**
-
-**Retomar tras el reset:** `/gsd-resume-work` → detecta `.planning/phases/02-.../.continue-here.md` → `/gsd-plan-phase 2` (re-lanza el planner; `has_plans:false`; todas las entradas commiteadas).
+**Siguiente:** `/gsd-execute-phase 2`. Ejecuta las 6 olas por subagentes y **se detiene en 5 checkpoints de ratificación del autor**: allowlist de plataformas (02-01), RAWG sí/no con cobertura medida (02-02), parámetros del protocolo congelado + rejilla de tuning (02-08, one-way), arquetipos de usuario sintético (02-09), numpy ahora vs Fase 3 (02-10). Detalle completo en `.planning/phases/02-.../.continue-here.md`.
 
 Progreso global: 2/8 fases (25%).
 
