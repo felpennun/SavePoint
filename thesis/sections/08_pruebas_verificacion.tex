@@ -1,10 +1,10 @@
 \chapter{Pruebas y verificación}\label{cap:pruebas}
 
 Este capítulo describe cómo se comprueba que el sistema hace lo que debe. Presenta la
-estrategia de pruebas, los gates de evidencia automáticos, la verificación independiente del
-objetivo de cada fase y la revisión de código de todo el repositorio, con sus resultados en
-cifras reales tomadas de \texttt{docs/verification/} y de los informes de verificación de las
-fases.
+estrategia de pruebas, los gates de evidencia automáticos, la verificación independiente de
+objetivos y la revisión de código de todo el repositorio, con sus resultados en
+cifras reales tomadas de \texttt{docs/verification/} y de los informes de verificación del
+repositorio.
 
 \section{Estrategia de pruebas}\label{sec:pru-estrategia}
 
@@ -19,8 +19,7 @@ Pautas de Accesibilidad para el Contenido Web (WCAG) 2.2~\cite{wcag22}. Por últ
 prueba de humo se ejecuta contra la URL pública desplegada y rechaza un despliegue con la
 revisión equivocada, tráfico entre orígenes inesperado o peticiones fallidas.
 
-La Tabla~\ref{tab:suites} recoge los resultados de las suites en el momento del cierre de la
-Fase 01.1.
+La Tabla~\ref{tab:suites} recoge los resultados de las suites sobre el sistema entregado.
 
 \begin{table}[htp]
 \centering
@@ -39,7 +38,7 @@ Fase 01.1.
     Extremo a extremo y accesibilidad & Playwright y \texttt{axe} & 41 pruebas superadas; cero incidencias críticas o graves de \texttt{axe} \\
     \hline
 \end{tabular}
-\caption{Resultados de las suites de pruebas al cierre de la Fase 01.1.}
+\caption{Resultados de las suites de pruebas del sistema.}
 \label{tab:suites}
 \end{table}
 
@@ -60,16 +59,17 @@ con su fichero de bloqueo. Los gates \texttt{verify-igdb-*.ps1} comprueban el co
 registro de decisión de IGDB, la evidencia del sondeo y la ejecución de importación sobre una
 base de datos fresca.
 
-\section{Verificación del objetivo de fase}\label{sec:pru-verificacion-fase}
+\section{Verificación independiente de objetivos}\label{sec:pru-verificacion-fase}
 
-Cada fase tiene una verificación independiente de su objetivo, realizada por un subagente
-distinto del que implementó el trabajo, que comprueba el código contra los criterios de éxito
-de la hoja de ruta en lugar de leer los resúmenes de plan. La Fase 1 se verificó con cinco de
-cinco criterios de éxito, con dos elementos manuales de accesibilidad aceptados como
-limitaciones nombradas: el reflujo al cuatrocientos por ciento de zoom y una pasada con
-lector de pantalla. La Fase 01.1 se verificó con cinco de cinco criterios, tras una
-reverificación del criterio de cuentas simuladas plurales que al cierre inicial estaba
-parcial. La Tabla~\ref{tab:criterios} resume los criterios de la Fase 01.1.
+Cada incremento del sistema se sometió a una verificación independiente de su objetivo,
+realizada por un subagente distinto del que implementó el trabajo, que comprueba el código
+contra los criterios de éxito en lugar de leer los resúmenes de plan. El recorrido vertical
+inicial se verificó con cinco de cinco criterios de éxito, con dos elementos manuales de
+accesibilidad aceptados como limitaciones nombradas: el reflujo al cuatrocientos por ciento
+de zoom y una pasada con lector de pantalla. El catálogo a escala real, el rediseño de la
+interfaz y los recomendadores se verificaron con cinco de cinco criterios, tras una
+reverificación del criterio de cuentas simuladas plurales que en una comprobación previa
+estaba parcial. La Tabla~\ref{tab:criterios} resume esos criterios.
 
 \begin{table}[htp]
 \centering
@@ -88,7 +88,7 @@ parcial. La Tabla~\ref{tab:criterios} resume los criterios de la Fase 01.1.
     SC5 & Página de recomendaciones por géneros según la actividad propia, distinta del baseline de popularidad. & Verificado \\
     \hline
 \end{tabular}
-\caption{Criterios de éxito de la Fase 01.1 y su veredicto.}
+\caption{Criterios de éxito verificados y su veredicto.}
 \label{tab:criterios}
 \end{table}
 
@@ -100,7 +100,7 @@ segunda cuenta simulada con colección vacía como prueba visual de independenci
 
 \section{Revisión de código de todo el repositorio}\label{sec:pru-revision}
 
-Al cierre de la Fase 01.1, un subagente revisor examinó todo el árbol con una postura
+Ya con el sistema completo, un subagente revisor examinó todo el árbol con una postura
 adversarial de búsqueda de defectos y un contexto propio, distinto del de la implementación.
 La revisión encontró dieciséis hallazgos, cuya distribución por severidad recoge la
 Tabla~\ref{tab:hallazgos}. El autor autorizó aplicar la totalidad de los hallazgos, que se
@@ -145,10 +145,10 @@ acotación de propiedad en todas las vistas de datos personales; escrituras tran
 con bloqueo de fila y restricciones de unicidad como guarda real de carreras; higiene de
 secretos con redacción en registros y excepciones.
 
-\section{Correcciones posteriores al cierre de la Fase 01.1}\label{sec:pru-post-cierre}
+\section{Correcciones posteriores a la revisión de producto}\label{sec:pru-post-cierre}
 
-Después de la firma de la Fase 01.1, una primera tanda de correcciones surgidas de la propia
-revisión de producto del autor se aplicó sobre la rama principal. La página de inicio dejó de
+Tras la revisión de producto del autor, una tanda de correcciones se aplicó sobre la rama
+principal. La página de inicio dejó de
 mostrar una llamada a la acción de acceso redundante. El formulario de registro pasó a
 devolver los incumplimientos concretos de la política de contraseñas en lugar de un mensaje
 impreciso. La comparación del nombre de usuario en el acceso se hizo insensible a mayúsculas,
@@ -162,8 +162,8 @@ Las cifras anteriores respaldan afirmaciones acotadas. El sistema tiene una cobe
 pruebas amplia sobre PostgreSQL real, una accesibilidad automática sólida aunque no
 exhaustiva y una revisión de seguridad de todo el árbol con sus hallazgos corregidos. Esas
 cifras no respaldan ninguna medida de rendimiento bajo carga, de recuperación ante desastre
-ni de calidad de recomendación. La memoria tampoco las afirma, porque pertenecen a fases
-posteriores. Los dos elementos manuales de accesibilidad de la Fase 1 siguen abiertos y
+ni de calidad de recomendación. La memoria tampoco las afirma, porque quedan como trabajo
+futuro. Los dos elementos manuales de accesibilidad del recorrido inicial siguen abiertos y
 declarados como tales.
 
 Este capítulo ha mostrado cómo se verifica el sistema. El capítulo siguiente trata su
