@@ -29,27 +29,46 @@ a follow-up plan / phase.
   review follow-ups. Affected: `apps/web/components/AppShell.tsx`,
   `apps/web/components/ThemeToggle.tsx`, `apps/web/components/AccountSwitcher.tsx`.
 
-## AUTH-02 / SC3 — plural simulated accounts built but not wired into any runtime
+## AUTH-02 / SC3 — cuentas simuladas plurales construidas pero no cableadas a ningún runtime
 
-**Status: deferred to a small follow-up plan.** `DemoAccountIdentity` +
-`bootstrap_demo_accounts` (env-only `DEMO_ACCOUNTS` JSON contract) are fully
-implemented and tested (Plan 01.1-04, 28 tests). But nothing activates the plural
-path in a running environment: `infra/compose.yaml` and `apps/api/render-start.sh`
-still call the singular `bootstrap_demo_account`, so the live product exposes one
-preloaded account. Phase 01.1 verification records SC3 as PARTIAL for this reason.
+**Estado: RESUELTO el 2026-09-06** (plan de seguimiento "reconciliar-y-cablear", opción A
+autorizada por el autor). Ya no es un ítem diferido.
 
-**Why it was not fixed at phase close-out (2026-09-06):** the "one-line" fix
-(swap the startup command + set a local `DEMO_ACCOUNTS`) does NOT work against a
-database that already holds the Phase 1 `demo-visitor` user — `bootstrap_demo_accounts`
-aborts with `SeedContractError: A seed username collides with an existing, unrelated
-account` because that pre-existing user has no matching `DemoAccountIdentity` for the
-legacy anchor key. It was tried and reverted; the dev stack was restored.
+### Cómo estaba (el hueco original)
 
-**The real fix (follow-up plan):** make `bootstrap_demo_accounts` *reconcile* a
-pre-existing user under `LEGACY_ANCHOR_KEY` (adopt it into a `DemoAccountIdentity`)
-instead of treating it as unrelated — the same "coexist with existing state" pattern
-as the `fix(01.1-02)` Platform-slug reconcile. Then wire the plural command into
-`infra/compose.yaml` (with a local, inert `DEMO_ACCOUNTS` placeholder value in the
-D-02 spirit) and make `render-start.sh` use the plural command when `DEMO_ACCOUNTS`
-is set (falling back to singular otherwise). During the deploy pass the author sets a
-real `DEMO_ACCOUNTS` value in the Render service environment.
+`DemoAccountIdentity` + `bootstrap_demo_accounts` (contrato JSON `DEMO_ACCOUNTS` solo por
+entorno) estaban implementados y testeados (Plan 01.1-04), pero nada activaba el camino
+plural en un entorno en ejecución: `infra/compose.yaml` y `apps/api/render-start.sh`
+llamaban al singular `bootstrap_demo_account`, así que el producto en vivo exponía una sola
+cuenta precargada. La verificación de la Fase 01.1 registraba SC3 como PARCIAL por eso.
+
+El arreglo "de una línea" (cambiar el comando de arranque + fijar un `DEMO_ACCOUNTS` local)
+**no** funcionaba contra una base de datos que ya tenía el usuario `demo-visitor` de la
+Fase 1 — `bootstrap_demo_accounts` abortaba con `SeedContractError: A seed username collides
+with an existing, unrelated account` porque ese usuario preexistente no tenía un
+`DemoAccountIdentity` para la clave de anchor legacy. Se probó y se revirtió en el cierre
+de fase.
+
+### Qué se hizo (2026-09-06)
+
+1. **Reconciliación:** `bootstrap_demo_accounts` ahora, cuando el contrato incluye una
+   entrada con `key == LEGACY_ANCHOR_KEY` y no existe aún su `DemoAccountIdentity`, **adopta**
+   el usuario que está detrás del `DemoAccountAnchor` fijo (`DEMO_ACCOUNT_ANCHOR_ID`) — le
+   adjunta el `DemoAccountIdentity` y rota usuario/contraseña — en vez de tratarlo como una
+   colisión ajena. Mismo patrón de "convivir con estado existente" que el
+   `fix(01.1-02)` de reconciliación de `slug` de `Platform`. Una colisión genuinamente ajena
+   (un usuario no-demo con el mismo nombre) sigue siendo `SeedContractError` fail-closed.
+2. **Cableado:** `infra/compose.yaml` y `apps/api/render-start.sh` llaman al comando
+   **plural**. `DEMO_ACCOUNTS` lleva 3 cuentas — `demo-visitor` (primaria, `key`
+   `demo-anchor-primary`), `demo-critico`, `demo-coleccionista` (etiquetas en español) —
+   como placeholder inerte D-02 en compose y `sync: false` en `render.yaml` (el autor pone
+   el valor real en el entorno de Render en el despliegue). `check-secrets.ps1` allowlista
+   las dos contraseñas placeholder nuevas.
+3. **Verificación en vivo:** al recrear el contenedor api, el arranque loguea
+   `Demo accounts ready (total=3, created=2, rotated=1)`; cada cuenta hace
+   `POST /api/accounts/login/` → 200 y `POST /api/accounts/logout/` → 200 de forma
+   independiente, y tras el logout `GET /api/library/entries/` → 403 (sesión invalidada).
+   3 tests de reconciliación nuevos en `test_bootstrap_demo_account.py` (31 en total) +
+   209 de la suite api pasan; `check-secrets.ps1` PASS.
+
+SC3 pasa a **VERIFICADO** en `01.1-VERIFICATION.md` (score 5/5).

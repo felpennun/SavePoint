@@ -149,11 +149,33 @@ def validate_seed_passwords(entries: Sequence[SeedEntry]) -> None:
             ) from exc
 
 
-def _bootstrap_identities(entries: Sequence[SeedEntry]) -> BootstrapResult:
+def _bootstrap_identities(
+    entries: Sequence[SeedEntry], *, legacy_anchor_key: str | None = None
+) -> BootstrapResult:
     """Create or rotate each identity. Caller MUST already hold an open
-    transaction and the advisory lock."""
+    transaction and the advisory lock.
+
+    ``legacy_anchor_key`` names the entry (if any) that stands in for the
+    Phase 1 primary demo account. When the switch from the singular
+    ``bootstrap_demo_account`` to this plural command happens on an
+    environment that already ran the singular one, the primary user exists
+    but may not yet carry a ``DemoAccountIdentity``. Rather than aborting on
+    a username collision, that pre-existing account -- and only the one
+    behind the fixed ``DEMO_ACCOUNT_ANCHOR_ID`` anchor -- is *adopted* into
+    the plural model. Same "coexist with existing state" pattern as
+    ``fix(01.1-02)``.
+    """
     user_model = get_user_model()
     result = BootstrapResult()
+
+    legacy_user = None
+    if legacy_anchor_key is not None:
+        legacy_anchor = (
+            DemoAccountAnchor.objects.select_related("user")
+            .filter(id=DEMO_ACCOUNT_ANCHOR_ID)
+            .first()
+        )
+        legacy_user = legacy_anchor.user if legacy_anchor is not None else None
 
     for entry in sorted(entries, key=lambda e: e.key):
         anchor_id = demo_identity_anchor_id(entry.key)
@@ -179,11 +201,24 @@ def _bootstrap_identities(entries: Sequence[SeedEntry]) -> BootstrapResult:
             identity.save(update_fields=["is_simulated", "marker", "display_label", "updated_at"])
             result.rotated += 1
         else:
-            if user_model.objects.filter(username=entry.username).exists():
+            adopt_user = legacy_user if entry.key == legacy_anchor_key else None
+            collision = user_model.objects.filter(username=entry.username)
+            if adopt_user is not None:
+                collision = collision.exclude(pk=adopt_user.pk)
+            if collision.exists():
                 raise SeedContractError(
                     "A seed username collides with an existing, unrelated account."
                 )
-            user = user_model.objects.create_user(username=entry.username, password=entry.password)
+            if adopt_user is not None:
+                user = adopt_user
+                user.username = entry.username
+                user.set_password(entry.password)
+                user.is_active = True
+                user.save(update_fields=["username", "password", "is_active"])
+            else:
+                user = user_model.objects.create_user(
+                    username=entry.username, password=entry.password
+                )
             DemoAccountIdentity.objects.create(
                 id=anchor_id,
                 seed_key=entry.key,
@@ -221,7 +256,7 @@ def apply_seed_contract(
         with connection.cursor() as cursor:
             cursor.execute("SELECT pg_advisory_xact_lock(%s)", [BOOTSTRAP_LOCK_KEY])
 
-        result = _bootstrap_identities(entries)
+        result = _bootstrap_identities(entries, legacy_anchor_key=legacy_anchor_key)
 
         if legacy_anchor_key is not None:
             _sync_legacy_anchor(result.users[legacy_anchor_key])
@@ -235,7 +270,14 @@ class Command(BaseCommand):
     def handle(self, *args: Any, **options: Any) -> None:
         entries = parse_seed_contract(os.environ.get(ENV_VAR))
         validate_seed_passwords(entries)
-        result = apply_seed_contract(entries)
+        # If the contract carries the legacy primary key, keep the Phase 1
+        # DemoAccountAnchor pointed at it (seed_demo + the startup chain rely
+        # on that row) and let that one entry adopt a pre-existing singular
+        # demo account instead of colliding with it.
+        has_legacy = any(entry.key == LEGACY_ANCHOR_KEY for entry in entries)
+        result = apply_seed_contract(
+            entries, legacy_anchor_key=LEGACY_ANCHOR_KEY if has_legacy else None
+        )
 
         self.stdout.write(
             self.style.SUCCESS(

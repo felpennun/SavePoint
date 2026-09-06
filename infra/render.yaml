@@ -39,7 +39,12 @@ services:
         # Render does not expose another service's public URL as a Blueprint
         # property. Enter the exact https:// web origin during first creation.
         sync: false
-      - key: DEMO_USERNAME
-        sync: false
-      - key: DEMO_PASSWORD
+      - key: DEMO_ACCOUNTS
+        # Plural simulated-account seed contract consumed by
+        # `bootstrap_demo_accounts` in render-start.sh (AUTH-02 / SC3). A JSON
+        # array of {key, username, password, label}. Include one entry with
+        # key "demo-anchor-primary" (the Phase 1 primary account, adopted in
+        # place and kept as the DemoAccountAnchor seed_demo needs) plus the
+        # additional simulated accounts. Passwords are entered here at
+        # creation and never committed.
         sync: false

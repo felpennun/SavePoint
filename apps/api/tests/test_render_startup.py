@@ -10,7 +10,7 @@ def test_render_start_script_is_fail_closed_and_execs_server_last():
         "set -eu",
         "python manage.py migrate --noinput",
         "python manage.py import_catalogue",
-        "python manage.py bootstrap_demo_account",
+        "python manage.py bootstrap_demo_accounts",
         "python manage.py seed_demo",
         "exec gunicorn config.wsgi:application",
     ]

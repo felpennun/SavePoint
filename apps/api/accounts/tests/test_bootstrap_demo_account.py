@@ -17,6 +17,7 @@ from django.contrib.auth import authenticate, get_user_model
 from django.core.management import call_command, CommandError
 from django.db import connections
 
+from accounts.management.commands.bootstrap_demo_accounts import LEGACY_ANCHOR_KEY
 from accounts.models import (
     DEMO_ACCOUNT_ANCHOR_ID,
     SIMULATED_ACCOUNT_MARKER,
@@ -389,6 +390,98 @@ def test_alias_collision_with_unrelated_account_fails_closed_no_partial_mutation
     # sim-one is processed first; its creation must be rolled back when sim-two collides.
     assert User.objects.count() == 1
     assert DemoAccountIdentity.objects.count() == 0
+
+
+# --- SC3: switching from the singular to the plural command must not abort on
+#     the primary demo account that the singular command already created. -----
+
+LEGACY_USERNAME = "canary-legacy-primary-do-not-leak"
+LEGACY_PASSWORD_NEW = "Canary-Legacy-Primary-Value-7!"  # noqa: S105 - test fixture
+
+
+def _contract_with_legacy(legacy_username: str, legacy_password: str) -> str:
+    return json.dumps(
+        [
+            {"key": LEGACY_ANCHOR_KEY, "username": legacy_username, "password": legacy_password},
+            {"key": SIM_ONE_KEY, "username": SIM_ONE_USERNAME, "password": SIM_ONE_PASSWORD},
+            {"key": SIM_TWO_KEY, "username": SIM_TWO_USERNAME, "password": SIM_TWO_PASSWORD},
+        ]
+    )
+
+
+@pytest.mark.django_db
+def test_plural_run_after_singular_reuses_the_primary_account(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A prior singular run leaves the primary user + anchor + identity. The
+    plural command must recognise it by seed_key and rotate it in place, not
+    create a duplicate."""
+    _run_bootstrap(monkeypatch, LEGACY_USERNAME, CANARY_PASSWORD)
+    primary_pk = DemoAccountIdentity.objects.get(seed_key=LEGACY_ANCHOR_KEY).user_id
+
+    _run_bootstrap_accounts(
+        monkeypatch, _contract_with_legacy(LEGACY_USERNAME, LEGACY_PASSWORD_NEW)
+    )
+
+    assert User.objects.count() == 3
+    assert DemoAccountIdentity.objects.get(seed_key=LEGACY_ANCHOR_KEY).user_id == primary_pk
+    assert authenticate(username=LEGACY_USERNAME, password=LEGACY_PASSWORD_NEW) is not None
+    assert authenticate(username=SIM_ONE_USERNAME, password=SIM_ONE_PASSWORD) is not None
+    assert authenticate(username=SIM_TWO_USERNAME, password=SIM_TWO_PASSWORD) is not None
+    anchor = DemoAccountAnchor.objects.get(id=DEMO_ACCOUNT_ANCHOR_ID)
+    assert anchor.user_id == primary_pk
+
+
+@pytest.mark.django_db
+def test_plural_adopts_a_legacy_primary_user_that_has_no_identity(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The real switch-over case: the primary user + its DemoAccountAnchor
+    exist (from the singular path or an interrupted migration) but no
+    DemoAccountIdentity does yet. The legacy entry must adopt it, not abort
+    with SeedContractError."""
+    legacy_user = User.objects.create_user(
+        username=LEGACY_USERNAME, password="Old-Legacy-Primary-Pass-1!"
+    )
+    DemoAccountAnchor.objects.create(id=DEMO_ACCOUNT_ANCHOR_ID, user=legacy_user)
+
+    _run_bootstrap_accounts(
+        monkeypatch, _contract_with_legacy(LEGACY_USERNAME, LEGACY_PASSWORD_NEW)
+    )
+
+    identity = DemoAccountIdentity.objects.get(seed_key=LEGACY_ANCHOR_KEY)
+    assert identity.user_id == legacy_user.pk  # adopted, not recreated
+    assert identity.is_simulated is True
+    assert User.objects.count() == 3
+    assert authenticate(username=LEGACY_USERNAME, password=LEGACY_PASSWORD_NEW) is not None
+    assert authenticate(username=SIM_ONE_USERNAME, password=SIM_ONE_PASSWORD) is not None
+    assert authenticate(username=SIM_TWO_USERNAME, password=SIM_TWO_PASSWORD) is not None
+    assert DemoAccountAnchor.objects.get(id=DEMO_ACCOUNT_ANCHOR_ID).user_id == legacy_user.pk
+
+
+@pytest.mark.django_db
+def test_legacy_entry_still_rejects_a_genuinely_unrelated_username_collision(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Adoption is scoped to the account behind DEMO_ACCOUNT_ANCHOR_ID. If the
+    legacy entry's username is already taken by some other, unrelated user,
+    that is still a fail-closed SeedContractError with no partial mutation."""
+    legacy_user = User.objects.create_user(
+        username=LEGACY_USERNAME, password="Old-Legacy-Primary-Pass-1!"
+    )
+    DemoAccountAnchor.objects.create(id=DEMO_ACCOUNT_ANCHOR_ID, user=legacy_user)
+    other = User.objects.create_user(username="someone-elses-name", password="Unrelated-2!")
+
+    monkeypatch.setenv("DEMO_ACCOUNTS", _contract_with_legacy("someone-elses-name", LEGACY_PASSWORD_NEW))
+
+    with pytest.raises(CommandError):
+        call_command("bootstrap_demo_accounts")
+
+    other.refresh_from_db()
+    assert other.check_password("Unrelated-2!")
+    assert not DemoAccountIdentity.objects.filter(seed_key=LEGACY_ANCHOR_KEY).exists()
+    legacy_user.refresh_from_db()
+    assert legacy_user.username == LEGACY_USERNAME  # untouched
 
 
 @pytest.mark.django_db

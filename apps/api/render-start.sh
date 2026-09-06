@@ -5,7 +5,7 @@ set -eu
 # offline: the HTTP listener is exec'd only after every idempotent step passes.
 python manage.py migrate --noinput
 python manage.py import_catalogue
-python manage.py bootstrap_demo_account
+python manage.py bootstrap_demo_accounts
 python manage.py seed_demo
 
 # Production WSGI server. The Django development server is explicitly

@@ -75,6 +75,11 @@ $KnownSafeValues = @(
     "local-development-only-not-a-secret-please-set-a-real-one-in-deploy"
     "local_test_only"
     "SavePoint-Demo-2026-Visit!"
+    # Additional local-dev demo-account passwords in infra/compose.yaml's
+    # DEMO_ACCOUNTS contract (AUTH-02 / SC3). Same D-02 spirit: inert local
+    # placeholders, overridden with real values via `sync: false` in deploy.
+    "SavePoint-Demo-2026-Critico!"
+    "SavePoint-Demo-2026-Coleccion!"
 )
 
 function Test-Content {
