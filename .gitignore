@@ -24,3 +24,21 @@ data/snapshots/
 skills-lock.json
 .agents/skills/neon*/
 .claude/skills/
+
+# Material de referencia de terceros (tesis de ejemplo, plantillas)
+thesis/referencias/
+
+# LaTeX build artifacts de la memoria
+thesis/*.pdf
+thesis/*.aux
+thesis/*.log
+thesis/*.out
+thesis/*.toc
+thesis/*.lof
+thesis/*.lot
+thesis/*.lol
+thesis/*.bbl
+thesis/*.blg
+thesis/*.fls
+thesis/*.fdb_latexmk
+thesis/*.synctex.gz
