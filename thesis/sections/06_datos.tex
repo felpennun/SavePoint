@@ -1,3 +1,149 @@
 \chapter{Datos: adquisición, licencias y procedencia}\label{cap:datos}
 
-\todo[inline]{Capítulo por redactar en la siguiente iteración.}
+Este capítulo describe de dónde salen los datos del catálogo, bajo qué licencia se usan y qué
+evidencia de procedencia se conserva. El proyecto tiene dos corpus. El primero es el corpus congelado de la Fase 1, procedente de
+Wikidata, que actúa como la referencia citable y estable. El segundo es la importación a
+escala real de la Fase 01.1, procedente de IGDB, que es el catálogo a escala de producto. Los
+dos conviven en la base de datos, indexados por su fuente.
+
+\section{El corpus congelado de la Fase 1}\label{sec:datos-wikidata}
+
+El corpus de la Fase 1 son ciento cincuenta juegos de datos estructurados de Wikidata,
+publicados bajo la dedicación al dominio público \textit{Creative Commons Zero}
+(CC0)~\cite{wikidata-licensing}. La adquisición se hace fuera de línea con un guion que
+lanza una consulta filtrada por clase contra el punto de acceso SPARQL de Wikidata, resuelve
+las subconsultas de plataforma de forma dinámica y valida la estructura y la cobertura por
+época del resultado. El guion escribe el fichero \texttt{data/raw/wikidata-games.json} con su
+huella SHA-256, más los manifiestos de catálogo y de recursos. El registro de decisión
+ADR-003 y el documento \texttt{docs/verification/catalogue-freeze.md} conservan la consulta,
+la fecha de corte en tiempo universal coordinado, la huella y la aprobación humana explícita
+del corpus.
+
+Los archivos multimedia se tratan por separado, porque no comparten la licencia de los datos
+estructurados. De diecinueve archivos de Wikimedia Commons revisados uno a uno, diecisiete se
+admitieron con crédito completo de autor, licencia y fuente. Los dos restantes se
+sustituyeron por un marcador de reserva de primera parte~\cite{commons-reuse}. El identificador de Wikidata se
+conserva solo como procedencia en \texttt{SourceRecord}, nunca como clave primaria, de modo
+que la identidad del producto no queda acoplada a la fuente.
+
+\section{La importación a escala real de IGDB}\label{sec:datos-igdb}
+
+La Fase 01.1 hace crecer el catálogo hasta la escala de un producto real con la API de
+versión 4 de IGDB~\cite{igdb-api}. El requisito DATA-04 exige elegir la fuente mediante una
+comparación documentada de cobertura, plataformas, licencia, atribución, cuotas, estabilidad
+y coste. La Tabla~\ref{tab:data04} resume esa comparación, que se apoya en un sondeo
+autenticado en vivo de la API ejecutado el 5 de septiembre de 2026 y en fuentes secundarias
+para las otras dos opciones.
+
+\begin{table}[htp]
+\centering
+\begin{tabular}{ | l | p{4.6cm} | p{3.6cm} | p{3.6cm} | }
+    \hline
+    \textbf{Eje} & \textbf{IGDB (elegida)} & \textbf{RAWG} & \textbf{Wikidata escalado} \\
+    \hline
+    Cobertura & 374.555 entradas totales, 312.418 juegos principales, medidos en vivo & Entre 350.000 y 500.000 declarados, fuente secundaria & Escasa y desigual para juegos \\
+    \hline
+    Plataformas & Entidad de primera clase, 220 filas & Metadatos de primera clase, fuente secundaria & Presentes pero inconsistentes \\
+    \hline
+    Licencia & \textit{Twitch Developer Services Agreement}, gratuita para uso comercial y no comercial & Nivel gratuito solo no comercial & CC0, la más limpia \\
+    \hline
+    Atribución & Estática y visible a IGDB.com & Obligatoria con enlace de vuelta en cada página & No requerida para datos CC0 \\
+    \hline
+    Cuotas & Sin cuota mensual; 4 peticiones por segundo & 20.000 peticiones al mes en el nivel gratuito & Sin cuota, sujeta a límites del punto de acceso \\
+    \hline
+    Estabilidad & API v4 estable desde 2020, respaldada por Twitch & Operador independiente, mayor riesgo & Muy estable como institución, datos de juegos volátiles \\
+    \hline
+    Coste & Cero & Cero dentro de la cuota & Cero \\
+    \hline
+\end{tabular}
+\caption{Comparación DATA-04 de fuentes para el catálogo a escala real.}
+\label{tab:data04}
+\end{table}
+
+De la comparación se desprende la elección de IGDB, la única opción que combina cobertura
+real, modelado de género y plataforma de primera clase, ausencia de cuota mensual y coste
+cero, a cambio de una obligación de atribución continua. La frontera de categoría es
+\texttt{game\_type = 0}, es decir, solo juegos principales; el contenido descargable, las
+expansiones, los paquetes y los ports quedan excluidos del catálogo primario. Las portadas se
+sirven por enlace directo al servidor de imágenes de IGDB, no se replican, con el marcador de
+reserva de primera parte de la Fase 1 como alternativa cuando una portada falta o falla. La
+regla de caché y redistribución se apoya en el texto de la propia documentación de la API,
+que prefiere que el integrador almacene y sirva los datos a sus usuarios finales, texto que
+se registra literalmente en el repositorio como la autorización escrita que contempla el
+acuerdo general~\cite{twitch-dsa}. El corpus de Wikidata y su regla de no consultar
+proveedores en tiempo de petición se conservan sin cambios; la importación de IGDB es aditiva
+y se ejecuta solo desde un comando de gestión fuera de línea.
+
+\section{Evidencia de congelación}\label{sec:datos-congelacion}
+
+Una revisión humana fila a fila no es posible con cientos de miles de obras, ni es el modelo
+legal correcto para las portadas de IGDB. El documento
+\texttt{docs/verification/igdb-catalogue-freeze.md} congela en su lugar tres artefactos: una
+huella de contenido, que es un SHA-256 sobre los pares de identificador de origen y huella
+normalizada de cada registro de procedencia de IGDB, ordenados por identificador numérico;
+una cobertura agregada, con el total de obras primarias, la distribución de géneros, las
+plataformas más frecuentes, el histograma de año de lanzamiento y el reparto entre portada
+presente y de reserva; y un manifiesto de revisión muestreada determinista de trescientos
+registros, tomando uno de cada mil cuarenta y uno por orden de identificador, con datos
+suficientes para una comprobación humana puntual. La Tabla~\ref{tab:freeze} recoge los
+valores de la carga en la base de datos de desarrollo persistente, del 6 de septiembre de
+2026.
+
+\begin{table}[htp]
+\centering
+\begin{tabular}{ | l | l | }
+    \hline
+    \textbf{Campo} & \textbf{Valor} \\
+    \hline
+    Obras primarias de IGDB importadas & 312.483 \\
+    \hline
+    Corpus de Wikidata conservado & 150 \\
+    \hline
+    Total de obras en el catálogo & 312.633 \\
+    \hline
+    Géneros & 23 \\
+    \hline
+    Plataformas (Wikidata e IGDB reconciliadas) & 288 \\
+    \hline
+    Portadas presentes / de reserva & 268.679 / 43.804 \\
+    \hline
+    Fecha de primer lanzamiento poblada & aproximadamente el 75\% de las filas \\
+    \hline
+    Valoración agregada poblada & 0 filas, pendiente de una reejecución del importador \\
+    \hline
+    Huella de contenido (SHA-256) & \texttt{ff3d67525c92\ldots} \\
+    \hline
+\end{tabular}
+\caption{Evidencia agregada de congelación de la importación de IGDB.}
+\label{tab:freeze}
+\end{table}
+
+La importación se probó además sobre una base de datos desechable, donde sobrevivió a una
+interrupción abrupta tras dos lotes confirmados y reanudó hasta completar sin duplicados ni
+huecos. Una segunda pasada completa sobre la base ya poblada convergió de forma idempotente,
+con la única diferencia de dos juegos primarios que IGDB añadió en vivo entre las dos
+pasadas. El snapshot reutilizable de la base cargada, de noventa y tres megabytes, no se
+versiona en el repositorio por decisión de ADR-006; se conserva fuera de él como vía de
+restauración rápida.
+
+Dos limitaciones de datos quedan registradas y no ocultadas. La valoración agregada de IGDB
+es nula en las 312.633 filas, porque ninguna fuente previa la llevaba y el importador, aunque
+ahora la captura, no se ha vuelto a ejecutar; el filtro y el orden por nota son correctos por
+contrato pero hoy inertes. La fecha de primer lanzamiento está poblada para en torno al
+setenta y cinco por ciento de las filas, con relleno desde las publicaciones cuando existe.
+
+\section{Registro de legitimidad de dependencias}\label{sec:datos-dependencias}
+
+Toda dependencia directa nueva o cambio de versión pasa por un gate: aprobación humana
+explícita, verificación de la ficha oficial del repositorio de paquetes, fijación a versión
+exacta con su árbol transitivo en el fichero de bloqueo, una fila en
+\texttt{docs/verification/dependency-legitimacy.md}, una fila en el gate
+\texttt{check-dependencies.ps1} y una entrada en el registro de agentes. En esta entrega solo
+se añadieron dos dependencias directas. La primera es \texttt{requests} en la versión 2.34.2,
+para el importador de IGDB. La segunda es \texttt{gunicorn} en la versión 23.0.0, como
+servidor de producción de la API tras una revisión de código. Ambas se verificaron contra la
+ficha oficial del índice de paquetes de Python, con su licencia, su versión mínima de
+intérprete y su fecha de publicación reales.
+
+Este capítulo ha documentado la procedencia y la licencia de los datos. El capítulo siguiente
+describe cómo se implementa el sistema que los sirve.
