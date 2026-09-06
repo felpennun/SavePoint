@@ -135,6 +135,10 @@ REST_FRAMEWORK = {
         "registration": "5/hour",
         "login": "10/min",
         "public_profile": "30/min",
+        # Generous enough for real catalogue browsing/typing; caps a scripted
+        # `?q=<random>` loop that would otherwise drive an unauthenticated
+        # trigram scan on every hit (M-05).
+        "catalogue_search": "120/min",
     },
     "NUM_PROXIES": int(_num_proxies_raw) if _num_proxies_raw.isdigit() else None,
 }

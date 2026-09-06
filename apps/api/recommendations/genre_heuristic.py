@@ -59,6 +59,10 @@ _RATING_DIVISOR = 10
 _MIN_LIMIT = 1
 _MAX_LIMIT = 50
 _DEFAULT_LIMIT = 20
+# The ranking SQL fetches this multiple of ``limit`` so the exact Python
+# re-score + canonical_slug tie-break (L-03) has every boundary-tied work in
+# hand before truncating. Still bounded: at most _MAX_LIMIT * this.
+_CANDIDATE_OVERFETCH = 4
 
 _LIMITATION = (
     "Deterministic genre-frequency heuristic computed at request time from "
@@ -165,8 +169,18 @@ def rank_genre_taste_v1(
     # 3. Rank unseen non-DLC works whose genres overlap the taste vector.
     #    The through table is the driving relation: filtered by ``genre_id``
     #    (indexed) and grouped by work, so Postgres never scans the full
-    #    catalogue -- and the ``[:limit]`` slice caps the working set
+    #    catalogue -- and the bounded candidate slice caps the working set
     #    (threat T-01.1-11).
+    #
+    #    The DB orders on Sum(score_case) in IEEE-754 double precision, but
+    #    rating contributions are multiples of 0.1 (not exactly representable),
+    #    so two works with the same *rational* score can carry different float
+    #    sums. Over-fetch a multiple of ``limit`` here and let step 4 do the
+    #    authoritative exact scoring + ``canonical_slug`` tie-break in Python
+    #    before truncating -- so the documented cut-line semantics hold, not
+    #    whatever order the float sums happened to land in (repo-review
+    #    2026-09-06 L-03).
+    candidate_pool = limit * _CANDIDATE_OVERFETCH
     score_case = Case(
         *[When(genre_id=genre_id, then=Value(float(weight))) for genre_id, weight in taste_weights.items()],
         default=Value(0.0),
@@ -178,7 +192,7 @@ def rank_genre_taste_v1(
         .exclude(gamework_id__in=list(seen_ids))
         .values("gamework_id")
         .annotate(taste_score=Sum(score_case))
-        .order_by("-taste_score", "gamework__canonical_slug")[:limit]
+        .order_by("-taste_score", "gamework__canonical_slug")[:candidate_pool]
     )
     ordered_work_ids = [row["gamework_id"] for row in ranked_rows]
 
@@ -211,7 +225,11 @@ def rank_genre_taste_v1(
         score = sum(taste_weights[genre.id] for genre in work.genres.all() if genre.id in taste_weights)
         scored.append((score, work.canonical_slug, work, matched))
 
+    # Authoritative order: exact score desc, then canonical_slug asc. Only
+    # now truncate to the requested limit -- the DB slice above was a
+    # deliberately wider candidate pool (L-03).
     scored.sort(key=lambda row: (-row[0], row[1]))
+    scored = scored[:limit]
 
     results = [
         {

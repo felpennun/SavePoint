@@ -44,11 +44,12 @@ Rank catalogue `GameWork` rows by summed genre overlap with the taste vector:
 - **Require** at least one genre in common with the taste vector (`taste_weight > 0`).
 - `score(work) = Σ taste_weight[g]` for `g` in `work.genres ∩ taste_genres`.
 - **Tie-break:** `canonical_slug` ascending. Identical inputs therefore produce an identical ordering.
+  - The database orders on `Sum(CASE …)` in IEEE-754 `double precision`, but rating contributions are multiples of `0.1` (not exactly representable), so two works with the same *rational* score can carry different float sums and land either side of a naive `LIMIT`. The service therefore over-fetches a fixed multiple of `limit` (`_CANDIDATE_OVERFETCH = 4`, so at most `50 × 4 = 200` candidate rows — still bounded per threat T-01.1-11), then performs the **authoritative** exact-arithmetic re-score and `canonical_slug` tie-break in Python before truncating to `limit`. The DB ordering is only a candidate pre-filter; the documented cut-line semantics are decided in Python (repo-review 2026-09-06, finding L-03).
 - Each result item carries its **genre-overlap explanation evidence**: `matched_genres = [{slug, name, weight}, …]` sorted by weight desc then slug, plus `work_id`, `slug`, `title`, `score`.
 
 ### 3. Bounded query (threat T-01.1-11)
 
-The dev database holds 312,483 works / 23 genres, so a naive genre-overlap scan is a DoS surface. The ranking query is driven by the **`GameWork.genres` M2M through table**, filtered by `genre_id__in=<taste genres>` (the through table's auto-created `genre_id` index), grouped by work, aggregated with a `CASE`-sum of the per-genre weights, ordered, and **`LIMIT`-capped in SQL**. Postgres never scans the full catalogue and the working set is never larger than `limit` rows. No new index migration is required — the auto `genre_id` index on the through table plus the SQL `LIMIT` bound the scan; the unique `canonical_slug` index serves the tie-break sort.
+The dev database holds 312,483 works / 23 genres, so a naive genre-overlap scan is a DoS surface. The ranking query is driven by the **`GameWork.genres` M2M through table**, filtered by `genre_id__in=<taste genres>` (the through table's auto-created `genre_id` index), grouped by work, aggregated with a `CASE`-sum of the per-genre weights, ordered, and **`LIMIT`-capped in SQL** at `limit × _CANDIDATE_OVERFETCH` (≤ 200; see the tie-break note above). Postgres never scans the full catalogue and the working set is never larger than that bounded candidate pool. No new index migration is required — the auto `genre_id` index on the through table plus the SQL `LIMIT` bound the scan; the unique `canonical_slug` index serves the tie-break sort.
 
 ### 4. `limit` bound
 

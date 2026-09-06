@@ -5,6 +5,7 @@ from __future__ import annotations
 
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from catalogue.models import AssetAttribution, GameWork, SourceRecord
@@ -34,7 +35,13 @@ class GameListView(APIView):
     Filters intersect. ``sort`` is a fixed allowlist key (never interpolated
     into ``order_by``). An unknown ``sort`` or an out-of-range / non-numeric
     ``year_*`` / ``min_rating`` is a bounded 400 (CAT-02, threat T-01.1-05).
+
+    Anonymous scoped throttle (M-05): a text query runs a trigram lookup, so
+    an unauthenticated request loop is rate-limited.
     """
+
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "catalogue_search"
 
     def get(self, request: Request) -> Response:
         try:

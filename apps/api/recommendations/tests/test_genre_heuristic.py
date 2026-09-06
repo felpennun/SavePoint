@@ -172,6 +172,26 @@ def test_ties_break_by_canonical_slug_ascending(user_a, genres) -> None:  # noqa
 
 
 @pytest.mark.django_db
+def test_tie_break_holds_at_the_limit_boundary(user_a, genres) -> None:  # noqa: ANN001
+    """L-03: with rating-driven weights (multiples of 0.1, not exactly
+    representable) two equally-scored works can carry different float sums.
+    The exact Python re-score must still cut on canonical_slug at limit=1, so
+    the DB's float ordering can never decide which side of the boundary a
+    tied work lands on."""
+    # A rating of 7 half-steps -> 0.7 rating contribution + 3 (completed) per
+    # matched genre; both candidate works share the same two taste genres, so
+    # their rational scores are identical.
+    _own(user_a, _work("owned-a", genres["rpg"]), status="completed", rating=7)
+    _own(user_a, _work("owned-b", genres["shooter"]), status="completed", rating=7)
+    _work("mmm-boundary", genres["rpg"], genres["shooter"])
+    _work("bbb-boundary", genres["rpg"], genres["shooter"])
+
+    result = rank_genre_taste_v1(user_a, limit=1)
+
+    assert _slugs(result) == ["bbb-boundary"]
+
+
+@pytest.mark.django_db
 def test_identical_inputs_produce_identical_ranking_and_hash(user_a, genres) -> None:  # noqa: ANN001
     _own(user_a, _work("owned-rpg", genres["rpg"]), status="completed", rating=8)
     _work("unseen-rpg-1", genres["rpg"])

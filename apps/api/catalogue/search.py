@@ -27,6 +27,9 @@ from catalogue.models import GameAlias, GameWork, Genre, Platform
 from catalogue.normalization import normalize_title
 
 TRIGRAM_SIMILARITY_THRESHOLD = 0.3
+# Cap the fuzzy-match candidate set so a single request can never fan out to
+# the whole alias table (M-05). Comfortably larger than any realistic page.
+TRIGRAM_CANDIDATE_CAP = 200
 DEFAULT_PAGE_SIZE = 24
 
 YEAR_MIN = 1958
@@ -202,13 +205,19 @@ def _ordered_matching_work_ids(normalized_query: str) -> list[str]:
     ]
     seen.update(prefix_ids)
 
+    # Pre-filter with the `%` operator (``__trigram_similar``) so the GIN
+    # trigram index does the selection; only then score + order the survivors,
+    # and cap the set. Without the `%` pre-filter this computed SIMILARITY()
+    # for every alias row on every request (M-05).
     trigram_ids = [
         wid
-        for wid in GameAlias.objects.filter(work__is_dlc=False)
+        for wid in GameAlias.objects.filter(
+            work__is_dlc=False, normalized_value__trigram_similar=normalized_query
+        )
         .annotate(similarity=TrigramSimilarity("normalized_value", normalized_query))
         .filter(similarity__gte=TRIGRAM_SIMILARITY_THRESHOLD)
         .order_by("-similarity", "normalized_value", "work_id")
-        .values_list("work_id", flat=True)
+        .values_list("work_id", flat=True)[:TRIGRAM_CANDIDATE_CAP]
         if wid not in seen
     ]
 
