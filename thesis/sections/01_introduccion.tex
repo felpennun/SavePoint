@@ -1,9 +1,9 @@
 \chapter{Introducción y objetivos}\label{cap:introduccion}
 
 Este capítulo sitúa el proyecto SavePoint, explica el problema que aborda y fija los
-objetivos que persigue. Describe también qué parte del proyecto cubre esta memoria, cuál
-queda como trabajo planificado para fases posteriores, cuáles son las tecnologías centrales
-y cómo se organiza el resto del documento.
+objetivos que persigue. Describe también el alcance de esta memoria, qué queda como línea de
+trabajo futuro, cuáles son las tecnologías centrales y cómo se organiza el resto del
+documento.
 
 \section{Contexto y motivación}\label{sec:intro-contexto}
 
@@ -57,9 +57,9 @@ resultado algorítmico permanece reproducible y defendible en la memoria del TFG
 
 El objetivo general se descompone en los objetivos específicos que recoge la
 Tabla~\ref{tab:objetivos-especificos}. Los cuatro primeros corresponden a la parte de
-producto y a la infraestructura de datos, que esta memoria documenta como trabajo hecho. Los
-tres últimos corresponden al trabajo de recomendadores y de evaluación, planificado para
-fases posteriores.
+producto y a la infraestructura de datos, entregadas en el sistema que esta memoria
+describe. Los tres últimos corresponden al trabajo de recomendadores y de evaluación, que el
+banco de pruebas habilita como líneas de trabajo futuro.
 
 \begin{table}[htp]
 \centering
@@ -67,22 +67,22 @@ fases posteriores.
     \hline
     \textbf{Id} & \textbf{Objetivo específico} & \textbf{Estado} \\
     \hline
-    OE-1 & Ofrecer un catálogo de videojuegos a escala real con identidad canónica propia, procedencia por obra y términos de licencia documentados. & Hecho \\
+    OE-1 & Ofrecer un catálogo de videojuegos a escala real con identidad canónica propia, procedencia por obra y términos de licencia documentados. & Entregado \\
     \hline
-    OE-2 & Permitir a una persona usuaria mantener una lista de pendientes, valorar juegos e inventariar copias físicas y digitales con su formato y edición. & Hecho \\
+    OE-2 & Permitir a una persona usuaria mantener una lista de pendientes, valorar juegos e inventariar copias físicas y digitales con su formato y edición. & Entregado \\
     \hline
-    OE-3 & Ofrecer búsqueda tolerante, ordenación y filtrado del catálogo por metadatos disponibles. & Hecho \\
+    OE-3 & Ofrecer búsqueda tolerante, ordenación y filtrado del catálogo por metadatos disponibles. & Entregado \\
     \hline
-    OE-4 & Entregar una página de recomendaciones por afinidad de géneros basada en la actividad registrada de cada persona usuaria, distinta del baseline de popularidad. & Hecho \\
+    OE-4 & Entregar una página de recomendaciones por afinidad de géneros basada en la actividad registrada de cada persona usuaria, distinta del baseline de popularidad. & Entregado \\
     \hline
-    OE-5 & Congelar un corpus de investigación inmutable y un contrato de evaluación con métricas, repartos y semillas fijados antes de comparar algoritmos. & Planificado \\
+    OE-5 & Congelar un corpus de investigación inmutable y un contrato de evaluación con métricas, repartos y semillas fijados antes de comparar algoritmos. & Trabajo futuro \\
     \hline
-    OE-6 & Implementar y comparar recomendadores basados en contenido, de filtrado colaborativo e híbridos bajo ese contrato, con explicabilidad y arranque en frío. & Planificado \\
+    OE-6 & Implementar y comparar recomendadores basados en contenido, de filtrado colaborativo e híbridos bajo ese contrato, con explicabilidad y arranque en frío. & Trabajo futuro \\
     \hline
-    OE-7 & Presentar la comparación en un panel accesible que exporte tablas y figuras listas para la memoria a partir de artefactos de experimento inmutables. & Planificado \\
+    OE-7 & Presentar la comparación en un panel accesible que exporte tablas y figuras listas para la memoria a partir de artefactos de experimento inmutables. & Trabajo futuro \\
     \hline
 \end{tabular}
-\caption{Objetivos específicos del proyecto y estado en esta primera entrega.}
+\caption{Objetivos específicos del proyecto y su estado.}
 \label{tab:objetivos-especificos}
 \end{table}
 
@@ -91,50 +91,23 @@ pedido por el propio planteamiento del TFG: usar de forma sistemática agentes d
 artificial y un método de desarrollo dirigido por especificación, evaluando el enfoque como
 una aportación observable por el tribunal. El Capítulo~\ref{cap:metodologia} lo desarrolla.
 
-\section{Alcance de esta primera entrega}\label{sec:intro-alcance}
+\section{Alcance del trabajo}\label{sec:intro-alcance}
 
-El proyecto se organiza en fases, cada una un incremento vertical con su propia evidencia.
-La Tabla~\ref{tab:roadmap} resume la hoja de ruta completa, reestructurada el 6 de
-septiembre de 2026 de ocho fases a siete. Esta memoria cubre las dos primeras fases,
-cerradas y verificadas, que se corresponden con los objetivos OE-1 a OE-4.
+Esta memoria describe un sistema construido y verificado que cubre los objetivos OE-1 a
+OE-4: el catálogo a escala real con procedencia documentada, la biblioteca personal con
+inventario de copias, el perfil público, la búsqueda tolerante con ordenación y filtrado,
+además de los dos recomendadores deterministas. El sistema se construyó como una sucesión de
+incrementos verticales, cada uno utilizable y con su propia evidencia de verificación, hasta
+llegar a la versión que aquí se documenta.
 
-\begin{table}[htp]
-\centering
-\begin{tabular}{ | c | p{9.5cm} | c | }
-    \hline
-    \textbf{Fase} & \textbf{Contenido} & \textbf{Estado} \\
-    \hline
-    1 & Recorrido vertical público con catálogo lícito, lista de pendientes, valoración, inventario, perfil público y recomendación por popularidad. & Cerrada \\
-    \hline
-    01.1 & Catálogo a escala real desde IGDB, rediseño de la interfaz, ordenación y filtrado, varias cuentas simuladas y página de recomendaciones por géneros. & Cerrada \\
-    \hline
-    2 & Corpus gobernado por una lista blanca de plataformas y de calidad (Steam incluido), valoraciones externas de usuarios con procedencia e instantánea inmutable, corrección de la búsqueda tolerante sobre el corpus real, filtros de selección múltiple, una pasada de interfaz de nivel de producto y el protocolo de evaluación congelado y consciente de la simulación. Incluye un primer recomendador basado en contenido, construido como un laboratorio parametrizado de variantes con nombre, evaluado bajo ese protocolo frente a los baselines aleatorio y de popularidad. & Planificada \\
-    \hline
-    3 & Recomendadores de contenido explicables y comparación con los baselines bajo el banco congelado, con enrutado de arranque en frío, exclusiones, explicaciones deterministas, la batería completa de métricas de acierto, cobertura, diversidad y novedad, además del informe por cohortes y artefactos recalculables de forma independiente. & Planificada \\
-    \hline
-    4 & Comparación de métodos de filtrado colaborativo e híbridos bajo el protocolo ya congelado, con conclusiones acotadas a la simulación sintética. & Planificada \\
-    \hline
-    5 & Flujos completos de colección y portabilidad de datos. & Planificada \\
-    \hline
-    6 & Descubrimiento público y enriquecimiento de datos resiliente y atribuible. & Planificada \\
-    \hline
-    7 & Panel de investigación, endurecimiento de seguridad y congelación de la evidencia. & Planificada \\
-    \hline
-\end{tabular}
-\caption{Hoja de ruta del proyecto. Esta memoria documenta las fases 1 y 01.1.}
-\label{tab:roadmap}
-\end{table}
-
-La Fase 01.1 es una inserción a petición del autor, decidida inmediatamente después de la
-firma de la Fase 1 y priorizada por delante de la Fase 2. El
-Capítulo~\ref{cap:metodologia} explica esa desviación y su registro.
-
-Queda fuera del alcance de esta entrega todo el trabajo de recomendadores más allá de dos
-heurísticos deterministas sin aprendizaje: la agregación por popularidad y la afinidad por
-géneros. La comparación de algoritmos, sus métricas y sus resultados no existen todavía, y
-la memoria los trata siempre como trabajo futuro planificado. También quedan fuera el
-registro abierto de producción, la red social completa, el diario de partidas y los
-controles finos de privacidad por lista, reservados para la versión 2 del producto.
+Queda fuera del alcance de esta memoria todo el trabajo de recomendadores más allá de los
+dos heurísticos deterministas sin aprendizaje que el sistema ya incorpora: la agregación por
+popularidad y la afinidad por géneros. La comparación sistemática de algoritmos, sus
+métricas y sus resultados se recogen como líneas de trabajo futuro que el banco de pruebas
+reproducible habilita; el Capítulo~\ref{cap:conclusiones} las detalla. También quedan
+fuera el registro abierto de producción, la red social completa, el diario de partidas y los
+controles finos de privacidad por lista, reservados para una evolución posterior del
+producto.
 
 \section{Tecnologías clave}\label{sec:intro-tecnologias}
 
@@ -155,7 +128,7 @@ de decisión de arquitectura (ADR).
 El resto del documento se organiza así. El Capítulo~\ref{cap:estado-del-arte} revisa los
 productos de referencia, las fuentes de datos de videojuegos y el panorama de los sistemas de
 recomendación y su evaluación. El Capítulo~\ref{cap:metodologia} describe la planificación,
-el método de desarrollo por fases y, con detalle, la metodología asistida por agentes. El
+el método de desarrollo iterativo y, con detalle, la metodología asistida por agentes. El
 Capítulo~\ref{cap:requisitos} presenta los actores, el modelo de dominio, los requisitos
 funcionales y no funcionales, las reglas de negocio, los casos de uso y la matriz de
 trazabilidad. El Capítulo~\ref{cap:diseno} expone la arquitectura, las decisiones de
