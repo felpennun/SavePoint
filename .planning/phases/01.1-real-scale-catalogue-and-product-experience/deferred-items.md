@@ -79,6 +79,42 @@ El autor aprobó la Fase 01.1 (QUAL-05 cerrado sin condiciones) tras revisar 18 
 stack local. Cuatro ítems cosméticos observados, aceptados explícitamente como pulido
 diferido (el autor espera cambios de UI de todas formas); ninguno bloquea el cierre de fase.
 
+## Corrección post-cierre — tanda 1 (2026-09-06, commit 2bfbfe2)
+
+El autor enumeró varios problemas de la web antes de la Fase 2. Los que estaban aislados
+del corpus del catálogo se arreglaron directamente sobre `main`; el resto (búsqueda,
+basura de juegos/plataformas, allowlist de plataformas, filtros multi-selección, ratings
+externos, algoritmos complejos, pase de UI) se lleva a la Fase 2. Antes de tocar nada se
+creó el tag `demo-estable` sobre `8b9d720` como versión congelada demostrable.
+
+### RESUELTO — Login en la home
+
+El hero de la home ya no lleva CTA de inicio de sesión. El acceso vive en el navbar (icono
+de persona) y en `/login`. La home deslogueada ahora encabeza con "Explorar el catálogo" y
+"Crear una cuenta". Mismo DOM en escritorio y móvil.
+
+### RESUELTO — Login sensible a mayúsculas dejaba fuera al usuario
+
+El registro bloquea duplicados por `username__iexact`, pero `authenticate` de Django
+distingue mayúsculas: quien se registraba como "Alice" quedaba fuera al escribir "alice"
+(login lo rechazaba y el registro no dejaba recrear la cuenta). `LoginView` resuelve ahora
+a la grafía almacenada y reintenta una vez; el error uniforme sigue sin revelar si el
+usuario existe.
+
+### RESUELTO — Motivos vagos de contraseña inválida
+
+`RegisterView` devuelve la lista concreta de fallos de política en el cuerpo del 400
+(`password_errors`) en vez de un "elige una más segura". El formulario los muestra como
+lista y añade una pista previa de las reglas (longitud mínima, ni comunes ni solo
+numéricas ni parecidas al usuario, cualquier carácter permitido).
+
+### RESUELTO — D-01.1-13-b: el menú de cuenta no identificaba la cuenta activa
+
+Añadida la vista `MeView` (`GET /api/accounts/me/`, `IsAuthenticated`) que devuelve
+`{"username", "is_demo"}`; registrada en `accounts/urls.py`. `AccountSwitcher` y la home ya
+la consumían y hasta ahora recibían 404. Anónimo devuelve 401/403 sin cuerpo. Cubierta por
+`accounts/tests/test_account_me.py`.
+
 ### D-01.1-13-a — Mezcla ES/EN en la disclosure de la página de recomendaciones
 
 - **Qué:** la caja "Cómo se generan" muestra el primer párrafo en español y el segundo en
