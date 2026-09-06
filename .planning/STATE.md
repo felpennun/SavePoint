@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 current_phase: 01.1
 current_phase_name: Real-Scale Catalogue and Product Experience
 status: executing
-stopped_at: "Plans 01.1-01/02/06/04/08/03/05 merged. Autonomous run through Waves 4-9; next Wave 8 = 01.1-09 (wire recommendations page + auth nav). Stop at Wave 10 (01.1-07 checkpoint)."
+stopped_at: "Plans 01.1-01/02/06/04/08/03/05/09 merged (8/10). Session rate limit was hit at Wave 8; 01.1-09 finalized inline. Next Wave 9 = 01.1-10 (evidence) once the limit resets (~02:30 Paris). Stop at Wave 10 (01.1-07 author checkpoint)."
 last_updated: "2026-09-05T23:25:00.000Z"
 last_activity: 2026-09-05
 last_activity_desc: "Plans 01.1-02 + 01.1-06 merged — importer proven + full apps/web redesign live"
@@ -12,7 +12,7 @@ progress:
   total_phases: 9
   completed_phases: 1
   total_plans: 26
-  completed_plans: 23
+  completed_plans: 24
   percent: 12
 ---
 
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-09-04)
 ## Current Position
 
 Phase: 01.1 (Real-Scale Catalogue and Product Experience) — EXECUTING
-Plan: 7 of 10 complete (01.1-01/02/06/04/08/03/05). Next: 01.1-09 (Wave 8 — wire recommendations page + auth nav).
+Plan: 8 of 10 complete (01.1-01/02/06/04/08/03/05/09). Next: 01.1-10 (Wave 9 — Playwright/axe/screenshot evidence).
 Status: Executing Phase 01.1 — Wave 3 done, next Wave 4
 Last activity: 2026-09-05 — Plans 01.1-02 + 01.1-06 merged (069f422)
 
-Progress: [███████░░░] 70% (7 of 10 plans)
+Progress: [████████░░] 80% (8 of 10 plans)
 
 ## Performance Metrics
 
