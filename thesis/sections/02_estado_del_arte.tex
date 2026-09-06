@@ -1,3 +1,145 @@
 \chapter{Antecedentes y estado del arte}\label{cap:estado-del-arte}
 
-\todo[inline]{Capítulo por redactar en la siguiente iteración.}
+Este capítulo revisa el terreno sobre el que se construye SavePoint. Primero examina los
+productos de catalogación que sirven de referencia, después las fuentes de datos de
+videojuegos disponibles y sus condiciones de uso, a continuación el panorama de los sistemas
+de recomendación y de su evaluación reproducible. Termina esa revisión con las metodologías
+de desarrollo asistido por agentes de código, antes de exponer la aportación diferencial que
+persigue el trabajo.
+
+\section{Productos de referencia}\label{sec:arte-productos}
+
+El modelo de catalogación social nació fuera del videojuego. Goodreads, para libros, y
+Letterboxd, para cine, comparten un patrón que SavePoint adopta: una ficha canónica por obra,
+independiente de la edición concreta que posea cada persona; un estado de consumo personal,
+como leído, viendo o pendiente; una valoración con una escala consistente; listas ordenadas;
+un perfil público que resume la actividad. Ninguno de los dos representa la propiedad
+material con detalle, porque un libro o una película no plantean el problema de inventario
+que sí plantea una consola con juegos en cartucho, disco y descarga.
+
+En el ámbito del videojuego, Backloggd traslada casi literalmente el modelo de Letterboxd,
+con buen tratamiento del backlog y del perfil, pero sin inventario de copias ni ambición de
+recomendación. OpenCritic agrega puntuaciones de prensa y es una referencia de densidad
+visual y de tratamiento de la nota, más que un catalogador personal. Steam ofrece una
+biblioteca personal rica, aunque acoplada a su tienda y limitada a lo comprado en ella. La
+web de IGDB expone un catálogo amplio y bien modelado, orientado a la consulta y no a la
+gestión de una colección. La Tabla~\ref{tab:productos} resume la comparación.
+
+\begin{table}[htp]
+\centering
+\begin{tabular}{ | l | c | c | c | c | }
+    \hline
+    \textbf{Producto} & \textbf{Ficha canónica} & \textbf{Backlog y perfil} & \textbf{Inventario de copias} & \textbf{Recomendación} \\
+    \hline
+    Goodreads & Sí & Sí & No & Sí \\
+    \hline
+    Letterboxd & Sí & Sí & No & Parcial \\
+    \hline
+    Backloggd & Sí & Sí & No & No \\
+    \hline
+    OpenCritic & Sí & No & No & No \\
+    \hline
+    Steam & Parcial & Parcial & Solo digital de su tienda & Sí \\
+    \hline
+    IGDB.com & Sí & No & No & No \\
+    \hline
+    \textbf{SavePoint} & Sí & Sí & Físico y digital, con edición & Heurística, comparación planificada \\
+    \hline
+\end{tabular}
+\caption{Comparación de SavePoint con los productos de referencia.}
+\label{tab:productos}
+\end{table}
+
+El hueco que SavePoint ocupa se ve en la última columna de la
+Tabla~\ref{tab:productos}: ningún producto reúne un inventario detallado de propiedad
+material con un catálogo a escala real y un banco de pruebas de recomendación abierto y
+reproducible.
+
+\section{Fuentes de datos de videojuegos y sus términos}\label{sec:arte-datos}
+
+Tres fuentes públicas cubren la mayor parte del catálogo de videojuegos: Wikidata, IGDB y
+RAWG. Difieren sobre todo en su licencia y en sus condiciones de reutilización, que son
+determinantes para un trabajo que debe citar fuentes defendibles.
+
+Wikidata publica sus datos estructurados bajo la dedicación al dominio público
+\textit{Creative Commons Zero} (CC0), la licencia más limpia de las tres, sin obligación de
+atribución~\cite{wikidata-licensing}. Los archivos multimedia asociados viven en Wikimedia
+Commons y no comparten esa licencia: cada imagen lleva su propia condición, que puede exigir
+crédito al autor y a la licencia concreta, de modo que su reutilización requiere una revisión
+por archivo~\cite{commons-reuse}. La contrapartida de Wikidata es la cobertura: el modelado
+de género y plataforma para videojuegos es desigual y depende de la edición voluntaria.
+
+IGDB, propiedad de Twitch, ofrece una API de versión 4 con una entidad de plataforma de
+primera clase, veintitrés géneros y arte de portada, servida bajo el \textit{Twitch
+Developer Services Agreement} (DSA)~\cite{igdb-api, twitch-dsa}. Su uso es gratuito para
+proyectos comerciales y no comerciales, sin cuota mensual de peticiones, con un límite de
+ritmo de cuatro peticiones por segundo. La documentación de la propia API declara que
+prefiere que el integrador almacene y sirva los datos a sus usuarios finales, con permiso
+explícito para conservarlos. Ese texto actúa como la autorización escrita que contempla el
+acuerdo general. A cambio, IGDB pide una atribución estática y visible.
+
+RAWG ofrece una cobertura comparable, con metadatos de tienda, pero su nivel gratuito impone
+un techo de veinte mil peticiones al mes y exige atribución con un enlace de vuelta en cada
+página que use los datos, además de un plan de pago para el uso comercial~\cite{rawg-api}.
+El Capítulo~\ref{cap:datos} desarrolla la comparación que llevó a elegir Wikidata para el
+corpus congelado de la Fase 1 y luego IGDB para el catálogo a escala real.
+
+\section{Sistemas de recomendación y evaluación reproducible}\label{sec:arte-recomendacion}
+
+Los sistemas de recomendación se agrupan de forma clásica en tres familias~\cite{ricci2022handbook,
+aggarwal2016recommender}. Los métodos basados en contenido describen cada ítem con un vector
+de rasgos, como género, plataforma o etiquetas, para recomendar ítems parecidos a los que la
+persona ha valorado bien; su ventaja es que funcionan con un solo usuario y explican bien sus
+resultados, mientras que su límite es la endogamia, es decir, la tendencia a recomendar
+siempre más de lo mismo. Los métodos de filtrado colaborativo ignoran el contenido y explotan
+la matriz de interacciones entre personas e ítems, con la hipótesis de que quienes
+coincidieron en el pasado volverán a coincidir~\cite{adomavicius2005toward}; capturan gustos
+que el contenido no expresa, pero sufren el problema del arranque en frío cuando un usuario o
+un ítem no tienen historial. Los métodos híbridos combinan ambas señales para mitigar las
+debilidades de cada una~\cite{burke2002hybrid}.
+
+La parte más delicada no es implementar los algoritmos, sino evaluarlos de forma
+comparable~\cite{herlocker2004evaluating, gunawardana2015evaluating}. La literatura señala
+varios riesgos recurrentes: ajustar los hiperparámetros sobre el conjunto de prueba, comparar
+algoritmos con repartos o candidatos distintos, medir solo la precisión y olvidar la
+cobertura, la diversidad o la novedad, o extraer conclusiones sobre personas reales a partir
+de simulaciones sintéticas. El trabajo de Cremonesi y otros mostró además que las métricas de
+error sobre la valoración predicha y las métricas de acierto sobre la lista recomendada
+pueden ordenar los algoritmos de forma distinta~\cite{cremonesi2010performance}. La respuesta
+metodológica aceptada es fijar por adelantado, de forma inmutable, el corpus, el reparto, las
+exclusiones, las métricas, las semillas y el presupuesto de ajuste, antes de comparar nada.
+Ese contrato de evaluación congelado es exactamente el objeto de la Fase 2 del proyecto,
+todavía no abordada. Por ese motivo, esta memoria no presenta ningún resultado de comparación
+de recomendadores.
+
+\section{Desarrollo de software asistido por agentes}\label{sec:arte-agentes}
+
+El uso de agentes de inteligencia artificial para escribir código ha pasado en pocos años del
+autocompletado a la ejecución autónoma de tareas de varios pasos. El obstáculo práctico
+conocido es la degradación del contexto: a medida que una conversación con un agente se
+alarga, su ventana de contexto se llena de historial, de razonamientos exploratorios y de
+lecturas de ficheros, hasta que la calidad de sus respuestas decae y llega a contradecir
+decisiones previas~\cite{anthropic-context}. La técnica que responde a este problema consiste en aislar
+el contexto: descomponer el trabajo en tareas atómicas, ejecutar cada una en una instancia
+nueva del agente con la ventana limpia y transportar la información entre tareas mediante
+ficheros de memoria persistentes en lugar de mediante el historial de la conversación.
+
+Sobre esa idea, métodos como \textit{Get Stuff Done} (GSD) organizan el desarrollo en fases
+que recorren un ciclo ordenado de discusión, planificación, ejecución y verificación, donde
+cada paso produce un artefacto escrito que actúa como fuente de verdad del
+siguiente~\cite{gsd}. La separación entre quien planifica, quien implementa y quien verifica
+se hace deliberada, con instancias independientes del agente, de modo que la verificación no
+hereda la confianza del código recién escrito. El Capítulo~\ref{cap:metodologia} describe
+cómo se aplicó este enfoque a SavePoint y qué evidencia dejó.
+
+\section{Aportación diferencial del trabajo}\label{sec:arte-aportacion}
+
+De la revisión anterior se desprenden las tres aportaciones que persigue el trabajo. La
+primera es un producto de catalogación de videojuegos que combina inventario de propiedad
+material, catálogo a escala real y procedencia de datos documentada, un conjunto que ningún
+servicio existente reúne. La segunda es un banco de pruebas reproducible para la comparación
+de recomendadores, con corpus citable, usuarios sintéticos y contrato de evaluación
+congelado, todavía en construcción. La tercera es la propia metodología de ingeniería
+asistida por agentes, aplicada de forma sistemática y versionada en el repositorio, de manera
+que el proceso que produjo el sistema es tan inspeccionable y reproducible por un tercero
+como el sistema mismo.
