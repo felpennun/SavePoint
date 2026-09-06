@@ -1,14 +1,14 @@
 ---
 gsd_state_version: 1.0
 status: in_progress
-stopped_at: "Fase 2, ola 1 en curso. 02-01 tarea 1 ratificada (39 plataformas); 02-07 en ejecución. Checkpoints por tarea en el directorio de fase."
-last_updated: "2026-09-07T00:00:00+02:00"
-state_head: f56f7a6
+stopped_at: Fase 2, ola 1 en curso. 02-01 tarea 1 ratificada (39 plataformas); 02-07 en ejecución. Checkpoints por tarea en el directorio de fase.
+last_updated: "2026-09-07T01:05:00+02:00"
+state_head: 8a97338
 progress:
   total_phases: 8
   completed_phases: 2
-  total_plans: 26
-  completed_plans: 26
+  total_plans: 39
+  completed_plans: 28
   percent: 25
 last_activity: 2026-09-07
 next_phase: 2
@@ -16,7 +16,7 @@ next_phase_name: Governed Corpus, External Ratings, Evaluation Contract, and Fir
 next_action: /gsd-execute-phase 2
 current_phase: 2
 current_phase_name: Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender
-last_activity_desc: "Ola 1 iniciada; D-01 ratificada, consolas actuales primero en filtros; tablero sincronizado (13 issues)."
+last_activity_desc: Ola 1 iniciada; D-01 ratificada, consolas actuales primero en filtros; tablero sincronizado (13 issues).
 ---
 
 # Project State
@@ -30,9 +30,16 @@ See: .planning/PROJECT.md (updated 2026-09-04)
 
 ## Current Position
 
+### Snapshot de ejecucion vigente (2026-09-07)
+
+Fase 2, ola 1 cerrada. 02-01 y 02-07 tienen SUMMARY, commits y verificaciones verdes.
+La siguiente es la ola 2; 02-02 se detiene antes de implementar la parte RAWG para que el
+autor decida con la cobertura de ratings medida.
+
 Fase 01.1 CERRADA. **Fase 2 en ejecución: ola 1, con checkpoints después de cada tarea.** D-01 ratificada por el autor el 2026-09-07 (39 plataformas). 02-07 en ejecución; 02-01 continúa por la tarea 2 al liberar el ejecutor. La preferencia de consolas actuales primero está registrada en 02-04.
 
 Hecho y commiteado esta sesión (2026-09-06):
+
 - Corrección post-cierre de la 01.1 (tanda 1): login fuera de la home, motivos reales de contraseña, login case-insensitive, `GET /api/accounts/me/` — `2bfbfe2`.
 - Borrador LaTeX del TFG (10 capítulos + portada + biblio + figuras) fusionado — `4f10914`. Tag `demo-estable` = versión demostrable congelada. Zip de Overleaf enviado (queda OBSOLETO tras la Fase 2).
 - Roadmap reestructurado (Fase 2 ampliada; antiguas 5+6 fundidas; 3/4/7/8 → 5/6/4/7; trazabilidad 91/91) — `85e98ba`.
@@ -134,11 +141,11 @@ TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<ver
 
 ## Registro histórico de sesiones (prevalece el checkpoint de ejecución actual)
 
-**Stopped at:** Phase 2 planning — inputs all done and committed; `gsd-planner` died on the account session rate limit (HTTP 429, reset 20:50 Europe/Paris) before writing any `02-*-PLAN.md`. 0 PLAN.md on disk, nothing to clean up.
+**Stopped at:** Completed 02-07-PLAN.md; ola 1 pendiente de 02-01
 
 **Resume (after the rate-limit reset):** `/gsd-plan-phase 2` re-spawns the planner from scratch. All inputs are committed: `02-CONTEXT.md`, `02-UI-SPEC.md` (verified 7/7), `02-RESEARCH.md`, `02-VALIDATION.md`, `02-PATTERNS.md`, `02-COVERAGE.md`. Then `gsd-plan-checker` → revision loop → present → `/gsd-execute-phase 2`. Full detail in `.planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/.continue-here.md`.
 
-Last session: 2026-09-06
+Last session: 2026-09-06T22:34:05.643Z
 
 ### Done this session (2026-09-06, all committed on `main`)
 
@@ -148,3 +155,16 @@ Last session: 2026-09-06
 - **Phase 2 planning inputs** — `02-CONTEXT.md` `f5d65e7` (discuss-phase, D-01..D-24), `02-UI-SPEC.md` `e548a2e` (ui-phase, checker 7/7, `## UI Considerations` 45 explicit + 10 backstop), `02-RESEARCH.md` `a78510f`, `02-VALIDATION.md` `53b173f`, `02-PATTERNS.md` `df45a33`, `02-COVERAGE.md` `15006b3` (rescued from the rate-limited planner).
 
 Resume file: .planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/.continue-here.md
+
+## Session Continuity
+
+Last session: 2026-09-07
+
+Stopped at: Session resumed; awaiting author selection to continue Plan 02-07, task 2.
+
+Resume file: .planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/.continue-here.md
+
+## Continuidad de esta sesion
+
+Ultimo estado: ola 1 cerrada; listo para ejecutar la ola 2 y detenerse en el checkpoint
+RAWG de 02-02.

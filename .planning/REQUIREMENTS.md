@@ -43,7 +43,7 @@
 
 - [x] **DATA-01**: Project uses a stable, citable dataset that is legally suitable for its experiments.
 - [x] **DATA-02**: Dataset records its version, licence, source URL, retrieval date, and checksum.
-- [ ] **DATA-03**: Project generates a data dictionary and a quality/missing-fields report for the fixed corpus.
+- [x] **DATA-03**: Project generates a data dictionary and a quality/missing-fields report for the fixed corpus.
 - [x] **DATA-04**: Enrichment API is selected through a documented comparison of coverage, platforms, licence, attribution, quotas, stability, and cost.
 - [ ] **DATA-05**: Each enriched value retains its source and retrieval date.
 - [ ] **DATA-06**: Mutable API data cannot retrospectively alter completed experiments.
@@ -187,7 +187,7 @@
 | DATA-04 | Phase 01.1 | Complete (ADR-006, Plan 01.1-01) |
 | REC-10 | Phase 01.1 | Pending |
 | QUAL-05 | Phase 01.1 | Pending |
-| DATA-03 | Phase 2 | Pending |
+| DATA-03 | Phase 2 | Complete |
 | DATA-05 | Phase 2 | Pending |
 | DATA-06 | Phase 2 | Pending |
 | DATA-07 | Phase 2 | Pending |

@@ -161,15 +161,15 @@ Plans (execution order follows the author's locked D-01 -> D-02 -> D-03 -> D-04 
   5. A signed-in user receives a ranked recommendation from a first ratings-aware recommender that combines their own recorded genre affinity with the aggregate external ratings of comparable games, excludes already-consumed titles, shows a deterministic explanation grounded in persisted features, records the model, feature, and input-data versions of every published result, and gives a sparse-history user an explicit cold-start fallback instead of an empty list; a random baseline is available as the comparison floor.
   6. The phase records the dataset, API, data-model, and normalisation documentation, the protocol, metrics, and threats to validity, and the controls against leakage, hallucination, bias, error, and information exposure, plus the author decisions behind them.
 
-**Plans**: 13 plans (6 waves)
+**Plans**: 2/13 plans executed (6 waves)
 **UI hint**: yes
 
 Plans:
 
 **Wave 1**
 
-- [ ] 02-01-PLAN.md — Esquema de corpus gobernado + comando `govern_corpus` (checksum, diccionario, informe de calidad — DATA-03)
-- [ ] 02-07-PLAN.md — Tokens de pulido compartidos en `globals.css` + fix de overflow de la nav autenticada <430px
+- [x] 02-01-PLAN.md — Esquema de corpus gobernado + comando `govern_corpus` (checksum, diccionario, informe de calidad — DATA-03)
+- [x] 02-07-PLAN.md — Tokens de pulido compartidos en `globals.css` + fix de overflow de la nav autenticada <430px
 
 **Wave 2** *(blocked on Wave 1)*
 
@@ -286,7 +286,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Three-Day Public Demo Slice | 16/16 | Complete    | 2026-09-05 |
 | 01.1. Real-Scale Catalogue and Product Experience (inserted) | 10/10 | Complete    | 2026-09-06 |
-| 2. Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender | 0/13 | Not started | - |
+| 2. Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender | 2/13 | In Progress|  |
 | 3. Explainable Content Recommenders and Baseline Comparison | 0/TBD | Not started | - |
 | 4. Collaborative and Hybrid Comparison | 0/TBD | Not started | - |
 | 5. Complete Collection Workflows and Portability | 0/TBD | Not started | - |
