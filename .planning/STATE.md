@@ -3,11 +3,11 @@ gsd_state_version: 1.0
 current_phase: 01.1
 current_phase_name: Real-Scale Catalogue and Product Experience
 status: complete
-stopped_at: "Phase 01.1 COMPLETE and closed out — 10/10 plans merged; 01.1-VERIFICATION.md (4/5 SC VERIFIED, SC3 PARTIAL); docs/verification/phase-01.1-signoff.md (CONDITIONALLY ACCEPTED); tag phase-01.1-complete pushed; docs/verification/repo-review-2026-09-06.md (0 Critical / 3 High / 6 Medium / 7 Low, L-05 fixed, rest PROPOSED); conservative cleanup done. STOPPED. Phase 2 NOT started. Author to decide: live per-viewport design review, deploy (check Vercel/Render dashboards), triage of the High/Medium review findings."
-last_updated: "2026-09-06T04:30:00.000Z"
+stopped_at: "Phase 01.1 COMPLETE + closed out + full-repo security remediation done. 10/10 plans; 01.1-VERIFICATION.md (4/5 SC, SC3 PARTIAL); phase-01.1-signoff.md (CONDITIONALLY ACCEPTED); tag phase-01.1-complete. repo-review-2026-09-06.md: all 16 findings FIXED (author 'apruebes todos en su totalidad') across a2b480a/7b05133/5e6082d/6637578/6370cf2 — pytest apps/api 206, web build + 16 tests, a11y 36 under CSP. New dep gunicorn==23.0.0 + migration catalogue/0005. STOPPED. Phase 2 NOT started. Author still owes: live per-viewport design review; evidence-gate reconciliation (check-evidence.ps1 red on main, pre-existing); SC3 follow-up; deploy wiring (deferred to end-of-project by author — current Vercel build left as-is)."
+last_updated: "2026-09-06T12:00:00.000Z"
 last_activity: 2026-09-06
-last_activity_desc: "Phase 01.1 closed out — verification, sign-off, restore-point tag, full-repo review + conservative cleanup"
-state_head: f3c08ad
+last_activity_desc: "Full-repo review remediation — all 16 findings fixed (5 batches), gunicorn added, migration 0005"
+state_head: 6370cf2
 progress:
   total_phases: 9
   completed_phases: 2

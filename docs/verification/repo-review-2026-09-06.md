@@ -9,13 +9,21 @@
 
 ## Summary
 
-| Severity  | Count |
-|-----------|-------|
-| Critical  | 0     |
-| High      | 3     |
-| Medium    | 6     |
-| Low       | 7     |
-| **Total** | **16**|
+| Severity  | Count | Status |
+|-----------|-------|--------|
+| Critical  | 0     | — |
+| High      | 3     | all FIXED |
+| Medium    | 6     | all FIXED |
+| Low       | 7     | all FIXED |
+| **Total** | **16**| **16 FIXED** (see *Disposition* below) |
+
+> **Update 2026-09-06:** after this review the author authorised applying **all 16
+> findings** ("quiero que apruebes todos en su totalidad"). They are implemented across
+> five committed batches (`a2b480a`, `7b05133`, `5e6082d`, `6637578`, `6370cf2`), tests run
+> after each: `pytest apps/api` 206 passed, `pnpm --dir apps/web build` + 16 web tests
+> green, Playwright a11y 36 green under the new CSP. One **new** pre-existing issue was
+> found during remediation (`scripts/check-evidence.ps1` is red on `main`) — see the end of
+> *Disposition*; it is PROPOSED, not fixed.
 
 **Top 3 issues**
 
@@ -176,31 +184,59 @@ if isinstance(ts, (int, float)):
 
 ---
 
-## Disposition (orchestrator, 2026-09-06)
+## Disposition (orchestrator)
 
-Per the author's instruction for this review — *fix only trivially-safe minors, everything
-else PROPOSED* — exactly one finding was fixed autonomously. Every High and Medium is left
-for the author to consciously accept, because each changes a security model, a deploy
-process, a dependency set, or a thesis-documented algorithm contract.
+**Initial pass (2026-09-06, first cleanup commit):** per *fix only trivially-safe minors*,
+only L-05 was applied; everything else was left PROPOSED.
 
-| ID | Severity | Disposition | Note |
-|----|----------|-------------|------|
-| H-01 | High | **PROPOSED** | One-line settings key, but it is a deliberate change to the auth model and wants a deploy smoke. Strongly recommended. |
-| H-02 | High | **PROPOSED** | Needs a schema field + migration + state-machine change; test against `scripts/verify-igdb-fresh-import.ps1`. |
-| H-03 | High | **PROPOSED** | Adds `gunicorn` (dependency — needs the package-legitimacy sign-off) + a deploy smoke. |
-| M-01 | Medium | **PROPOSED** | Additive throttle mirroring `registration`; low-risk, recommended alongside H-01. |
-| M-02 | Medium | **PROPOSED** | Requires an explicit proxy-trust decision (`NUM_PROXIES` vs a documented global ceiling). |
-| M-03 | Medium | **PROPOSED** | Throttle part is safe; the response-shape change is a product decision tied to the plan 01-07 private/public toggle. |
-| M-04 | Medium | **PROPOSED** | Small localized guard; recommended — it restores the "one bad row can't wedge the import" guarantee. |
-| M-05 | Medium | **PROPOSED** | Query rework + perf check on the real 300k-row catalogue. |
-| M-06 | Medium | **PROPOSED** | One `filter(...)` clause + regression test; recommended — the published `limitation` text is currently inaccurate. |
-| L-01 | Low | **PROPOSED** | Needs the real public API hostname. |
-| L-02 | Low | **PROPOSED** | CSP needs a manual click-through to confirm nothing inline breaks. |
-| L-03 | Low | **PROPOSED** | Touches the `genre-taste-v1` ranking at the cut line — ADR-007 documents the current behaviour; author should own the change. |
-| L-04 | Low | **PROPOSED** | Deletion logic on catalogue data; needs a dry-run + test. |
-| **L-05** | Low | **FIXED** — commit in this cleanup | Added `isinstance(username/password, str)` guard to `LoginView.post`, mirroring the identical guard already in `RegisterView`. Converts a crafted-JSON 500 into a clean 401; no behaviour change for valid input. `pytest apps/api` → 202 passed. |
-| L-06 | Low | **PROPOSED** | Cosmetic counter renames span 3 files incl. a thesis file (`genre_heuristic.py`); low value, left for the author. |
-| L-07 | Low | **PROPOSED** | Hiding the two inert collection sorts is a product/UI decision; backend wiring is already scheduled for Plan 03. |
+**Remediation pass (2026-09-06, later the same day):** the author then instructed
+*"quiero que apruebes todos en su totalidad"* — apply **every** finding. All 16 are now
+implemented across five committed batches (`a2b480a` auth/throttle, `7b05133` importer,
+`5e6082d` search/recs, `6637578` frontend, `6370cf2` deploy), each with tests run after it.
+`pytest apps/api` → **206 passed**; `pnpm --dir apps/web build` + 16 web tests green;
+Playwright a11y (36) green under the new CSP; `scripts/check-dependencies.ps1` exit 0.
+
+| ID | Severity | Disposition | Where / how |
+|----|----------|-------------|-------------|
+| H-01 | High | **FIXED** `a2b480a` | `DEFAULT_AUTHENTICATION_CLASSES = [SessionAuthentication]` in settings — BasicAuthentication no longer enabled anywhere. |
+| H-02 | High | **FIXED** `7b05133` | New `IgdbImportRun.pass_cursor` (migration `0005`, backfilled); resume uses it, `last_committed_igdb_id` stays a pure monotonic guard. Regression test: chunked re-import after COMPLETE → page not skipped. |
+| H-03 | High | **FIXED** `6370cf2` | `render-start.sh` execs `gunicorn config.wsgi:application`; `gunicorn==23.0.0` added (legitimacy doc + allowlist + ledger); image rebuilt, `--check-config` exit 0. Local compose still `runserver` (acceptable). |
+| M-01 | Medium | **FIXED** `a2b480a` | `LoginView` gains `ScopedRateThrottle` scope `login` (10/min) + throttle regression test + cache-isolation fixture. |
+| M-02 | Medium | **FIXED** `a2b480a` + `6370cf2` | `REST_FRAMEWORK["NUM_PROXIES"]` read from `DJANGO_NUM_PROXIES` (default 0 = local); `render.yaml` gains the var (`sync: false`) for deploy. |
+| M-03 | Medium | **FIXED** `a2b480a` | `PublicProfileView` gains `ScopedRateThrottle` scope `public_profile` (30/min). Response-shape narrowing left to the plan 01-07 toggle (noted in code). |
+| M-04 | Medium | **FIXED** `7b05133` | `datetime.fromtimestamp` in `_normalize` wrapped in `try/except (ValueError, OverflowError, OSError)` → degrades to no date. |
+| M-05 | Medium | **FIXED** `5e6082d` | Trigram branch pre-filtered by `__trigram_similar` (`%` operator, GIN-served) + capped at 200; `GameListView` gains `catalogue_search` throttle (120/min). |
+| M-06 | Medium | **FIXED** `a2b480a` | `rank_popularity_v1` restricted to `demo_anchor`/`demo_identity` accounts; new test that a self-registered user's entry does not move the baseline. |
+| L-01 | Low | **FIXED** `6370cf2` | `render.yaml` `DJANGO_ALLOWED_HOSTS` → `sync: false` (real hostname at creation); `RENDER_EXTERNAL_HOSTNAME` still appended. |
+| L-02 | Low | **FIXED** `6637578` | `next.config.ts` `headers()`: CSP + `X-Content-Type-Options` + `Referrer-Policy` + `X-Frame-Options` + `Permissions-Policy`. `script-src` keeps `'unsafe-inline'` (Next's unnonced bootstrap); nonce tightening noted as follow-up. Verified: all routes 200, a11y + registration journey pass. |
+| L-03 | Low | **FIXED** `5e6082d` | `rank_genre_taste_v1` over-fetches `limit × 4` (≤ 200), exact Python re-score + `canonical_slug` tie-break decides the cut, then truncates. ADR-007 updated; limit-boundary regression test. |
+| L-04 | Low | **FIXED** `7b05133` | Both importers prune releases (and Wikidata importer, aliases) whose name drifted, guarded by `owned_copies__isnull=True, editions__isnull=True` so PROTECT rows are never touched. |
+| **L-05** | Low | **FIXED** `592c5c9` (initial pass) | `isinstance` guard on `LoginView.post`, mirroring `RegisterView`. |
+| L-06 | Low | **FIXED** `7b05133` | `import_catalogue` now reports `Processed N (X new, Y already present)`; IGDB importer field semantics documented; the dead `sum(...) <= 0` disjunct left in place with the existing `if weight:` guard (removing it is a no-op — deferred as pure cosmetics). |
+| L-07 | Low | **FIXED** `6637578` | `MyLibraryView` returns `year` + `updated_at`; the Collection page's `recently_updated` (default) sort branch added. Cover/platform enrichment stays Plan 03. |
+
+### New issue found during remediation — NOT fixed
+
+**`scripts/check-evidence.ps1` is RED on `main`, pre-existing and independent of this work.**
+It fails before it even reaches the ledger checks:
+
+1. **ADR heading convention.** The gate requires seven exact Spanish headings
+   (`## Contexto`, `## Alternativas consideradas`, `## Decisión`, `## Evidencia y fuentes`,
+   `## Consecuencias`, `## Reversibilidad`, `## Aprobación y revisión`) plus the literal
+   string `Autor de la decisi…` in **every** `docs/adr/ADR-*.md`. **ADR-006** and
+   **ADR-007** (both written during Phase 01.1) use English headings, so the gate throws at
+   `ADR-006: missing required field '## Contexto'`. This has been red since those ADRs
+   landed; the phase verification/sign-off did not run this gate.
+2. **Stale artifact-hash pin.** After getting past (1) locally, the gate also throws
+   `Artifact hash mismatch: scripts/check-secrets.ps1` — a ledger entry pins an old hash of
+   a file that has since changed. (The `dependency-legitimacy.md` pin in the 2026-09-05
+   `@neon` entry was refreshed as part of this session's authorized `gunicorn` alta, since
+   that doc is append-only; the `check-secrets.ps1` one is untouched and still stale.)
+
+**Disposition: PROPOSED.** Fixing (1) is an author call on ADR language convention
+(conform ADR-006/007 to the Spanish scheme, or teach the checker both). Fixing (2) means
+re-pinning historical hashes in the evidence ledger — an integrity artifact the author
+should own. A dedicated *evidence-gate reconciliation* plan is the right home for both.
 
 ## Orchestrator-side checks (not part of the source review)
 

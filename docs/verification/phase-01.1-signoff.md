@@ -119,8 +119,31 @@ production database before any deploy decision.
   complete; the author explicitly expects UI changes regardless of whether the phase closes
   now.
 - The SC3 wiring gap is for a **small follow-up plan**.
-- **Deployment** is a separate decision the author will make when reviewing this package.
 - Phase 2 (Governed Corpus and Frozen Evaluation Contract) is **not** started.
+
+### Post-sign-off addenda (2026-09-06, same day)
+
+- **Deployment decision (author):** the author checked the Vercel dashboard — a build of
+  the redesigned frontend is live, but the catalogue is empty and the catalogue view
+  errors (the deployed database still holds only the 150-game corpus; the 312k IGDB
+  catalogue is local only). The author's decision: **leave the current public deployment
+  as-is for now.** The demo to examiners is run from the local `docker compose` stack;
+  wiring the deployment to real internet data (loading the catalogue into a deployed DB,
+  applying migrations, `NUM_PROXIES` / `ALLOWED_HOSTS`) is deferred to the end of the
+  project *"cuando todo esté montado"*. This is a recorded author decision, not an
+  outstanding defect against Phase 01.1's scope.
+- **Full-repo security remediation (author-authorised):** after the full-tree review
+  (`docs/verification/repo-review-2026-09-06.md`) the author instructed *"quiero que
+  apruebes todos en su totalidad"*. **All 16 review findings** (3 High / 6 Medium / 7 Low)
+  are now fixed across five committed batches (`a2b480a` auth/throttle, `7b05133` importer,
+  `5e6082d` search/recs, `6637578` frontend headers, `6370cf2` gunicorn/deploy config),
+  each verified (`pytest apps/api` 206 passed; `pnpm --dir apps/web build` + 16 web tests;
+  Playwright a11y 36 green under the new CSP). This adds one pinned dependency,
+  `gunicorn==23.0.0` (legitimacy recorded), and one migration,
+  `catalogue/0005_igdbimportrun_pass_cursor`. A separately-discovered pre-existing issue —
+  `scripts/check-evidence.ps1` is red on `main` (ADR-006/007 English headings vs the gate's
+  Spanish contract; a stale `check-secrets.ps1` hash pin) — remains **open / PROPOSED** for
+  a dedicated evidence-gate reconciliation.
 
 ## Reversibility
 
