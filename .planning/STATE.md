@@ -1,9 +1,9 @@
 ---
 gsd_state_version: 1.0
 status: closed
-stopped_at: Phase 2 context gathered
-last_updated: "2026-09-06T14:53:59.303Z"
-state_head: f5d65e7ffdd259561c9e43897557dfae844f84c7
+stopped_at: Phase 2 UI-SPEC approved
+last_updated: "2026-09-06T15:19:29.882Z"
+state_head: e548a2ed3e7be34c728524a244a0b865cb44b8de
 progress:
   total_phases: 8
   completed_phases: 2
@@ -130,7 +130,7 @@ TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<ver
 
 ## Session Continuity
 
-**Stopped at:** Phase 2 context gathered
+**Stopped at:** Phase 2 UI-SPEC approved
 
 **Author is remote (on mobile), at-the-helm delegation in effect.** Pre-approvals recorded below in this section's history and in `.continue-here.md`. Stop for the author only on: a genuine 01.1-06 design ambiguity, the deploy phase, anything destructive, or a failure. Mobile push is OFF in the author's /config — leave decision messages in the conversation.
 
@@ -139,7 +139,7 @@ TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<ver
 - **A — Plan 01.1-06 (Wave 3 redesign):** approved to run now. Task 1 (checkpoint "approve the UI-SPEC") is satisfied — `01.1-UI-SPEC.md` is checker-VERIFIED 7/7 ×3, `status: approved`. Before Task 2, ADD a per-surface coverage matrix to the UI-SPEC (rows: catalogue / detail / registration / recommendations, each naming desktop + mobile + accessibility + an explicit "approved" verdict) — the plan's Task 1 `<verify>` PowerShell gate greps for exactly that and the current spec lacks it. Then Task 2: implement across `apps/web` (globals.css tokens light+dark, AppShell navbar w/ ThemeToggle + login icon, GameCard w/ StatusPill/ScorePill/StarRating, catalogue, detail, NEW recommendations page, NEW register page visual/form-only) + collection + login per the post-approval additions (note the scope addition in the SUMMARY — they are not in the plan's `files_modified`). Verify: `pnpm --dir apps/web run build` passes. Brand assets are staged at `design/brand/` — wire per `design/brand/README.md` checklist (favicon route, AppShell brand, opengraph-image, drop the "02 / CRISTAL" round label).
 - **B — Persistent catalogue load:** approved. Run the now-merged `import_igdb_catalogue` against the real dev DB `savepoint-db-1` in the background (~1–1.5h; must coexist with the existing 150-game `source="wikidata"` corpus + demo accounts/library — watch for coexistence bugs), then `pg_dump` a reusable snapshot (NOT a committed bulk file — ADR-006). This load also produces the deferred deterministic sample manifest for `igdb-catalogue-freeze.md`. Deployed Neon load deferred to the deploy phase (check free-tier size for ~312k rows then).
 
-Last session: 2026-09-06T14:53:58.986Z
+Last session: 2026-09-06T15:19:29.622Z
 
 ### Done this session (all merged + pushed to `origin/main` through `507f876`)
 
@@ -148,4 +148,4 @@ Last session: 2026-09-06T14:53:58.986Z
 - **Wave 3 prep** — `01.1-UI-SPEC.md` checker-VERIFIED 7/7 ×3, `status: approved`; 4 design decisions author-ratified (light+dark theme w/ SSR cookie toggle; ~156px grid no list-toggle; tiered ScorePill + gold personal stars; genre shelves for REC-10); Collection screen + navbar person-icon login added on author direction; 6 mockups in `mockups/`.
 - **Brand** — author's "Cristal" identity staged at `design/brand/` (mark/lockup/favicon/OG-banner × dark+light + mono; mojibake repaired). NOT wired to the app; `design/brand/README.md` has the 01.1-06 integration checklist.
 
-Resume file: .planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/02-CONTEXT.md
+Resume file: .planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/02-UI-SPEC.md
