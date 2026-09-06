@@ -115,7 +115,14 @@ class Command(BaseCommand):
         release_date = None
         ts = row.get("first_release_date")
         if isinstance(ts, (int, float)):
-            release_date = datetime.fromtimestamp(int(ts), tz=timezone.utc).date()
+            # A corrupt/out-of-range epoch value (huge -> OverflowError, deep
+            # negative -> OSError on some platforms, non-finite -> ValueError)
+            # must degrade to "no date", never raise past the per-row skip and
+            # mark the whole resumable run FAILED (repo-review 2026-09-06 M-04).
+            try:
+                release_date = datetime.fromtimestamp(int(ts), tz=timezone.utc).date()
+            except (ValueError, OverflowError, OSError):
+                release_date = None
 
         total_rating = None
         rating = row.get("total_rating")
@@ -283,20 +290,36 @@ class Command(BaseCommand):
 
         work.genres.set([self._genre_for(gid, gname) for gid, gname in norm["genres"]])
 
+        written_release_names: list[str] = []
         if norm["platforms"]:
             for pname in norm["platforms"]:
                 platform = self._platform_for(pname)
+                release_name = f"{norm['name']} ({pname})"
+                written_release_names.append(release_name)
                 GameRelease.objects.update_or_create(
                     work=work,
-                    release_name=f"{norm['name']} ({pname})",
+                    release_name=release_name,
                     defaults={"platform": platform, "release_date": norm["release_date"]},
                 )
         else:
+            written_release_names.append(norm["name"])
             GameRelease.objects.update_or_create(
                 work=work,
                 release_name=norm["name"],
                 defaults={"platform": None, "release_date": norm["release_date"]},
             )
+
+        # A prior import may have written releases under a now-stale name
+        # (title or platform label changed upstream). Drop those so the
+        # catalogue converges instead of accumulating duplicates -- but never
+        # one a user already owns or that carries editions (both PROTECT), so
+        # a title change can't raise ProtectedError and wedge the batch
+        # (repo-review 2026-09-06 L-04).
+        (
+            work.releases.exclude(release_name__in=written_release_names)
+            .filter(owned_copies__isnull=True, editions__isnull=True)
+            .delete()
+        )
 
         AssetAttribution.objects.update_or_create(
             work=work,
@@ -447,12 +470,20 @@ class Command(BaseCommand):
             source="igdb", query_identity=query_identity
         )
 
-        resuming = run.status != IgdbImportRun.Status.COMPLETE and run.last_committed_igdb_id > 0
-        pass_start = run.last_committed_igdb_id if resuming else 0
+        # Resume from the CURRENT pass's own cursor, not the monotonic
+        # high-water mark. After a COMPLETE pass a chunked rerun (--max-batches)
+        # restarts at 0; earlier this reused last_committed_igdb_id, so a rerun
+        # that was then interrupted and resumed would jump straight back to the
+        # stale high-water mark and skip every id below it while still
+        # finalizing COMPLETE with a fresh checksum -- a false converged pass
+        # (repo-review 2026-09-06 H-02).
+        resuming = run.status != IgdbImportRun.Status.COMPLETE and run.pass_cursor > 0
+        pass_start = run.pass_cursor if resuming else 0
 
         run.status = IgdbImportRun.Status.RUNNING
         run.error_summary = ""
         run.eligible_count_live = eligible
+        run.pass_cursor = pass_start
         run.batches_committed = 0
         run.works_imported = 0
         run.works_updated = 0
@@ -504,13 +535,18 @@ class Command(BaseCommand):
                     # all skipped, so the cursor cannot stall on a poison tail.
                     batch_last_id = max(batch_last_id, page_last_id)
 
+                    # last_committed_igdb_id is the non-regressing evidence
+                    # boundary; pass_cursor tracks this pass and is what a
+                    # resume restarts from (H-02).
                     run.last_committed_igdb_id = max(run.last_committed_igdb_id, batch_last_id)
+                    run.pass_cursor = batch_last_id
                     run.batches_committed = batches + 1
                     run.works_imported += batch_created
                     run.works_updated += batch_updated
                     run.save(
                         update_fields=[
                             "last_committed_igdb_id",
+                            "pass_cursor",
                             "batches_committed",
                             "works_imported",
                             "works_updated",
@@ -552,6 +588,12 @@ class Command(BaseCommand):
             .filter(display_allowed=True)
             .count()
         )
+        # Field semantics (repo-review 2026-09-06 L-06): on a COMPLETE run
+        # works_imported is the all-time IGDB catalogue size (DB truth, so a
+        # resumed-to-completion run matches a single clean run), while
+        # works_updated stays this-pass-only. The per-pass created/updated
+        # counts live in the evidence JSON as works_created_this_pass /
+        # works_updated_this_pass.
         run.works_imported = total_works
         run.works_updated = updated_total
         run.covers_present = covers_present

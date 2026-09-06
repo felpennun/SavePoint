@@ -103,6 +103,7 @@ class Command(BaseCommand):
             for qid in asset.get("game_qids", []):
                 assets_by_qid.setdefault(qid, []).append(asset)
 
+        processed_works = 0
         created_works = 0
         with transaction.atomic():
             with connection.cursor() as cursor:
@@ -137,7 +138,8 @@ class Command(BaseCommand):
                         title_en=title_en,
                         title_es=title_es,
                     )
-                created_works += 1
+                    created_works += 1
+                processed_works += 1
 
                 SourceRecord.objects.update_or_create(
                     source="wikidata",
@@ -151,15 +153,25 @@ class Command(BaseCommand):
                     },
                 )
 
+                written_alias_keys: list[tuple[str, str]] = []
                 for locale, title in (("en", title_en), ("es", title_es)):
                     if not title:
                         continue
+                    normalized = normalize_title(title)
+                    written_alias_keys.append((locale, normalized))
                     GameAlias.objects.update_or_create(
                         work=work,
                         locale=locale,
-                        normalized_value=normalize_title(title),
+                        normalized_value=normalized,
                         defaults={"value": title},
                     )
+                # Drop aliases from a previous import whose title drifted
+                # (repo-review 2026-09-06 L-04). GameAlias.work is CASCADE with
+                # no protected dependents, so this is always safe.
+                stale_aliases = work.aliases.all()
+                for existing_alias in stale_aliases:
+                    if (existing_alias.locale, existing_alias.normalized_value) not in written_alias_keys:
+                        existing_alias.delete()
 
                 release_date = None
                 if game.get("release_dates"):
@@ -171,16 +183,27 @@ class Command(BaseCommand):
                         release_date = f"{match.group(1)}-{match.group(2)}-{match.group(3)}"
 
                 platform_names = game.get("platforms") or ["Unknown"]
+                written_release_names: list[str] = []
                 for platform_name in platform_names:
                     platform, _ = Platform.objects.get_or_create(
                         name=platform_name,
                         defaults={"slug": slugify(platform_name)[:150] or "platform"},
                     )
+                    release_name = f"{original_title} ({platform_name})"
+                    written_release_names.append(release_name)
                     GameRelease.objects.update_or_create(
                         work=work,
-                        release_name=f"{original_title} ({platform_name})",
+                        release_name=release_name,
                         defaults={"platform": platform, "release_date": release_date},
                     )
+                # Prune releases whose name drifted since a prior import, but
+                # never one a user owns or that has editions (both PROTECT)
+                # (repo-review 2026-09-06 L-04).
+                (
+                    work.releases.exclude(release_name__in=written_release_names)
+                    .filter(owned_copies__isnull=True, editions__isnull=True)
+                    .delete()
+                )
 
                 for asset in assets_by_qid.get(qid, []):
                     AssetAttribution.objects.update_or_create(
@@ -197,4 +220,10 @@ class Command(BaseCommand):
                         },
                     )
 
-        self.stdout.write(self.style.SUCCESS(f"Imported {created_works} games from snapshot {snapshot_sha256[:12]}..."))
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Processed {processed_works} games ({created_works} new, "
+                f"{processed_works - created_works} already present) "
+                f"from snapshot {snapshot_sha256[:12]}..."
+            )
+        )

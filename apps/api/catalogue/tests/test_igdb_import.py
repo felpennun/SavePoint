@@ -290,6 +290,41 @@ def test_reimport_is_idempotent_and_convergent() -> None:
 
 
 @pytest.mark.django_db
+def test_chunked_reimport_after_complete_does_not_skip_the_committed_range() -> None:
+    """Regression (repo-review 2026-09-06 H-02): a chunked re-import after a
+    COMPLETE pass must rescan from id 0 and, if interrupted and resumed, pick
+    up from *this pass's* cursor -- not jump forward to the stale monotonic
+    high-water mark and silently skip everything below it."""
+    _run_import(FakeIgdbClient(_two_full_pages(), eligible=4))
+    run = IgdbImportRun.objects.get(source="igdb", query_identity="game_type=0")
+    assert run.status == IgdbImportRun.Status.COMPLETE
+    assert run.last_committed_igdb_id == 40
+
+    # Re-import in one-batch chunks: the first chunk rescans page 1 (ids 10, 20)
+    # and stops, resumable.
+    _run_import(FakeIgdbClient(_two_full_pages(), eligible=4), max_batches=1)
+    run.refresh_from_db()
+    assert run.status == IgdbImportRun.Status.INTERRUPTED
+    assert run.pass_cursor == 20
+    assert run.last_committed_igdb_id == 40  # monotonic guard unmoved
+
+    # Simulate a page-2 row needing to be re-processed (an upstream change):
+    # corrupt one of its works locally. A correct resume re-fetches page 2
+    # and the upsert on id 30 restores it; the buggy resume jumps past id 40
+    # and leaves the corruption in place.
+    GameWork.objects.filter(canonical_slug="gamma").update(original_title="STALE-DO-NOT-KEEP")
+
+    _run_import(FakeIgdbClient(_two_full_pages(), eligible=4))
+    run.refresh_from_db()
+    assert run.status == IgdbImportRun.Status.COMPLETE
+    assert run.pass_cursor == 40
+    assert GameWork.objects.get(canonical_slug="gamma").original_title == "Gamma", (
+        "resume jumped past the committed range and skipped page 2"
+    )
+    assert SourceRecord.objects.filter(source="igdb").count() == 4
+
+
+@pytest.mark.django_db
 def test_import_coexists_with_preexisting_wikidata_platform_colliding_on_slug() -> None:
     """Regression (Plan 01.1-02 follow-up): the IGDB import must reconcile a
     shared lookup entity (Platform) on its natural key against a row that

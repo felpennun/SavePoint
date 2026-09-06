@@ -232,6 +232,13 @@ class IgdbImportRun(models.Model):
     source = models.CharField(max_length=50, default="igdb")
     query_identity = models.CharField(max_length=200)
     last_committed_igdb_id = models.BigIntegerField(default=0)
+    # In-progress cursor for the CURRENT pass. Unlike last_committed_igdb_id
+    # (a monotonic, trigger-guarded high-water mark used as the evidence
+    # boundary), this is reset to 0 whenever a fresh pass begins and is the
+    # value a resume actually restarts from -- so a chunked re-import after a
+    # COMPLETE pass can no longer jump forward to the stale high-water mark
+    # and silently skip the range in between (repo-review 2026-09-06 H-02).
+    pass_cursor = models.BigIntegerField(default=0)
     batches_committed = models.PositiveIntegerField(default=0)
     works_imported = models.PositiveIntegerField(default=0)
     works_updated = models.PositiveIntegerField(default=0)
