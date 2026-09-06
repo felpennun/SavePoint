@@ -34,8 +34,10 @@ GAMES_COUNT_URL = "https://api.igdb.com/v4/games/count"
 # Apicalypse field list -- dot expansion keeps genres/platforms/cover to a
 # single request per page (ADR-006 anti-pattern: no N+1 per-game lookups).
 GAME_FIELDS = (
-    "id,name,slug,url,first_release_date,total_rating,"
-    "genres.id,genres.name,platforms.id,platforms.name,cover.image_id"
+    "id,name,slug,url,first_release_date,total_rating,total_rating_count,"
+    "rating,rating_count,summary,genres.id,genres.name,platforms.id,platforms.name,"
+    "alternative_names.name,franchises.name,collections.name,"
+    "involved_companies.company.name,involved_companies.developer,cover.image_id"
 )
 
 DEFAULT_TIMEOUT = (10, 45)          # (connect, read) seconds

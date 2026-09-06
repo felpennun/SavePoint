@@ -50,6 +50,9 @@ class GameWork(models.Model):
     # on a 0-100 scale (null = unrated).
     first_release_date = models.DateField(null=True, blank=True)
     total_rating = models.FloatField(null=True, blank=True)
+    rating = models.FloatField(null=True, blank=True)
+    rating_count = models.PositiveIntegerField(null=True, blank=True)
+    total_rating_count = models.PositiveIntegerField(null=True, blank=True)
     # Governed-corpus state is deliberately additive and reversible. The
     # source catalogue remains intact for later discovery phases.
     in_corpus = models.BooleanField(default=False)

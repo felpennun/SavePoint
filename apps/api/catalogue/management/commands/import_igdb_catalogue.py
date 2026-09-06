@@ -48,6 +48,7 @@ from django.utils.text import slugify
 from catalogue.igdb import IgdbClient, redact
 from catalogue.models import (
     AssetAttribution,
+    GameAlias,
     GameRelease,
     GameWork,
     Genre,
@@ -55,6 +56,7 @@ from catalogue.models import (
     Platform,
     SourceRecord,
 )
+from catalogue.normalization import normalize_title
 
 # Transaction-scoped advisory lock key -- distinct from the Wikidata importer's
 # 725_01_06 so the two imports never contend with each other.
@@ -125,9 +127,57 @@ class Command(BaseCommand):
                 release_date = None
 
         total_rating = None
-        rating = row.get("total_rating")
-        if isinstance(rating, (int, float)):
-            total_rating = round(float(rating), 4)
+        raw_total_rating = row.get("total_rating")
+        if isinstance(raw_total_rating, (int, float)):
+            total_rating = round(float(raw_total_rating), 4)
+
+        user_rating = None
+        raw_rating = row.get("rating")
+        if isinstance(raw_rating, (int, float)):
+            user_rating = round(float(raw_rating), 4)
+
+        rating_count = row.get("rating_count")
+        if not isinstance(rating_count, int) or isinstance(rating_count, bool) or rating_count < 0:
+            rating_count = None
+        total_rating_count = row.get("total_rating_count")
+        if (
+            not isinstance(total_rating_count, int)
+            or isinstance(total_rating_count, bool)
+            or total_rating_count < 0
+        ):
+            total_rating_count = None
+        summary = str(row.get("summary") or "").strip()
+        title_en = str(row.get("title_en") or name).strip()
+
+        alternative_names = []
+        for alias in row.get("alternative_names") or []:
+            if isinstance(alias, dict):
+                value = str(alias.get("name") or "").strip()
+            else:
+                value = str(alias or "").strip()
+            if value:
+                alternative_names.append(value)
+
+        franchises = [
+            str(item.get("name") or "").strip()
+            for item in row.get("franchises") or []
+            if isinstance(item, dict) and str(item.get("name") or "").strip()
+        ]
+        collections = [
+            str(item.get("name") or "").strip()
+            for item in row.get("collections") or []
+            if isinstance(item, dict) and str(item.get("name") or "").strip()
+        ]
+        involved_companies = []
+        for item in row.get("involved_companies") or []:
+            if not isinstance(item, dict):
+                continue
+            company = item.get("company") or {}
+            company_name = str(company.get("name") or "").strip() if isinstance(company, dict) else ""
+            if company_name:
+                involved_companies.append(
+                    {"name": company_name, "developer": bool(item.get("developer"))}
+                )
 
         genres = []
         for g in row.get("genres") or []:
@@ -147,10 +197,19 @@ class Command(BaseCommand):
         return {
             "igdb_id": igdb_id,
             "name": name,
+            "title_en": title_en,
             "base_slug": base_slug,
             "source_url": str(row.get("url") or f"https://www.igdb.com/games/{slugify(slug_source)}"),
             "release_date": release_date,
             "total_rating": total_rating,
+            "rating": user_rating,
+            "rating_count": rating_count,
+            "total_rating_count": total_rating_count,
+            "summary": summary,
+            "alternative_names": sorted(set(alternative_names)),
+            "franchises": sorted(set(franchises)),
+            "collections": sorted(set(collections)),
+            "involved_companies": involved_companies,
             "genres": genres,
             "platforms": sorted(set(platforms)),
             "cover_url": cover_url,
@@ -162,8 +221,17 @@ class Command(BaseCommand):
             "igdb_id": norm["igdb_id"],
             "slug": norm["canonical_slug"],
             "title": norm["name"],
+            "title_en": norm["title_en"],
             "first_release_date": norm["release_date"].isoformat() if norm["release_date"] else None,
             "total_rating": norm["total_rating"],
+            "rating": norm["rating"],
+            "rating_count": norm["rating_count"],
+            "total_rating_count": norm["total_rating_count"],
+            "summary": norm["summary"],
+            "alternative_names": norm["alternative_names"],
+            "franchises": norm["franchises"],
+            "collections": norm["collections"],
+            "involved_companies": norm["involved_companies"],
             "genres": sorted(gid for gid, _ in norm["genres"]),
             "platforms": norm["platforms"],
             "cover": norm["cover_url"],
@@ -251,10 +319,14 @@ class Command(BaseCommand):
             work = existing.work
             work.canonical_slug = norm["canonical_slug"]
             work.original_title = norm["name"]
-            work.title_en = norm["name"]
+            work.title_en = norm["title_en"]
             work.is_dlc = False
             work.first_release_date = norm["release_date"]
             work.total_rating = norm["total_rating"]
+            work.rating = norm["rating"]
+            work.rating_count = norm["rating_count"]
+            work.total_rating_count = norm["total_rating_count"]
+            work.summary = norm["summary"]
             work.save(
                 update_fields=[
                     "canonical_slug",
@@ -263,6 +335,10 @@ class Command(BaseCommand):
                     "is_dlc",
                     "first_release_date",
                     "total_rating",
+                    "rating",
+                    "rating_count",
+                    "total_rating_count",
+                    "summary",
                 ]
             )
             outcome = "updated"
@@ -270,9 +346,13 @@ class Command(BaseCommand):
             work = GameWork.objects.create(
                 canonical_slug=norm["canonical_slug"],
                 original_title=norm["name"],
-                title_en=norm["name"],
+                title_en=norm["title_en"],
                 first_release_date=norm["release_date"],
                 total_rating=norm["total_rating"],
+                rating=norm["rating"],
+                rating_count=norm["rating_count"],
+                total_rating_count=norm["total_rating_count"],
+                summary=norm["summary"],
             )
             outcome = "created"
 
@@ -289,6 +369,33 @@ class Command(BaseCommand):
         )
 
         work.genres.set([self._genre_for(gid, gname) for gid, gname in norm["genres"]])
+
+        # IGDB is the owner of the English alias set. The legacy Wikidata
+        # importer also uses locale=en/es but its Spanish aliases are kept;
+        # no unmarked alias is deleted outside the English import boundary.
+        desired_aliases: dict[str, str] = {}
+        for value in [norm["name"], *norm["alternative_names"]]:
+            normalized = normalize_title(value)
+            if normalized:
+                desired_aliases.setdefault(normalized, value)
+        title_en = str(norm.get("title_en") or "").strip()
+        if title_en and normalize_title(title_en) not in desired_aliases:
+            desired_aliases[normalize_title(title_en)] = title_en
+        GameAlias.objects.bulk_create(
+            [
+                GameAlias(work=work, locale="en", value=value, normalized_value=normalized)
+                for normalized, value in desired_aliases.items()
+            ],
+            ignore_conflicts=True,
+            batch_size=5000,
+        )
+        for normalized, value in desired_aliases.items():
+            GameAlias.objects.filter(
+                work=work, locale="en", normalized_value=normalized
+            ).update(value=value)
+        work.aliases.filter(locale="en").exclude(
+            normalized_value__in=desired_aliases
+        ).delete()
 
         written_release_names: list[str] = []
         if norm["platforms"]:

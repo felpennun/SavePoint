@@ -21,6 +21,7 @@ from django.db import DatabaseError, IntegrityError, transaction
 from catalogue.igdb import IgdbClient, IgdbClientError, redact
 from catalogue.models import (
     AssetAttribution,
+    GameAlias,
     GameRelease,
     GameWork,
     Genre,
@@ -28,6 +29,7 @@ from catalogue.models import (
     Platform,
     SourceRecord,
 )
+from catalogue.normalization import normalize_title
 
 
 # ---------------------------------------------------------------------------
@@ -124,6 +126,12 @@ def _game(
     platforms: tuple[tuple[int, str], ...] = (),
     cover: str | None = None,
     first_release_date: int | None = None,
+    rating: float | None = None,
+    rating_count: int | None = None,
+    total_rating_count: int | None = None,
+    summary: str | None = None,
+    alternative_names: tuple[str, ...] = (),
+    title_en: str | None = None,
 ) -> dict:
     row: dict = {"id": igdb_id, "name": name, "slug": slug or name.lower().replace(" ", "-")}
     row["url"] = f"https://www.igdb.com/games/{row['slug']}"
@@ -135,7 +143,87 @@ def _game(
         row["cover"] = {"image_id": cover}
     if first_release_date is not None:
         row["first_release_date"] = first_release_date
+    if rating is not None:
+        row["rating"] = rating
+    if rating_count is not None:
+        row["rating_count"] = rating_count
+    if total_rating_count is not None:
+        row["total_rating_count"] = total_rating_count
+    if summary is not None:
+        row["summary"] = summary
+    if alternative_names:
+        row["alternative_names"] = [{"name": value} for value in alternative_names]
+    if title_en is not None:
+        row["title_en"] = title_en
     return row
+
+
+@pytest.mark.django_db
+def test_igdb_import_maps_user_ratings_summary_and_reconciles_english_aliases() -> None:
+    page = [[
+        _game(
+            909,
+            "Café Quest",
+            title_en="Cafe Quest",
+            rating=87.5,
+            rating_count=123,
+            total_rating_count=140,
+            summary="A short summary.",
+            alternative_names=("Cafe Adventure", "Old Cafe Quest"),
+        )
+    ]]
+    _run_import(FakeIgdbClient(page, eligible=1))
+
+    work = GameWork.objects.get(canonical_slug="cafe-quest")
+    assert work.rating == 87.5
+    assert work.rating_count == 123
+    assert work.total_rating_count == 140
+    assert work.summary == "A short summary."
+    assert normalize_title("Café Quest") in set(work.aliases.values_list("normalized_value", flat=True))
+    assert normalize_title("Cafe Quest") in set(work.aliases.values_list("normalized_value", flat=True))
+    assert normalize_title("Cafe Adventure") in set(work.aliases.values_list("normalized_value", flat=True))
+
+    GameAlias.objects.create(
+        work=work,
+        locale="en",
+        value="stale alias",
+        normalized_value="stale alias",
+    )
+    GameAlias.objects.create(
+        work=work,
+        locale="es",
+        value="Alias legado",
+        normalized_value="alias legado",
+    )
+    changed = [[
+        _game(
+            909,
+            "Café Quest",
+            title_en="Cafe Quest",
+            rating=88.0,
+            rating_count=124,
+            total_rating_count=141,
+            summary="A changed summary.",
+            alternative_names=("Cafe Adventure",),
+        )
+    ]]
+    _run_import(FakeIgdbClient(changed, eligible=1))
+
+    work.refresh_from_db()
+    assert work.rating == 88.0
+    assert work.summary == "A changed summary."
+    assert not work.aliases.filter(normalized_value="stale alias").exists()
+    assert work.aliases.filter(normalized_value="alias legado", locale="es").exists()
+    assert work.aliases.filter(locale="en").count() == 2
+
+
+@pytest.mark.django_db
+def test_igdb_import_keeps_omitted_rating_fields_null() -> None:
+    _run_import(FakeIgdbClient([[_game(910, "No Rating")]], eligible=1))
+    work = GameWork.objects.get(canonical_slug="no-rating")
+    assert work.rating is None
+    assert work.rating_count is None
+    assert work.total_rating_count is None
 
 
 class FakeIgdbClient:
