@@ -145,6 +145,17 @@ acotación de propiedad en todas las vistas de datos personales; escrituras tran
 con bloqueo de fila y restricciones de unicidad como guarda real de carreras; higiene de
 secretos con redacción en registros y excepciones.
 
+\section{Correcciones posteriores al cierre de la Fase 01.1}\label{sec:pru-post-cierre}
+
+Después de la firma de la Fase 01.1, una primera tanda de correcciones surgidas de la propia
+revisión de producto del autor se aplicó sobre la rama principal. La página de inicio dejó de
+mostrar una llamada a la acción de acceso redundante. El formulario de registro pasó a
+devolver los incumplimientos concretos de la política de contraseñas en lugar de un mensaje
+impreciso. La comparación del nombre de usuario en el acceso se hizo insensible a mayúsculas,
+para casar con la comprobación de unicidad, que ya lo era. Se añadió un punto de acceso
+pequeño, \texttt{GET /api/accounts/me/}, para que la barra de navegación pueda nombrar la
+cuenta activa.
+
 \section{Lectura de los resultados}\label{sec:pru-lectura}
 
 Las cifras anteriores respaldan afirmaciones acotadas. El sistema tiene una cobertura de

@@ -72,25 +72,60 @@ El trabajo futuro es el núcleo académico del proyecto y está planificado en l
 No existe todavía ningún resultado de comparación de recomendadores. Esta memoria no presenta
 ninguno.
 
-La Fase 2 establecerá el corpus de investigación inmutable y el contrato de evaluación
-congelado: relevancia, valor de la lista, usuarios, candidatos, exclusiones, repartos,
-métricas, semillas y presupuesto de ajuste, todos fijados antes de comparar ningún algoritmo,
-con escenarios de usuarios sintéticos parametrizados y reproducibles. La Fase 3 completará
-los flujos de colección y la portabilidad de datos. La Fase 4 añadirá el descubrimiento
-público y el enriquecimiento de datos resiliente y atribuible.
+La Fase 2 es, en el momento de esta entrega, una fase diseñada y planificada por completo,
+aunque no ejecutada. Se produjo con el mismo proceso gobernado que las fases ya cerradas:
+discusión registrada, investigación, contrato de diseño de interfaz, plan y verificación
+independiente del plan. El resultado son trece planes ejecutables repartidos en seis oleadas.
+La fase establece el corpus de investigación gobernado, mediante una lista blanca de
+plataformas y de calidad que incluye Steam, junto con las valoraciones externas de usuarios,
+con su procedencia y una instantánea inmutable que impide que datos posteriores del proveedor
+alteren un experimento ya cerrado. Sobre esa base, la fase incorpora dos contribuciones
+metodológicas que el autor ha diseñado y que el tribunal puede evaluar como decisiones
+observables.
 
-Las Fases 5 a 8 son el trabajo de recomendadores propiamente dicho. La Fase 5 construirá el
-banco de experimentos reproducible con los baselines aleatorio y de popularidad, con métricas
-de acierto, cobertura, diversidad y novedad, además de artefactos de experimento inmutables a
-partir de los que recalcular los resultados sin volver a ejecutar los modelos. La Fase 6
-entregará el recomendador basado en contenido, con explicaciones deterministas ancladas en
-evidencia real del modelo y con una estrategia explícita de arranque en frío. La Fase 7
-comparará métodos de filtrado colaborativo e híbridos bajo el mismo protocolo ya congelado,
-con conclusiones acotadas a la simulación sintética. La Fase 8 presentará la comparación en
-un panel accesible que exporte tablas y figuras listas para la memoria. También cerrará el
-endurecimiento de seguridad, la recuperación y la congelación de la evidencia.
+La primera es un protocolo de evaluación congelado y consciente de la simulación, que se fija
+antes de comparar ningún recomendador avanzado y no se modifica después. Reparte los datos
+dejando una interacción fuera por persona usuaria (\textit{leave-one-out}) y evalúa en las
+posiciones de corte K iguales a 5, 10 y 20. La métrica principal es la ganancia acumulada
+descontada y normalizada (nDCG), evaluada en la posición diez y anotada nDCG@10. El ajuste de
+hiperparámetros se limita a una rejilla acotada de como mucho veinticuatro configuraciones,
+medidas sobre un reparto de validación disjunto del de prueba, con una única ejecución final
+sobre el conjunto de prueba. El protocolo documenta además un conjunto cerrado de métricas de
+ranking y de métricas más allá del acierto, como la cobertura, la diversidad y la novedad. La
+población de evaluación son unas doscientas personas usuarias sintéticas, generadas a partir
+de unos ocho arquetipos parametrizados y reproducibles por semilla, con una cohorte explícita
+de arranque en frío. Fijar todo esto por adelantado es un compromiso metodológico deliberado
+contra dos malas prácticas concretas: ajustar sobre el conjunto de prueba y elegir a
+posteriori la métrica que favorece a un algoritmo.
 
-El heurístico de afinidad por géneros de esta entrega da a la Fase 6 un contrato de página y
+La segunda contribución es un primer recomendador basado en contenido, construido de forma
+deliberada como un laboratorio de variantes con nombre y no como un único algoritmo. Cada
+obra se representa con un vector de características que reúne géneros, plataformas, franquicia,
+estudio de desarrollo y una señal derivada de la valoración de usuarios. El perfil de cada
+persona usuaria es un vector agregado, ponderado por su actividad registrada. La afinidad se
+mide con la similitud del coseno. El modo de combinación de las puntuaciones se trata como un
+parámetro que se compara, con tres valores: suma ponderada (\texttt{weighted\_sum}),
+combinación multiplicativa (\texttt{multiplicative}) y dos etapas (\texttt{two\_stage}). Cada
+modo es un algoritmo con nombre y versión, que se compara bajo el protocolo anterior frente a
+los baselines aleatorio y de popularidad. Cada recomendación lleva una explicación
+determinista anclada en las características persistidas. Una persona con historial escaso
+recibe una vía explícita de arranque en frío en lugar de una lista vacía.
+
+La Fase 3 ejecuta el banco congelado sobre los baselines aleatorio y de popularidad y sobre
+recomendadores de contenido adicionales, con enrutado de arranque en frío, exclusiones,
+explicaciones deterministas y la batería completa de métricas de acierto, ranking, cobertura,
+diversidad y novedad, informada por cohortes que incluyen a las personas sin historial y a
+las de historial escaso, a partir de artefactos inmutables que un tercero puede recalcular
+sin volver a ejecutar los modelos. La Fase 4 compara métodos de filtrado colaborativo e
+híbridos bajo ese mismo protocolo ya congelado, con conclusiones acotadas a la simulación
+sintética. La Fase 5 completa los flujos de colección y la portabilidad de datos. La Fase 6
+añade el descubrimiento público y el enriquecimiento de datos resiliente y atribuible sin
+contaminar los datos de investigación. La Fase 7 presenta la comparación en un panel de
+investigación accesible que exporta tablas y figuras listas para la memoria. También cierra
+el endurecimiento de seguridad, la recuperación ante desastre, la accesibilidad y la
+congelación de la evidencia.
+
+El heurístico de afinidad por géneros de esta entrega da a la Fase 3 un contrato de página y
 de punto de acceso ya cableado que sustituir, sin adelantar ni difuminar la comparación
 rigurosa que vendrá después.
 
