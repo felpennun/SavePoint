@@ -1,14 +1,15 @@
 \chapter{Datos: adquisición, licencias y procedencia}\label{cap:datos}
 
 Este capítulo describe de dónde salen los datos del catálogo, bajo qué licencia se usan y qué
-evidencia de procedencia se conserva. El proyecto tiene dos corpus. El primero es el corpus congelado de la Fase 1, procedente de
-Wikidata, que actúa como la referencia citable y estable. El segundo es la importación a
-escala real de la Fase 01.1, procedente de IGDB, que es el catálogo a escala de producto. Los
-dos conviven en la base de datos, indexados por su fuente.
+evidencia de procedencia se conserva. El sistema integra dos fuentes de datos de catálogo. La
+primera es un corpus curado de ciento cincuenta juegos procedente de Wikidata, que actúa como
+la referencia citable y estable. La segunda es el catálogo a escala real procedente de IGDB,
+con más de trescientas mil obras. Las dos conviven en la base de datos, indexadas por su
+fuente.
 
-\section{El corpus congelado de la Fase 1}\label{sec:datos-wikidata}
+\section{El corpus curado de Wikidata}\label{sec:datos-wikidata}
 
-El corpus de la Fase 1 son ciento cincuenta juegos de datos estructurados de Wikidata,
+El corpus curado son ciento cincuenta juegos de datos estructurados de Wikidata,
 publicados bajo la dedicación al dominio público \textit{Creative Commons Zero}
 (CC0)~\cite{wikidata-licensing}. La adquisición se hace fuera de línea con un guion que
 lanza una consulta filtrada por clase contra el punto de acceso SPARQL de Wikidata, resuelve
@@ -26,9 +27,9 @@ sustituyeron por un marcador de reserva de primera parte~\cite{commons-reuse}. E
 conserva solo como procedencia en \texttt{SourceRecord}, nunca como clave primaria, de modo
 que la identidad del producto no queda acoplada a la fuente.
 
-\section{La importación a escala real de IGDB}\label{sec:datos-igdb}
+\section{El catálogo a escala real de IGDB}\label{sec:datos-igdb}
 
-La Fase 01.1 hace crecer el catálogo hasta la escala de un producto real con la API de
+El catálogo a la escala de un producto real se construye con la API de
 versión 4 de IGDB~\cite{igdb-api}. El requisito DATA-04 exige elegir la fuente mediante una
 comparación documentada de cobertura, plataformas, licencia, atribución, cuotas, estabilidad
 y coste. La Tabla~\ref{tab:data04} resume esa comparación, que se apoya en un sondeo
@@ -66,7 +67,7 @@ cero, a cambio de una obligación de atribución continua. La frontera de catego
 \texttt{game\_type = 0}, es decir, solo juegos principales; el contenido descargable, las
 expansiones, los paquetes y los ports quedan excluidos del catálogo primario. Las portadas se
 sirven por enlace directo al servidor de imágenes de IGDB, no se replican, con el marcador de
-reserva de primera parte de la Fase 1 como alternativa cuando una portada falta o falla. La
+reserva de primera parte como alternativa cuando una portada falta o falla. La
 regla de caché y redistribución se apoya en el texto de la propia documentación de la API,
 que prefiere que el integrador almacene y sirva los datos a sus usuarios finales, texto que
 se registra literalmente en el repositorio como la autorización escrita que contempla el
@@ -138,7 +139,7 @@ Toda dependencia directa nueva o cambio de versión pasa por un gate: aprobació
 explícita, verificación de la ficha oficial del repositorio de paquetes, fijación a versión
 exacta con su árbol transitivo en el fichero de bloqueo, una fila en
 \texttt{docs/verification/dependency-legitimacy.md}, una fila en el gate
-\texttt{check-dependencies.ps1} y una entrada en el registro de agentes. En esta entrega solo
+\texttt{check-dependencies.ps1} y una entrada en el registro de agentes. En el sistema solo
 se añadieron dos dependencias directas. La primera es \texttt{requests} en la versión 2.34.2,
 para el importador de IGDB. La segunda es \texttt{gunicorn} en la versión 23.0.0, como
 servidor de producción de la API tras una revisión de código. Ambas se verificaron contra la

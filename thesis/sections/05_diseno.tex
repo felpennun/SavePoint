@@ -53,7 +53,7 @@ límites de dominio y las migraciones actúan como puntos de salida si una decis
     \hline
     ADR-006 & IGDB como fuente del catálogo a escala real, con portadas por enlace directo. Cobertura real y modelado de género y plataforma de primera clase, a cambio de una obligación de atribución continua y de una licencia que es un acuerdo, no una dedicación al dominio público. \\
     \hline
-    ADR-007 & Heurístico determinista de afinidad por géneros para la página de recomendaciones. Entrega el requisito como página real y explicable sin adelantar el trabajo de recomendadores de la Fase 3, del que queda explícitamente fuera. \\
+    ADR-007 & Heurístico determinista de afinidad por géneros para la página de recomendaciones. Entrega el requisito como página real y explicable sin adelantar una comparación sistemática de recomendadores, que queda fuera del alcance de esta memoria. \\
     \hline
 \end{tabular}
 \caption{Registros de decisión de arquitectura vigentes.}
@@ -164,7 +164,7 @@ navegador.
 \section{Frontera de la demostración controlada}\label{sec:dis-frontera}
 
 El diseño mantiene una frontera explícita entre lo que la demostración expone y lo que
-pertenece a la versión 2 del producto. En esta entrega, el registro es funcional pero vive
+pertenece a una evolución posterior del producto. El registro es funcional pero vive
 dentro del territorio de las cuentas de demostración, sin abrir el registro de producción sin
 restricciones. Todas las cuentas son públicas por diseño, sin conmutador de privacidad. El
 acceso a IGDB está confinado a un comando de gestión fuera de línea. Esta frontera se

@@ -3,14 +3,14 @@
 Este capítulo recoge el análisis de requisitos del proyecto. Presenta los actores del
 sistema, el modelo de dominio que sostiene los requisitos de información, los requisitos
 funcionales y no funcionales, las reglas de negocio, los casos de uso y la matriz de
-trazabilidad que enlaza cada requisito con la fase que lo entrega y con su evidencia. Los
+trazabilidad que enlaza cada requisito con su evidencia. Los
 requisitos se identifican con códigos estables tomados de \texttt{.planning/REQUIREMENTS.md},
 de modo que la matriz de trazabilidad de este capítulo y la del repositorio coinciden.
 
 \section{Actores del sistema}\label{sec:req-actores}
 
 La Tabla~\ref{tab:actores} enumera los actores. Dos de ellos, el administrador y el personal
-investigador, corresponden a funcionalidad planificada para fases posteriores y se incluyen
+investigador, corresponden a funcionalidad que queda como trabajo futuro y se incluyen
 para dar contexto completo al modelo.
 
 \begin{table}[htp]
@@ -25,9 +25,9 @@ para dar contexto completo al modelo.
     \hline
     Cuenta simulada & Cuenta de demostración claramente etiquetada como simulada, precargada para el tribunal. & Activo \\
     \hline
-    Administrador & Perfil autorizado para gestionar cuentas de demostración y datos del catálogo sin editar la base directamente. & Planificado \\
+    Administrador & Perfil autorizado para gestionar cuentas de demostración y datos del catálogo sin editar la base directamente. & Trabajo futuro \\
     \hline
-    Personal investigador & Perfil que ejecuta experimentos de recomendación y consulta el panel de comparación. & Planificado \\
+    Personal investigador & Perfil que ejecuta experimentos de recomendación y consulta el panel de comparación. & Trabajo futuro \\
     \hline
 \end{tabular}
 \caption{Actores del sistema.}
@@ -80,7 +80,7 @@ reintentar una alta.
 
 En las cuentas, el proyecto usa el modelo de usuario de Django directamente y añade dos
 entidades. El ancla de cuenta de demostración (\texttt{DemoAccountAnchor}) identifica la
-cuenta de demostración única de la Fase 1 con independencia del nombre que tenga en cada
+cuenta de demostración original con independencia del nombre que tenga en cada
 momento. La identidad de cuenta de demostración (\texttt{DemoAccountIdentity}) es la
 generalización plural: cada fila es una cuenta simulada con una clave de semilla estable, una
 marca durable que la señala como simulada y una etiqueta visible. Una restricción de
@@ -116,10 +116,10 @@ información que satisface.
 
 \section{Requisitos funcionales}\label{sec:req-funcionales}
 
-La Tabla~\ref{tab:req-funcionales} recoge los requisitos funcionales relevantes para esta
-entrega, con su estado real. Los marcados como completos tienen evidencia en las firmas de
-fase; los marcados como planificados pertenecen a fases posteriores y se incluyen para
-mostrar la continuidad del análisis.
+La Tabla~\ref{tab:req-funcionales} recoge los requisitos funcionales considerados en el
+análisis, con su estado real. Los marcados como completos tienen evidencia en las firmas de
+aceptación; los marcados como trabajo futuro se incluyen para mostrar la continuidad del
+análisis.
 
 \begin{table}[htp]
 \centering
@@ -163,18 +163,18 @@ mostrar la continuidad del análisis.
     \hline
     REC-10 & Página de recomendaciones por géneros según la actividad propia. & Completo \\
     \hline
-    REC-03 a REC-09 & Recomendadores basados en contenido, colaborativos e híbridos, con explicaciones y arranque en frío. & Planificado \\
+    REC-03 a REC-09 & Recomendadores basados en contenido, colaborativos e híbridos, con explicaciones y arranque en frío. & Trabajo futuro \\
     \hline
-    PORT-01 a PORT-04 & Exportación e importación de colección, valoraciones y listas. & Planificado \\
+    PORT-01 a PORT-04 & Exportación e importación de colección, valoraciones y listas. & Trabajo futuro \\
     \hline
 \end{tabular}
-\caption{Requisitos funcionales relevantes para la primera entrega.}
+\caption{Requisitos funcionales considerados en el análisis del sistema.}
 \label{tab:req-funcionales}
 \end{table}
 
 \section{Requisitos no funcionales}\label{sec:req-no-funcionales}
 
-Los requisitos no funcionales de esta entrega se agrupan en cinco familias. La
+Los requisitos no funcionales del sistema se agrupan en cinco familias. La
 \textit{reproducibilidad} exige que el sistema arranque de forma reproducible en un entorno
 local documentado, con las dependencias fijadas a versión exacta (QUAL-02, OPS-02). La
 \textit{legalidad y procedencia de datos} exige que cada dato del catálogo conserve su
@@ -194,7 +194,7 @@ prototipo utilitario (QUAL-05).
 \section{Reglas de negocio}\label{sec:req-reglas}
 
 La Tabla~\ref{tab:reglas-negocio} recoge las reglas de negocio que gobiernan el
-comportamiento del sistema en esta entrega.
+comportamiento del sistema.
 
 \begin{table}[htp]
 \centering
@@ -216,7 +216,7 @@ comportamiento del sistema en esta entrega.
     \hline
     RN-7 & Registrar de nuevo una copia con la misma clave de idempotencia devuelve la copia existente en lugar de crear un duplicado. \\
     \hline
-    RN-8 & En esta entrega toda cuenta es pública por diseño; no hay conmutador de privacidad. \\
+    RN-8 & Toda cuenta es pública por diseño; no hay conmutador de privacidad. \\
     \hline
     RN-9 & El acceso a IGDB queda confinado a un comando de gestión fuera de línea; ninguna petición de usuario llama a un proveedor externo. \\
     \hline
@@ -227,14 +227,14 @@ comportamiento del sistema en esta entrega.
 
 \section{Casos de uso}\label{sec:req-casos-uso}
 
-La Figura~\ref{fig:casos-uso} presenta el diagrama de casos de uso de la primera entrega. Los
-casos que involucran al administrador y al personal investigador quedan fuera de esta
-entrega.
+La Figura~\ref{fig:casos-uso} presenta el diagrama de casos de uso del sistema. Los
+casos que involucran al administrador y al personal investigador quedan fuera del alcance de
+esta memoria.
 
 \begin{figure}[htp]
     \centering
     \missingfigure[figwidth=0.9\textwidth]{Diagrama de casos de uso: Visitante (buscar juego, consultar ficha y procedencia, ver perfil público, ver recomendacion por popularidad, filtrar y ordenar catalogo, registrarse); Persona usuaria (iniciar y cerrar sesion, cambiar estado de backlog, valorar juego, registrar copias, abrir pagina de recomendaciones por generos). Pendiente de dibujar.}
-    \caption{Diagrama de casos de uso de la primera entrega.}
+    \caption{Diagrama de casos de uso del sistema.}
     \label{fig:casos-uso}
 \end{figure}
 % PENDIENTE: diagrama de casos de uso real (figures/casos-uso.pdf).
@@ -271,58 +271,58 @@ funcional que satisface.
     CU-11 & Abrir la página de recomendaciones por afinidad de géneros & Persona usuaria & REC-10 \\
     \hline
 \end{tabular}
-\caption{Casos de uso de la primera entrega.}
+\caption{Casos de uso del sistema.}
 \label{tab:casos-uso}
 \end{table}
 
 \section{Matriz de trazabilidad}\label{sec:req-trazabilidad}
 
-La Tabla~\ref{tab:trazabilidad} enlaza cada requisito completado en esta entrega con la fase
-que lo entregó y con la evidencia que lo respalda. La columna de evidencia remite a
-documentos del repositorio: firmas de fase en \texttt{docs/verification/}, registros de
-decisión en \texttt{docs/adr/} e informes de verificación en \texttt{.planning/phases/}.
+La Tabla~\ref{tab:trazabilidad} enlaza cada requisito entregado con la evidencia que lo
+respalda. La columna de evidencia remite a documentos del repositorio: firmas de aceptación
+en \texttt{docs/verification/}, registros de decisión en \texttt{docs/adr/} e informes de
+verificación en \texttt{.planning/phases/}.
 
 \begin{table}[htp]
 \centering
-\begin{tabular}{ | l | c | p{8cm} | }
+\begin{tabular}{ | l | p{9.5cm} | }
     \hline
-    \textbf{Requisito} & \textbf{Fase} & \textbf{Evidencia} \\
+    \textbf{Requisito} & \textbf{Evidencia} \\
     \hline
-    AUTH-01, PROF-02 & 1 & \texttt{phase-01-signoff.md}; pruebas de \texttt{accounts}. \\
+    AUTH-01, PROF-02 & \texttt{phase-01-signoff.md}; pruebas de \texttt{accounts}. \\
     \hline
-    CAT-01, CAT-03, CAT-04, CAT-06 & 1 & \texttt{phase-01-signoff.md}; \texttt{catalogue-freeze.md}. \\
+    CAT-01, CAT-03, CAT-04, CAT-06 & \texttt{phase-01-signoff.md}; \texttt{catalogue-freeze.md}. \\
     \hline
-    LIB-01, LIB-02, INV-01, INV-02, INV-05 & 1 & \texttt{phase-01-signoff.md}; pruebas de \texttt{library}. \\
+    LIB-01, LIB-02, INV-01, INV-02, INV-05 & \texttt{phase-01-signoff.md}; pruebas de \texttt{library}. \\
     \hline
-    DATA-01, DATA-02 & 1 & \texttt{catalogue-freeze.md}; ADR-003. \\
+    DATA-01, DATA-02 & \texttt{catalogue-freeze.md}; ADR-003. \\
     \hline
-    REC-02 & 1 & \texttt{library/popularity.py}; \texttt{phase-01-signoff.md}. \\
+    REC-02 & \texttt{library/popularity.py}; \texttt{phase-01-signoff.md}. \\
     \hline
-    SEC-02, OPS-01, OPS-02, OPS-03 & 1 & \texttt{phase-01-signoff.md}; \texttt{check-secrets.ps1}. \\
+    SEC-02, OPS-01, OPS-02, OPS-03 & \texttt{phase-01-signoff.md}; \texttt{check-secrets.ps1}. \\
     \hline
-    QUAL-03 & 1 & \texttt{phase-01-manual.md}; 400\% de zoom y lector de pantalla pendientes. \\
+    QUAL-03 & \texttt{phase-01-manual.md}; 400\% de zoom y lector de pantalla pendientes. \\
     \hline
-    DOC-01, AGENT-01, AGENT-02, AGENT-03 & 1 & ADR-001 a 005; \texttt{agent-ledger.jsonl}. \\
+    DOC-01, AGENT-01, AGENT-02, AGENT-03 & ADR-001 a 005; \texttt{agent-ledger.jsonl}. \\
     \hline
-    DATA-04 & 01.1 & ADR-006; \texttt{igdb-api-probe.md}. \\
+    DATA-04 & ADR-006; \texttt{igdb-api-probe.md}. \\
     \hline
-    CAT-02 & 01.1 & \texttt{01.1-VERIFICATION.md} SC2; migración \texttt{0004}. \\
+    CAT-02 & \texttt{01.1-VERIFICATION.md} SC2; migración \texttt{0004}. \\
     \hline
-    AUTH-02 & 01.1 & \texttt{01.1-VERIFICATION.md} SC3; \texttt{bootstrap\_demo\_accounts}. \\
+    AUTH-02 & \texttt{01.1-VERIFICATION.md} SC3; \texttt{bootstrap\_demo\_accounts}. \\
     \hline
-    REC-10 & 01.1 & ADR-007; \texttt{01.1-VERIFICATION.md} SC5. \\
+    REC-10 & ADR-007; \texttt{01.1-VERIFICATION.md} SC5. \\
     \hline
-    QUAL-05 & 01.1 & \texttt{phase-01.1-signoff.md}; revisión remota de capturas del autor. \\
+    QUAL-05 & \texttt{phase-01.1-signoff.md}; revisión remota de capturas del autor. \\
     \hline
 \end{tabular}
-\caption{Matriz de trazabilidad de requisito a fase y a evidencia.}
+\caption{Matriz de trazabilidad de requisito a evidencia.}
 \label{tab:trazabilidad}
 \end{table}
 
 Los requisitos de las familias de evaluación, experimentación y recomendadores avanzados
-(EVAL-01 a EVAL-14, REC-01, REC-03 a REC-09) están asignados a las Fases 2 a 4 y 7 en
-\texttt{REQUIREMENTS.md}, con estado pendiente. El Capítulo~\ref{cap:conclusiones} detalla
-ese trabajo futuro.
+(EVAL-01 a EVAL-14, REC-01, REC-03 a REC-09) quedan fuera del alcance de esta memoria y se
+recogen como líneas de trabajo futuro en \texttt{REQUIREMENTS.md}. El
+Capítulo~\ref{cap:conclusiones} las detalla.
 
 Este capítulo ha fijado qué debe hacer el sistema y con qué restricciones. El capítulo
 siguiente describe cómo se ha diseñado para cumplirlo.

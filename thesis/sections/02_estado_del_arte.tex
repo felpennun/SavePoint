@@ -43,7 +43,7 @@ gestión de una colección. La Tabla~\ref{tab:productos} resume la comparación.
     \hline
     IGDB.com & Sí & No & No & No \\
     \hline
-    \textbf{SavePoint} & Sí & Sí & Físico y digital, con edición & Heurística, comparación planificada \\
+    \textbf{SavePoint} & Sí & Sí & Físico y digital, con edición & Heurística determinista \\
     \hline
 \end{tabular}
 \caption{Comparación de SavePoint con los productos de referencia.}
@@ -82,7 +82,7 @@ RAWG ofrece una cobertura comparable, con metadatos de tienda, pero su nivel gra
 un techo de veinte mil peticiones al mes y exige atribución con un enlace de vuelta en cada
 página que use los datos, además de un plan de pago para el uso comercial~\cite{rawg-api}.
 El Capítulo~\ref{cap:datos} desarrolla la comparación que llevó a elegir Wikidata para el
-corpus congelado de la Fase 1 y luego IGDB para el catálogo a escala real.
+corpus curado inicial e IGDB para el catálogo a escala real.
 
 \section{Sistemas de recomendación y evaluación reproducible}\label{sec:arte-recomendacion}
 
@@ -108,9 +108,9 @@ error sobre la valoración predicha y las métricas de acierto sobre la lista re
 pueden ordenar los algoritmos de forma distinta~\cite{cremonesi2010performance}. La respuesta
 metodológica aceptada es fijar por adelantado, de forma inmutable, el corpus, el reparto, las
 exclusiones, las métricas, las semillas y el presupuesto de ajuste, antes de comparar nada.
-Ese contrato de evaluación congelado es exactamente el objeto de la Fase 2 del proyecto,
-todavía no abordada. Por ese motivo, esta memoria no presenta ningún resultado de comparación
-de recomendadores.
+Ese contrato de evaluación congelado, que este proyecto deja como línea de trabajo futuro,
+es la base sobre la que se compararían los recomendadores. Por ese motivo, esta memoria no
+presenta ningún resultado de comparación de recomendadores.
 
 \section{Desarrollo de software asistido por agentes}\label{sec:arte-agentes}
 
@@ -124,10 +124,10 @@ el contexto: descomponer el trabajo en tareas atómicas, ejecutar cada una en un
 nueva del agente con la ventana limpia y transportar la información entre tareas mediante
 ficheros de memoria persistentes en lugar de mediante el historial de la conversación.
 
-Sobre esa idea, métodos como \textit{Get Stuff Done} (GSD) organizan el desarrollo en fases
-que recorren un ciclo ordenado de discusión, planificación, ejecución y verificación, donde
-cada paso produce un artefacto escrito que actúa como fuente de verdad del
-siguiente~\cite{gsd}. La separación entre quien planifica, quien implementa y quien verifica
+Sobre esa idea, métodos como \textit{Get Stuff Done} (GSD) organizan el desarrollo en
+incrementos que recorren un ciclo ordenado de discusión, planificación, ejecución y
+verificación, donde cada paso produce un artefacto escrito que actúa como fuente de verdad
+del siguiente~\cite{gsd}. La separación entre quien planifica, quien implementa y quien verifica
 se hace deliberada, con instancias independientes del agente, de modo que la verificación no
 hereda la confianza del código recién escrito. El Capítulo~\ref{cap:metodologia} describe
 cómo se aplicó este enfoque a SavePoint y qué evidencia dejó.
@@ -138,8 +138,9 @@ De la revisión anterior se desprenden las tres aportaciones que persigue el tra
 primera es un producto de catalogación de videojuegos que combina inventario de propiedad
 material, catálogo a escala real y procedencia de datos documentada, un conjunto que ningún
 servicio existente reúne. La segunda es un banco de pruebas reproducible para la comparación
-de recomendadores, con corpus citable, usuarios sintéticos y contrato de evaluación
-congelado, todavía en construcción. La tercera es la propia metodología de ingeniería
-asistida por agentes, aplicada de forma sistemática y versionada en el repositorio, de manera
-que el proceso que produjo el sistema es tan inspeccionable y reproducible por un tercero
-como el sistema mismo.
+de recomendadores, con corpus citable, usuarios sintéticos y procedencia de datos
+documentada, cuya explotación mediante un contrato de evaluación congelado queda como línea
+de trabajo futuro. La tercera es la propia metodología de ingeniería asistida por agentes,
+aplicada de forma sistemática y versionada en el repositorio, de manera que el proceso que
+produjo el sistema es tan inspeccionable y reproducible por un tercero como el sistema
+mismo.
