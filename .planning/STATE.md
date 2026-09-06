@@ -166,5 +166,5 @@ Resume file: .planning/phases/02-governed-corpus-external-ratings-evaluation-con
 
 ## Continuidad de esta sesion
 
-Ultimo estado: ola 1 cerrada; listo para ejecutar la ola 2 y detenerse en el checkpoint
-RAWG de 02-02.
+Ultimo estado: 02-02 tareas 1 y 2 cerradas; esperando decision del autor en el checkpoint
+RAWG con cobertura medida 0,00 % sobre la base persistente pre-rating.
