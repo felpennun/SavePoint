@@ -691,31 +691,31 @@ cover.image_id
 | A7 | The persistent dev DB (`savepoint_test`) still holds the 2026-09-06 import and the `.dump` is restorable. | Runtime State Inventory | Re-import from IGDB (~50 min) if not. Low risk — documented in `igdb-catalogue-freeze.md`. |
 | A8 | RAWG `rating` is 0–5 user average, `ratings_count` the count, `metacritic` the critic score. | D-05 / Pattern 2 | Field-mapping rework. `[CITED: rawg.io/apidocs mentions "average ratings" and "Metacritic ratings"; the exact `rating`/`rating_top`/`ratings`/`ratings_count` shape is from RAWG API training knowledge, not re-read from the schema this session]` — confirm against `api.rawg.io/docs` before writing `rawg.py`. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **RAWG in or out this phase?**
    - Known: IGDB `rating`/`rating_count` will be imported; RAWG terms are harsh (20k/mo, backlink, no redistribution).
    - Unclear: whether measured IGDB governed-corpus user-rating coverage is low enough to justify RAWG's cost (second provenance chain, ADR-008 section, persistent backlink).
-   - Recommendation: measure IGDB coverage in Wave 0; present the number to the author at planning; default to "IGDB-only, document the coverage" unless the author opts in. If in: bounded top-N-by-`rating_count` RAWG subset over allowlist games, its own ADR section, footer backlink.
+   - RESOLVED: closed by the blocking-human `checkpoint:decision` in **02-02 Task 3** — IGDB coverage is measured in 02-02 Task 2, the number is put to the author, and the author picks `igdb-only` (document the coverage per D-06) or `add-rawg` (bounded top-N-by-`rating_count` RAWG subset, its own ADR-008 section, footer backlink, planned as 02-02b). In the `igdb-only` branch DATA-07 is satisfied by a forward-looking tie-break rule written into ADR-008 by 02-13 Task 3 — no reconciliation code or `test_rawg_reconcile.py` this phase.
 
 2. **`numpy` now or in Phase 3?**
    - Known: STACK blesses `numpy 2.5.2` for exactly this; the project has kept to 5 deps and pure-Python recommenders.
-   - Recommendation: pure-Python for Phase 2; put the "adopt now to avoid a Phase 3 rewrite" choice to the author as an explicit, cheap-to-reverse decision. If adopted: full dependency gate + `checkpoint:human-verify`.
+   - RESOLVED: closed by the blocking `checkpoint:decision` in **02-10 Task 1** — default is pure-Python for Phase 2 (RESEARCH-recommended); the author may pick `adopt-numpy`, which triggers the full dependency gate (legitimacy `checkpoint:human-verify` + `uv add numpy==<pinned>` + `dependency-legitimacy.md` row + `check-dependencies.ps1` row + `agent-ledger.jsonl` entry + ADR-008 line) carved out as its own commit before 02-10 Tasks 2–3.
 
 3. **D-09 live-rating composition (weights + which accounts count).**
    - Unclear by design (D-09 delegates it). Needs an author decision: external-vs-local weight, and self-registered-only vs including demo/synthetic.
-   - Recommendation: confidence-weighted blend (external weight ∝ `rating_count`, local weight ∝ SavePoint entry count), self-registered + demo count for the live number, snapshot stays external-only. Confirm in discuss-phase.
+   - RESOLVED: fixed in **02-05 `<flagged_assumptions>`** and its `must_haves` — `display_rating` is a read-time confidence-weighted blend of the external value and the mean `LibraryEntry.rating_half_steps` (×10) restricted to the same account set as `rank_popularity_v1`; the `CorpusRatingSnapshot` does not participate (external-only, frozen). The executor surfaces the assumption for author confirmation during 02-05.
 
 4. **Franchise / developer as first-class entities or denormalised slugs?**
    - `CAT-05` (franchises/developers/publishers as entities) is Phase 6. This phase needs only a feature key.
-   - Recommendation: denormalised `franchise_slug` / `developer_slug` (or a small `WorkFeatureVector` cache) now; do NOT add `Franchise`/`Developer` models (stay inside D-11's "minimal" and CAT-05's Phase 6 boundary).
+   - RESOLVED: fixed in **02-10 Task 3** — denormalised `franchise:{slug}` / `developer:{slug}` feature keys inside the `WorkFeatureVector` cache, emitted only when measured coverage over the governed view clears a documented threshold (D-11). No `Franchise` / `Developer` models this phase (stays inside CAT-05's Phase 6 boundary).
 
 5. **Number of tuning-grid configs and the exact ≤24 grid.**
    - D-21 caps it at 24, declared before running. The grid must be in `protocol.json` before any run.
-   - Recommendation: e.g. `weighted_sum` with `(w1,w2)` ∈ {(0.7,0.3),(0.5,0.5),(0.3,0.7)} × feature sets {genres+rating, +platform, +franchise/dev} = 9; `multiplicative` × 3 feature sets = 3; `two_stage` with band counts {3,5} × 3 feature sets = 6 → 18 configs. Author ratifies the grid in the PLAN.
+   - RESOLVED: ratified in the **02-08 Task 1 `checkpoint:decision`** and frozen into `protocol.json` by 02-08 Task 2 — proposed grid is ~18 configs (`weighted_sum` (w1,w2) ∈ {(0.7,0.3),(0.5,0.5),(0.3,0.7)} × {genres+rating, +platform, +franchise/dev} = 9; `multiplicative` × 3 feature sets = 3; `two_stage` band counts {3,5} × 3 feature sets = 6), `len(grid) > 24` → `ProtocolError`.
 
 6. **Cold-start threshold N.**
-   - Recommendation: `< 3` genre-bearing library entries (aligns with the D-20 cold-start cohort of 1–3 items). Confirm.
+   - RESOLVED: fixed at `< 3` genre-bearing library entries in **02-11** (`must_haves` truth + `rank_content_v1` cold-start wrapper + `test_content.py` cases), aligned with the D-20 cold-start cohort of 1–3 items.
 
 ## Environment Availability
 
