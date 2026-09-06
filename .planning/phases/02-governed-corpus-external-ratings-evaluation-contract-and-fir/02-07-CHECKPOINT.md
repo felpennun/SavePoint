@@ -2,8 +2,8 @@
 phase: 02
 plan: 07
 github_issue: 23
-status: in_progress
-completed_tasks: 1
+status: complete
+completed_tasks: 2
 total_tasks: 2
 updated: 2026-09-07
 ---
@@ -39,5 +39,23 @@ Ejecutar tarea 2 de `02-07-PLAN.md`: ocultar solo las etiquetas visibles bajo `m
 conservar nombre accesible y estado de ambos controles, comprobar header y añadir tests
 DOM de navbar. No rehacer tarea 1. Antes, verificar el commit GREEN con `git log`.
 
-El orquestador mantiene `STATE.md`, `ROADMAP.md`, `REQUIREMENTS.md` y los checkpoints
-globales. No modificarlos desde este ejecutor. No ejecutar otros planes.
+## Tarea 2 terminada
+
+La barra autenticada conserva ambos controles en el header y oculta solo las etiquetas
+visibles por debajo de `md`, sin cambiar el orden del DOM ni el nombre accesible.
+`AccountSwitcher` conserva siempre la identificación de cuenta simulada en
+`aria-label`; `ThemeToggle` conserva `aria-pressed` y sus etiquetas de estado.
+
+- Verificación: `corepack pnpm --dir apps/web run test --run` con
+  `PLAYWRIGHT_CHANNEL=chrome`: **27/27 PASS**, cinco suites.
+- Verificación: `corepack pnpm --dir apps/web run build`: **PASS**, compilación y TypeScript.
+- El test de navbar comprueba nombres accesibles, estado pulsado, paridad del DOM y
+  presencia de ambos controles en el header a 320/375/768/1280 px.
+- La verificación usa el Chrome instalado localmente porque no hay binarios gestionados
+  de Playwright descargados; no se añadió ninguna dependencia ni se modificó el lockfile.
+
+## Cierre del plan
+
+Las dos tareas de 02-07 están completas y verificadas. El orquestador mantiene
+`STATE.md`, `ROADMAP.md` y `REQUIREMENTS.md`; no iniciar la ola 2 hasta cerrar también
+02-01.

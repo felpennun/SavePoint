@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 
 /**
  * AccountSwitcher (01.1-UI-SPEC, AUTH-02). Occupies the navbar right-end
- * account slot when the visitor is authenticated. Trigger always shows
- * the word "simulated"/"simulada". Panel = role="menu", focus-trapped,
+ * account slot when the visitor is authenticated. The accessible trigger
+ * name always includes "simulated"/"simulada", including icon-only mobile.
+ * Panel = role="menu", focus-trapped,
  * Escape-closes, focus-returns -- reuses the MobileMenu focus-management
  * pattern. Lists the way to pick another simulated account plus Log out.
  * The preloaded-account list itself is wired by Plan 04/08; until then
@@ -104,6 +105,7 @@ export function AccountSwitcher({
         ref={triggerRef}
         type="button"
         className="sp-btn-secondary"
+        aria-label={triggerText}
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
@@ -112,7 +114,7 @@ export function AccountSwitcher({
           <circle cx="12" cy="8" r="4" />
           <path d="M4 21v-1a7 7 0 0 1 14 0v1" />
         </svg>
-        <span>{triggerText}</span>
+        <span className="hidden md:inline">{triggerText}</span>
         <span aria-hidden="true">▾</span>
       </button>
       {open ? (

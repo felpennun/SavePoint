@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
  * activate it flips `document.documentElement.dataset.theme` synchronously
  * and writes the sp-theme cookie (path=/, 1 year, SameSite=Lax, not
  * HttpOnly -- it is not a secret and the client must set it).
- * Icon-plus-visible-label, 44px target, correct aria-pressed / aria-label.
+ * Icon-only below md, 44px target, correct aria-pressed / aria-label.
  */
 export function ThemeToggle({
   labels,
@@ -46,7 +46,7 @@ export function ThemeToggle({
   return (
     <button
       type="button"
-      className="sp-btn-secondary"
+      className="sp-btn-secondary min-w-11 shrink-0"
       aria-pressed={isLight}
       aria-label={isLight ? labels.switchToDark : labels.switchToLight}
       onClick={toggle}
@@ -61,7 +61,7 @@ export function ThemeToggle({
           <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
         )}
       </svg>
-      <span>
+      <span className="hidden md:inline">
         {labels.label}: {stateWord}
       </span>
     </button>
