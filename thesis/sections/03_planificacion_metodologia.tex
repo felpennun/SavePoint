@@ -1,51 +1,51 @@
 \chapter{Planificación y metodología de trabajo}\label{cap:metodologia}
 
 Este capítulo describe cómo se ha organizado el trabajo. Empieza por los objetivos de
-gestión y por el método de desarrollo por fases. Después detalla la metodología de ingeniería
+gestión y por el método de desarrollo iterativo. Después detalla la metodología de ingeniería
 asistida por agentes de inteligencia artificial, que el planteamiento del trabajo pide tratar
-como una aportación observable y no como una nota al margen. Termina con la planificación
-temporal, la estimación de esfuerzo, los riesgos, las desviaciones sufridas y las
-convenciones de commits y de idioma.
+como una aportación observable y no como una nota al margen. Termina con la estimación de
+esfuerzo, los riesgos, las lecciones de ingeniería más relevantes y las convenciones de
+commits y de idioma.
 
 \section{Objetivos de gestión}\label{sec:met-objetivos-gestion}
 
 La gestión del proyecto persigue cuatro objetivos. El primero es entregar valor de forma
-incremental, con cada fase como un incremento vertical utilizable y verificado, en lugar de
-una integración final de riesgo. El segundo es que toda afirmación de la memoria tenga
-respaldo: una decisión registrada, una verificación independiente o una firma del autor. El
-tercero es mantener el alcance bajo control a lo largo de varias fases, sin que el trabajo de
-una contamine el de otra. El cuarto es que el proceso de ingeniería quede documentado con el
+incremental, con cada incremento vertical utilizable y verificado, en lugar de una
+integración final de riesgo. El segundo es que toda afirmación de la memoria tenga respaldo:
+una decisión registrada, una verificación independiente o una firma del autor. El tercero es
+mantener el alcance bajo control a lo largo de sucesivos incrementos, sin que el trabajo de
+uno contamine el de otro. El cuarto es que el proceso de ingeniería quede documentado con el
 mismo rigor que el producto, de modo que un tercero pueda reconstruir no solo el sistema,
 sino la secuencia de decisiones que lo produjo.
 
-\section{Método de desarrollo por fases}\label{sec:met-fases}
+\section{Método de desarrollo iterativo}\label{sec:met-fases}
 
-El ciclo de vida del proyecto se gobierna mediante el método \textit{Get Stuff Done}
+El ciclo de vida del proyecto se gobernó mediante el método \textit{Get Stuff Done}
 (GSD)~\cite{gsd}, un sistema de desarrollo dirigido por especificación pensado para agentes de
-código, versionado en el propio repositorio. GSD descompone el proyecto en hitos, cada hito
-en fases y cada fase en un ciclo ordenado de cuatro pasos que la Figura~\ref{fig:ciclo-gsd}
-resume: discutir, planificar, ejecutar y verificar. Cada paso produce un artefacto escrito
-que actúa como fuente de verdad del siguiente. Lo que sobrevive a los límites de sesión es la
-especificación escrita, no el historial de la conversación con el agente.
+código, versionado en el propio repositorio. GSD descompone el trabajo en incrementos
+verticales y somete cada uno a un ciclo ordenado de cuatro pasos que la
+Figura~\ref{fig:ciclo-gsd} resume: discutir, planificar, ejecutar y verificar. Cada paso
+produce un artefacto escrito que actúa como fuente de verdad del siguiente. Lo que sobrevive
+a los límites de sesión es la especificación escrita, no el historial de la conversación con
+el agente.
 
 \begin{figure}[htp]
     \centering
     \missingfigure[figwidth=0.85\textwidth]{Diagrama del ciclo GSD: idea, hoja de ruta, discutir, contrato de interfaz, planificar, ejecutar, verificar y revisar; con los artefactos que produce cada paso en el árbol .planning/. Pendiente de dibujar.}
-    \caption{Ciclo de una fase en el método GSD y los artefactos que produce cada paso.}
+    \caption{Ciclo de un incremento en el método GSD y los artefactos que produce cada paso.}
     \label{fig:ciclo-gsd}
 \end{figure}
 % PENDIENTE: sustituir el \missingfigure por un diagrama real del ciclo GSD (figures/ciclo-gsd.pdf).
 
-En la práctica, cada fase se abre con una discusión que fija por escrito sus decisiones y
-supuestos. Si la fase tiene interfaz, se establece además un contrato de diseño con sus
-componentes y estados. A continuación se investiga y se redacta el plan de la fase, que la
-descompone en tareas atómicas con criterios de aceptación y se comprueba antes de tocar
-código. La ejecución implementa ese plan, confirma los cambios en el control de versiones y
-registra en un resumen lo realmente hecho y las desviaciones. Por último, la verificación
-comprueba, de forma independiente, que el objetivo de la fase se ha alcanzado. Una revisión
-de código somete después los cambios a un análisis de seguridad, rendimiento y corrección con
-un contexto distinto del que los escribió. Cada fase termina con una firma de aceptación del
-autor.
+En la práctica, cada incremento se abre con una discusión que fija por escrito sus decisiones
+y supuestos. Si tiene interfaz, se establece además un contrato de diseño con sus componentes
+y estados. A continuación se investiga y se redacta el plan, que lo descompone en tareas
+atómicas con criterios de aceptación y se comprueba antes de tocar código. La ejecución
+implementa ese plan, confirma los cambios en el control de versiones y registra en un resumen
+lo realmente hecho y las desviaciones. Por último, la verificación comprueba, de forma
+independiente, que el objetivo se ha alcanzado. Una revisión de código somete después los
+cambios a un análisis de seguridad, rendimiento y corrección con un contexto distinto del que
+los escribió. Cada incremento termina con una firma de aceptación del autor.
 
 Las órdenes de este flujo se usaron de verdad durante el proyecto: \texttt{discuss-phase},
 \texttt{ui-phase}, \texttt{plan-phase}, \texttt{execute-phase}, \texttt{verify-work},
@@ -57,13 +57,13 @@ retomar el trabajo entre sesiones sin perder el hilo.
 GSD sustituye los documentos de planificación estáticos por un árbol de ficheros en formato
 Markdown, versionados, que evolucionan con el proyecto. En \texttt{.planning/} conviven la
 definición del producto (\texttt{PROJECT.md}), los requisitos operativos
-(\texttt{REQUIREMENTS.md}), la hoja de ruta por fases (\texttt{ROADMAP.md}) y una instantánea
+(\texttt{REQUIREMENTS.md}), la hoja de ruta (\texttt{ROADMAP.md}) y una instantánea
 del estado actual (\texttt{STATE.md}) que cualquier agente o persona lee antes de actuar.
-Cada fase se descompone en \texttt{.planning/phases/} en pares de plan y resumen: el plan
-fija el alcance y los criterios de aceptación antes de implementar, mientras que el resumen
-registra lo ejecutado, las desviaciones y las evidencias al cerrar. Junto a ellos viven los
-documentos de contexto, investigación, contrato de interfaz, verificación e ítems diferidos
-de cada fase.
+Cada incremento se descompone en \texttt{.planning/phases/} en pares de plan y resumen: el
+plan fija el alcance y los criterios de aceptación antes de implementar, mientras que el
+resumen registra lo ejecutado, las desviaciones y las evidencias al cerrar. Junto a ellos
+viven los documentos de contexto, investigación, contrato de interfaz, verificación e ítems
+diferidos de cada incremento.
 
 La Tabla~\ref{tab:planning-arbol} enumera los artefactos principales del árbol y su función.
 
@@ -75,19 +75,19 @@ La Tabla~\ref{tab:planning-arbol} enumera los artefactos principales del árbol 
     \hline
     \texttt{PROJECT.md} & Definición del producto, valor central, requisitos activos y fuera de alcance. \\
     \hline
-    \texttt{REQUIREMENTS.md} & Catálogo de requisitos con identificador estable y matriz de trazabilidad a fase. \\
+    \texttt{REQUIREMENTS.md} & Catálogo de requisitos con identificador estable y matriz de trazabilidad a evidencia. \\
     \hline
-    \texttt{ROADMAP.md} & Fases, objetivos, criterios de éxito y progreso. \\
+    \texttt{ROADMAP.md} & Incrementos, objetivos, criterios de éxito y progreso. \\
     \hline
     \texttt{STATE.md} & Estado actual, posición, decisiones acumuladas y continuidad de sesión. \\
     \hline
-    \texttt{phases/<fase>/<plan>-PLAN.md} & Alcance y criterios de aceptación de un plan, antes de implementar. \\
+    \texttt{phases/<incremento>/<plan>-PLAN.md} & Alcance y criterios de aceptación de un plan, antes de implementar. \\
     \hline
-    \texttt{phases/<fase>/<plan>-SUMMARY.md} & Lo realmente ejecutado, desviaciones y evidencias, al cerrar el plan. \\
+    \texttt{phases/<incremento>/<plan>-SUMMARY.md} & Lo realmente ejecutado, desviaciones y evidencias, al cerrar el plan. \\
     \hline
-    \texttt{phases/<fase>/<fase>-VERIFICATION.md} & Verificación independiente del objetivo de fase. \\
+    \texttt{phases/<incremento>/<incremento>-VERIFICATION.md} & Verificación independiente del objetivo del incremento. \\
     \hline
-    \texttt{phases/<fase>/deferred-items.md} & Hallazgos fuera de alcance, enrutados a una fase posterior. \\
+    \texttt{phases/<incremento>/deferred-items.md} & Hallazgos fuera de alcance, enrutados a trabajo posterior. \\
     \hline
 \end{tabular}
 \caption{Artefactos principales del árbol \texttt{.planning/}.}
@@ -97,22 +97,22 @@ La Tabla~\ref{tab:planning-arbol} enumera los artefactos principales del árbol 
 \section{Trazabilidad de tareas, requisitos y evidencias}\label{sec:met-trazabilidad}
 
 La trazabilidad se apoya en tres mecanismos. El primero es la matriz de
-\texttt{REQUIREMENTS.md}, que asigna cada requisito a una fase y registra su estado, de modo
-que cualquier requisito se puede seguir hasta la fase que lo entrega y hasta la evidencia que
-lo cierra. El segundo es la correspondencia entre planes e incidencias: cada plan tiene un
-issue de GitHub asociado, que se cierra a medida que la ejecución avanza, lo que enlaza el
-seguimiento externo con el árbol de planificación. El tercero es el registro de agentes
-descrito en la Sección~\ref{sec:met-ledger}, que ata cada artefacto a la acción que lo
-produjo mediante un hash de contenido. Entre los tres, una decisión de la memoria se puede
-recorrer hacia atrás hasta su plan, su requisito y su discusión; hacia delante llega hasta la
-prueba y la firma que la verifican.
+\texttt{REQUIREMENTS.md}, que registra el estado de cada requisito y la evidencia que lo
+cierra, de modo que cualquier requisito se puede seguir hasta el trabajo que lo entrega y
+hasta la prueba que lo respalda. El segundo es la correspondencia entre planes e incidencias:
+cada plan tiene un issue de GitHub asociado, que se cierra a medida que la ejecución avanza,
+lo que enlaza el seguimiento externo con el árbol de planificación. El tercero es el registro
+de agentes descrito en la Sección~\ref{sec:met-ledger}, que ata cada artefacto a la acción
+que lo produjo mediante un hash de contenido. Entre los tres, una decisión de la memoria se
+puede recorrer hacia atrás hasta su plan, su requisito y su discusión; hacia delante llega
+hasta la prueba y la firma que la verifican.
 
 \section{Agentes de inteligencia artificial y skills}\label{sec:met-agentes}
 
 El proyecto se desarrolló con asistencia sistemática de agentes de inteligencia artificial.
 Conviene delimitar desde el principio el reparto de responsabilidades, que la
-Sección~\ref{sec:met-encuadre} retoma: los agentes ejecutan, mientras que la definición de
-las fases, los criterios de aceptación, la revisión de cada entrega y la decisión final son
+Sección~\ref{sec:met-encuadre} retoma: los agentes ejecutan, mientras que la definición del
+alcance, los criterios de aceptación, la revisión de cada entrega y la decisión final son
 del autor. El uso de agentes se describe aquí como una metodología de trabajo que el autor
 diseñó, dirigió y evaluó, no como una coautoría.
 
@@ -142,7 +142,7 @@ entre desarrollo y revisión propia de un equipo humano.
     \hline
     \textbf{Rol} & \textbf{Responsabilidad y límite} \\
     \hline
-    \texttt{gsd-phase-researcher} & Recopila y sintetiza evidencia para planificar una fase. Propone; etiqueta fuente, evidencia o supuesto. \\
+    \texttt{gsd-phase-researcher} & Recopila y sintetiza evidencia para planificar un incremento. Propone; etiqueta fuente, evidencia o supuesto. \\
     \hline
     \texttt{gsd-ui-researcher} / \texttt{gsd-ui-checker} & Convierten los requisitos en un contrato de diseño y lo validan. La comprobación automática de accesibilidad no sustituye la revisión humana. \\
     \hline
@@ -150,7 +150,7 @@ entre desarrollo y revisión propia de un equipo humano.
     \hline
     \texttt{gsd-executor} & Implementa, prueba y registra correcciones en una copia de trabajo aislada, con commits atómicos. No se presenta como verificación independiente. \\
     \hline
-    \texttt{gsd-verifier} & Verifica el objetivo de fase de forma independiente y escribe el informe de verificación. \\
+    \texttt{gsd-verifier} & Verifica el objetivo del incremento de forma independiente y escribe el informe de verificación. \\
     \hline
     \texttt{gsd-code-reviewer} & Revisa todo el repositorio en busca de defectos con un contexto propio, distinto del de la implementación. \\
     \hline
@@ -201,18 +201,17 @@ tipo a partir de incidencias reales:
     cualquier identificador de Wikidata antes de usarlo, sin confiar en la memoria ni en un
     commit anterior.
     \item El primer intento de cargar el catálogo de IGDB junto al corpus de Wikidata abortó
-    por una colisión de \textit{slug} de plataforma. La corrección \texttt{fix(01.1-02)}
-    enseñó al importador a reconciliar una plataforma existente por \textit{slug}, nombre e
-    inserción dentro de un savepoint, en lugar de fallar. El mismo patrón de convivir con
-    estado preexistente resolvió más tarde el criterio de cuentas simuladas plurales, cuando
-    el comando de arranque adoptó la cuenta primaria heredada bajo una clave de anclaje en
-    lugar de abortar por colisión.
-    \item Los enganches de GSD fallaban en Windows por un problema de shell. La corrección se
-    aplicó al principio de la Fase 01.1 para que el resto de la fase no tropezara con lo
-    mismo.
+    por una colisión de \textit{slug} de plataforma. La corrección enseñó al importador a
+    reconciliar una plataforma existente por \textit{slug}, nombre e inserción dentro de un
+    savepoint, en lugar de fallar. El mismo patrón de convivir con estado preexistente
+    resolvió más tarde el arranque de las cuentas simuladas plurales, cuando el comando de
+    arranque adoptó la cuenta primaria heredada bajo una clave de anclaje en lugar de abortar
+    por colisión.
+    \item Los enganches de GSD fallaban en Windows por un problema de shell. Detectarlo y
+    corregirlo pronto evitó que el resto del trabajo tropezara con lo mismo.
     \item Sin un montaje enlazado de Docker y sin cargar el módulo de configuración de Django
     dentro del contenedor, toda verificación posterior habría probado una imagen obsoleta o
-    habría fallado al arrancar. Corregir ambos al detectarlos evitó que cada plan siguiente
+    habría fallado al arrancar. Corregir ambos al detectarlos evitó que el trabajo siguiente
     chocara con la misma pared.
 \end{itemize}
 
@@ -225,10 +224,10 @@ salidas referenciadas por ruta relativa y hash SHA-256, las herramientas emplead
 secretos, el resultado y las limitaciones declaradas. El tipo es uno de tres:
 \texttt{proposal} para una propuesta de agente, \texttt{automated-check} para una
 comprobación determinista y \texttt{author-decision} para una decisión humana, que siempre
-identifica al actor como persona. Al cierre de esta entrega el registro contiene veinte
-entradas. El gate \texttt{scripts/check-evidence.ps1} valida su esquema, sus tipos, sus
-actores, sus rutas, sus hashes y su cobertura, probando primero con entradas inválidas antes
-de dar por buena una ejecución limpia.
+identifica al actor como persona. El registro contiene veinte entradas. El gate
+\texttt{scripts/check-evidence.ps1} valida su esquema, sus tipos, sus actores, sus rutas, sus
+hashes y su cobertura, probando primero con entradas inválidas antes de dar por buena una
+ejecución limpia.
 
 El registro es una convención auditable, no un almacén criptográficamente inmutable: Git
 conserva las revisiones y el gate detecta corrupción de referencias en el estado actual, pero
@@ -236,22 +235,21 @@ un actor con permiso de escritura podría reescribir el historial. Para la evide
 firma o etiqueta el commit correspondiente. El registro es honesto sobre sus propios huecos:
 donde un artefacto histórico resultó irrecuperable, la entrada lo declara en sus campos de
 entradas no verificables y de limitaciones en lugar de ocultarlo o falsearlo. También registra
-que el proyecto usó más de un entorno de agente, la familia \texttt{gpt-5} sobre Codex en la
-Fase 1 y Claude en trabajos posteriores, con la advertencia de que un nombre de modelo no
-basta para reproducir una salida probabilística: la evidencia reproducible son los artefactos
-versionados, los hashes, los comandos y las decisiones humanas.
+que el proyecto usó más de un entorno de agente, la familia \texttt{gpt-5} sobre Codex en el
+trabajo inicial y Claude en el trabajo posterior, con la advertencia de que un nombre de
+modelo no basta para reproducir una salida probabilística: la evidencia reproducible son los
+artefactos versionados, los hashes, los comandos y las decisiones humanas.
 
 \subsection{Beneficios observados}\label{sec:met-beneficios}
 
 El enfoque produjo beneficios concretos y observables en el proyecto. El alcance se mantuvo
-bajo control a lo largo de dos fases y veintiséis planes, sin que el trabajo de una fase se
-filtrara en otra. Cada cambio quedó trazado hasta su plan, su requisito y su evidencia. Las
-revisiones de código con contexto independiente encontraron dieciséis hallazgos reales al
-cierre de la Fase 01.1, descritos en el Capítulo~\ref{cap:pruebas}, que se corrigieron por
-completo. El trabajo se pudo reanudar sin pérdida de hilo tras interrupciones y límites de
-sesión, porque el estado vivía en ficheros y no en una conversación. Y el proceso quedó
-reproducible, no solo el producto: un tercero puede clonar el repositorio y reconstruir la
-historia de decisiones.
+bajo control a lo largo de sucesivos incrementos, sin que el trabajo de uno se filtrara en
+otro. Cada cambio quedó trazado hasta su plan, su requisito y su evidencia. Las revisiones de
+código con contexto independiente encontraron dieciséis hallazgos reales, descritos en el
+Capítulo~\ref{cap:pruebas}, que se corrigieron por completo. El trabajo se pudo reanudar sin
+pérdida de hilo tras interrupciones y límites de sesión, porque el estado vivía en ficheros y
+no en una conversación. Y el proceso quedó reproducible, no solo el producto: un tercero
+puede clonar el repositorio y reconstruir la historia de decisiones.
 
 \subsection{Limitaciones y riesgos}\label{sec:met-limitaciones}
 
@@ -278,60 +276,36 @@ proceso, no solo la del producto, es una de las aportaciones del trabajo.
 \section{Registro de incidencias y decisiones}\label{sec:met-incidencias}
 
 Además del registro de agentes, el proyecto conserva dos registros de decisión. Los ítems
-diferidos de cada fase, en \texttt{deferred-items.md}, recogen los hallazgos fuera de alcance
-descubiertos durante la ejecución, con su motivo y su destino. Los registros de decisión de
-arquitectura, en \texttt{docs/adr/}, documentan cada decisión material con su contexto, sus
-alternativas, su decisión, su evidencia, sus consecuencias y su reversibilidad. El
+diferidos, en \texttt{deferred-items.md}, recogen los hallazgos fuera de alcance descubiertos
+durante la ejecución, con su motivo y su destino. Los registros de decisión de arquitectura,
+en \texttt{docs/adr/}, documentan cada decisión material con su contexto, sus alternativas,
+su decisión, su evidencia, sus consecuencias y su reversibilidad. El
 Capítulo~\ref{cap:diseno} resume los siete registros de decisión de arquitectura vigentes.
 
-\section{Planificación temporal por fases e hitos}\label{sec:met-temporal}
+\section{Planificación temporal}\label{sec:met-temporal}
 
-El proyecto se planificó por fases, no por un calendario cerrado de tareas. La Fase 1 tenía
-una restricción explícita de tres días para una demostración pública visible. Se organizó en
-dieciséis planes agrupados en doce oleadas de ejecución, cada oleada dependiente de la
-anterior. La Fase 01.1, insertada después, se organizó en diez planes en diez oleadas,
-siguiendo el orden de prioridad fijado por el autor. La hoja de ruta se reestructuró el 6 de
-septiembre de 2026, pasando de ocho fases a siete: la Fase 2 ampliada absorbió la
-gobernanza del corpus, las valoraciones externas, el protocolo de evaluación congelado y un
-primer recomendador avanzado, mientras que las antiguas fases de banco de experimentos y de
-recomendación de contenido se fundieron en una sola. La Fase 2, todavía sin ejecutar, está
-sin embargo planificada por completo con el mismo proceso gobernado que las fases anteriores
-(discutir, investigar, fijar el contrato de diseño de interfaz, planificar y verificar el
-plan de forma independiente): trece planes ejecutables repartidos en seis oleadas. Las fases
-3 a 7 quedan pendientes de planificación. La Tabla~\ref{tab:hitos} recoge los hitos
-alcanzados con su fecha.
+El trabajo se planificó como una sucesión de incrementos verticales, cada uno utilizable y
+verificado antes de abordar el siguiente, en lugar de un calendario cerrado de tareas. El
+primer incremento tuvo una restricción explícita de tres días para poner en pie una
+demostración pública visible, lo que fijó un alcance deliberadamente estrecho: un catálogo
+reducido, una cuenta y la recomendación por popularidad. Los incrementos siguientes
+ampliaron el catálogo a escala real, rediseñaron la interfaz con criterio de producto,
+añadieron la ordenación y el filtrado, las cuentas simuladas de demostración y la página de
+recomendaciones por géneros. Cada incremento se cerró con una verificación de objetivo
+independiente y una firma de aceptación del autor.
 
-\begin{table}[htp]
-\centering
-\begin{tabular}{ | p{7.5cm} | c | c | }
-    \hline
-    \textbf{Hito} & \textbf{Planes} & \textbf{Fecha} \\
-    \hline
-    Fase 1 cerrada y firmada por el autor & 16 & 5 de septiembre de 2026 \\
-    \hline
-    Fase 01.1 cerrada y firmada por el autor & 10 & 6 de septiembre de 2026 \\
-    \hline
-    Fase 2 planificada por completo (13 planes en 6 oleadas), pendiente de ejecución & 13 & 6 de septiembre de 2026 \\
-    \hline
-    Fases 3 a 7 & Por planificar & Pendiente \\
-    \hline
-\end{tabular}
-\caption{Hitos alcanzados en esta primera entrega.}
-\label{tab:hitos}
-\end{table}
-
-\todo[inline]{Añadir un diagrama de Gantt o una línea de tiempo con las fechas reales de inicio y fin de cada fase cuando el autor consolide el registro temporal.}
-% PENDIENTE: cronograma detallado (figures/cronograma.pdf) con fechas reales por fase.
+\todo[inline]{Añadir un diagrama de Gantt o una línea de tiempo con las fechas reales de inicio y fin de cada bloque de entrega cuando el autor consolide el registro temporal.}
+% PENDIENTE: cronograma detallado (figures/cronograma.pdf) con fechas reales.
 
 \section{Estimación de esfuerzo y presupuesto}\label{sec:met-presupuesto}
 
 El proyecto no llevó un registro sistemático de horas por tarea, de modo que la estimación de
-esfuerzo que sigue es aproximada y debe entenderse como tal. Tomando como unidad el plan
-ejecutado y verificado, la primera entrega comprende veintiséis planes repartidos entre
-análisis y diseño, infraestructura reproducible, implementación de backend y de frontend,
-adquisición de datos, pruebas y despliegue. La Tabla~\ref{tab:presupuesto} presenta una
-estimación de coste por bloque, calculada con una tarifa por hora de un perfil junior tomada
-como cota conservadora. Las cifras son una estimación, no una medición.
+esfuerzo que sigue es aproximada y debe entenderse como tal. Tomando como unidad el
+incremento ejecutado y verificado, el trabajo se repartió entre análisis y diseño,
+infraestructura reproducible, implementación de backend y de frontend, adquisición de datos,
+pruebas y despliegue. La Tabla~\ref{tab:presupuesto} presenta una estimación de coste por
+bloque, calculada con una tarifa por hora de un perfil junior tomada como cota conservadora.
+Las cifras son una estimación, no una medición.
 
 \begin{table}[htp]
 \centering
@@ -352,7 +326,7 @@ como cota conservadora. Las cifras son una estimación, no una medición.
     \textbf{Total} & \textbf{PENDIENTE} & \textbf{PENDIENTE} \\
     \hline
 \end{tabular}
-\caption{Estimación de esfuerzo y presupuesto de la primera entrega.}
+\caption{Estimación de esfuerzo y presupuesto del proyecto.}
 \label{tab:presupuesto}
 \end{table}
 
@@ -370,7 +344,7 @@ mantienen bajo vigilancia.
     \hline
     \textbf{Riesgo} & \textbf{Mitigación} \\
     \hline
-    Restricción de tres días de la Fase 1 & Alcance de demostración deliberadamente estrecho: catálogo pequeño, una cuenta y recomendación por popularidad. \\
+    Restricción de tres días del primer incremento público & Alcance de demostración deliberadamente estrecho: catálogo pequeño, una cuenta y recomendación por popularidad. \\
     \hline
     Términos legales de las fuentes de datos & Confirmación caso por caso: corpus de Wikidata bajo dominio público, términos de IGDB registrados textualmente y reconciliados en un registro de decisión. \\
     \hline
@@ -378,9 +352,9 @@ mantienen bajo vigilancia.
     \hline
     Portadas por enlace directo a un tercero & Ventana de retención de treinta días asumida; ausencia o fallo de una portada cae a un marcador propio. \\
     \hline
-    La Fase 2 debe congelar el protocolo antes de comparar & El heurístico de géneros de la Fase 01.1 se declara explícitamente fuera de esa comparación. \\
+    El protocolo de evaluación debe congelarse antes de comparar recomendadores & El heurístico de géneros del sistema se declara explícitamente fuera de esa comparación, que queda como trabajo futuro. \\
     \hline
-    Errores del agente en trabajo dado por bueno & Verificación independiente por fase y revisión de código de todo el repositorio con contexto propio. \\
+    Errores del agente en trabajo dado por bueno & Verificación de objetivos independiente y revisión de código de todo el repositorio con contexto propio. \\
     \hline
     Despliegue no conectado a datos reales & Decisión registrada del autor de posponer esa conexión al final del proyecto; el entorno local reproducible es la vía de demostración. \\
     \hline
@@ -389,35 +363,29 @@ mantienen bajo vigilancia.
 \label{tab:riesgos}
 \end{table}
 
-\section{Desviaciones y replanificación}\label{sec:met-desviaciones}
+\section{Lecciones de ingeniería}\label{sec:met-desviaciones}
 
-La desviación más relevante es la inserción de la Fase 01.1. Tras la firma de la Fase 1, el
-autor pidió una fase de seguimiento inmediata, con un orden de prioridad propio: importación
-masiva del catálogo y rediseño de la interfaz, sistema de acceso real con varias cuentas
-precargadas, ordenación y filtrado del catálogo, más una página de recomendaciones
-independiente. Esa fase se priorizó por delante de la Fase 2, ya planificada, con registro
-explícito como inserción en la hoja de ruta. Durante su planificación, la investigación detectó un
-conflicto real de alcance con el registro abierto de producción, reservado a la versión 2. Se
-resolvió con una vía intermedia: un formulario de registro funcional dentro de la frontera de
-demostración controlada, sin abrir el registro de producción.
+El trabajo dejó varias lecciones de ingeniería que conviene recoger. La primera surgió al
+planificar el crecimiento del catálogo y del sistema de cuentas: la investigación detectó un
+conflicto real de alcance con el registro abierto de producción, reservado a una evolución
+posterior del producto. Se resolvió con una vía intermedia, un formulario de registro
+funcional dentro de la frontera de demostración controlada, sin abrir el registro de
+producción sin restricciones. La lección es que un contrato de alcance escrito y revisado
+antes de tocar código evita que una funcionalidad aparentemente inocua cruce una frontera de
+diseño.
 
-La segunda desviación de calado es la reestructuración de la hoja de ruta del 6 de septiembre
-de 2026, decidida por el autor tras la revisión de producto de la Fase 01.1. La antigua Fase
-2, limitada al corpus gobernado y al contrato de evaluación, se amplió para absorber el
-enriquecimiento de valoraciones externas de usuarios con su instantánea inmutable, la
-corrección de la búsqueda tolerante, los filtros de selección múltiple, una pasada adicional
-de interfaz y un primer recomendador basado en contenido evaluado bajo el protocolo ya
-congelado. En paralelo, las antiguas fases de banco de experimentos y de recomendación de
-contenido se comprimieron en una sola. El conjunto pasó de ocho fases a siete y los
-requisitos afectados se reasignaron en \texttt{REQUIREMENTS.md} sin cambiar sus
-identificadores. La Fase 2 resultante quedó planificada por completo con el proceso habitual,
-en trece planes ejecutables.
+La segunda tiene que ver con el despliegue. La topología pasó de un único proveedor con
+predespliegue para las dos imágenes de contenedor a tres servicios gratuitos coordinados, al
+chocar la restricción de coste cero con el modelo de un solo proveedor. La decisión y sus
+consecuencias quedaron documentadas en un registro de decisión de arquitectura, de modo que
+la diferencia entre el despliegue público y el entorno local es una elección deliberada y
+no una divergencia de comportamiento.
 
-Otras desviaciones menores, todas registradas en los resúmenes de plan, incluyen el cambio de
-la topología de despliegue de un único proveedor a tres servicios gratuitos, además de la
-corrección de un gate de evidencia que estaba en rojo en la rama principal por un problema de
-fin de línea y por registros de decisión escritos en inglés antes de fijarse la convención de
-idioma.
+La tercera es de higiene del propio proceso: un gate de evidencia llegó a estar en rojo en la
+rama principal por un problema de fin de línea y por registros de decisión escritos en inglés
+antes de fijarse la convención de idioma. Corregirlo en cuanto se detectó evitó que el resto
+del trabajo arrastrara un gate poco fiable. Estas incidencias, junto con otras menores,
+quedaron registradas en los resúmenes de plan.
 
 \section{Convenciones de commits y de idioma}\label{sec:met-convenciones}
 
