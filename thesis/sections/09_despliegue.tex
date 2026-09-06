@@ -1,0 +1,74 @@
+\chapter{Despliegue}\label{cap:despliegue}
+
+Este capítulo describe cómo se despliega SavePoint en internet, qué relación guarda ese
+despliegue con el entorno local reproducible y en qué estado se encuentra al cierre de esta
+primera entrega.
+
+\section{Topología pública}\label{sec:desp-topologia}
+
+La restricción de partida es un despliegue de coste cero, sin introducir ninguna tarjeta de
+pago ni habilitar ningún recurso de pago. Esa restricción impide usar un único proveedor con
+predespliegue para las dos imágenes de Docker, así que el registro de decisión ADR-005 fija
+una topología repartida entre tres servicios gratuitos, recogida en la
+Tabla~\ref{tab:topologia}.
+
+\begin{table}[htp]
+\centering
+\begin{tabular}{ | l | l | p{6.5cm} | }
+    \hline
+    \textbf{Superficie} & \textbf{Servicio} & \textbf{Contrato} \\
+    \hline
+    Interfaz de navegador & Vercel Hobby & Construye el frontend Next.js; reenvía del lado del servidor las rutas de la API y de salud hacia Render. \\
+    \hline
+    API & Render Free & Construye la imagen de la API con el catálogo local congelado y expone la ruta de salud. \\
+    \hline
+    Base de datos & Neon Free & Proyecto \texttt{autumn-breeze-06234770}, rama \texttt{production}; suministra PostgreSQL a Render. \\
+    \hline
+\end{tabular}
+\caption{Topología pública aprobada, de coste cero.}
+\label{tab:topologia}
+\end{table}
+
+El navegador solo ve el origen HTTPS de Vercel. La variable que apunta al backend existe
+únicamente en el entorno de servidor de Next.js, de modo que las cookies de sesión y de
+protección contra falsificación de petición en sitios cruzados que emite Django siguen siendo
+del mismo origen. En Render, la cadena de arranque encadena migración, importación del
+catálogo, creación de cuentas simuladas y semilla; solo entonces cede el control al servidor
+\texttt{gunicorn}. Cada paso es idempotente y está protegido con un bloqueo consultivo. Un
+paso fallido detiene el arranque.
+
+\section{Paridad con el entorno local}\label{sec:desp-paridad}
+
+Docker Compose sigue siendo el entorno reproducible canónico, con los tres servicios de base
+de datos, API y frontend construidos desde sus ficheros de Docker. La equivalencia con el
+despliegue público es funcional, de versiones, de commit y de datos, no de imagen byte a
+byte: el frontend público lo construye Vercel de forma nativa y no ejecuta la imagen de
+Docker del frontend. Es una diferencia de despliegue documentada, no una divergencia de
+comportamiento. Si cualquier servicio gratuito duerme, cambia sus términos o desaparece, el
+entorno local sigue disponible sin conexión.
+
+Los límites conocidos del nivel gratuito se declaran de forma explícita. El servicio de la
+API en Render duerme tras quince minutos sin tráfico, de modo que un visitante puede
+encontrar un arranque en frío de cerca de un minuto. Las cuotas mensuales de los tres
+proveedores pueden suspender un servicio. El nivel gratuito no promete copias de seguridad ni
+restauración.
+
+\section{Estado actual del despliegue}\label{sec:desp-estado}
+
+La demostración pública de la Fase 1 está en vivo desde el 5 de septiembre de 2026, con la
+prueba de humo en verde contra la revisión desplegada. Sirve la interfaz anterior al rediseño
+contra el corpus de ciento cincuenta juegos de Wikidata.
+
+La Fase 01.1 no está desplegada. Todo su trabajo está integrado en la rama principal y se
+ejecuta en el entorno local de Docker Compose. El frontend rediseñado llegó a construirse en
+Vercel, pero la base de datos desplegada todavía contiene solo el corpus pequeño, de modo que
+la vista de catálogo da error contra ese despliegue. El autor revisó esta situación y decidió
+dejar el despliegue público actual como está por ahora. La demostración ante el tribunal se
+ejecuta desde el entorno local. Conectar el despliegue a datos reales de internet, es decir,
+cargar el catálogo de IGDB en una base de datos desplegada, aplicar las migraciones nuevas y
+ajustar la configuración de hosts y de proxies, queda pospuesto al final del proyecto, cuando
+todo esté montado. Esta es una decisión registrada del autor, no un defecto pendiente contra
+el alcance de la Fase 01.1.
+
+Este capítulo ha descrito el despliegue y su estado. El capítulo final valora el grado de
+cumplimiento de los objetivos y detalla el trabajo futuro.

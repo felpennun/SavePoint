@@ -1,0 +1,104 @@
+\chapter{Conclusiones y trabajo futuro}\label{cap:conclusiones}
+
+Este capítulo cierra la memoria. Valora el grado de cumplimiento de los objetivos, resume las
+aportaciones de esta primera entrega, declara sus limitaciones sin suavizarlas y detalla el
+trabajo futuro planificado, con especial atención a la comparación de recomendadores que da
+sentido último al proyecto.
+
+\section{Grado de cumplimiento de objetivos}\label{sec:conc-objetivos}
+
+De los siete objetivos específicos fijados en la Sección~\ref{sec:intro-objetivos-especificos},
+los cuatro de producto e infraestructura de datos están cumplidos y verificados. El catálogo
+tiene identidad canónica propia, procedencia por obra y licencia documentada, con más de
+trescientas mil obras servidas (OE-1). Una persona usuaria puede mantener su lista de
+pendientes, valorar juegos e inventariar copias físicas y digitales con su formato y su
+edición (OE-2). La búsqueda es tolerante. El catálogo se puede ordenar y filtrar por
+plataforma, género, año y nota (OE-3). Existe una página de recomendaciones por afinidad de
+géneros basada en la actividad propia de cada persona, visiblemente distinta del baseline de
+popularidad (OE-4). Los tres objetivos restantes, el contrato de evaluación congelado, la
+comparación de recomendadores y el panel de investigación, quedan como trabajo planificado
+(OE-5 a OE-7).
+
+Las dos fases documentadas se cerraron con cinco de cinco criterios de éxito verificados y
+con la firma de aceptación del autor. El objetivo general se cumple de forma parcial y
+honesta: la plataforma de catalogación existe y funciona como base del banco de pruebas,
+mientras que el banco de pruebas de recomendadores todavía está en construcción.
+
+\section{Aportaciones}\label{sec:conc-aportaciones}
+
+Esta primera entrega deja tres aportaciones. La primera es el producto: una plataforma de
+catalogación de videojuegos que combina inventario de propiedad física y digital, catálogo a
+escala real y procedencia de datos documentada, un conjunto que los productos de referencia
+no reúnen. La segunda es la base del banco de pruebas reproducible: un corpus citable, un
+modelo de dominio pensado para la evaluación, usuarios simulados y una disciplina de
+procedencia sobre la que las fases siguientes montarán el contrato de evaluación y los
+experimentos. La tercera es la metodología de ingeniería asistida por agentes, aplicada fase
+a fase y versionada en el repositorio, con un árbol de planificación vivo, registros de
+decisión, un registro de agentes de solo anexado y gates de evidencia, de modo que el proceso
+que produjo el sistema es tan inspeccionable y reproducible por un tercero como el sistema
+mismo.
+
+\section{Limitaciones}\label{sec:conc-limitaciones}
+
+Las limitaciones conocidas se declaran sin ocultarlas, como recogen los ítems diferidos de
+cada fase. La Tabla~\ref{tab:limitaciones} las resume.
+
+\begin{table}[htp]
+\centering
+\begin{tabular}{ | p{5cm} | p{8cm} | }
+    \hline
+    \textbf{Limitación} & \textbf{Situación} \\
+    \hline
+    Valoración agregada sin cargar & Nula en las 312.633 filas; el filtro y el orden por nota son correctos por contrato pero hoy inertes, a la espera de una reejecución del importador. \\
+    \hline
+    Fecha de lanzamiento parcial & Poblada para en torno al 75\% de las filas. \\
+    \hline
+    Página de recomendaciones sin datos poblados & Las cuentas de demostración carecen de historial con género, de modo que la página muestra el estado de bienvenida; el ranking está probado de forma determinista con datos de prueba. \\
+    \hline
+    Pasada de refinamiento de diseño pendiente & Cuatro elementos cosméticos aceptados por el autor: mezcla de idiomas en la explicación de recomendaciones, navegación superior autenticada estrecha por debajo de 430 píxeles, detalle de juego algo escaso y menú de cuenta que no identifica la cuenta activa. \\
+    \hline
+    Accesibilidad manual de la Fase 1 & El reflujo al 400\% de zoom y una pasada con lector de pantalla siguen abiertos. \\
+    \hline
+    Despliegue no conectado a datos reales & Pospuesto al final del proyecto por decisión del autor; la demostración se ejecuta en local. \\
+    \hline
+\end{tabular}
+\caption{Limitaciones conocidas de la primera entrega.}
+\label{tab:limitaciones}
+\end{table}
+
+\section{Trabajo futuro}\label{sec:conc-trabajo-futuro}
+
+El trabajo futuro es el núcleo académico del proyecto y está planificado en la hoja de ruta.
+No existe todavía ningún resultado de comparación de recomendadores. Esta memoria no presenta
+ninguno.
+
+La Fase 2 establecerá el corpus de investigación inmutable y el contrato de evaluación
+congelado: relevancia, valor de la lista, usuarios, candidatos, exclusiones, repartos,
+métricas, semillas y presupuesto de ajuste, todos fijados antes de comparar ningún algoritmo,
+con escenarios de usuarios sintéticos parametrizados y reproducibles. La Fase 3 completará
+los flujos de colección y la portabilidad de datos. La Fase 4 añadirá el descubrimiento
+público y el enriquecimiento de datos resiliente y atribuible.
+
+Las Fases 5 a 8 son el trabajo de recomendadores propiamente dicho. La Fase 5 construirá el
+banco de experimentos reproducible con los baselines aleatorio y de popularidad, con métricas
+de acierto, cobertura, diversidad y novedad, además de artefactos de experimento inmutables a
+partir de los que recalcular los resultados sin volver a ejecutar los modelos. La Fase 6
+entregará el recomendador basado en contenido, con explicaciones deterministas ancladas en
+evidencia real del modelo y con una estrategia explícita de arranque en frío. La Fase 7
+comparará métodos de filtrado colaborativo e híbridos bajo el mismo protocolo ya congelado,
+con conclusiones acotadas a la simulación sintética. La Fase 8 presentará la comparación en
+un panel accesible que exporte tablas y figuras listas para la memoria. También cerrará el
+endurecimiento de seguridad, la recuperación y la congelación de la evidencia.
+
+El heurístico de afinidad por géneros de esta entrega da a la Fase 6 un contrato de página y
+de punto de acceso ya cableado que sustituir, sin adelantar ni difuminar la comparación
+rigurosa que vendrá después.
+
+\section{Cierre}\label{sec:conc-cierre}
+
+SavePoint parte de una idea doble: un producto de catalogación que a la vez sea un banco de
+pruebas de recomendadores. Esta primera entrega deja el producto construido, verificado y
+documentado, con el banco de pruebas cimentado sobre datos citables y un modelo pensado para
+la evaluación. Deja además una forma de trabajar, asistida por agentes y gobernada por
+especificación, cuyo rastro completo de decisiones queda en el repositorio. El trabajo que
+falta, la comparación de recomendadores, tiene ahora una base sobre la que apoyarse.

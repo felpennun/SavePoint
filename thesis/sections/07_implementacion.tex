@@ -1,0 +1,183 @@
+\chapter{Implementación}\label{cap:implementacion}
+
+Este capítulo describe cómo se ha construido el sistema. Empieza por el entorno reproducible y
+las versiones fijadas, sigue con el backend, con sus comandos de gestión, sus vistas y sus
+algoritmos deterministas. Termina con el frontend, con sus rutas, sus componentes y su
+internacionalización. Incluye extractos de código representativos, todos referenciados en el
+texto.
+
+\section{Herramientas y entorno reproducible}\label{sec:impl-entorno}
+
+El entorno de desarrollo y de pruebas se orquesta con Docker Compose, con tres servicios:
+base de datos, backend y frontend. Las dependencias se fijan a versión exacta, con
+\texttt{uv} para Python y \texttt{pnpm} para Node. Sus ficheros de bloqueo se congelan en las
+construcciones. Las imágenes base se fijan por resumen criptográfico. La
+Tabla~\ref{tab:stack} recoge las versiones principales.
+
+\begin{table}[htp]
+\centering
+\begin{tabular}{ | l | l | l | }
+    \hline
+    \textbf{Componente} & \textbf{Versión} & \textbf{Papel} \\
+    \hline
+    Python & 3.13.7 & Lenguaje del backend y de los guiones de datos. \\
+    \hline
+    Django & 5.2.17 LTS & Dominio, autenticación, ORM, sesiones y migraciones. \\
+    \hline
+    Django REST Framework & 3.18.0 & Serialización, permisos y API. \\
+    \hline
+    PostgreSQL & 18.6 & Base de datos de aplicación y de pruebas de integración. \\
+    \hline
+    psycopg & 3.3.5 & Controlador de PostgreSQL. \\
+    \hline
+    Node.js & 24.13.0 & Ejecución del frontend. \\
+    \hline
+    Next.js & 16.3.4 & Renderizado en el servidor, rutas y metadatos. \\
+    \hline
+    React & 19.2.7 & Modelo de componentes. \\
+    \hline
+    TypeScript & 6.0.3 & Tipado estricto del frontend. \\
+    \hline
+    Tailwind CSS & 4.3.3 & Tokens de diseño y maquetación adaptable. \\
+    \hline
+\end{tabular}
+\caption{Versiones principales del entorno reproducible.}
+\label{tab:stack}
+\end{table}
+
+\section{Backend}\label{sec:impl-backend}
+
+\subsection{Comandos de gestión}\label{sec:impl-comandos}
+
+Toda tarea de datos es un comando de gestión de Django, ejecutable fuera de la petición HTTP e
+idempotente. El importador de Wikidata, \texttt{import\_catalogue}, carga el corpus congelado
+de la Fase 1. El importador de IGDB, \texttt{import\_igdb\_catalogue}, recorre la API por
+lotes con un cursor de identificador reanudable: cada lote se confirma dentro de una
+transacción que también escribe el cursor. Un disparador de base de datos impide que ese
+cursor retroceda, de modo que una ejecución interrumpida siempre reanuda hacia delante desde
+el progreso real. El comando \texttt{bootstrap\_demo\_accounts} crea las cuentas simuladas a
+partir de un contrato en variables de entorno, con validación completa antes de escribir y un
+bloqueo consultivo que evita inicializaciones concurrentes. El comando \texttt{seed\_demo}
+carga interacciones deterministas que se autoverifican contra resultados con huella en cada
+carga. En el despliegue, la cadena de arranque encadena migración, importación, creación de
+cuentas y semilla antes de ceder el control al servidor HTTP. Un paso fallido detiene el
+arranque para que el chequeo de salud nunca se ponga en verde con una inicialización parcial.
+
+\subsection{Vistas y límite de ritmo}\label{sec:impl-vistas}
+
+La configuración de DRF fija la autenticación por sesión como única clase de autenticación,
+de modo que no queda habilitada ninguna vía de autenticación básica sin límite de ritmo. Las
+vistas anónimas de mayor coste llevan un límite de ritmo con ámbito propio: cinco registros
+por hora, diez intentos de acceso por minuto, treinta consultas de perfil público por minuto
+y ciento veinte búsquedas de catálogo por minuto. El número de proxies de confianza se lee de
+una variable de entorno, con valor cero en local, para que el límite de ritmo por dirección
+se agrupe correctamente detrás del proxy del mismo origen.
+
+\subsection{Búsqueda y filtrado del catálogo}\label{sec:impl-busqueda}
+
+La búsqueda del catálogo es tolerante: primero coincidencia exacta, después por prefijo y por
+último por similitud de trigramas para erratas pequeñas, siempre sobre el índice de alias
+normalizados y sin ninguna llamada externa. Sobre ese resultado se cruzan los filtros de
+plataforma, género, año y nota mínima. Una lista fija de claves de ordenación se traduce a un
+\texttt{order\_by} determinista con desempate por identificador canónico. El texto de
+ordenación que envía el cliente nunca se interpola: una clave desconocida produce un error
+acotado antes de tocar el ORM. El Extracto de código~\ref{cod:sort} muestra esa lista de
+ordenaciones permitidas.
+
+\begin{lstlisting}[language=Python, caption={Lista fija de ordenaciones del catálogo, con desempate por identificador canónico (\texttt{apps/api/catalogue/search.py}).}, label={cod:sort}, captionpos=b, float, floatplacement=!htp]
+# Cada clave resuelve a una tupla de argumentos de order_by que SIEMPRE
+# termina en canonical_slug, de modo que todo orden es total y estable
+# entre llamadas. Nada derivado de la entrada del cliente llega a este
+# diccionario: una clave no reconocida lanza un error antes de construir
+# la consulta.
+SORT_ORDERS = {
+    "title_asc": ("original_title", "canonical_slug"),
+    "title_desc": ("-original_title", "canonical_slug"),
+    "release_newest": (F("first_release_date").desc(nulls_last=True), "canonical_slug"),
+    "release_oldest": (F("first_release_date").asc(nulls_last=True), "canonical_slug"),
+    "rating_desc": (F("total_rating").desc(nulls_last=True), "canonical_slug"),
+}
+\end{lstlisting}
+
+\subsection{El heurístico de afinidad por géneros}\label{sec:impl-heuristico}
+
+La página de recomendaciones se apoya en el heurístico \texttt{rank\_genre\_taste\_v1},
+descrito en el registro ADR-007. Es una agregación en tiempo de petición, sin estado, acotada
+a la persona autenticada. Cada entrada de la biblioteca de esa persona aporta un peso de
+actividad a cada género de su obra, según la fórmula del Extracto de
+código~\ref{cod:heuristico}. La tabla de pesos por estado es una copia deliberada de la del
+baseline de popularidad; la contribución de la valoración también coincide. Las obras del
+catálogo no vistas y sin ser contenido descargable se ordenan por el peso sumado de los
+géneros que comparten con ese vector de gusto, con desempate por identificador canónico. Cada
+respuesta lleva una huella SHA-256 del vector de gusto y del resultado ordenado, de modo que
+dos llamadas con la misma entrada producen la misma huella. Sin actividad con género, la
+respuesta es una forma explícita de historial insuficiente que nunca cae al baseline de
+popularidad.
+
+\begin{lstlisting}[language=Python, caption={Peso de actividad por entrada de biblioteca en el heurístico de géneros (\texttt{apps/api/recommendations/genre\_heuristic.py}).}, label={cod:heuristico}, captionpos=b, float, floatplacement=!htp]
+ALGORITHM_ID = "genre-taste-v1"
+
+# Igual que la tabla del baseline de popularidad, de modo que el
+# heuristico personal y el agregado publico hablan el mismo idioma de
+# "cuanto cuenta esta interaccion". Un titulo abandonado no es evidencia
+# de gusto: aporta cero.
+STATUS_WEIGHTS = {"completed": 3.0, "playing": 2.0, "pending": 1.0, "abandoned": 0.0}
+RATING_DIVISOR = 10  # rating_half_steps / 10 -> aporta entre 0.1 y 1.0
+
+def entry_weight(status, rating_half_steps):
+    return STATUS_WEIGHTS.get(status or "", 0.0) + (rating_half_steps or 0) / RATING_DIVISOR
+\end{lstlisting}
+
+La frontera con el trabajo futuro es explícita. Este heurístico es un conteo de frecuencia
+sobre una tabla, sin paso de entrenamiento, sin vectores latentes y sin almacén de
+características persistido. No reclama calidad predictiva. Su cadena de limitación, incluida en
+cada respuesta, dice con palabras que no debe compararse con el recomendador basado en
+contenido de la Fase 6. Su papel es doble: hacer que el producto se lea como un sitio de
+catalogación real y dar a la Fase 6 un contrato de página y de punto de acceso ya cableado
+que sustituir.
+
+\section{Frontend}\label{sec:impl-frontend}
+
+\subsection{Rutas y componentes}\label{sec:impl-rutas}
+
+El frontend usa el enrutador de aplicación de Next.js, con un segmento de idioma en la raíz de
+la ruta. Las rutas de esta entrega son la página de inicio, el catálogo, el detalle de un
+juego, la colección, el perfil público, las fuentes, el acceso, el registro y las
+recomendaciones. Los componentes reutilizables incluyen el armazón de la aplicación con su
+barra de navegación, la tarjeta de juego, las píldoras de estado y de nota, la valoración por
+estrellas, la imagen de portada, la barra de filtros, el conmutador de tema y el selector de
+cuenta. Las páginas de solo lectura se renderizan en el servidor; los controles de biblioteca
+son componentes de cliente que llaman a la API del mismo origen.
+
+\subsection{Internacionalización}\label{sec:impl-i18n}
+
+La interfaz está disponible en español y en inglés. Los textos viven en diccionarios por
+idioma. Una prueba de paridad falla si una clave existe en un idioma pero no en el otro, de
+modo que ninguna cadena queda sin traducir. La convención del proyecto fija el español como
+idioma por defecto de la documentación y de la conversación, mientras que el código y sus
+cadenas de registro permanecen en inglés.
+
+\subsection{Proxy del mismo origen}\label{sec:impl-proxy}
+
+El navegador solo llama a rutas del mismo origen de Next.js. Una reescritura del lado del
+servidor reenvía las rutas bajo \texttt{/api/} y la ruta de chequeo de salud hacia el
+backend, con el destino tomado de una variable de entorno visible únicamente en el servidor.
+El Extracto de código~\ref{cod:proxy} muestra esa reescritura. Así, las cookies de sesión y
+de protección contra falsificación de petición en sitios cruzados que emite Django siguen
+siendo del mismo origen, sin necesidad de compartir recursos entre orígenes con credenciales.
+
+\begin{lstlisting}[language=javascript, caption={Reescritura del mismo origen hacia el backend (\texttt{apps/web/next.config.ts}).}, label={cod:proxy}, captionpos=b, float, floatplacement=!htp]
+// El navegador solo habla con este origen de Next.js: las cookies de
+// sesion y CSRF que fija Django siguen siendo del mismo origen y no hace
+// falta ninguna configuracion de CORS con credenciales. API_PROXY_TARGET
+// solo existe en el entorno de servidor, nunca como variable NEXT_PUBLIC_.
+async rewrites() {
+  return [
+    { source: "/api/:path*", destination: `${API_PROXY_TARGET}/api/:path*/` },
+    { source: "/health/", destination: `${API_PROXY_TARGET}/health/` },
+  ];
+}
+\end{lstlisting}
+
+Este capítulo ha descrito la construcción del sistema. El capítulo siguiente detalla cómo se
+ha probado y verificado.

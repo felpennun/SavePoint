@@ -1,0 +1,159 @@
+\chapter{Pruebas y verificación}\label{cap:pruebas}
+
+Este capítulo describe cómo se comprueba que el sistema hace lo que debe. Presenta la
+estrategia de pruebas, los gates de evidencia automáticos, la verificación independiente del
+objetivo de cada fase y la revisión de código de todo el repositorio, con sus resultados en
+cifras reales tomadas de \texttt{docs/verification/} y de los informes de verificación de las
+fases.
+
+\section{Estrategia de pruebas}\label{sec:pru-estrategia}
+
+La estrategia combina cuatro niveles. Las pruebas unitarias y de integración del backend se
+ejecutan con \texttt{pytest} contra una instancia real de PostgreSQL 18.6, sin sustituirla
+por una base en memoria, porque el sistema depende de restricciones, transacciones y búsqueda
+de trigramas que solo se comportan igual sobre el motor real. Las pruebas del frontend usan
+\texttt{vitest} para la lógica y los componentes, con una prueba de paridad de claves de
+traducción. Las pruebas de extremo a extremo usan Playwright sobre un navegador real, con la
+biblioteca \texttt{axe} para las comprobaciones automáticas de accesibilidad frente a las
+Pautas de Accesibilidad para el Contenido Web (WCAG) 2.2~\cite{wcag22}. Por último, una
+prueba de humo se ejecuta contra la URL pública desplegada y rechaza un despliegue con la
+revisión equivocada, tráfico entre orígenes inesperado o peticiones fallidas.
+
+La Tabla~\ref{tab:suites} recoge los resultados de las suites en el momento del cierre de la
+Fase 01.1.
+
+\begin{table}[htp]
+\centering
+\begin{tabular}{ | l | l | l | }
+    \hline
+    \textbf{Suite} & \textbf{Herramienta} & \textbf{Resultado} \\
+    \hline
+    Backend & \texttt{pytest} sobre PostgreSQL & 209 pruebas superadas \\
+    \hline
+    Recomendaciones & \texttt{pytest} & 21 pruebas superadas \\
+    \hline
+    Frontend, unidad y paridad & \texttt{vitest} & 16 pruebas superadas \\
+    \hline
+    Construcción del frontend & \texttt{next build} & correcta, sin errores de tipos \\
+    \hline
+    Extremo a extremo y accesibilidad & Playwright y \texttt{axe} & 41 pruebas superadas; cero incidencias críticas o graves de \texttt{axe} \\
+    \hline
+\end{tabular}
+\caption{Resultados de las suites de pruebas al cierre de la Fase 01.1.}
+\label{tab:suites}
+\end{table}
+
+Las comprobaciones de \texttt{axe} cubren el catálogo, el detalle, el registro, las
+recomendaciones, la página de inicio, el acceso y las fuentes, en escritorio a 1280 por 800
+píxeles y en móvil a 375 por 812 píxeles.
+
+\section{Gates de evidencia}\label{sec:pru-gates}
+
+Además de las pruebas, el repositorio tiene gates deterministas que protegen la evidencia. El
+gate \texttt{check-secrets.ps1} escanea el árbol de Git, los paquetes de construcción, las
+capas de las imágenes y los registros capturados en busca de cadenas con forma de credencial,
+y se autoverifica primero contra señuelos sintéticos. El gate \texttt{check-evidence.ps1}
+valida el esquema, los tipos, los actores, las rutas, los hashes y la cobertura del registro
+de agentes, probando primero con entradas inválidas. El gate \texttt{check-dependencies.ps1}
+comprueba que toda dependencia directa está en la lista permitida, fijada a versión exacta,
+con su fichero de bloqueo. Los gates \texttt{verify-igdb-*.ps1} comprueban el contenido del
+registro de decisión de IGDB, la evidencia del sondeo y la ejecución de importación sobre una
+base de datos fresca.
+
+\section{Verificación del objetivo de fase}\label{sec:pru-verificacion-fase}
+
+Cada fase tiene una verificación independiente de su objetivo, realizada por un subagente
+distinto del que implementó el trabajo, que comprueba el código contra los criterios de éxito
+de la hoja de ruta en lugar de leer los resúmenes de plan. La Fase 1 se verificó con cinco de
+cinco criterios de éxito, con dos elementos manuales de accesibilidad aceptados como
+limitaciones nombradas: el reflujo al cuatrocientos por ciento de zoom y una pasada con
+lector de pantalla. La Fase 01.1 se verificó con cinco de cinco criterios, tras una
+reverificación del criterio de cuentas simuladas plurales que al cierre inicial estaba
+parcial. La Tabla~\ref{tab:criterios} resume los criterios de la Fase 01.1.
+
+\begin{table}[htp]
+\centering
+\begin{tabular}{ | c | p{10.5cm} | c | }
+    \hline
+    \textbf{Criterio} & \textbf{Enunciado} & \textbf{Veredicto} \\
+    \hline
+    SC1 & Catálogo a escala real con fuente IGDB, con licencia, atribución y procedencia documentadas. & Verificado \\
+    \hline
+    SC2 & Ordenar y filtrar el catálogo por plataforma, género y otros metadatos. & Verificado \\
+    \hline
+    SC3 & Varias cuentas precargadas distintas inician y cierran sesión de forma independiente. & Verificado \\
+    \hline
+    SC4 & La interfaz se lee como un producto de catalogación profesional. & Verificado \\
+    \hline
+    SC5 & Página de recomendaciones por géneros según la actividad propia, distinta del baseline de popularidad. & Verificado \\
+    \hline
+\end{tabular}
+\caption{Criterios de éxito de la Fase 01.1 y su veredicto.}
+\label{tab:criterios}
+\end{table}
+
+El criterio SC4, la calidad visual de producto, se cerró con la aprobación del autor. Empezó
+como aprobación anticipada condicional, mientras el autor estaba desconectado. Quedó
+confirmada sin condiciones tras una revisión remota de dieciocho capturas del entorno local
+que cubrían las cuatro superficies principales en escritorio y en móvil, ambos temas y una
+segunda cuenta simulada con colección vacía como prueba visual de independencia.
+
+\section{Revisión de código de todo el repositorio}\label{sec:pru-revision}
+
+Al cierre de la Fase 01.1, un subagente revisor examinó todo el árbol con una postura
+adversarial de búsqueda de defectos y un contexto propio, distinto del de la implementación.
+La revisión encontró dieciséis hallazgos, cuya distribución por severidad recoge la
+Tabla~\ref{tab:hallazgos}. El autor autorizó aplicar la totalidad de los hallazgos, que se
+corrigieron en cinco tandas confirmadas, cada una con las pruebas ejecutadas después.
+
+\begin{table}[htp]
+\centering
+\begin{tabular}{ | l | c | c | }
+    \hline
+    \textbf{Severidad} & \textbf{Hallazgos} & \textbf{Estado} \\
+    \hline
+    Crítica & 0 & Ninguno \\
+    \hline
+    Alta & 3 & Corregidos \\
+    \hline
+    Media & 6 & Corregidos \\
+    \hline
+    Baja & 7 & Corregidos \\
+    \hline
+    \textbf{Total} & \textbf{16} & \textbf{16 corregidos} \\
+    \hline
+\end{tabular}
+\caption{Hallazgos de la revisión de código de todo el repositorio.}
+\label{tab:hallazgos}
+\end{table}
+
+Los tres hallazgos de severidad alta ilustran el valor de una revisión con contexto
+independiente. El primero era que la configuración de DRF dejaba habilitada de forma
+silenciosa la autenticación básica en todo punto de acceso autenticado, lo que abría una vía
+de adivinación de contraseñas sin límite de ritmo y una ruta de cambio de estado exenta de la
+protección contra falsificación de petición en sitios cruzados. El segundo era que una
+reimportación troceada del catálogo de IGDB tras una pasada completa podía saltarse en
+silencio un rango de identificadores ya recorrido y aun así declararse completa con una huella
+nueva. El tercero era que el arranque de producción usaba el servidor de desarrollo de
+Django, que su documentación desaconseja explícitamente. Los tres se corrigieron, el segundo
+con un campo de esquema nuevo y una migración, el tercero con la incorporación del servidor
+\texttt{gunicorn}.
+
+La revisión también dejó constancia de las áreas sanas: ausencia de inyección de SQL, con
+todo el uso del ORM parametrizado; validación minuciosa de las consultas del catálogo;
+acotación de propiedad en todas las vistas de datos personales; escrituras transaccionales
+con bloqueo de fila y restricciones de unicidad como guarda real de carreras; higiene de
+secretos con redacción en registros y excepciones.
+
+\section{Lectura de los resultados}\label{sec:pru-lectura}
+
+Las cifras anteriores respaldan afirmaciones acotadas. El sistema tiene una cobertura de
+pruebas amplia sobre PostgreSQL real, una accesibilidad automática sólida aunque no
+exhaustiva y una revisión de seguridad de todo el árbol con sus hallazgos corregidos. Esas
+cifras no respaldan ninguna medida de rendimiento bajo carga, de recuperación ante desastre
+ni de calidad de recomendación. La memoria tampoco las afirma, porque pertenecen a fases
+posteriores. Los dos elementos manuales de accesibilidad de la Fase 1 siguen abiertos y
+declarados como tales.
+
+Este capítulo ha mostrado cómo se verifica el sistema. El capítulo siguiente trata su
+despliegue.
