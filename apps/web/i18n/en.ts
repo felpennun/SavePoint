@@ -161,12 +161,15 @@ export const en: Dictionary = {
       "This creates a working account inside the controlled demo. It is not a public production account.",
     username: "Username",
     password: "Password",
+    passwordHint:
+      "At least 8 characters. Avoid common passwords, all-numeric passwords, or ones close to your username. Any character is allowed, including spaces and symbols.",
     confirmPassword: "Confirm password",
     submit: "Create simulated account",
     pending: "Creating…",
     haveAccount: "Already have an account? Log in",
     errorDuplicate: "That username is taken. Try another.",
     errorWeakPassword: "Choose a stronger password and try again.",
+    weakPasswordIntro: "The password does not meet the requirements:",
     errorGeneric: "We couldn't create the account. Try again.",
     errorRateLimited: "Too many attempts. Wait a minute and try again.",
   },
@@ -180,7 +183,6 @@ export const en: Dictionary = {
       recommendationsCta: "See your genre recommendations",
     },
     loggedOut: {
-      primaryCta: "Log in",
       secondaryCta: "Browse the catalogue",
       registerCta: "Create a simulated account",
     },

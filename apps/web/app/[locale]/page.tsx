@@ -106,11 +106,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           </div>
           <h1 className="sp-h1">SavePoint</h1>
           <p className="sp-lead">{dict.home.valueProposition}</p>
+          {/* No log-in entry here on purpose: sign-in lives in the navbar
+              (person icon) and on its own /login page. The home hero leads
+              with browsing the catalogue and creating an account. */}
           <nav style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-ctl)", alignItems: "center", margin: "var(--space-lg) 0" }}>
-            <Link href={`/${locale}/login`} className="sp-btn-primary">
-              {dict.home.loggedOut.primaryCta}
-            </Link>
-            <Link href={`/${locale}/catalogue`} className="sp-link">
+            <Link href={`/${locale}/catalogue`} className="sp-btn-primary">
               {dict.home.loggedOut.secondaryCta}
             </Link>
             <Link href={`/${locale}/register`} className="sp-link">

@@ -106,6 +106,30 @@ def test_weak_password_is_rejected_and_creates_no_user() -> None:
 
 
 @pytest.mark.django_db
+def test_weak_password_response_lists_concrete_reasons() -> None:
+    """The 400 body carries the specific validator failures so the client
+    can tell the visitor exactly what to fix, not just "too weak"."""
+    client = _csrf_client()
+    token = _bootstrap_csrf(client)
+
+    response = client.post(
+        "/api/accounts/register/",
+        {"username": "reasons-account", "password": WEAK_PASSWORD},
+        format="json",
+        HTTP_X_CSRFTOKEN=token,
+    )
+
+    assert response.status_code == 400
+    reasons = response.json()["password_errors"]
+    assert isinstance(reasons, list)
+    # "1234" trips several validators at once (too short, too common,
+    # entirely numeric); at least two concrete messages come back.
+    assert len(reasons) >= 2
+    assert all(isinstance(message, str) and message for message in reasons)
+    assert not User.objects.filter(username="reasons-account").exists()
+
+
+@pytest.mark.django_db
 def test_password_too_similar_to_username_is_rejected() -> None:
     client = _csrf_client()
     token = _bootstrap_csrf(client)

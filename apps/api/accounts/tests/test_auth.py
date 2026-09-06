@@ -74,6 +74,40 @@ def test_invalid_credentials_return_uniform_message(demo_user) -> None:  # noqa:
 
 
 @pytest.mark.django_db
+def test_login_username_is_case_insensitive(demo_user) -> None:  # noqa: ANN001
+    """Registration blocks case-variant duplicates (``username__iexact``),
+    so a login that only differs in case must resolve to the stored account
+    instead of locking the visitor out."""
+    client = _csrf_client()
+    client.get("/api/accounts/csrf/")
+    csrf_token = client.cookies["csrftoken"].value
+
+    response = client.post(
+        "/api/accounts/login/",
+        {"username": USERNAME.upper(), "password": PASSWORD},
+        format="json",
+        HTTP_X_CSRFTOKEN=csrf_token,
+    )
+    assert response.status_code == 200
+    assert response.json()["next"] == "/catalogue"
+
+
+@pytest.mark.django_db
+def test_case_insensitive_login_still_needs_the_right_password(demo_user) -> None:  # noqa: ANN001
+    client = _csrf_client()
+    client.get("/api/accounts/csrf/")
+    csrf_token = client.cookies["csrftoken"].value
+
+    response = client.post(
+        "/api/accounts/login/",
+        {"username": USERNAME.upper(), "password": "wrong"},
+        format="json",
+        HTTP_X_CSRFTOKEN=csrf_token,
+    )
+    assert response.status_code == 401
+
+
+@pytest.mark.django_db
 def test_login_without_csrf_token_is_rejected(demo_user) -> None:  # noqa: ANN001
     client = _csrf_client()
     client.get("/api/accounts/csrf/")

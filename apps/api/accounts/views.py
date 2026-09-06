@@ -75,6 +75,24 @@ class LoginView(APIView):
             return Response({"detail": INVALID_CREDENTIALS_MESSAGE}, status=401)
 
         user = authenticate(request, username=username, password=password)
+        if user is None:
+            # Registration enforces case-insensitive username uniqueness
+            # (``username__iexact``), but Django's ModelBackend matches the
+            # username case-sensitively. Without this retry a visitor who
+            # registered as "Alice" is locked out the instant they type
+            # "alice": login rejects them and registration refuses to
+            # recreate the account. Resolve to the stored spelling and try
+            # once more. The uniform error below still hides whether the
+            # username exists.
+            canonical = (
+                User.objects.filter(username__iexact=username)
+                .exclude(username=username)
+                .order_by("pk")
+                .values_list("username", flat=True)
+                .first()
+            )
+            if canonical:
+                user = authenticate(request, username=canonical, password=password)
         if user is None or not user.is_active:
             return Response({"detail": INVALID_CREDENTIALS_MESSAGE}, status=401)
 
@@ -142,8 +160,18 @@ class RegisterView(APIView):
         # numeric, similarity-to-username).
         try:
             validate_password(password, user=User(username=username))
-        except DjangoValidationError:
-            return Response({"detail": REGISTRATION_WEAK_PASSWORD_MESSAGE}, status=400)
+        except DjangoValidationError as exc:
+            # Return the concrete validator messages (too short, too common,
+            # entirely numeric, too similar to the username) so the client
+            # can tell the visitor exactly what to fix instead of a vague
+            # "weak password".
+            return Response(
+                {
+                    "detail": REGISTRATION_WEAK_PASSWORD_MESSAGE,
+                    "password_errors": list(exc.messages),
+                },
+                status=400,
+            )
 
         try:
             with transaction.atomic():
@@ -167,6 +195,23 @@ class LogoutView(APIView):
     def post(self, request: Request) -> Response:
         logout(request)
         return Response({"detail": "ok"})
+
+
+class MeView(APIView):
+    """GET /api/accounts/me/ -- the signed-in visitor's own identity.
+
+    The navbar account control and the home greeting read this to show
+    *which* account is active. An anonymous caller gets 401 with no body,
+    so a 200 always carries a username. Deliberately minimal: alias plus a
+    demo/real flag, never email or internal IDs.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request) -> Response:
+        user = request.user
+        is_demo = hasattr(user, "demo_identity") or hasattr(user, "demo_anchor")
+        return Response({"username": user.username, "is_demo": is_demo})
 
 
 class PublicProfileView(APIView):

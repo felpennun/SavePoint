@@ -138,12 +138,14 @@ export interface Dictionary {
     intro: string;
     username: string;
     password: string;
+    passwordHint: string;
     confirmPassword: string;
     submit: string;
     pending: string;
     haveAccount: string;
     errorDuplicate: string;
     errorWeakPassword: string;
+    weakPasswordIntro: string;
     errorGeneric: string;
     errorRateLimited: string;
   };
@@ -156,7 +158,6 @@ export interface Dictionary {
       recommendationsCta: string;
     };
     loggedOut: {
-      primaryCta: string;
       secondaryCta: string;
       registerCta: string;
     };

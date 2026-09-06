@@ -34,10 +34,12 @@ export default function RegisterPage() {
   const [confirm, setConfirm] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
+    setPasswordErrors([]);
 
     if (password !== confirm) {
       setError(mismatchMsg);
@@ -67,10 +69,29 @@ export default function RegisterPage() {
       }
       setPassword("");
       setConfirm("");
-      if (response.status === 409) setError(t.errorDuplicate);
-      else if (response.status === 400) setError(t.errorWeakPassword);
-      else if (response.status === 429) setError(t.errorRateLimited);
-      else setError(t.errorGeneric);
+      if (response.status === 409) {
+        setError(t.errorDuplicate);
+      } else if (response.status === 400) {
+        // The API returns the concrete password-policy failures (too short,
+        // too common, all numeric, too similar to the username). Show them
+        // as a list; fall back to the generic line if the body is absent.
+        const body = (await response.json().catch(() => null)) as
+          | { password_errors?: unknown }
+          | null;
+        const reasons = Array.isArray(body?.password_errors)
+          ? body.password_errors.filter((m): m is string => typeof m === "string")
+          : [];
+        if (reasons.length > 0) {
+          setError(t.weakPasswordIntro);
+          setPasswordErrors(reasons);
+        } else {
+          setError(t.errorWeakPassword);
+        }
+      } else if (response.status === 429) {
+        setError(t.errorRateLimited);
+      } else {
+        setError(t.errorGeneric);
+      }
     } catch {
       setError(t.errorGeneric);
     } finally {
@@ -107,9 +128,12 @@ export default function RegisterPage() {
             autoComplete="new-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            aria-describedby={error ? "register-error" : undefined}
+            aria-describedby={error ? "password-hint register-error" : "password-hint"}
             required
           />
+          <p id="password-hint" className="sp-muted" style={{ margin: "var(--space-sm) 0 0" }}>
+            {t.passwordHint}
+          </p>
         </div>
         <div className="sp-field">
           <label htmlFor="confirm-password">{t.confirmPassword}</label>
@@ -129,6 +153,16 @@ export default function RegisterPage() {
           <p id="register-error" role="alert" data-testid="register-error" style={{ color: "var(--color-danger)", margin: 0 }}>
             {error}
           </p>
+        ) : null}
+        {passwordErrors.length > 0 ? (
+          <ul
+            data-testid="register-password-errors"
+            style={{ color: "var(--color-danger)", margin: "var(--space-sm) 0 0", paddingLeft: "1.25rem" }}
+          >
+            {passwordErrors.map((reason) => (
+              <li key={reason}>{reason}</li>
+            ))}
+          </ul>
         ) : null}
 
         <button type="submit" className="sp-btn-primary" disabled={pending}>

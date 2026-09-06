@@ -164,12 +164,15 @@ export const es: Dictionary = {
       "Crea una cuenta funcional dentro de la demo controlada. No es una cuenta pública de producción.",
     username: "Usuario",
     password: "Contraseña",
+    passwordHint:
+      "Al menos 8 caracteres. Evita contraseñas habituales, que sean solo números o que se parezcan a tu usuario. Se admite cualquier carácter, incluidos espacios y símbolos.",
     confirmPassword: "Confirmar contraseña",
     submit: "Crear cuenta simulada",
     pending: "Creando…",
     haveAccount: "¿Ya tienes una cuenta? Inicia sesión",
     errorDuplicate: "Ese usuario ya existe. Prueba con otro.",
     errorWeakPassword: "Elige una contraseña más segura e inténtalo de nuevo.",
+    weakPasswordIntro: "La contraseña no cumple los requisitos:",
     errorGeneric: "No se pudo crear la cuenta. Inténtalo de nuevo.",
     errorRateLimited: "Demasiados intentos. Espera un minuto e inténtalo de nuevo.",
   },
@@ -183,7 +186,6 @@ export const es: Dictionary = {
       recommendationsCta: "Ver tus recomendaciones por género",
     },
     loggedOut: {
-      primaryCta: "Iniciar sesión",
       secondaryCta: "Explorar el catálogo",
       registerCta: "Crear una cuenta simulada",
     },
