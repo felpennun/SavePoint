@@ -6,10 +6,10 @@ last_updated: "2026-09-06T14:53:59.303Z"
 state_head: f5d65e7ffdd259561c9e43897557dfae844f84c7
 progress:
   total_phases: 8
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 26
   completed_plans: 26
-  percent: 13
+  percent: 25
 last_activity: 2026-09-06
 next_phase: 2
 next_phase_name: Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender
