@@ -61,6 +61,7 @@ Every consequential implementation choice must leave usable evidence for the the
 - **Controlled initial audience**: v1 uses a controlled academic demo with synthetic accounts rather than unrestricted public operation — this limits moderation and operational scope.
 - **Accessibility and responsive design**: Core workflows must work across desktop and mobile layouts and follow accessible interaction practices — usability must be demonstrable.
 - **No fixed stack**: Architecture and technologies remain open until researched — selections must be justified rather than inherited without evidence.
+- **Language convention (since 2026-09-06)**: thesis documentation (`docs/**`), all conversation with the author, all prompts written for other AIs, and new prose in `.planning/**` are in **Spanish**; code (identifiers, code comments, commit messages, test names, log strings, branch names) stays in **English**. Verbatim legal quotations and language-neutral tokens (requirement IDs, paths, hashes, URLs, env-var names, commands) are kept as-is. Canonical doc: `CONVENTIONS.md`. No command needed — instruction files load per session; `/gsd-resume-work` reloads planning context.
 
 ## Key Decisions
 

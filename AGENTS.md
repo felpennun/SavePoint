@@ -21,6 +21,38 @@ The project is also an academic platform for a final degree thesis (TFG). It wil
 
 <!-- GSD:project-end -->
 
+<!-- Non-GSD section — manually maintained, do not remove on GSD sync. -->
+## Convenciones del proyecto (léelas antes de trabajar)
+
+El documento canónico es [`CONVENTIONS.md`](CONVENTIONS.md). Resumen de lo que más afecta al
+trabajo diario:
+
+### Idioma (vigente desde 2026-09-06)
+
+- **Español**: toda la documentación de la tesis (`docs/**` — ADRs, `docs/verification/`,
+  `docs/methodology/`, `docs/deployment/`, firmas de fase), toda la conversación con el autor,
+  todos los prompts que escribas para otra IA, y la prosa nueva en `.planning/**`.
+- **Inglés**: el código — identificadores, comentarios *de código*, mensajes de commit,
+  nombres de tests, cadenas de log, nombres de rama.
+- **Se conservan en su idioma original**: citas legales textuales (Twitch DSA / FAQ de IGDB en
+  `docs/verification/igdb-api-probe.md` §5 y `docs/adr/ADR-006`), y tokens neutrales de idioma
+  (IDs de requisito como `CAT-02`, rutas de fichero, hashes de commit, URLs, nombres de
+  variables de entorno, comandos).
+- **Al traducir un documento con gate determinista** (`scripts/verify-igdb-adr.ps1`,
+  `verify-igdb-probe.ps1`, el here-string de `verify-igdb-fresh-import.ps1`) actualiza los
+  patrones del gate en el **mismo commit**. **Si el documento está fijado por hash** en
+  `docs/methodology/agent-ledger.jsonl`, refresca el pin al nuevo hash LF y añade una entrada
+  de ledger. Ver `CONVENTIONS.md` §1.
+- `scripts/check-evidence.ps1` exige siete encabezados en español en cada
+  `docs/adr/ADR-*.md`: `## Contexto`, `## Alternativas consideradas`, `## Decisión`,
+  `## Evidencia y fuentes`, `## Consecuencias`, `## Reversibilidad`, `## Aprobación y revisión`.
+
+No hay ningún comando para "recargar convenciones": este fichero se lee automáticamente al
+inicio de cada sesión. Para GSD, `/gsd-resume-work` recarga STATE + contexto de planificación.
+Empujón manual para cualquier IA: *"Antes de empezar, lee `CONVENTIONS.md` y revisa `.planning/`."*
+
+<!-- /Non-GSD section -->
+
 <!-- GSD:stack-start source:research/STACK.md -->
 
 ## Technology Stack
