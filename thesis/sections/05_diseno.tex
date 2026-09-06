@@ -1,3 +1,175 @@
 \chapter{Diseño de la solución}\label{cap:diseno}
 
-\todo[inline]{Capítulo por redactar en la siguiente iteración.}
+Este capítulo describe el diseño del sistema. Presenta la arquitectura general, resume los
+siete registros de decisión de arquitectura vigentes y explica las decisiones del modelo de
+datos, el diseño de la interfaz de programación de aplicaciones (API) y el de la interfaz de
+usuario (UI). Cierra con el modelo de sesión y con la frontera de la demostración
+controlada.
+
+\section{Arquitectura}\label{sec:dis-arquitectura}
+
+SavePoint es un monolito modular con dos ejecutables, representado en la
+Figura~\ref{fig:arquitectura}. El backend, en \texttt{apps/api/}, usa Django 5.2 con soporte
+a largo plazo (LTS) y Django REST Framework (DRF) sobre PostgreSQL 18, con el mapeo
+objeto-relacional (ORM) de Django como interfaz de persistencia. Los módulos se separan por
+dominio (\texttt{catalogue}, \texttt{library}, \texttt{accounts}, \texttt{recommendations})
+pero comparten despliegue y base de datos. El frontend, en \texttt{apps/web/}, es una
+aplicación Next.js 16 con React 19 y TypeScript en modo estricto, que renderiza en el
+servidor (SSR) las páginas públicas. El navegador solo llama a rutas del mismo origen de
+Next.js, que las reescribe hacia el backend. Toda tarea de datos a escala, como la
+importación del catálogo, se ejecuta como un comando de gestión fuera de la petición HTTP,
+nunca dentro de ella.
+
+\begin{figure}[htp]
+    \centering
+    \missingfigure[figwidth=0.9\textwidth]{Diagrama de arquitectura: capa de presentación Next.js 16 (App Router, SSR), proxy same-origin, capa de aplicacion Django 5.2 / DRF con los modulos catalogue, library, accounts y recommendations, persistencia PostgreSQL 18 y la tuberia de ingesta fuera de linea (comandos de gestion IGDB y Wikidata). Pendiente de dibujar.}
+    \caption{Arquitectura de SavePoint.}
+    \label{fig:arquitectura}
+\end{figure}
+% PENDIENTE: diagrama de arquitectura real (figures/arquitectura.pdf).
+
+\section{Decisiones de arquitectura}\label{sec:dis-adr}
+
+Las decisiones materiales del diseño están registradas en \texttt{docs/adr/} con un formato
+fijo de contexto, alternativas, decisión, evidencia, consecuencias, reversibilidad y
+aprobación. La Tabla~\ref{tab:adr} las resume. Cada registro es citable y reversible: los
+límites de dominio y las migraciones actúan como puntos de salida si una decisión se revisa.
+
+\begin{table}[htp]
+\centering
+\begin{tabular}{ | l | p{10.5cm} | }
+    \hline
+    \textbf{Registro} & \textbf{Decisión y consecuencia principal} \\
+    \hline
+    ADR-001 & Monolito modular Django/DRF con frontend Next.js separado. Integridad y autenticación maduras, límites de dominio legibles, dos ejecutables con una sola arquitectura operable. \\
+    \hline
+    ADR-002 & PostgreSQL 18.6 como única base de datos de aplicación y de pruebas de integración. Paridad entre entornos, integridad relacional, bloqueos y búsqueda de trigramas disponibles de forma reproducible. \\
+    \hline
+    ADR-003 & Corpus congelado de Wikidata bajo dominio público y revisión de Commons por archivo. Evaluación repetible y procedencia visible, sin ninguna consulta a proveedores en tiempo de petición. \\
+    \hline
+    ADR-004 & Sesión de Django y frontera del mismo origen. Las primitivas de sesión y de protección contra falsificación de petición en sitios cruzados las mantiene Django; ningún token accesible al código del navegador. \\
+    \hline
+    ADR-005 & Docker Compose local y demostración pública repartida entre tres servicios gratuitos. Coste cero sin tarjeta, a cambio de que el frontend público no sea la misma imagen que la local. \\
+    \hline
+    ADR-006 & IGDB como fuente del catálogo a escala real, con portadas por enlace directo. Cobertura real y modelado de género y plataforma de primera clase, a cambio de una obligación de atribución continua y de una licencia que es un acuerdo, no una dedicación al dominio público. \\
+    \hline
+    ADR-007 & Heurístico determinista de afinidad por géneros para la página de recomendaciones. Entrega el requisito como página real y explicable sin adelantar el trabajo de recomendadores de la Fase 6, del que queda explícitamente fuera. \\
+    \hline
+\end{tabular}
+\caption{Registros de decisión de arquitectura vigentes.}
+\label{tab:adr}
+\end{table}
+
+\section{Modelo de datos}\label{sec:dis-modelo-datos}
+
+El modelo de datos, descrito en la Sección~\ref{sec:req-informacion}, sigue cuatro decisiones
+de diseño. La primera es que toda identidad canónica es un identificador único universal
+(UUID) interno, generado en la importación, con el identificador del proveedor guardado solo
+como procedencia; así, cambiar de proveedor o prescindir de él nunca obliga a renumerar el
+catálogo (ADR-006, CAT-04). La segunda es que las restricciones y las transacciones viven
+también en la base de datos, no solo en la capa de aplicación: unicidad de entrada por
+persona y obra, unicidad de copia por clave de idempotencia, rango de la valoración por
+restricción de comprobación y un disparador que impide que el cursor de importación de IGDB
+retroceda. La tercera es la desnormalización deliberada de la fecha de primer lanzamiento y
+de la valoración agregada sobre la propia obra, para que el filtrado por año y por nota sea
+un recorrido de índice y no una agregación sobre cientos de miles de publicaciones. La cuarta
+es un índice de trigramas sobre los alias normalizados, que sostiene la búsqueda tolerante
+por prefijo y por similitud.
+
+\section{Diseño de la API}\label{sec:dis-api}
+
+La API es de estilo REST, servida por DRF bajo el prefijo \texttt{/api/}. Las respuestas de
+lista están paginadas. Las vistas de escritura y las de datos personales exigen sesión. Las
+anónimas de mayor coste llevan un límite de ritmo con ámbito propio. La
+Tabla~\ref{tab:endpoints} recoge los puntos de acceso principales.
+
+\begin{table}[htp]
+\centering
+\begin{tabular}{ | l | l | p{6.2cm} | }
+    \hline
+    \textbf{Método y ruta} & \textbf{Acceso} & \textbf{Función} \\
+    \hline
+    \texttt{GET /api/catalogue/games/} & Anónimo & Lista paginada con búsqueda, filtros, orden y facetas. \\
+    \hline
+    \texttt{GET /api/catalogue/games/<slug>/} & Anónimo & Ficha de una obra con su jerarquía y su procedencia. \\
+    \hline
+    \texttt{GET /api/catalogue/sources/} & Anónimo & Dataset, licencia, hash y política de portadas. \\
+    \hline
+    \texttt{POST /api/accounts/login/}, \texttt{logout/} & Anónimo & Inicio y cierre de sesión con protección de origen. \\
+    \hline
+    \texttt{POST /api/accounts/register/} & Anónimo & Registro dentro de la frontera de demostración, con límite de ritmo. \\
+    \hline
+    \texttt{GET /api/accounts/profiles/<alias>/} & Anónimo & Proyección pública por lista de campos permitidos. \\
+    \hline
+    \texttt{GET /api/library/entries/} & Sesión & Biblioteca de la persona autenticada. \\
+    \hline
+    \texttt{POST /api/library/entries/<id>/status/}, \texttt{rating/}, \texttt{copies/} & Sesión & Cambio de estado, valoración y alta de copias. \\
+    \hline
+    \texttt{GET /api/library/popularity/} & Anónimo & Baseline de popularidad sobre cuentas simuladas. \\
+    \hline
+    \texttt{GET /api/recommendations/genre-taste/} & Sesión & Recomendación por afinidad de géneros de la persona autenticada. \\
+    \hline
+\end{tabular}
+\caption{Puntos de acceso principales de la API.}
+\label{tab:endpoints}
+\end{table}
+
+La proyección pública de un perfil se construye con una lista explícita de campos permitidos,
+escrita a mano, en lugar de una serialización automática por introspección del modelo. Así,
+exponer un campo privado nuevo requiere una decisión explícita, que es el modo de fallo
+opuesto al de ocultarlo por olvido.
+
+\section{Diseño de la interfaz de usuario}\label{sec:dis-ui}
+
+El diseño de la interfaz se fijó en un contrato de diseño, \texttt{01.1-UI-SPEC.md},
+aprobado antes de implementar y validado por un subagente comprobador. El contrato define un
+sistema de tokens de variables CSS, con juegos completos para tema claro y tema oscuro, cuya
+selección se aplica en el servidor mediante una cookie para evitar el destello al cargar. Los
+componentes reutilizables incluyen la tarjeta de juego, las píldoras de estado y de nota, la
+valoración por estrellas, la imagen de portada con su marcador de reserva, la barra de
+filtros, el conmutador de tema y el selector de cuenta. Las Figuras~\ref{fig:ui-claro}
+y~\ref{fig:ui-oscuro} muestran la página de inicio en ambos temas.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{figures/captura-home-claro.png}
+    \caption{Página de inicio con tema claro.}
+    \label{fig:ui-claro}
+\end{figure}
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{figures/captura-home-oscuro.png}
+    \caption{Página de inicio con tema oscuro.}
+    \label{fig:ui-oscuro}
+\end{figure}
+
+El contrato de diseño incluye una matriz de cobertura por superficie, con filas para el
+catálogo, el detalle, el registro y las recomendaciones, cada una con su verificación en
+escritorio, en móvil y de accesibilidad. El Capítulo~\ref{cap:implementacion} describe las
+rutas y los componentes concretos; el Capítulo~\ref{cap:pruebas} recoge su verificación.
+
+\section{Modelo de sesión y frontera del mismo origen}\label{sec:dis-sesion}
+
+La autenticación sigue el diseño del registro ADR-004. Django emite y valida la sesión. El
+navegador solo llama a rutas del mismo origen de Next.js, que las reescribe hacia el backend
+mediante una variable de entorno visible únicamente en el servidor. Las cookies de sesión y
+de protección contra falsificación de petición en sitios cruzados (CSRF) viajan con ámbito
+del mismo origen, sin necesidad de compartir recursos entre orígenes con credenciales. Las
+mutaciones exigen el testigo CSRF. El cierre de sesión la invalida. Los redirectos
+posteriores al acceso solo aceptan rutas relativas del mismo sitio, revalidadas en el
+servidor. No hay ningún testigo de tipo \textit{bearer} accesible al código JavaScript del
+navegador.
+
+\section{Frontera de la demostración controlada}\label{sec:dis-frontera}
+
+El diseño mantiene una frontera explícita entre lo que la demostración expone y lo que
+pertenece a la versión 2 del producto. En esta entrega, el registro es funcional pero vive
+dentro del territorio de las cuentas de demostración, sin abrir el registro de producción sin
+restricciones. Todas las cuentas son públicas por diseño, sin conmutador de privacidad. El
+acceso a IGDB está confinado a un comando de gestión fuera de línea. Esta frontera se
+comprueba con pruebas que fallan si aparece lenguaje de registro de producción abierto, de
+modo que un cambio futuro no la cruce por descuido.
+
+Este capítulo ha descrito qué forma tiene el sistema y por qué. El capítulo siguiente entra
+en los datos que lo alimentan.
