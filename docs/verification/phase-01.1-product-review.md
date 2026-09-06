@@ -115,3 +115,43 @@ Notes carried to Plan 01.1-07 / follow-up:
   reflows cleanly at 375px), and needs a design decision on mobile chrome
   density. Logged in
   `.planning/phases/01.1-real-scale-catalogue-and-product-experience/deferred-items.md`.
+
+## Author Review
+
+Review date: 2026-09-06
+Reviewed commit: 490dcf6
+Author verdict: APPROVED
+
+**Nature of this approval — advance / conditional, recorded by author instruction.**
+The author gave an explicit advance approval for the Phase 01.1 product-quality gate
+on 2026-09-06 (before going offline), conditioned on the automated evidence above
+passing — which it did: 41 Playwright tests green (3 consecutive runs), axe zero
+critical/serious on every surface at desktop and mobile, all eight surface/viewport
+screenshot artifacts present. The approval was made against the in-session screenshots
+(home, catalogue, game detail, recommendations, login, register — dark and light — plus
+mobile catalogue and the full-catalogue views) rather than a full live per-viewport
+walkthrough of all four surfaces. A full live review by the author is **deferred** and
+does not block phase completion; the author's stated intent is to focus on design
+refinement in a later pass once functionality is complete, and expects UI changes
+regardless.
+
+catalogue verdict: APPROVED
+detail verdict: APPROVED
+registration verdict: APPROVED
+recommendations verdict: APPROVED
+
+### Deferred polish (not blockers — logged for a future design pass)
+
+- **Game detail** reads a little sparse: genre chips render only when the work
+  carries genres, and the cover could be larger / more dominant per the OpenCritic
+  density reference in `01.1-CONTEXT.md` D-07. Cosmetic, not a defect.
+- **Authenticated top navigation** overflows horizontally below ~430px (shared
+  chrome, not a single surface). Needs a mobile-chrome-density design decision —
+  see `deferred-items.md`.
+- **Genre recommendation shelves** shown as the onboarding/insufficient-history
+  state because demo + fresh accounts lack enough library activity in the seeded
+  dev DB; the algorithm + disclosure are evidenced and unit-tested (Plan 01.1-09).
+  A history-bearing account would render populated shelves.
+
+These are captured as backlog items for a dedicated design-refinement pass; none
+were treated as blocking the QUAL-05 verdict for this progress milestone.
