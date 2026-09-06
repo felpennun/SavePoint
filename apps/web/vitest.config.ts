@@ -14,9 +14,13 @@ export default defineConfig({
     },
   },
   test: {
-    include: ["tests/**/*.test.ts", "tests/**/*.test.tsx"],
+    include: [
+      "tests/**/*.test.ts",
+      "tests/**/*.test.tsx",
+      "app/**/__tests__/*.test.ts",
+      "components/**/__tests__/*.test.tsx",
+    ],
     passWithNoTests: false,
     reporters: ["default"],
   },
 });
-
