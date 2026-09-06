@@ -1,6 +1,6 @@
 # Firma de la Fase 01.1: Catálogo a escala real y experiencia de producto
 
-**Estado: ACEPTADA CONDICIONALMENTE** por Felipe (autor), 2026-09-06, contra el commit `2d49fc8df2beaf7fb741a68c9f835b7f51f57295`.
+**Estado: ACEPTADA** por Felipe (autor), 2026-09-06, contra el commit `2d49fc8df2beaf7fb741a68c9f835b7f51f57295` (fase completa) + los commits de seguimiento del mismo día (SC3, remediación de la revisión, traducción de `docs/`). La aprobación de calidad de producto (QUAL-05) empezó como anticipada condicional y quedó **confirmada** el 2026-09-06 tras la revisión remota del autor de 18 capturas del stack local — ver *Naturaleza de esta aceptación*.
 
 No desplegada — todo plan de esta fase está mergeado en `origin/main` y corre solo en el stack local de `docker compose` (ver *Estado del despliegue* abajo).
 
@@ -8,7 +8,11 @@ Este documento es el registro de cierre de fase de la Fase 01.1, el seguimiento 
 
 ## Naturaleza de esta aceptación
 
-El gate humano de calidad de producto de la fase (QUAL-05 / D-07, Plan 01.1-07) se cerró como una **aprobación anticipada condicional del autor**. El 2026-09-06, antes de desconectarse, el autor autorizó explícitamente APROBADO para las cuatro superficies D-07 (catálogo, detalle de juego, registro, recomendaciones) en escritorio y móvil, condicionado a que la evidencia automática pasara — cosa que hizo. La aprobación se hizo contra el conjunto de capturas en sesión, **no** un recorrido en vivo completo por viewport; ese recorrido queda diferido por elección del autor, con la intención declarada de ejecutar una pasada dedicada de refinamiento de diseño una vez la funcionalidad esté completa y de esperar cambios de UI en cualquier caso. Esto está registrado textualmente en `docs/verification/phase-01.1-product-review.md` → `## Revisión del autor`, y en `.planning/phases/01.1-real-scale-catalogue-and-product-experience/01.1-07-SUMMARY.md`.
+El gate humano de calidad de producto de la fase (QUAL-05 / D-07, Plan 01.1-07) se abrió como una **aprobación anticipada condicional del autor** (2026-09-06, antes de desconectarse: APROBADO para las cuatro superficies D-07 — catálogo, detalle de juego, registro, recomendaciones — en escritorio y móvil, condicionado a que la evidencia automática pasara, cosa que hizo).
+
+**Confirmación (2026-09-06, el mismo día).** El autor revisó de forma remota 18 capturas del stack local (`localhost:3000`) que cubren home, catálogo completo (312.633 juegos con portadas IGDB), catálogo con filtro `Género = Shooter` (20.919), detalle con procedencia/atribución, colección poblada, recomendaciones, fuentes, menú de cuenta, login, registro, tema claro y oscuro, una **segunda cuenta simulada** (`demo-critico`, colección vacía) como prueba visual de independencia (SC3), y las cuatro superficies en móvil a 390px. **Veredicto: APROBADO, confirmado (ya no condicional).** QUAL-05 queda cerrado sin condiciones pendientes. Las capturas están en `e2e/artifacts/review-2026-09-06/`.
+
+Cuatro ítems cosméticos observados en esa revisión se registran como **pulido diferido para una pasada de diseño posterior** — el autor los acepta explícitamente y espera cambios de UI de todas formas; ninguno bloquea el cierre de fase: (1) mezcla ES/EN en la disclosure de recomendaciones (el `limitation` del DTO se vuelca crudo — `D-01.1-13-a`); (2) nav superior autenticada apretada a <430px (`D-01.1-10-a`); (3) detalle de juego escaso (sin `summary` de IGDB; panel de estado/copias comprimido); (4) el menú de cuenta no identifica la cuenta activa (falta el endpoint `/api/accounts/me/` — `D-01.1-13-b`). Detalle en `docs/verification/phase-01.1-product-review.md` → `## Revisión del autor` y en `.planning/phases/01.1-.../deferred-items.md`.
 
 ## Evidencia automática (esta sesión, en o cerca del commit `2d49fc8`)
 
@@ -34,7 +38,7 @@ Detalle completo: `.planning/phases/01.1-real-scale-catalogue-and-product-experi
 | SC1 | Catálogo a escala real con fuente IGDB, con licencia/atribución documentadas y procedencia por obra | **VERIFICADO** — 312,633 obras; comparación DATA-04 de ADR-006; `docs/verification/igdb-api-probe.md` con evidencia de sondeo redactada y términos textuales de la DSA + FAQ de IGDB; API de fuentes + procedencia en el detalle de juego |
 | SC2 | Ordenar y filtrar el catálogo por plataforma, género y otros metadatos | **VERIFICADO** — `parse_catalogue_query` con allowlists `platform` / `genre` / `year_from` / `year_to` / `min_rating` + un conjunto `sort` de 6 claves, cada una con desempate por `canonical_slug`; entrada hostil / fuera de lista → 400 acotado; DTO de facetas sin N+1; `FilterBar` compartible por URL; la migración `0004` añade los campos escalares + 4 índices |
 | SC3 | Múltiples cuentas precargadas distintas inician y cierran sesión de forma independiente | **VERIFICADO** (re-verificado el 2026-09-06 tras el plan de seguimiento) — `bootstrap_demo_accounts` ahora reconcilia el usuario primario preexistente bajo `LEGACY_ANCHOR_KEY` (lo adopta en vez de abortar con `SeedContractError`); `infra/compose.yaml` y `apps/api/render-start.sh` llaman al comando **plural**; `DEMO_ACCOUNTS` lleva 3 cuentas (`demo-visitor` / `demo-critico` / `demo-coleccionista`), placeholder inerte D-02 en compose y `sync: false` en `render.yaml`. Verificado en vivo: arranque `Demo accounts ready (total=3, created=2, rotated=1)`; cada cuenta hace login (200) y logout (200) independientemente, sesión invalidada tras logout (403). 31 tests de bootstrap + 209 de la suite api pasan. |
-| SC4 | La interfaz se lee como un producto de catalogación profesional | **VERIFICADO (aprobación condicional del autor)** — sistema de tokens de variables CSS de primera parte claro/oscuro con cookie SSR `sp-theme` sin flash; `ThemeToggle`; `ScorePill` / `StatusPill` / `StarRating` / `CoverImage` / `FilterBar`; todas las superficies D-07 rediseñadas; `01.1-UI-SPEC.md` VERIFICADO 7/7 por el checker; Playwright 41 pasados + axe limpio + 8 capturas |
+| SC4 | La interfaz se lee como un producto de catalogación profesional | **VERIFICADO** (aprobación del autor confirmada el 2026-09-06 tras revisión remota de 18 capturas) — sistema de tokens de variables CSS de primera parte claro/oscuro con cookie SSR `sp-theme` sin flash; `ThemeToggle`; `ScorePill` / `StatusPill` / `StarRating` / `CoverImage` / `FilterBar`; todas las superficies D-07 rediseñadas; `01.1-UI-SPEC.md` VERIFICADO 7/7 por el checker; Playwright 41 pasados + axe limpio + 8 capturas |
 | SC5 | Página de recomendaciones dedicada: sugerencias por género a partir de la actividad propia del usuario, distinta del baseline de popularidad | **VERIFICADO** — `rank_genre_taste_v1`, un heurístico por petición sin estado que **nunca** cae al baseline de popularidad (D-09), con `input_snapshot_sha256` y una forma `insufficient_history` distinta; `RecommendationsView` es `IsAuthenticated`; ADR-007 lo documenta como heurístico y explícitamente **no** la contribución de ML de la tesis; página web con gate de auth, disclosure de algoritmo + limitación y un enlace de navegación solo-autenticado |
 
 **Veredicto de fase:** al cierre inicial, 4/5 criterios VERIFICADOS y 1 PARCIAL (SC3). Tras el plan de seguimiento del 2026-09-06 (reconciliar-y-cablear, opción A autorizada por el autor), **SC3 pasa a VERIFICADO** → **5/5 criterios VERIFICADOS**. Ver *Addenda posteriores a la firma*.
@@ -49,7 +53,7 @@ Registradas en `.planning/phases/01.1-real-scale-catalogue-and-product-experienc
 4. **La página de recomendaciones muestra el estado de onboarding / `insufficient_history`** para la cuenta demo y las cuentas recién registradas, que no tienen historial de librería con género en la BD de desarrollo con seed. El ranking personalizado en sí está unit-testeado de forma determinista.
 5. **La navegación superior autenticada hace overflow horizontal por debajo de ~430px** (chrome compartido, no una sola superficie). Necesita una decisión de diseño sobre densidad del chrome móvil. (`deferred-items.md` → `### D-01.1-10-a`.)
 6. **El detalle de juego se lee un poco escaso** — chips de género condicionales; la portada podría ser más grande / más dominante. Cosmético.
-7. **El recorrido en vivo completo por viewport del autor está pendiente** por elección del autor (ver *Naturaleza de esta aceptación*).
+7. **Pasada dedicada de refinamiento de diseño** pendiente por elección del autor — recoge los 4 ítems cosméticos de la revisión del 2026-09-06 (mezcla ES/EN en recomendaciones, nav autenticada <430px, detalle escaso, menú de cuenta sin identificar la cuenta) más el pulido previo. No bloquea el cierre; el autor espera cambios de UI de todas formas.
 
 ## Estado del despliegue
 
@@ -66,7 +70,7 @@ Como hubo aproximadamente veinte pushes a `main` esta sesión, deberían comprob
 
 ## Decisiones del autor y próximos pasos (registrado para la tesis)
 
-- El autor aceptó la Fase 01.1 como entregada, **condicionalmente**, y pidió que la fase se cerrara de forma autónoma (2026-09-06) con checkpoints, una revisión de todo el repo y una limpieza conservadora.
+- El autor aceptó la Fase 01.1 como entregada (2026-09-06): primero condicionalmente y con cierre autónomo (checkpoints + revisión de todo el repo + limpieza conservadora), y luego **confirmó QUAL-05 sin condiciones** tras revisar 18 capturas del stack local en remoto.
 - Los ítems cosméticos (densidad del detalle de juego, overflow de la navegación superior autenticada, estado de onboarding de recomendaciones) son para una **pasada dedicada de refinamiento de diseño** una vez la funcionalidad esté completa; el autor espera explícitamente cambios de UI se cierre o no la fase ahora.
 - El hueco de cableado de SC3 se resolvió el 2026-09-06 (ver *Addenda*).
 - La Fase 2 (Corpus gobernado y contrato de evaluación congelado) **no** está empezada.
@@ -83,6 +87,6 @@ Como hubo aproximadamente veinte pushes a `main` esta sesión, deberían comprob
 Todo plan de esta fase es un commit discreto en `main`, con push. El estado de fase-completa está tagueado `phase-01.1-complete` en el commit `2d49fc8`. La base de datos de desarrollo puede restaurarse desde `data/snapshots/savepoint_test-igdb-catalogue-20260906.dump` vía `pg_restore` en minutos.
 
 ---
-*Firmado: 2026-09-06 (aprobación anticipada condicional)*
+*Firmado: 2026-09-06 (QUAL-05 confirmado tras revisión remota por capturas; 5/5 criterios VERIFICADOS)*
 *Commit: `2d49fc8df2beaf7fb741a68c9f835b7f51f57295`*
 *Firma de la Fase 1.0 (separada, ya aceptada): `docs/verification/phase-01-signoff.md`*

@@ -85,3 +85,39 @@ Veredicto de recomendaciones: APROBADO
 - **Estanterías de recomendación por género** mostradas como el estado de onboarding/historial-insuficiente porque las cuentas demo + frescas carecen de suficiente actividad de librería en la BD de desarrollo con seed; el algoritmo + la disclosure están evidenciados y unit-testeados (Plan 01.1-09). Una cuenta con historial renderizaría estanterías pobladas.
 
 Estos se capturan como ítems de backlog para una pasada dedicada de refinamiento de diseño; ninguno se trató como bloqueante del veredicto QUAL-05 para este hito de progreso.
+
+### Confirmación del autor tras revisión remota por capturas (2026-09-06)
+
+La aprobación anticipada condicional de arriba quedó **confirmada** el mismo día. El autor
+revisó de forma remota (desde el móvil) un conjunto nuevo de **18 capturas del stack local**
+(`localhost:3000`) que cubren: home, catálogo completo (312.633 juegos con portadas IGDB),
+catálogo con filtro `Género = Shooter` (20.919 coincidencias), detalle de juego con
+procedencia/atribución, colección poblada (`demo-visitor`, 6 juegos con estado + valoración),
+recomendaciones, fuentes, menú de cuenta, login, registro, tema claro y oscuro, **una segunda
+cuenta simulada** (`demo-critico`) con colección vacía como prueba visual de independencia
+(SC3), y las cuatro superficies en móvil a 390px.
+
+**Veredicto del autor: APROBADO** (confirmado, no ya condicional). Las capturas quedan en
+`e2e/artifacts/review-2026-09-06/`.
+
+Cuatro ítems cosméticos observados en esa revisión, **registrados como pulido diferido para la
+pasada de diseño** (el autor los acepta explícitamente y espera cambios de UI de todas
+formas — no bloquean el cierre de fase):
+
+1. **Mezcla ES/EN en la disclosure de recomendaciones.** La caja "Cómo se generan" muestra su
+   segundo párrafo en inglés (es el string `limitation` del DTO de la API, definido en
+   `genre_heuristic.py`). Debe localizarse en el frontend en vez de volcar el `limitation`
+   crudo. → `deferred-items.md` D-01.1-13-a.
+2. **Nav superior autenticada apretada en móvil** (`Tema` / `Cuenta simulada` / `Abrir menú`
+   en una fila a <430px). → ya en `deferred-items.md` D-01.1-10-a.
+3. **Detalle de juego escaso** (sin descripción/`summary` — IGDB no lo importa; panel de
+   estado/valoración/copias comprimido; algún juego con título vacío por dato IGDB pobre). →
+   ya en el "Pulido diferido" de arriba + `deferred-items.md`.
+4. **El menú de cuenta no identifica la cuenta activa** (falta un endpoint
+   `/api/accounts/me/`; `AccountSwitcher` degrada al literal "Cuenta simulada"). Los tres
+   logins funcionan de forma independiente (probado); solo el nav no las distingue
+   visualmente. → `deferred-items.md` D-01.1-13-b.
+
+Con esta confirmación, QUAL-05 queda **cerrado sin condiciones pendientes**. La pasada de
+refinamiento de diseño (con estos ítems + los anteriores) es trabajo de una fase/plan
+posterior, no un bloqueo de la Fase 01.1.

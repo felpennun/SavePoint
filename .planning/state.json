@@ -50,9 +50,9 @@
     }
   ],
   "next": {
-    "command": "/gsd:progress --next",
-    "label": "Advance to the next step",
-    "reason": "Phases 1 and 01.1 of 9 complete · 22% · Phase 2 not started (author decision pending)"
+    "command": "/gsd-plan-phase 2",
+    "label": "Planificar la Fase 2 (Governed Corpus and Frozen Evaluation Contract)",
+    "reason": "Fases 1 y 01.1 cerradas (2/9 · 22%). El autor autorizó empezar la Fase 2 el 2026-09-06; aún sin planificar."
   },
-  "updated_at": "2026-09-06T04:30:00.000Z"
+  "updated_at": "2026-09-06T15:00:00.000Z"
 }

@@ -2,12 +2,15 @@
 gsd_state_version: 1.0
 current_phase: 01.1
 current_phase_name: Real-Scale Catalogue and Product Experience
-status: complete
-stopped_at: "Phase 01.1 COMPLETE + closed out + full-repo security remediation + docs/ al español + SC3 RESUELTO. 10/10 plans. 01.1-VERIFICATION.md ahora status:verified, score 5/5 (SC3 re-verificado 2026-09-06). phase-01.1-signoff.md CONDICIONALMENTE ACEPTADA (la condición es solo el walkthrough de diseño en vivo de QUAL-05). repo-review-2026-09-06.md: 16/16 hallazgos FIXED + check-evidence.ps1 arreglado (bug CRLF). docs/ traducido al español (convención de idioma en CONVENTIONS.md). SC3: bootstrap_demo_accounts reconcilia el usuario legacy + compose/render-start.sh usan el comando plural + DEMO_ACCOUNTS 3 cuentas; verificado en vivo (login/logout independiente). STOPPED. Phase 2 NOT started. Autor todavía debe: walkthrough de diseño en vivo; decisión de despliegue (diferida a fin de proyecto)."
-last_updated: "2026-09-06T14:00:00.000Z"
+status: closed
+stopped_at: "Fase 01.1 CERRADA. Firma ACEPTADA (2026-09-06): QUAL-05 confirmado sin condiciones tras la revisión remota del autor de 18 capturas del stack local ('doy el okey'). 01.1-VERIFICATION.md status:verified, score 5/5. 10/10 planes + cierre + remediación de la revisión de repo (16/16) + check-evidence.ps1 arreglado + docs/ al español + SC3 resuelto. 4 ítems cosméticos → pulido diferido (deferred-items.md D-01.1-10-a / 13-a / 13-b + detalle escaso) para una pasada de diseño posterior. NO desplegada (decisión de despliegue diferida a fin de proyecto). SIGUIENTE: Fase 2 (Governed Corpus and Frozen Evaluation Contract) — autorizada por el autor ('podemos empezar la fase 2 cuando veas'), aún SIN planificar. Ejecutar /gsd-plan-phase 2 para empezar."
+last_updated: "2026-09-06T15:00:00.000Z"
 last_activity: 2026-09-06
-last_activity_desc: "SC3 resuelto (reconciliar-y-cablear cuentas demo plurales); docs/ traducido al español; convención de idioma documentada"
+last_activity_desc: "Fase 01.1 CERRADA — firma ACEPTADA (QUAL-05 confirmado por revisión remota); Fase 2 autorizada, pendiente de planificar"
 state_head: 4df6cf4
+next_phase: 2
+next_phase_name: Governed Corpus and Frozen Evaluation Contract
+next_action: "/gsd-plan-phase 2"
 progress:
   total_phases: 9
   completed_phases: 2
@@ -23,16 +26,18 @@ progress:
 See: .planning/PROJECT.md (updated 2026-09-04)
 
 **Core value:** Users receive useful and explainable video-game recommendations from a well-organised collection, while every algorithmic result remains reproducible and defensible in the thesis.
-**Current focus:** Phase 01.1 — Real-Scale Catalogue and Product Experience
+**Current focus:** Fase 01.1 CERRADA — siguiente: Fase 2 (Governed Corpus and Frozen Evaluation Contract), autorizada, sin planificar.
 
 ## Current Position
 
-Phase: 01.1 (Real-Scale Catalogue and Product Experience) — EXECUTING
-Plan: 10 of 10 complete. Phase 01.1 done. Next: phase verification + sign-off, then STOP (author decides deploy + a design-refinement pass).
-Status: Phase 01.1 COMPLETE — closing out (verification, sign-off, tag, full-repo review)
-Last activity: 2026-09-05 — Plans 01.1-02 + 01.1-06 merged (069f422)
+Fase: 01.1 (Real-Scale Catalogue and Product Experience) — **CERRADA** (firma ACEPTADA 2026-09-06).
+Planes: 10/10. Verificación 5/5 (SC3 re-verificado). QUAL-05 confirmado por revisión remota de capturas.
+4 ítems cosméticos → pulido diferido para una pasada de diseño posterior (no bloquean).
+NO desplegada — decisión de despliegue diferida a fin de proyecto.
+Siguiente: **Fase 2** — `/gsd-plan-phase 2` cuando se quiera empezar.
+Última actividad: 2026-09-06 — cierre de fase, remediación de la revisión de repo, docs/ al español, SC3.
 
-Progress: [██████████] 100% (10 of 10 plans) — PHASE 01.1 COMPLETE
+Progress: [██████████] 100% (10 of 10 plans) — FASE 01.1 CERRADA
 
 ## Performance Metrics
 
