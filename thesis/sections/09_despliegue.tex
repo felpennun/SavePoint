@@ -1,8 +1,7 @@
 \chapter{Despliegue}\label{cap:despliegue}
 
 Este capítulo describe cómo se despliega SavePoint en internet, qué relación guarda ese
-despliegue con el entorno local reproducible y en qué estado se encuentra al cierre de esta
-primera entrega.
+despliegue con el entorno local reproducible y en qué estado se encuentra.
 
 \section{Topología pública}\label{sec:desp-topologia}
 
@@ -55,20 +54,20 @@ restauración.
 
 \section{Estado actual del despliegue}\label{sec:desp-estado}
 
-La demostración pública de la Fase 1 está en vivo desde el 5 de septiembre de 2026, con la
-prueba de humo en verde contra la revisión desplegada. Sirve la interfaz anterior al rediseño
-contra el corpus de ciento cincuenta juegos de Wikidata.
+La demostración pública está en vivo desde el 5 de septiembre de 2026, con la prueba de humo
+en verde contra la revisión desplegada. En ese despliegue sirve la interfaz anterior al
+rediseño contra el corpus curado de ciento cincuenta juegos de Wikidata.
 
-La Fase 01.1 no está desplegada. Todo su trabajo está integrado en la rama principal y se
-ejecuta en el entorno local de Docker Compose. El frontend rediseñado llegó a construirse en
-Vercel, pero la base de datos desplegada todavía contiene solo el corpus pequeño, de modo que
-la vista de catálogo da error contra ese despliegue. El autor revisó esta situación y decidió
-dejar el despliegue público actual como está por ahora. La demostración ante el tribunal se
-ejecuta desde el entorno local. Conectar el despliegue a datos reales de internet, es decir,
-cargar el catálogo de IGDB en una base de datos desplegada, aplicar las migraciones nuevas y
-ajustar la configuración de hosts y de proxies, queda pospuesto al final del proyecto, cuando
-todo esté montado. Esta es una decisión registrada del autor, no un defecto pendiente contra
-el alcance de la Fase 01.1.
+El rediseño de la interfaz y el catálogo a escala real no están en el despliegue público.
+Todo ese trabajo está integrado en la rama principal y se ejecuta en el entorno local de
+Docker Compose. El frontend rediseñado llegó a construirse en Vercel, pero la base de datos
+desplegada todavía contiene solo el corpus curado, de modo que la vista de catálogo da error
+contra ese despliegue. El autor revisó esta situación y decidió dejar el despliegue público
+actual como está por ahora. La demostración ante el tribunal se ejecuta desde el entorno
+local reproducible. Conectar el despliegue a datos reales de internet, es decir, cargar el
+catálogo de IGDB en una base de datos desplegada, aplicar las migraciones nuevas y ajustar
+la configuración de hosts y de proxies, queda pospuesto al final del proyecto. Es una
+decisión registrada del autor, no un defecto pendiente.
 
 Este capítulo ha descrito el despliegue y su estado. El capítulo final valora el grado de
 cumplimiento de los objetivos y detalla el trabajo futuro.
