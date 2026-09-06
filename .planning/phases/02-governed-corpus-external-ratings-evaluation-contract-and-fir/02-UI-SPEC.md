@@ -1,10 +1,11 @@
 ---
 phase: "2"
 slug: "governed-corpus-external-ratings-evaluation-contract-and-fir"
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: "2026-09-06"
+reviewed_at: "2026-09-06"
 ---
 
 # Phase 2 — UI Design Contract
@@ -539,21 +540,130 @@ respetan `prefers-reduced-motion` (regla global ya presente).
 
 ## UI Considerations
 
-Consideraciones de estado aplicables resueltas: **7 cubiertas, 1 backstop, 0 sin resolver**.
+> Análogo visual de la sección de cobertura del edge-probe. Lo lee gsd-planner para construir
+> `must_haves.truths`. Las 56 consideraciones de estado aplicables enumeradas por el
+> ui-consideration-probe (55 filas distintas — se consolidó un duplicado de categoría) sobre
+> 9 superficies. La **copy** de vacío/error vive en `## Copywriting Contract`; esta sección
+> cubre la **forma** del estado y **referencia** esas claves en vez de repetirlas.
+>
+> Las matrices transversales de estado heredadas de 01.1 (`empty` / `loading` / `error` /
+> `populated` / `partial` / `overflow` / `zero-one-many` / `long-text`) están todas marcadas
+> "explicit" en `ROADMAP.md`; las filas abajo referencian la sección concreta de este
+> 02-UI-SPEC o esa matriz heredada.
 
-Cobertura de estado para las superficies de esta fase. La **copy** de vacío/error vive en
-`## Copywriting Contract`; esta tabla cubre cobertura de estado y **referencia** esas filas.
+Consideraciones de estado aplicables resueltas: **45 resolved (explicit), 10 resolved
+(backstop), 0 unresolved — 55 filas sobre 9 superficies**.
 
-| Category | Element(s) | Status | Resolution / Reason |
-|----------|------------|--------|---------------------|
-| empty | menús de faceta (0 opciones), catálogo filtrado (multi-select sin resultados), recomendador de contenido (sin historial → arranque en frío), estantes "Novedades" y "Para tus juegos" (0 ítems) | ✅ covered | Faceta sin opciones → `<details>` deshabilitado + `catalogue.filters.unavailable`, la búsqueda sigue. Catálogo filtrado vacío → `catalogue.filters.emptyHeading/Body` + "Borrar todos los filtros". Recomendador sin historial → **nunca lista vacía**: `recommendations.forYou` empty copy + `coldStartBadge` + fallback de géneros populares (REC-06). Estantes con 0 ítems → **la sección entera no se renderiza** (sin `.sp-empty`). |
-| loading | rejilla de catálogo, lista "Recomendado para ti", tablas "Por qué" (no bloqueante), estantes "Novedades" / "Para tus juegos" / por género | ✅ covered | `.sp-skeleton` geometry-matched reserva el layout (156×208 en rejilla, 120×160 en estantes; cabecera + 5 filas en la lista de contenido; 2 cabeceras + 4 bloques en estantes por género). Esqueletos `aria-hidden`. Exactamente **un** `role="status"` polite por región. Estático bajo `prefers-reduced-motion`. |
-| error | fetch de catálogo, lista de facetas, endpoint del recomendador de contenido, endpoint de estantes por género, `summary` de la ficha, estantes de home | ✅ covered | Reintento con preservación de valores; mensajes localizados seguros (`errors.retryCatalogue`, `recommendations.forYou.error`, `recommendations.error`). Fallo de facetas → degrada a búsqueda-solo (`catalogue.filters.unavailable`). Fallo de `summary` / estante / popularidad → esa pieza se omite, **nunca deja la página en blanco** (contrato "partial" heredado). El foco se mueve al control de reintento. |
-| populated | conteo de catálogo + label de sort + chips (uno por valor); pill de valoración relabelado + línea de desglose; variante + versiones del recomendador de contenido; orden de estantes | ✅ covered | Conteo completo siempre visible con separador de miles localizado (`Intl.NumberFormat`); vista filtrada "{n} de {total}"; label de sort siempre visible; `ScorePill` con texto "Valoración" + `RatingBreakdownLine`; `recommendations.forYou.variantLabel` + `versionsLabel` visibles una vez en cabecera y la variante también en el pie de cada "Por qué" (D-16 / REC-09); "Novedades" ordenado `first_release_date` desc / `canonical_slug`. |
-| partial | score ausente, `summary` ausente, portada muerta, DLC ausente / juego no poseído, estante escaso, géneros/plataformas ausentes en la ficha, una de las 3 secciones de recomendaciones falla | ✅ covered | Sin score → sin pill + texto "Sin valoración" (Label muted), excluido del sort/filtro por rating (D-07). Sin `summary` → sección de sinopsis omitida. Portada muerta → `CoverImage` cambia al placeholder de primera parte (ADR-006, sin texto de error). Sin DLC / juego no poseído → estante "Para tus juegos" omitido. Estante con solo su mínimo de ítems → renderiza igual. Sin géneros/plataformas → fila omitida, nunca cabecera vacía. Una sección de recomendaciones falla → las otras dos renderizan. |
-| overflow | conteo de 312k, fila de chips (varios valores), rejilla de catálogo, panel de faceta, tablas "Por qué", estantes horizontales, nav autenticada `< md` | ✅ covered | `Intl.NumberFormat(locale)` para conteos; la fila de chips (ahora con más chips por multi-select) **envuelve**; rejilla adaptativa con suelo 2-up; panel de faceta con `max-height` + `overflow-y: auto`; tablas "Por qué" y estantes hacen scroll dentro de su propio contenedor; barra de filtros → `<details>` en `< md`; `ThemeToggle` / `AccountSwitcher` solo-icono en `< md` (fix D-01.1-10-a) → la fila del header cabe a 320px. **Sin scroll horizontal de página a 320px ni a 400% de zoom.** |
-| zero-one-many | cada cadena de conteo (resultados, resultados filtrados, valores de faceta seleccionados, filtros activos, contribución por género, conteos de rating N/M, copias, ítems de estante) | ✅ covered | Todos los conteos pasan por el mecanismo `formatCount` `zero/one/many` con sustantivos localizados; claves nuevas (`catalogue.facet.selectedCount`, `recommendations.why.contributionValue`) siguen la misma forma. Los conteos N/M del desglose de rating se interpolan como números en `detail.ratingBreakdown` (texto directo, no pluralización de sustantivo). |
-| long-text | títulos de juego largos, sinopsis de IGDB larga, listas largas de géneros/plataformas, frase de explicación larga, 400% zoom, 30% de expansión de texto | 🧪 backstop | Títulos de tarjeta → clamp de 2 líneas (completo en la ficha). Sinopsis → clamp de ~6 líneas + "Mostrar más" / "Mostrar menos". Géneros → 3 + `+N`. Frase de explicación → una línea, envuelve libre. Verificado por el pase Playwright/axe de viewport + zoom del plan de evidencia de esta fase, no por un assert unitario. |
+<!-- Vocabulario de status (probe-core projectTruths):
+     ✅ covered   → cadena de verdad plana, se eleva a must_haves.truths
+     🧪 backstop  → escalar plano { statement, verification: backstop }; en verify sin evidencia
+                    explícita → insufficient_spec → human_needed (nunca un pase silencioso)
+     ⚠ unresolved → asunción explícita del planner (se expone, nunca se descarta en silencio)
+     Filas REEMPLAZADAS (no añadidas) en cada re-run del probe — idempotente. -->
+
+### E1 — `FacetMenu` (form + list-collection + interactive-control)
+
+| Category | Element | Status | Resolution / Reason |
+|----------|---------|--------|---------------------|
+| empty | E1 FacetMenu — 0 opciones de faceta | ✅ covered | El `<details>` se renderiza `disabled` + `aria-disabled` y se muestra `catalogue.filters.unavailable`; el input `q` sigue enviando (Screen Contract 3 › cobertura error; First-Party Component Contracts › `FacetMenu` estado `empty`). |
+| loading | E1 FacetMenu | ✅ covered | El catálogo es server-render; las opciones de faceta llegan con el payload de la página, así que `FacetMenu` no tiene estado async propio — la rejilla que lo rodea usa `.sp-skeleton` geometry-matched + un único `role="status"` polite (Screen Contract 3 › loading; matriz `loading` heredada de 01.1). |
+| error | E1 FacetMenu | ✅ covered | El fallo del fetch de opciones degrada **cada** `FacetMenu` a `disabled` y renderiza `catalogue.filters.unavailable`; la búsqueda `q` sigue viva (Screen Contract 3 › error; `FacetMenu` estado `disabled`). |
+| populated | E1 FacetMenu | ✅ covered | El menú abierto muestra la línea de semántica AND/OR (`catalogue.facet.genreSemantics` / `platformSemantics`), la lista scrollable de checkboxes y el enlace `catalogue.facet.clear`; el `<summary>` siempre muestra `catalogue.facet.selectedCount` (First-Party Component Contracts › `FacetMenu`; Screen Contract 3). |
+| partial | E1 FacetMenu — slug seleccionado desconocido en la URL | ✅ covered | Un slug desconocido se ignora: no se pinta como checkbox fantasma ni fuerza resultado vacío (Screen Contract 3 "valor de faceta desconocido → se ignora"; matriz `partial` heredada de 01.1). |
+| overflow | E1 FacetMenu — lista de ~220 plataformas | 🧪 backstop | La lista de checkboxes de plataforma dentro de `max-height: ~320px; overflow-y: auto` se renderiza y desplaza de forma aceptable a 320px de ancho y 400% de zoom **sin virtualización** — a confirmar con el pase visual/Playwright de la fase. |
+| zero-one-many | E1 FacetMenu — recuento de selección | ✅ covered | `catalogue.facet.selectedCount` usa el mecanismo `formatCount` zero/one/many (`Cualquiera` / `1 seleccionado` / `{n} seleccionados`); `countActiveFilters` cuenta **cada** valor seleccionado (Copywriting Contract; `lib/catalogue-filters.ts`). |
+| long-text | E1 FacetMenu — etiquetas de opción largas | 🧪 backstop | Las etiquetas largas de género/plataforma envuelven dentro del panel sin recortar el checkbox ni el panel a 30% de expansión de texto / 400% de zoom — verificado por el pase de viewport+zoom, no por un assert unitario. |
+
+### E2 — Fila de chips de filtro activo (list-collection)
+
+| Category | Element | Status | Resolution / Reason |
+|----------|---------|--------|---------------------|
+| empty | E2 chip row | ✅ covered | Sin filtros activos la fila no se renderiza y "Borrar todos los filtros" se oculta (Screen Contract 3 "se muestra si hay ≥1 filtro activo"). |
+| loading | E2 chip row | ✅ covered | La fila se deriva síncronamente de `searchParams` durante el SSR — sin estado async (Screen Contract 3; matriz `loading` heredada de 01.1). |
+| error | E2 chip row | ✅ covered | Si el mapa de etiquetas de faceta no está disponible, el chip cae al slug crudo (`{genreLabels|platformLabels}.get(value) ?? value`); la fila sigue renderizando y cada chip sigue quitando su valor (Screen Contract 3). |
+| populated | E2 chip row | ✅ covered | Un `FilterChip` por valor activo ("Género: RPG ✕", "Género: Estrategia ✕", "Plataforma: Switch ✕"); cada uno es un enlace que quita **solo ese valor** y conserva el resto de params (Screen Contract 3; First-Party Component Contracts › `FilterChip` `MOD`). |
+| partial | E2 chip row | ✅ covered | Un chip de un valor que la lista de facetas ya no ofrece sigue renderizando con su slug y sigue siendo individualmente removible (Screen Contract 3 › fallback de etiqueta de chip). |
+| overflow | E2 chip row | ✅ covered | La fila envuelve (`flex-wrap`, `.sp-chip-row`); con multi-select contiene más chips y sigue envolviendo en vez de causar scroll horizontal de página (Screen Contract 3; matriz `overflow` heredada de 01.1). |
+| zero-one-many | E2 chip row | ✅ covered | Zero → fila oculta; one → un chip; many → chips envueltos, uno por valor; sin cadena de recuento en la propia fila (Screen Contract 3). |
+| long-text | E2 chip row — etiqueta de filtro larga | 🧪 backstop | Un chip con una etiqueta de filtro localizada larga envuelve/trunca dentro de la fila sin desbordar el viewport a 30% de expansión / 400% de zoom — a confirmar con el pase visual. |
+
+### E3 — `NewReleasesShelf` (list-collection + media)
+
+| Category | Element | Status | Resolution / Reason |
+|----------|---------|--------|---------------------|
+| empty | E3 NewReleasesShelf — 0 lanzamientos en la ventana de 6 meses | 🧪 backstop | Toda la sección (cabecera + fila) está **ausente del DOM** — no un contenedor vacío renderizado; la ausencia efectiva se confirma con un test held-out/visual (Screen Contract 1; First-Party Component Contracts › `NewReleasesShelf` estado `empty`; P5). |
+| loading | E3 NewReleasesShelf | ✅ covered | Esqueleto = 1 cabecera + 6 bloques `.sp-skeleton` de portada (120×160), `aria-hidden`, un `role="status"` polite "Cargando…" (`NewReleasesShelf` estado `loading`; matriz `loading` heredada de 01.1). |
+| error | E3 NewReleasesShelf | ✅ covered | El fallo del fetch omite la sección; el resto de la home renderiza sin cambios (`NewReleasesShelf` estado `error`; matriz `partial` heredada de 01.1). |
+| populated | E3 NewReleasesShelf | ✅ covered | Hasta 20 `GameCard` variante `shelf` ordenados `first_release_date` desc con desempate `canonical_slug`, colocados **encima** del `RecommendationStrip` de popularidad, visibles logueado y deslogueado (Screen Contract 1; P5). |
+| partial | E3 NewReleasesShelf | ✅ covered | Un ítem con portada muerta/ausente usa el placeholder de primera parte vía `CoverImage` onError; un estante fallido nunca deja la home en blanco (matriz `partial` heredada de 01.1). |
+| overflow | E3 NewReleasesShelf | ✅ covered | La fila hace scroll horizontal dentro de su propio `.sp-shelf-track` y nunca causa scroll horizontal de página a 320px / 400% de zoom (§ UI Considerations `overflow`). |
+| zero-one-many | E3 NewReleasesShelf | ✅ covered | Zero → sección oculta; one → una tarjeta; many → fila scrollable acotada a 20; sin cadena de recuento visible (Screen Contract 1). |
+| long-text | E3 NewReleasesShelf — títulos largos | 🧪 backstop | Los títulos largos en el estante hacen clamp a 2 líneas (`GameCard`) sin romper la altura de la fila a 30% de expansión / 400% de zoom — a confirmar con el pase visual. |
+
+### E4 — `RatingBreakdownLine` (static-content)
+
+| Category | Element | Status | Resolution / Reason |
+|----------|---------|--------|---------------------|
+| overflow | E4 RatingBreakdownLine | ✅ covered | Es un único `<p>` (Label, `--color-text-muted`) que envuelve bajo el `ScorePill`; nunca ensancha la columna derecha (Screen Contract 2 §2; First-Party Component Contracts › `RatingBreakdownLine`). |
+| long-text | E4 RatingBreakdownLine — N/M grandes + frase ES larga | 🧪 backstop | `detail.ratingBreakdown` con valores N/M grandes y la redacción ES más larga envuelve a 2+ líneas sin recorte a 30% de expansión de texto / 400% de zoom — a confirmar con el pase visual. |
+
+### E5 — `Synopsis` (static-content)
+
+| Category | Element | Status | Resolution / Reason |
+|----------|---------|--------|---------------------|
+| loading | E5 Synopsis | ✅ covered | El `summary` viene en el payload server de la ficha — sin estado async propio; la ruta de detalle está cubierta por la matriz `loading` heredada de 01.1 (Screen Contract 2). |
+| error | E5 Synopsis | ✅ covered | Si IGDB no aporta `summary`, toda la `<section>` de sinopsis (cabecera incluida) se omite — nunca una cabecera vacía (First-Party Component Contracts › `Synopsis` estado `absent`; Screen Contract 2 §3). |
+| overflow | E5 Synopsis | ✅ covered | La prosa hace clamp a ~6 líneas (`-webkit-line-clamp: 6`); la expansión es un toggle `aria-expanded` en el sitio (`common.showMore` / `common.showLess`) — nunca ensancha el layout de dos columnas (First-Party Component Contracts › `Synopsis`). |
+| long-text | E5 Synopsis — `summary` muy largo | 🧪 backstop | Un `summary` de IGDB muy largo hace clamp a 6 líneas, se expande entero con "Mostrar más" y vuelve a colapsar con "Mostrar menos" sin layout shift a 400% de zoom — a confirmar con el pase visual. |
+
+### E6 — `ContentRecommendationList` (list-collection)
+
+| Category | Element | Status | Resolution / Reason |
+|----------|---------|--------|---------------------|
+| empty | E6 ContentRecommendationList — sin historial / deslogueado | 🧪 backstop | Un usuario sin historial suficiente **nunca** ve una `<ol>` vacía: la sección muestra la copy vacía de `recommendations.forYou` + `coldStartBadge` y renderiza un fallback explícito de arranque en frío por géneros populares (REC-06); la **forma exacta** del ítem de fallback / la ruta deslogueada se confirman con un test held-out (First-Party Component Contracts › `ContentRecommendationList` estado `coldStart`). |
+| loading | E6 ContentRecommendationList | ✅ covered | Esqueleto = 1 cabecera de sección + 5 filas cada una con un bloque `.sp-skeleton` de portada; un `role="status"` polite por región (`ContentRecommendationList` estado `loading`; matriz `loading` heredada de 01.1). |
+| error | E6 ContentRecommendationList | ✅ covered | `recommendations.forYou.error` + control de reintento; el chrome de la página y las otras dos secciones siguen renderizando (`ContentRecommendationList` estado `error`; Screen Contract 4 › cobertura error). |
+| populated | E6 ContentRecommendationList | ✅ covered | `<ol>` ordenada; cada ítem = `GameCard` + `explanationSentence` determinista + `WhyDisclosure`; la cabecera muestra `variantLabel` + `versionsLabel` una vez (Screen Contract 4 §a; D-16 / REC-08 / REC-09). |
+| partial | E6 ContentRecommendationList | ✅ covered | Los títulos ya consumidos/poseídos se excluyen (REC-07, `recommendations.forYou.excludedNote`); si esta sección falla, los estantes por género y la sección DLC siguen renderizando (Screen Contract 4 › cobertura partial). |
+| overflow | E6 ContentRecommendationList | ✅ covered | La lista es vertical; cada `WhyDisclosure` está colapsado por defecto, así que la longitud de página queda acotada; los paneles `<details>` y sus tablas internas hacen scroll dentro de su contenedor (Screen Contract 4 › cobertura overflow). |
+| zero-one-many | E6 ContentRecommendationList | ✅ covered | Zero → fallback de arranque en frío (nunca vacío); one → un ítem ordenado; many → lista ordenada completa; posición ordinal renderizada por ítem (Screen Contract 4 §a). |
+
+### E7 — `WhyDisclosure` + `ContributionTable` (interactive-control + static-content + list-collection)
+
+| Category | Element | Status | Resolution / Reason |
+|----------|---------|--------|---------------------|
+| empty | E7 WhyDisclosure — sin contribuciones de género | ✅ covered | Aún sin solape de género, el `WhyDisclosure` renderiza la fila de término de rating y el `variantFooter`; la tabla de género muestra su única fila aplicable (First-Party Component Contracts › `ContributionTable` estado `singleGenre`). |
+| loading | E7 WhyDisclosure | ✅ covered | El `WhyDisclosure` está colapsado por defecto y su contenido ya viene en el payload de la recomendación — sin estado async al expandir (First-Party Component Contracts › `WhyDisclosure`). |
+| error | E7 WhyDisclosure | ✅ covered | Si faltan datos de contribución, la disclosure abre igualmente mostrando el `variantFooter` y los términos presentes; nunca bloquea el ítem de lista padre (`ContributionTable` comportamiento `partial`). |
+| populated | E7 WhyDisclosure + ContributionTable | ✅ covered | El panel expandido = `why.heading` + tabla de contribución por género (nombre + barra `aria-hidden` + `{pct}%` como texto) + fila de término de rating + `why.variantFooter` "Variante: {algorithm_id}" (Screen Contract 4 §a; D-16). |
+| partial | E7 ContributionTable — sin rating propio del candidato | ✅ covered | Cuando el candidato no tenía rating propio y se usó la mediana de género, `why.ratingTermFallback` aparece como fila-nota (`ContributionTable` estado `withFallbackNote`; D-07 / D-13). |
+| overflow | E7 ContributionTable — muchos géneros | ✅ covered | La tabla hace scroll dentro del panel `<details>`; el panel está cerrado por defecto, así que nunca extiende la página de forma inesperada (Screen Contract 4 › cobertura overflow). |
+| zero-one-many | E7 ContributionTable | ✅ covered | Zero géneros contribuyentes → solo fila de término de rating; one → una fila; many → una fila por género, cada una con un `why.contributionValue` `{pct}%` localizado (Copywriting Contract; First-Party Component Contracts › `ContributionTable`). |
+
+### E8 — `OwnedGamesDlcShelf` (list-collection)
+
+| Category | Element | Status | Resolution / Reason |
+|----------|---------|--------|---------------------|
+| empty | E8 OwnedGamesDlcShelf — el usuario no posee juegos con DLC | 🧪 backstop | Toda la sección `OwnedGamesDlcShelf` está **ausente del DOM** (no un contenedor vacío renderizado) — la ausencia efectiva, en ficha y en la página de recomendaciones, se confirma con un test held-out/visual (Screen Contract 2 §8 / Screen Contract 4 §c; First-Party Component Contracts › `OwnedGamesDlcShelf` estado `empty`; D-15). |
+| loading | E8 OwnedGamesDlcShelf | ✅ covered | Esqueleto = 1 cabecera + 4 bloques `.sp-skeleton` de portada; un `role="status"` polite (`OwnedGamesDlcShelf` estado `loading`; matriz `loading` heredada de 01.1). |
+| error | E8 OwnedGamesDlcShelf | ✅ covered | El fallo del fetch omite la sección tanto en la ficha como en la página de recomendaciones; ninguna de las dos se queda en blanco (`OwnedGamesDlcShelf` estado `error`; matriz `partial` heredada de 01.1). |
+| populated | E8 OwnedGamesDlcShelf | ✅ covered | Agrupado por juego base poseído (`recommendations.dlc.baseGameLabel` "DLC de {game}") con una fila horizontal `GameCard` variante `shelf` por grupo; los DLC quedan fuera del catálogo gobernado pero consultables aquí (D-15; Screen Contract 4 §c). |
+| partial | E8 OwnedGamesDlcShelf | ✅ covered | Las entradas de DLC con portada ausente usan el placeholder de primera parte; un juego base con 0 DLC resolubles no se muestra como grupo vacío (matriz `partial` heredada de 01.1). |
+| overflow | E8 OwnedGamesDlcShelf | ✅ covered | La fila de cada grupo hace scroll dentro de su propio `.sp-shelf-track`; sin scroll horizontal de página a 320px / 400% de zoom (§ UI Considerations `overflow`). |
+| zero-one-many | E8 OwnedGamesDlcShelf | ✅ covered | Zero poseídos-con-DLC → sección oculta; one → un grupo; many → un grupo etiquetado por juego base poseído (Screen Contract 4 §c). |
+
+### E9 — Navbar autenticada solo-icono `< md` (nav + interactive-control)
+
+| Category | Element | Status | Resolution / Reason |
+|----------|---------|--------|---------------------|
+| loading | E9 navbar solo-icono | ✅ covered | La navbar es chrome server-render sin estado async; el estado de auth se lee de la cookie `sessionid` durante el SSR (Navbar Screen Contract; heredado de 01.1). |
+| error | E9 navbar solo-icono | ✅ covered | Si `fetchAccountMe` falla, el `AccountSwitcher` cae a la etiqueta genérica "Cuenta simulada" pero el trigger solo-icono y el menú siguen funcionando (heredado de 01.1 + fix D-01.1-13-b). |
+| overflow | E9 navbar solo-icono | ✅ covered | En `< md`, `ThemeToggle` y `AccountSwitcher` renderizan solo-icono (texto visible `hidden md:inline`), así que la fila del header autenticada cabe a 320px sin scroll horizontal de página — el fix D-01.1-10-a (Navbar Screen Contract; First-Party Component Contracts › `AppShell` / `ThemeToggle` / `AccountSwitcher` `MOD`; P6). |
+| long-text | E9 navbar solo-icono — alias de cuenta largo | 🧪 backstop | A 320px y 400% de zoom con un alias de cuenta simulada largo, la navbar autenticada solo-icono sigue cabiendo sin scroll horizontal y ambos controles conservan su `aria-label` / `aria-pressed` completos — a confirmar con el pase visual/Playwright de la fase. |
+
+**Backstop (10) — se elevan como `{ statement, verification: backstop }`:** E1 overflow, E1 long-text,
+E2 long-text, E3 empty, E3 long-text, E4 long-text, E5 long-text, E6 empty, E8 empty, E9 long-text.
+Sin evidencia explícita en verify → `insufficient_spec` → `human_needed` (nunca un pase silencioso).
 
 ---
 
@@ -621,12 +731,12 @@ verificación de QUAL-05 leen.
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
-- [ ] Dimension 7 Inventory Provenance: PASS (n/a — `Tool: none`)
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
+- [x] Dimension 7 Inventory Provenance: PASS (n/a — `Tool: none`)
 
-**Approval:** pending
+**Approval:** approved — checker-verified 7/7 (2026-09-06); `## UI Considerations` added (55 filas: 45 explicit, 10 backstop, 0 unresolved).
