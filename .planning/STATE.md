@@ -1,9 +1,9 @@
 ---
 gsd_state_version: 1.0
-status: closed
-stopped_at: Phase 2 UI-SPEC approved
-last_updated: "2026-09-06T15:19:29.882Z"
-state_head: e548a2ed3e7be34c728524a244a0b865cb44b8de
+status: in_progress
+stopped_at: "Phase 2 plan-phase mid-flight — CONTEXT + UI-SPEC + RESEARCH + VALIDATION + PATTERNS done and committed; gsd-planner was running in a background agent (dies with the session) and had not yet written the 02-*-PLAN.md files. Resume: /gsd-resume-work → it picks up .planning/phases/02-.../.continue-here.md → re-run /gsd-plan-phase 2 (init reports has_plans; if true go to gsd-plan-checker, if false re-spawn planner)."
+last_updated: "2026-09-06T15:40:00.000Z"
+state_head: f56f7a6
 progress:
   total_phases: 8
   completed_phases: 2
@@ -13,10 +13,10 @@ progress:
 last_activity: 2026-09-06
 next_phase: 2
 next_phase_name: Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender
-next_action: /gsd-plan-phase 2
-current_phase: 01.1
-current_phase_name: Real-Scale Catalogue and Product Experience
-last_activity_desc: Fase 01.1 CERRADA — firma ACEPTADA (QUAL-05 confirmado por revisión remota); Fase 2 autorizada, pendiente de planificar
+next_action: /gsd-resume-work
+current_phase: 2
+current_phase_name: Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender
+last_activity_desc: "Fase 2: discuss + UI-SPEC (7/7) + research + validation + pattern-map hechos; planner corriendo. Ver .planning/phases/02-.../.continue-here.md"
 ---
 
 # Project State
