@@ -10,6 +10,7 @@ from django.contrib.auth import get_user_model
 from django.db import connections
 from rest_framework.test import APIClient
 
+from accounts.models import DemoAccountAnchor
 from catalogue.models import GameWork
 from library import services
 from library.models import LibraryEntry
@@ -18,14 +19,23 @@ from library.popularity import rank_popularity_v1
 User = get_user_model()
 
 
+def _demo_user(username: str, password: str):  # noqa: ANN001, ANN202
+    """A seeded/simulated demo account -- the only kind that feeds the
+    popularity baseline (repo-review 2026-09-06 M-06). The anchor stands in
+    for what seed_demo attaches in the real runtime."""
+    user = User.objects.create_user(username=username, password=password)
+    DemoAccountAnchor.objects.create(user=user)
+    return user
+
+
 @pytest.fixture
 def user_a(db):  # noqa: ANN001
-    return User.objects.create_user(username="pop-user-a", password="Pop-User-A-Pass-9!")
+    return _demo_user("pop-user-a", "Pop-User-A-Pass-9!")
 
 
 @pytest.fixture
 def user_b(db):  # noqa: ANN001
-    return User.objects.create_user(username="pop-user-b", password="Pop-User-B-Pass-9!")
+    return _demo_user("pop-user-b", "Pop-User-B-Pass-9!")
 
 
 @pytest.mark.django_db
@@ -109,6 +119,20 @@ def test_hash_changes_when_underlying_data_changes(user_a) -> None:  # noqa: ANN
     after = rank_popularity_v1()
 
     assert before["input_snapshot_sha256"] != after["input_snapshot_sha256"]
+
+
+@pytest.mark.django_db
+def test_self_registered_user_activity_does_not_move_the_baseline() -> None:
+    """M-06: a non-demo account (no demo_anchor, no demo_identity) is a
+    self-registered visitor; their private backlog must never feed the
+    public popularity aggregate or the `limitation` text becomes a lie."""
+    real_user = User.objects.create_user(username="real-visitor", password="Real-Visitor-Pass-9!")
+    work = GameWork.objects.create(canonical_slug="pop-private", original_title="Privately Tracked Game")
+    LibraryEntry.objects.create(user=real_user, work=work, current_status="completed")
+
+    result = rank_popularity_v1()
+    assert result["results"] == []
+    assert "pop-private" not in {r["slug"] for r in result["results"]}
 
 
 @pytest.mark.django_db

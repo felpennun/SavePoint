@@ -17,6 +17,8 @@ import json
 from datetime import datetime, timezone
 from uuid import UUID
 
+from django.db.models import Q
+
 from catalogue.models import GameWork
 from library.models import LibraryEntry
 
@@ -28,14 +30,22 @@ _STATUS_WEIGHTS = {"completed": 3, "playing": 2, "pending": 1, "abandoned": 0}
 def rank_popularity_v1(cutoff: datetime | None = None) -> dict:
     cutoff = cutoff or datetime.now(timezone.utc)
 
+    # Restrict to seeded + simulated demo accounts (a `demo_anchor` from
+    # seed_demo, or a `demo_identity` from bootstrap_demo_accounts). A
+    # self-registered visitor has neither, so their private backlog and
+    # ratings never move this public, unauthenticated baseline -- which is
+    # exactly what the `limitation` field below promises (repo-review
+    # 2026-09-06 M-06).
+    #
     # A single resolved queryset (one query, one consistent snapshot under
     # PostgreSQL's default read-committed isolation) -- a concurrent write
     # mid-computation either lands entirely before or entirely after this
     # read, never partially mixed into it.
     entries = list(
-        LibraryEntry.objects.filter(updated_at__lte=cutoff).values(
-            "work_id", "current_status", "rating_half_steps"
-        )
+        LibraryEntry.objects.filter(
+            Q(user__demo_anchor__isnull=False) | Q(user__demo_identity__isnull=False),
+            updated_at__lte=cutoff,
+        ).values("work_id", "current_status", "rating_half_steps")
     )
 
     scores: dict[str, float] = {}

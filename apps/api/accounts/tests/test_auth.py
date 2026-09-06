@@ -4,12 +4,24 @@ from __future__ import annotations
 
 import pytest
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from rest_framework.test import APIClient
 
 User = get_user_model()
 
 USERNAME = "demo-tracer-user"
 PASSWORD = "Tracer-Demo-Password-9!"  # noqa: S105 - test fixture
+
+
+@pytest.fixture(autouse=True)
+def _isolate_throttle_state() -> None:
+    """LoginView now carries a scoped anonymous rate throttle (H-01/M-01);
+    DRF keeps its per-IP history in the default cache, which LocMemCache
+    holds for the whole process. Clear it around every test so one test's
+    login burst never throttles the next."""
+    cache.clear()
+    yield
+    cache.clear()
 
 
 @pytest.fixture
@@ -147,3 +159,26 @@ def test_safe_relative_redirect_target_is_honored(demo_user) -> None:  # noqa: A
     )
     assert response.status_code == 200
     assert response.json()["next"] == "/collection"
+
+
+@pytest.mark.django_db
+def test_repeated_failed_logins_are_throttled(demo_user) -> None:  # noqa: ANN001
+    """M-01: LoginView caps anonymous attempts (scope "login", 10/min) so a
+    uniform error message is not an invitation to brute-force at full speed."""
+    client = _csrf_client()
+    client.get("/api/accounts/csrf/")
+    csrf_token = client.cookies["csrftoken"].value
+
+    statuses = []
+    for _ in range(15):
+        response = client.post(
+            "/api/accounts/login/",
+            {"username": USERNAME, "password": "wrong-password"},
+            format="json",
+            HTTP_X_CSRFTOKEN=csrf_token,
+        )
+        statuses.append(response.status_code)
+
+    assert 429 in statuses, f"expected a throttled (429) response in the burst, got {statuses}"
+    # Everything before the limit is a normal 401, never a 5xx.
+    assert set(statuses) <= {401, 429}

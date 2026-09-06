@@ -58,6 +58,10 @@ class CsrfBootstrapView(APIView):
 class LoginView(APIView):
     authentication_classes: list = []
     permission_classes = [AllowAny]
+    # Blunt online password-guessing: the uniform error message defeats
+    # username *enumeration* but not brute force. Scope + rate in settings.
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "login"
 
     def post(self, request: Request) -> Response:
         username = request.data.get("username")
@@ -174,9 +178,16 @@ class PublicProfileView(APIView):
     public by design; FLAGGED ASSUMPTION -- see plan 01-07), so today the
     only 404 case is "no such user", but the response is built to stay
     indistinguishable if a privacy toggle is added later.
+
+    An anonymous scoped throttle blunts scripted alias enumeration -- a
+    200-vs-404 still reveals existence, but not at scraping speed (M-03).
+    Narrowing the 200 body to aggregate counts only is a separate product
+    decision tracked with the plan 01-07 public/private toggle.
     """
 
     permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "public_profile"
 
     def get(self, request: Request, alias: str) -> Response:
         user = User.objects.filter(username=alias, is_active=True).first()

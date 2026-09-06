@@ -106,15 +106,37 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-# Only throttle rates are declared here -- DEFAULT_THROTTLE_CLASSES stays
-# empty so throttling applies solely to views that opt in explicitly. The
-# controlled-demo registration endpoint (AUTH-02, D-08) uses a scoped
-# per-IP anonymous ceiling: high enough for a real demo visitor, low enough
-# to blunt automated account-creation abuse (threat T-01.1-07).
+# Authentication: pin DRF to SessionAuthentication only. DRF's unconfigured
+# default also enables BasicAuthentication, which would (a) accept
+# username/password on every request as an unthrottled online-guessing
+# channel and (b) skip CSRF on state-changing endpoints -- a second door
+# around the session/CSRF model the auth views deliberately enforce
+# (repo-review-2026-09-06 H-01). Anonymous endpoints (login/register/csrf)
+# still set `authentication_classes = []` locally.
+#
+# Throttling: DEFAULT_THROTTLE_CLASSES stays empty so throttling applies
+# only to views that opt in. Scopes:
+#   registration -- controlled-demo self-registration ceiling (AUTH-02/D-08,
+#                   threat T-01.1-07)
+#   login        -- blunts online password-guessing against LoginView (H-01/M-01)
+#   public_profile -- blunts unauthenticated alias enumeration (M-03)
+# ScopedRateThrottle keys on the client IP. Behind the deployed
+# browser -> Vercel rewrite -> Render chain, REMOTE_ADDR is a single
+# upstream address, so per-IP scoping only works if NUM_PROXIES matches the
+# real hop count. It is read from DJANGO_NUM_PROXIES (default 0 = trust
+# REMOTE_ADDR directly, correct for local/Docker); deploy MUST set it to the
+# real chain length or the per-IP limits collapse to global (M-02).
+_num_proxies_raw = os.environ.get("DJANGO_NUM_PROXIES", "").strip()
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+    ],
     "DEFAULT_THROTTLE_RATES": {
         "registration": "5/hour",
+        "login": "10/min",
+        "public_profile": "30/min",
     },
+    "NUM_PROXIES": int(_num_proxies_raw) if _num_proxies_raw.isdigit() else None,
 }
 
 LANGUAGE_CODE = "es"
