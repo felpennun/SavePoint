@@ -1,157 +1,87 @@
-# Phase 01.1 sign-off: Real-Scale Catalogue and Product Experience
+# Firma de la Fase 01.1: Catálogo a escala real y experiencia de producto
 
-**Status: CONDITIONALLY ACCEPTED** by Felipe (author), 2026-09-06, against commit `2d49fc8df2beaf7fb741a68c9f835b7f51f57295`.
+**Estado: ACEPTADA CONDICIONALMENTE** por Felipe (autor), 2026-09-06, contra el commit `2d49fc8df2beaf7fb741a68c9f835b7f51f57295`.
 
-Not deployed — every plan in this phase is merged to `origin/main` and runs only on the
-local `docker compose` stack (see *Deployment status* below).
+No desplegada — todo plan de esta fase está mergeado en `origin/main` y corre solo en el stack local de `docker compose` (ver *Estado del despliegue* abajo).
 
-This document is the phase-close record for Phase 01.1, the author-requested real-scale
-follow-up to Phase 1 (which is separately signed off in
-`docs/verification/phase-01-signoff.md`). It links the automated evidence, the phase
-goal-verification, and the author's own decisions. It does not soften the one partial
-success criterion or the carried limitations to present the phase as more complete than it
-is.
+Este documento es el registro de cierre de fase de la Fase 01.1, el seguimiento a escala real pedido por el autor tras la Fase 1 (que se firma por separado en `docs/verification/phase-01-signoff.md`). Enlaza la evidencia automática, la verificación de objetivo de fase y las decisiones del propio autor. No suaviza el único criterio de éxito parcial ni las limitaciones arrastradas para presentar la fase como más completa de lo que es.
 
-## Nature of this acceptance
+## Naturaleza de esta aceptación
 
-The phase's human product-quality gate (QUAL-05 / D-07, Plan 01.1-07) was closed as a
-**conditional advance author approval**. On 2026-09-06, before going offline, the author
-explicitly authorised APPROVED for all four D-07 surfaces (catalogue, game detail,
-registration, recommendations) at desktop and mobile, conditioned on the automated
-evidence passing — which it did. The approval was made against the in-session screenshot
-set, **not** a full live per-viewport walkthrough; that walkthrough is deferred by author
-choice, with the stated intent to run a dedicated design-refinement pass once functionality
-is complete and to expect UI changes regardless. This is recorded verbatim in
-`docs/verification/phase-01.1-product-review.md` → `## Author Review`, and in
-`.planning/phases/01.1-real-scale-catalogue-and-product-experience/01.1-07-SUMMARY.md`.
+El gate humano de calidad de producto de la fase (QUAL-05 / D-07, Plan 01.1-07) se cerró como una **aprobación anticipada condicional del autor**. El 2026-09-06, antes de desconectarse, el autor autorizó explícitamente APROBADO para las cuatro superficies D-07 (catálogo, detalle de juego, registro, recomendaciones) en escritorio y móvil, condicionado a que la evidencia automática pasara — cosa que hizo. La aprobación se hizo contra el conjunto de capturas en sesión, **no** un recorrido en vivo completo por viewport; ese recorrido queda diferido por elección del autor, con la intención declarada de ejecutar una pasada dedicada de refinamiento de diseño una vez la funcionalidad esté completa y de esperar cambios de UI en cualquier caso. Esto está registrado textualmente en `docs/verification/phase-01.1-product-review.md` → `## Revisión del autor`, y en `.planning/phases/01.1-real-scale-catalogue-and-product-experience/01.1-07-SUMMARY.md`.
 
-## Automated evidence (this session, at or near commit `2d49fc8`)
+## Evidencia automática (esta sesión, en o cerca del commit `2d49fc8`)
 
-| Check | Command | Result |
+| Check | Comando | Resultado |
 |---|---|---|
-| Backend test suite | `docker compose -f infra/compose.yaml run --rm api pytest apps/api -q` | passing (accounts demo-identity, catalogue search/filter/sort, recommendations heuristic, importer) |
-| Frontend build | `pnpm --dir apps/web run build` | success, no type/build error (Next 16.3.4 + React 19 + TS + Tailwind v4) |
-| Frontend unit / i18n parity | `pnpm --dir apps/web test` | 16 passed (includes EN/ES message-key parity) |
-| Product Playwright + axe | `pnpm exec playwright test e2e/a11y.spec.ts e2e/demo-journey.spec.ts --project=chromium` | 41 passed across 3 consecutive runs; axe zero critical/serious on catalogue, detail, registration, recommendations (plus homepage/login/sources) at desktop 1280×800 and mobile 375×812 |
-| Screenshot artifacts | committed under `e2e/artifacts/phase-01.1/` | 8 files — catalogue / detail / registration / recommendations × desktop / mobile |
-| Product-review structure gate | `powershell -File` regex over `docs/verification/phase-01.1-product-review.md` | PASS — `Playwright verdict: PASS`, `axe verdict: PASS`, bounded 8-row Screenshot Artifacts table, per-surface desktop+mobile PASS |
-| Author-review gate | `powershell -File` regex (Plan 01.1-07 Task 2) | `AUTHOR-REVIEW GATE: PASS` |
-| Secret scan | `powershell -File scripts/check-secrets.ps1` | PASS exit 0 — running containers/images/logs + tree scanned, zero non-allowlisted secret-shaped matches |
-| Real-scale catalogue load | `docs/verification/igdb-catalogue-freeze.md` + `.sample.json` | 312,483 IGDB primary works (`game_type = 0`) loaded into dev DB alongside the 150-work Wikidata corpus; content checksum `ff3d67525c92…`, aggregate coverage, 300-row deterministic sampled-review manifest; `GET /api/catalogue/games/` → `count: 312633` |
-| Dependency policy | `powershell -File scripts/check-dependencies.ps1` | PASS — only `requests==2.34.2` added this phase, pinned + legitimacy recorded |
+| Suite de tests del backend | `docker compose -f infra/compose.yaml run --rm api pytest apps/api -q` | pasando (demo-identity de accounts, búsqueda/filtro/orden de catálogo, heurístico de recomendaciones, importador) |
+| Build del frontend | `pnpm --dir apps/web run build` | éxito, sin error de tipos/build (Next 16.3.4 + React 19 + TS + Tailwind v4) |
+| Unit del frontend / paridad i18n | `pnpm --dir apps/web test` | 16 pasados (incluye paridad de claves de mensaje EN/ES) |
+| Playwright de producto + axe | `pnpm exec playwright test e2e/a11y.spec.ts e2e/demo-journey.spec.ts --project=chromium` | 41 pasados en 3 ejecuciones consecutivas; axe cero critical/serious en catálogo, detalle, registro, recomendaciones (más homepage/login/fuentes) en escritorio 1280×800 y móvil 375×812 |
+| Artefactos de captura | commiteados en `e2e/artifacts/phase-01.1/` | 8 ficheros — catálogo / detalle / registro / recomendaciones × escritorio / móvil |
+| Gate de estructura de la revisión de producto | regex `powershell -File` sobre `docs/verification/phase-01.1-product-review.md` | PASS — `Veredicto de Playwright: PASS`, `Veredicto de axe: PASS`, tabla de Artefactos de captura acotada de 8 filas, PASS escritorio+móvil por superficie |
+| Gate de revisión del autor | regex `powershell -File` (Plan 01.1-07 Tarea 2) | `AUTHOR-REVIEW GATE: PASS` |
+| Barrido de secretos | `powershell -File scripts/check-secrets.ps1` | PASS exit 0 — contenedores/imágenes/logs en ejecución + árbol escaneados, cero matches con forma de secreto fuera de allowlist |
+| Carga de catálogo a escala real | `docs/verification/igdb-catalogue-freeze.md` + `.sample.json` | 312,483 obras primarias de IGDB (`game_type = 0`) cargadas en la BD de desarrollo junto al corpus Wikidata de 150 obras; checksum de contenido `ff3d67525c92…`, cobertura agregada, manifiesto de revisión muestreada determinista de 300 filas; `GET /api/catalogue/games/` → `count: 312633` |
+| Política de dependencias | `powershell -File scripts/check-dependencies.ps1` | PASS — solo `requests==2.34.2` añadido en esta fase, fijado + legitimidad registrada |
 
-## Success criteria
+## Criterios de éxito
 
-Full detail:
-`.planning/phases/01.1-real-scale-catalogue-and-product-experience/01.1-VERIFICATION.md`
-(`status: gaps_found`, `score: 4/5`).
+Detalle completo: `.planning/phases/01.1-real-scale-catalogue-and-product-experience/01.1-VERIFICATION.md` (`status: gaps_found`, `score: 4/5`).
 
-| # | Criterion | Verdict |
+| # | Criterio | Veredicto |
 |---|---|---|
-| SC1 | Real-scale IGDB-sourced catalogue with documented licence/attribution and per-work provenance | **VERIFIED** — 312,633 works; ADR-006 DATA-04 comparison; `docs/verification/igdb-api-probe.md` redacted probe evidence with verbatim DSA + IGDB FAQ terms; sources API + game-detail provenance |
-| SC2 | Sort and filter the catalogue by platform, genre and other metadata | **VERIFIED** — `parse_catalogue_query` allowlists `platform` / `genre` / `year_from` / `year_to` / `min_rating` + a 6-key `sort` set, each with a `canonical_slug` tie-break; hostile / off-list input → bounded 400; facet DTO with no N+1; URL-shareable `FilterBar`; migration `0004` adds the scalar fields + 4 indexes |
-| SC3 | Multiple distinct preloaded accounts each sign in and out independently | **PARTIAL** — `DemoAccountIdentity` + `bootstrap_demo_accounts` (env-only `DEMO_ACCOUNTS` JSON, `validate_password`, advisory lock, all-or-nothing) are built and tested and were proven live in `savepoint_test`; but no running environment activates the plural seed — `infra/compose.yaml` and `apps/api/render-start.sh` still call the singular `bootstrap_demo_account`, and no `DEMO_ACCOUNTS` is set. The live product exposes one preloaded account. Deferred — see below. |
-| SC4 | Interface reads as a professional cataloguing product | **VERIFIED (conditional author approval)** — first-party light/dark CSS-variable token system with no-flash SSR `sp-theme` cookie; `ThemeToggle`; `ScorePill` / `StatusPill` / `StarRating` / `CoverImage` / `FilterBar`; all D-07 surfaces redesigned; `01.1-UI-SPEC.md` checker-VERIFIED 7/7; Playwright 41 pass + axe clean + 8 screenshots |
-| SC5 | Dedicated recommendations page: genre suggestions from the user's own activity, distinct from the popularity baseline | **VERIFIED** — `rank_genre_taste_v1`, a stateless per-request heuristic that **never** falls back to popularity (D-09), with `input_snapshot_sha256` and a distinct `insufficient_history` shape; `RecommendationsView` is `IsAuthenticated`; ADR-007 documents it as a heuristic and explicitly **not** the thesis ML contribution; auth-gated web page with algorithm + limitation disclosure and an authenticated-only nav link |
+| SC1 | Catálogo a escala real con fuente IGDB, con licencia/atribución documentadas y procedencia por obra | **VERIFICADO** — 312,633 obras; comparación DATA-04 de ADR-006; `docs/verification/igdb-api-probe.md` con evidencia de sondeo redactada y términos textuales de la DSA + FAQ de IGDB; API de fuentes + procedencia en el detalle de juego |
+| SC2 | Ordenar y filtrar el catálogo por plataforma, género y otros metadatos | **VERIFICADO** — `parse_catalogue_query` con allowlists `platform` / `genre` / `year_from` / `year_to` / `min_rating` + un conjunto `sort` de 6 claves, cada una con desempate por `canonical_slug`; entrada hostil / fuera de lista → 400 acotado; DTO de facetas sin N+1; `FilterBar` compartible por URL; la migración `0004` añade los campos escalares + 4 índices |
+| SC3 | Múltiples cuentas precargadas distintas inician y cierran sesión de forma independiente | **PARCIAL** — `DemoAccountIdentity` + `bootstrap_demo_accounts` (JSON `DEMO_ACCOUNTS` solo por entorno, `validate_password`, advisory lock, todo-o-nada) están construidos, testeados y probados en vivo en `savepoint_test`; pero ningún entorno en ejecución activa el seed plural — `infra/compose.yaml` y `apps/api/render-start.sh` siguen llamando al singular `bootstrap_demo_account`, y no se fija ningún `DEMO_ACCOUNTS`. El producto en vivo expone una cuenta precargada. Diferido — ver abajo. |
+| SC4 | La interfaz se lee como un producto de catalogación profesional | **VERIFICADO (aprobación condicional del autor)** — sistema de tokens de variables CSS de primera parte claro/oscuro con cookie SSR `sp-theme` sin flash; `ThemeToggle`; `ScorePill` / `StatusPill` / `StarRating` / `CoverImage` / `FilterBar`; todas las superficies D-07 rediseñadas; `01.1-UI-SPEC.md` VERIFICADO 7/7 por el checker; Playwright 41 pasados + axe limpio + 8 capturas |
+| SC5 | Página de recomendaciones dedicada: sugerencias por género a partir de la actividad propia del usuario, distinta del baseline de popularidad | **VERIFICADO** — `rank_genre_taste_v1`, un heurístico por petición sin estado que **nunca** cae al baseline de popularidad (D-09), con `input_snapshot_sha256` y una forma `insufficient_history` distinta; `RecommendationsView` es `IsAuthenticated`; ADR-007 lo documenta como heurístico y explícitamente **no** la contribución de ML de la tesis; página web con gate de auth, disclosure de algoritmo + limitación y un enlace de navegación solo-autenticado |
 
-**Phase verdict:** 4/5 criteria VERIFIED, 1 PARTIAL. The phase substantially achieves its
-goal; the one gap is a runtime-wiring step with a documented follow-up, not missing
-capability.
+**Veredicto de fase:** 4/5 criterios VERIFICADOS, 1 PARCIAL. La fase logra sustancialmente su objetivo; el único hueco es un paso de cableado de runtime con un seguimiento documentado, no una capacidad ausente.
 
-## Named limitations carried out of this phase
+## Limitaciones nombradas arrastradas fuera de esta fase
 
-Recorded in
-`.planning/phases/01.1-real-scale-catalogue-and-product-experience/deferred-items.md`:
+Registradas en `.planning/phases/01.1-real-scale-catalogue-and-product-experience/deferred-items.md`:
 
-1. **SC3 — plural preloaded accounts not wired into any runtime.** The mechanism is built
-   and tested; activating it needs `bootstrap_demo_accounts` to *reconcile* the
-   pre-existing `demo-visitor` user under `LEGACY_ANCHOR_KEY` — the same "coexist with
-   existing state" pattern as `fix(01.1-02)`. A close-out attempt to wire it directly
-   aborted with `SeedContractError` against the existing dev DB and was reverted. This is a
-   small follow-up plan (reconcile-then-wire), not new design work.
-2. **`total_rating` is NULL on all 312,633 rows.** No prior source carried it; the importer
-   now captures it but has not been re-run. The "Minimum IGDB rating" filter and the
-   `rating_desc` sort are contractually correct but currently inert.
-3. **`first_release_date` is populated for roughly 75% of rows** (backfilled from releases
-   via a correlated subquery in migration `0004`; rows with no dated release stay NULL).
-4. **The recommendations page shows the onboarding / `insufficient_history` state** for the
-   demo account and freshly registered accounts, which have no genre-bearing library
-   history in the seeded dev DB. The personalised ranking itself is deterministically
-   unit-tested.
-5. **Authenticated top navigation overflows horizontally below ~430px** (shared chrome, not
-   a single surface). Needs a mobile-chrome-density design decision.
-   (`deferred-items.md` → `### D-01.1-10-a`.)
-6. **Game-detail page reads a little sparse** — conditional genre chips; the cover could be
-   larger / more dominant. Cosmetic.
-7. **Full live per-viewport author walkthrough is outstanding** by author choice (see
-   *Nature of this acceptance*).
+1. **SC3 — las cuentas precargadas plurales no están cableadas a ningún runtime.** El mecanismo está construido y testeado; activarlo necesita que `bootstrap_demo_accounts` *reconcilie* el usuario preexistente `demo-visitor` bajo `LEGACY_ANCHOR_KEY` — el mismo patrón de "coexistir con estado existente" que `fix(01.1-02)`. Un intento de cablearlo directamente al cierre abortó con `SeedContractError` contra la BD de desarrollo existente y se revirtió. Es un plan de seguimiento pequeño (reconciliar-y-cablear), no trabajo de diseño nuevo.
+2. **`total_rating` es NULL en las 312,633 filas.** Ninguna fuente previa lo llevaba; el importador ahora lo captura pero no se ha reejecutado. El filtro de "valoración mínima de IGDB" y el orden `rating_desc` son contractualmente correctos pero actualmente inertes.
+3. **`first_release_date` está poblado para aproximadamente el 75% de las filas** (con backfill desde releases vía subconsulta correlacionada en la migración `0004`; las filas sin release con fecha quedan NULL).
+4. **La página de recomendaciones muestra el estado de onboarding / `insufficient_history`** para la cuenta demo y las cuentas recién registradas, que no tienen historial de librería con género en la BD de desarrollo con seed. El ranking personalizado en sí está unit-testeado de forma determinista.
+5. **La navegación superior autenticada hace overflow horizontal por debajo de ~430px** (chrome compartido, no una sola superficie). Necesita una decisión de diseño sobre densidad del chrome móvil. (`deferred-items.md` → `### D-01.1-10-a`.)
+6. **El detalle de juego se lee un poco escaso** — chips de género condicionales; la portada podría ser más grande / más dominante. Cosmético.
+7. **El recorrido en vivo completo por viewport del autor está pendiente** por elección del autor (ver *Naturaleza de esta aceptación*).
 
-## Deployment status
+## Estado del despliegue
 
-**Nothing from Phase 01.1 is deployed.** No deploy command was run during this phase. All
-merged work is on `origin/main`. The Phase 1 public demo
-(`docs/verification/phase-01-signoff.md`, `https://save-point-orpin.vercel.app`, API
-`https://savepoint-api-37nz.onrender.com`, commit `1af981e`) still serves the pre-redesign
-UI against the 150-work Wikidata catalogue.
+**Nada de la Fase 01.1 está desplegado.** No se ejecutó ningún comando de despliegue durante esta fase. Todo el trabajo mergeado está en `origin/main`. La demo pública de la Fase 1 (`docs/verification/phase-01-signoff.md`, `https://save-point-orpin.vercel.app`, API `https://savepoint-api-37nz.onrender.com`, commit `1af981e`) sigue sirviendo la UI pre-rediseño contra el catálogo Wikidata de 150 obras.
 
-Deploying Phase 01.1 would require, as a separate and explicit author decision:
+Desplegar la Fase 01.1 requeriría, como decisión del autor separada y explícita:
 
-- pushing the redesigned `apps/web` frontend;
-- applying this phase's new migrations (genre + IGDB import fields, and
-  `catalogue/0004_catalogue_filter_sort_fields`);
-- loading the deployed database with the IGDB catalogue (~312k rows) — **check the hosting
-  tier's size limit first**; a 93 MB `pg_dump` of the loaded dev DB is at
-  `data/snapshots/savepoint_test-igdb-catalogue-20260906.dump` (gitignored) as a restore
-  path;
-- deciding whether to also re-run the importer to populate `total_rating`.
+- hacer push del frontend rediseñado `apps/web`;
+- aplicar las migraciones nuevas de esta fase (campos de género + importación de IGDB, y `catalogue/0004_catalogue_filter_sort_fields`);
+- cargar la base de datos desplegada con el catálogo de IGDB (~312k filas) — **comprobar primero el límite de tamaño del tier de hosting**; hay un `pg_dump` de 93 MB de la BD de desarrollo cargada en `data/snapshots/savepoint_test-igdb-catalogue-20260906.dump` (gitignored) como ruta de restauración;
+- decidir si además reejecutar el importador para poblar `total_rating`.
 
-Because roughly twenty pushes to `main` happened this session, the Vercel and Render
-dashboards should be checked for auto-triggered builds against the still-unloaded
-production database before any deploy decision.
+Como hubo aproximadamente veinte pushes a `main` esta sesión, deberían comprobarse los paneles de Vercel y Render en busca de builds auto-disparados contra la base de datos de producción aún sin cargar antes de cualquier decisión de despliegue.
 
-## Author decisions and next steps (recorded for the thesis)
+## Decisiones del autor y próximos pasos (registrado para la tesis)
 
-- The author accepted Phase 01.1 as delivered, **conditionally**, and asked for the phase
-  to be closed autonomously (2026-09-06) with checkpoints, a full-repo review, and a
-  conservative cleanup.
-- The cosmetic items (game-detail density, authenticated top-nav overflow, recommendations
-  onboarding state) are for a **dedicated design-refinement pass** once functionality is
-  complete; the author explicitly expects UI changes regardless of whether the phase closes
-  now.
-- The SC3 wiring gap is for a **small follow-up plan**.
-- Phase 2 (Governed Corpus and Frozen Evaluation Contract) is **not** started.
+- El autor aceptó la Fase 01.1 como entregada, **condicionalmente**, y pidió que la fase se cerrara de forma autónoma (2026-09-06) con checkpoints, una revisión de todo el repo y una limpieza conservadora.
+- Los ítems cosméticos (densidad del detalle de juego, overflow de la navegación superior autenticada, estado de onboarding de recomendaciones) son para una **pasada dedicada de refinamiento de diseño** una vez la funcionalidad esté completa; el autor espera explícitamente cambios de UI se cierre o no la fase ahora.
+- El hueco de cableado de SC3 es para un **plan de seguimiento pequeño**.
+- La Fase 2 (Corpus gobernado y contrato de evaluación congelado) **no** está empezada.
 
-### Post-sign-off addenda (2026-09-06, same day)
+### Addenda posteriores a la firma (2026-09-06, el mismo día)
 
-- **Deployment decision (author):** the author checked the Vercel dashboard — a build of
-  the redesigned frontend is live, but the catalogue is empty and the catalogue view
-  errors (the deployed database still holds only the 150-game corpus; the 312k IGDB
-  catalogue is local only). The author's decision: **leave the current public deployment
-  as-is for now.** The demo to examiners is run from the local `docker compose` stack;
-  wiring the deployment to real internet data (loading the catalogue into a deployed DB,
-  applying migrations, `NUM_PROXIES` / `ALLOWED_HOSTS`) is deferred to the end of the
-  project *"cuando todo esté montado"*. This is a recorded author decision, not an
-  outstanding defect against Phase 01.1's scope.
-- **Full-repo security remediation (author-authorised):** after the full-tree review
-  (`docs/verification/repo-review-2026-09-06.md`) the author instructed *"quiero que
-  apruebes todos en su totalidad"*. **All 16 review findings** (3 High / 6 Medium / 7 Low)
-  are now fixed across five committed batches (`a2b480a` auth/throttle, `7b05133` importer,
-  `5e6082d` search/recs, `6637578` frontend headers, `6370cf2` gunicorn/deploy config),
-  each verified (`pytest apps/api` 206 passed; `pnpm --dir apps/web build` + 16 web tests;
-  Playwright a11y 36 green under the new CSP). This adds one pinned dependency,
-  `gunicorn==23.0.0` (legitimacy recorded), and one migration,
-  `catalogue/0005_igdbimportrun_pass_cursor`. A separately-discovered pre-existing issue —
-  `scripts/check-evidence.ps1` is red on `main` (ADR-006/007 English headings vs the gate's
-  Spanish contract; a stale `check-secrets.ps1` hash pin) — remains **open / PROPOSED** for
-  a dedicated evidence-gate reconciliation.
+- **Decisión de despliegue (autor):** el autor revisó el panel de Vercel — hay un build del frontend rediseñado en vivo, pero el catálogo está vacío y la vista de catálogo da error (la base de datos desplegada todavía tiene solo el corpus de 150 juegos; el catálogo IGDB de 312k es solo local). La decisión del autor: **dejar el despliegue público actual tal cual por ahora.** La demo a los examinadores se ejecuta desde el stack local de `docker compose`; cablear el despliegue a datos reales de internet (cargar el catálogo en una BD desplegada, aplicar migraciones, `NUM_PROXIES` / `ALLOWED_HOSTS`) queda diferido al final del proyecto *"cuando todo esté montado"*. Esto es una decisión del autor registrada, no un defecto pendiente contra el alcance de la Fase 01.1.
+- **Remediación de seguridad de todo el repo (autorizada por el autor):** tras la revisión de todo el árbol (`docs/verification/repo-review-2026-09-06.md`) el autor instruyó *"quiero que apruebes todos en su totalidad"*. **Los 16 hallazgos de la revisión** (3 Alta / 6 Media / 7 Baja) están ahora arreglados en cinco tandas commiteadas (`a2b480a` auth/throttle, `7b05133` importador, `5e6082d` búsqueda/recs, `6637578` cabeceras del frontend, `6370cf2` config de gunicorn/deploy), cada una verificada (`pytest apps/api` 206 pasados; `pnpm --dir apps/web build` + 16 tests web; Playwright a11y 36 en verde bajo la nueva CSP). Esto añade una dependencia fijada, `gunicorn==23.0.0` (legitimidad registrada), y una migración, `catalogue/0005_igdbimportrun_pass_cursor`. Un problema pre-existente descubierto por separado — `scripts/check-evidence.ps1` estaba en rojo en `main` (bug CRLF de hashing; ADR-006/007 con encabezados en inglés vs el contrato español del gate) — **también se arregló** (commits `e55ff8f`/`bc48f5a`): el gate normaliza CRLF→LF antes de hashear, ADR-006/007 traducidos al español con los siete encabezados requeridos, y tres pins de hash del ledger refrescados a su valor LF. `check-evidence.ps1` ahora pasa en verde.
+- **Traducción de `docs/` al español (autorizada por el autor):** convención de idioma fijada por el autor el 2026-09-06 — toda la documentación de tesis y las conversaciones en español, el código en inglés. Barrido de `docs/` completo: ADR-006/007, `igdb-api-probe.md`, `igdb-catalogue-freeze.md`, `phase-01-manual.md`, `phase-01.1-product-review.md`, `repo-review-2026-09-06.md`, `public-demo.md` y este documento traducidos; los gates de contenido asociados (`verify-igdb-adr.ps1`, `verify-igdb-probe.ps1`, `verify-igdb-fresh-import.ps1`) actualizados en paralelo; las citas legales textuales de IGDB se conservan en inglés. La foto congelada `docs/verification/phase-01-signoff.2026-09-05T10-45.md` se deja en inglés como registro histórico.
 
-## Reversibility
+## Reversibilidad
 
-Every plan in this phase is a discrete commit on `main`, pushed. The phase-complete state
-is tagged `phase-01.1-complete` at commit `2d49fc8`. The dev database can be restored from
-`data/snapshots/savepoint_test-igdb-catalogue-20260906.dump` via `pg_restore` in minutes.
+Todo plan de esta fase es un commit discreto en `main`, con push. El estado de fase-completa está tagueado `phase-01.1-complete` en el commit `2d49fc8`. La base de datos de desarrollo puede restaurarse desde `data/snapshots/savepoint_test-igdb-catalogue-20260906.dump` vía `pg_restore` en minutos.
 
 ---
-*Signed off: 2026-09-06 (conditional advance approval)*
+*Firmado: 2026-09-06 (aprobación anticipada condicional)*
 *Commit: `2d49fc8df2beaf7fb741a68c9f835b7f51f57295`*
-*Phase 1.0 sign-off (separate, already accepted): `docs/verification/phase-01-signoff.md`*
+*Firma de la Fase 1.0 (separada, ya aceptada): `docs/verification/phase-01-signoff.md`*
