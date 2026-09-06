@@ -15,44 +15,39 @@
     },
     {
       "number": "2",
-      "name": "Governed Corpus and Frozen Evaluation Contract",
+      "name": "Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender",
       "status": "pending"
     },
     {
       "number": "3",
-      "name": "Complete Collection Workflows and Portability",
+      "name": "Explainable Content Recommenders and Baseline Comparison",
       "status": "pending"
     },
     {
       "number": "4",
-      "name": "Public Discovery and Resilient Enrichment",
-      "status": "pending"
-    },
-    {
-      "number": "5",
-      "name": "Reproducible Experiment Harness and Baselines",
-      "status": "pending"
-    },
-    {
-      "number": "6",
-      "name": "Explainable Content Recommendations",
-      "status": "pending"
-    },
-    {
-      "number": "7",
       "name": "Collaborative and Hybrid Comparison",
       "status": "pending"
     },
     {
-      "number": "8",
+      "number": "5",
+      "name": "Complete Collection Workflows and Portability",
+      "status": "pending"
+    },
+    {
+      "number": "6",
+      "name": "Public Discovery and Resilient Enrichment",
+      "status": "pending"
+    },
+    {
+      "number": "7",
       "name": "Research Panel, Hardening, and Evidence Freeze",
       "status": "pending"
     }
   ],
   "next": {
     "command": "/gsd-plan-phase 2",
-    "label": "Planificar la Fase 2 (Governed Corpus and Frozen Evaluation Contract)",
-    "reason": "Fases 1 y 01.1 cerradas (2/9 · 22%). El autor autorizó empezar la Fase 2 el 2026-09-06; aún sin planificar."
+    "label": "Planificar la Fase 2 (Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender)",
+    "reason": "Fases 1 y 01.1 cerradas. Roadmap reestructurado el 2026-09-06: la Fase 2 absorbe ratings externos, gobernanza del corpus, el contrato de evaluación y un primer recomendador avanzado; las antiguas fases 5 y 6 se funden y 3, 4, 8 se renumeran a 5, 6, 7. Fase 2 sin planificar."
   },
-  "updated_at": "2026-09-06T15:00:00.000Z"
+  "updated_at": "2026-09-06T16:30:00.000Z"
 }

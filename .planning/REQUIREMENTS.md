@@ -188,74 +188,75 @@
 | REC-10 | Phase 01.1 | Pending |
 | QUAL-05 | Phase 01.1 | Pending |
 | DATA-03 | Phase 2 | Pending |
+| DATA-05 | Phase 2 | Pending |
+| DATA-06 | Phase 2 | Pending |
+| DATA-07 | Phase 2 | Pending |
+| DATA-08 | Phase 2 | Pending |
 | EVAL-01 | Phase 2 | Pending |
 | EVAL-02 | Phase 2 | Pending |
 | EVAL-03 | Phase 2 | Pending |
 | EVAL-09 | Phase 2 | Pending |
 | EVAL-10 | Phase 2 | Pending |
+| REC-01 | Phase 2 | Pending |
+| REC-03 | Phase 2 | Pending |
+| REC-06 | Phase 2 | Pending |
+| REC-07 | Phase 2 | Pending |
+| REC-08 | Phase 2 | Pending |
+| REC-09 | Phase 2 | Pending |
+| DOC-02 | Phase 2 | Pending |
 | DOC-04 | Phase 2 | Pending |
 | AGENT-04 | Phase 2 | Pending |
-| PROF-01 | Phase 3 | Pending |
-| LIB-03 | Phase 3 | Pending |
-| LIB-04 | Phase 3 | Pending |
-| INV-03 | Phase 3 | Pending |
-| INV-04 | Phase 3 | Pending |
-| PORT-01 | Phase 3 | Pending |
-| PORT-02 | Phase 3 | Pending |
-| PORT-03 | Phase 3 | Pending |
-| PORT-04 | Phase 3 | Pending |
-| PRIV-01 | Phase 3 | Pending |
-| PROF-03 | Phase 4 | Pending |
-| PROF-04 | Phase 4 | Pending |
-| CAT-05 | Phase 4 | Pending |
-| DATA-05 | Phase 4 | Pending |
-| DATA-06 | Phase 4 | Pending |
-| DATA-07 | Phase 4 | Pending |
-| DATA-08 | Phase 4 | Pending |
-| REC-01 | Phase 5 | Pending |
-| EVAL-04 | Phase 5 | Pending |
-| EVAL-05 | Phase 5 | Pending |
-| EVAL-06 | Phase 5 | Pending |
-| EVAL-07 | Phase 5 | Pending |
-| EVAL-08 | Phase 5 | Pending |
-| EVAL-11 | Phase 5 | Pending |
-| EVAL-12 | Phase 5 | Pending |
-| QUAL-02 | Phase 5 | Pending |
-| REC-03 | Phase 6 | Pending |
-| REC-06 | Phase 6 | Pending |
-| REC-07 | Phase 6 | Pending |
-| REC-08 | Phase 6 | Pending |
-| REC-09 | Phase 6 | Pending |
-| REC-04 | Phase 7 | Pending |
-| REC-05 | Phase 7 | Pending |
-| DOC-03 | Phase 7 | Pending |
-| EVAL-13 | Phase 8 | Pending |
-| EVAL-14 | Phase 8 | Pending |
-| ADMIN-01 | Phase 8 | Pending |
-| ADMIN-02 | Phase 8 | Pending |
-| SEC-01 | Phase 8 | Pending |
-| SEC-03 | Phase 8 | Pending |
-| SEC-04 | Phase 8 | Pending |
-| SEC-05 | Phase 8 | Pending |
-| SEC-06 | Phase 8 | Pending |
-| SEC-07 | Phase 8 | Pending |
-| SEC-08 | Phase 8 | Pending |
-| PRIV-02 | Phase 8 | Pending |
-| OPS-04 | Phase 8 | Pending |
-| OPS-05 | Phase 8 | Pending |
-| QUAL-01 | Phase 8 | Pending |
-| QUAL-04 | Phase 8 | Pending |
-| DOC-02 | Phase 8 | Pending |
-| DOC-05 | Phase 8 | Pending |
-| DOC-06 | Phase 8 | Pending |
-| AGENT-05 | Phase 8 | Pending |
-| AGENT-06 | Phase 8 | Pending |
+| EVAL-04 | Phase 3 | Pending |
+| EVAL-05 | Phase 3 | Pending |
+| EVAL-06 | Phase 3 | Pending |
+| EVAL-07 | Phase 3 | Pending |
+| EVAL-08 | Phase 3 | Pending |
+| EVAL-11 | Phase 3 | Pending |
+| EVAL-12 | Phase 3 | Pending |
+| QUAL-02 | Phase 3 | Pending |
+| REC-04 | Phase 4 | Pending |
+| REC-05 | Phase 4 | Pending |
+| DOC-03 | Phase 4 | Pending |
+| PROF-01 | Phase 5 | Pending |
+| LIB-03 | Phase 5 | Pending |
+| LIB-04 | Phase 5 | Pending |
+| INV-03 | Phase 5 | Pending |
+| INV-04 | Phase 5 | Pending |
+| PORT-01 | Phase 5 | Pending |
+| PORT-02 | Phase 5 | Pending |
+| PORT-03 | Phase 5 | Pending |
+| PORT-04 | Phase 5 | Pending |
+| PRIV-01 | Phase 5 | Pending |
+| PROF-03 | Phase 6 | Pending |
+| PROF-04 | Phase 6 | Pending |
+| CAT-05 | Phase 6 | Pending |
+| EVAL-13 | Phase 7 | Pending |
+| EVAL-14 | Phase 7 | Pending |
+| ADMIN-01 | Phase 7 | Pending |
+| ADMIN-02 | Phase 7 | Pending |
+| SEC-01 | Phase 7 | Pending |
+| SEC-03 | Phase 7 | Pending |
+| SEC-04 | Phase 7 | Pending |
+| SEC-05 | Phase 7 | Pending |
+| SEC-06 | Phase 7 | Pending |
+| SEC-07 | Phase 7 | Pending |
+| SEC-08 | Phase 7 | Pending |
+| PRIV-02 | Phase 7 | Pending |
+| OPS-04 | Phase 7 | Pending |
+| OPS-05 | Phase 7 | Pending |
+| QUAL-01 | Phase 7 | Pending |
+| QUAL-04 | Phase 7 | Pending |
+| DOC-05 | Phase 7 | Pending |
+| DOC-06 | Phase 7 | Pending |
+| AGENT-05 | Phase 7 | Pending |
+| AGENT-06 | Phase 7 | Pending |
 
 **Coverage:**
 
-- v1 requirements: 89 total
-- Mapped to phases: 89
+- v1 requirements: 91 total
+- Mapped to phases: 91
 - Unmapped: 0
+- Roadmap revised 2026-09-06: DATA-05..08 moved from the former Phase 4 into the enlarged Phase 2; REC-01 moved from the former Phase 5; REC-03/06/07/08/09 moved from the former Phase 6; DOC-02 moved from the former Phase 8. Former phases 5 and 6 merged into the new Phase 3; former 3, 4, 7, 8 renumbered to 5, 6, 4, 7 respectively.
 
 ---
 *Requirements defined: 2026-09-04*

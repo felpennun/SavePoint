@@ -9,10 +9,10 @@ last_activity: 2026-09-06
 last_activity_desc: "Fase 01.1 CERRADA — firma ACEPTADA (QUAL-05 confirmado por revisión remota); Fase 2 autorizada, pendiente de planificar"
 state_head: 4df6cf4
 next_phase: 2
-next_phase_name: Governed Corpus and Frozen Evaluation Contract
+next_phase_name: "Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender"
 next_action: "/gsd-plan-phase 2"
 progress:
-  total_phases: 9
+  total_phases: 8
   completed_phases: 2
   total_plans: 26
   completed_plans: 26
@@ -26,7 +26,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-09-04)
 
 **Core value:** Users receive useful and explainable video-game recommendations from a well-organised collection, while every algorithmic result remains reproducible and defensible in the thesis.
-**Current focus:** Fase 01.1 CERRADA — siguiente: Fase 2 (Governed Corpus and Frozen Evaluation Contract), autorizada, sin planificar.
+**Current focus:** Fase 01.1 CERRADA. Roadmap reestructurado el 2026-09-06: la Fase 2 se amplía (corpus gobernado, ratings externos, contrato de evaluación, primer recomendador avanzado, búsqueda y filtros, pase de UI); antiguas fases 5 y 6 fundidas, 3/4/7/8 renumeradas a 5/6/4/7. Siguiente: planificar la Fase 2 ampliada, sin planificar.
 
 ## Current Position
 
