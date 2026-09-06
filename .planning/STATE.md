@@ -1,7 +1,7 @@
 ---
 gsd_state_version: 1.0
 status: in_progress
-stopped_at: "Phase 2 planner hit the session rate limit (429) before writing any PLAN.md; resets 20:50 Europe/Paris. 02-COVERAGE.md rescued. Resume after reset: /gsd-resume-work -> /gsd-plan-phase 2 (re-spawns planner, has_plans:false, all inputs committed). See .planning/phases/02-.../.continue-here.md"
+stopped_at: "Phase 2 PLANNED and VERIFIED — 13 plans / 6 waves, gsd-plan-checker 0 blockers (both advisory warnings closed: W1 254f999, W2 9ad347b). Ready to execute. Next: /gsd-execute-phase 2 (stops at 5 author ratification checkpoints: platform allowlist, RAWG in/out, frozen protocol params, synthetic archetypes, numpy). Detail: .planning/phases/02-.../.continue-here.md"
 last_updated: "2026-09-06T15:40:00.000Z"
 state_head: f56f7a6
 progress:
@@ -13,10 +13,10 @@ progress:
 last_activity: 2026-09-06
 next_phase: 2
 next_phase_name: Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender
-next_action: /gsd-resume-work
+next_action: /gsd-execute-phase 2
 current_phase: 2
 current_phase_name: Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender
-last_activity_desc: "Fase 2: discuss+UI-SPEC+research+validation+pattern-map+COVERAGE hechos; planner cayo por rate limit (reset 20:50 Paris), 0 PLAN.md. Retomar tras el reset."
+last_activity_desc: "Fase 2 planificada y verificada (13 planes, 6 olas, 0 blockers). Lista para /gsd-execute-phase 2."
 ---
 
 # Project State
