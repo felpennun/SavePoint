@@ -1,3 +1,328 @@
 \chapter{Análisis de requisitos}\label{cap:requisitos}
 
-\todo[inline]{Capítulo por redactar en la siguiente iteración.}
+Este capítulo recoge el análisis de requisitos del proyecto. Presenta los actores del
+sistema, el modelo de dominio que sostiene los requisitos de información, los requisitos
+funcionales y no funcionales, las reglas de negocio, los casos de uso y la matriz de
+trazabilidad que enlaza cada requisito con la fase que lo entrega y con su evidencia. Los
+requisitos se identifican con códigos estables tomados de \texttt{.planning/REQUIREMENTS.md},
+de modo que la matriz de trazabilidad de este capítulo y la del repositorio coinciden.
+
+\section{Actores del sistema}\label{sec:req-actores}
+
+La Tabla~\ref{tab:actores} enumera los actores. Dos de ellos, el administrador y el personal
+investigador, corresponden a funcionalidad planificada para fases posteriores y se incluyen
+para dar contexto completo al modelo.
+
+\begin{table}[htp]
+\centering
+\begin{tabular}{ | l | p{9.5cm} | c | }
+    \hline
+    \textbf{Actor} & \textbf{Descripción} & \textbf{Estado} \\
+    \hline
+    Visitante & Persona no autenticada que consulta el catálogo, la ficha de un juego, un perfil público y la recomendación por popularidad. & Activo \\
+    \hline
+    Persona usuaria & Titular de una cuenta controlada que gestiona su lista de pendientes, valora juegos e inventaría copias. & Activo \\
+    \hline
+    Cuenta simulada & Cuenta de demostración claramente etiquetada como simulada, precargada para el tribunal. & Activo \\
+    \hline
+    Administrador & Perfil autorizado para gestionar cuentas de demostración y datos del catálogo sin editar la base directamente. & Planificado \\
+    \hline
+    Personal investigador & Perfil que ejecuta experimentos de recomendación y consulta el panel de comparación. & Planificado \\
+    \hline
+\end{tabular}
+\caption{Actores del sistema.}
+\label{tab:actores}
+\end{table}
+
+\section{Requisitos de información: modelo de dominio}\label{sec:req-informacion}
+
+El modelo de dominio distingue tres áreas: el catálogo, la biblioteca personal y las cuentas.
+La Figura~\ref{fig:modelo-dominio} lo representa por completo; los párrafos siguientes
+describen cada entidad.
+
+\begin{figure}[htp]
+    \centering
+    \missingfigure[figwidth=0.9\textwidth]{Diagrama entidad-relación del modelo de dominio: catálogo (GameWork, GameRelease, Edition, Platform, Genre, GameAlias, RelatedContent, SourceRecord, AssetAttribution, IgdbImportRun), biblioteca (LibraryEntry, StatusTransition, OwnedCopy) y cuentas (User, DemoAccountAnchor, DemoAccountIdentity). Pendiente de dibujar a partir de apps/api/*/models.py.}
+    \caption{Modelo de dominio de SavePoint.}
+    \label{fig:modelo-dominio}
+\end{figure}
+% PENDIENTE: diagrama entidad-relación real (figures/modelo-dominio.pdf) generado desde los modelos Django.
+
+En el catálogo, la entidad central es la obra (\texttt{GameWork}), la identidad canónica de
+un título de videojuego con independencia de la plataforma y de la edición. Su clave primaria
+es un identificador único universal (UUID) interno generado en el momento de la importación,
+de modo que reapuntar a otro proveedor o prescindir de él no obliga a renumerar el catálogo.
+Cada obra puede tener varias publicaciones (\texttt{GameRelease}), una por plataforma
+(\texttt{Platform}). Cada publicación puede tener a su vez varias ediciones
+(\texttt{Edition}). La obra guarda además dos escalares desnormalizados de IGDB, la fecha de
+primer lanzamiento y la
+valoración agregada, para que el filtrado por año y por nota sea un recorrido de índice y no
+una agregación sobre cientos de miles de publicaciones. Los géneros (\texttt{Genre}) se
+asocian a la obra mediante una relación de muchos a muchos. Los alias bilingües
+(\texttt{GameAlias}) sostienen la búsqueda tolerante, con un índice de trigramas para las
+coincidencias aproximadas. El contenido relacionado (\texttt{RelatedContent}) enlaza
+contenido descargable (DLC) y expansiones con su obra padre, de modo que ese contenido vive
+dentro de la página del padre y nunca como resultado independiente del catálogo. La
+procedencia de cada obra vive en \texttt{SourceRecord}, con la fuente, el identificador de
+origen, la licencia, la fecha de recuperación y un hash del contenido normalizado. La
+atribución de cada portada revisada individualmente vive en \texttt{AssetAttribution}, cuya
+marca de portada permitida está a falso por defecto. El progreso de una importación de IGDB
+se registra en \texttt{IgdbImportRun}, con el cursor de identificador y el estado.
+
+En la biblioteca personal, la entrada de biblioteca (\texttt{LibraryEntry}) representa la
+relación entre una persona usuaria y una obra, con su estado en la lista de pendientes y su
+valoración, esta última almacenada como un entero de medias estrellas entre uno y diez. Una
+restricción de unicidad impide más de una entrada por persona y obra. El historial de
+transiciones de estado (\texttt{StatusTransition}) es un registro de solo anexado. Las copias
+en propiedad (\texttt{OwnedCopy}) representan cada ejemplar, físico o digital, con su formato,
+su publicación y su edición. Llevan además una clave de idempotencia que evita duplicados al
+reintentar una alta.
+
+En las cuentas, el proyecto usa el modelo de usuario de Django directamente y añade dos
+entidades. El ancla de cuenta de demostración (\texttt{DemoAccountAnchor}) identifica la
+cuenta de demostración única de la Fase 1 con independencia del nombre que tenga en cada
+momento. La identidad de cuenta de demostración (\texttt{DemoAccountIdentity}) es la
+generalización plural: cada fila es una cuenta simulada con una clave de semilla estable, una
+marca durable que la señala como simulada y una etiqueta visible. Una restricción de
+comprobación fija que esa marca de simulada sea siempre verdadera.
+
+La Tabla~\ref{tab:req-informacion} enlaza cada área del modelo con los requisitos de
+información que satisface.
+
+\begin{table}[htp]
+\centering
+\begin{tabular}{ | l | p{7.5cm} | l | }
+    \hline
+    \textbf{Área} & \textbf{Requisito de información} & \textbf{Códigos} \\
+    \hline
+    Catálogo & Identidad canónica independiente del proveedor de enriquecimiento. & CAT-04 \\
+    \hline
+    Catálogo & Registro de fuente, licencia, fecha de recuperación y hash por obra. & DATA-02 \\
+    \hline
+    Catálogo & Metadatos de plataforma, género, edición y fechas de fuentes aprobadas. & CAT-05 \\
+    \hline
+    Biblioteca & Estado de la lista de pendientes por persona y obra. & LIB-01 \\
+    \hline
+    Biblioteca & Valoración con escala consistente. & LIB-02 \\
+    \hline
+    Biblioteca & Copias en propiedad con formato, plataforma y edición. & INV-01, INV-02 \\
+    \hline
+    Cuentas & Cuentas simuladas identificadas de forma inequívoca como tales. & AUTH-02 \\
+    \hline
+\end{tabular}
+\caption{Áreas del modelo de dominio y requisitos de información asociados.}
+\label{tab:req-informacion}
+\end{table}
+
+\section{Requisitos funcionales}\label{sec:req-funcionales}
+
+La Tabla~\ref{tab:req-funcionales} recoge los requisitos funcionales relevantes para esta
+entrega, con su estado real. Los marcados como completos tienen evidencia en las firmas de
+fase; los marcados como planificados pertenecen a fases posteriores y se incluyen para
+mostrar la continuidad del análisis.
+
+\begin{table}[htp]
+\centering
+\begin{tabular}{ | l | p{8.5cm} | c | }
+    \hline
+    \textbf{Código} & \textbf{Requisito funcional} & \textbf{Estado} \\
+    \hline
+    AUTH-01 & Iniciar y cerrar sesión en una cuenta controlada. & Completo \\
+    \hline
+    AUTH-02 & Cargar cuentas simuladas etiquetadas como tales. & Completo \\
+    \hline
+    PROF-02 & Consultar un perfil público. & Completo \\
+    \hline
+    CAT-01 & Buscar videojuegos por título. & Completo \\
+    \hline
+    CAT-02 & Filtrar y ordenar el catálogo por metadatos disponibles. & Completo \\
+    \hline
+    CAT-03 & Ficha de detalle de cada juego con sus datos y su procedencia. & Completo \\
+    \hline
+    CAT-04 & Identificadores canónicos que no dependen de la API de enriquecimiento. & Completo \\
+    \hline
+    CAT-06 & Catálogo usable con datos locales si la API no está disponible. & Completo \\
+    \hline
+    LIB-01 & Marcar un juego como pendiente, jugando, completado o abandonado. & Completo \\
+    \hline
+    LIB-02 & Valorar un juego con una escala consistente. & Completo \\
+    \hline
+    INV-01 & Registrar varias copias de la misma obra. & Completo \\
+    \hline
+    INV-02 & Registrar formato, plataforma y edición de cada copia. & Completo \\
+    \hline
+    INV-05 & Las notas privadas y los detalles de compra nunca aparecen en la proyección pública. & Completo \\
+    \hline
+    DATA-01 & Conjunto de datos estable, citable y legalmente adecuado. & Completo \\
+    \hline
+    DATA-02 & El conjunto registra versión, licencia, URL de origen, fecha y hash. & Completo \\
+    \hline
+    DATA-04 & API de enriquecimiento elegida mediante comparación documentada. & Completo \\
+    \hline
+    REC-02 & Baseline de recomendación por popularidad. & Completo \\
+    \hline
+    REC-10 & Página de recomendaciones por géneros según la actividad propia. & Completo \\
+    \hline
+    REC-03 a REC-09 & Recomendadores basados en contenido, colaborativos e híbridos, con explicaciones y arranque en frío. & Planificado \\
+    \hline
+    PORT-01 a PORT-04 & Exportación e importación de colección, valoraciones y listas. & Planificado \\
+    \hline
+\end{tabular}
+\caption{Requisitos funcionales relevantes para la primera entrega.}
+\label{tab:req-funcionales}
+\end{table}
+
+\section{Requisitos no funcionales}\label{sec:req-no-funcionales}
+
+Los requisitos no funcionales de esta entrega se agrupan en cinco familias. La
+\textit{reproducibilidad} exige que el sistema arranque de forma reproducible en un entorno
+local documentado, con las dependencias fijadas a versión exacta (QUAL-02, OPS-02). La
+\textit{legalidad y procedencia de datos} exige que cada dato del catálogo conserve su
+fuente, su licencia y su fecha de recuperación, con la elección de fuentes documentada junto
+con sus términos (DATA-01, DATA-02, DATA-04, DATA-08). La \textit{accesibilidad y el diseño
+responsive} exigen que los flujos principales funcionen con teclado y en anchuras de
+escritorio y de móvil, verificables frente a las Pautas de Accesibilidad para el Contenido
+Web (WCAG) 2.2 en nivel AA~\cite{wcag22} (QUAL-03). La \textit{seguridad de la demostración
+controlada} exige que ningún secreto aparezca en el control de versiones, en los paquetes del
+navegador, en los registros ni en artefactos públicos. También exige que las acciones de
+cambio de estado estén protegidas contra falsificación de petición en sitios cruzados
+(SEC-02, SEC-04). La
+\textit{calidad visual de producto} exige que la interfaz presente una densidad, una
+tipografía y un tratamiento de la imagen propios de un producto de catalogación, no de un
+prototipo utilitario (QUAL-05).
+
+\section{Reglas de negocio}\label{sec:req-reglas}
+
+La Tabla~\ref{tab:reglas-negocio} recoge las reglas de negocio que gobiernan el
+comportamiento del sistema en esta entrega.
+
+\begin{table}[htp]
+\centering
+\begin{tabular}{ | l | p{11cm} | }
+    \hline
+    \textbf{Regla} & \textbf{Enunciado} \\
+    \hline
+    RN-1 & La identidad de una obra es un identificador interno propio; el identificador del proveedor externo se guarda solo como procedencia. \\
+    \hline
+    RN-2 & El contenido descargable y las expansiones se muestran dentro de la página de su obra padre, nunca como resultado independiente del catálogo ni como entrada de biblioteca. \\
+    \hline
+    RN-3 & Los detalles privados de propiedad, como notas y datos de compra, nunca aparecen en ninguna proyección pública. \\
+    \hline
+    RN-4 & La valoración se almacena como un entero de medias estrellas entre uno y diez; nunca como un número en coma flotante. \\
+    \hline
+    RN-5 & La recomendación por popularidad se calcula solo sobre la actividad de cuentas simuladas y nunca se presenta como personalizada. \\
+    \hline
+    RN-6 & La recomendación por afinidad de géneros refleja solo la actividad de la persona autenticada y nunca cae al baseline de popularidad; sin historial suficiente, muestra un estado de bienvenida. \\
+    \hline
+    RN-7 & Registrar de nuevo una copia con la misma clave de idempotencia devuelve la copia existente en lugar de crear un duplicado. \\
+    \hline
+    RN-8 & En esta entrega toda cuenta es pública por diseño; no hay conmutador de privacidad. \\
+    \hline
+    RN-9 & El acceso a IGDB queda confinado a un comando de gestión fuera de línea; ninguna petición de usuario llama a un proveedor externo. \\
+    \hline
+\end{tabular}
+\caption{Reglas de negocio.}
+\label{tab:reglas-negocio}
+\end{table}
+
+\section{Casos de uso}\label{sec:req-casos-uso}
+
+La Figura~\ref{fig:casos-uso} presenta el diagrama de casos de uso de la primera entrega. Los
+casos que involucran al administrador y al personal investigador quedan fuera de esta
+entrega.
+
+\begin{figure}[htp]
+    \centering
+    \missingfigure[figwidth=0.9\textwidth]{Diagrama de casos de uso: Visitante (buscar juego, consultar ficha y procedencia, ver perfil público, ver recomendacion por popularidad, filtrar y ordenar catalogo, registrarse); Persona usuaria (iniciar y cerrar sesion, cambiar estado de backlog, valorar juego, registrar copias, abrir pagina de recomendaciones por generos). Pendiente de dibujar.}
+    \caption{Diagrama de casos de uso de la primera entrega.}
+    \label{fig:casos-uso}
+\end{figure}
+% PENDIENTE: diagrama de casos de uso real (figures/casos-uso.pdf).
+
+La Tabla~\ref{tab:casos-uso} describe cada caso de uso con su actor principal y el requisito
+funcional que satisface.
+
+\begin{table}[htp]
+\centering
+\begin{tabular}{ | l | p{6.5cm} | l | l | }
+    \hline
+    \textbf{Id} & \textbf{Caso de uso} & \textbf{Actor} & \textbf{Requisito} \\
+    \hline
+    CU-1 & Buscar un juego por título & Visitante & CAT-01 \\
+    \hline
+    CU-2 & Consultar la ficha de un juego y su procedencia & Visitante & CAT-03 \\
+    \hline
+    CU-3 & Filtrar y ordenar el catálogo & Visitante & CAT-02 \\
+    \hline
+    CU-4 & Ver un perfil público & Visitante & PROF-02 \\
+    \hline
+    CU-5 & Ver la recomendación por popularidad & Visitante & REC-02 \\
+    \hline
+    CU-6 & Registrarse dentro de la frontera de demostración & Visitante & AUTH-02 \\
+    \hline
+    CU-7 & Iniciar y cerrar sesión con una cuenta simulada & Cuenta simulada & AUTH-01 \\
+    \hline
+    CU-8 & Cambiar el estado de un juego en la lista de pendientes & Persona usuaria & LIB-01 \\
+    \hline
+    CU-9 & Valorar un juego & Persona usuaria & LIB-02 \\
+    \hline
+    CU-10 & Registrar una o varias copias en propiedad & Persona usuaria & INV-01, INV-02 \\
+    \hline
+    CU-11 & Abrir la página de recomendaciones por afinidad de géneros & Persona usuaria & REC-10 \\
+    \hline
+\end{tabular}
+\caption{Casos de uso de la primera entrega.}
+\label{tab:casos-uso}
+\end{table}
+
+\section{Matriz de trazabilidad}\label{sec:req-trazabilidad}
+
+La Tabla~\ref{tab:trazabilidad} enlaza cada requisito completado en esta entrega con la fase
+que lo entregó y con la evidencia que lo respalda. La columna de evidencia remite a
+documentos del repositorio: firmas de fase en \texttt{docs/verification/}, registros de
+decisión en \texttt{docs/adr/} e informes de verificación en \texttt{.planning/phases/}.
+
+\begin{table}[htp]
+\centering
+\begin{tabular}{ | l | c | p{8cm} | }
+    \hline
+    \textbf{Requisito} & \textbf{Fase} & \textbf{Evidencia} \\
+    \hline
+    AUTH-01, PROF-02 & 1 & \texttt{phase-01-signoff.md}; pruebas de \texttt{accounts}. \\
+    \hline
+    CAT-01, CAT-03, CAT-04, CAT-06 & 1 & \texttt{phase-01-signoff.md}; \texttt{catalogue-freeze.md}. \\
+    \hline
+    LIB-01, LIB-02, INV-01, INV-02, INV-05 & 1 & \texttt{phase-01-signoff.md}; pruebas de \texttt{library}. \\
+    \hline
+    DATA-01, DATA-02 & 1 & \texttt{catalogue-freeze.md}; ADR-003. \\
+    \hline
+    REC-02 & 1 & \texttt{library/popularity.py}; \texttt{phase-01-signoff.md}. \\
+    \hline
+    SEC-02, OPS-01, OPS-02, OPS-03 & 1 & \texttt{phase-01-signoff.md}; \texttt{check-secrets.ps1}. \\
+    \hline
+    QUAL-03 & 1 & \texttt{phase-01-manual.md}; 400\% de zoom y lector de pantalla pendientes. \\
+    \hline
+    DOC-01, AGENT-01, AGENT-02, AGENT-03 & 1 & ADR-001 a 005; \texttt{agent-ledger.jsonl}. \\
+    \hline
+    DATA-04 & 01.1 & ADR-006; \texttt{igdb-api-probe.md}. \\
+    \hline
+    CAT-02 & 01.1 & \texttt{01.1-VERIFICATION.md} SC2; migración \texttt{0004}. \\
+    \hline
+    AUTH-02 & 01.1 & \texttt{01.1-VERIFICATION.md} SC3; \texttt{bootstrap\_demo\_accounts}. \\
+    \hline
+    REC-10 & 01.1 & ADR-007; \texttt{01.1-VERIFICATION.md} SC5. \\
+    \hline
+    QUAL-05 & 01.1 & \texttt{phase-01.1-signoff.md}; revisión remota de capturas del autor. \\
+    \hline
+\end{tabular}
+\caption{Matriz de trazabilidad de requisito a fase y a evidencia.}
+\label{tab:trazabilidad}
+\end{table}
+
+Los requisitos de las familias de evaluación, experimentación y recomendadores avanzados
+(EVAL-01 a EVAL-14, REC-01, REC-03 a REC-09) están asignados a las Fases 2 y 5 a 8 en
+\texttt{REQUIREMENTS.md}, con estado pendiente. El Capítulo~\ref{cap:conclusiones} detalla
+ese trabajo futuro.
+
+Este capítulo ha fijado qué debe hacer el sistema y con qué restricciones. El capítulo
+siguiente describe cómo se ha diseñado para cumplirlo.
