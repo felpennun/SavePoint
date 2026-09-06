@@ -50,8 +50,8 @@ Tabla~\ref{tab:stack} recoge las versiones principales.
 \subsection{Comandos de gestión}\label{sec:impl-comandos}
 
 Toda tarea de datos es un comando de gestión de Django, ejecutable fuera de la petición HTTP e
-idempotente. El importador de Wikidata, \texttt{import\_catalogue}, carga el corpus congelado
-de la Fase 1. El importador de IGDB, \texttt{import\_igdb\_catalogue}, recorre la API por
+idempotente. El importador de Wikidata, \texttt{import\_catalogue}, carga el corpus curado
+de Wikidata. El importador de IGDB, \texttt{import\_igdb\_catalogue}, recorre la API por
 lotes con un cursor de identificador reanudable: cada lote se confirma dentro de una
 transacción que también escribe el cursor. Un disparador de base de datos impide que ese
 cursor retroceda, de modo que una ejecución interrumpida siempre reanuda hacia delante desde
@@ -131,17 +131,17 @@ def entry_weight(status, rating_half_steps):
 La frontera con el trabajo futuro es explícita. Este heurístico es un conteo de frecuencia
 sobre una tabla, sin paso de entrenamiento, sin vectores latentes y sin almacén de
 características persistido. No reclama calidad predictiva. Su cadena de limitación, incluida en
-cada respuesta, dice con palabras que no debe compararse con los recomendadores basados en
-contenido de la Fase 3. Su papel es doble: hacer que el producto se lea como un sitio de
-catalogación real y dar a la Fase 3 un contrato de página y de punto de acceso ya cableado
-que sustituir.
+cada respuesta, dice con palabras que no debe entrar en una comparación sistemática de
+recomendadores, que queda fuera del alcance de esta memoria. Su papel es doble: hacer que el
+producto se lea como un sitio de catalogación real y dejar un contrato de página y de punto
+de acceso ya cableado que un recomendador más elaborado pueda sustituir.
 
 \section{Frontend}\label{sec:impl-frontend}
 
 \subsection{Rutas y componentes}\label{sec:impl-rutas}
 
 El frontend usa el enrutador de aplicación de Next.js, con un segmento de idioma en la raíz de
-la ruta. Las rutas de esta entrega son la página de inicio, el catálogo, el detalle de un
+la ruta. Las rutas del sistema son la página de inicio, el catálogo, el detalle de un
 juego, la colección, el perfil público, las fuentes, el acceso, el registro y las
 recomendaciones. Los componentes reutilizables incluyen el armazón de la aplicación con su
 barra de navegación, la tarjeta de juego, las píldoras de estado y de nota, la valoración por
