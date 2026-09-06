@@ -267,39 +267,45 @@ try {
   $commitShort = if ($commit.Length -ge 12) { $commit.Substring(0, 12) } else { $commit }
   $nowUtc = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
 
+  # This here-string writes into a Spanish thesis document (project convention:
+  # docs in Spanish, code in English), so its emitted labels are Spanish. The
+  # HTML MEASURED-EVIDENCE markers are load-bearing for the regex below and
+  # stay verbatim.
   $measured = @"
 <!-- MEASURED-EVIDENCE-START -->
-| Field | Value |
+| Campo | Valor |
 |---|---|
-| Run timestamp (UTC) | $nowUtc |
-| Repo commit | ``$commit`` |
-| Query boundary | ``$($evResume.where)`` (identity ``$($evResume.query_identity)``) |
-| Live eligible count (``game_type = 0``, re-measured) | $eligible |
-| Acceptance floor ``max(100000, 0.90 x eligible)`` | $floor |
-| Primary works imported | $works |
-| Distinct ``source_id`` == imported total | $distinctSrcs == $works (yes) |
-| Covers present / first-party fallback | $covPresent / $covFallback |
-| Genres seen | $genreCount |
-| Content checksum (``sha256``) | ``$checksum`` |
+| Marca de tiempo de la ejecución (UTC) | $nowUtc |
+| Commit del repo | ``$commit`` |
+| Frontera de consulta | ``$($evResume.where)`` (identidad ``$($evResume.query_identity)``) |
+| Conteo elegible en vivo (``game_type = 0``, re-medido) | $eligible |
+| Suelo de aceptación ``max(100000, 0.90 x eligible)`` | $floor |
+| Obras primarias importadas | $works |
+| ``source_id`` distintos == total importado | $distinctSrcs == $works (sí) |
+| Portadas presentes / fallback de primera parte | $covPresent / $covFallback |
+| Géneros vistos | $genreCount |
+| Checksum de contenido (``sha256``) | ``$checksum`` |
 | ``IgdbImportRun.status`` / ``last_committed_igdb_id`` | $status / $cursor |
 
-### Interrupt / resume observations
+### Observaciones de interrupción / reanudación
 
-- Import started fresh against an empty database, hard-killed (SIGKILL) after
-  it had committed >= 2 batches at ``last_committed_igdb_id = $interruptCursor``
-  ($afterKillWorks works already durable, run status ``$killStatus``).
-- The resume run continued forward from the committed checkpoint (the
-  monotonic-cursor trigger guarantees it could not regress) and drove the
-  import to ``status = complete`` with no duplicate ``source_id`` values.
+- La importación arrancó fresca contra una base de datos vacía, se mató en duro
+  (SIGKILL) tras haber commiteado >= 2 batches en
+  ``last_committed_igdb_id = $interruptCursor`` ($afterKillWorks obras ya
+  durables, estado de la ejecución ``$killStatus``).
+- La ejecución de reanudación continuó hacia delante desde el checkpoint
+  commiteado (el trigger de cursor monótono garantiza que no pudo regresar) y
+  llevó la importación a ``status = complete`` sin valores ``source_id``
+  duplicados.
 
-### Rerun convergence
+### Convergencia de la re-ejecución
 
-- A third invocation, with the checkpoint already ``complete``, re-scanned the
-  full catalogue from id 0 and converged:
-  primary works ``$($evResume.primary_works_imported)`` -> ``$($evRerun.primary_works_imported)``,
-  checksum ``$($evResume.checksum_sha256)`` unchanged.
+- Una tercera invocación, con el checkpoint ya ``complete``, re-escaneó el
+  catálogo completo desde id 0 y convergió:
+  obras primarias ``$($evResume.primary_works_imported)`` -> ``$($evRerun.primary_works_imported)``,
+  checksum ``$($evResume.checksum_sha256)`` sin cambios.
 
-### Redacted command outcomes
+### Resultados de comandos redactados
 
 ``````
 $($interruptLog.Trim())
@@ -313,7 +319,7 @@ $($interruptLog.Trim())
     '(?s)<!-- MEASURED-EVIDENCE-START -->.*?<!-- MEASURED-EVIDENCE-END -->',
     { param($m) $measured.TrimEnd() }
   )
-  $doc = $doc -replace '(?m)^\*\*Estado:\*\* PENDING.*$', "**Estado:** FROZEN ($nowUtc, commit $commitShort)"
+  $doc = $doc -replace '(?m)^\*\*Estado:\*\* (PENDING|PENDIENTE).*$', "**Estado:** CONGELADO ($nowUtc, commit $commitShort)"
   Set-Content -Path $FreezeDoc -Value $doc -NoNewline -Encoding UTF8
 
   Write-Host ""

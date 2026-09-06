@@ -63,38 +63,45 @@ function Require-Conclusion {
 
 Write-Host "== verify-igdb-probe: $EvidencePath ==" -ForegroundColor Cyan
 
+# The probe evidence prose is Spanish (project convention: thesis docs in
+# Spanish, code in English). These patterns match the Spanish anchors; the
+# verbatim IGDB terms quotes in section 5 stay in English, so their patterns
+# (rate-limit numbers, URLs) are unchanged. Numbers/queries/field names are
+# language-neutral and matched verbatim.
+
 # 1. ISO-8601 UTC probe timestamp.
 Require-Match -Label "ISO-8601 UTC probe timestamp" `
-    -Pattern 'Probe run \(ISO-8601 UTC\):\*\*\s*\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z'
+    -Pattern 'Sondeo ejecutado \(ISO-8601 UTC\):\*\*\s*\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z'
 
 # 2. Authenticated response status (a real HTTP status, not a blank cell).
 Require-Match -Label "Authenticated OAuth response status" `
-    -Pattern 'Authenticated response status\s*\|\s*\*\*HTTP\s*200\*\*'
+    -Pattern 'Estado de la respuesta autenticada\s*\|\s*\*\*HTTP\s*200\*\*'
 
 # 3. Numeric total games count.
 Require-Match -Label "Numeric total games count" `
-    -Pattern 'Total games:\s*([1-9]\d{4,})'
+    -Pattern 'Juegos totales:\s*([1-9]\d{4,})'
 
 # 4. Numeric eligible-category (primary) count.
 Require-Match -Label "Numeric eligible primary game_type=0 count" `
-    -Pattern 'Eligible primary games \(game_type = 0\):\s*([1-9]\d{4,})'
+    -Pattern 'Juegos primarios elegibles \(game_type = 0\):\s*([1-9]\d{4,})'
 
 # 5. game_type breakdown sum reconciliation is stated.
 Require-Match -Label "game_type breakdown reconciled to total" `
-    -Pattern '(?i)sum\D+374555.*matches unfiltered'
+    -Pattern '(?i)suma\D+374555.*coincide con'
 
 # 6. Quota conclusion -- must say there is no monthly quota, with words after it.
 Require-Match -Label "Quota conclusion (no monthly quota)" `
-    -Pattern '(?i)Quota conclusion:\s*there is\s*NO\s*monthly request quota'
+    -Pattern '(?i)Conclusión de cuota:\s*NO existe ninguna cuota mensual'
 
-# 7. Rate-limit numbers recorded (4 req/s, 8 concurrent).
+# 7. Rate-limit numbers recorded (4 req/s, 8 concurrent) -- from the verbatim
+#    English api-docs.igdb.com quote, kept in English.
 Require-Match -Label "Rate-limit values (4 req/s, 8 concurrent)" `
     -Pattern '(?i)4 requests per second.*8 open requests'
 
 # 8. Written conclusions -- each label must carry real text.
-Require-Conclusion -Label "Caching conclusion" -LabelPattern '\*\*Caching conclusion:\*\*\s*'
-Require-Conclusion -Label "Attribution / redistribution conclusion" -LabelPattern '\*\*Attribution / redistribution conclusion:\*\*\s*'
-Require-Conclusion -Label "Hotlink-versus-mirror cover conclusion" -LabelPattern '\*\*Hotlink-versus-mirror cover conclusion:\*\*\s*'
+Require-Conclusion -Label "Caching conclusion" -LabelPattern '\*\*Conclusión sobre caché:\*\*\s*'
+Require-Conclusion -Label "Attribution / redistribution conclusion" -LabelPattern '\*\*Conclusión sobre atribución / redistribución:\*\*\s*'
+Require-Conclusion -Label "Hotlink-versus-mirror cover conclusion" -LabelPattern '\*\*Conclusión sobre hotlink vs\. mirror de portadas:\*\*\s*'
 
 # 9. Both primary sources for the terms are cited by URL.
 Require-Match -Label "Primary source cited: api-docs.igdb.com" -Pattern 'api-docs\.igdb\.com'
@@ -106,7 +113,7 @@ Require-Match -Label "Cover image URL structure recorded" `
 
 # 11. Secret-hygiene assertion is present (no credential/token written).
 Require-Match -Label "Credential-handling statement" `
-    -Pattern '(?i)No credential value, OAuth token, or .+ was printed'
+    -Pattern '(?i)No se imprimió.{0,90}ningún valor de credencial'
 
 Write-Host ""
 if ($failures.Count -gt 0) {
