@@ -61,3 +61,19 @@ rating para todo el corpus. Como no había credenciales operativas para ninguna 
 se añade RAWG acotado con `N=10.000`, ordenado por `rating_count` descendente y con
 desempate determinista. La implementación está probada; queda pendiente una ejecución
 autenticada para medir cobertura RAWG real.
+
+### Ratificación final (2026-09-07, re-import ampliado completado)
+
+El re-import IGDB con `GAME_FIELDS` ampliado terminó y persistió: corpus activo
+`2026.09.1`, 193.885 obras gobernadas, 27.014 con `rating` de usuario (**13,933 %**),
+30.672 con `total_rating` (15,820 %); 27.014 `CorpusRatingSnapshot` `source="igdb"`
+insertados. La cifra 13,933 % está muy por debajo del ~60 % orientativo (no vinculante)
+de D-06 y lejos de «rating para todo el corpus».
+
+**Selección del autor en el checkpoint de reanudación: `Ejecutar RAWG N=10.000`.** Se
+autoriza la ejecución en vivo de `enrich_rawg_ratings --corpus-version 2026.09.1
+--limit 10000` con `--env-file .env.local` y evidencia JSON fuera de Git. Antes de
+lanzar: añadir `shm_size` al servicio `db` de Compose para evitar el `DiskFull` en
+memoria compartida observado en el paso de evidencia de IGDB. Después: medir cobertura
+RAWG real (emparejados / no emparejados / snapshots insertados), congelar evidencia,
+escribir `02-02-SUMMARY.md` y cerrar con `Closes #18`.

@@ -160,9 +160,13 @@ Resume file: .planning/phases/02-governed-corpus-external-ratings-evaluation-con
 
 Last session: 2026-09-07
 
-Stopped at: Session resumed; awaiting author selection to continue Plan 02-07, task 2.
+Stopped at: Session resumed from HANDOFF.json. Plan 02-02 task 3/3 paused at the RAWG
+blocking-human checkpoint: IGDB final governed-corpus user-rating coverage measured at
+13,933 % (27.014/193.885); awaiting author decision to run the bounded RAWG enrichment
+(N=10000) or record IGDB-only in ADR-008. RAWG code + ADR committed in wip commit a718e8d.
 
 Resume file: .planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/.continue-here.md
+Handoff: .planning/HANDOFF.json (structured, one-shot — delete after resumption)
 
 ## Continuidad de esta sesion
 
