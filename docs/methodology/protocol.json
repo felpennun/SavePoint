@@ -1,0 +1,54 @@
+{
+  "protocol_version": 1,
+  "frozen_on": "2026-09-07",
+  "ratified_by": "Felipe — 02-08 Task 1 checkpoint:decision, option ratify-as-proposed, 2026-09-07",
+  "simulation": true,
+  "limitation": "Frozen offline evaluation protocol scored over seeded synthetic users. Every number produced under this protocol is simulation evidence about parameterised archetypes, not evidence about real SavePoint users (EVAL-10).",
+  "relevance": {
+    "completed": true,
+    "rating_half_steps_gte": 7
+  },
+  "k_values": [5, 10, 20],
+  "headline": "ndcg@10",
+  "split": {
+    "strategy": "leave_one_out_per_user",
+    "seed": 20260907,
+    "heldout_returned_to_candidates": true
+  },
+  "candidate_set": "governed_corpus_minus_user_library_plus_heldout",
+  "exclusions": "any_library_entry",
+  "metrics": ["precision@k", "recall@k", "ndcg@k", "map@k"],
+  "tuning": {
+    "select_on": "ndcg@10",
+    "select_split": "validation",
+    "test_runs": 1,
+    "grid": [
+      {"combine_mode": "weighted_sum", "feature_set": "genres_rating", "params": {"w1": 0.7, "w2": 0.3}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_rating", "params": {"w1": 0.5, "w2": 0.5}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_rating", "params": {"w1": 0.3, "w2": 0.7}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_rating_platform", "params": {"w1": 0.7, "w2": 0.3}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_rating_platform", "params": {"w1": 0.5, "w2": 0.5}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_rating_platform", "params": {"w1": 0.3, "w2": 0.7}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_rating_platform_franchise_dev", "params": {"w1": 0.7, "w2": 0.3}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_rating_platform_franchise_dev", "params": {"w1": 0.5, "w2": 0.5}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_rating_platform_franchise_dev", "params": {"w1": 0.3, "w2": 0.7}},
+      {"combine_mode": "multiplicative", "feature_set": "genres_rating", "params": {}},
+      {"combine_mode": "multiplicative", "feature_set": "genres_rating_platform", "params": {}},
+      {"combine_mode": "multiplicative", "feature_set": "genres_rating_platform_franchise_dev", "params": {}},
+      {"combine_mode": "two_stage", "feature_set": "genres_rating", "params": {"bands": 3}},
+      {"combine_mode": "two_stage", "feature_set": "genres_rating", "params": {"bands": 5}},
+      {"combine_mode": "two_stage", "feature_set": "genres_rating_platform", "params": {"bands": 3}},
+      {"combine_mode": "two_stage", "feature_set": "genres_rating_platform", "params": {"bands": 5}},
+      {"combine_mode": "two_stage", "feature_set": "genres_rating_platform_franchise_dev", "params": {"bands": 3}},
+      {"combine_mode": "two_stage", "feature_set": "genres_rating_platform_franchise_dev", "params": {"bands": 5}}
+    ]
+  },
+  "user_split": {
+    "train": 120,
+    "validation": 40,
+    "test": 40,
+    "seed": 20260908
+  },
+  "corpus_version": null,
+  "snapshot_sha256": null
+}

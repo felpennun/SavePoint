@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "catalogue.apps.CatalogueConfig",
     "library.apps.LibraryConfig",
     "recommendations.apps.RecommendationsConfig",
+    "evaluation.apps.EvaluationConfig",
 ]
 
 MIDDLEWARE = [
