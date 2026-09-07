@@ -1,0 +1,35 @@
+{
+  "version": "1.0",
+  "project": "SavePoint",
+  "phase": "02-governed-corpus-external-ratings-evaluation-contract-and-fir",
+  "plan": "02-13",
+  "status": "evaluation_run_in_progress",
+  "updated_at": "2026-09-07T23:14:54Z",
+  "branch": "main",
+  "head_at_run_start": "c7fe48b",
+  "completed_commits": [
+    {"hash": "708b0d3", "message": "test(02-13): cover shared-candidate evaluation harness"},
+    {"hash": "c7fe48b", "message": "feat(02-13): add reproducible evaluation runner"}
+  ],
+  "active_command": "docker compose -f infra/compose.yaml run --rm api python manage.py run_evaluation --corpus-version 2026.09.1 --split test --evidence-json /workspace/apps/api/evaluation-run-first.artifact.json",
+  "temporary_artifact_host_path": "apps/api/evaluation-run-first.artifact.json",
+  "final_artifact_host_path": "docs/verification/evaluation-run-first.artifact.json",
+  "test_marker_host_path": "apps/api/.evaluation-test-run.json",
+  "monitor": [
+    "docker ps --format table",
+    "check whether apps/api/evaluation-run-first.artifact.json exists and has non-zero length",
+    "check whether apps/api/.evaluation-test-run.json exists"
+  ],
+  "resume": [
+    "If the run container is active, wait for it without starting a second run.",
+    "If the temporary artifact exists, validate its JSON and frozen fields, then move it from the host to docs/verification/evaluation-run-first.artifact.json.",
+    "If no run is active and neither artifact nor marker exists, re-run active_command exactly as recorded.",
+    "If the marker exists but the artifact is absent or invalid, stop and investigate; do not use --force-new-protocol."
+  ],
+  "constraints": [
+    "Do not use --force-new-protocol.",
+    "Do not make any new RAWG request; the former RAWG pass 2 is cancelled and does not block plan 02-13.",
+    "Do not stage or commit plan 02-06, plan 02-12, data/localization/**, or phase 03 context changes.",
+    "Preserve all unrelated working-tree changes."
+  ]
+}
