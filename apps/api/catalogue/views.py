@@ -3,11 +3,15 @@ calls at request time (CAT-06/OPS-03)."""
 
 from __future__ import annotations
 
+from datetime import date, timedelta
+
+from django.db.models import F
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.throttling import ScopedRateThrottle
+from rest_framework.throttling import ScopedRateThrottle, SimpleRateThrottle
 from rest_framework.views import APIView
 
+from catalogue.corpus import governed_works
 from catalogue.models import AssetAttribution, GameWork, SourceRecord
 from catalogue.search import (
     DEFAULT_PAGE_SIZE,
@@ -16,6 +20,26 @@ from catalogue.search import (
     search_games,
 )
 from catalogue.serializers import GameCardSerializer, GameDetailSerializer
+
+# ~6 months, expressed in days so the window is a single indexed btree
+# comparison on ``first_release_date`` (no calendar arithmetic per row).
+NEW_RELEASE_WINDOW_DAYS = 183
+NEW_RELEASE_LIMIT = 20
+
+
+class NewReleasesThrottle(SimpleRateThrottle):
+    """Per-IP scoped throttle for the anonymous "Novedades" shelf (D-24,
+    threat T-02-05-04). Its own scope with an explicit rate so it never
+    shares a bucket with catalogue search and needs no settings change."""
+
+    scope = "catalogue_new_releases"
+    rate = "120/min"
+
+    def get_cache_key(self, request: Request, view: APIView) -> str:
+        return self.cache_format % {
+            "scope": self.scope,
+            "ident": self.get_ident(request),
+        }
 
 
 def _parse_page(raw: str | None) -> int:
@@ -79,6 +103,31 @@ class GameDetailView(APIView):
             # Generic 404 -- never confirm/deny via a distinguishing message.
             return Response({"detail": "Not found."}, status=404)
         return Response(GameDetailSerializer(work).data)
+
+
+class NewReleasesView(APIView):
+    """GET /api/catalogue/new-releases/ -- the home "Novedades" shelf (D-24).
+
+    Up to 20 governed works whose ``first_release_date`` falls in the last
+    ~6 months, newest first with ``canonical_slug`` as the deterministic
+    tie-break. An empty window is ``[]`` with 200 (the frontend hides the
+    whole shelf), never an error. DLC and works outside the governed corpus
+    are excluded by ``governed_works()``.
+    """
+
+    throttle_classes = [NewReleasesThrottle]
+
+    def get(self, request: Request) -> Response:
+        cutoff = date.today() - timedelta(days=NEW_RELEASE_WINDOW_DAYS)
+        works = (
+            governed_works()
+            .filter(first_release_date__gte=cutoff)
+            .order_by(F("first_release_date").desc(nulls_last=True), "canonical_slug")
+            .prefetch_related("assets", "releases__platform", "genres")[
+                :NEW_RELEASE_LIMIT
+            ]
+        )
+        return Response(GameCardSerializer(works, many=True).data)
 
 
 class SourcesView(APIView):

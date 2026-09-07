@@ -6,6 +6,7 @@ from __future__ import annotations
 from rest_framework import serializers
 
 from catalogue.models import AssetAttribution, GameRelease, GameWork
+from catalogue.ratings import display_rating
 
 
 def _display_title(work: GameWork) -> str:
@@ -61,7 +62,12 @@ class GameCardSerializer(serializers.Serializer):
     year = serializers.SerializerMethodField()
     platform_summary = serializers.SerializerMethodField()
     cover = serializers.SerializerMethodField()
+    # ``total_rating`` is the IGDB user+critic blend and remains the key the
+    # catalogue sort / ``min_rating`` filter operate on (Plan 02-05 flagged
+    # assumption 2). ``display_rating`` is the live product number (D-09):
+    # null when no source has a value, so "sin valoración" is explicit.
     total_rating = serializers.FloatField(allow_null=True)
+    display_rating = serializers.SerializerMethodField()
     genres = serializers.SerializerMethodField()
 
     def get_title(self, work: GameWork) -> str:
@@ -69,6 +75,9 @@ class GameCardSerializer(serializers.Serializer):
 
     def get_year(self, work: GameWork) -> int | None:
         return _release_year(work)
+
+    def get_display_rating(self, work: GameWork) -> float | None:
+        return display_rating(work)
 
     def get_platform_summary(self, work: GameWork) -> str:
         return _platform_summary(work)
@@ -129,7 +138,15 @@ class GameDetailSerializer(serializers.Serializer):
     original_title = serializers.CharField()
     is_dlc = serializers.BooleanField()
     year = serializers.SerializerMethodField()
+    # IGDB synopsis (D-24 P3) -- a blank string when IGDB carries none; the
+    # client omits the whole section rather than render an empty heading.
+    summary = serializers.CharField(allow_blank=True)
     total_rating = serializers.FloatField(allow_null=True)
+    # IGDB *user* rating (D-05) and its sample size, surfaced for the
+    # detail-page rating breakdown line.
+    rating = serializers.FloatField(allow_null=True)
+    rating_count = serializers.IntegerField(allow_null=True)
+    display_rating = serializers.SerializerMethodField()
     genres = serializers.SerializerMethodField()
     cover = serializers.SerializerMethodField()
     releases = serializers.SerializerMethodField()
@@ -141,6 +158,9 @@ class GameDetailSerializer(serializers.Serializer):
 
     def get_year(self, work: GameWork) -> int | None:
         return _release_year(work)
+
+    def get_display_rating(self, work: GameWork) -> float | None:
+        return display_rating(work)
 
     def get_genres(self, work: GameWork) -> list[dict]:
         return _genres(work)
@@ -160,7 +180,11 @@ class GameDetailSerializer(serializers.Serializer):
         # Always visible per UI-SPEC -- absent only if a work somehow has no
         # SourceRecord, which the import command never produces; explicit
         # "missing" is safer than a serializer crash for that edge case.
-        record = work.source_records.first()
-        if record is None:
+        # Prefer the IGDB record (the enrichment source for summary/rating),
+        # falling back to whatever provenance row exists. Iterates the
+        # prefetched list so this stays a single query.
+        records = list(work.source_records.all())
+        if not records:
             return None
+        record = next((r for r in records if r.source == "igdb"), records[0])
         return ProvenanceSerializer(record).data

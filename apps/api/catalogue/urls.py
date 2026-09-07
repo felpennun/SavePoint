@@ -1,11 +1,17 @@
 from django.urls import path
 
-from catalogue.views import GameDetailView, GameListView, SourcesView
+from catalogue.views import (
+    GameDetailView,
+    GameListView,
+    NewReleasesView,
+    SourcesView,
+)
 
 app_name = "catalogue"
 
 urlpatterns = [
     path("games/", GameListView.as_view(), name="game-list"),
     path("games/<slug:slug>/", GameDetailView.as_view(), name="game-detail"),
+    path("new-releases/", NewReleasesView.as_view(), name="new-releases"),
     path("sources/", SourcesView.as_view(), name="sources"),
 ]
