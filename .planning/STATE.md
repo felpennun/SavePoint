@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 status: in_progress
 stopped_at: Fase 2, ola 3 CERRADA (02-03 + 02-05 + 02-09 + 02-10 completados). Ola 4 desbloqueada. Pendiente RAWG pasada 2 (juegos sin rating, 2022-2026, por popularidad — ratificado por el autor).
 last_updated: "2026-09-07T14:30:00+02:00"
-state_head: fb2dafe
+state_head: f972f20
 progress:
   total_phases: 8
   completed_phases: 2
