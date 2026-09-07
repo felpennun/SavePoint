@@ -6,7 +6,18 @@ from __future__ import annotations
 from rest_framework import serializers
 
 from catalogue.models import AssetAttribution, GameRelease, GameWork
-from catalogue.ratings import display_rating
+from catalogue.ratings import display_rating, rating_breakdown
+
+# Serializer context key carrying a pre-computed {work_id: (mean_x10, count)}
+# map so list rendering stays query-bounded (see ratings.savepoint_rating_stats).
+SAVEPOINT_STATS_CONTEXT_KEY = "savepoint_stats"
+
+
+def _display_rating_for(serializer: serializers.Serializer, work: GameWork) -> float | None:
+    stats_map = serializer.context.get(SAVEPOINT_STATS_CONTEXT_KEY)
+    if stats_map is None:
+        return display_rating(work)
+    return display_rating(work, savepoint_stats=stats_map.get(work.id, (None, 0)))
 
 
 def _display_title(work: GameWork) -> str:
@@ -77,7 +88,7 @@ class GameCardSerializer(serializers.Serializer):
         return _release_year(work)
 
     def get_display_rating(self, work: GameWork) -> float | None:
-        return display_rating(work)
+        return _display_rating_for(self, work)
 
     def get_platform_summary(self, work: GameWork) -> str:
         return _platform_summary(work)
@@ -147,6 +158,9 @@ class GameDetailSerializer(serializers.Serializer):
     rating = serializers.FloatField(allow_null=True)
     rating_count = serializers.IntegerField(allow_null=True)
     display_rating = serializers.SerializerMethodField()
+    # Aggregate-only counts for the detail-page rating breakdown line
+    # (never per-user rows -- threat T-02-05-02).
+    rating_breakdown = serializers.SerializerMethodField()
     genres = serializers.SerializerMethodField()
     cover = serializers.SerializerMethodField()
     releases = serializers.SerializerMethodField()
@@ -160,7 +174,10 @@ class GameDetailSerializer(serializers.Serializer):
         return _release_year(work)
 
     def get_display_rating(self, work: GameWork) -> float | None:
-        return display_rating(work)
+        return _display_rating_for(self, work)
+
+    def get_rating_breakdown(self, work: GameWork) -> dict[str, int]:
+        return rating_breakdown(work)
 
     def get_genres(self, work: GameWork) -> list[dict]:
         return _genres(work)

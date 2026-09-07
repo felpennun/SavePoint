@@ -20,13 +20,23 @@ from catalogue.search import (
     parse_catalogue_query,
     search_games,
 )
+from catalogue.ratings import savepoint_rating_stats
 from catalogue.serializers import (
+    SAVEPOINT_STATS_CONTEXT_KEY,
     GameCardSerializer,
     GameDetailSerializer,
     _cover,
     _display_title,
 )
 from library.models import LibraryEntry
+
+
+def _card_context(works: list[GameWork]) -> dict:
+    """Serializer context with a bulk SavePoint-rating stats map so a card
+    list renders ``display_rating`` without a query per row."""
+    return {
+        SAVEPOINT_STATS_CONTEXT_KEY: savepoint_rating_stats([w.id for w in works])
+    }
 
 # DLC/expansion linkage relations surfaced by the "Para tus juegos" shelf.
 DLC_RELATIONS = ("dlc", "expansion")
@@ -84,9 +94,12 @@ class GameListView(APIView):
             return Response({"detail": str(exc), "code": exc.code}, status=400)
         page = _parse_page(request.query_params.get("page"))
         result = search_games(cq.q, page=page, page_size=DEFAULT_PAGE_SIZE, cq=cq)
+        results = list(result["results"])
         return Response(
             {
-                "results": GameCardSerializer(result["results"], many=True).data,
+                "results": GameCardSerializer(
+                    results, many=True, context=_card_context(results)
+                ).data,
                 "count": result["count"],
                 "page": result["page"],
                 "page_size": result["page_size"],
@@ -129,7 +142,7 @@ class NewReleasesView(APIView):
 
     def get(self, request: Request) -> Response:
         cutoff = date.today() - timedelta(days=NEW_RELEASE_WINDOW_DAYS)
-        works = (
+        works = list(
             governed_works()
             .filter(first_release_date__gte=cutoff)
             .order_by(F("first_release_date").desc(nulls_last=True), "canonical_slug")
@@ -137,7 +150,11 @@ class NewReleasesView(APIView):
                 :NEW_RELEASE_LIMIT
             ]
         )
-        return Response(GameCardSerializer(works, many=True).data)
+        return Response(
+            GameCardSerializer(
+                works, many=True, context=_card_context(works)
+            ).data
+        )
 
 
 class OwnedGamesDlcView(APIView):
