@@ -3,6 +3,11 @@ name: savepoint
 services:
   db:
     image: postgres:18.6@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280
+    # The default 64MB /dev/shm is too small for the aggregate evidence queries
+    # the offline enrichment/import commands run over 190k+ governed works: a
+    # large hash/sort spills to shared memory and PostgreSQL raises DiskFull.
+    # 256MB clears the observed failure with headroom.
+    shm_size: "256mb"
     environment:
       POSTGRES_DB: savepoint_test
       POSTGRES_USER: savepoint_test

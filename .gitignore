@@ -18,6 +18,12 @@ playwright-report/
 .neon
 data/snapshots/
 
+# Offline enrichment evidence JSON (retained next to its corpus_version, never
+# committed in bulk -- same rule as data/snapshots/, ADR-006 §4 / ADR-008).
+.rawg-evidence*.json
+apps/api/.rawg-evidence*.json
+**/.rawg-evidence*.json
+
 # Editor / agent tooling state (machine- and session-local, not project source)
 .gsd/
 .planning/milestone.lock
