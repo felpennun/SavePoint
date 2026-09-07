@@ -15,7 +15,7 @@ para dar contexto completo al modelo.
 
 \begin{table}[htp]
 \centering
-\begin{tabular}{ | l | p{9.5cm} | c | }
+\begin{tabularx}{\textwidth}{ | Y | Y | Z | }
     \hline
     \textbf{Actor} & \textbf{Descripción} & \textbf{Estado} \\
     \hline
@@ -29,7 +29,7 @@ para dar contexto completo al modelo.
     \hline
     Personal investigador & Perfil que ejecuta experimentos de recomendación y consulta el panel de comparación. & Trabajo futuro \\
     \hline
-\end{tabular}
+\end{tabularx}
 \caption{Actores del sistema.}
 \label{tab:actores}
 \end{table}
@@ -91,7 +91,7 @@ información que satisface.
 
 \begin{table}[htp]
 \centering
-\begin{tabular}{ | l | p{7.5cm} | l | }
+\begin{tabularx}{\textwidth}{ | Y | Y | Y | }
     \hline
     \textbf{Área} & \textbf{Requisito de información} & \textbf{Códigos} \\
     \hline
@@ -109,7 +109,7 @@ información que satisface.
     \hline
     Cuentas & Cuentas simuladas identificadas de forma inequívoca como tales. & AUTH-02 \\
     \hline
-\end{tabular}
+\end{tabularx}
 \caption{Áreas del modelo de dominio y requisitos de información asociados.}
 \label{tab:req-informacion}
 \end{table}
@@ -123,7 +123,7 @@ análisis.
 
 \begin{table}[htp]
 \centering
-\begin{tabular}{ | l | p{8.5cm} | c | }
+\begin{tabularx}{\textwidth}{ | Y | Y | Z | }
     \hline
     \textbf{Código} & \textbf{Requisito funcional} & \textbf{Estado} \\
     \hline
@@ -167,7 +167,7 @@ análisis.
     \hline
     PORT-01 a PORT-04 & Exportación e importación de colección, valoraciones y listas. & Trabajo futuro \\
     \hline
-\end{tabular}
+\end{tabularx}
 \caption{Requisitos funcionales considerados en el análisis del sistema.}
 \label{tab:req-funcionales}
 \end{table}
@@ -198,7 +198,7 @@ comportamiento del sistema.
 
 \begin{table}[htp]
 \centering
-\begin{tabular}{ | l | p{11cm} | }
+\begin{tabularx}{\textwidth}{ | Y | Y | }
     \hline
     \textbf{Regla} & \textbf{Enunciado} \\
     \hline
@@ -220,7 +220,7 @@ comportamiento del sistema.
     \hline
     RN-9 & El acceso a IGDB queda confinado a un comando de gestión fuera de línea; ninguna petición de usuario llama a un proveedor externo. \\
     \hline
-\end{tabular}
+\end{tabularx}
 \caption{Reglas de negocio.}
 \label{tab:reglas-negocio}
 \end{table}
@@ -244,7 +244,7 @@ funcional que satisface.
 
 \begin{table}[htp]
 \centering
-\begin{tabular}{ | l | p{6.5cm} | l | l | }
+\begin{tabularx}{\textwidth}{ | Y | Y | Y | Y | }
     \hline
     \textbf{Id} & \textbf{Caso de uso} & \textbf{Actor} & \textbf{Requisito} \\
     \hline
@@ -270,7 +270,7 @@ funcional que satisface.
     \hline
     CU-11 & Abrir la página de recomendaciones por afinidad de géneros & Persona usuaria & REC-10 \\
     \hline
-\end{tabular}
+\end{tabularx}
 \caption{Casos de uso del sistema.}
 \label{tab:casos-uso}
 \end{table}
@@ -284,7 +284,7 @@ verificación en \texttt{.planning/phases/}.
 
 \begin{table}[htp]
 \centering
-\begin{tabular}{ | l | p{9.5cm} | }
+\begin{tabularx}{\textwidth}{ | Y | Y | }
     \hline
     \textbf{Requisito} & \textbf{Evidencia} \\
     \hline
@@ -314,14 +314,36 @@ verificación en \texttt{.planning/phases/}.
     \hline
     QUAL-05 & \texttt{phase-01.1-signoff.md}; revisión remota de capturas del autor. \\
     \hline
-\end{tabular}
+\end{tabularx}
 \caption{Matriz de trazabilidad de requisito a evidencia.}
 \label{tab:trazabilidad}
 \end{table}
 
+\subsection{Requisitos metodológicos incorporados en la Fase 2}
+
+La planificación posterior a la primera demostración añadió requisitos que no se pueden
+validar únicamente recorriendo la interfaz. DATA-03 y DATA-06 exigen una frontera de corpus
+gobernada, reversible y versionada, con checksum, diccionario, informe de calidad y muestra
+determinista. DATA-05, DATA-07 y DATA-08 exigen importar ratings con procedencia, reconciliar
+fuentes externas sin fuzzy matching y conservar snapshots inmutables por versión.
+
+EVAL-01, EVAL-02 y EVAL-03 fijan la comparación sobre la misma partición, los mismos
+candidatos y las mismas exclusiones. EVAL-09 y EVAL-10 añaden usuarios sintéticos
+parametrizados y obligan a separar la evidencia simulada de cualquier afirmación sobre
+usuarios reales. DOC-04 exige que el protocolo, las métricas, las semillas, las versiones y
+las amenazas a la validez queden escritos antes del resultado.
+
+En recomendación, REC-01 ya dispone de un baseline aleatorio reproducible y REC-03 de
+vectores de contenido dispersos, perfil de usuario y similitud coseno. REC-06 a REC-09
+describen el cold-start, las exclusiones, la explicación por contribuciones y el DTO
+versionado que completarán los planes siguientes. Así se diferencia el requisito que ya
+tiene una implementación probada del que solo tiene un contrato de diseño.
+
 Los requisitos de las familias de evaluación, experimentación y recomendadores avanzados
-(EVAL-01 a EVAL-14, REC-01, REC-03 a REC-09) quedan fuera del alcance de esta memoria y se
-recogen como líneas de trabajo futuro en \texttt{REQUIREMENTS.md}. El
+(EVAL-01 a EVAL-14, REC-01, REC-03 a REC-09) ya no se presentan como un bloque homogéneo de
+trabajo futuro. La Fase 2 ha cerrado contratos de datos, protocolo, métricas y primeras
+primitivas de contenido, mientras que la población sintética completa, las variantes finales
+y la comparación experimental permanecen pendientes. El
 Capítulo~\ref{cap:conclusiones} las detalla.
 
 Este capítulo ha fijado qué debe hacer el sistema y con qué restricciones. El capítulo

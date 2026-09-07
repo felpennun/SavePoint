@@ -4,16 +4,17 @@ A stateless, request-time aggregation over the signed-in user's own
 ``LibraryEntry`` rows -- the personal sibling of ``library/popularity.py``'s
 non-personalized REC-02 baseline. It mirrors that module's DTO contract
 (``algorithm_id`` + ``generated_at`` + ``input_snapshot_sha256`` + explicit
-``limitation`` string, deterministic ``canonical_slug`` tie-break) but is
+``limitation`` string, deterministic rating/genre/``canonical_slug`` order) but is
 scoped strictly to ``request.user``:
 
   1. Weight the user's genres by their own recorded activity -- each of the
      user's library entries contributes ``_STATUS_WEIGHTS[status] +
      rating_half_steps / 10`` to every genre attached to that entry's work.
-  2. Rank UNSEEN, non-DLC catalogue works by the summed weight of the
-     genres they share with that taste vector.
-  3. Break ties by ``canonical_slug`` ascending; fingerprint the exact
-     taste vector + ordered result so identical inputs hash identically.
+  2. Rank UNSEEN, non-DLC catalogue works by catalogue rating inside the
+     genres they share with that taste vector. The user's genre affinity is
+     retained as the first tie-breaker, followed by ``canonical_slug``.
+  3. Break remaining ties by ``canonical_slug`` ascending; fingerprint the
+     exact taste vector + ordered result so identical inputs hash identically.
 
 There is NO trained model and NO persisted feature store here -- Phase 6
 (REC-03) owns the real content-based recommender with versioned artifacts
@@ -30,9 +31,10 @@ import json
 from datetime import datetime, timezone
 
 from django.contrib.auth.models import AbstractBaseUser
-from django.db.models import Case, FloatField, Sum, Value, When
+from django.db.models import Case, F, FloatField, Sum, Value, When
 
 from catalogue.models import GameWork
+from catalogue.serializers import _cover, _platform_summary, _release_year
 from library.models import LibraryEntry
 from recommendations._weights import (  # noqa: F401  (re-exported for callers)
     _entry_weight,
@@ -56,6 +58,7 @@ ALGORITHM_ID = "genre-taste-v1"
 _MIN_LIMIT = 1
 _MAX_LIMIT = 50
 _DEFAULT_LIMIT = 20
+_MIN_CATALOGUE_RATING_COUNT = 1000
 # The ranking SQL fetches this multiple of ``limit`` so the exact Python
 # re-score + canonical_slug tie-break (L-03) has every boundary-tied work in
 # hand before truncating. Still bounded: at most _MAX_LIMIT * this.
@@ -65,8 +68,10 @@ _LIMITATION = (
     "Deterministic genre-frequency heuristic computed at request time from "
     "the signed-in user's own library only. Genres are weighted by the "
     "user's recorded status and rating, then unseen non-DLC catalogue works "
-    "are ranked by summed genre-overlap weight (canonical_slug ascending "
-    "tie-break). This is a product feature, not a trained model or a "
+    "with matching genres and at least 1,000 catalogue ratings are ordered "
+    "by catalogue rating (unrated last), "
+    "genre-overlap weight, and canonical_slug. This is a product feature, "
+    "not a trained model or a "
     "persisted feature store, and is deliberately simpler than the Phase 6 "
     "content-based recommender comparison (REC-03). It is not the thesis's "
     "algorithmic contribution and must not be presented as, or evaluated "
@@ -88,8 +93,8 @@ def _clamp_limit(limit: int | None) -> int:
     return max(_MIN_LIMIT, min(_MAX_LIMIT, int(limit)))
 
 
-def _fingerprint(taste: dict, ranked: list[tuple[str, float]]) -> str:
-    """Hash the exact taste vector and ordered (slug, score) result.
+def _fingerprint(taste: dict, ranked: list[tuple[str, float, float | None, int | None]]) -> str:
+    """Hash the exact taste vector and ordered result metadata.
 
     Identical inputs -> identical hash; any change to the user's activity or
     to the produced ranking is always visible as a hash change.
@@ -97,7 +102,15 @@ def _fingerprint(taste: dict, ranked: list[tuple[str, float]]) -> str:
     payload = {
         "algorithm_id": ALGORITHM_ID,
         "taste": sorted((str(genre_id), round(weight, 6)) for genre_id, weight in taste.items()),
-        "ranked": [(slug, round(score, 6)) for slug, score in ranked],
+        "ranked": [
+            (
+                slug,
+                round(score, 6),
+                None if rating is None else round(rating, 6),
+                rating_count,
+            )
+            for slug, score, rating, rating_count in ranked
+        ],
     }
     return hashlib.sha256(json.dumps(payload, sort_keys=True).encode("utf-8")).hexdigest()
 
@@ -159,7 +172,9 @@ def rank_genre_taste_v1(
     if not taste_weights or sum(taste_weights.values()) <= 0:
         return _insufficient_history(generated_at, taste_weights)
 
-    # 3. Rank unseen non-DLC works whose genres overlap the taste vector.
+    # 3. Rank unseen non-DLC works whose genres overlap the taste vector and
+    # have a sufficiently reliable catalogue rating sample. Null counts are
+    # excluded as they cannot demonstrate the 1,000-rating minimum.
     #    The through table is the driving relation: filtered by ``genre_id``
     #    (indexed) and grouped by work, so Postgres never scans the full
     #    catalogue -- and the bounded candidate slice caps the working set
@@ -182,23 +197,28 @@ def rank_genre_taste_v1(
     ranked_rows = (
         through.objects.filter(genre_id__in=list(taste_weights))
         .filter(gamework__is_dlc=False)
+        .filter(gamework__total_rating_count__gte=_MIN_CATALOGUE_RATING_COUNT)
         .exclude(gamework_id__in=list(seen_ids))
         .values("gamework_id")
         .annotate(taste_score=Sum(score_case))
-        .order_by("-taste_score", "gamework__canonical_slug")[:candidate_pool]
+        .order_by(
+            F("gamework__total_rating").desc(nulls_last=True),
+            "-taste_score",
+            "gamework__canonical_slug",
+        )[:candidate_pool]
     )
     ordered_work_ids = [row["gamework_id"] for row in ranked_rows]
 
     works = (
         GameWork.objects.filter(id__in=ordered_work_ids)
-        .prefetch_related("genres")
+        .prefetch_related("genres", "assets", "releases__platform")
         .in_bulk()
     )
 
     # 4. Recompute every score in Python from the authoritative taste vector
     #    (not the DB float sum) so the returned score, the per-item
     #    explanation, and the tie-break are exactly consistent, then re-sort.
-    scored: list[tuple[float, str, GameWork, list[dict]]] = []
+    scored: list[tuple[float, float | None, str, GameWork, list[dict]]] = []
     for work_id in ordered_work_ids:
         work = works.get(work_id)
         if work is None:
@@ -216,12 +236,19 @@ def rank_genre_taste_v1(
             continue
         matched.sort(key=lambda item: (-item["weight"], item["slug"]))
         score = sum(taste_weights[genre.id] for genre in work.genres.all() if genre.id in taste_weights)
-        scored.append((score, work.canonical_slug, work, matched))
+        scored.append((score, work.total_rating, work.canonical_slug, work, matched))
 
-    # Authoritative order: exact score desc, then canonical_slug asc. Only
-    # now truncate to the requested limit -- the DB slice above was a
-    # deliberately wider candidate pool (L-03).
-    scored.sort(key=lambda row: (-row[0], row[1]))
+    # Authoritative order: catalogue rating desc (unrated last), then exact
+    # taste score desc, then canonical_slug asc. Only now truncate to the
+    # requested limit -- the DB slice above was a deliberately wider candidate
+    # pool (L-03).
+    scored.sort(
+        key=lambda row: (
+            -(row[1] if row[1] is not None else -1.0),
+            -row[0],
+            row[2],
+        )
+    )
     scored = scored[:limit]
 
     results = [
@@ -230,16 +257,30 @@ def rank_genre_taste_v1(
             "slug": work.canonical_slug,
             "title": work.title_en or work.original_title,
             "score": round(score, 3),
+            "catalogue_rating": None if rating is None else round(rating, 2),
+            "catalogue_rating_count": work.total_rating_count,
+            "year": _release_year(work),
+            "platform_summary": _platform_summary(work),
+            "cover": _cover(work),
             "matched_genres": matched,
         }
-        for score, _slug, work, matched in scored
+        for score, rating, _slug, work, matched in scored
     ]
 
     return {
         "algorithm_id": ALGORITHM_ID,
         "generated_at": generated_at.isoformat(),
         "input_snapshot_sha256": _fingerprint(
-            taste_weights, [(item["slug"], item["score"]) for item in results]
+            taste_weights,
+            [
+                (
+                    item["slug"],
+                    item["score"],
+                    item["catalogue_rating"],
+                    item["catalogue_rating_count"],
+                )
+                for item in results
+            ],
         ),
         "insufficient_history": False,
         "limitation": _LIMITATION,

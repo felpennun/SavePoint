@@ -1,64 +1,58 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import type { Release } from "@/lib/api";
 
 const STATUSES = ["pending", "playing", "completed", "abandoned"] as const;
 type Status = (typeof STATUSES)[number];
+type CopyFormat = "physical" | "digital";
 
 const COPY = {
   es: {
-    statusLegend: "Estado:",
+    statusLegend: "Estado",
     statusLabels: { pending: "Pendiente", playing: "Jugando", completed: "Completado", abandoned: "Abandonado" },
-    statusSave: "Guardar estado",
-    statusSaving: "Guardando…",
-    statusSuccess: "Estado guardado",
-    ratingLabel: "Valoración",
+    ratingLabel: "Tu valoración",
     ratingUnrated: "Sin valorar",
-    ratingSave: "Guardar valoración",
-    ratingSaving: "Guardando…",
-    ratingSuccess: "Valoración guardada",
-    ratingClear: "Borrar valoración",
-    copiesHeading: "Copias",
-    copiesEmpty: "Sin copias registradas.",
+    starLabel: "{n} de 5 estrellas",
+    copiesHeading: "Copias que tienes",
+    copiesEmpty: "Todavía no has añadido ninguna copia.",
     copyFormat: "Formato",
     copyPhysical: "Física",
     copyDigital: "Digital",
-    copyRelease: "Edición/plataforma",
+    copyRelease: "Plataforma",
     copyEdition: "Edición (opcional)",
-    copyAdd: "Añadir copia",
-    copyAdding: "Añadiendo…",
-    copyAdded: "Copia añadida",
-    error: "No se pudo guardar. Inténtalo de nuevo.",
+    copyAdd: "Añadir otra copia",
+    save: "Guardar configuración",
+    saving: "Guardando configuración…",
+    success: "Configuración guardada",
+    removeCopy: "Eliminar esta copia",
+    error: "No se pudo guardar la configuración. Inténtalo de nuevo.",
     loginRequired: "Inicia sesión para guardar estado, valoración o copias.",
-    loading: "Cargando…",
+    loading: "Cargando configuración…",
   },
   en: {
-    statusLegend: "Status:",
+    statusLegend: "Status",
     statusLabels: { pending: "Pending", playing: "Playing", completed: "Completed", abandoned: "Abandoned" },
-    statusSave: "Save status",
-    statusSaving: "Saving…",
-    statusSuccess: "Status saved",
-    ratingLabel: "Rating",
+    ratingLabel: "Your rating",
     ratingUnrated: "Unrated",
-    ratingSave: "Save rating",
-    ratingSaving: "Saving…",
-    ratingSuccess: "Rating saved",
-    ratingClear: "Clear rating",
-    copiesHeading: "Copies",
-    copiesEmpty: "No copies registered.",
+    starLabel: "{n} of 5 stars",
+    copiesHeading: "Copies you own",
+    copiesEmpty: "You have not added any copies yet.",
     copyFormat: "Format",
     copyPhysical: "Physical",
     copyDigital: "Digital",
-    copyRelease: "Release/platform",
+    copyRelease: "Platform",
     copyEdition: "Edition (optional)",
-    copyAdd: "Add copy",
-    copyAdding: "Adding…",
-    copyAdded: "Copy added",
-    error: "We couldn't save that. Try again.",
+    copyAdd: "Add another copy",
+    save: "Save configuration",
+    saving: "Saving configuration…",
+    success: "Configuration saved",
+    removeCopy: "Remove this copy",
+    error: "We couldn't save the configuration. Try again.",
     loginRequired: "Log in to save status, rating, or copies.",
-    loading: "Loading…",
+    loading: "Loading configuration…",
   },
 } as const;
 
@@ -69,8 +63,15 @@ function readCookie(name: string): string | undefined {
     ?.split("=")[1];
 }
 
+async function ensureCsrfToken(): Promise<string | undefined> {
+  const current = readCookie("csrftoken");
+  if (current) return current;
+  await fetch("/api/accounts/csrf/", { credentials: "same-origin" });
+  return readCookie("csrftoken");
+}
+
 async function apiPost(path: string, body: unknown) {
-  const csrfToken = readCookie("csrftoken");
+  const csrfToken = await ensureCsrfToken();
   return fetch(path, {
     method: "POST",
     credentials: "same-origin",
@@ -80,10 +81,24 @@ async function apiPost(path: string, body: unknown) {
 }
 
 interface OwnedCopyItem {
-  id: string;
+  id?: string;
   release_id: string;
   edition_id: string | null;
-  format: "physical" | "digital";
+  format: CopyFormat;
+  idempotency_key?: string;
+}
+
+function newCopy(releases: Release[]): OwnedCopyItem {
+  const idempotencyKey =
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  return {
+    release_id: releases[0]?.id ?? "",
+    edition_id: null,
+    format: "physical",
+    idempotency_key: idempotencyKey,
+  };
 }
 
 export function LibraryControls({
@@ -98,22 +113,13 @@ export function LibraryControls({
   releases: Release[];
 }) {
   const copy = COPY[locale];
+  const router = useRouter();
   const [loading, setLoading] = useState(isAuthenticated);
-
+  const [saving, setSaving] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
   const [status, setStatus] = useState<Status | "">("");
-  const [statusPending, setStatusPending] = useState(false);
-  const [statusFeedback, setStatusFeedback] = useState<string | null>(null);
-
-  const [rating, setRating] = useState<number>(0); // half-steps, 0 = unrated
-  const [ratingPending, setRatingPending] = useState(false);
-  const [ratingFeedback, setRatingFeedback] = useState<string | null>(null);
-
+  const [rating, setRating] = useState(0);
   const [copies, setCopies] = useState<OwnedCopyItem[]>([]);
-  const [releaseId, setReleaseId] = useState(releases[0]?.id ?? "");
-  const [editionId, setEditionId] = useState("");
-  const [format, setFormat] = useState<"physical" | "digital">("physical");
-  const [copyPending, setCopyPending] = useState(false);
-  const [copyFeedback, setCopyFeedback] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -125,8 +131,8 @@ export function LibraryControls({
     ])
       .then(([statusBody, ratingBody, copiesBody]) => {
         if (cancelled) return;
-        if (statusBody.status) setStatus(statusBody.status);
-        if (ratingBody.rating_half_steps) setRating(ratingBody.rating_half_steps);
+        setStatus(statusBody.status ?? "");
+        setRating(ratingBody.rating_half_steps ?? 0);
         if (Array.isArray(copiesBody.copies)) setCopies(copiesBody.copies);
       })
       .finally(() => {
@@ -137,180 +143,169 @@ export function LibraryControls({
     };
   }, [workId, isAuthenticated]);
 
-  if (!isAuthenticated) {
-    return <p>{copy.loginRequired}</p>;
-  }
-  if (loading) {
-    return <p aria-live="polite">{copy.loading}</p>;
+  if (!isAuthenticated) return <p>{copy.loginRequired}</p>;
+  if (loading) return <p aria-live="polite">{copy.loading}</p>;
+
+  function updateCopy(index: number, patch: Partial<OwnedCopyItem>) {
+    setCopies((previous) => previous.map((item, itemIndex) => (itemIndex === index ? { ...item, ...patch } : item)));
   }
 
-  async function saveStatus() {
-    if (!status) return;
-    setStatusPending(true);
-    setStatusFeedback(null);
+  async function saveConfiguration() {
+    setSaving(true);
+    setFeedback(null);
     try {
-      const response = await apiPost(`/api/library/entries/${workId}/status/`, { status });
-      setStatusFeedback(response.ok ? copy.statusSuccess : copy.error);
-    } catch {
-      setStatusFeedback(copy.error);
-    } finally {
-      setStatusPending(false);
-    }
-  }
-
-  async function saveRating(nextValue: number | null) {
-    setRatingPending(true);
-    setRatingFeedback(null);
-    try {
-      const response = await apiPost(`/api/library/entries/${workId}/rating/`, { rating_half_steps: nextValue });
-      if (response.ok) {
-        setRating(nextValue ?? 0);
-        setRatingFeedback(copy.ratingSuccess);
-      } else {
-        setRatingFeedback(copy.error);
-      }
-    } catch {
-      setRatingFeedback(copy.error);
-    } finally {
-      setRatingPending(false);
-    }
-  }
-
-  async function addCopy() {
-    if (!releaseId) return;
-    setCopyPending(true);
-    setCopyFeedback(null);
-    try {
-      const idempotencyKey = crypto.randomUUID();
-      const response = await apiPost(`/api/library/entries/${workId}/copies/`, {
-        release_id: releaseId,
-        edition_id: editionId || null,
-        format,
-        idempotency_key: idempotencyKey,
+      const response = await apiPost(`/api/library/entries/${workId}/configuration/`, {
+        status: status || null,
+        rating_half_steps: rating || null,
+        copies: copies.map(({ id, release_id, edition_id, format, idempotency_key }) => ({
+          ...(id ? { id } : { idempotency_key }),
+          release_id,
+          edition_id,
+          format,
+        })),
       });
-      if (response.ok) {
-        const body = await response.json();
-        setCopies((prev) => [body.copy, ...prev]);
-        setCopyFeedback(copy.copyAdded);
-      } else {
-        setCopyFeedback(copy.error);
+      if (!response.ok) {
+        setFeedback(copy.error);
+        return;
       }
+      const body = await response.json();
+      setStatus(body.status ?? "");
+      setRating(body.rating_half_steps ?? 0);
+      setCopies(Array.isArray(body.copies) ? body.copies : []);
+      setFeedback(copy.success);
+      router.refresh();
     } catch {
-      setCopyFeedback(copy.error);
+      setFeedback(copy.error);
     } finally {
-      setCopyPending(false);
+      setSaving(false);
     }
   }
-
-  const selectedRelease = releases.find((r) => r.id === releaseId);
-  const ratingStars = (rating / 2).toFixed(1);
 
   return (
-    <div>
-      <fieldset>
+    <section className="sp-library-controls" aria-label={copy.copiesHeading}>
+      <fieldset className="sp-library-section">
         <legend>{copy.statusLegend}</legend>
-        {STATUSES.map((value) => (
-          <label key={value}>
-            <input type="radio" name="status" value={value} checked={status === value} onChange={() => setStatus(value)} />
-            {copy.statusLabels[value]}
-          </label>
-        ))}
-        <button type="button" onClick={saveStatus} disabled={statusPending || !status}>
-          {statusPending ? copy.statusSaving : copy.statusSave}
-        </button>
-        {statusFeedback ? (
-          <p role="status" data-testid="status-feedback">
-            {statusFeedback}
-          </p>
-        ) : null}
+        <div className="sp-status-options">
+          {STATUSES.map((value) => (
+            <label key={value} className="sp-choice">
+              <input type="radio" name={`status-${workId}`} value={value} checked={status === value} onChange={() => setStatus(value)} />
+              <span>{copy.statusLabels[value]}</span>
+            </label>
+          ))}
+        </div>
       </fieldset>
 
-      <div>
-        <label htmlFor="rating-range">
-          {copy.ratingLabel}: {rating > 0 ? `${ratingStars}` : copy.ratingUnrated}
-        </label>
-        <input
-          id="rating-range"
-          type="range"
-          min={1}
-          max={10}
-          step={1}
-          value={rating || 1}
-          onChange={(event) => setRating(Number(event.target.value))}
-          aria-valuetext={ratingStars}
-        />
-        <button type="button" onClick={() => saveRating(rating || 1)} disabled={ratingPending}>
-          {ratingPending ? copy.ratingSaving : copy.ratingSave}
-        </button>
-        <button type="button" onClick={() => saveRating(null)} disabled={ratingPending || rating === 0}>
-          {copy.ratingClear}
-        </button>
-        {ratingFeedback ? (
-          <p role="status" data-testid="rating-feedback">
-            {ratingFeedback}
-          </p>
-        ) : null}
-      </div>
-
-      <div>
-        <h3>{copy.copiesHeading}</h3>
-        {copies.length === 0 ? <p>{copy.copiesEmpty}</p> : null}
-        <ul>
-          {copies.map((item) => (
-            <li key={item.id}>
-              {item.format === "physical" ? copy.copyPhysical : copy.copyDigital}
-            </li>
+      <div className="sp-library-section">
+        <div className="sp-section-heading-row">
+          <h3>{copy.ratingLabel}</h3>
+          <span className="sp-rating-value">{rating > 0 ? `${(rating / 2).toFixed(1)} / 5` : copy.ratingUnrated}</span>
+        </div>
+        <div className="sp-interactive-stars" role="group" aria-label={copy.ratingLabel}>
+          {Array.from({ length: 5 }, (_, index) => (
+            <span className="sp-star-unit" key={index}>
+              <span
+                className={`sp-star-glyph${rating >= (index + 1) * 2 ? " is-filled" : ""}${rating === index * 2 + 1 ? " is-half" : ""}`}
+                aria-hidden="true"
+              >
+                ★
+              </span>
+              {[1, 2].map((half) => {
+                const halfStep = index * 2 + half;
+                const value = halfStep / 2;
+                const label = copy.starLabel.replace("{n}", value.toFixed(1));
+                return (
+                  <button
+                    key={halfStep}
+                    type="button"
+                    className={`sp-star-half-button${half === 1 ? " is-left" : " is-right"}`}
+                    aria-label={label}
+                    aria-pressed={rating === halfStep}
+                    onClick={() => setRating(rating === halfStep ? 0 : halfStep)}
+                    disabled={saving}
+                  />
+                );
+              })}
+            </span>
           ))}
-        </ul>
+        </div>
+      </div>
+
+      <div className="sp-library-section">
+        <div className="sp-section-heading-row">
+          <h3>{copy.copiesHeading}</h3>
+          <span className="sp-meta">{copies.length}</span>
+        </div>
+        {copies.length === 0 ? <p className="sp-meta">{copy.copiesEmpty}</p> : null}
+        <div className="sp-copy-list">
+          {copies.map((item, index) => {
+            const selectedRelease = releases.find((release) => release.id === item.release_id);
+            return (
+              <div className="sp-copy-row" key={item.id ?? item.idempotency_key ?? index}>
+                <div className="sp-field">
+                  <label htmlFor={`copy-release-${index}`}>{copy.copyRelease}</label>
+                  <select
+                    id={`copy-release-${index}`}
+                    value={item.release_id}
+                    onChange={(event) => updateCopy(index, { release_id: event.target.value, edition_id: null })}
+                    disabled={releases.length === 0 || saving}
+                  >
+                    {releases.map((release) => (
+                      <option key={release.id} value={release.id}>
+                        {release.platform ?? release.release_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="sp-field">
+                  <label htmlFor={`copy-format-${index}`}>{copy.copyFormat}</label>
+                  <select
+                    id={`copy-format-${index}`}
+                    value={item.format}
+                    onChange={(event) => updateCopy(index, { format: event.target.value as CopyFormat })}
+                    disabled={saving}
+                  >
+                    <option value="physical">{copy.copyPhysical}</option>
+                    <option value="digital">{copy.copyDigital}</option>
+                  </select>
+                </div>
+                {selectedRelease && selectedRelease.editions.length > 0 ? (
+                  <div className="sp-field">
+                    <label htmlFor={`copy-edition-${index}`}>{copy.copyEdition}</label>
+                    <select
+                      id={`copy-edition-${index}`}
+                      value={item.edition_id ?? ""}
+                      onChange={(event) => updateCopy(index, { edition_id: event.target.value || null })}
+                      disabled={saving}
+                    >
+                      <option value="">—</option>
+                      {selectedRelease.editions.map((edition) => (
+                        <option key={edition.id} value={edition.id}>
+                          {edition.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ) : null}
+                <button type="button" className="sp-btn-secondary sp-copy-remove" onClick={() => setCopies((previous) => previous.filter((_, itemIndex) => itemIndex !== index))} disabled={saving}>
+                  {copy.removeCopy}
+                </button>
+              </div>
+            );
+          })}
+        </div>
         {releases.length > 0 ? (
-          <div>
-            <label htmlFor="copy-release">{copy.copyRelease}</label>
-            <select
-              id="copy-release"
-              value={releaseId}
-              onChange={(event) => {
-                setReleaseId(event.target.value);
-                setEditionId("");
-              }}
-            >
-              {releases.map((release) => (
-                <option key={release.id} value={release.id}>
-                  {release.platform ?? release.release_name}
-                </option>
-              ))}
-            </select>
-
-            {selectedRelease && selectedRelease.editions.length > 0 ? (
-              <>
-                <label htmlFor="copy-edition">{copy.copyEdition}</label>
-                <select id="copy-edition" value={editionId} onChange={(event) => setEditionId(event.target.value)}>
-                  <option value="">—</option>
-                  {selectedRelease.editions.map((edition) => (
-                    <option key={edition.id} value={edition.id}>
-                      {edition.name}
-                    </option>
-                  ))}
-                </select>
-              </>
-            ) : null}
-
-            <label htmlFor="copy-format">{copy.copyFormat}</label>
-            <select id="copy-format" value={format} onChange={(event) => setFormat(event.target.value as "physical" | "digital")}>
-              <option value="physical">{copy.copyPhysical}</option>
-              <option value="digital">{copy.copyDigital}</option>
-            </select>
-
-            <button type="button" onClick={addCopy} disabled={copyPending}>
-              {copyPending ? copy.copyAdding : copy.copyAdd}
-            </button>
-            {copyFeedback ? (
-              <p role="status" data-testid="copy-feedback">
-                {copyFeedback}
-              </p>
-            ) : null}
-          </div>
+          <button type="button" className="sp-btn-secondary sp-copy-add" onClick={() => setCopies((previous) => [...previous, newCopy(releases)])} disabled={saving}>
+            {copy.copyAdd}
+          </button>
         ) : null}
       </div>
-    </div>
+
+      <div className="sp-library-save">
+        <button type="button" className="sp-btn-primary" onClick={saveConfiguration} disabled={saving}>
+          {saving ? copy.saving : copy.save}
+        </button>
+        {feedback ? <p role="status" data-testid="configuration-feedback">{feedback}</p> : null}
+      </div>
+    </section>
   );
 }

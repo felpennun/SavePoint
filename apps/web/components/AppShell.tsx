@@ -8,6 +8,7 @@ import { AccountSwitcher } from "@/components/AccountSwitcher";
 import { BrandLockup } from "@/components/BrandLockup";
 import { DemoAccountBanner } from "@/components/DemoAccountBanner";
 import { LoginIconButton } from "@/components/LoginIconButton";
+import { LanguageToggle } from "@/components/LanguageToggle";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { getDictionary, type Dictionary } from "@/i18n";
 
@@ -168,6 +169,7 @@ export function AppShell({
           </Link>
           <div className="flex shrink-0 items-center gap-2 md:gap-4">
             <TopNavigation items={items} locale={locale} />
+            <LanguageToggle locale={locale} />
             <ThemeToggle labels={dict.theme.toggle} />
             {isAuthenticated ? (
               <AccountSwitcher

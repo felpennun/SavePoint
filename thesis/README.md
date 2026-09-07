@@ -24,7 +24,7 @@ pdflatex TFG.tex
 Se necesita una distribución TeX completa: **TeX Live** (`texlive-full` o, como mínimo, los
 paquetes `babel-spanish`, `mathpazo`, `natbib`, `hyperref`, `listings`, `inconsolata`,
 `float`, `caption`, `geometry`, `graphicx`, `subfigure`, `tocbibind`, `todonotes`,
-`titlesec`, `tocbasic`, `csquotes`, `eurosym`) o **MiKTeX**. También compila en **Overleaf**
+`titlesec`, `tocbasic`, `csquotes`, `eurosym`, `array`, `tabularx`) o **MiKTeX**. También compila en **Overleaf**
 seleccionando el motor pdfLaTeX y el compilador `latexmk`.
 
 En esta máquina de desarrollo no hay `latexmk` ni `pdflatex` instalados, de modo que el PDF

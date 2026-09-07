@@ -23,21 +23,21 @@ La Tabla~\ref{tab:suites} recoge los resultados de las suites sobre el sistema e
 
 \begin{table}[htp]
 \centering
-\begin{tabular}{ | l | l | l | }
+\begin{tabularx}{\textwidth}{ | Y | Y | Y | }
     \hline
     \textbf{Suite} & \textbf{Herramienta} & \textbf{Resultado} \\
     \hline
-    Backend & \texttt{pytest} sobre PostgreSQL & 209 pruebas superadas \\
+    Backend & \texttt{pytest} sobre PostgreSQL & 345 pruebas superadas \\
     \hline
-    Recomendaciones & \texttt{pytest} & 21 pruebas superadas \\
+    Recomendaciones & \texttt{pytest} & 48 pruebas superadas \\
     \hline
-    Frontend, unidad y paridad & \texttt{vitest} & 16 pruebas superadas \\
+    Frontend, unidad y paridad & \texttt{vitest} & 27 pruebas superadas \\
     \hline
     Construcción del frontend & \texttt{next build} & correcta, sin errores de tipos \\
     \hline
     Extremo a extremo y accesibilidad & Playwright y \texttt{axe} & 41 pruebas superadas; cero incidencias críticas o graves de \texttt{axe} \\
     \hline
-\end{tabular}
+\end{tabularx}
 \caption{Resultados de las suites de pruebas del sistema.}
 \label{tab:suites}
 \end{table}
@@ -45,6 +45,38 @@ La Tabla~\ref{tab:suites} recoge los resultados de las suites sobre el sistema e
 Las comprobaciones de \texttt{axe} cubren el catálogo, el detalle, el registro, las
 recomendaciones, la página de inicio, el acceso y las fuentes, en escritorio a 1280 por 800
 píxeles y en móvil a 375 por 812 píxeles.
+
+\section{Verificación de la Fase 2}\label{sec:pru-fase2}
+
+La verificación de la Fase 2 se dividió en dos grupos. El primero comprobó que los datos y
+sus contratos eran correctos: 70 pruebas del catálogo cubrieron la importación de campos de
+rating, los snapshots insert-only y la reconciliación determinista de RAWG; 54 pruebas de
+la aplicación \texttt{evaluation} cubrieron el cargador de protocolo, las particiones y las
+métricas. El segundo comprobó las primitivas de recomendación: 48 pruebas cubrieron el
+baseline aleatorio, el coseno, los vectores de contenido, el perfil de usuario, la caché
+\texttt{WorkFeatureVector} y el cálculo del perfil de rating por género.
+
+Las propiedades relevantes se verificaron con casos pequeños y respuestas conocidas. El
+baseline aleatorio devuelve el mismo orden para la misma semilla, no devuelve obras de la
+biblioteca y no sale del corpus gobernado. La similitud coseno queda acotada entre cero y
+uno, es exactamente uno para vectores iguales no nulos y vale cero para vectores ortogonales
+o sin norma. Las métricas se comparan con cálculos manuales, mientras que el split rechaza
+particiones cuyo train, validation y test no sean disjuntos y completos.
+
+La prueba de datos a escala también dejó una evidencia reproducible. El enriquecimiento RAWG
+se ejecutó en 18 lotes y una repetición de un lote ya procesado insertó cero snapshots
+adicionales. La huella de \texttt{GameWork.rating} permaneció idéntica antes y después, lo
+que demuestra que el enriquecimiento no muta el valor vivo del catálogo. Esta evidencia
+prueba integridad e idempotencia; no prueba que RAWG haya mejorado la calidad de las
+recomendaciones.
+
+El protocolo congelado ya está probado como contrato, pero la comparación completa no se
+declara realizada. La Wave 3 ya generó y validó la población sintética del Plan 02-09,
+incluidos sus 200 perfiles, la cohorte cold-start y el aislamiento del baseline de
+popularidad. Todavía faltan las variantes finales y el runner del Plan 02-13. En
+consecuencia, no se incluyen en esta memoria tablas
+de Precision, Recall, nDCG o MAP como resultados comparativos ni se ordenan los algoritmos
+por una cifra que aún no ha sido producida bajo el contrato.
 
 \section{Gates de evidencia}\label{sec:pru-gates}
 
@@ -73,7 +105,7 @@ estaba parcial. La Tabla~\ref{tab:criterios} resume esos criterios.
 
 \begin{table}[htp]
 \centering
-\begin{tabular}{ | c | p{10.5cm} | c | }
+\begin{tabularx}{\textwidth}{ | Z | Y | Z | }
     \hline
     \textbf{Criterio} & \textbf{Enunciado} & \textbf{Veredicto} \\
     \hline
@@ -87,7 +119,7 @@ estaba parcial. La Tabla~\ref{tab:criterios} resume esos criterios.
     \hline
     SC5 & Página de recomendaciones por géneros según la actividad propia, distinta del baseline de popularidad. & Verificado \\
     \hline
-\end{tabular}
+\end{tabularx}
 \caption{Criterios de éxito verificados y su veredicto.}
 \label{tab:criterios}
 \end{table}
@@ -108,7 +140,7 @@ corrigieron en cinco tandas confirmadas, cada una con las pruebas ejecutadas des
 
 \begin{table}[htp]
 \centering
-\begin{tabular}{ | l | c | c | }
+\begin{tabularx}{\textwidth}{ | Y | Z | Y | }
     \hline
     \textbf{Severidad} & \textbf{Hallazgos} & \textbf{Estado} \\
     \hline
@@ -122,7 +154,7 @@ corrigieron en cinco tandas confirmadas, cada una con las pruebas ejecutadas des
     \hline
     \textbf{Total} & \textbf{16} & \textbf{16 corregidos} \\
     \hline
-\end{tabular}
+\end{tabularx}
 \caption{Hallazgos de la revisión de código de todo el repositorio.}
 \label{tab:hallazgos}
 \end{table}

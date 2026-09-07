@@ -21,11 +21,11 @@ export const SORT_KEYS = [
 ] as const;
 export type SortKey = (typeof SORT_KEYS)[number];
 
-export const DEFAULT_SORT: SortKey = "release_newest";
+export const DEFAULT_SORT: SortKey = "relevance";
 
-export function resolveSort(raw: string | undefined, hasQuery: boolean): SortKey {
+export function resolveSort(raw: string | undefined): SortKey {
   if (raw && (SORT_KEYS as readonly string[]).includes(raw)) return raw as SortKey;
-  return hasQuery ? "relevance" : DEFAULT_SORT;
+  return DEFAULT_SORT;
 }
 
 export const MIN_RATING_OPTIONS = ["70", "80", "90"] as const;
@@ -78,7 +78,7 @@ export function parseFilters(
     year_from: from != null ? String(from) : undefined,
     year_to: to != null ? String(to) : undefined,
     min_rating: minRating,
-    sort: resolveSort(sp.sort, Boolean(q)),
+    sort: resolveSort(sp.sort),
   };
 }
 

@@ -58,12 +58,13 @@ resultado algorítmico permanece reproducible y defendible en la memoria del TFG
 El objetivo general se descompone en los objetivos específicos que recoge la
 Tabla~\ref{tab:objetivos-especificos}. Los cuatro primeros corresponden a la parte de
 producto y a la infraestructura de datos, entregadas en el sistema que esta memoria
-describe. Los tres últimos corresponden al trabajo de recomendadores y de evaluación, que el
-banco de pruebas habilita como líneas de trabajo futuro.
+describe. El quinto se ha iniciado y queda parcialmente entregado con la gobernanza del
+corpus y el contrato congelado; los dos últimos corresponden a la comparación experimental y
+al panel, que permanecen como trabajo futuro.
 
 \begin{table}[htp]
 \centering
-\begin{tabular}{ | c | p{10.5cm} | c | }
+\begin{tabularx}{\textwidth}{ | Z | Y | Z | }
     \hline
     \textbf{Id} & \textbf{Objetivo específico} & \textbf{Estado} \\
     \hline
@@ -75,13 +76,13 @@ banco de pruebas habilita como líneas de trabajo futuro.
     \hline
     OE-4 & Entregar una página de recomendaciones por afinidad de géneros basada en la actividad registrada de cada persona usuaria, distinta del baseline de popularidad. & Entregado \\
     \hline
-    OE-5 & Congelar un corpus de investigación inmutable y un contrato de evaluación con métricas, repartos y semillas fijados antes de comparar algoritmos. & Trabajo futuro \\
+    OE-5 & Congelar un corpus de investigación inmutable y un contrato de evaluación con métricas, repartos y semillas fijados antes de comparar algoritmos. & Parcialmente entregado \\
     \hline
     OE-6 & Implementar y comparar recomendadores basados en contenido, de filtrado colaborativo e híbridos bajo ese contrato, con explicabilidad y arranque en frío. & Trabajo futuro \\
     \hline
     OE-7 & Presentar la comparación en un panel accesible que exporte tablas y figuras listas para la memoria a partir de artefactos de experimento inmutables. & Trabajo futuro \\
     \hline
-\end{tabular}
+\end{tabularx}
 \caption{Objetivos específicos del proyecto y su estado.}
 \label{tab:objetivos-especificos}
 \end{table}
@@ -94,17 +95,17 @@ una aportación observable por el tribunal. El Capítulo~\ref{cap:metodologia} l
 \section{Alcance del trabajo}\label{sec:intro-alcance}
 
 Esta memoria describe un sistema construido y verificado que cubre los objetivos OE-1 a
-OE-4: el catálogo a escala real con procedencia documentada, la biblioteca personal con
+OE-4 y deja OE-5 parcialmente entregado: el catálogo a escala real con procedencia documentada, la biblioteca personal con
 inventario de copias, el perfil público, la búsqueda tolerante con ordenación y filtrado,
 además de los dos recomendadores deterministas. El sistema se construyó como una sucesión de
 incrementos verticales, cada uno utilizable y con su propia evidencia de verificación, hasta
 llegar a la versión que aquí se documenta.
 
-Queda fuera del alcance de esta memoria todo el trabajo de recomendadores más allá de los
-dos heurísticos deterministas sin aprendizaje que el sistema ya incorpora: la agregación por
-popularidad y la afinidad por géneros. La comparación sistemática de algoritmos, sus
-métricas y sus resultados se recogen como líneas de trabajo futuro que el banco de pruebas
-reproducible habilita; el Capítulo~\ref{cap:conclusiones} las detalla. También quedan
+Queda fuera del alcance de esta memoria la comparación completa de recomendadores y sus
+resultados. La Fase 2 sí incorpora el contrato, las métricas, las particiones, los snapshots
+de ratings y las primeras primitivas del recomendador de contenido; los resultados
+experimentales se recogen como trabajo futuro que el banco de pruebas reproducible habilita.
+También quedan
 fuera el registro abierto de producción, la red social completa, el diario de partidas y los
 controles finos de privacidad por lista, reservados para una evolución posterior del
 producto.
@@ -113,9 +114,9 @@ producto.
 
 La plataforma es un monolito modular con dos ejecutables. El backend usa Django 5.2 con soporte
 a largo plazo (LTS) y Django REST Framework (DRF) sobre PostgreSQL 18, con el mapeo
-objeto-relacional (ORM) de Django como interfaz de persistencia. El frontend es una
+objeto-relacional (ORM) de Django como interfaz de persistencia~\cite{django,drf,postgresql}. El frontend es una
 aplicación Next.js 16 con React 19 y TypeScript en modo estricto, que renderiza en el
-servidor (SSR) las páginas públicas. El navegador solo habla con rutas del mismo origen, que
+servidor (SSR) las páginas públicas~\cite{nextjs,react}. El navegador solo habla con rutas del mismo origen, que
 Next.js reescribe hacia el backend, de modo que la sesión y la protección contra
 falsificación de petición en sitios cruzados (CSRF) de Django siguen siendo del mismo origen.
 El entorno reproducible se orquesta con Docker Compose, con las dependencias fijadas a

@@ -89,6 +89,7 @@ def test_govern_corpus_applies_every_d03_clause_and_keeps_unrated() -> None:
         "is_dlc": 1,
         "missing_genre": 1,
         "missing_first_release_date": 1,
+        "future_release_date": 0,
     }
     assert evidence["quality_report"]["governed_count"] == 1
     assert len(evidence["sampled_manifest"]) == 1

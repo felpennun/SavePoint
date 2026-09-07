@@ -30,7 +30,7 @@ def _client_for(user) -> APIClient:  # noqa: ANN001
     return client
 
 
-@pytest.mark.parametrize("value", [1, 2, 5, 9, 10])
+@pytest.mark.parametrize("value", list(range(1, 11)))
 @pytest.mark.django_db
 def test_every_valid_half_step_is_accepted(value: int, work, user_a) -> None:  # noqa: ANN001
     entry = services.set_rating(user=user_a, work=work, rating_half_steps=value)

@@ -25,7 +25,7 @@ from dataclasses import dataclass
 from datetime import date
 
 from django.contrib.postgres.search import TrigramSimilarity
-from django.db.models import Count, F, Max, Min, QuerySet
+from django.db.models import Case, Count, F, IntegerField, Max, Min, QuerySet, Value, When
 
 from catalogue.corpus import governed_works
 from catalogue.models import GameAlias, GameWork, Genre, Platform
@@ -40,6 +40,18 @@ DEFAULT_PAGE_SIZE = 24
 YEAR_MIN = 1958
 RATING_MIN = 0.0
 RATING_MAX = 100.0
+# Relevance is a stepped discovery ordering, not a visibility filter. A larger
+# rating sample gets an earlier tier; the IGDB score then ranks games within
+# each tier. The final tier contains works with fewer than ten ratings or no
+# rating-count data at all.
+RELEVANCE_RATING_COUNT_TIERS: tuple[tuple[int, int], ...] = (
+    (1000, 0),
+    (500, 1),
+    (200, 2),
+    (100, 3),
+    (50, 4),
+    (10, 5),
+)
 
 # Cap repeated ``genre`` / ``platform`` params so a single request can never
 # fan a query out into an unbounded chain of joins (threat T-02-03-02, V5 DoS).
@@ -61,10 +73,10 @@ SORT_ORDERS: dict[str, tuple] = {
     "release_oldest": (F("first_release_date").asc(nulls_last=True), "canonical_slug"),
     "rating_desc": (F("total_rating").desc(nulls_last=True), "canonical_slug"),
 }
-# ``relevance`` is only meaningful with a text query; with no ``q`` it falls
-# back to ``release_newest`` (UI-SPEC Screen Contract 2).
+# ``relevance`` is the default discovery mode with or without a text query.
+# It means a stepped rating-count order followed by the IGDB score.
 SORT_KEYS: tuple[str, ...] = ("relevance", *SORT_ORDERS.keys())
-DEFAULT_SORT_NO_QUERY = "release_newest"
+DEFAULT_SORT_NO_QUERY = "relevance"
 DEFAULT_SORT_WITH_QUERY = "relevance"
 
 
@@ -150,8 +162,6 @@ def parse_catalogue_query(params: Mapping[str, str]) -> CatalogueQuery:
         raise FilterValidationError("invalid_sort", f"unknown sort key: {raw_sort!r}")
     if not raw_sort:
         sort = DEFAULT_SORT_WITH_QUERY if q else DEFAULT_SORT_NO_QUERY
-    elif raw_sort == "relevance" and not q:
-        sort = DEFAULT_SORT_NO_QUERY
     else:
         sort = raw_sort
 
@@ -308,6 +318,28 @@ def _facets(scoped: QuerySet[GameWork]) -> dict:
     }
 
 
+def _relevance_order(qs: QuerySet[GameWork]) -> QuerySet[GameWork]:
+    """Order discovery results by rating-count confidence, then IGDB score.
+
+    The tier is deliberately expressed in the database query so pagination is
+    applied after the complete deterministic ranking rather than after a
+    Python-side page-sized approximation.
+    """
+    tier = Case(
+        *(
+            When(total_rating_count__gte=threshold, then=Value(rank))
+            for threshold, rank in RELEVANCE_RATING_COUNT_TIERS
+        ),
+        default=Value(len(RELEVANCE_RATING_COUNT_TIERS)),
+        output_field=IntegerField(),
+    )
+    return qs.annotate(relevance_tier=tier).order_by(
+        "relevance_tier",
+        F("total_rating").desc(nulls_last=True),
+        "canonical_slug",
+    )
+
+
 def search_games(
     query: str | None = None,
     page: int = 1,
@@ -318,8 +350,9 @@ def search_games(
     """Return a paginated, deterministically-ordered result set plus facets.
 
     ``cq`` carries the validated CAT-02 filters/sort. When omitted the call
-    behaves exactly as the pre-CAT-02 endpoint did: an empty/whitespace-only
-    query returns the unfiltered, alphabetically ordered catalogue.
+    behaves exactly as the pre-CAT-02 endpoint did for filtering: an
+    empty/whitespace-only query returns the unfiltered catalogue, now ordered
+    by the stepped relevance ranking.
     """
     page = max(page, 1)
     page_size = max(page_size, 1)
@@ -347,19 +380,12 @@ def search_games(
 
     filtered = _apply_filters(scoped, cq)
 
-    effective_sort = cq.sort
-    if effective_sort == "relevance" and not stripped:
-        effective_sort = DEFAULT_SORT_NO_QUERY
-
-    if effective_sort == "relevance":
-        allowed = set(filtered.values_list("id", flat=True))
-        ranked = [wid for wid in ordered_ids if wid in allowed]
-        total = len(ranked)
-        page_ids = ranked[start : start + page_size]
-        works_by_id = {w.id: w for w in _prefetched(GameWork.objects.filter(id__in=page_ids))}
-        page_works = [works_by_id[wid] for wid in page_ids if wid in works_by_id]
+    if cq.sort == "relevance":
+        ordered_qs = _relevance_order(filtered)
+        total = ordered_qs.count()
+        page_works = list(_prefetched(ordered_qs)[start : start + page_size])
     else:
-        ordered_qs = filtered.order_by(*SORT_ORDERS[effective_sort])
+        ordered_qs = filtered.order_by(*SORT_ORDERS[cq.sort])
         total = ordered_qs.count()
         page_works = list(_prefetched(ordered_qs)[start : start + page_size])
 
@@ -369,6 +395,6 @@ def search_games(
         "page": page,
         "page_size": page_size,
         "has_next": start + page_size < total,
-        "sort": effective_sort,
+        "sort": cq.sort,
         "facets": facets,
     }

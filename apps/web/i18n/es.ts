@@ -86,6 +86,14 @@ export const es: Dictionary = {
     },
   },
   detail: {
+    summary: "Sinopsis",
+    summaryUnavailable: "No hay una sinopsis disponible en español para este juego.",
+    ratings: "Valoraciones",
+    releases: "Lanzamientos y ediciones",
+    editions: "Ediciones",
+    relatedContent: "Contenido relacionado",
+    dlc: "DLC",
+    expansion: "Expansión",
     igdbRating: "Valoración IGDB",
     genres: "Géneros",
     platforms: "Plataformas",
@@ -97,13 +105,13 @@ export const es: Dictionary = {
   },
   recommendations: {
     nav: "Recomendaciones",
-    heading: "Recomendaciones según tus géneros",
+    heading: "Recomendaciones según tus géneros y valoraciones",
     intro:
-      "Generado a partir de los géneros de los juegos que has valorado y completado. No es el ranking de popularidad de la demo.",
+      "Generado a partir de los géneros de los juegos que has valorado y completado, priorizando los mejor valorados del catálogo. No es el ranking de popularidad de la demo.",
     excludedNote: "No se muestran los juegos que ya están en tu colección.",
     methodHeading: "Cómo se generan",
     methodAlgorithm:
-      "Algoritmo: {id} — una heurística determinista de frecuencia de géneros, no el ranking de popularidad de la demo ni un modelo entrenado.",
+      "Algoritmo: {id} — una heurística determinista de géneros que ordena por valoración del catálogo, no el ranking de popularidad de la demo ni un modelo entrenado.",
     shelfHeading: "Porque juegas mucho a {genre}",
     shelfEvidence:
       "Estos juegos comparten el género {genre} con títulos que has valorado o a los que has puesto un estado.",
@@ -126,6 +134,10 @@ export const es: Dictionary = {
     },
     filterByStatus: "Estado",
     allStatuses: "Todos",
+    filterByCopy: "Copias",
+    allCopyStates: "Con y sin copia",
+    withCopy: "Con copia",
+    withoutCopy: "Sin copia",
     statusEmptyGroup: "Ningún juego marcado como {status}.",
     showAll: "Mostrar todos",
     statusSummaryCount: {

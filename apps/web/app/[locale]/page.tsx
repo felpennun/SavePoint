@@ -3,14 +3,12 @@ import { cookies } from "next/headers";
 
 import { BrandLockup } from "@/components/BrandLockup";
 import { GameCard } from "@/components/GameCard";
-import { RecommendationStrip } from "@/components/RecommendationStrip";
 import { getDictionary } from "@/i18n";
-import { fetchAccountMe, fetchCatalogueList, fetchMyLibrary, fetchPopularity } from "@/lib/api";
+import { fetchAccountMe, fetchCatalogueList, fetchMyLibrary } from "@/lib/api";
 
 /** Home (01.1-UI-SPEC Screen Contract 1). Logged-out: wordmark + value
- * proposition + CTA row + catalogue sample + quieter popularity strip.
- * Signed-in: greeting + "pick up where you left off" + genre-
- * recommendations CTA, popularity strip still below as the demo baseline.
+ * proposition + CTA row + catalogue sample. Signed-in: greeting + "pick up
+ * where you left off" + genre-recommendations CTA.
  * Home was not in the plan's files_modified -- redesigned here as a scope
  * addition so the whole journey reads as one product. */
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
@@ -32,13 +30,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     sample = result.results.slice(0, 8);
   } catch {
     sampleFailed = true;
-  }
-
-  let popularity: Awaited<ReturnType<typeof fetchPopularity>>["results"] = [];
-  try {
-    popularity = (await fetchPopularity()).results.slice(0, 5);
-  } catch {
-    popularity = [];
   }
 
   let continueItems: Awaited<ReturnType<typeof fetchMyLibrary>>["items"] = [];
@@ -138,9 +129,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </>
       )}
 
-      <div style={{ marginTop: "var(--space-2xl)", paddingTop: "var(--space-lg)", borderTop: "1px solid var(--color-surface-border)" }}>
-        <RecommendationStrip results={popularity} locale={locale} />
-      </div>
     </main>
   );
 }

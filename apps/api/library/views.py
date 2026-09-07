@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
@@ -15,11 +16,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from catalogue.models import GameWork
+from catalogue.serializers import _cover, _platform_summary
 from library import services
 from library.models import BacklogStatus, LibraryEntry, OwnedCopy, StatusTransition
 from library.popularity import rank_popularity_v1
 from library.serializers import (
     CreateOwnedCopyRequestSerializer,
+    LibraryConfigurationSerializer,
     RatingRequestSerializer,
     serialize_copy,
 )
@@ -37,15 +40,22 @@ class MyLibraryView(APIView):
     def get(self, request: Request) -> Response:
         entries = (
             LibraryEntry.objects.filter(user=request.user)
-            .exclude(current_status__isnull=True)
+            .filter(
+                Q(current_status__isnull=False)
+                | Q(rating_half_steps__isnull=False)
+                | Q(work__owned_copies__user=request.user)
+            )
             .select_related("work")
-            .prefetch_related("work__source_records")
+            .prefetch_related("work__source_records", "work__assets", "work__releases__platform")
+            .annotate(owned_copy_count=Count("work__owned_copies", distinct=True))
+            .distinct()
             .order_by("work__original_title", "id")
         )
         items = []
         summary = {choice.value: 0 for choice in BacklogStatus}
         for entry in entries:
-            summary[entry.current_status] += 1
+            if entry.current_status is not None:
+                summary[entry.current_status] += 1
             items.append(
                 {
                     "work_id": str(entry.work_id),
@@ -53,12 +63,15 @@ class MyLibraryView(APIView):
                     "work_title": entry.work.title_en or entry.work.original_title,
                     "status": entry.current_status,
                     "rating_half_steps": entry.rating_half_steps,
-                    "owned_copy_count": OwnedCopy.objects.filter(user=request.user, work=entry.work).count(),
+                    "owned_copy_count": entry.owned_copy_count,
                     # Enough for the Collection page's client-side sorts
                     # (recently_updated / release_year) to actually work; the
-                    # richer cover/platform enrichment is still Plan 03
-                    # (repo-review 2026-09-06 L-07).
+                    # enrichment is kept in the same allowlisted shape as
+                    # catalogue cards so the collection needs no extra API
+                    # requests per item.
                     "year": entry.work.first_release_date.year if entry.work.first_release_date else None,
+                    "platform_summary": _platform_summary(entry.work),
+                    "cover": _cover(entry.work),
                     "updated_at": entry.updated_at.isoformat(),
                 }
             )
@@ -166,6 +179,55 @@ class OwnedCopiesView(APIView):
             return Response({"detail": str(exc.message if hasattr(exc, "message") else exc)}, status=400)
 
         return Response({"copy": serialize_copy(copy), "created": created}, status=201 if created else 200)
+
+
+class LibraryConfigurationView(APIView):
+    """POST the complete status/rating/copies configuration for one work."""
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request: Request, work_id: str) -> Response:
+        serializer = LibraryConfigurationSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({"detail": "Invalid library configuration.", "errors": serializer.errors}, status=400)
+        work = get_object_or_404(GameWork, id=work_id, is_dlc=False)
+        try:
+            entry = services.save_library_configuration(work=work, user=request.user, **serializer.validated_data)
+        except ValidationError as exc:
+            return Response({"detail": str(exc.message if hasattr(exc, "message") else exc)}, status=400)
+        return Response(
+            {
+                "status": entry.current_status if entry else None,
+                "rating_half_steps": entry.rating_half_steps if entry else None,
+                "copies": [
+                    serialize_copy(copy)
+                    for copy in OwnedCopy.objects.filter(user=request.user, work=work)
+                ],
+            }
+        )
+
+
+class OwnedCopyDetailView(APIView):
+    """DELETE one owner-scoped copy."""
+
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request: Request, work_id: str, copy_id: str) -> Response:
+        work = get_object_or_404(GameWork, id=work_id, is_dlc=False)
+        if not services.delete_owned_copy(user=request.user, work=work, copy_id=copy_id):
+            return Response({"detail": "Copy not found."}, status=404)
+        return Response(status=204)
+
+
+class ClearLibraryConfigurationView(APIView):
+    """DELETE the work from the caller's collection and remove all config."""
+
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request: Request, work_id: str) -> Response:
+        work = get_object_or_404(GameWork, id=work_id, is_dlc=False)
+        services.clear_library_configuration(user=request.user, work=work)
+        return Response(status=204)
 
 
 class PopularityView(APIView):

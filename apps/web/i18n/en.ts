@@ -83,6 +83,14 @@ export const en: Dictionary = {
     },
   },
   detail: {
+    summary: "Synopsis",
+    summaryUnavailable: "No synopsis is available for this game.",
+    ratings: "Ratings",
+    releases: "Releases and editions",
+    editions: "Editions",
+    relatedContent: "Related content",
+    dlc: "DLC",
+    expansion: "Expansion",
     igdbRating: "IGDB rating",
     genres: "Genres",
     platforms: "Platforms",
@@ -94,13 +102,13 @@ export const en: Dictionary = {
   },
   recommendations: {
     nav: "Recommendations",
-    heading: "Recommended by your genres",
+    heading: "Recommended by your genres and ratings",
     intro:
-      "Built from the genres of the games you've rated and completed. Not the demo popularity ranking.",
+      "Built from the genres of the games you've rated and completed, prioritising the catalogue's highest-rated games. Not the demo popularity ranking.",
     excludedNote: "Games already in your collection are not shown.",
     methodHeading: "How these are generated",
     methodAlgorithm:
-      "Algorithm: {id} — a deterministic genre-frequency heuristic, not the demo popularity ranking and not a trained model.",
+      "Algorithm: {id} — a deterministic genre heuristic ordered by catalogue rating, not the demo popularity ranking and not a trained model.",
     shelfHeading: "Because you play a lot of {genre}",
     shelfEvidence:
       "These games share the {genre} genre with titles you've rated or set a status on.",
@@ -123,6 +131,10 @@ export const en: Dictionary = {
     },
     filterByStatus: "Status",
     allStatuses: "All",
+    filterByCopy: "Copies",
+    allCopyStates: "With and without copies",
+    withCopy: "With a copy",
+    withoutCopy: "Without a copy",
     statusEmptyGroup: "No games marked {status}.",
     showAll: "Show all",
     statusSummaryCount: {

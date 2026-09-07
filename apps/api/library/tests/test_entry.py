@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 from django.db import connections
 from rest_framework.test import APIClient
 
-from catalogue.models import GameWork
+from catalogue.models import AssetAttribution, GameRelease, GameWork, Platform
 from library.models import LibraryEntry, StatusTransition
 
 User = get_user_model()
@@ -42,20 +42,74 @@ def _client_for(user) -> APIClient:  # noqa: ANN001
 
 
 @pytest.mark.django_db
-def test_my_library_lists_only_entries_with_a_status(work, user_a) -> None:  # noqa: ANN001
+def test_my_library_lists_actioned_entries_and_excludes_untouched_ones(work, user_a) -> None:  # noqa: ANN001
     other_work = GameWork.objects.create(canonical_slug="untouched-game", original_title="Untouched Game")
-    GameWork.objects.create(canonical_slug="no-status-game", original_title="No Status Game")
+    unrated_work = GameWork.objects.create(canonical_slug="no-status-game", original_title="No Status Game")
     LibraryEntry.objects.create(user=user_a, work=work, current_status="playing")
     LibraryEntry.objects.create(user=user_a, work=other_work, current_status=None)  # never actioned
+    LibraryEntry.objects.create(user=user_a, work=unrated_work, current_status=None, rating_half_steps=8)
 
     client = _client_for(user_a)
     response = client.get("/api/library/entries/")
     assert response.status_code == 200
     body = response.json()
-    assert len(body["items"]) == 1
-    assert body["items"][0]["work_slug"] == "tracer-game"
+    assert {item["work_slug"] for item in body["items"]} == {"tracer-game", "no-status-game"}
     assert body["summary"]["playing"] == 1
     assert body["summary"]["pending"] == 0
+
+
+@pytest.mark.django_db
+def test_my_library_lists_a_rating_without_a_status_after_reload(work, user_a) -> None:  # noqa: ANN001
+    client = _client_for(user_a)
+    response = client.post(
+        f"/api/library/entries/{work.id}/rating/",
+        {"rating_half_steps": 10},
+        format="json",
+    )
+
+    assert response.status_code == 200
+    items = client.get("/api/library/entries/").json()["items"]
+    assert len(items) == 1
+    assert items[0]["work_slug"] == "tracer-game"
+    assert items[0]["status"] is None
+    assert items[0]["rating_half_steps"] == 10
+
+
+@pytest.mark.django_db
+def test_my_library_returns_cover_and_platform_metadata(work, user_a) -> None:  # noqa: ANN001
+    platform = Platform.objects.create(name="PC", slug="pc")
+    GameRelease.objects.create(work=work, platform=platform, release_name="Tracer Game (PC)")
+    AssetAttribution.objects.create(
+        work=work,
+        file_url="https://cdn.example.test/tracer-game.jpg",
+        creator="Catalogue source",
+        licence="Catalogue terms",
+        licence_url="https://example.test/licence",
+        source_url="https://example.test/tracer-game",
+        display_allowed=True,
+    )
+    LibraryEntry.objects.create(user=user_a, work=work, current_status="playing")
+
+    item = _client_for(user_a).get("/api/library/entries/").json()["items"][0]
+
+    assert item["cover"]["is_placeholder"] is False
+    assert item["cover"]["url"] == "https://cdn.example.test/tracer-game.jpg"
+    assert item["platform_summary"] == "PC"
+
+
+@pytest.mark.django_db
+def test_my_library_counts_a_work_once_when_user_owns_multiple_copies(work, user_a) -> None:  # noqa: ANN001
+    platform = Platform.objects.create(name="PC", slug="pc")
+    release = GameRelease.objects.create(work=work, platform=platform, release_name="Tracer Game (PC)")
+    LibraryEntry.objects.create(user=user_a, work=work, current_status="completed")
+    work.owned_copies.create(user=user_a, release=release, format="physical", idempotency_key="copy-1")
+    work.owned_copies.create(user=user_a, release=release, format="digital", idempotency_key="copy-2")
+
+    body = _client_for(user_a).get("/api/library/entries/").json()
+
+    assert len(body["items"]) == 1
+    assert body["items"][0]["owned_copy_count"] == 2
+    assert body["summary"] == {"pending": 0, "playing": 0, "completed": 1, "abandoned": 0}
 
 
 @pytest.mark.django_db

@@ -12,7 +12,7 @@ from rest_framework.test import APIClient
 
 from catalogue.models import Edition, GameRelease, GameWork, Platform
 from library import services
-from library.models import OwnedCopy
+from library.models import LibraryEntry, OwnedCopy, StatusTransition
 
 User = get_user_model()
 
@@ -122,6 +122,30 @@ def test_empty_copy_list_is_valid(work, user_a) -> None:  # noqa: ANN001
 
 
 @pytest.mark.django_db
+def test_created_copy_makes_work_visible_in_my_library(work, release, user_a) -> None:  # noqa: ANN001
+    client = _client_for(user_a)
+    response = client.post(
+        f"/api/library/entries/{work.id}/copies/",
+        {
+            "release_id": str(release.id),
+            "edition_id": None,
+            "format": "physical",
+            "idempotency_key": "collection-visibility",
+        },
+        format="json",
+    )
+
+    assert response.status_code == 201
+    items = client.get("/api/library/entries/").json()["items"]
+    assert len(items) == 1
+    assert items[0]["work_id"] == str(work.id)
+    assert items[0]["work_slug"] == "copies-game"
+    assert items[0]["status"] is None
+    assert items[0]["rating_half_steps"] is None
+    assert items[0]["owned_copy_count"] == 1
+
+
+@pytest.mark.django_db
 def test_copy_list_ordered_stably_newest_first(work, release, user_a) -> None:  # noqa: ANN001
     first_copy, _ = services.create_owned_copy(
         user=user_a, work=work, release_id=str(release.id), edition_id=None, format="physical", idempotency_key="a"
@@ -192,3 +216,65 @@ def test_concurrent_intentionally_distinct_keys_produce_distinct_copies(work, re
 
     assert not errors, f"concurrent copy creation raised: {errors}"
     assert OwnedCopy.objects.filter(user=user_a, work=work).count() == 3
+
+
+@pytest.mark.django_db
+def test_configuration_saves_updates_and_removes_the_complete_work_state(work, release, user_a) -> None:  # noqa: ANN001
+    client = _client_for(user_a)
+    initial = client.post(
+        f"/api/library/entries/{work.id}/configuration/",
+        {
+            "status": "playing",
+            "rating_half_steps": 8,
+            "copies": [
+                {"release_id": str(release.id), "format": "physical", "edition_id": None},
+                {"release_id": str(release.id), "format": "digital", "edition_id": None},
+            ],
+        },
+        format="json",
+    )
+    assert initial.status_code == 200
+    assert len(initial.json()["copies"]) == 2
+    first_id = initial.json()["copies"][0]["id"]
+
+    updated = client.post(
+        f"/api/library/entries/{work.id}/configuration/",
+        {
+            "status": "completed",
+            "rating_half_steps": 10,
+            "copies": [{"id": first_id, "release_id": str(release.id), "format": "digital", "edition_id": None}],
+        },
+        format="json",
+    )
+    assert updated.status_code == 200
+    assert updated.json()["status"] == "completed"
+    assert updated.json()["rating_half_steps"] == 10
+    assert len(updated.json()["copies"]) == 1
+    assert updated.json()["copies"][0]["id"] == first_id
+    assert updated.json()["copies"][0]["format"] == "digital"
+    assert OwnedCopy.objects.filter(user=user_a, work=work).count() == 1
+    assert StatusTransition.objects.filter(entry__user=user_a, entry__work=work).count() == 2
+
+
+@pytest.mark.django_db
+def test_owner_can_delete_one_copy_and_then_clear_the_whole_configuration(work, release, user_a) -> None:  # noqa: ANN001
+    client = _client_for(user_a)
+    saved = client.post(
+        f"/api/library/entries/{work.id}/configuration/",
+        {
+            "status": "pending",
+            "rating_half_steps": None,
+            "copies": [{"release_id": str(release.id), "format": "physical", "edition_id": None}],
+        },
+        format="json",
+    )
+    copy_id = saved.json()["copies"][0]["id"]
+    deleted_copy = client.delete(f"/api/library/entries/{work.id}/copies/{copy_id}/")
+    assert deleted_copy.status_code == 204
+    assert not OwnedCopy.objects.filter(user=user_a, work=work).exists()
+    assert LibraryEntry.objects.filter(user=user_a, work=work).exists()
+
+    deleted_entry = client.delete(f"/api/library/entries/{work.id}/")
+    assert deleted_entry.status_code == 204
+    assert not LibraryEntry.objects.filter(user=user_a, work=work).exists()
+    assert not StatusTransition.objects.filter(entry__user=user_a, entry__work=work).exists()

@@ -52,6 +52,24 @@ def test_detail_includes_hierarchy_and_provenance() -> None:
 
 
 @pytest.mark.django_db
+def test_detail_uses_the_requested_locale_for_the_synopsis() -> None:
+    work = GameWork.objects.create(
+        canonical_slug="localized-game",
+        original_title="Localized Game",
+        summary="English synopsis.",
+        summary_es="Sinopsis en español.",
+    )
+    SourceRecord.objects.create(
+        work=work, source="wikidata", source_id="Q-localized", source_url="https://www.wikidata.org/wiki/Q-localized",
+        retrieved_at="2026-09-04T00:00:00Z", licence="CC0 1.0", snapshot_sha256="e" * 64,
+    )
+
+    client = APIClient()
+    assert client.get("/api/catalogue/games/localized-game/?locale=en").json()["summary"] == "English synopsis."
+    assert client.get("/api/catalogue/games/localized-game/?locale=es").json()["summary"] == "Sinopsis en español."
+
+
+@pytest.mark.django_db
 def test_detail_shows_dlc_as_non_actionable_child_content() -> None:
     base = GameWork.objects.create(canonical_slug="base-game-2", original_title="Base Game 2")
     dlc = GameWork.objects.create(canonical_slug="base-game-2-dlc", original_title="Base Game 2: Expansion", is_dlc=True)
@@ -69,9 +87,17 @@ def test_detail_shows_dlc_as_non_actionable_child_content() -> None:
     related = body["related_content"][0]
     assert related["title"] == "Base Game 2: Expansion"
     assert related["relation"] == "expansion"
-    # The related-content DTO carries identity only -- no status/rating/copy
-    # fields that would make it independently actionable (D-11).
-    assert set(related.keys()) == {"id", "slug", "title", "relation"}
+    # The related-content DTO carries display metadata but no status/rating/
+    # copy fields that would make it independently actionable (D-11).
+    assert set(related.keys()) == {
+        "id",
+        "slug",
+        "title",
+        "relation",
+        "year",
+        "platform_summary",
+        "cover",
+    }
 
     # The DLC itself is never surfaced as an independent catalogue result.
     assert "base-game-2-dlc" not in [w["slug"] for w in client.get("/api/catalogue/games/").json()["results"]]

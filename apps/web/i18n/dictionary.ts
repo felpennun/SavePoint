@@ -75,6 +75,14 @@ export interface Dictionary {
     genres: string;
     platforms: string;
     releaseDate: string;
+    summary: string;
+    summaryUnavailable: string;
+    ratings: string;
+    releases: string;
+    editions: string;
+    relatedContent: string;
+    dlc: string;
+    expansion: string;
     addToCollection: string;
     inCollection: string;
     attribution: string;
@@ -109,6 +117,10 @@ export interface Dictionary {
     count: CountCopy;
     filterByStatus: string;
     allStatuses: string;
+    filterByCopy: string;
+    allCopyStates: string;
+    withCopy: string;
+    withoutCopy: string;
     statusEmptyGroup: string;
     showAll: string;
     statusSummaryCount: CountCopy;

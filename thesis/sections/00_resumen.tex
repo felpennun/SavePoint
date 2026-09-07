@@ -21,6 +21,15 @@ recomendadores deterministas: una línea base por popularidad y una página de a
 géneros basada en la actividad registrada de cada persona. El sistema arranca de forma reproducible en un
 entorno local documentado y funciona sin conexión a servicios externos.
 
+La Fase 2 añade la frontera de investigación: 193.885 obras forman el corpus gobernado de la
+versión \texttt{2026.09.1}, 27.014 de ellas con rating de usuarios de IGDB, y las
+valoraciones externas quedan congeladas en snapshots inmutables. También deja fijado, antes
+de cualquier prueba de laboratorio, un protocolo con leave-one-out, usuarios sintéticos,
+exclusiones, semillas, una rejilla de 18 configuraciones y las métricas Precision, Recall,
+nDCG y MAP para $K\in\{5,10,20\}$. En esta versión se han implementado y probado el
+protocolo, sus métricas y las primeras primitivas de contenido, pero la comparación completa
+todavía no se presenta como resultado.
+
 El trabajo presta atención especial a dos aspectos. El primero es el rigor de la evidencia:
 cada decisión de arquitectura queda registrada en un documento de decisión, la verificación
 de objetivos se realiza de forma independiente y cada resultado lleva una firma de

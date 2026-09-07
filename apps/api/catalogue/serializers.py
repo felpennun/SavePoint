@@ -78,6 +78,7 @@ class GameCardSerializer(serializers.Serializer):
     # assumption 2). ``display_rating`` is the live product number (D-09):
     # null when no source has a value, so "sin valoración" is explicit.
     total_rating = serializers.FloatField(allow_null=True)
+    total_rating_count = serializers.IntegerField(allow_null=True)
     display_rating = serializers.SerializerMethodField()
     genres = serializers.SerializerMethodField()
 
@@ -117,16 +118,27 @@ class ReleaseSerializer(serializers.Serializer):
 
 
 class RelatedContentSerializer(serializers.Serializer):
-    """DLC/expansions: identity only, no action affordance in the DTO
-    itself (D-11) -- the client renders these as non-actionable."""
+    """DLC/expansions: display metadata, but no independent action affordance."""
 
     id = serializers.UUIDField(source="child_work.id")
     slug = serializers.CharField(source="child_work.canonical_slug")
     title = serializers.SerializerMethodField()
     relation = serializers.CharField()
+    year = serializers.SerializerMethodField()
+    platform_summary = serializers.SerializerMethodField()
+    cover = serializers.SerializerMethodField()
 
     def get_title(self, related) -> str:  # noqa: ANN001 - RelatedContent instance
         return _display_title(related.child_work)
+
+    def get_year(self, related) -> int | None:  # noqa: ANN001 - RelatedContent instance
+        return _release_year(related.child_work)
+
+    def get_platform_summary(self, related) -> str:  # noqa: ANN001 - RelatedContent instance
+        return _platform_summary(related.child_work)
+
+    def get_cover(self, related) -> dict:  # noqa: ANN001 - RelatedContent instance
+        return _cover(related.child_work)
 
 
 class ProvenanceSerializer(serializers.Serializer):
@@ -149,10 +161,12 @@ class GameDetailSerializer(serializers.Serializer):
     original_title = serializers.CharField()
     is_dlc = serializers.BooleanField()
     year = serializers.SerializerMethodField()
-    # IGDB synopsis (D-24 P3) -- a blank string when IGDB carries none; the
-    # client omits the whole section rather than render an empty heading.
-    summary = serializers.CharField(allow_blank=True)
+    # The English source summary is kept separate from the optional Spanish
+    # editorial translation. A Spanish request must never receive English
+    # text as a silent fallback.
+    summary = serializers.SerializerMethodField()
     total_rating = serializers.FloatField(allow_null=True)
+    total_rating_count = serializers.IntegerField(allow_null=True)
     # IGDB *user* rating (D-05) and its sample size, surfaced for the
     # detail-page rating breakdown line.
     rating = serializers.FloatField(allow_null=True)
@@ -169,6 +183,11 @@ class GameDetailSerializer(serializers.Serializer):
 
     def get_title(self, work: GameWork) -> str:
         return _display_title(work)
+
+    def get_summary(self, work: GameWork) -> str:
+        if self.context.get("locale") == "es":
+            return work.summary_es
+        return work.summary
 
     def get_year(self, work: GameWork) -> int | None:
         return _release_year(work)

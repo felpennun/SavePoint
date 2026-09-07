@@ -16,7 +16,7 @@ Tabla~\ref{tab:stack} recoge las versiones principales.
 
 \begin{table}[htp]
 \centering
-\begin{tabular}{ | l | l | l | }
+\begin{tabularx}{\textwidth}{ | Y | Y | Y | }
     \hline
     \textbf{Componente} & \textbf{Versión} & \textbf{Papel} \\
     \hline
@@ -40,7 +40,7 @@ Tabla~\ref{tab:stack} recoge las versiones principales.
     \hline
     Tailwind CSS & 4.3.3 & Tokens de diseño y maquetación adaptable. \\
     \hline
-\end{tabular}
+\end{tabularx}
 \caption{Versiones principales del entorno reproducible.}
 \label{tab:stack}
 \end{table}
@@ -62,6 +62,42 @@ carga interacciones deterministas que se autoverifican contra resultados con hue
 carga. En el despliegue, la cadena de arranque encadena migración, importación, creación de
 cuentas y semilla antes de ceder el control al servidor HTTP. Un paso fallido detiene el
 arranque para que el chequeo de salud nunca se ponga en verde con una inicialización parcial.
+
+\subsubsection{Comandos y contratos de la Fase 2}
+
+La gobernanza se ejecuta con \texttt{govern\_corpus}, que aplica la allowlist de plataformas,
+calcula las razones de exclusión, crea una versión monotónica y emite evidencia agregada sin
+enumerar todo el catálogo. \texttt{snapshot\_corpus\_ratings} congela los ratings de IGDB
+por versión. \texttt{enrich\_rawg\_ratings} es un enriquecimiento opcional y acotado: usa
+lotes, backoff ante respuestas transitorias y reconciliación exacta por slug o por título y
+año. \texttt{backfill\_game\_aliases} reconstruye los alias normalizados para que la
+búsqueda sea útil sobre el catálogo real.
+
+El protocolo se carga desde \texttt{docs/methodology/protocol.json}. El módulo
+\texttt{evaluation/protocol.py} rechaza una rejilla con más de 24 configuraciones, comprueba
+que las claves obligatorias estén presentes y permite distinguir un protocolo todavía no
+consumido de un test ya ejecutado. Las funciones de \texttt{evaluation/metrics.py} son
+deliberadamente pequeñas y explícitas: no delegan la definición de P@K, R@K, nDCG@K o MAP@K
+en una librería externa. \texttt{evaluation/splits.py} fija la selección leave-one-out con
+una semilla derivada del protocolo y del usuario, para que el orden de las filas en la base
+de datos no altere la obra retenida.
+
+\subsubsection{Baseline aleatorio y features de contenido}
+
+El Plan 02-10 incorpora \texttt{rank\_random\_v1} como suelo de comparación. Selecciona con
+\texttt{random.Random(seed)} sobre los candidatos gobernados que no aparecen en la biblioteca
+de la persona usuaria. Ordenar previamente los identificadores y guardar una huella de la
+semilla, los candidatos y el resultado hace que la misma entrada produzca exactamente el
+mismo ranking.
+
+El modelo de contenido utiliza diccionarios dispersos con claves \texttt{genre:<slug>} y
+\texttt{platform:<slug>}. Las facetas se ponderan con $1/\sqrt{k}$ y se calcula el coseno
+con la biblioteca estándar. \texttt{WorkFeatureVector} es una caché versionada, no un modelo
+entrenado; \texttt{rebuild\_feature\_vectors} la rellena de forma idempotente. El perfil
+de usuario es una media ponderada de vectores normalizados y reutiliza la tabla de pesos del
+heurístico: completado vale 3, jugando 2, pendiente 1 y abandonado 0, más la aportación de
+la valoración local. El rating se mantiene fuera del vector para poder estudiarlo como una
+señal independiente.
 
 \subsection{Vistas y límite de ritmo}\label{sec:impl-vistas}
 

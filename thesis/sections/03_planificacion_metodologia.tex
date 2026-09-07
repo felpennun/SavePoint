@@ -69,7 +69,7 @@ La Tabla~\ref{tab:planning-arbol} enumera los artefactos principales del árbol 
 
 \begin{table}[htp]
 \centering
-\begin{tabular}{ | l | p{9.5cm} | }
+\begin{tabularx}{\textwidth}{ | Y | Y | }
     \hline
     \textbf{Artefacto} & \textbf{Función} \\
     \hline
@@ -89,7 +89,7 @@ La Tabla~\ref{tab:planning-arbol} enumera los artefactos principales del árbol 
     \hline
     \texttt{phases/<incremento>/deferred-items.md} & Hallazgos fuera de alcance, enrutados a trabajo posterior. \\
     \hline
-\end{tabular}
+\end{tabularx}
 \caption{Artefactos principales del árbol \texttt{.planning/}.}
 \label{tab:planning-arbol}
 \end{table}
@@ -106,6 +106,85 @@ de agentes descrito en la Sección~\ref{sec:met-ledger}, que ata cada artefacto 
 que lo produjo mediante un hash de contenido. Entre los tres, una decisión de la memoria se
 puede recorrer hacia atrás hasta su plan, su requisito y su discusión; hacia delante llega
 hasta la prueba y la firma que la verifican.
+
+\section{Planificación de la Fase 2: del producto al laboratorio}\label{sec:met-fase2}
+
+La Fase 2 se planificó como el puente entre la demostración de producto y la investigación
+reproducible. Su objetivo no era añadir una pantalla aislada, sino fijar las condiciones que
+permiten afirmar algo sobre un recomendador: qué obras entran en el corpus, qué significan
+las valoraciones, qué usuarios se simulan, cómo se construyen los candidatos y con qué
+métricas se comparan las listas. Las decisiones metodológicas se tomaron antes de cualquier
+ejecución de laboratorio y se conservaron en el directorio de planes de la fase.
+
+La planificación se dividió en seis olas. Las dos primeras cerraron la frontera del corpus,
+los ratings y el protocolo. La tercera reunió la búsqueda, la API de catálogo, los usuarios
+sintéticos y las primeras primitivas del recomendador. La cuarta reservó la interfaz de
+filtros y las variantes de contenido; la quinta, la ficha y la ejecución comparativa; y la
+sexta, la página final de recomendaciones. En esta versión están cerrados los planes 02-01,
+02-02, 02-03, 02-05, 02-07, 02-08 y 02-10. Los planes 02-04, 02-06, 02-09, 02-11, 02-12 y
+02-13 permanecen abiertos o pendientes de ejecución.
+
+El orden no es accidental. El corpus y el snapshot preceden al protocolo; el protocolo
+precede a la generación de usuarios y a la implementación de variantes; y solo entonces se
+puede ejecutar una comparación con garantías de que todos los algoritmos han recibido la
+misma partición y el mismo conjunto de candidatos. Una tarea completada ha superado las
+verificaciones de su contrato, pero no demuestra una superioridad algorítmica.
+
+\subsection{Decisiones previas a las pruebas de laboratorio}
+
+Las decisiones que bloquean una comparación posterior quedaron congeladas en
+\texttt{docs/methodology/protocol.json} y en
+\texttt{docs/methodology/evaluation-protocol.md}. El corpus se define mediante una vista
+versionada de obras principales con fecha, género y al menos una plataforma de la lista de
+39 plataformas. La ausencia de rating no excluye una obra. La vista es reversible y conserva
+el catálogo fuente para que una nueva decisión pueda producir otra versión sin reescribir la
+anterior.
+
+Las valoraciones de investigación se almacenan en
+\texttt{CorpusRatingSnapshot}. El modelo es insert-only por pareja de obra, fuente y versión
+de corpus. IGDB actúa como fuente primaria y RAWG como contraste acotado. El número mostrado
+en la ficha puede combinar información externa y valoraciones locales, pero esa mezcla
+pertenece al producto y no se utiliza como entrada mutable del laboratorio.
+
+La relevancia quedó fijada como una entrada de biblioteca con estado completado y una
+valoración de al menos siete medias estrellas
+(\texttt{rating\_half\_steps >= 7}). Para cada usuario se retiene una obra mediante
+\textit{leave-one-out}, con semilla 20260907, y se devuelve al conjunto de candidatos. Este
+conjunto es el corpus gobernado menos cualquier obra presente en la biblioteca, más la obra
+retenida. De este modo, todos los algoritmos predicen exactamente el mismo caso y no
+recomiendan obras ya conocidas.
+
+La población sintética generada en la Wave 3 combina ocho escenarios: monogénero severo,
+monogénero generoso, omnívoro medio, completista de saga, explorador de novedades,
+coleccionista de pendientes, jugador ocasional cold-start y veterano de biblioteca grande.
+Cada arquetipo varía el número de géneros preferidos, el tamaño de la biblioteca, la
+generosidad al puntuar y la mezcla de estados. Sus usuarios se identifican con el marcador
+\texttt{synthetic-eval-user} y una semilla por arquetipo, de modo que no contaminan el
+baseline de popularidad de la aplicación ni se presentan como actividad real.
+
+El protocolo utiliza \texttt{precision@k}, \texttt{recall@k}, \texttt{nDCG@k} y
+\texttt{MAP@k}, para $k\in\{5,10,20\}$, y fija \texttt{nDCG@10} como métrica titular. La
+rejilla de ajuste contiene 18 configuraciones, se selecciona en validación y el conjunto de
+prueba solo se puede consumir una vez. El protocolo declara explícitamente que la población
+es simulada: la ejecución de referencia produjo 200 usuarios y una cohorte independiente
+de 25 perfiles cold-start, con entre uno y tres juegos por perfil. Sus distribuciones de
+biblioteca, ratings y estados se conservan en el informe de verificación del repositorio.
+
+\subsection{Ratificaciones, incidencias y límites}
+
+El autor ratificó la lista de plataformas, la incorporación acotada de RAWG, el protocolo
+propuesto y la implementación del primer modelo de features con Python puro. RAWG se ejecutó
+en 18 lotes de 500 peticiones para limitar el coste de un reinicio y mantener la idempotencia.
+Se emparejaron 8.575 de 10.000 obras, pero la cobertura combinada siguió siendo 27.014 de
+193.885 obras gobernadas (13,9330\%), porque la selección estaba ordenada por
+\texttt{rating\_count} de IGDB. RAWG aporta, por tanto, contraste de fuente y no cobertura
+adicional en ese corte.
+
+El importador actual no tiene cobertura suficiente de franquicias ni desarrolladores. El
+vector de contenido los excluye mediante un gate de cobertura en lugar de imputarlos. La
+mezcla de rating mostrada en la ficha también quedó señalada para confirmación del autor y
+no debe confundirse con el término de rating del laboratorio, que procede del snapshot
+inmutable.
 
 \section{Agentes de inteligencia artificial y skills}\label{sec:met-agentes}
 
@@ -138,7 +217,7 @@ entre desarrollo y revisión propia de un equipo humano.
 
 \begin{table}[htp]
 \centering
-\begin{tabular}{ | l | p{9cm} | }
+\begin{tabularx}{\textwidth}{ | Y | Y | }
     \hline
     \textbf{Rol} & \textbf{Responsabilidad y límite} \\
     \hline
@@ -154,7 +233,7 @@ entre desarrollo y revisión propia de un equipo humano.
     \hline
     \texttt{gsd-code-reviewer} & Revisa todo el repositorio en busca de defectos con un contexto propio, distinto del de la implementación. \\
     \hline
-\end{tabular}
+\end{tabularx}
 \caption{Subagentes empleados y su responsabilidad.}
 \label{tab:subagentes}
 \end{table}
@@ -309,28 +388,28 @@ Las cifras son una estimación, no una medición.
 
 \begin{table}[htp]
 \centering
-\begin{tabular}{ | l | c | c | }
+\begin{tabularx}{\textwidth}{ | Y | Z | Z | }
     \hline
     \textbf{Bloque} & \textbf{Horas estimadas} & \textbf{Coste estimado (\euro{})} \\
     \hline
-    Análisis, requisitos y diseño & PENDIENTE & PENDIENTE \\
+    Análisis, requisitos y diseño & No registrado & No calculado \\
     \hline
-    Infraestructura reproducible y despliegue & PENDIENTE & PENDIENTE \\
+    Infraestructura reproducible y despliegue & No registrado & No calculado \\
     \hline
-    Implementación de backend y frontend & PENDIENTE & PENDIENTE \\
+    Implementación de backend y frontend & No registrado & No calculado \\
     \hline
-    Adquisición y congelación de datos & PENDIENTE & PENDIENTE \\
+    Adquisición y congelación de datos & No registrado & No calculado \\
     \hline
-    Pruebas, verificación y revisión & PENDIENTE & PENDIENTE \\
+    Pruebas, verificación y revisión & No registrado & No calculado \\
     \hline
-    \textbf{Total} & \textbf{PENDIENTE} & \textbf{PENDIENTE} \\
+    \textbf{Total} & \textbf{No disponible} & \textbf{No calculado} \\
     \hline
-\end{tabular}
+\end{tabularx}
 \caption{Estimación de esfuerzo y presupuesto del proyecto.}
 \label{tab:presupuesto}
 \end{table}
 
-\todo[inline]{El autor debe consolidar el registro temporal (horas por bloque) y una tarifa de referencia citada para completar la Tabla \ref{tab:presupuesto}. La tarifa de la Junta de Andalucía de 2018 usada por la referencia BarGAIN es una opción; conviene una fuente actualizada si existe.}
+\todo[inline]{El autor debe consolidar el registro temporal (horas por bloque) y documentar una tarifa de referencia vigente para completar la Tabla \ref{tab:presupuesto}.}
 % PENDIENTE: rellenar horas y coste reales en la Tabla \ref{tab:presupuesto}.
 
 \section{Riesgos y mitigaciones}\label{sec:met-riesgos}
@@ -340,7 +419,7 @@ mantienen bajo vigilancia.
 
 \begin{table}[htp]
 \centering
-\begin{tabular}{ | p{4.2cm} | p{9cm} | }
+\begin{tabularx}{\textwidth}{ | Y | Y | }
     \hline
     \textbf{Riesgo} & \textbf{Mitigación} \\
     \hline
@@ -358,7 +437,7 @@ mantienen bajo vigilancia.
     \hline
     Despliegue no conectado a datos reales & Decisión registrada del autor de posponer esa conexión al final del proyecto; el entorno local reproducible es la vía de demostración. \\
     \hline
-\end{tabular}
+\end{tabularx}
 \caption{Riesgos identificados y sus mitigaciones.}
 \label{tab:riesgos}
 \end{table}

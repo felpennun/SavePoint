@@ -28,6 +28,7 @@ def _igdb_work(*, title: str, title_en: str = "", in_corpus: bool = True) -> Gam
         title_en=title_en or title,
         title_es="",
         in_corpus=in_corpus,
+        total_rating_count=1000,
     )
 
 

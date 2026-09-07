@@ -118,14 +118,23 @@ class GameDetailView(APIView):
             work = (
                 GameWork.objects.select_related()
                 .prefetch_related(
-                    "releases__platform", "releases__editions", "assets", "source_records", "genres"
+                    "releases__platform",
+                    "releases__editions",
+                    "assets",
+                    "source_records",
+                    "genres",
+                    "related_children__child_work__assets",
+                    "related_children__child_work__releases__platform",
                 )
                 .get(canonical_slug=slug)
             )
         except GameWork.DoesNotExist:
             # Generic 404 -- never confirm/deny via a distinguishing message.
             return Response({"detail": "Not found."}, status=404)
-        return Response(GameDetailSerializer(work).data)
+        locale = request.query_params.get("locale")
+        if locale not in {"es", "en"}:
+            locale = "en"
+        return Response(GameDetailSerializer(work, context={"locale": locale}).data)
 
 
 class NewReleasesView(APIView):

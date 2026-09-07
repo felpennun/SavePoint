@@ -9,8 +9,9 @@ the same boundary.
 from __future__ import annotations
 
 import re
+from datetime import date
 
-from django.db.models import QuerySet
+from django.db.models import Q, QuerySet
 
 from catalogue.models import GameWork
 
@@ -59,6 +60,11 @@ PLATFORM_ALLOWLIST: tuple[tuple[int, str, str], ...] = (
 
 ALLOWLIST_SLUGS = frozenset(slug for _igdb_id, slug, _display_name in PLATFORM_ALLOWLIST)
 
+# The project catalogue is a reproducible snapshot, not a list of announced
+# releases. Keep future-dated imports out of the application until they have
+# actually been released and can be verified in a later corpus snapshot.
+MAX_CATALOGUE_RELEASE_DATE = date(2026, 12, 31)
+
 
 def is_valid_name(name: str | None) -> bool:
     """Return whether a title has at least two alphanumeric characters."""
@@ -70,7 +76,13 @@ def is_valid_name(name: str | None) -> bool:
 def governed_works(corpus_version: str | None = None) -> QuerySet[GameWork]:
     """Return the canonical governed view, optionally pinned to one version."""
 
-    queryset = GameWork.objects.filter(is_dlc=False, in_corpus=True)
+    queryset = GameWork.objects.filter(
+        is_dlc=False,
+        in_corpus=True,
+    ).filter(
+        Q(first_release_date__isnull=True)
+        | Q(first_release_date__lte=MAX_CATALOGUE_RELEASE_DATE)
+    )
     if corpus_version is not None:
         queryset = queryset.filter(corpus_version=corpus_version)
     return queryset

@@ -219,6 +219,10 @@ textarea {
   padding: var(--space-xl) var(--space-lg) var(--space-3xl);
 }
 
+.sp-game-page {
+  max-width: 1440px;
+}
+
 .sp-h1 {
   font-size: var(--text-display);
   font-weight: 600;
@@ -415,6 +419,29 @@ textarea {
   margin: 0;
 }
 
+.sp-collection-grid > li {
+  height: 24rem;
+  min-width: 0;
+}
+
+.sp-collection-grid .sp-card {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sp-collection-grid .sp-card-title {
+  min-height: 2.8em;
+}
+
+.sp-collection-grid .sp-card-meta {
+  min-height: 1.35rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .sp-card-stars {
   color: var(--color-rating);
   font-size: var(--text-meta);
@@ -513,21 +540,53 @@ textarea {
   padding: 1px var(--space-sm);
 }
 
+.sp-recommendation-shelves {
+  display: grid;
+  gap: var(--space-2xl);
+}
+
 .sp-shelf {
-  margin-bottom: var(--space-2xl);
+  min-width: 0;
+}
+
+.sp-recommendation-shelves .sp-h2 {
+  margin-top: 0;
 }
 
 .sp-shelf-track {
   display: flex;
   gap: var(--space-md);
   overflow-x: auto;
+  min-height: 15.5rem;
   padding-bottom: var(--space-sm);
   scroll-snap-type: x proximity;
 }
 
-.sp-shelf-track .sp-card {
+.sp-shelf-track > li {
   flex: 0 0 120px;
+  height: 15rem;
+}
+
+.sp-shelf-track .sp-card {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
   scroll-snap-align: start;
+}
+
+.sp-shelf-track .sp-cover {
+  width: 120px;
+  height: 160px;
+  aspect-ratio: 3 / 4;
+  flex: 0 0 160px;
+}
+
+.sp-shelf-track .sp-card-title {
+  min-height: 2.8em;
+}
+
+.sp-shelf-track .sp-card-meta {
+  min-height: 1.35rem;
 }
 
 .sp-empty {
@@ -558,6 +617,192 @@ textarea {
   align-items: end;
 }
 
+.sp-content-sidebar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 292px);
+  gap: var(--space-2xl);
+  align-items: start;
+}
+
+.sp-results-column {
+  min-width: 0;
+}
+
+.sp-filter-column {
+  min-width: 0;
+  order: 2;
+  position: sticky;
+  top: var(--space-lg);
+}
+
+.sp-filter-column .sp-filterbar {
+  margin: 0;
+}
+
+.sp-filter-column .sp-filterbar-body,
+.sp-filter-column .sp-controls-row {
+  grid-template-columns: 1fr;
+}
+
+.sp-filter-column .sp-controls-row {
+  display: grid;
+  align-items: stretch;
+  padding: var(--space-lg);
+}
+
+.sp-library-controls {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.sp-library-section {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0 0 var(--space-lg);
+  border: 0;
+  border-bottom: 1px solid var(--color-surface-border);
+}
+
+.sp-library-section legend,
+.sp-library-section h3 {
+  margin: 0;
+  padding: 0;
+  font-size: var(--text-body);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.sp-status-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-sm);
+}
+
+.sp-choice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  color: var(--color-text-secondary);
+}
+
+.sp-section-heading-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.sp-rating-value {
+  color: var(--color-text-secondary);
+  font-size: var(--text-meta);
+}
+
+.sp-interactive-stars {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.sp-star-unit {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.35rem;
+  height: 2.75rem;
+}
+
+.sp-star-glyph {
+  color: var(--color-text-muted);
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.sp-star-glyph.is-filled {
+  color: var(--color-rating);
+}
+
+.sp-star-glyph.is-half {
+  background: linear-gradient(90deg, var(--color-rating) 50%, var(--color-text-muted) 50%);
+  background-clip: text;
+  color: transparent;
+}
+
+.sp-star-half-button {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  width: 50%;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0;
+}
+
+.sp-star-half-button.is-left {
+  left: 0;
+}
+
+.sp-star-half-button.is-right {
+  right: 0;
+}
+
+.sp-star-half-button:hover,
+.sp-star-half-button:focus-visible {
+  outline: 2px solid var(--color-rating);
+  outline-offset: -2px;
+}
+
+.sp-copy-list {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.sp-copy-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-sm);
+  align-items: end;
+  padding: var(--space-md);
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-raised);
+}
+
+.sp-copy-remove {
+  grid-column: 1 / -1;
+  width: 100%;
+  white-space: normal;
+  line-height: 1.25;
+}
+
+.sp-copy-add {
+  width: 100%;
+}
+
+.sp-library-save {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.sp-library-save .sp-btn-primary {
+  width: 100%;
+}
+
+.sp-bulk-selection {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.sp-selection-list {
+  display: grid;
+  gap: var(--space-sm);
+  max-height: 20rem;
+  overflow-y: auto;
+}
+
 .sp-summary-dl {
   display: flex;
   gap: var(--space-lg);
@@ -582,13 +827,31 @@ textarea {
   color: var(--color-text-primary);
 }
 
-/* Game detail: two columns on >= md, stacked on mobile (01.1-UI-SPEC
+/* Game detail: game cover and information on the left, the game configuration
+   panel on the right, and all sections stacked on mobile (01.1-UI-SPEC
    Screen Contract 3). */
 .sp-detail-grid {
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 340px);
   gap: var(--space-2xl);
   align-items: start;
+}
+
+.sp-detail-main {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: var(--space-2xl);
+  min-width: 0;
+}
+
+.sp-detail-content {
+  min-width: 0;
+}
+
+.sp-game-config {
+  min-width: 0;
+  position: sticky;
+  top: var(--space-lg);
 }
 
 .sp-cover-hero {
@@ -601,8 +864,25 @@ textarea {
     grid-template-columns: 1fr;
     gap: var(--space-lg);
   }
+  .sp-detail-main {
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
   .sp-cover-hero {
     width: 200px;
+  }
+  .sp-game-config {
+    position: static;
+  }
+}
+
+@media (min-width: 821px) and (max-width: 1180px) {
+  .sp-detail-grid,
+  .sp-detail-main {
+    gap: var(--space-xl);
+  }
+  .sp-cover-hero {
+    width: 220px;
   }
 }
 
@@ -620,9 +900,8 @@ textarea {
   color: var(--color-text-muted);
 }
 
-/* Filter bar: inline on desktop, a <details> disclosure on mobile
-   (01.1-UI-SPEC Screen Contract 2). The DOM order is identical at every
-   width -- only the summary visibility and forced-open behaviour change. */
+/* Filter bar: a right-hand desktop column, collapsing into a disclosure on
+   mobile (01.1-UI-SPEC Screen Contracts 2 and 6). */
 .sp-filterbar {
   margin: var(--space-xl) 0;
 }
@@ -636,6 +915,81 @@ textarea {
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: var(--space-md);
   align-items: end;
+}
+
+.sp-detail-summary {
+  max-width: 72ch;
+  color: var(--color-text-secondary);
+  line-height: 1.65;
+}
+
+.sp-detail-rating-count {
+  margin: calc(var(--space-xs) * -1) 0 var(--space-md);
+}
+
+.sp-release-list {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.sp-release-item {
+  display: grid;
+  gap: 2px;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-raised);
+  color: var(--color-text-secondary);
+  font-size: var(--text-meta);
+}
+
+.sp-release-item strong {
+  color: var(--color-text-primary);
+  font-size: var(--text-body);
+}
+
+.sp-related-list {
+  display: grid;
+  gap: var(--space-sm);
+  list-style: none;
+  padding: 0;
+}
+
+.sp-related-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  color: inherit;
+  text-decoration: none;
+  padding: var(--space-sm);
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-raised);
+}
+
+.sp-related-cover {
+  flex: 0 0 72px;
+  width: 72px;
+  height: 96px;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: var(--radius-control);
+  background: var(--color-surface-overlay);
+}
+
+.sp-related-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sp-related-card > span:last-child {
+  display: grid;
+  gap: 2px;
+}
+
+.sp-related-card small {
+  color: var(--color-text-secondary);
 }
 
 /* Phase 2 product polish utilities. Skeleton consumers supply the final
@@ -781,6 +1135,28 @@ textarea {
 }
 
 @media (max-width: 720px) {
+  .sp-content-sidebar {
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+
+  .sp-filter-column {
+    position: static;
+    order: -1;
+  }
+
+  .sp-copy-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .sp-collection-grid > li {
+    height: 22rem;
+  }
+
+  .sp-copy-remove {
+    grid-column: 1 / -1;
+  }
+
   .sp-filterbar > summary {
     display: flex;
     align-items: center;

@@ -37,6 +37,7 @@ def _make_work(
         title_es="",
         is_dlc=is_dlc,
         in_corpus=in_corpus,
+        total_rating_count=1000,
     )
     GameAlias.objects.create(work=work, locale="en", value=title, normalized_value=normalize_title(title))
     if platform_name:
@@ -97,6 +98,88 @@ def test_whitespace_only_query_returns_unfiltered_catalogue() -> None:
     _make_work("Beta Game")
     result = search_games("   ")
     assert result["count"] == 2
+
+
+@pytest.mark.django_db
+def test_catalogue_without_query_defaults_to_relevance() -> None:
+    _make_work("Unrated Game")
+    rated = _make_work("Highly Rated Game")
+    rated.total_rating = 96.0
+    rated.save(update_fields=["total_rating"])
+
+    result = search_games()
+
+    assert result["sort"] == "relevance"
+    assert [work.original_title for work in result["results"]] == [
+        "Highly Rated Game",
+        "Unrated Game",
+    ]
+
+
+@pytest.mark.django_db
+def test_default_relevance_keeps_works_with_fewer_than_one_thousand_ratings() -> None:
+    included = _make_work("Included Default Result")
+    included.total_rating = 90.0
+    included.save(update_fields=["total_rating"])
+    excluded = _make_work("Excluded Small Sample")
+    excluded.total_rating = 99.0
+    excluded.total_rating_count = 999
+    excluded.save(update_fields=["total_rating", "total_rating_count"])
+
+    result = search_games()
+
+    assert result["sort"] == "relevance"
+    assert [work.original_title for work in result["results"]] == [
+        "Included Default Result",
+        "Excluded Small Sample",
+    ]
+
+
+@pytest.mark.django_db
+def test_relevance_uses_stepped_rating_count_tiers() -> None:
+    expected = [
+        ("Tier 1000", 1000, 60.0),
+        ("Tier 500", 500, 99.0),
+        ("Tier 200", 200, 98.0),
+        ("Tier 100", 100, 97.0),
+        ("Tier 50", 50, 96.0),
+        ("Tier 10", 10, 95.0),
+        ("Tier No Ratings", 0, 100.0),
+        ("Tier Missing Count", None, 90.0),
+    ]
+    for title, rating_count, rating in expected:
+        work = _make_work(title)
+        work.total_rating = rating
+        work.total_rating_count = rating_count
+        work.save(update_fields=["total_rating", "total_rating_count"])
+
+    result = search_games()
+
+    assert [work.original_title for work in result["results"]] == [title for title, _, _ in expected]
+
+
+@pytest.mark.django_db
+def test_relevance_uses_rating_tier_before_score_for_search() -> None:
+    low = _make_work("Elden Ring Low")
+    low.total_rating = 60.0
+    low.total_rating_count = 1000
+    low.save(update_fields=["total_rating", "total_rating_count"])
+    high = _make_work("Elden Ring High")
+    high.total_rating = 95.0
+    high.save(update_fields=["total_rating"])
+    too_small = _make_work("Elden Ring Small")
+    too_small.total_rating = 99.0
+    too_small.total_rating_count = 999
+    too_small.save(update_fields=["total_rating", "total_rating_count"])
+
+    result = search_games("Elden Ring")
+
+    assert result["sort"] == "relevance"
+    assert [work.original_title for work in result["results"]] == [
+        "Elden Ring High",
+        "Elden Ring Low",
+        "Elden Ring Small",
+    ]
 
 
 @pytest.mark.django_db
@@ -177,6 +260,7 @@ def _work(
         is_dlc=is_dlc,
         first_release_date=date(year, 1, 1) if year else None,
         total_rating=rating,
+        total_rating_count=1000,
         in_corpus=in_corpus,
     )
     GameAlias.objects.create(work=work, locale="en", value=title, normalized_value=normalize_title(title))
@@ -379,6 +463,7 @@ def test_serializer_exposes_total_rating_and_genres() -> None:
     client = APIClient()
     card = client.get("/api/catalogue/games/", {"q": "Rated"}).json()["results"][0]
     assert card["total_rating"] == 88.5
+    assert card["total_rating_count"] == 1000
     assert card["genres"] == [{"slug": "role-playing-rpg", "name": "Role-playing (RPG)"}]
 
 

@@ -49,6 +49,13 @@
 }
 \setlength{\marginparwidth}{2cm} 
 
+% Columnas adaptables para tablas: evitan que los textos largos desborden la página.
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{Z}{>{\centering\arraybackslash}X}
+\renewcommand{\tabularxcolumn}[1]{>{\small}m{#1}}
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.15}
+
 % Limite de profundidad del índice
 \setcounter{tocdepth}{2}
 

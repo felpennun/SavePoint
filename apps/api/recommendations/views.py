@@ -26,7 +26,18 @@ _DTO_KEYS = (
     "limitation",
     "results",
 )
-_ITEM_KEYS = ("work_id", "slug", "title", "score", "matched_genres")
+_ITEM_KEYS = (
+    "work_id",
+    "slug",
+    "title",
+    "score",
+    "catalogue_rating",
+    "catalogue_rating_count",
+    "year",
+    "platform_summary",
+    "cover",
+    "matched_genres",
+)
 
 
 class RecommendationsView(APIView):

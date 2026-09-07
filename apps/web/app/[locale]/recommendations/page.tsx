@@ -12,7 +12,7 @@ import { getPersonalRecommendations, groupRecommendationsByGenre } from "@/lib/a
  * The independent D-04 personalized page: it wires the D-09 backend
  * contract (`GET /api/recommendations/genre-taste/`, `IsAuthenticated`)
  * into genre-grouped horizontal shelves (D-UI-4), each with a
- * plain-language explainer and per-card genre-overlap evidence, plus an
+ * localized visible heading. The API retains the
  * explicit `algorithm_id` + `limitation` disclosure so it can never be
  * confused with the public popularity baseline (REC-02, still shown
  * separately as `RecommendationStrip`) or the Phase 6 research recommender
@@ -54,9 +54,6 @@ export default async function RecommendationsPage({
 
   return (
     <main className="sp-page">
-      <h1 className="sp-h1">{r.heading}</h1>
-      <p className="sp-lead">{r.intro}</p>
-
       {response.kind === "error" ? (
         <div className="sp-empty" role="alert">
           <p className="sp-lead" style={{ marginInline: "auto" }}>
@@ -68,20 +65,6 @@ export default async function RecommendationsPage({
         </div>
       ) : (
         <>
-          {data ? (
-            <section className="sp-disclosure" aria-label={r.methodHeading}>
-              <p className="sp-meta" style={{ margin: "0 0 var(--space-xs)" }}>
-                {r.methodHeading}
-              </p>
-              <p className="sp-muted" style={{ margin: "0 0 var(--space-xs)" }}>
-                {r.methodAlgorithm.replace("{id}", data.algorithm_id)}
-              </p>
-              <p className="sp-muted" style={{ margin: 0 }}>
-                {data.limitation}
-              </p>
-            </section>
-          ) : null}
-
           {showEmpty ? (
             <div className="sp-empty">
               <p className="sp-h2" style={{ margin: 0 }}>
@@ -95,14 +78,11 @@ export default async function RecommendationsPage({
               </Link>
             </div>
           ) : (
-            <>
-              <p className="sp-muted" style={{ margin: "0 0 var(--space-xl)" }}>
-                {r.excludedNote}
-              </p>
+            <div className="sp-recommendation-shelves">
               {shelves.map((shelf) => (
                 <RecommendationShelf key={shelf.genreSlug} shelf={shelf} locale={locale} />
               ))}
-            </>
+            </div>
           )}
         </>
       )}

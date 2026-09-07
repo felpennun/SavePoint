@@ -4,18 +4,16 @@ import { notFound } from "next/navigation";
 
 import { CoverImage } from "@/components/CoverImage";
 import { LibraryControls } from "@/components/LibraryControls";
-import { RecommendationStrip } from "@/components/RecommendationStrip";
 import { ScorePill } from "@/components/ScorePill";
 import { getDictionary } from "@/i18n";
-import { fetchGameDetail, fetchPopularity } from "@/lib/api";
+import { fetchGameDetail } from "@/lib/api";
 
 /**
- * Game detail (01.1-UI-SPEC Screen Contract 3, redesign only). Two-column
- * on >= md: cover hero left; title / IGDB ScorePill / genres / platforms /
- * release date / LibraryControls / provenance right. Missing cover ->
- * first-party placeholder (CoverImage onError). Missing score/genres/
- * platforms -> the row is omitted, never an empty heading. Popularity is a
- * secondary panel whose failure must not blank the page.
+ * Game detail (01.1-UI-SPEC Screen Contract 3, redesign only). Three columns
+ * on wide screens: cover hero left, game information in the centre, and the
+ * game configuration panel on the right. Missing cover -> first-party placeholder
+ * (CoverImage onError). Missing score/genres/platforms -> the row is omitted,
+ * never an empty heading.
  */
 export default async function GameDetailPage({
   params,
@@ -26,7 +24,7 @@ export default async function GameDetailPage({
   const locale = rawLocale === "en" ? "en" : "es";
   const dict = getDictionary(locale);
 
-  const game = await fetchGameDetail(id);
+  const game = await fetchGameDetail(id, locale);
   if (!game) {
     notFound();
   }
@@ -34,48 +32,36 @@ export default async function GameDetailPage({
   const cookieStore = await cookies();
   const isAuthenticated = cookieStore.has("sessionid");
 
-  let popularityResults: Awaited<ReturnType<typeof fetchPopularity>>["results"] = [];
-  try {
-    const popularity = await fetchPopularity();
-    popularityResults = popularity.results.filter((r) => r.work_id !== game.id).slice(0, 5);
-  } catch {
-    popularityResults = [];
-  }
-
   const platforms = Array.from(
     new Set(game.releases.map((r) => r.platform).filter((p): p is string => Boolean(p))),
   );
-  const releaseDates = game.releases
-    .map((r) => r.release_date)
-    .filter((d): d is string => Boolean(d))
-    .sort();
-  const firstReleaseDate = releaseDates[0];
   const genres = game.genres ?? [];
 
   return (
-    <main className="sp-page">
+    <main className="sp-page sp-game-page">
       <div className="sp-detail-grid">
-        <div className="sp-cover-hero">
-          <div className="sp-cover">
-            {game.cover.is_placeholder ? (
-              <div className="sp-cover-placeholder" data-testid="cover-placeholder">
-                <span>{game.title}</span>
-                <span className="visually-hidden">{dict.common.coverMissing}</span>
-              </div>
-            ) : (
-              <CoverImage
-                src={game.cover.url}
-                alt={game.cover.alt}
-                title={game.title}
-                missingLabel={dict.common.coverMissing}
-                width={280}
-                height={373}
-              />
-            )}
+        <div className="sp-detail-main">
+          <div className="sp-cover-hero">
+            <div className="sp-cover">
+              {game.cover.is_placeholder ? (
+                <div className="sp-cover-placeholder" data-testid="cover-placeholder">
+                  <span>{game.title}</span>
+                  <span className="visually-hidden">{dict.common.coverMissing}</span>
+                </div>
+              ) : (
+                <CoverImage
+                  src={game.cover.url}
+                  alt={game.cover.alt}
+                  title={game.title}
+                  missingLabel={dict.common.coverMissing}
+                  width={280}
+                  height={373}
+                />
+              )}
+            </div>
           </div>
-        </div>
 
-        <div>
+          <div className="sp-detail-content">
           <h1 className="sp-h1">
             {game.title}{" "}
             {game.year != null ? (
@@ -95,6 +81,12 @@ export default async function GameDetailPage({
           ) : (
             <span className="visually-hidden">{dict.card.score.none}</span>
           )}
+
+          {game.total_rating_count != null || game.rating_count != null ? (
+            <p className="sp-meta sp-detail-rating-count" aria-label={dict.detail.ratings}>
+              {dict.detail.ratings}: {game.total_rating_count ?? game.rating_count}
+            </p>
+          ) : null}
 
           {genres.length > 0 ? (
             <>
@@ -116,35 +108,47 @@ export default async function GameDetailPage({
             </>
           ) : null}
 
-          {firstReleaseDate ? (
-            <>
-              <h2 className="sp-h2">{dict.detail.releaseDate}</h2>
-              <p className="sp-kv">
-                {new Intl.DateTimeFormat(locale, { dateStyle: "long" }).format(new Date(firstReleaseDate))}
-              </p>
-            </>
+          {game.summary || locale === "es" ? (
+            <section>
+              <h2 className="sp-h2">{dict.detail.summary}</h2>
+              <p className="sp-detail-summary">{game.summary || dict.detail.summaryUnavailable}</p>
+            </section>
           ) : null}
 
-          <div className="sp-surface" style={{ marginTop: "var(--space-lg)" }}>
-            <LibraryControls workId={game.id} locale={locale} isAuthenticated={isAuthenticated} releases={game.releases} />
-          </div>
-
           {game.related_content.length > 0 ? (
-            <section aria-label={locale === "es" ? "Contenido relacionado" : "Related content"}>
-              <h2 className="sp-h2">{locale === "es" ? "Contenido relacionado" : "Related content"}</h2>
-              <ul>
+            <section aria-label={dict.detail.relatedContent}>
+              <h2 className="sp-h2">{dict.detail.relatedContent}</h2>
+              <ul className="sp-related-list">
                 {game.related_content.map((related) => (
                   <li key={related.id}>
-                    {related.title} ({related.relation})
+                    <Link href={`/${locale}/games/${related.slug}`} className="sp-related-card">
+                      <div className="sp-related-cover">
+                        {related.cover.is_placeholder ? (
+                          <div className="sp-cover-placeholder" data-testid="cover-placeholder">
+                            <span>{related.title}</span>
+                          </div>
+                        ) : (
+                          <CoverImage
+                            src={related.cover.url}
+                            alt={related.cover.alt}
+                            title={related.title}
+                            missingLabel={dict.common.coverMissing}
+                            width={72}
+                            height={96}
+                          />
+                        )}
+                      </div>
+                      <span>
+                        <strong>{related.title}</strong>
+                        <small>{related.relation === "dlc" ? dict.detail.dlc : dict.detail.expansion}</small>
+                        <small>{[related.year, related.platform_summary].filter(Boolean).join(" · ")}</small>
+                      </span>
+                    </Link>
                   </li>
                 ))}
               </ul>
             </section>
           ) : null}
-
-          <div style={{ marginTop: "var(--space-xl)", paddingTop: "var(--space-md)", borderTop: "1px solid var(--color-surface-border)" }}>
-            <RecommendationStrip results={popularityResults} locale={locale} />
-          </div>
 
           {game.provenance ? (
             <section aria-label={dict.provenance.heading} className="sp-provenance">
@@ -163,7 +167,14 @@ export default async function GameDetailPage({
               </p>
             </section>
           ) : null}
+          </div>
         </div>
+
+        <aside className="sp-game-config" aria-label={locale === "es" ? "Configuración del videojuego" : "Game configuration"}>
+          <div className="sp-surface">
+            <LibraryControls workId={game.id} locale={locale} isAuthenticated={isAuthenticated} releases={game.releases} />
+          </div>
+        </aside>
       </div>
     </main>
   );

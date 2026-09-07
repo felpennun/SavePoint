@@ -3,13 +3,10 @@ import { getDictionary } from "@/i18n";
 import type { PersonalRecommendationShelf } from "@/lib/api";
 
 /**
- * RecommendationShelf (01.1-UI-SPEC, D-UI-4). One <section> per top taste
- * genre: a labelled <h2> ("Because you play a lot of {genre}"), a
- * plain-language explainer, and a horizontally scrollable GameCard row
- * (120px cover variant). Each card carries its own genre-overlap
- * evidence line. Contains its own overflow -- never causes page-level
- * horizontal scroll. Structurally distinct from the flat popularity
- * RecommendationStrip <ol> (D-09).
+ * RecommendationShelf renders one horizontally scrollable GameCard list per
+ * recommendation genre. The page intentionally keeps only these lists in
+ * the successful state; explanatory copy belongs in the thesis, not in the
+ * demo surface.
  */
 export function RecommendationShelf({
   shelf,
@@ -18,19 +15,13 @@ export function RecommendationShelf({
   shelf: PersonalRecommendationShelf;
   locale: string;
 }) {
-  const dict = getDictionary(locale);
-  const r = dict.recommendations;
-  const heading = r.shelfHeading.replace("{genre}", shelf.genre);
-  const explainer = r.shelfEvidence.replace("{genre}", shelf.genre);
+  const heading = getDictionary(locale).recommendations.shelfHeading.replace("{genre}", shelf.genre);
 
   return (
-    <section className="sp-shelf" aria-label={heading}>
-      <h2 className="sp-h2" style={{ margin: "0 0 var(--space-xs)" }}>
+    <section className="sp-shelf" aria-labelledby={`recommendation-${shelf.genreSlug}`}>
+      <h2 id={`recommendation-${shelf.genreSlug}`} className="sp-h2">
         {heading}
       </h2>
-      <p className="sp-muted" style={{ margin: "0 0 var(--space-md)" }}>
-        {explainer}
-      </p>
       <ul className="sp-shelf-track" style={{ listStyle: "none", margin: 0, padding: 0 }}>
         {shelf.items.map((item) => (
           <GameCard
@@ -39,16 +30,13 @@ export function RecommendationShelf({
               id: item.work_id,
               slug: item.slug,
               title: item.title,
-              year: null,
-              platform_summary: "",
-              cover: { url: null, is_placeholder: true, alt: item.title },
+              year: item.year,
+              platform_summary: item.platform_summary,
+              cover: item.cover,
             }}
             locale={locale}
             coverVariant="shelf"
-            evidence={r.cardEvidence.replace(
-              "{genres}",
-              item.matched_genres.map((genre) => genre.name).join(", "),
-            )}
+            score={item.catalogue_rating}
           />
         ))}
       </ul>

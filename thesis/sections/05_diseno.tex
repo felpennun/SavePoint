@@ -12,7 +12,8 @@ SavePoint es un monolito modular con dos ejecutables, representado en la
 Figura~\ref{fig:arquitectura}. El backend, en \texttt{apps/api/}, usa Django 5.2 con soporte
 a largo plazo (LTS) y Django REST Framework (DRF) sobre PostgreSQL 18, con el mapeo
 objeto-relacional (ORM) de Django como interfaz de persistencia. Los módulos se separan por
-dominio (\texttt{catalogue}, \texttt{library}, \texttt{accounts}, \texttt{recommendations})
+dominio (\texttt{catalogue}, \texttt{library}, \texttt{accounts}, \texttt{recommendations},
+\texttt{evaluation})
 pero comparten despliegue y base de datos. El frontend, en \texttt{apps/web/}, es una
 aplicación Next.js 16 con React 19 y TypeScript en modo estricto, que renderiza en el
 servidor (SSR) las páginas públicas. El navegador solo llama a rutas del mismo origen de
@@ -37,7 +38,7 @@ límites de dominio y las migraciones actúan como puntos de salida si una decis
 
 \begin{table}[htp]
 \centering
-\begin{tabular}{ | l | p{10.5cm} | }
+\begin{tabularx}{\textwidth}{ | Y | Y | }
     \hline
     \textbf{Registro} & \textbf{Decisión y consecuencia principal} \\
     \hline
@@ -55,7 +56,7 @@ límites de dominio y las migraciones actúan como puntos de salida si una decis
     \hline
     ADR-007 & Heurístico determinista de afinidad por géneros para la página de recomendaciones. Entrega el requisito como página real y explicable sin adelantar una comparación sistemática de recomendadores, que queda fuera del alcance de esta memoria. \\
     \hline
-\end{tabular}
+\end{tabularx}
 \caption{Registros de decisión de arquitectura vigentes.}
 \label{tab:adr}
 \end{table}
@@ -85,7 +86,7 @@ Tabla~\ref{tab:endpoints} recoge los puntos de acceso principales.
 
 \begin{table}[htp]
 \centering
-\begin{tabular}{ | l | l | p{6.2cm} | }
+\begin{tabularx}{\textwidth}{ | Y | Y | Y | }
     \hline
     \textbf{Método y ruta} & \textbf{Acceso} & \textbf{Función} \\
     \hline
@@ -109,7 +110,7 @@ Tabla~\ref{tab:endpoints} recoge los puntos de acceso principales.
     \hline
     \texttt{GET /api/recommendations/genre-taste/} & Sesión & Recomendación por afinidad de géneros de la persona autenticada. \\
     \hline
-\end{tabular}
+\end{tabularx}
 \caption{Puntos de acceso principales de la API.}
 \label{tab:endpoints}
 \end{table}
@@ -118,6 +119,47 @@ La proyección pública de un perfil se construye con una lista explícita de ca
 escrita a mano, en lugar de una serialización automática por introspección del modelo. Así,
 exponer un campo privado nuevo requiere una decisión explícita, que es el modo de fallo
 opuesto al de ocultarlo por olvido.
+
+\subsection{Diseño del laboratorio de recomendación}
+
+El laboratorio se diseñó como una tubería fuera de línea, separada de las peticiones de
+usuario. Su entrada no es el valor mutable de \texttt{GameWork.total\_rating}, sino una
+pareja de versión de corpus y snapshot de valoraciones. A partir de ella, el runner resuelve
+la partición de usuarios, construye el manifiesto de candidatos de cada usuario y ejecuta
+las variantes sobre la misma entrada. El artefacto resultante debe conservar la versión del
+código, la huella del protocolo, las semillas, la huella del manifiesto y las métricas por
+usuario y por $k$.
+
+La aplicación \texttt{evaluation} separa cuatro responsabilidades. El cargador del
+protocolo valida las claves, el tamaño de la rejilla y el consumo único del test. El módulo
+de particiones selecciona la obra relevante retenida y comprueba que train, validation y test
+sean conjuntos disjuntos y completos. El módulo de métricas calcula P@K, R@K, nDCG@K y MAP@K
+con fórmulas escritas y probadas en el proyecto. Por último, el runner orquesta los algoritmos
+y escribe un artefacto JSON con sus huellas y resultados.
+
+El primer algoritmo avanzado se apoya en vectores dispersos de géneros y plataformas. Cada
+faceta pesa $1/\sqrt{k}$ para que una obra con muchos géneros no domine la similitud. El
+perfil de la persona usuaria es la media de los vectores normalizados de su biblioteca,
+ponderada por el estado y la valoración con los mismos pesos que el heurístico de géneros.
+La similitud coseno se implementó con la biblioteca estándar de Python. El rating no forma
+parte del vector: se incorpora después como término separado calculado desde
+\texttt{CorpusRatingSnapshot}.
+
+Para un candidato con rating propio, el término de rating se obtiene mediante una mezcla por
+confianza entre su rating del snapshot y el perfil medio de rating de sus géneros. La
+confianza se acota a partir de \texttt{rating\_count}; así, una observación aislada no domina
+la señal. Si el candidato carece de rating propio, se utiliza la mediana de sus géneros y se
+marca \texttt{rating\_term\_is\_fallback=true}. En ambos casos el resultado se normaliza a
+[0,1] y queda separado de la similitud.
+
+Las tres variantes planificadas comparten el conjunto de candidatos, la semántica de
+exclusión y el DTO versionado. La variante \texttt{weighted} combina similitud y rating
+mediante suma ponderada; \texttt{multiplicative} multiplica ambas señales; y
+\texttt{twostage} agrupa por bandas de similitud y ordena cada banda mediante el rating.
+Las explicaciones no generan texto libre: devuelven una tabla determinista de contribuciones
+por género, el valor del término de rating y si se usó el fallback por género. El parámetro
+\texttt{algorithm\_id} solo puede seleccionar identificadores de una allowlist, nunca una
+función o importación dinámica.
 
 \section{Diseño de la interfaz de usuario}\label{sec:dis-ui}
 

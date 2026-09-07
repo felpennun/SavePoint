@@ -5,7 +5,7 @@ evidencia de procedencia se conserva. El sistema integra dos fuentes de datos de
 primera es un corpus curado de ciento cincuenta juegos procedente de Wikidata, que actúa como
 la referencia citable y estable. La segunda es el catálogo a escala real procedente de IGDB,
 con más de trescientas mil obras. Las dos conviven en la base de datos, indexadas por su
-fuente.
+fuente, pero la evaluación solo consume la vista gobernada y versionada.
 
 \section{El corpus curado de Wikidata}\label{sec:datos-wikidata}
 
@@ -38,7 +38,7 @@ para las otras dos opciones.
 
 \begin{table}[htp]
 \centering
-\begin{tabular}{ | l | p{4.6cm} | p{3.6cm} | p{3.6cm} | }
+\begin{tabularx}{\textwidth}{ | Y | Y | Y | Y | }
     \hline
     \textbf{Eje} & \textbf{IGDB (elegida)} & \textbf{RAWG} & \textbf{Wikidata escalado} \\
     \hline
@@ -56,7 +56,7 @@ para las otras dos opciones.
     \hline
     Coste & Cero & Cero dentro de la cuota & Cero \\
     \hline
-\end{tabular}
+\end{tabularx}
 \caption{Comparación DATA-04 de fuentes para el catálogo a escala real.}
 \label{tab:data04}
 \end{table}
@@ -87,20 +87,20 @@ plataformas más frecuentes, el histograma de año de lanzamiento y el reparto e
 presente y de reserva; y un manifiesto de revisión muestreada determinista de trescientos
 registros, tomando uno de cada mil cuarenta y uno por orden de identificador, con datos
 suficientes para una comprobación humana puntual. La Tabla~\ref{tab:freeze} recoge los
-valores de la carga en la base de datos de desarrollo persistente, del 6 de septiembre de
-2026.
+valores medidos en la carga de la base de datos de desarrollo persistente y actualizados
+durante la Fase 2, el 7 de septiembre de 2026.
 
 \begin{table}[htp]
 \centering
-\begin{tabular}{ | l | l | }
+\begin{tabularx}{\textwidth}{ | Y | Y | }
     \hline
     \textbf{Campo} & \textbf{Valor} \\
     \hline
-    Obras primarias de IGDB importadas & 312.483 \\
+    Obras primarias de IGDB importadas & 312.560 \\
     \hline
     Corpus de Wikidata conservado & 150 \\
     \hline
-    Total de obras en el catálogo & 312.633 \\
+    Total de obras en el catálogo & 312.710 \\
     \hline
     Géneros & 23 \\
     \hline
@@ -110,11 +110,13 @@ valores de la carga en la base de datos de desarrollo persistente, del 6 de sept
     \hline
     Fecha de primer lanzamiento poblada & aproximadamente el 75\% de las filas \\
     \hline
-    Valoración agregada poblada & 0 filas, pendiente de una reejecución del importador \\
+    Obras con rating de usuarios de IGDB & 27.014 (13,9330\% del corpus gobernado) \\
+    \hline
+    Cobertura de \texttt{total\_rating} & 15,8197\% del corpus gobernado \\
     \hline
     Huella de contenido (SHA-256) & \texttt{ff3d67525c92\ldots} \\
     \hline
-\end{tabular}
+\end{tabularx}
 \caption{Evidencia agregada de congelación de la importación de IGDB.}
 \label{tab:freeze}
 \end{table}
@@ -127,11 +129,46 @@ pasadas. El snapshot reutilizable de la base cargada, de noventa y tres megabyte
 versiona en el repositorio por decisión de ADR-006; se conserva fuera de él como vía de
 restauración rápida.
 
-Dos limitaciones de datos quedan registradas y no ocultadas. La valoración agregada de IGDB
-es nula en las 312.633 filas, porque ninguna fuente previa la llevaba y el importador, aunque
-ahora la captura, no se ha vuelto a ejecutar; el filtro y el orden por nota son correctos por
-contrato pero hoy inertes. La fecha de primer lanzamiento está poblada para en torno al
-setenta y cinco por ciento de las filas, con relleno desde las publicaciones cuando existe.
+La Fase 2 añadió una frontera de investigación sobre este catálogo. El comando
+\texttt{govern\_corpus} aplica las reglas D-03 de forma reversible: conserva las obras
+fuente, pero marca como gobernadas las que son obras principales, tienen fecha de lanzamiento,
+al menos un género y al menos una plataforma de la allowlist. El rating no es un criterio de
+exclusión. La ejecución documentada dejó 193.885 obras gobernadas y una versión de corpus
+\texttt{2026.09.1}; el checksum, el diccionario, el informe de calidad y la muestra
+determinista se conservan en \texttt{docs/verification/corpus-governance-freeze.md}.
+
+\section{Ratings externos y aislamiento de la investigación}\label{sec:datos-ratings}
+
+Durante la reimportación de IGDB se añadieron los campos \texttt{rating},
+\texttt{rating\_count} y \texttt{total\_rating\_count}, además del resumen y los alias
+alternativos. El campo \texttt{rating} representa la valoración de usuarios de IGDB en una
+escala de 0 a 100; \texttt{total\_rating} representa la valoración agregada disponible en
+IGDB. Son señales distintas y por eso se almacenan con nombres distintos. En el corte de
+\texttt{2026.09.1}, 27.014 obras gobernadas tenían \texttt{rating}, lo que equivale al
+13,9330\%. La cobertura de \texttt{total\_rating} fue del 15,8197\%.
+
+El comando \texttt{snapshot\_corpus\_ratings} copia las valoraciones externas a
+\texttt{CorpusRatingSnapshot} con una operación insert-only asociada a una
+\texttt{corpus\_version}. Una reimportación puede actualizar los campos vivos que usa la
+interfaz y producir una versión posterior, pero no modifica el snapshot de una versión ya
+utilizada por el laboratorio. Esta separación es la condición que permite repetir una
+comparación y explicar qué datos recibió.
+
+Como fuente secundaria se probó RAWG en una ejecución acotada a 10.000 obras seleccionadas
+por \texttt{rating\_count} de IGDB. La reconciliación fue determinista: primero se intentó
+el slug exacto y después el título normalizado junto con el año de lanzamiento. No se aplicó
+fuzzy matching; las filas no emparejadas se descartaron y se contabilizaron. El resultado
+fue de 8.575 emparejamientos y 1.425 descartes, con 8.575 snapshots RAWG insertados. La
+cobertura nueva fue cero porque las obras seleccionadas ya tenían rating de IGDB. RAWG se
+documenta, por tanto, como contraste de procedencia, no como una fuente que haya ampliado
+la cobertura del corpus.
+
+La valoración mostrada en la ficha es una decisión de producto diferente. Puede mezclar,
+con pesos limitados por la cantidad de observaciones, el rating externo y las valoraciones
+locales de las cuentas de demostración. El laboratorio no lee esa mezcla derivada ni el
+valor mutable de \texttt{GameWork}: utiliza los snapshots de la versión fijada. Esta
+distinción evita que una nueva valoración de una cuenta o una reimportación cambie
+retroactivamente un resultado académico.
 
 \section{Registro de legitimidad de dependencias}\label{sec:datos-dependencias}
 

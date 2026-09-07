@@ -58,6 +58,9 @@ class GameWork(models.Model):
     in_corpus = models.BooleanField(default=False)
     corpus_version = models.CharField(max_length=32, blank=True)
     summary = models.TextField(blank=True)
+    # Optional editorial translation for the Spanish UI. The source summary
+    # remains intact in ``summary``; the API never displays it as Spanish.
+    summary_es = models.TextField(blank=True)
     genres = models.ManyToManyField(Genre, blank=True, related_name="works")
 
     class Meta:

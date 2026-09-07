@@ -65,3 +65,8 @@ thesis/*.bbl-SAVE
 thesis/sections/*.aux
 thesis/_minted*/
 thesis/svg-inkscape/
+
+# Spanish-synopsis translation working files (regenerated from DB + work log)
+data/localization/_pending-es.jsonl
+data/localization/_batches/
+data/localization/_export.err

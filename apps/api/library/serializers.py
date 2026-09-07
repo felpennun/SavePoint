@@ -29,5 +29,25 @@ class CreateOwnedCopyRequestSerializer(serializers.Serializer):
     idempotency_key = serializers.CharField(max_length=100, allow_blank=False)
 
 
+class LibraryCopyConfigurationSerializer(serializers.Serializer):
+    """One copy row in the complete library configuration payload."""
+
+    id = serializers.UUIDField(required=False)
+    release_id = serializers.UUIDField()
+    edition_id = serializers.UUIDField(required=False, allow_null=True)
+    format = serializers.ChoiceField(choices=["physical", "digital"])
+    idempotency_key = serializers.CharField(max_length=100, required=False, allow_blank=False)
+
+
+class LibraryConfigurationSerializer(serializers.Serializer):
+    """Complete replacement for a user's work-level configuration."""
+
+    status = serializers.ChoiceField(
+        choices=["pending", "playing", "completed", "abandoned"], allow_null=True
+    )
+    rating_half_steps = serializers.IntegerField(min_value=1, max_value=10, allow_null=True)
+    copies = LibraryCopyConfigurationSerializer(many=True)
+
+
 def serialize_copy(copy: OwnedCopy) -> dict:
     return OwnedCopySerializer(copy).data

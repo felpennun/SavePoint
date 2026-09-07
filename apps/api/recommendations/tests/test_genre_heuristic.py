@@ -14,7 +14,7 @@ import pytest
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 
-from catalogue.models import GameWork, Genre
+from catalogue.models import AssetAttribution, GameWork, Genre
 from library.models import LibraryEntry
 from recommendations.genre_heuristic import ALGORITHM_ID, rank_genre_taste_v1
 
@@ -48,6 +48,7 @@ def _work(slug: str, *genre_objs: Genre, is_dlc: bool = False) -> GameWork:
         canonical_slug=slug,
         original_title=slug.replace("-", " ").title(),
         is_dlc=is_dlc,
+        total_rating_count=1000,
     )
     if genre_objs:
         work.genres.set(genre_objs)
@@ -154,6 +155,39 @@ def test_stronger_genre_overlap_ranks_higher(user_a, genres) -> None:  # noqa: A
     slugs = _slugs(result)
 
     assert slugs.index("unseen-rpg-shooter") < slugs.index("unseen-shooter-only")
+
+
+@pytest.mark.django_db
+def test_catalogue_rating_orders_matching_candidates_before_numeric_titles(user_a, genres) -> None:  # noqa: ANN001
+    _own(user_a, _work("owned-rpg", genres["rpg"]), status=None, rating=10)
+    low = _work("100 Animals", genres["rpg"])
+    low.total_rating = 25.0
+    low.save(update_fields=["total_rating"])
+    high = _work("100 Tokyo Cats", genres["rpg"])
+    high.total_rating = 95.0
+    high.save(update_fields=["total_rating"])
+
+    result = rank_genre_taste_v1(user_a, limit=10)
+
+    assert [item["slug"] for item in result["results"]] == ["100 Tokyo Cats", "100 Animals"]
+    assert result["results"][0]["catalogue_rating"] == 95.0
+    assert result["results"][1]["catalogue_rating"] == 25.0
+
+
+@pytest.mark.django_db
+def test_candidates_need_at_least_one_thousand_catalogue_ratings(user_a, genres) -> None:  # noqa: ANN001
+    _own(user_a, _work("owned-rpg", genres["rpg"]), status=None, rating=10)
+    excluded = _work("small-sample-rpg", genres["rpg"])
+    excluded.total_rating_count = 999
+    excluded.save(update_fields=["total_rating_count"])
+    included = _work("large-sample-rpg", genres["rpg"])
+    included.total_rating_count = 1000
+    included.save(update_fields=["total_rating_count"])
+
+    result = rank_genre_taste_v1(user_a, limit=10)
+
+    assert _slugs(result) == ["large-sample-rpg"]
+    assert result["results"][0]["catalogue_rating_count"] == 1000
 
 
 # --------------------------------------------------------------------------- #
@@ -324,7 +358,18 @@ _DTO_KEYS = {
     "limitation",
     "results",
 }
-_ITEM_KEYS = {"work_id", "slug", "title", "score", "matched_genres"}
+_ITEM_KEYS = {
+    "work_id",
+    "slug",
+    "title",
+    "score",
+    "catalogue_rating",
+    "catalogue_rating_count",
+    "year",
+    "platform_summary",
+    "cover",
+    "matched_genres",
+}
 
 
 @pytest.mark.django_db
@@ -343,6 +388,28 @@ def test_endpoint_returns_current_users_ranking_with_allowlisted_dto(user_a, gen
     assert set(body) == _DTO_KEYS
     assert [item["slug"] for item in body["results"]] == ["unseen-rpg"]
     assert set(body["results"][0]) == _ITEM_KEYS
+
+
+@pytest.mark.django_db
+def test_recommendation_item_includes_card_cover_metadata(user_a, genres) -> None:  # noqa: ANN001
+    _own(user_a, _work("owned-rpg", genres["rpg"]), status="completed", rating=10)
+    recommended = _work("recommended-rpg", genres["rpg"])
+    AssetAttribution.objects.create(
+        work=recommended,
+        file_url="https://cdn.example.test/recommended-rpg.jpg",
+        creator="Catalogue source",
+        licence="Catalogue terms",
+        licence_url="https://example.test/licence",
+        source_url="https://example.test/recommended-rpg",
+        display_allowed=True,
+    )
+
+    client = APIClient()
+    client.force_authenticate(user=user_a)
+    item = client.get(_ENDPOINT).json()["results"][0]
+
+    assert item["cover"]["is_placeholder"] is False
+    assert item["cover"]["url"] == "https://cdn.example.test/recommended-rpg.jpg"
 
 
 @pytest.mark.django_db

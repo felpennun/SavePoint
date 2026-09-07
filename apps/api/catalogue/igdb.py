@@ -211,6 +211,21 @@ class IgdbClient:
             raise IgdbClientError("games response was not a JSON array")
         return rows
 
+    def fetch_by_ids(self, ids: list[int], *, fields: str = GAME_FIELDS) -> list[dict]:
+        """Fetch a bounded set of games by IGDB id for relationship syncs."""
+        normalized_ids = sorted({int(value) for value in ids})
+        if not normalized_ids:
+            return []
+        body = f"fields {fields}; where id = ({','.join(map(str, normalized_ids))}); limit 500;"
+        resp = self._post(GAMES_URL, body)
+        try:
+            rows = resp.json()
+        except ValueError:
+            raise IgdbClientError("games response was not JSON") from None
+        if not isinstance(rows, list):
+            raise IgdbClientError("games response was not a JSON array")
+        return rows
+
     def iter_pages(
         self, after_id: int = 0, page_size: int = 500, where: str = "game_type = 0"
     ) -> Iterator[list[dict]]:

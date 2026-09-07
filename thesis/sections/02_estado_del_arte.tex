@@ -9,15 +9,15 @@ persigue el trabajo.
 
 \section{Productos de referencia}\label{sec:arte-productos}
 
-El modelo de catalogación social nació fuera del videojuego. Goodreads, para libros, y
-Letterboxd, para cine, comparten un patrón que SavePoint adopta: una ficha canónica por obra,
+El modelo de catalogación social nació fuera del videojuego. Goodreads, centrado en los libros,
+comparte con Letterboxd, dedicado al cine, un patrón que SavePoint adopta: una ficha canónica por obra,
 independiente de la edición concreta que posea cada persona; un estado de consumo personal,
 como leído, viendo o pendiente; una valoración con una escala consistente; listas ordenadas;
-un perfil público que resume la actividad. Ninguno de los dos representa la propiedad
+un perfil público que resume la actividad~\cite{goodreads,letterboxd}. Ninguno de los dos representa la propiedad
 material con detalle, porque un libro o una película no plantean el problema de inventario
 que sí plantea una consola con juegos en cartucho, disco y descarga.
 
-En el ámbito del videojuego, Backloggd traslada casi literalmente el modelo de Letterboxd,
+En el ámbito del videojuego, Backloggd traslada casi literalmente el modelo de Letterboxd~\cite{backloggd},
 con buen tratamiento del backlog y del perfil, pero sin inventario de copias ni ambición de
 recomendación. OpenCritic agrega puntuaciones de prensa y es una referencia de densidad
 visual y de tratamiento de la nota, más que un catalogador personal. Steam ofrece una
@@ -27,7 +27,7 @@ gestión de una colección. La Tabla~\ref{tab:productos} resume la comparación.
 
 \begin{table}[htp]
 \centering
-\begin{tabular}{ | l | c | c | c | c | }
+\begin{tabularx}{\textwidth}{ | Y | Z | Z | Z | Z | }
     \hline
     \textbf{Producto} & \textbf{Ficha canónica} & \textbf{Backlog y perfil} & \textbf{Inventario de copias} & \textbf{Recomendación} \\
     \hline
@@ -45,7 +45,7 @@ gestión de una colección. La Tabla~\ref{tab:productos} resume la comparación.
     \hline
     \textbf{SavePoint} & Sí & Sí & Físico y digital, con edición & Heurística determinista \\
     \hline
-\end{tabular}
+\end{tabularx}
 \caption{Comparación de SavePoint con los productos de referencia.}
 \label{tab:productos}
 \end{table}
@@ -71,16 +71,17 @@ de género y plataforma para videojuegos es desigual y depende de la edición vo
 
 IGDB, propiedad de Twitch, ofrece una API de versión 4 con una entidad de plataforma de
 primera clase, veintitrés géneros y arte de portada, servida bajo el \textit{Twitch
-Developer Services Agreement} (DSA)~\cite{igdb-api, twitch-dsa}. Su uso es gratuito para
-proyectos comerciales y no comerciales, sin cuota mensual de peticiones, con un límite de
-ritmo de cuatro peticiones por segundo. La documentación de la propia API declara que
-prefiere que el integrador almacene y sirva los datos a sus usuarios finales, con permiso
-explícito para conservarlos. Ese texto actúa como la autorización escrita que contempla el
-acuerdo general. A cambio, IGDB pide una atribución estática y visible.
+Developer Services Agreement} (DSA)~\cite{igdb-api, twitch-dsa}. La documentación indica que
+la API es gratuita para proyectos comerciales y no comerciales, aunque las integraciones
+monetizadas pueden requerir una asociación comercial. También fija un límite de cuatro
+peticiones por segundo. La misma documentación recomienda almacenar y servir los datos desde
+la propia aplicación, permite conservarlos y solicita una atribución estática y visible.
 
 RAWG ofrece una cobertura comparable, con metadatos de tienda, pero su nivel gratuito impone
 un techo de veinte mil peticiones al mes y exige atribución con un enlace de vuelta en cada
-página que use los datos, además de un plan de pago para el uso comercial~\cite{rawg-api}.
+página que use los datos. Los términos también contemplan determinados usos comerciales
+dentro de ese límite y con restricciones de audiencia, mientras que los proyectos que lo
+superan deben acogerse a condiciones comerciales específicas~\cite{rawg-api}.
 El Capítulo~\ref{cap:datos} desarrolla la comparación que llevó a elegir Wikidata para el
 corpus curado inicial e IGDB para el catálogo a escala real.
 
@@ -108,9 +109,10 @@ error sobre la valoración predicha y las métricas de acierto sobre la lista re
 pueden ordenar los algoritmos de forma distinta~\cite{cremonesi2010performance}. La respuesta
 metodológica aceptada es fijar por adelantado, de forma inmutable, el corpus, el reparto, las
 exclusiones, las métricas, las semillas y el presupuesto de ajuste, antes de comparar nada.
-Ese contrato de evaluación congelado, que este proyecto deja como línea de trabajo futuro,
-es la base sobre la que se compararían los recomendadores. Por ese motivo, esta memoria no
-presenta ningún resultado de comparación de recomendadores.
+En SavePoint este principio se concreta en un protocolo congelado durante la Fase 2. El
+protocolo deja preparada la comparación, pero no debe confundirse con sus resultados: esta
+memoria presenta el contrato y las pruebas de sus componentes, no una afirmación de qué
+algoritmo funciona mejor sobre usuarios reales.
 
 \section{Desarrollo de software asistido por agentes}\label{sec:arte-agentes}
 
@@ -144,3 +146,11 @@ de trabajo futuro. La tercera es la propia metodología de ingeniería asistida 
 aplicada de forma sistemática y versionada en el repositorio, de manera que el proceso que
 produjo el sistema es tan inspeccionable y reproducible por un tercero como el sistema
 mismo.
+
+La Fase 2 concreta esa aportación metodológica en tres decisiones que suelen quedar ocultas
+en una comparación de recomendadores. Primero, separa el número que se muestra en el producto
+de las valoraciones externas que alimentan el laboratorio. Segundo, fija la población,
+la relevancia, los candidatos, las exclusiones, las semillas y las métricas antes de ejecutar
+pruebas de laboratorio. Tercero, obliga a que cada variante tenga nombre, versión, huella del
+input y una explicación basada en contribuciones almacenadas, en lugar de generar una
+explicación narrativa después de observar el resultado.

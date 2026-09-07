@@ -17,6 +17,11 @@ function makeItem(
     slug,
     title: `Title ${slug}`,
     score,
+    catalogue_rating: 80,
+    catalogue_rating_count: 1200,
+    year: null,
+    platform_summary: "",
+    cover: { url: null, is_placeholder: true, alt: `Title ${slug}` },
     matched_genres: genres.map(([gslug, name, weight]) => ({ slug: gslug, name, weight })),
   };
 }

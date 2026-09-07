@@ -15,15 +15,17 @@ pendientes, valorar juegos e inventariar copias físicas y digitales con su form
 edición (OE-2). La búsqueda es tolerante. El catálogo se puede ordenar y filtrar por
 plataforma, género, año y nota (OE-3). Existe una página de recomendaciones por afinidad de
 géneros basada en la actividad propia de cada persona, visiblemente distinta del baseline de
-popularidad (OE-4). Los tres objetivos restantes, el contrato de evaluación congelado, la
-comparación de recomendadores y el panel de investigación, quedan como líneas de trabajo
-futuro (OE-5 a OE-7).
+popularidad (OE-4). El contrato de evaluación ya está congelado, y también se han
+implementado y probado sus métricas, particiones y primeras primitivas de contenido (OE-5,
+parcialmente). La comparación completa de recomendadores y el panel de investigación siguen
+como trabajo futuro (OE-6 y OE-7).
 
 Cada incremento del sistema se cerró con sus criterios de éxito verificados de forma
 independiente y con la firma de aceptación del autor. El objetivo general se cumple en su
-primera mitad: la plataforma de catalogación existe, funciona y sirve de base al banco de
-pruebas, mientras que la comparación de recomendadores que lo explota queda como trabajo
-futuro.
+primera mitad y deja avanzada la segunda: la plataforma de catalogación existe, funciona y
+sirve de base al banco de pruebas; el corpus gobernado, los snapshots de ratings y el
+contrato del laboratorio ya están implementados. Falta ejecutar la población sintética
+completa, las variantes finales y la comparación que los explota.
 
 \section{Aportaciones}\label{sec:conc-aportaciones}
 
@@ -46,15 +48,15 @@ repositorio. La Tabla~\ref{tab:limitaciones} las resume.
 
 \begin{table}[htp]
 \centering
-\begin{tabular}{ | p{5cm} | p{8cm} | }
+\begin{tabularx}{\textwidth}{ | Y | Y | }
     \hline
     \textbf{Limitación} & \textbf{Situación} \\
     \hline
-    Valoración agregada sin cargar & Nula en las 312.633 filas; el filtro y el orden por nota son correctos por contrato pero hoy inertes, a la espera de una reejecución del importador. \\
+    Cobertura parcial de ratings & El rating de usuarios de IGDB está disponible en 27.014 obras gobernadas (13,9330\%); RAWG no añadió cobertura nueva en el corte de 10.000 obras. \\
     \hline
     Fecha de lanzamiento parcial & Poblada para en torno al 75\% de las filas. \\
     \hline
-    Página de recomendaciones sin datos poblados & Las cuentas de demostración carecen de historial con género, de modo que la página muestra el estado de bienvenida; el ranking está probado de forma determinista con datos de prueba. \\
+    Comparación de laboratorio no ejecutada & El protocolo, las métricas y las primeras primitivas están probados, pero todavía no existe el artefacto final con resultados de Precision, Recall, nDCG y MAP. \\
     \hline
     Pasada de refinamiento de diseño pendiente & Cuatro elementos cosméticos aceptados por el autor: mezcla de idiomas en la explicación de recomendaciones, navegación superior autenticada estrecha por debajo de 430 píxeles, detalle de juego algo escaso y menú de cuenta que no identifica la cuenta activa. \\
     \hline
@@ -62,7 +64,7 @@ repositorio. La Tabla~\ref{tab:limitaciones} las resume.
     \hline
     Despliegue no conectado a datos reales & Pospuesto al final del proyecto por decisión del autor; la demostración se ejecuta en local. \\
     \hline
-\end{tabular}
+\end{tabularx}
 \caption{Limitaciones conocidas del sistema.}
 \label{tab:limitaciones}
 \end{table}
@@ -70,24 +72,22 @@ repositorio. La Tabla~\ref{tab:limitaciones} las resume.
 \section{Trabajo futuro}\label{sec:conc-trabajo-futuro}
 
 El banco de pruebas reproducible que esta memoria deja construido habilita de forma natural
-la línea de trabajo que da sentido último al proyecto: la comparación sistemática de
-recomendadores. Esa comparación parte de un protocolo de evaluación congelado y consciente de
-la simulación, fijado antes de medir y no modificado después, que reparte los datos dejando
-una interacción fuera por persona usuaria, acota el ajuste de hiperparámetros a una rejilla
-pequeña sobre un conjunto de validación disjunto del de prueba y cierra por adelantado el
-conjunto de métricas de acierto, ranking, cobertura, diversidad y novedad, con una población
-de usuarios sintéticos reproducible por semilla y una cohorte explícita de arranque en frío.
-Sobre ese protocolo se pueden implementar y comparar recomendadores basados en contenido, de
-filtrado colaborativo e híbridos frente a las líneas base aleatoria y de popularidad, con
-explicaciones deterministas y una vía de arranque en frío para el historial escaso, y
-presentar los resultados en un panel accesible que exporte tablas y figuras a partir de
-artefactos de experimento recalculables por un tercero. El heurístico de afinidad por géneros
-del sistema deja un contrato de página y de punto de acceso ya cableado que uno de esos
-recomendadores podrá sustituir, sin adelantar ni difuminar esa comparación. Más allá de la
-recomendación, quedan como extensiones la gobernanza del corpus mediante listas de
-plataformas y de calidad, el enriquecimiento con valoraciones externas de usuarios bajo
-instantánea inmutable, los flujos completos de colección con portabilidad de datos y el
-descubrimiento público.
+la comparación sistemática de recomendadores. La Fase 2 ya ha congelado un protocolo
+consciente de la simulación: deja una interacción fuera por persona usuaria, fija una rejilla
+de 18 configuraciones sobre validación, reserva el test para una única ejecución y establece
+P@K, R@K, nDCG@K y MAP@K en K de 5, 10 y 20. También deja especificados el baseline
+aleatorio, el de popularidad y las tres variantes de contenido, con explicaciones
+deterministas y una vía de arranque en frío.
+
+El siguiente trabajo no consiste en cambiar esas reglas al ver los resultados. Los
+arquetipos sintéticos ya se han generado y validado con 200 perfiles reproducibles y una
+cohorte cold-start separada. Queda cerrar las variantes y ejecutar el runner sobre el mismo
+manifiesto de candidatos. Después se podrán añadir el filtrado colaborativo y los
+híbridos, siempre como extensiones comparables y con nuevas versiones del protocolo si
+introducen otras señales. El panel accesible deberá leer los artefactos producidos, exportar
+sus tablas y declarar que las cifras son evidencia de simulación, no de usuarios reales.
+Más allá de la recomendación, quedan los flujos completos de colección, la portabilidad de
+datos y el descubrimiento público.
 
 \section{Cierre}\label{sec:conc-cierre}
 

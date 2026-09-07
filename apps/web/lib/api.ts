@@ -36,6 +36,8 @@ export interface GameCard {
   cover: Cover;
   /** IGDB total_rating (0-100). Absent -> no ScorePill. */
   total_rating?: number | null;
+  /** Number of IGDB user/critic ratings used by the relevance threshold. */
+  total_rating_count?: number | null;
   /** IGDB genres for this work (CAT-02). */
   genres?: GenreRef[];
 }
@@ -93,6 +95,9 @@ export interface RelatedContentItem {
   slug: string;
   title: string;
   relation: "dlc" | "expansion";
+  year: number | null;
+  platform_summary: string;
+  cover: Cover;
 }
 
 export interface Provenance {
@@ -113,6 +118,11 @@ export interface GameDetail {
   original_title: string;
   is_dlc: boolean;
   year: number | null;
+  summary: string;
+  rating: number | null;
+  rating_count: number | null;
+  total_rating_count: number | null;
+  rating_breakdown: { igdb_count: number; savepoint_count: number };
   cover: Cover;
   releases: Release[];
   related_content: RelatedContentItem[];
@@ -141,8 +151,9 @@ export async function fetchCatalogueList(params: CatalogueListParams = {}): Prom
   return (await response.json()) as CatalogueListResult;
 }
 
-export async function fetchGameDetail(slug: string): Promise<GameDetail | null> {
+export async function fetchGameDetail(slug: string, locale: "es" | "en" = "en"): Promise<GameDetail | null> {
   const url = new URL(`/api/catalogue/games/${encodeURIComponent(slug)}/`, API_BASE);
+  url.searchParams.set("locale", locale);
   const response = await fetch(url, { cache: "no-store" });
   if (response.status === 404) {
     return null;
@@ -208,11 +219,9 @@ export interface MyLibraryItem {
   status: string;
   rating_half_steps: number | null;
   owned_copy_count: number;
-  /** Cover/year/platform enrichment is wired by Plan 03; absent -> the
-   * card renders the first-party placeholder. */
-  year?: number | null;
-  platform_summary?: string;
-  cover?: Cover;
+  year: number | null;
+  platform_summary: string;
+  cover: Cover;
   updated_at?: string;
 }
 
@@ -254,6 +263,12 @@ export interface PersonalRecommendationItem {
   slug: string;
   title: string;
   score: number;
+  /** IGDB catalogue rating used to order candidates; null means unrated. */
+  catalogue_rating: number | null;
+  catalogue_rating_count: number;
+  year: number | null;
+  platform_summary: string;
+  cover: Cover;
   matched_genres: RecommendationMatchedGenre[];
 }
 

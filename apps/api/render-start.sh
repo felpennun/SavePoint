@@ -5,6 +5,7 @@ set -eu
 # offline: the HTTP listener is exec'd only after every idempotent step passes.
 python manage.py migrate --noinput
 python manage.py import_catalogue
+python manage.py load_localized_summaries
 python manage.py bootstrap_demo_accounts
 python manage.py seed_demo
 

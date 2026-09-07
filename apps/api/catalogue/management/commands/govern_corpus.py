@@ -13,12 +13,18 @@ from django.core.management.base import BaseCommand
 from django.db import connection, transaction
 from django.db.models import Count
 
-from catalogue.corpus import ALLOWLIST_SLUGS, PLATFORM_ALLOWLIST, governed_works, is_valid_name
+from catalogue.corpus import (
+    ALLOWLIST_SLUGS,
+    MAX_CATALOGUE_RELEASE_DATE,
+    PLATFORM_ALLOWLIST,
+    governed_works,
+    is_valid_name,
+)
 from catalogue.models import AssetAttribution, CorpusVersion, GameWork, Platform, SourceRecord
 
 
 GOVERN_CORPUS_LOCK_KEY = 902_020_201
-RULESET_ID = "D-01-platform-slug+D-03-name-release-dlc-genre-date"
+RULESET_ID = "D-01-platform-slug+D-03-name-release-dlc-genre-date-max-2026"
 
 
 def _ruleset_sha256() -> str:
@@ -121,6 +127,10 @@ class Command(BaseCommand):
                 "is_dlc": bool(work.is_dlc),
                 "missing_genre": work.pk not in valid_genre_ids,
                 "missing_first_release_date": work.first_release_date is None,
+                "future_release_date": (
+                    work.first_release_date is not None
+                    and work.first_release_date > MAX_CATALOGUE_RELEASE_DATE
+                ),
             }
             for reason, applies in failed.items():
                 if applies:
@@ -219,6 +229,7 @@ class Command(BaseCommand):
                     "is_dlc",
                     "missing_genre",
                     "missing_first_release_date",
+                    "future_release_date",
                 )
             },
             "unresolved_allowlist_slugs": unresolved,
