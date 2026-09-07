@@ -5,13 +5,17 @@ trigram similarity for small typos -- always over the normalized (casefolded,
 accent-stripped) alias index, entirely local (CAT-06: zero external calls,
 works with the provider unavailable).
 
-CAT-02 (Plan 01.1-03): ``platform`` / ``genre`` / ``year_from`` / ``year_to`` /
-``min_rating`` filters intersect on top of that result set, and a fixed
+CAT-02 (Plan 01.1-03, extended in Plan 02-03): ``platform`` / ``genre`` are
+repeated multi-select params -- several ``genre`` values are ANDed ("has all"),
+several ``platform`` values are ORed ("available on any") -- while ``year_from``
+/ ``year_to`` / ``min_rating`` stay single-valued and intersect on top. A fixed
 ``sort`` allowlist maps to a deterministic ``order_by`` with a
 ``canonical_slug`` tie-break. Client sort text is NEVER interpolated into
 ``order_by`` -- an unknown key is a bounded 400, handled by
-:func:`parse_catalogue_query`. Out-of-range / non-numeric year and rating are
-likewise a bounded 400.
+:func:`parse_catalogue_query`. Out-of-range / non-numeric year and rating, and
+more than :data:`MAX_MULTISELECT_VALUES` repeated facet values, are likewise a
+bounded 400. The public list, search, and facets all operate over the governed
+corpus view (:func:`catalogue.corpus.governed_works`).
 """
 
 from __future__ import annotations
@@ -23,6 +27,7 @@ from datetime import date
 from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models import Count, F, Max, Min, QuerySet
 
+from catalogue.corpus import governed_works
 from catalogue.models import GameAlias, GameWork, Genre, Platform
 from catalogue.normalization import normalize_title
 
@@ -35,6 +40,10 @@ DEFAULT_PAGE_SIZE = 24
 YEAR_MIN = 1958
 RATING_MIN = 0.0
 RATING_MAX = 100.0
+
+# Cap repeated ``genre`` / ``platform`` params so a single request can never
+# fan a query out into an unbounded chain of joins (threat T-02-03-02, V5 DoS).
+MAX_MULTISELECT_VALUES = 20
 
 
 def _year_max() -> int:
@@ -73,8 +82,8 @@ class FilterValidationError(ValueError):
 @dataclass
 class CatalogueQuery:
     q: str | None = None
-    platform: str | None = None
-    genre: str | None = None
+    genres: tuple[str, ...] = ()
+    platforms: tuple[str, ...] = ()
     year_from: int | None = None
     year_to: int | None = None
     min_rating: float | None = None
@@ -95,14 +104,44 @@ def _parse_float(raw: str, code: str, label: str) -> float:
         raise FilterValidationError(code, f"{label} must be a number") from None
 
 
+def _multi_values(params: Mapping[str, str], key: str) -> tuple[str, ...]:
+    """Read every repeated value of ``key`` -- ``getlist`` when the mapping
+    supports it (DRF ``request.query_params`` / Django ``QueryDict``), else the
+    single ``get`` value -- then trim, drop blanks, and de-duplicate in order.
+
+    Raises :class:`FilterValidationError` past :data:`MAX_MULTISELECT_VALUES`
+    repeated values so a request cannot fan a query out into an unbounded join
+    chain (threat T-02-03-02).
+    """
+    getlist = getattr(params, "getlist", None)
+    if callable(getlist):
+        raw = list(getlist(key))
+    else:
+        one = params.get(key)
+        raw = [one] if one is not None else []
+    if len(raw) > MAX_MULTISELECT_VALUES:
+        raise FilterValidationError(
+            "too_many_facet_values",
+            f"at most {MAX_MULTISELECT_VALUES} {key} values allowed",
+        )
+    cleaned = tuple(dict.fromkeys(s.strip() for s in raw if s and s.strip()))
+    if len(cleaned) > MAX_MULTISELECT_VALUES:
+        raise FilterValidationError(
+            "too_many_facet_values",
+            f"at most {MAX_MULTISELECT_VALUES} {key} values allowed",
+        )
+    return cleaned
+
+
 def parse_catalogue_query(params: Mapping[str, str]) -> CatalogueQuery:
     """Validate raw query params into a :class:`CatalogueQuery`.
 
-    Raises :class:`FilterValidationError` for an unknown ``sort`` key or an
-    out-of-range / non-numeric ``year_from`` / ``year_to`` / ``min_rating``.
-    Unknown ``platform`` / ``genre`` slugs are NOT an error here -- they are
-    resolved (and silently dropped if absent) in :func:`search_games`, matching
-    the UI-SPEC "unknown facet value -> ignored" contract.
+    Raises :class:`FilterValidationError` for an unknown ``sort`` key, an
+    out-of-range / non-numeric ``year_from`` / ``year_to`` / ``min_rating``, or
+    more than :data:`MAX_MULTISELECT_VALUES` repeated ``genre`` / ``platform``
+    values. Unknown ``platform`` / ``genre`` slugs are NOT an error here -- they
+    are resolved (and silently dropped if absent) in :func:`_apply_filters`,
+    matching the UI-SPEC "unknown facet value -> ignored" contract.
     """
     q = (params.get("q") or "").strip() or None
 
@@ -139,13 +178,13 @@ def parse_catalogue_query(params: Mapping[str, str]) -> CatalogueQuery:
                 f"min_rating must be between {int(RATING_MIN)} and {int(RATING_MAX)}",
             )
 
-    platform = (params.get("platform") or "").strip() or None
-    genre = (params.get("genre") or "").strip() or None
+    genres = _multi_values(params, "genre")
+    platforms = _multi_values(params, "platform")
 
     return CatalogueQuery(
         q=q,
-        platform=platform,
-        genre=genre,
+        genres=genres,
+        platforms=platforms,
         year_from=year_from,
         year_to=year_to,
         min_rating=min_rating,
@@ -153,24 +192,32 @@ def parse_catalogue_query(params: Mapping[str, str]) -> CatalogueQuery:
     )
 
 
-def _base_works() -> QuerySet[GameWork]:
-    # D-11: DLC/expansions never appear as independent search/list results.
-    return GameWork.objects.filter(is_dlc=False)
-
-
 def _apply_filters(qs: QuerySet[GameWork], cq: CatalogueQuery) -> QuerySet[GameWork]:
     """Intersect the requested facet filters onto ``qs``.
 
-    An unknown platform/genre slug resolves to no row and is dropped (the
-    filter simply does not apply) rather than forcing an empty result set.
+    Several ``genre`` values are ANDed -- one chained ``filter`` per genre, each
+    adding a join, so ``.distinct()`` is required once any facet joined
+    (Pitfall 3). Several ``platform`` values are ORed -- a single ``__in`` over
+    the resolved slugs. An unknown platform/genre slug resolves to no row and is
+    dropped (the filter simply does not apply) rather than forcing an empty
+    result set.
     """
     joined = False
-    if cq.platform and Platform.objects.filter(slug=cq.platform).exists():
-        qs = qs.filter(releases__platform__slug=cq.platform)
-        joined = True
-    if cq.genre and Genre.objects.filter(slug=cq.genre).exists():
-        qs = qs.filter(genres__slug=cq.genre)
-        joined = True
+    if cq.platforms:
+        valid_platforms = list(
+            Platform.objects.filter(slug__in=cq.platforms).values_list("slug", flat=True)
+        )
+        if valid_platforms:
+            qs = qs.filter(releases__platform__slug__in=valid_platforms)
+            joined = True
+    if cq.genres:
+        valid_genres = set(
+            Genre.objects.filter(slug__in=cq.genres).values_list("slug", flat=True)
+        )
+        for slug in cq.genres:
+            if slug in valid_genres:
+                qs = qs.filter(genres__slug=slug)
+                joined = True
     if cq.year_from is not None:
         qs = qs.filter(first_release_date__gte=date(cq.year_from, 1, 1))
     if cq.year_to is not None:
@@ -286,9 +333,11 @@ def search_games(
     stripped = (cq.q or query or "").strip()
     start = (page - 1) * page_size
 
-    # Text-scoped base: DLC-excluded catalogue, narrowed to alias matches when
-    # a query is present. This set drives both the facets and the filters.
-    scoped = _base_works()
+    # Text-scoped base: the governed corpus view (is_dlc=False, in_corpus=True),
+    # narrowed to alias matches when a query is present. This set drives both
+    # the facets and the filters; the ~312k non-governed rows stay out of the
+    # public catalogue for later discovery phases.
+    scoped = governed_works()
     ordered_ids: list[str] = []
     if stripped:
         ordered_ids = _ordered_matching_work_ids(normalize_title(stripped))

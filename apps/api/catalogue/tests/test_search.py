@@ -7,6 +7,7 @@ import socket
 from datetime import date
 
 import pytest
+from django.http import QueryDict
 from rest_framework.test import APIClient
 
 from catalogue.models import GameAlias, GameRelease, GameWork, Genre, Platform, SourceRecord
@@ -20,7 +21,14 @@ from catalogue.search import (
 )
 
 
-def _make_work(title: str, *, is_dlc: bool = False, year: int | None = None, platform_name: str | None = None) -> GameWork:
+def _make_work(
+    title: str,
+    *,
+    is_dlc: bool = False,
+    year: int | None = None,
+    platform_name: str | None = None,
+    in_corpus: bool = True,
+) -> GameWork:
     slug = title.lower().replace(" ", "-").replace("'", "")
     work = GameWork.objects.create(
         canonical_slug=slug,
@@ -28,6 +36,7 @@ def _make_work(title: str, *, is_dlc: bool = False, year: int | None = None, pla
         title_en=title,
         title_es="",
         is_dlc=is_dlc,
+        in_corpus=in_corpus,
     )
     GameAlias.objects.create(work=work, locale="en", value=title, normalized_value=normalize_title(title))
     if platform_name:
@@ -157,6 +166,7 @@ def _work(
     rating: float | None = None,
     platforms: tuple[str, ...] = (),
     genres: tuple[Genre, ...] = (),
+    in_corpus: bool = True,
 ) -> GameWork:
     slug = title.lower().replace(" ", "-").replace("'", "").replace(":", "")
     work = GameWork.objects.create(
@@ -167,6 +177,7 @@ def _work(
         is_dlc=is_dlc,
         first_release_date=date(year, 1, 1) if year else None,
         total_rating=rating,
+        in_corpus=in_corpus,
     )
     GameAlias.objects.create(work=work, locale="en", value=title, normalized_value=normalize_title(title))
     for pname in platforms:
@@ -403,3 +414,121 @@ def test_unknown_platform_or_genre_slug_is_ignored_not_500() -> None:
     result = search_games(cq=parse_catalogue_query({"platform": "does-not-exist"}))
     # Unknown facet value -> filter dropped, catalogue still returned (UI-SPEC).
     assert {w.original_title for w in result["results"]} == {"Present Game"}
+
+
+# ---------------------------------------------------------------------------
+# Plan 02-03 Task 2 -- multi-select filters + governed-corpus scoping (CAT-02)
+# ---------------------------------------------------------------------------
+
+
+def _qd(**lists: list[str]) -> QueryDict:
+    qd = QueryDict(mutable=True)
+    for key, values in lists.items():
+        qd.setlist(key, values)
+    return qd
+
+
+@pytest.mark.django_db
+def test_parse_reads_all_repeated_genre_and_platform_values() -> None:
+    cq = parse_catalogue_query(
+        _qd(genre=["rpg", "strategy"], platform=["switch", "pc-microsoft-windows"])
+    )
+    assert cq.genres == ("rpg", "strategy")
+    assert cq.platforms == ("switch", "pc-microsoft-windows")
+
+
+@pytest.mark.django_db
+def test_parse_dedupes_and_drops_blank_repeated_values() -> None:
+    cq = parse_catalogue_query(_qd(genre=["rpg", "", "rpg", " strategy ", "strategy"]))
+    assert cq.genres == ("rpg", "strategy")
+    assert cq.platforms == ()
+
+
+@pytest.mark.django_db
+def test_parse_rejects_more_than_twenty_repeated_facet_values() -> None:
+    with pytest.raises(FilterValidationError):
+        parse_catalogue_query(_qd(genre=[f"g{i}" for i in range(21)]))
+    with pytest.raises(FilterValidationError):
+        parse_catalogue_query(_qd(platform=[f"p{i}" for i in range(21)]))
+
+
+@pytest.mark.django_db
+def test_single_value_dict_params_still_supported() -> None:
+    cq = parse_catalogue_query({"genre": "role-playing-rpg", "platform": "pc"})
+    assert cq.genres == ("role-playing-rpg",)
+    assert cq.platforms == ("pc",)
+
+
+@pytest.mark.django_db
+def test_multiple_genres_are_ANDed_without_join_duplicates() -> None:
+    rpg = _genre("Role-playing (RPG)", 12)
+    strategy = _genre("Strategy", 15)
+    shooter = _genre("Shooter", 5)
+    _work("Triple Genre", year=2015, genres=(rpg, strategy, shooter))
+    _work("Only RPG", year=2016, genres=(rpg,))
+
+    cq = parse_catalogue_query(_qd(genre=["role-playing-rpg", "strategy"]))
+    result = search_games(cq=cq)
+
+    assert [w.original_title for w in result["results"]] == ["Triple Genre"]
+    assert result["count"] == 1
+
+
+@pytest.mark.django_db
+def test_multiple_platforms_are_ORed() -> None:
+    _work("On Switch", year=2015, platforms=("Switch",))
+    _work("On PC", year=2016, platforms=("PC",))
+    _work("On PS5", year=2017, platforms=("PlayStation 5",))
+
+    cq = parse_catalogue_query(_qd(platform=["switch", "pc"]))
+    result = search_games(cq=cq)
+
+    assert {w.original_title for w in result["results"]} == {"On Switch", "On PC"}
+
+
+@pytest.mark.django_db
+def test_unknown_repeated_slug_is_dropped_not_emptying() -> None:
+    rpg = _genre("Role-playing (RPG)", 12)
+    _work("Present", year=2011, platforms=("PC",), genres=(rpg,))
+
+    cq = parse_catalogue_query(
+        _qd(genre=["role-playing-rpg", "does-not-exist"], platform=["pc", "nope"])
+    )
+    assert {w.original_title for w in search_games(cq=cq)["results"]} == {"Present"}
+
+
+@pytest.mark.django_db
+def test_min_rating_remains_single_valued() -> None:
+    cq = parse_catalogue_query({"min_rating": "80"})
+    assert cq.min_rating == 80.0
+    _work("High", year=2015, rating=90.0)
+    _work("Low", year=2015, rating=40.0)
+
+    result = search_games(cq=parse_catalogue_query({"min_rating": "80"}))
+    assert {w.original_title for w in result["results"]} == {"High"}
+
+
+@pytest.mark.django_db
+def test_non_governed_work_hidden_from_list_search_and_facets() -> None:
+    rpg = _genre("Role-playing (RPG)", 12)
+    _work("Governed Game", year=2015, platforms=("PC",), genres=(rpg,))
+    _work("Excluded Game", year=2016, platforms=("PC",), genres=(rpg,), in_corpus=False)
+
+    listing = search_games()
+    assert {w.original_title for w in listing["results"]} == {"Governed Game"}
+    assert listing["count"] == 1
+
+    assert search_games("Excluded Game")["results"] == []
+
+    genre_counts = {g["slug"]: g["count"] for g in listing["facets"]["genres"]}
+    assert genre_counts["role-playing-rpg"] == 1
+
+
+@pytest.mark.django_db
+def test_endpoint_rejects_more_than_twenty_repeated_values_with_bounded_400() -> None:
+    client = APIClient()
+    response = client.get(
+        "/api/catalogue/games/", {"genre": [f"g{i}" for i in range(21)]}
+    )
+    assert response.status_code == 400
+    assert "results" not in response.json()
