@@ -2,8 +2,8 @@
 phase: 02
 plan: 10
 github_issue: 26
-status: in_progress
-completed_tasks: 1
+status: complete
+completed_tasks: 3
 total_tasks: 3
 updated: 2026-09-07
 ---
@@ -45,6 +45,10 @@ La Fase 3 revisita `numpy` para la capa estadística con datos de rendimiento re
 ## Estado
 
 - Tarea 1: **ratificada** (este documento). No se dispara el gate de dependencias.
-- Tarea 2: pendiente — `rank_random_v1` (REC-01) + coseno stdlib end-to-end.
-- Tarea 3: pendiente — vectores de features de contenido, perfil de usuario, caché `WorkFeatureVector`.
-- Cierre: `02-10-SUMMARY.md` + commit con `Closes #26`.
+- Tarea 2: **completa** — `rank_random_v1` (REC-01) + coseno stdlib. RED `50b3194` -> GREEN `6a8341e`.
+- Tarea 3: **completa** — `feature_vector` / `coverage_report` / `genre_rating_profile`, `build_profile`,
+  `WorkFeatureVector` + migración `0001_work_feature_vector`, comando `rebuild_feature_vectors`.
+  RED `6043036` -> GREEN `d189117`.
+- Cierre: `02-10-SUMMARY.md` escrito; commit de metadatos con `Closes #26`.
+- Verificación: `pytest apps/api/recommendations -q` -> 48 passed; suite completa
+  (`-w /workspace/apps/api`) -> 345 passed, 0 regresiones; `makemigrations --check` limpio.
