@@ -1,22 +1,22 @@
 ---
 gsd_state_version: 1.0
 status: in_progress
-stopped_at: Fase 2, ola 2. Plan 02-08 COMPLETO (protocolo de evaluación congelado). 02-02 sigue pausado en el checkpoint RAWG (job aparte del autor).
-last_updated: "2026-09-07T08:14:50.863Z"
-state_head: 2696c5423895a14a878941b55697668e912f294d
+stopped_at: Fase 2, ola 2 CERRADA (02-02 + 02-08 fusionados en main). Ola 3 desbloqueada. Pendiente RAWG pasada 2 (juegos sin rating, 2022-2026, por popularidad — ratificado por el autor).
+last_updated: "2026-09-07T09:00:00+02:00"
+state_head: fb2dafe
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 39
-  completed_plans: 29
-  percent: 25
+  completed_plans: 30
+  percent: 26
 last_activity: 2026-09-07
 next_phase: 2
 next_phase_name: Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender
 next_action: /gsd-execute-phase 2
 current_phase: 2
 current_phase_name: Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender
-last_activity_desc: 02-08 completo — app `evaluation`, `protocol.json` congelado (12 claves + rejilla de 18 configs), `evaluation-protocol.md` (DOC-04), métricas de ranking y split leave-one-out; suite `pytest apps/api` 280/280.
+last_activity_desc: Ola 2 cerrada. 02-08 congeló el protocolo (`protocol.json`, métricas, split LOO; 280/280). 02-02 verificó el import IGDB completo (312.560 obras, 27.014 con rating = 13,933 %) y corrió RAWG acotado N=10.000 top-`rating_count` → 8.575 snapshots `source="rawg"`, 0 cobertura nueva (el corte ya tenía rating IGDB). Fusiones `f8fd255` y `fb2dafe`.
 ---
 
 # Project State
@@ -32,21 +32,36 @@ See: .planning/PROJECT.md (updated 2026-09-04)
 
 ### Snapshot de ejecucion vigente (2026-09-07)
 
-Fase 2, ola 2 en curso. 02-01 y 02-07 (ola 1) y **02-08** tienen SUMMARY, commits y
-verificaciones verdes. 02-08 congeló el contrato de evaluación EVAL-03:
-`docs/methodology/protocol.json` (12 claves + `simulation:true`, rejilla de 18 configs,
-tope 24), `docs/methodology/evaluation-protocol.md` (`## Amenazas a la validez`, DOC-04),
-app `apps/api/evaluation/` en `INSTALLED_APPS` con `protocol.py` (loader fail-closed),
-`metrics.py` (precision/recall/nDCG/MAP a mano) y `splits.py` (leave-one-out por usuario +
-partición train/val/test). Commits `2f51d16` (Tarea 2, tracer) y `2696c54` (Tarea 3). La
-Tarea 1 (`checkpoint:decision`, one-way) ya venía ratificada `ratify-as-proposed` (`e9be42d`).
-EVAL-02 y EVAL-03 marcados completos; EVAL-01/EVAL-10/DOC-04 esperan a 02-09 / 02-13
-(shared-ID gate).
+**Fase 2, ola 2 CERRADA.** 02-01 y 02-07 (ola 1), **02-02** y **02-08** tienen SUMMARY,
+commits y verificaciones verdes, fusionados en `main` (`f8fd255`, `fb2dafe`).
 
-02-02 sigue **pausado** antes de implementar la parte RAWG, en un job aparte del autor —
-no tocado por 02-08.
+- **02-08** congeló el contrato de evaluación EVAL-03: `docs/methodology/protocol.json`
+  (12 claves + `simulation:true`, rejilla de 18 configs, tope 24),
+  `docs/methodology/evaluation-protocol.md` (`## Amenazas a la validez`, DOC-04), app
+  `apps/api/evaluation/` en `INSTALLED_APPS` con `protocol.py`, `metrics.py`
+  (precision/recall/nDCG/MAP a mano) y `splits.py` (leave-one-out por usuario + partición
+  train/val/test). `pytest apps/api` 280/280. Tarea 1 ratificada `ratify-as-proposed`.
+- **02-02** verificó por consulta directa a BD que el import IGDB está **completo**
+  (312.560 obras, cursor 416.648; 193.885 gobernadas; 27.014 con `rating` = **13,933 %**;
+  no se reimportó nada). RAWG acotado N=10.000 sobre el top por `rating_count` →
+  **8.575 emparejadas / 8.575 `CorpusRatingSnapshot(source="rawg")` / 1.425 descartadas**,
+  `GameWork.rating` sin mutar (huella idéntica), 70 tests catalogue. **Cobertura nueva por
+  RAWG: 0 obras** — el corte por `rating_count` ya tenía rating IGDB, así que RAWG aquí es
+  contraste de fuente, no relleno. `shm_size:256mb` añadido al `db` de Compose. 3
+  desviaciones documentadas en el SUMMARY (contenedor `db` recreado por el worktree
+  concurrente; conversión de rutas MSYS; bug pre-existente de FK de `SourceRecord` en 22
+  filas, 0,26 %, diferido).
 
-Fase 01.1 CERRADA. **Fase 2 en ejecución: ola 1, con checkpoints después de cada tarea.** D-01 ratificada por el autor el 2026-09-07 (39 plataformas). 02-07 en ejecución; 02-01 continúa por la tarea 2 al liberar el ejecutor. La preferencia de consolas actuales primero está registrada en 02-04.
+Requisitos completados en la ola 2: EVAL-02, EVAL-03, DATA-06, DATA-08, DOC-02.
+EVAL-01/EVAL-10/DOC-04 y DATA-05/DATA-07 siguen pendientes (shared-ID gate con 02-09/02-13/02-05).
+
+**Pendiente inmediato — RAWG pasada 2** (ratificado por el autor 2026-09-07, ver
+`02-02-RATINGS-FOLLOWUP.md`): juegos con `rating IS NULL` y `first_release_date` 2022-2026,
+ordenados por popularidad (`total_rating_count` → `rating_count` → recientes), `--limit 20000`
+hasta agotar cuota. Necesita flags nuevos en `enrich_rawg_ratings` + enmienda a ADR-008.
+
+Fase 01.1 CERRADA. D-01 ratificada por el autor el 2026-09-07 (39 plataformas). La
+preferencia de consolas actuales primero está registrada en 02-04.
 
 Hecho y commiteado esta sesión (2026-09-06):
 
@@ -97,6 +112,7 @@ Progreso global: 2/8 fases (25%).
 | Phase 01 P12 | 2 sessions | 2 tasks | 9 files |
 | Phase 01 P14 | 1 session | 1 tasks | 4 files |
 | Phase 02 P08 | 18 min | 3 tasks | 12 files |
+| Phase 02 P02 | ~80 min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -127,13 +143,26 @@ Decisions are logged in PROJECT.md Key Decisions table.
 
 ### Pending Todos
 
-None yet.
+- **RAWG pasada 2** (ratificado por el autor, 2026-09-07) — segunda pasada de
+  `enrich_rawg_ratings` sobre juegos con `rating IS NULL` y `first_release_date` en
+  2022-2026, ordenados por popularidad (`total_rating_count` → `rating_count` →
+  recientes), `--limit 20000` hasta agotar cuota. Necesita flags nuevos
+  (`--only-unrated`, `--release-year-min/max`, `--order-by popularity`) + tests +
+  enmienda a ADR-008. Motivo del autor: "máxima cantidad de datos ahora; el resto se
+  rellena con otras APIs al final". Spec completa en
+  `.planning/phases/02-.../02-02-RATINGS-FOLLOWUP.md`.
+- **Verificación del import IGDB** (petición del autor, 2026-09-07) — RESUELTA en 02-02:
+  consulta directa a BD confirma el import `complete` (312.560 obras, cursor 416.648),
+  sin franjas sin campos ampliados. El 13,933 % es la densidad real de rating de usuario
+  de IGDB, no un hueco del import. No hay nada que reimportar.
 
 ### Blockers/Concerns
 
 - Phase 1 must fit the three-day demo constraint; keep seeded accounts/catalogue and popularity logic intentionally thin.
 - Phase 2 must freeze the evaluation protocol before sophisticated recommender comparisons. — DONE (Plan 02-08, 2026-09-07): `docs/methodology/protocol.json` is checked in and `evaluation/protocol.py` refuses to run on a >24 grid or a consumed test split. 02-09/02-10/02-11/02-13 build on it.
-- Dataset and enrichment-provider legal terms require case-specific confirmation before adoption. — IGDB terms captured verbatim and reconciled in ADR-006 / docs/verification/igdb-api-probe.md §5 (2026-09-05). The FAQ-vs-DSA reading is a reasoned position for the author to accept, not legal advice; RAWG/Wikidata terms remain as previously recorded.
+- Dataset and enrichment-provider legal terms require case-specific confirmation before adoption. — IGDB terms captured verbatim and reconciled in ADR-006 / docs/verification/igdb-api-probe.md §5 (2026-09-05). RAWG Free API terms (non-commercial, attribution + backlink, 20k req/month, no redistribution) recorded in ADR-008; the authenticated N=10.000 run (2026-09-07) stayed well under quota with no 429s. The FAQ-vs-DSA reading is a reasoned position for the author to accept, not legal advice; Wikidata terms remain as previously recorded.
+- RAWG rating coverage is low: the top-10.000-by-`rating_count` slice added 0 net new coverage (those works already had IGDB ratings). Net coverage stays 13,933 %. RAWG pasada 2 (unrated + 2022-2026, by popularity) is the queued mechanism to raise it; other APIs will fill the remainder later.
+- Pre-existing defect (logged, deferred): 22 RAWG game ids reconcile to 2 governed works each; `SourceRecord.update_or_create(source, source_id)` overwrites the shared row's `work` FK. Ratings data is correct (each work keeps its own immutable snapshot); only RAWG provenance for those 22 rows (0,26 %) is imprecise. Fix is a provenance-schema change — see `.planning/WINDOWS.md`.
 - Plan 01-04 (Wave 5) is mid-execution and paused on a real blocker: the frontend (apps/web) was scaffolded in Plan 01-03 WITHOUT @types/react or @types/react-dom in devDependencies. Re-enabling TypeScript build-error checking (next.config.ts's ignoreBuildErrors:true was itself a bug, now removed) surfaces this immediately -- every .tsx file in apps/web fails to type-check (useState/FormEvent not found on 'react', JSX.IntrinsicElements missing, react/jsx-runtime has no types).
 
 Per project policy (01-01's package-legitimacy gate; deviation Rule 3's explicit exclusion for package-manager installs), a new dependency install requires human sign-off, not an agent's unilateral pnpm add -- even though @types/react and @types/react-dom are about as standard/low-risk as a package gets.
@@ -181,9 +210,14 @@ Handoff: .planning/HANDOFF.json (structured, one-shot — delete after resumptio
 
 ## Continuidad de esta sesion
 
-Ultimo estado: **Plan 02-08 COMPLETO** (2026-09-07) — protocolo de evaluación congelado,
-app `evaluation`, métricas y split leave-one-out; `pytest apps/api` 280/280; issue #24
-cerrada. En paralelo, 02-02 sigue esperando la decisión del autor en el checkpoint RAWG
-(job aparte). Siguiente trabajo desbloqueado en Fase 2: 02-03 (`depends_on: [02-01]`,
-búsqueda tolerante + filtros multi-selección) y, tras cerrar 02-02, el resto de la ola 3
-(02-05, 02-09, 02-10).
+Ultimo estado: **Ola 2 de la Fase 2 CERRADA** (2026-09-07). 02-08 (protocolo congelado) y
+02-02 (ratings IGDB + RAWG acotado) fusionados en `main` (`f8fd255`, `fb2dafe`); issues
+#24 y #18 cerradas. Reconciliados STATE / ROADMAP (4/13) / REQUIREMENTS (EVAL-02, EVAL-03,
+DATA-06, DATA-08, DOC-02 completos).
+
+**Ola 3 desbloqueada:** 02-03 (búsqueda tolerante + filtros backend), 02-05 (API de
+catálogo para el pase de UI), 02-09 (usuarios sintéticos — **checkpoint del autor**),
+02-10 (baseline aleatorio + features de contenido — **checkpoint del autor: numpy ahora
+vs Fase 3**).
+
+**Pendiente inmediato:** RAWG pasada 2 (ver Pending Todos y `02-02-RATINGS-FOLLOWUP.md`).

@@ -173,7 +173,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1)*
 
-- [ ] 02-02-PLAN.md — Campos de rating de usuario de IGDB, re-import + alias, snapshot inmutable `CorpusRatingSnapshot`, ADR-008
+- [x] 02-02-PLAN.md — Campos de rating de usuario de IGDB, re-import + alias, snapshot inmutable `CorpusRatingSnapshot`, ADR-008 — `fb2dafe` (2026-09-07); import IGDB verificado completo (312.560 obras, 27.014 con `rating` = 13,933 %), RAWG acotado N=10.000 top-`rating_count` → 8.575 emparejadas / 8.575 snapshots `source="rawg"` / 0 cobertura nueva (el corte ya tenía rating IGDB), `GameWork.rating` sin mutar, 70 tests catalogue
 - [x] 02-08-PLAN.md — Protocolo de evaluación congelado (`protocol.json`) + métricas de ranking + split leave-one-out — `2f51d16`/`2696c54` (2026-09-07); app `evaluation` en `INSTALLED_APPS`, 12 claves congeladas + `simulation:true`, rejilla de 18 configs (tope 24), `## Amenazas a la validez` (DOC-04), 54 tests; suite `pytest apps/api` 280/280
 
 **Wave 3** *(blocked on Wave 2)*

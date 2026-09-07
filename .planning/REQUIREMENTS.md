@@ -46,9 +46,9 @@
 - [x] **DATA-03**: Project generates a data dictionary and a quality/missing-fields report for the fixed corpus.
 - [x] **DATA-04**: Enrichment API is selected through a documented comparison of coverage, platforms, licence, attribution, quotas, stability, and cost.
 - [ ] **DATA-05**: Each enriched value retains its source and retrieval date.
-- [ ] **DATA-06**: Mutable API data cannot retrospectively alter completed experiments.
+- [x] **DATA-06**: Mutable API data cannot retrospectively alter completed experiments.
 - [ ] **DATA-07**: System uses deterministic rules to reconcile source identifiers and conflicting values.
-- [ ] **DATA-08**: Thesis evidence explains the dataset and API choices, limitations, and redistribution rights.
+- [x] **DATA-08**: Thesis evidence explains the dataset and API choices, limitations, and redistribution rights.
 
 ### Recommendations
 
@@ -111,7 +111,7 @@
 ### Thesis and Agent-Assisted Methodology
 
 - [x] **DOC-01**: Architecture and technology decisions record alternatives and rationale.
-- [ ] **DOC-02**: Dataset, API, data model, and normalisation processes are documented.
+- [x] **DOC-02**: Dataset, API, data model, and normalisation processes are documented.
 - [ ] **DOC-03**: Each algorithm documents its theory, formulation, parameters, and limitations.
 - [ ] **DOC-04**: Experimental protocol, metrics, results, and threats to validity are documented.
 - [ ] **DOC-05**: Thesis tables and figures are generated from immutable experiment artifacts.
@@ -189,9 +189,9 @@
 | QUAL-05 | Phase 01.1 | Pending |
 | DATA-03 | Phase 2 | Complete |
 | DATA-05 | Phase 2 | Pending |
-| DATA-06 | Phase 2 | Pending |
+| DATA-06 | Phase 2 | Complete |
 | DATA-07 | Phase 2 | Pending |
-| DATA-08 | Phase 2 | Pending |
+| DATA-08 | Phase 2 | Complete |
 | EVAL-01 | Phase 2 | Pending |
 | EVAL-02 | Phase 2 | Complete |
 | EVAL-03 | Phase 2 | Complete |
@@ -203,7 +203,7 @@
 | REC-07 | Phase 2 | Pending |
 | REC-08 | Phase 2 | Pending |
 | REC-09 | Phase 2 | Pending |
-| DOC-02 | Phase 2 | Pending |
+| DOC-02 | Phase 2 | Complete |
 | DOC-04 | Phase 2 | Pending |
 | AGENT-04 | Phase 2 | Pending |
 | EVAL-04 | Phase 3 | Pending |
