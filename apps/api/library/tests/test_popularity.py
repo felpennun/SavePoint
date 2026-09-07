@@ -10,7 +10,7 @@ from django.contrib.auth import get_user_model
 from django.db import connections
 from rest_framework.test import APIClient
 
-from accounts.models import DemoAccountAnchor
+from accounts.models import DemoAccountAnchor, DemoAccountIdentity
 from catalogue.models import GameWork
 from library import services
 from library.models import LibraryEntry
@@ -133,6 +133,32 @@ def test_self_registered_user_activity_does_not_move_the_baseline() -> None:
     result = rank_popularity_v1()
     assert result["results"] == []
     assert "pop-private" not in {r["slug"] for r in result["results"]}
+
+
+@pytest.mark.django_db
+def test_synthetic_evaluation_users_do_not_contaminate_baseline() -> None:
+    demo_user = _demo_user("pop-public-demo", "Pop-Public-Demo-Pass-9!")
+    work = GameWork.objects.create(canonical_slug="pop-public", original_title="Public Game")
+    LibraryEntry.objects.create(user=demo_user, work=work, current_status="completed")
+    cutoff = datetime.now(timezone.utc)
+    before = rank_popularity_v1(cutoff=cutoff)
+
+    synthetic_user = User.objects.create(username="synthetic-population-1", is_active=False)
+    synthetic_user.set_unusable_password()
+    synthetic_user.save(update_fields=["password"])
+    DemoAccountIdentity.objects.create(
+        id=__import__("uuid").uuid4(),
+        seed_key="synthetic-test-1",
+        user=synthetic_user,
+        marker="synthetic-eval-user",
+        display_label="Usuario sintético de prueba",
+    )
+    extra_work = GameWork.objects.create(canonical_slug="pop-synthetic-only", original_title="Synthetic Only")
+    LibraryEntry.objects.create(user=synthetic_user, work=extra_work, current_status="completed")
+
+    after = rank_popularity_v1(cutoff=cutoff)
+    assert after["results"] == before["results"]
+    assert after["input_snapshot_sha256"] == before["input_snapshot_sha256"]
 
 
 @pytest.mark.django_db

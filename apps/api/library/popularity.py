@@ -23,6 +23,7 @@ from catalogue.models import GameWork
 from library.models import LibraryEntry
 
 ALGORITHM_ID = "popularity-v1"
+SYNTHETIC_EVAL_USER_MARKER = "synthetic-eval-user"
 
 _STATUS_WEIGHTS = {"completed": 3, "playing": 2, "pending": 1, "abandoned": 0}
 
@@ -44,6 +45,8 @@ def rank_popularity_v1(cutoff: datetime | None = None) -> dict:
     entries = list(
         LibraryEntry.objects.filter(
             Q(user__demo_anchor__isnull=False) | Q(user__demo_identity__isnull=False),
+            # Evaluation-only accounts must never change the public demo baseline.
+            ~Q(user__demo_identity__marker=SYNTHETIC_EVAL_USER_MARKER),
             updated_at__lte=cutoff,
         ).values("work_id", "current_status", "rating_half_steps")
     )
