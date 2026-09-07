@@ -77,3 +77,34 @@ lanzar: añadir `shm_size` al servicio `db` de Compose para evitar el `DiskFull`
 memoria compartida observado en el paso de evidencia de IGDB. Después: medir cobertura
 RAWG real (emparejados / no emparejados / snapshots insertados), congelar evidencia,
 escribir `02-02-SUMMARY.md` y cerrar con `Closes #18`.
+
+### Resultado de la ejecución RAWG — 2026-09-07 (COMPLETO)
+
+Verificación previa en BD (constraints bloqueantes de `.continue-here.md`): `IgdbImportRun`
+`complete` (cursor 416.648, 312.560 works importados), 312.710 `GameWork`, 193.885 obras
+gobernadas `2026.09.1`, 27.014 con `rating` IGDB, 27.014 snapshots `source="igdb"`, 0
+`source="rawg"`. Todo coincide; se procedió.
+
+`shm_size: "256mb"` añadido al servicio `db` en `infra/compose.yaml`. Ejecución en 18
+lotes de 500 con `--offset` (resiliencia frente al reinicio del contenedor `db` por el
+worktree concurrente de 02-08) y `--env-file .env.local`; `RAWG_API_KEY` solo por
+entorno, nunca impreso ni commiteado. Evidencia JSON por lote conservada en scratchpad,
+fuera del control de versiones.
+
+| Métrica | Valor |
+|---|---:|
+| Obras consideradas (top-10.000 por `rating_count` IGDB) | 10.000 |
+| Emparejadas (slug exacto / título normalizado + año, con `rating` usable) | 8.575 |
+| No emparejadas (descartadas y contadas) | 1.425 |
+| Emparejadas sin `rating` usable | 0 |
+| `CorpusRatingSnapshot(source="rawg")` insertados | 8.575 |
+| `SourceRecord(source="rawg")` | 8.553 |
+| `GameWork.rating` mutado | no (huella SHA-256 idéntica antes/después) |
+| Cobertura combinada `igdb` OR `rawg` sobre 193.885 obras | 27.014 = **13,9330 %** (sin cambio) |
+| Cobertura nueva solo por RAWG | **0 obras** |
+
+Hallazgo: el corte ordenado por `rating_count` de IGDB es un subconjunto de las 27.014
+obras que ya tienen `rating` IGDB, así que RAWG aporta contraste de fuente, no cobertura
+nueva. `pytest apps/api/catalogue -q` → 70 passed. Re-ejecución de `--offset` idempotente
+(`snapshots_inserted=0`). Detalle en `docs/adr/ADR-008-external-ratings.md` y
+`docs/verification/igdb-catalogue-freeze.md`. Plan 02-02 cerrado.
