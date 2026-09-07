@@ -1,0 +1,44 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-09-07T07:42:40Z",
+  "phase": "02",
+  "phase_name": "Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender",
+  "phase_dir": ".planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir",
+  "plan": 2,
+  "task": 3,
+  "total_tasks": 3,
+  "status": "paused",
+  "completed_tasks": [
+    {"id": 1, "name": "Import IGDB user ratings and aliases", "status": "done", "commit": "a2c24e3"},
+    {"id": 2, "name": "Snapshot governed-corpus ratings", "status": "done", "commit": "e51388f"},
+    {"id": 3, "name": "Choose and prepare the secondary RAWG source", "status": "in_progress", "progress": "RAWG branch implemented and tested; live 10000-work enrichment not executed"}
+  ],
+  "remaining_tasks": [
+    {"id": 3, "name": "Review the 13.933 percent IGDB coverage and run RAWG if approved", "status": "not_started"},
+    {"id": 4, "name": "Create the final 02-02 SUMMARY and close the plan metadata", "status": "not_started"}
+  ],
+  "blockers": [
+    {"description": "The full IGDB import completed and persisted its data, but its final evidence-building step exited with PostgreSQL DiskFull in shared memory.", "type": "technical", "workaround": "The database was queried separately and verified complete; run the evidence/snapshot commands after checking Docker shared-memory availability."},
+    {"description": "The RAWG full enrichment still needs an explicit decision after reviewing the final IGDB coverage.", "type": "human_action", "workaround": "The RAWG key is configured in .env.local and a one-work probe authenticated successfully; resume with the bounded command when approved."
+  ],
+  "async_jobs": [],
+  "human_actions_pending": [
+    {"action": "Confirm whether to run the prepared RAWG enrichment after reviewing IGDB coverage", "context": "IGDB covers 27014 of 193885 governed works (13.933 percent); RAWG is the optional complement for the remainder.", "blocking": true}
+  ],
+  "decisions": [
+    {"decision": "Keep IGDB as primary rating source and add RAWG as an optional bounded complement", "rationale": "IGDB returned ratings, but final governed-corpus user-rating coverage is only 13.933 percent.", "phase": "02"},
+    {"decision": "RAWG enrichment default limit is N=10000", "rationale": "One request per work stays below the documented 20000 monthly free-plan quota and leaves retry/probe margin.", "phase": "02"},
+    {"decision": "Freeze IGDB ratings insert-only by corpus version", "rationale": "27014 immutable snapshots were inserted for corpus version 2026.09.1.", "phase": "02"}
+  ],
+  "uncommitted_files": [
+    ".planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/02-02-CHECKPOINT.md",
+    "docs/verification/igdb-catalogue-freeze.md",
+    "infra/compose.yaml",
+    "apps/api/catalogue/management/commands/enrich_rawg_ratings.py",
+    "apps/api/catalogue/rawg.py",
+    "apps/api/catalogue/tests/test_rawg_reconcile.py",
+    "docs/adr/ADR-008-external-ratings.md"
+  ],
+  "next_action": "Read the required files, verify CorpusVersion 2026.09.1 and the persisted counts, then decide/run RAWG with docker compose --env-file .env.local -f infra/compose.yaml run --rm api python manage.py enrich_rawg_ratings --corpus-version 2026.09.1 --limit 10000 --evidence-json <path>.",
+  "context_notes": "The IGDB reimport resumed after a DNS failure and completed at pass_cursor 416648 with 312560 works. Separate verification measured 193885 governed works, 27014 user ratings, and 30672 combined ratings. snapshot_corpus_ratings inserted 27014 IGDB snapshots. The RAWG client/command/reconciliation tests pass (4 tests); a one-work real probe authenticated but found no safe match. Do not print or commit API keys."
+}

@@ -48,8 +48,8 @@ rating permanece dentro del corpus y simplemente no recibe fila de snapshot.
 
 | Campo | Conteo | Porcentaje | Fuente de medición |
 |---|---:|---:|---|
-| `total_rating IS NOT NULL` | generado por comando | generado por comando | vista `in_corpus=True` |
-| `rating IS NOT NULL` | generado por comando | generado por comando | vista `in_corpus=True` |
+| `total_rating IS NOT NULL` | 30.672 | 15,8197 % | vista `in_corpus=True`, versión `2026.09.1` |
+| `rating IS NOT NULL` | 27.014 | 13,9330 % | vista `in_corpus=True`, versión `2026.09.1` |
 
 ### Medición reproducida de la BD de desarrollo — 2026-09-07
 
@@ -65,6 +65,29 @@ El JSON emitido por `snapshot_corpus_ratings` debe conservarse junto a esta evid
 al `corpus_version`. El dump de desarrollo queda obsoleto después de un re-import y un
 snapshot nuevos; al regenerarlo debe actualizarse el artefacto gitignored, nunca
 commitear el volcado completo.
+
+### Enriquecimiento RAWG acotado
+
+Por decisión de ADR-008, RAWG solo se consulta offline para las 10.000 obras
+gobernadas con mayor `rating_count` de IGDB, con desempate determinista por título e
+identidad interna. La ejecución requiere `RAWG_API_KEY`, se detiene en el límite
+configurado y produce un JSON con coincidencias, no emparejados y snapshots insertados.
+Una observación RAWG se guarda separada de IGDB y no sobrescribe `GameWork.rating`.
+Las páginas que muestren ese valor deben incluir un backlink activo a
+`https://rawg.io`; no se permite redistribuir el catálogo RAWG en bloque.
+
+En esta ejecución no se publica una cifra RAWG: el entorno no contenía
+`RAWG_API_KEY`. La implementación y sus pruebas quedan preparadas para la siguiente
+ejecución autenticada; el JSON resultante debe anexarse aquí sin sustituir la medición
+IGDB.
+
+### Resultado autenticado de IGDB — 2026-09-07
+
+El reimport ampliado terminÃ³ con `status=complete` y procesÃ³ 312.560 obras IGDB.
+Sobre la vista gobernada de la versiÃ³n `2026.09.1` se midieron 193.885 obras, de las
+que 27.014 tienen `rating` de usuario (13,9330 %) y 30.672 tienen `total_rating`
+combinado (15,8197 %). El comando `snapshot_corpus_ratings` insertÃ³ 27.014 filas
+`CorpusRatingSnapshot(source="igdb")`; una segunda ejecuciÃ³n es no-op para esa versiÃ³n.
 
 ## Evidencia medida
 

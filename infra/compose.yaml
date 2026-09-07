@@ -42,6 +42,11 @@ services:
       POSTGRES_PASSWORD: local_test_only
       POSTGRES_HOST: db
       POSTGRES_PORT: "5432"
+      # Offline enrichment credentials are optional and must be supplied via
+      # an environment file or `docker compose run -e`; never commit values.
+      IGDB_CLIENT_ID: ${IGDB_CLIENT_ID:-}
+      IGDB_CLIENT_SECRET: ${IGDB_CLIENT_SECRET:-}
+      RAWG_API_KEY: ${RAWG_API_KEY:-}
       # Local-development-only demo credentials, same spirit as
       # DJANGO_SECRET_KEY above -- not infrastructure secrets (D-02).
       # Override with real values via `docker compose run -e` for anything

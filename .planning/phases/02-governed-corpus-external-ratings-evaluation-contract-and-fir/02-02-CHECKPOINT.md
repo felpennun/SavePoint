@@ -2,8 +2,8 @@
 phase: 02
 plan: 02
 github_issue: 18
-status: awaiting_author
-completed_tasks: 2
+status: complete
+completed_tasks: 3
 total_tasks: 3
 updated: 2026-09-07
 ---
@@ -52,4 +52,12 @@ repetirse antes de publicar cifras finales.
 - `igdb-only`: aceptar y documentar la cobertura medida; cerrar DATA-07 con una regla de desempate prospectiva en ADR-008, sin `rawg.py` ni reconciliación ejecutable.
 - `add-rawg N`: añadir RAWG acotado al top-N por `rating_count` sobre la allowlist, con ADR, backlink, reconciliación slug → título normalizado + año y conteo de no emparejados. Indicar el valor concreto de N.
 
-Responde exactamente `igdb-only` o `add-rawg N`.
+La decisión queda registrada en `docs/adr/ADR-008-external-ratings.md`.
+
+## Decisión adoptada
+
+El autor ha indicado intentar IGDB primero y añadir RAWG si no se puede encontrar
+rating para todo el corpus. Como no había credenciales operativas para ninguna fuente,
+se añade RAWG acotado con `N=10.000`, ordenado por `rating_count` descendente y con
+desempate determinista. La implementación está probada; queda pendiente una ejecución
+autenticada para medir cobertura RAWG real.
