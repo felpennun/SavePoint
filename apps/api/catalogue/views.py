@@ -6,20 +6,30 @@ from __future__ import annotations
 from datetime import date, timedelta
 
 from django.db.models import F
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle, SimpleRateThrottle
 from rest_framework.views import APIView
 
 from catalogue.corpus import governed_works
-from catalogue.models import AssetAttribution, GameWork, SourceRecord
+from catalogue.models import AssetAttribution, GameWork, RelatedContent, SourceRecord
 from catalogue.search import (
     DEFAULT_PAGE_SIZE,
     FilterValidationError,
     parse_catalogue_query,
     search_games,
 )
-from catalogue.serializers import GameCardSerializer, GameDetailSerializer
+from catalogue.serializers import (
+    GameCardSerializer,
+    GameDetailSerializer,
+    _cover,
+    _display_title,
+)
+from library.models import LibraryEntry
+
+# DLC/expansion linkage relations surfaced by the "Para tus juegos" shelf.
+DLC_RELATIONS = ("dlc", "expansion")
 
 # ~6 months, expressed in days so the window is a single indexed btree
 # comparison on ``first_release_date`` (no calendar arithmetic per row).
@@ -128,6 +138,59 @@ class NewReleasesView(APIView):
             ]
         )
         return Response(GameCardSerializer(works, many=True).data)
+
+
+class OwnedGamesDlcView(APIView):
+    """GET /api/catalogue/owned-dlc/ -- the "Para tus juegos" shelf (D-15).
+
+    Owner-scoped by construction (threat T-02-05-01): ``IsAuthenticated``
+    and derived solely from ``request.user``'s library. No target-user
+    parameter is read. Returns the DLC / expansions of base games the user
+    owns, grouped by base game, projected through an explicit allowlist
+    tuple (threat T-02-05-05). Child works are returned even when they sit
+    outside ``governed_works()`` (D-03). A user with no resolvable DLC gets
+    ``{"groups": []}`` and 200, never an error.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request) -> Response:
+        library_work_ids = LibraryEntry.objects.filter(
+            user=request.user
+        ).values_list("work_id", flat=True)
+        rows = (
+            RelatedContent.objects.filter(
+                parent_work_id__in=library_work_ids,
+                relation__in=DLC_RELATIONS,
+            )
+            .select_related("parent_work", "child_work")
+            .prefetch_related("child_work__assets")
+            .order_by("parent_work__canonical_slug", "child_work__canonical_slug")
+        )
+
+        groups: dict[object, dict] = {}
+        for row in rows:
+            group = groups.setdefault(
+                row.parent_work_id,
+                {
+                    "base_game": {
+                        "slug": row.parent_work.canonical_slug,
+                        "title": _display_title(row.parent_work),
+                    },
+                    "dlc": [],
+                },
+            )
+            group["dlc"].append(
+                {
+                    "work_id": str(row.child_work_id),
+                    "slug": row.child_work.canonical_slug,
+                    "title": _display_title(row.child_work),
+                    "cover": _cover(row.child_work),
+                    "relation": row.relation,
+                }
+            )
+
+        return Response({"groups": list(groups.values())})
 
 
 class SourcesView(APIView):
