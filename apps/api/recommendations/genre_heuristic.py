@@ -34,23 +34,20 @@ from django.db.models import Case, FloatField, Sum, Value, When
 
 from catalogue.models import GameWork
 from library.models import LibraryEntry
+from recommendations._weights import (  # noqa: F401  (re-exported for callers)
+    _entry_weight,
+    _RATING_DIVISOR,
+    _STATUS_WEIGHTS,
+)
+
+# ``_STATUS_WEIGHTS`` / ``_RATING_DIVISOR`` / ``_entry_weight`` moved to the
+# shared ``recommendations._weights`` module (Plan 02-10) so the content
+# profile speaks the same activity-weighting language. They are re-exported
+# here unchanged -- ``from recommendations.genre_heuristic import
+# _entry_weight`` still resolves, REC-10 behaviour is byte-for-byte identical.
+__all__ = ["ALGORITHM_ID", "rank_genre_taste_v1"]
 
 ALGORITHM_ID = "genre-taste-v1"
-
-# Mirrors ``library/popularity.py``'s ``_STATUS_WEIGHTS`` so the personal
-# heuristic and the public baseline speak the same "how much does this
-# interaction count" language. ``abandoned`` contributes nothing: a
-# bounced-off title is not evidence of taste.
-_STATUS_WEIGHTS: dict[str, float] = {
-    "completed": 3.0,
-    "playing": 2.0,
-    "pending": 1.0,
-    "abandoned": 0.0,
-}
-
-# A rating adds ``rating_half_steps / 10`` (0.1 .. 1.0), identical to the
-# popularity baseline's rating contribution.
-_RATING_DIVISOR = 10
 
 # Documented request bound (threat T-01.1-11): the caller-supplied ``limit``
 # is clamped into ``[_MIN_LIMIT, _MAX_LIMIT]`` and the ranking SQL carries a
@@ -89,10 +86,6 @@ def _clamp_limit(limit: int | None) -> int:
     if limit is None:
         return _DEFAULT_LIMIT
     return max(_MIN_LIMIT, min(_MAX_LIMIT, int(limit)))
-
-
-def _entry_weight(status: str | None, rating_half_steps: int | None) -> float:
-    return _STATUS_WEIGHTS.get(status or "", 0.0) + (rating_half_steps or 0) / _RATING_DIVISOR
 
 
 def _fingerprint(taste: dict, ranked: list[tuple[str, float]]) -> str:
