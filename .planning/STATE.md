@@ -1,14 +1,14 @@
 ---
 gsd_state_version: 1.0
 status: in_progress
-stopped_at: Fase 2, ola 1 en curso. 02-01 tarea 1 ratificada (39 plataformas); 02-07 en ejecución. Checkpoints por tarea en el directorio de fase.
-last_updated: "2026-09-07T01:05:00+02:00"
-state_head: 8a97338
+stopped_at: Fase 2, ola 2. Plan 02-08 COMPLETO (protocolo de evaluación congelado). 02-02 sigue pausado en el checkpoint RAWG (job aparte del autor).
+last_updated: "2026-09-07T08:14:50.863Z"
+state_head: 2696c5423895a14a878941b55697668e912f294d
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 39
-  completed_plans: 28
+  completed_plans: 29
   percent: 25
 last_activity: 2026-09-07
 next_phase: 2
@@ -16,7 +16,7 @@ next_phase_name: Governed Corpus, External Ratings, Evaluation Contract, and Fir
 next_action: /gsd-execute-phase 2
 current_phase: 2
 current_phase_name: Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender
-last_activity_desc: Ola 1 iniciada; D-01 ratificada, consolas actuales primero en filtros; tablero sincronizado (13 issues).
+last_activity_desc: 02-08 completo — app `evaluation`, `protocol.json` congelado (12 claves + rejilla de 18 configs), `evaluation-protocol.md` (DOC-04), métricas de ranking y split leave-one-out; suite `pytest apps/api` 280/280.
 ---
 
 # Project State
@@ -32,9 +32,19 @@ See: .planning/PROJECT.md (updated 2026-09-04)
 
 ### Snapshot de ejecucion vigente (2026-09-07)
 
-Fase 2, ola 1 cerrada. 02-01 y 02-07 tienen SUMMARY, commits y verificaciones verdes.
-La siguiente es la ola 2; 02-02 se detiene antes de implementar la parte RAWG para que el
-autor decida con la cobertura de ratings medida.
+Fase 2, ola 2 en curso. 02-01 y 02-07 (ola 1) y **02-08** tienen SUMMARY, commits y
+verificaciones verdes. 02-08 congeló el contrato de evaluación EVAL-03:
+`docs/methodology/protocol.json` (12 claves + `simulation:true`, rejilla de 18 configs,
+tope 24), `docs/methodology/evaluation-protocol.md` (`## Amenazas a la validez`, DOC-04),
+app `apps/api/evaluation/` en `INSTALLED_APPS` con `protocol.py` (loader fail-closed),
+`metrics.py` (precision/recall/nDCG/MAP a mano) y `splits.py` (leave-one-out por usuario +
+partición train/val/test). Commits `2f51d16` (Tarea 2, tracer) y `2696c54` (Tarea 3). La
+Tarea 1 (`checkpoint:decision`, one-way) ya venía ratificada `ratify-as-proposed` (`e9be42d`).
+EVAL-02 y EVAL-03 marcados completos; EVAL-01/EVAL-10/DOC-04 esperan a 02-09 / 02-13
+(shared-ID gate).
+
+02-02 sigue **pausado** antes de implementar la parte RAWG, en un job aparte del autor —
+no tocado por 02-08.
 
 Fase 01.1 CERRADA. **Fase 2 en ejecución: ola 1, con checkpoints después de cada tarea.** D-01 ratificada por el autor el 2026-09-07 (39 plataformas). 02-07 en ejecución; 02-01 continúa por la tarea 2 al liberar el ejecutor. La preferencia de consolas actuales primero está registrada en 02-04.
 
@@ -86,6 +96,7 @@ Progreso global: 2/8 fases (25%).
 | Phase 01 P11 | 55min | 2 tasks | 6 files |
 | Phase 01 P12 | 2 sessions | 2 tasks | 9 files |
 | Phase 01 P14 | 1 session | 1 tasks | 4 files |
+| Phase 02 P08 | 18 min | 3 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -121,7 +132,7 @@ None yet.
 ### Blockers/Concerns
 
 - Phase 1 must fit the three-day demo constraint; keep seeded accounts/catalogue and popularity logic intentionally thin.
-- Phase 2 must freeze the evaluation protocol before sophisticated recommender comparisons.
+- Phase 2 must freeze the evaluation protocol before sophisticated recommender comparisons. — DONE (Plan 02-08, 2026-09-07): `docs/methodology/protocol.json` is checked in and `evaluation/protocol.py` refuses to run on a >24 grid or a consumed test split. 02-09/02-10/02-11/02-13 build on it.
 - Dataset and enrichment-provider legal terms require case-specific confirmation before adoption. — IGDB terms captured verbatim and reconciled in ADR-006 / docs/verification/igdb-api-probe.md §5 (2026-09-05). The FAQ-vs-DSA reading is a reasoned position for the author to accept, not legal advice; RAWG/Wikidata terms remain as previously recorded.
 - Plan 01-04 (Wave 5) is mid-execution and paused on a real blocker: the frontend (apps/web) was scaffolded in Plan 01-03 WITHOUT @types/react or @types/react-dom in devDependencies. Re-enabling TypeScript build-error checking (next.config.ts's ignoreBuildErrors:true was itself a bug, now removed) surfaces this immediately -- every .tsx file in apps/web fails to type-check (useState/FormEvent not found on 'react', JSX.IntrinsicElements missing, react/jsx-runtime has no types).
 
@@ -170,5 +181,9 @@ Handoff: .planning/HANDOFF.json (structured, one-shot — delete after resumptio
 
 ## Continuidad de esta sesion
 
-Ultimo estado: 02-02 tareas 1 y 2 cerradas; esperando decision del autor en el checkpoint
-RAWG con cobertura medida 0,00 % sobre la base persistente pre-rating.
+Ultimo estado: **Plan 02-08 COMPLETO** (2026-09-07) — protocolo de evaluación congelado,
+app `evaluation`, métricas y split leave-one-out; `pytest apps/api` 280/280; issue #24
+cerrada. En paralelo, 02-02 sigue esperando la decisión del autor en el checkpoint RAWG
+(job aparte). Siguiente trabajo desbloqueado en Fase 2: 02-03 (`depends_on: [02-01]`,
+búsqueda tolerante + filtros multi-selección) y, tras cerrar 02-02, el resto de la ola 3
+(02-05, 02-09, 02-10).

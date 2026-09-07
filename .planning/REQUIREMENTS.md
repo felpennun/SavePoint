@@ -66,8 +66,8 @@
 ### Experimentation and Evaluation
 
 - [ ] **EVAL-01**: All algorithms are compared with the same users, candidates, exclusions, and split manifests.
-- [ ] **EVAL-02**: Transformations fit training data only and the test set remains isolated from tuning.
-- [ ] **EVAL-03**: Protocol fixes relevance, K, splits, metrics, and tuning budget before algorithm comparison.
+- [x] **EVAL-02**: Transformations fit training data only and the test set remains isolated from tuning.
+- [x] **EVAL-03**: Protocol fixes relevance, K, splits, metrics, and tuning budget before algorithm comparison.
 - [ ] **EVAL-04**: Evaluation calculates justified accuracy and ranking metrics.
 - [ ] **EVAL-05**: Evaluation calculates coverage, diversity, and novelty metrics.
 - [ ] **EVAL-06**: Evaluation records execution time and resource consumption.
@@ -193,8 +193,8 @@
 | DATA-07 | Phase 2 | Pending |
 | DATA-08 | Phase 2 | Pending |
 | EVAL-01 | Phase 2 | Pending |
-| EVAL-02 | Phase 2 | Pending |
-| EVAL-03 | Phase 2 | Pending |
+| EVAL-02 | Phase 2 | Complete |
+| EVAL-03 | Phase 2 | Complete |
 | EVAL-09 | Phase 2 | Pending |
 | EVAL-10 | Phase 2 | Pending |
 | REC-01 | Phase 2 | Pending |

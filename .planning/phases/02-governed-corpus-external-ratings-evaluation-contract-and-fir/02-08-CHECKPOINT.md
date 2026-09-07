@@ -2,8 +2,8 @@
 phase: 02
 plan: 08
 github_issue: 24
-status: in_progress
-completed_tasks: 1
+status: complete
+completed_tasks: 3
 total_tasks: 3
 updated: 2026-09-07
 ---
@@ -37,6 +37,14 @@ en el Plan 02-13 contra el `CorpusVersion` activo.
 ## Estado
 
 - Tarea 1: **ratificada** (este documento).
-- Tarea 2: pendiente — app `evaluation`, `protocol.json` + `evaluation-protocol.md`, `metrics.py`, tests.
-- Tarea 3: pendiente — `splits.py` (leave-one-out por usuario + partición train/val/test), tests.
-- Cierre: `02-08-SUMMARY.md` + commit con `Closes #24`.
+- Tarea 2: **completada** (`2f51d16`) — app `evaluation` en `INSTALLED_APPS`, `docs/methodology/protocol.json`
+  (12 claves congeladas + `simulation: true`), `docs/methodology/evaluation-protocol.md`
+  (`## Amenazas a la validez`), `protocol.py` (loader fail-closed, `frozen_hash`, tope de rejilla,
+  marcador de test consumido), `metrics.py` (precision/recall/nDCG/MAP a mano). 46 tests verdes.
+- Tarea 3: **completada** (`2696c54`) — `splits.py`: `relevant_positive_ids` (D-17),
+  `leave_one_out` determinista por `(seed, user.pk)` con `sha256` del manifiesto de candidatos,
+  `user_split` disjunto 120/40/40. 8 tests verdes.
+- Cierre: `02-08-SUMMARY.md` escrito; suite completa `pytest apps/api` 280/280; commit de
+  metadatos con `Closes #24`.
+
+**Plan 02-08 COMPLETO (2026-09-07).**

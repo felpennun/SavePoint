@@ -161,7 +161,7 @@ Plans (execution order follows the author's locked D-01 -> D-02 -> D-03 -> D-04 
   5. A signed-in user receives a ranked recommendation from a first ratings-aware recommender that combines their own recorded genre affinity with the aggregate external ratings of comparable games, excludes already-consumed titles, shows a deterministic explanation grounded in persisted features, records the model, feature, and input-data versions of every published result, and gives a sparse-history user an explicit cold-start fallback instead of an empty list; a random baseline is available as the comparison floor.
   6. The phase records the dataset, API, data-model, and normalisation documentation, the protocol, metrics, and threats to validity, and the controls against leakage, hallucination, bias, error, and information exposure, plus the author decisions behind them.
 
-**Plans**: 2/13 plans executed (6 waves)
+**Plans**: 3/13 plans executed (6 waves)
 **UI hint**: yes
 
 Plans:
@@ -174,7 +174,7 @@ Plans:
 **Wave 2** *(blocked on Wave 1)*
 
 - [ ] 02-02-PLAN.md — Campos de rating de usuario de IGDB, re-import + alias, snapshot inmutable `CorpusRatingSnapshot`, ADR-008
-- [ ] 02-08-PLAN.md — Protocolo de evaluación congelado (`protocol.json`) + métricas de ranking + split leave-one-out
+- [x] 02-08-PLAN.md — Protocolo de evaluación congelado (`protocol.json`) + métricas de ranking + split leave-one-out — `2f51d16`/`2696c54` (2026-09-07); app `evaluation` en `INSTALLED_APPS`, 12 claves congeladas + `simulation:true`, rejilla de 18 configs (tope 24), `## Amenazas a la validez` (DOC-04), 54 tests; suite `pytest apps/api` 280/280
 
 **Wave 3** *(blocked on Wave 2)*
 
