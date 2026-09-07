@@ -1,22 +1,22 @@
 ---
 gsd_state_version: 1.0
 status: in_progress
-stopped_at: Fase 2, ola 2 CERRADA (02-02 + 02-08 fusionados en main). Ola 3 desbloqueada. Pendiente RAWG pasada 2 (juegos sin rating, 2022-2026, por popularidad — ratificado por el autor).
-last_updated: "2026-09-07T09:00:00+02:00"
+stopped_at: Fase 2, ola 3 CERRADA (02-03 + 02-05 + 02-09 + 02-10 completados). Ola 4 desbloqueada. Pendiente RAWG pasada 2 (juegos sin rating, 2022-2026, por popularidad — ratificado por el autor).
+last_updated: "2026-09-07T14:30:00+02:00"
 state_head: fb2dafe
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 39
-  completed_plans: 30
-  percent: 26
+  completed_plans: 34
+  percent: 87
 last_activity: 2026-09-07
 next_phase: 2
 next_phase_name: Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender
-next_action: /gsd-execute-phase 2
+next_action: /gsd-execute-phase 2 --wave 4
 current_phase: 2
 current_phase_name: Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender
-last_activity_desc: Ola 2 cerrada. 02-08 congeló el protocolo (`protocol.json`, métricas, split LOO; 280/280). 02-02 verificó el import IGDB completo (312.560 obras, 27.014 con rating = 13,933 %) y corrió RAWG acotado N=10.000 top-`rating_count` → 8.575 snapshots `source="rawg"`, 0 cobertura nueva (el corte ya tenía rating IGDB). Fusiones `f8fd255` y `fb2dafe`.
+last_activity_desc: Ola 3 cerrada. 02-09 generó y persistió 200 usuarios sintéticos reproducibles por semilla, incluidos 25 cold-start; aisló `synthetic-eval-user` del baseline de popularidad y dejó el informe estadístico. Verificación: 17 tests específicos y 352 tests del backend en verde. Commit de producción: `0b90de7`.
 ---
 
 # Project State
@@ -26,14 +26,15 @@ last_activity_desc: Ola 2 cerrada. 02-08 congeló el protocolo (`protocol.json`,
 See: .planning/PROJECT.md (updated 2026-09-04)
 
 **Core value:** Users receive useful and explainable video-game recommendations from a well-organised collection, while every algorithmic result remains reproducible and defensible in the thesis.
-**Current focus:** Fase 2 en ejecución, ola 1. Registro vigente: `.planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/02-EXECUTION-CHECKPOINT.md`.
+**Current focus:** Fase 2 en ejecución, ola 4. Registro vigente: `.planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/02-EXECUTION-CHECKPOINT.md`.
 
 ## Current Position
 
 ### Snapshot de ejecucion vigente (2026-09-07)
 
-**Fase 2, ola 2 CERRADA.** 02-01 y 02-07 (ola 1), **02-02** y **02-08** tienen SUMMARY,
-commits y verificaciones verdes, fusionados en `main` (`f8fd255`, `fb2dafe`).
+**Fase 2, ola 3 CERRADA.** 02-01 y 02-07 (ola 1), 02-02 y 02-08 (ola 2), y 02-03,
+02-05, 02-09 y 02-10 (ola 3) tienen SUMMARY, commits y verificaciones verdes. El plan
+02-09 se cerró en `0b90de7`.
 
 - **02-08** congeló el contrato de evaluación EVAL-03: `docs/methodology/protocol.json`
   (12 claves + `simulation:true`, rejilla de 18 configs, tope 24),
@@ -52,8 +53,8 @@ commits y verificaciones verdes, fusionados en `main` (`f8fd255`, `fb2dafe`).
   concurrente; conversión de rutas MSYS; bug pre-existente de FK de `SourceRecord` en 22
   filas, 0,26 %, diferido).
 
-Requisitos completados en la ola 2: EVAL-02, EVAL-03, DATA-06, DATA-08, DOC-02.
-EVAL-01/EVAL-10/DOC-04 y DATA-05/DATA-07 siguen pendientes (shared-ID gate con 02-09/02-13/02-05).
+Requisitos completados en la ola 3: EVAL-09, EVAL-10 y AUTH-02, además de REC-01 y REC-03.
+Siguen pendientes EVAL-01, DATA-05, DATA-07 y los planes restantes de la Fase 2.
 
 **Pendiente inmediato — RAWG pasada 2** (ratificado por el autor 2026-09-07, ver
 `02-02-RATINGS-FOLLOWUP.md`): juegos con `rating IS NULL` y `first_release_date` 2022-2026,
@@ -173,6 +174,13 @@ WHAT'S UNCOMMITTED (working tree, not yet type-checked clean): apps/web/app/[loc
 
 TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<version matching react 19.2.7> @types/react-dom@<matching>` at the repo root (deps are hoisted there, see package.json), run `pnpm exec tsc --noEmit` in apps/web to confirm the errors clear, then continue: verify the dev server actually renders each page, write/run the e2e/demo-journey.spec.ts real login journey (replacing the 01-15 skip block), run the plan's two <verify> commands, then close out Plan 01-04 (SUMMARY.md, STATE/ROADMAP/REQUIREMENTS updates) exactly like 01-05/01-06/01-15 before it.
 
+## Tareas rápidas completadas
+
+| Fecha | Tarea | Resultado |
+|---|---|---|
+| 2026-09-07 | Incorporación de la documentación de la Fase 2 en la memoria LaTeX | Protocolo, ratings, corpus gobernado, algoritmos y decisiones previas al laboratorio documentados; compilación pendiente de entorno TeX |
+| 2026-09-07 | Revisión académica y corrección de la memoria LaTeX | Tablas adaptables, prosa y referencias revisadas; compilación pendiente de entorno TeX |
+
 ## Deferred Items
 
 | Category | Item | Status | Deferred At | Milestone |
@@ -208,16 +216,19 @@ blocking-human checkpoint: IGDB final governed-corpus user-rating coverage measu
 Resume file: .planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/.continue-here.md
 Handoff: .planning/HANDOFF.json (structured, one-shot — delete after resumption)
 
-## Continuidad de esta sesion
+## Continuidad de esta sesión
 
-Ultimo estado: **Ola 2 de la Fase 2 CERRADA** (2026-09-07). 02-08 (protocolo congelado) y
-02-02 (ratings IGDB + RAWG acotado) fusionados en `main` (`f8fd255`, `fb2dafe`); issues
-#24 y #18 cerradas. Reconciliados STATE / ROADMAP (4/13) / REQUIREMENTS (EVAL-02, EVAL-03,
-DATA-06, DATA-08, DOC-02 completos).
+Último estado comprobado: **Wave 3 de la Fase 2 cerrada** (2026-09-07). Hay 8/13 planes
+con `SUMMARY.md`: 02-01, 02-02, 02-03, 02-05, 02-07, 02-08, 02-09 y 02-10. Permanecen
+pendientes 02-04, 02-06, 02-11, 02-12 y 02-13; la Wave 4 es el siguiente bloque.
 
-**Ola 3 desbloqueada:** 02-03 (búsqueda tolerante + filtros backend), 02-05 (API de
-catálogo para el pase de UI), 02-09 (usuarios sintéticos — **checkpoint del autor**),
-02-10 (baseline aleatorio + features de contenido — **checkpoint del autor: numpy ahora
-vs Fase 3**).
+La documentación LaTeX de la Fase 2 y la revisión académica están incorporadas en el
+árbol de trabajo (`thesis/`), con tablas adaptables, referencias revisadas y la memoria
+de algoritmos, ratings, decisiones previas al laboratorio, protocolo y limitaciones. La
+compilación final se hará en Overleaf porque TeX Live/MiKTeX no queda instalado localmente;
+los cambios siguen sin commit y deben compilarse allí antes de generar el ZIP definitivo.
 
-**Pendiente inmediato:** RAWG pasada 2 (ver Pending Todos y `02-02-RATINGS-FOLLOWUP.md`).
+**Demo local solicitada por el autor:** la Wave 3 ya está cerrada. El siguiente paso
+operativo es levantar el entorno con `docker compose -f infra/compose.yaml up --build` y
+abrir `http://localhost:3000` para el walkthrough. Comprobar antes que `api` y `web` estén
+healthy y mantener a mano las tres cuentas demo definidas en `infra/compose.yaml`.

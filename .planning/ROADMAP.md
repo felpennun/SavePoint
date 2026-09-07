@@ -178,10 +178,10 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2)*
 
-- [ ] 02-03-PLAN.md — Búsqueda tolerante (backfill de `GameAlias`) + filtros multi-selección backend
-- [ ] 02-05-PLAN.md — API de catálogo para el pase de UI: serializer, `NewReleasesView` (D-24), `OwnedGamesDlcView` (D-15), `display_rating` (D-09)
-- [ ] 02-09-PLAN.md — Usuarios sintéticos reproducibles por semilla + aislamiento del baseline de popularidad + informe de validación
-- [ ] 02-10-PLAN.md — Baseline aleatorio `rank_random_v1` (REC-01) + modelo de features de contenido + caché `WorkFeatureVector`
+- [x] 02-03-PLAN.md — Búsqueda tolerante (backfill de `GameAlias`) + filtros multi-selección backend — completado; resumen y pruebas disponibles
+- [x] 02-05-PLAN.md — API de catálogo para el pase de UI: serializer, `NewReleasesView` (D-24), `OwnedGamesDlcView` (D-15), `display_rating` (D-09) — completado; resumen y pruebas disponibles
+- [x] 02-09-PLAN.md — Usuarios sintéticos reproducibles por semilla + aislamiento del baseline de popularidad + informe de validación — completado; 200 usuarios, 25 cold-start, 17 tests específicos y 352 tests de backend
+- [x] 02-10-PLAN.md — Baseline aleatorio `rank_random_v1` (REC-01) + modelo de features de contenido + caché `WorkFeatureVector` — completado; resumen y pruebas disponibles
 
 **Wave 4** *(blocked on Wave 3)*
 

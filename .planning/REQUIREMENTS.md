@@ -8,7 +8,7 @@
 ### Accounts and Profiles
 
 - [x] **AUTH-01**: User can sign in to and sign out of a controlled account.
-- [ ] **AUTH-02**: System can load synthetic users that are clearly identified as simulated accounts.
+- [x] **AUTH-02**: System can load synthetic users that are clearly identified as simulated accounts.
 - [ ] **PROF-01**: User can edit their alias, avatar, and biography.
 - [x] **PROF-02**: An authorised visitor can view a public profile.
 - [ ] **PROF-03**: Public profile shows only permitted games, lists, ratings, comments, and statistics.
@@ -73,8 +73,8 @@
 - [ ] **EVAL-06**: Evaluation records execution time and resource consumption.
 - [ ] **EVAL-07**: Results are reported by user cohort, including zero-history and sparse-history users.
 - [ ] **EVAL-08**: Comparisons use multiple seeds, uncertainty estimates, and justified statistical tests.
-- [ ] **EVAL-09**: Synthetic users are generated from contrasting, parameterised, and reproducible scenarios.
-- [ ] **EVAL-10**: Conclusions distinguish synthetic simulation results from evidence about real users.
+- [x] **EVAL-09**: Synthetic users are generated from contrasting, parameterised, and reproducible scenarios.
+- [x] **EVAL-10**: Conclusions distinguish synthetic simulation results from evidence about real users.
 - [ ] **EVAL-11**: Every run records code, environment, dataset, split, seeds, parameters, model, and metric identities.
 - [ ] **EVAL-12**: Stored artifacts allow aggregate results to be recalculated without rerunning an experiment.
 - [ ] **EVAL-13**: Research panel compares algorithms, configurations, metrics, cohorts, and runs.
@@ -183,7 +183,7 @@
 | AGENT-02 | Phase 1 | Complete |
 | AGENT-03 | Phase 1 | Complete |
 | CAT-02 | Phase 01.1 | Pending |
-| AUTH-02 | Phase 01.1 | Pending |
+| AUTH-02 | Phase 2 | Complete (Plan 02-09) |
 | DATA-04 | Phase 01.1 | Complete (ADR-006, Plan 01.1-01) |
 | REC-10 | Phase 01.1 | Pending |
 | QUAL-05 | Phase 01.1 | Pending |
@@ -195,8 +195,8 @@
 | EVAL-01 | Phase 2 | Pending |
 | EVAL-02 | Phase 2 | Complete |
 | EVAL-03 | Phase 2 | Complete |
-| EVAL-09 | Phase 2 | Pending |
-| EVAL-10 | Phase 2 | Pending |
+| EVAL-09 | Phase 2 | Complete (Plan 02-09) |
+| EVAL-10 | Phase 2 | Complete (Plan 02-09) |
 | REC-01 | Phase 2 | Pending |
 | REC-03 | Phase 2 | Pending |
 | REC-06 | Phase 2 | Pending |
