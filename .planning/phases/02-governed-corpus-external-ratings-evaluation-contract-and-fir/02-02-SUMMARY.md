@@ -205,6 +205,13 @@ Per the execute-phase instructions, this plan did **not** modify `.planning/STAT
 - Phase 2 success criterion 2 is observable: every work with an external rating carries it with source + `retrieved_at`, immutably snapshotted per `corpus_version`, with a deterministic, documented reconciliation rule (executable slug/title+year matching in `enrich_rawg_ratings.py` + `test_rawg_reconcile.py`).
 - Open follow-up: the 22-row RAWG `SourceRecord` FK-overwrite (see Deviation 3) if per-work RAWG provenance is later needed.
 
+## Self-Check: PASSED
+
+- `02-02-SUMMARY.md` present and committed (`bbf94c0`).
+- Commits verified in log: `794d091` (shm_size), `9cbcdeb` (RAWG run), `bbf94c0` (plan close, `Closes #18`).
+- Working tree clean (only pre-existing `.claude/settings.local.json`, not touched by this plan).
+- No stray `.rawg-evidence*.json` in the repo tree; per-batch evidence retained only in the session scratchpad.
+
 ---
 *Phase: 02-governed-corpus-external-ratings-evaluation-contract-and-fir*
 *Completed: 2026-09-07*
