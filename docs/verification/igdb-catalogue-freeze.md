@@ -76,10 +76,40 @@ Una observación RAWG se guarda separada de IGDB y no sobrescribe `GameWork.rati
 Las páginas que muestren ese valor deben incluir un backlink activo a
 `https://rawg.io`; no se permite redistribuir el catálogo RAWG en bloque.
 
-En esta ejecución no se publica una cifra RAWG: el entorno no contenía
-`RAWG_API_KEY`. La implementación y sus pruebas quedan preparadas para la siguiente
-ejecución autenticada; el JSON resultante debe anexarse aquí sin sustituir la medición
-IGDB.
+#### Ejecución autenticada RAWG — 2026-09-07
+
+Estado previo verificado directamente en la BD antes de lanzar: `IgdbImportRun` en
+`complete` (cursor 416.648), 312.710 `GameWork`, 193.885 obras gobernadas de
+`2026.09.1`, 27.014 con `rating` de usuario IGDB, 27.014
+`CorpusRatingSnapshot(source="igdb")`, 0 filas RAWG.
+
+`enrich_rawg_ratings --corpus-version 2026.09.1 --limit 10000` con
+`--env-file .env.local`, ejecutado en 18 lotes de 500 (`--offset`) para resistir el
+reinicio del contenedor `db` por un worktree concurrente. `RAWG_API_KEY` solo por
+entorno; no se imprimió ni se commiteó. La evidencia JSON por lote se conservó en el
+área de scratchpad, fuera del control de versiones (misma regla que `data/snapshots/`).
+
+| Métrica | Valor |
+|---|---:|
+| Obras consideradas (top-10.000 por `rating_count` IGDB, orden determinista) | 10.000 |
+| Emparejadas por slug exacto o título normalizado + año | 8.575 |
+| No emparejadas (descartadas y contadas, sin fuzzy) | 1.425 |
+| Emparejadas sin `rating` usable | 0 |
+| `CorpusRatingSnapshot(source="rawg")` insertados | 8.575 |
+| `SourceRecord(source="rawg")` | 8.553 |
+| `GameWork.rating` mutado | no (huella SHA-256 idéntica antes/después) |
+| Cobertura combinada `igdb` OR `rawg` sobre 193.885 obras | 27.014 = **13,9330 %** |
+| Cobertura nueva aportada solo por RAWG | **0 obras** |
+
+Re-ejecutar cualquier `--offset` es idempotente: `snapshots_inserted = 0` en la
+segunda pasada (verificado sobre el rango 500–700). La suite
+`pytest apps/api/catalogue -q` queda en verde (70 passed).
+
+Interpretación (DATA-07/DATA-08): como el corte se ordena por `rating_count` de IGDB,
+las 10.000 obras procesadas caen dentro de las 27.014 que ya tienen `rating` IGDB.
+RAWG aporta aquí una segunda observación contrastable para las obras más valoradas,
+**no** cobertura adicional. La cifra de cobertura del corpus gobernado sigue siendo
+13,9330 %.
 
 ### Resultado autenticado de IGDB — 2026-09-07
 

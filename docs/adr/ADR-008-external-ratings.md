@@ -48,8 +48,8 @@ acotado a `N=10.000` obras por ejecución y al corpus gobernado activo. El coman
 
 En cualquier comparación futura, IGDB gana los empates de procedencia; RAWG solo
 rellena la ausencia de una observación IGDB para la misma obra y versión de corpus.
-La cifra de RAWG no se considera cobertura medida hasta ejecutar el comando con una
-clave válida y guardar su JSON de evidencia.
+El comando se ejecutó de forma autenticada el 2026-09-07 (resultados en
+*Resultado autenticado*, más abajo).
 
 ## Evidencia y fuentes
 
@@ -64,14 +64,43 @@ clave válida y guardar su JSON de evidencia.
 - `apps/api/catalogue/rawg.py` y `enrich_rawg_ratings.py`: cliente offline,
   redirecciones bloqueadas, backoff para 429/5xx y reconciliación determinista.
 
+### Resultado autenticado — 2026-09-07
+
+Ejecución en vivo de `enrich_rawg_ratings --corpus-version 2026.09.1 --limit 10000`
+con `--env-file .env.local`, en lotes de 500 (18 lotes) sobre la base de desarrollo
+persistente. Estado previo verificado en BD: `IgdbImportRun` en `complete`, 312.710
+`GameWork`, 193.885 obras gobernadas de `2026.09.1`, 27.014 con `rating` de usuario
+IGDB (13,9330 %), 27.014 `CorpusRatingSnapshot(source="igdb")`.
+
+| Métrica | Valor |
+|---|---:|
+| Obras consideradas (top-10.000 por `rating_count` IGDB) | 10.000 |
+| Emparejadas (slug exacto o título normalizado + año, con `rating` usable) | 8.575 |
+| No emparejadas (descartadas y contadas, sin fuzzy) | 1.425 |
+| Emparejadas sin `rating` usable | 0 |
+| `CorpusRatingSnapshot(source="rawg")` insertados | 8.575 |
+| `SourceRecord(source="rawg")` | 8.553 (22 juegos RAWG cubren 2 obras IGDB cada uno) |
+| Escala de `rating` RAWG resultante | 0–100 (máx. observado 96,6; ninguno fuera de rango) |
+| `GameWork.rating` mutado por la ejecución | no — huella SHA-256 idéntica antes/después |
+| Cobertura combinada (`igdb` OR `rawg`) sobre 193.885 obras | 27.014 = **13,9330 %** (sin cambio) |
+| Cobertura nueva aportada solo por RAWG | **0 obras** |
+
+Hallazgo clave: el corte acotado ordena por `rating_count` de IGDB descendente, así
+que las 10.000 obras procesadas son un subconjunto de las 27.014 que ya tienen
+`rating` de usuario IGDB. RAWG, en este alcance, **no aumenta la cobertura de rating
+del corpus gobernado**: aporta una segunda observación independiente y contrastable
+para las obras más valoradas, no ratings para obras que no lo tenían. La evidencia
+JSON por lote se conservó fuera del control de versiones (regla de `data/snapshots/`).
+
 ## Consecuencias
 
-La fase puede aumentar la cobertura de ratings populares sin hacer una descarga
-completa ni convertir RAWG en fuente de identidad. La contrapartida es una segunda
-procedencia con términos propios: toda interfaz que muestre datos RAWG debe incluir
-un backlink activo a `https://rawg.io`, y los datos no se redistribuyen en bloque.
-La ausencia de `RAWG_API_KEY` sigue siendo un bloqueo operativo para medir cobertura
-real, no una razón para inventar resultados.
+RAWG queda como segunda cadena de procedencia contrastable para las obras más
+valoradas del corpus, no como vía para subir la cobertura: la ejecución autenticada
+del 2026-09-07 aportó 0 obras nuevas con rating. La contrapartida se mantiene: toda
+interfaz que muestre datos RAWG debe incluir un backlink activo a `https://rawg.io`,
+y los datos no se redistribuyen en bloque. Si en el futuro se quisiera cobertura
+adicional real habría que cambiar el criterio de selección (p. ej. obras gobernadas
+*sin* `rating` IGDB) y revisar cuota y esta decisión.
 
 ## Reversibilidad
 
