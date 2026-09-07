@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { FilterBar } from "@/components/FilterBar";
+import { FilterChip } from "@/components/FilterChip";
 import { GameCard } from "@/components/GameCard";
 import { getDictionary } from "@/i18n";
 import { fetchCatalogueList } from "@/lib/api";
@@ -9,6 +10,8 @@ import {
   buildQuery,
   countActiveFilters,
   parseFilters,
+  removeHref,
+  sortPlatformOptions,
 } from "@/lib/catalogue-filters";
 
 type RawParams = Record<string, string | string[] | undefined>;
@@ -17,11 +20,21 @@ function first(v: string | string[] | undefined): string | undefined {
   return Array.isArray(v) ? v[0] : v;
 }
 
+function toQueryString(params: RawParams): string {
+  const query = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    for (const item of Array.isArray(value) ? value : value == null ? [] : [value]) {
+      query.append(key, item);
+    }
+  }
+  return query.toString();
+}
+
 /**
  * Catalogue (01.1-UI-SPEC Screen Contract 2, CAT-02). Server component,
  * searchParams-driven, every control submits via GET so each filtered view
  * is a shareable/bookmarkable URL — no client-only filter state. The
- * platform/genre `<select>` options and the year-input bounds come from the
+ * platform/genre checkbox options and the year-input bounds come from the
  * API `facets` payload; if that payload is unavailable the FilterBar
  * degrades to search-only. Pagination carries the full query string.
  */
@@ -38,14 +51,10 @@ export default async function CataloguePage({
   const sp = await searchParams;
 
   const currentYear = new Date().getUTCFullYear();
-  const flat: Record<string, string | undefined> = {};
-  for (const key of ["q", "platform", "genre", "year_from", "year_to", "min_rating", "sort"]) {
-    flat[key] = first(sp[key]);
-  }
-  const filters = parseFilters(flat, currentYear);
-  const activeCount = countActiveFilters(filters);
+  const filters = parseFilters(sp, currentYear);
   const currentPage = Math.max(1, Number(first(sp.page)) || 1);
   const basePath = `/${locale}/catalogue`;
+  const currentQuery = toQueryString(sp);
 
   let result: Awaited<ReturnType<typeof fetchCatalogueList>> | null = null;
   let failed = false;
@@ -65,10 +74,20 @@ export default async function CataloguePage({
   }
 
   const platformOptions: FilterOption[] =
-    result?.facets.platforms.map((p) => ({ value: p.slug, label: p.name })) ?? [];
+    sortPlatformOptions(result?.facets.platforms.map((p) => ({ value: p.slug, label: p.name })) ?? []);
   const genreOptions: FilterOption[] =
     result?.facets.genres.map((g) => ({ value: g.slug, label: g.name })) ?? [];
   const yearRange = result?.facets.year_range;
+  const platformSlugs = new Set(platformOptions.map((option) => option.value));
+  const genreSlugs = new Set(genreOptions.map((option) => option.value));
+  const visibleFilters = {
+    ...filters,
+    platform: filters.platform.filter((value) => platformSlugs.has(value)),
+    genre: filters.genre.filter((value) => genreSlugs.has(value)),
+  };
+  const activeCount = countActiveFilters(visibleFilters);
+  const platformLabels = new Map(platformOptions.map((option) => [option.value, option.label]));
+  const genreLabels = new Map(genreOptions.map((option) => [option.value, option.label]));
 
   return (
     <main className="sp-page">
@@ -76,6 +95,32 @@ export default async function CataloguePage({
 
       <div className="sp-content-sidebar">
         <section className="sp-results-column" aria-label={dict.catalogue.heading}>
+          {activeCount > 0 ? (
+            <div className="sp-chip-row" aria-label={dict.catalogue.filters.activeLabel.many(activeCount)}>
+              {visibleFilters.genre.map((value) => {
+                const label = dict.catalogue.chip.genre.replace("{value}", genreLabels.get(value) ?? value);
+                return (
+                  <FilterChip
+                    key={`genre-${value}`}
+                    label={label}
+                    removeHref={`${basePath}${removeHref(currentQuery, "genre", value)}`}
+                    removeAriaLabel={`${locale === "es" ? "Quitar filtro" : "Remove filter"} ${label}`}
+                  />
+                );
+              })}
+              {visibleFilters.platform.map((value) => {
+                const label = dict.catalogue.chip.platform.replace("{value}", platformLabels.get(value) ?? value);
+                return (
+                  <FilterChip
+                    key={`platform-${value}`}
+                    label={label}
+                    removeHref={`${basePath}${removeHref(currentQuery, "platform", value)}`}
+                    removeAriaLabel={`${locale === "es" ? "Quitar filtro" : "Remove filter"} ${label}`}
+                  />
+                );
+              })}
+            </div>
+          ) : null}
           {failed || !result ? (
         <div>
           <p role="alert">{dict.errors.retryCatalogue}</p>
@@ -119,7 +164,7 @@ export default async function CataloguePage({
               </ul>
               <nav aria-label={locale === "es" ? "Paginación" : "Pagination"} style={{ display: "flex", gap: "var(--space-md)", alignItems: "center", justifyContent: "center", marginTop: "var(--space-xl)" }}>
                 {currentPage > 1 ? (
-                  <Link href={`${basePath}${buildQuery(filters, currentPage - 1)}`}>
+                  <Link href={`${basePath}${buildQuery(visibleFilters, currentPage - 1)}`}>
                     {locale === "es" ? "Anterior" : "Previous"}
                   </Link>
                 ) : null}
@@ -127,7 +172,7 @@ export default async function CataloguePage({
                   {currentPage}
                 </span>
                 {result.has_next ? (
-                  <Link href={`${basePath}${buildQuery(filters, currentPage + 1)}`}>
+                  <Link href={`${basePath}${buildQuery(visibleFilters, currentPage + 1)}`}>
                     {locale === "es" ? "Siguiente" : "Next"}
                   </Link>
                 ) : null}
@@ -146,6 +191,7 @@ export default async function CataloguePage({
             activeCount={activeCount}
             platformOptions={platformOptions}
             genreOptions={genreOptions}
+            currentQuery={currentQuery}
             yearMin={yearRange?.min ?? 1958}
             yearMax={yearRange?.max ?? currentYear + 2}
             optionsUnavailable={failed}

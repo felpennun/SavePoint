@@ -1,4 +1,5 @@
 import { getDictionary } from "@/i18n";
+import { FacetMenu } from "@/components/FacetMenu";
 import {
   MIN_RATING_OPTIONS,
   SORT_KEYS,
@@ -21,6 +22,7 @@ export function FilterBar({
   activeCount,
   platformOptions,
   genreOptions,
+  currentQuery,
   yearMin = 1958,
   yearMax,
   optionsUnavailable = false,
@@ -31,6 +33,7 @@ export function FilterBar({
   activeCount: number;
   platformOptions: FilterOption[];
   genreOptions: FilterOption[];
+  currentQuery: string;
   yearMin?: number;
   yearMax?: number;
   optionsUnavailable?: boolean;
@@ -62,29 +65,27 @@ export function FilterBar({
           <input id="q" name="q" type="search" defaultValue={filters.q ?? ""} />
         </div>
 
-        <div className="sp-field">
-          <label htmlFor="platform">{f.platform}</label>
-          <select id="platform" name="platform" defaultValue={filters.platform ?? ""} disabled={platformsUnavailable}>
-            <option value="">{f.anyOption}</option>
-            {platformOptions.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        <FacetMenu
+          name="platform"
+          label={f.platform}
+          options={platformOptions}
+          selected={filters.platform}
+          semanticsText={dict.catalogue.facet.platformSemantics}
+          locale={locale}
+          currentQuery={currentQuery}
+          unavailable={platformsUnavailable}
+        />
 
-        <div className="sp-field">
-          <label htmlFor="genre">{f.genre}</label>
-          <select id="genre" name="genre" defaultValue={filters.genre ?? ""} disabled={genresUnavailable}>
-            <option value="">{f.anyOption}</option>
-            {genreOptions.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        <FacetMenu
+          name="genre"
+          label={f.genre}
+          options={genreOptions}
+          selected={filters.genre}
+          semanticsText={dict.catalogue.facet.genreSemantics}
+          locale={locale}
+          currentQuery={currentQuery}
+          unavailable={genresUnavailable}
+        />
 
         <div className="sp-field">
           <label htmlFor="year_from">{f.yearFrom}</label>

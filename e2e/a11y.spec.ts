@@ -161,14 +161,9 @@ for (const [viewportName, viewport] of Object.entries(VIEWPORTS)) {
   test.describe(`product surface evidence @ ${viewportName}`, () => {
     test.use({ viewport });
 
-    test("catalogue: filter state survives reload, count line, pagination, axe, screenshot", async ({ page }) => {
+    test("catalogue: filter state survives reload, pagination, axe, screenshot", async ({ page }) => {
       await page.goto("/es/catalogue");
       await expect(page.getByRole("heading", { level: 1, name: "Catálogo" })).toBeVisible();
-
-      // Full-catalogue count line is always shown.
-      const countLine = page.getByTestId("result-count");
-      await expect(countLine).toBeVisible();
-      await expect(countLine).toHaveText(/juegos/);
 
       // Populated grid + pagination affordance.
       const cards = page.locator("main ul.sp-grid li");
@@ -180,21 +175,41 @@ for (const [viewportName, viewport] of Object.entries(VIEWPORTS)) {
       await page.getByLabel("Buscar juegos").focus();
       await expect(page.getByLabel("Buscar juegos")).toBeFocused();
 
-      // Apply a genre filter via the GET form; the filtered view must be a
-      // shareable URL that still reflects the filter after a full reload.
-      const genreSelect = page.locator("#genre");
-      await genreSelect.selectOption({ index: 1 });
-      const chosenGenre = await genreSelect.inputValue();
-      expect(chosenGenre).not.toEqual("");
+      // Apply a genre facet via the repeated-parameter GET form; the filtered
+      // view must be a shareable URL that still reflects the filter after a
+      // full reload.
+      const genreFacet = page.locator("details.sp-facet").filter({ hasText: "Género" }).first();
+      await genreFacet.locator("summary").click();
+      const genreCheckboxes = genreFacet.locator('input[type="checkbox"]');
+      expect(await genreCheckboxes.count()).toBeGreaterThanOrEqual(2);
+      const chosenGenres = [
+        await genreCheckboxes.nth(0).getAttribute("value"),
+        await genreCheckboxes.nth(1).getAttribute("value"),
+      ];
+      expect(chosenGenres[0]).not.toBeNull();
+      expect(chosenGenres[1]).not.toBeNull();
+      await genreCheckboxes.nth(0).check();
+      await genreCheckboxes.nth(1).check();
+
+      const platformFacet = page.locator("details.sp-facet").filter({ hasText: "Plataforma" }).first();
+      await platformFacet.locator("summary").click();
+      const platformCheckbox = platformFacet.locator('input[type="checkbox"]').first();
+      const chosenPlatform = await platformCheckbox.getAttribute("value");
+      expect(chosenPlatform).not.toBeNull();
+      await platformCheckbox.check();
       await page.getByRole("button", { name: "Aplicar filtros" }).click();
       await page.waitForURL(/[?&]genre=/);
       await page.reload();
       expect(page.url()).toMatch(/[?&]genre=/);
-      await expect(page.locator("#genre")).toHaveValue(chosenGenre);
+      const query = new URL(page.url()).searchParams;
+      expect(query.getAll("genre")).toEqual(chosenGenres);
+      expect(query.getAll("platform")).toEqual([chosenPlatform]);
+      for (const chosenGenre of chosenGenres) {
+        await expect(page.locator(`input[name="genre"][value="${chosenGenre}"]`)).toBeChecked();
+      }
+      await expect(page.locator(`input[name="platform"][value="${chosenPlatform}"]`)).toBeChecked();
       await expect(page.locator(".sp-chip-row")).toBeVisible();
-      // Filtered result line switches to the "{n} coinciden" copy.
-      await expect(page.getByTestId("result-count")).toHaveText(/coinciden|juegos/);
-
+      await expect(page.locator(".sp-chip-row .sp-chip")).toHaveCount(3);
       const violations = await runAxeScan(page);
       assertNoCriticalOrSeriousViolations(violations, `catalogue (filtered, ${viewportName})`);
       if (viewportName === "mobile") await assertNoMobileOverflow(page, "catalogue");

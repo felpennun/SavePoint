@@ -19,6 +19,7 @@ export default defineConfig({
       "tests/**/*.test.tsx",
       "app/**/__tests__/*.test.ts",
       "components/**/__tests__/*.test.tsx",
+      "lib/**/__tests__/*.test.ts",
     ],
     passWithNoTests: false,
     reporters: ["default"],

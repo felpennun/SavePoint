@@ -66,6 +66,21 @@ export const es: Dictionary = {
       emptyHeading: "Ningún juego coincide con estos filtros",
       emptyBody: "Quita un filtro o amplía tu búsqueda.",
     },
+    facet: {
+      genreSemantics: "Muestra juegos que tienen todos los géneros seleccionados.",
+      platformSemantics: "Muestra juegos disponibles en alguna de las plataformas seleccionadas.",
+      selectedCount: {
+        zero: "Cualquiera",
+        one: "1 seleccionado",
+        many: (count) => `${count} seleccionados`,
+      },
+      clear: "Quitar",
+      searchInList: "Filtrar esta lista",
+    },
+    chip: {
+      genre: "Género: {value}",
+      platform: "Plataforma: {value}",
+    },
     sort: {
       label: "Ordenar por",
       relevance: "Relevancia",

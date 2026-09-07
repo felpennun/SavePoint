@@ -57,8 +57,8 @@ export interface CatalogueFacets {
 export interface CatalogueListParams {
   q?: string;
   page?: number;
-  platform?: string;
-  genre?: string;
+  platform?: string[];
+  genre?: string[];
   year_from?: string;
   year_to?: string;
   min_rating?: string;
@@ -137,8 +137,12 @@ export async function fetchCatalogueList(params: CatalogueListParams = {}): Prom
   const url = new URL("/api/catalogue/games/", API_BASE);
   if (params.q) url.searchParams.set("q", params.q);
   if (params.page) url.searchParams.set("page", String(params.page));
-  if (params.platform) url.searchParams.set("platform", params.platform);
-  if (params.genre) url.searchParams.set("genre", params.genre);
+  if (params.platform) {
+    for (const platform of params.platform) url.searchParams.append("platform", platform);
+  }
+  if (params.genre) {
+    for (const genre of params.genre) url.searchParams.append("genre", genre);
+  }
   if (params.year_from) url.searchParams.set("year_from", params.year_from);
   if (params.year_to) url.searchParams.set("year_to", params.year_to);
   if (params.min_rating) url.searchParams.set("min_rating", params.min_rating);

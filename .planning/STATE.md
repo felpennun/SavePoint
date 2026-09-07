@@ -1,22 +1,22 @@
 ---
 gsd_state_version: 1.0
 status: in_progress
-stopped_at: Fase 2, ola 3 CERRADA (02-03 + 02-05 + 02-09 + 02-10 completados). Ola 4 desbloqueada. Pendiente RAWG pasada 2 (juegos sin rating, 2022-2026, por popularidad — ratificado por el autor).
-last_updated: "2026-09-07T14:30:00+02:00"
-state_head: f972f20
+stopped_at: Fase 2, ola 4 ejecutada (02-04 + 02-11 completados). Ola 5 desbloqueada. Pendiente RAWG pasada 2 (juegos sin rating, 2022-2026, por popularidad — ratificado por el autor).
+last_updated: "2026-09-07T18:40:00+02:00"
+state_head: 2ea3a8c
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 39
-  completed_plans: 34
-  percent: 87
+  completed_plans: 36
+  percent: 92
 last_activity: 2026-09-07
 next_phase: 2
 next_phase_name: Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender
 next_action: /gsd-execute-phase 2 --wave 4
 current_phase: 2
 current_phase_name: Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender
-last_activity_desc: Ola 3 cerrada. 02-09 generó y persistió 200 usuarios sintéticos reproducibles por semilla, incluidos 25 cold-start; aisló `synthetic-eval-user` del baseline de popularidad y dejó el informe estadístico. Verificación: 17 tests específicos y 352 tests del backend en verde. Commit de producción: `0b90de7`.
+last_activity_desc: Ola 4 ejecutada. 02-04 incorporó facetas multi-selección del catálogo con parámetros GET repetidos y 02-11 incorporó el recomendador de contenido versionado, explicable y owner-scoped. Verificación: 10 tests frontend, build de Next.js y 61 tests de recomendaciones en verde. El pase E2E queda pendiente porque el contenedor no declara el proyecto Chromium.
 ---
 
 # Project State
@@ -218,17 +218,23 @@ Handoff: .planning/HANDOFF.json (structured, one-shot — delete after resumptio
 
 ## Continuidad de esta sesión
 
-Último estado comprobado: **Wave 3 de la Fase 2 cerrada** (2026-09-07). Hay 8/13 planes
-con `SUMMARY.md`: 02-01, 02-02, 02-03, 02-05, 02-07, 02-08, 02-09 y 02-10. Permanecen
-pendientes 02-04, 02-06, 02-11, 02-12 y 02-13; la Wave 4 es el siguiente bloque.
+Último estado comprobado: **Wave 4 de la Fase 2 ejecutada** (2026-09-07). Hay 10/13 planes
+con `SUMMARY.md`: 02-01, 02-02, 02-03, 02-04, 02-05, 02-07, 02-08, 02-09, 02-10 y
+02-11. Permanecen pendientes 02-06, 02-12 y 02-13; la Wave 5 es el siguiente bloque.
 
 La documentación LaTeX de la Fase 2 y la revisión académica están incorporadas en el
 árbol de trabajo (`thesis/`), con tablas adaptables, referencias revisadas y la memoria
 de algoritmos, ratings, decisiones previas al laboratorio, protocolo y limitaciones. La
 compilación final se hará en Overleaf porque TeX Live/MiKTeX no queda instalado localmente;
-los cambios siguen sin commit y deben compilarse allí antes de generar el ZIP definitivo.
+el ZIP definitivo se generó y los cambios de aplicación y tesis están sincronizados en
+`origin/main` mediante `2ea3a8c`.
 
 **Demo local solicitada por el autor:** la Wave 3 ya está cerrada. El siguiente paso
 operativo es levantar el entorno con `docker compose -f infra/compose.yaml up --build` y
 abrir `http://localhost:3000` para el walkthrough. Comprobar antes que `api` y `web` estén
 healthy y mantener a mano las tres cuentas demo definidas en `infra/compose.yaml`.
+
+**Reanudación 2026-09-07:** el repositorio está en `2ea3a8c` (`main` y `origin/main`),
+sin agentes interrumpidos ni `HANDOFF.json`. La Wave 4 se completó en el árbol de trabajo;
+la acción siguiente es ejecutar la Wave 5 con `/clear` y después
+`$gsd-execute-phase 2 --wave 5`.

@@ -51,6 +51,17 @@ export interface Dictionary {
       emptyHeading: string;
       emptyBody: string;
     };
+    facet: {
+      genreSemantics: string;
+      platformSemantics: string;
+      selectedCount: CountCopy;
+      clear: string;
+      searchInList: string;
+    };
+    chip: {
+      genre: string;
+      platform: string;
+    };
     sort: {
       label: string;
       relevance: string;
