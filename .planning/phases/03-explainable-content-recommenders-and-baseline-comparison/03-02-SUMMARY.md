@@ -133,6 +133,14 @@ emite si todas están observadas. El DTO conserva tanto el valor compuesto como
 el hash de las primitivas utilizadas. No se ha activado todavía un peso de
 PopScore en el score final.
 
+### Variante aislada de recencia
+
+`recency-v1` puntúa exclusivamente la fecha de lanzamiento mediante
+`exp(-ln(2) * edad_días / 365)`. Solo se calcula para juegos publicados con
+rating externo; una fecha ausente, futura o sin valoración no se convierte en
+una puntuación baja. La recencia aparece en las señales trazables, pero no
+interviene en las variantes de contenido ni de PopScore.
+
 ## Commits de tareas
 
 1. **Features y variantes explicables de contenido** — `3addc55` (`feat(03-02): add governed content signal variants`)

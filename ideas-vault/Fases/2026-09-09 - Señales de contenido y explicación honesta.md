@@ -39,6 +39,11 @@ rango medio en su snapshot; `igdb-engagement-mean-v1` es la media simple de
 las cuatro y se declara ausente si falta una. El valor ya es trazable en el
 DTO, pero todavía no cambia la puntuación de ningún recomendador.
 
+La recencia se calcula por separado en `recency-v1`: `exp(-ln(2) * edad_días /
+365)`, solo en obras ya lanzadas y con rating externo observado. Es un
+algoritmo independiente; no cambia el orden de las variantes de contenido ni
+el de PopScore.
+
 No se ha consultado IGDB, ni se ha reimportado o gobernado un corpus nuevo, ni
 se han ejecutado experimentos. La decisión siguiente es revisar esta base y,
 solo después, publicar un nuevo corpus y capturar sus instantáneas.

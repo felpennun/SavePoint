@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 import pytest
 from django.contrib.auth import get_user_model
@@ -12,6 +12,7 @@ from catalogue.models import CorpusRatingSnapshot, GameWork, Genre
 from library.models import LibraryEntry
 from recommendations.content.features import normalise_rating, normalise_rating_volume
 from recommendations.content.profile import build_profile_inputs
+from recommendations.content.recency import recency_score
 from recommendations.content.rank import rank_content_v1
 
 
@@ -69,6 +70,16 @@ def test_normalised_snapshot_scalars_preserve_missing_values() -> None:
     assert normalise_rating_volume(0, 0) is None
 
 
+def test_recency_score_is_bounded_and_requires_released_rated_work() -> None:
+    cutoff = date(2026, 9, 9)
+
+    assert recency_score(date(2026, 9, 9), eligibility_cutoff_date=cutoff, has_external_rating=True) == pytest.approx(1.0)
+    assert recency_score(date(2025, 9, 9), eligibility_cutoff_date=cutoff, has_external_rating=True) == pytest.approx(0.5)
+    assert recency_score(None, eligibility_cutoff_date=cutoff, has_external_rating=True) is None
+    assert recency_score(date(2026, 10, 1), eligibility_cutoff_date=cutoff, has_external_rating=True) is None
+    assert recency_score(date(2026, 9, 9), eligibility_cutoff_date=cutoff, has_external_rating=False) is None
+
+
 @pytest.mark.django_db
 def test_profile_accepts_playing_positive_ratings_and_ignores_pending(user, genres) -> None:  # noqa: ANN001
     entry(user, work("completed-rpg", genres["rpg"]), "completed", 8)
@@ -123,3 +134,33 @@ def test_negative_variant_penalises_only_the_guarded_negative_genre(user, genres
     assert by_slug[unobserved.canonical_slug]["signals"]["rating_volume"] is None
     assert payload["parameters"]["negative_penalty"] == 1.0
     assert payload["signal_availability"]["popscore_available"] is False
+
+
+@pytest.mark.django_db
+def test_recency_variant_orders_only_by_released_rated_age(user, genres) -> None:  # noqa: ANN001
+    for index in range(3):
+        entry(user, work(f"history-{index}", genres["rpg"]), "completed", 10)
+    recent = work("recent", genres["rpg"])
+    recent.first_release_date = date(2026, 9, 9)
+    recent.save(update_fields=["first_release_date"])
+    older = work("older", genres["rpg"])
+    older.first_release_date = date(2025, 9, 9)
+    older.save(update_fields=["first_release_date"])
+    unrated = work("unrated", genres["rpg"])
+    unrated.first_release_date = date(2026, 9, 9)
+    unrated.save(update_fields=["first_release_date"])
+    snapshot(recent, 80.0, 5)
+    snapshot(older, 80.0, 5)
+
+    payload = rank_content_v1(
+        user,
+        "recency-v1",
+        corpus_version=CORPUS,
+        min_rating_count=None,
+        eligibility_cutoff_date=date(2026, 9, 9),
+    )
+    by_slug = {item["slug"]: item for item in payload["results"]}
+
+    assert by_slug["recent"]["score"] == pytest.approx(1.0)
+    assert by_slug["older"]["score"] == pytest.approx(0.5)
+    assert by_slug["unrated"]["signals"]["recency_score"] is None

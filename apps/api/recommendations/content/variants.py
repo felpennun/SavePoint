@@ -50,4 +50,11 @@ ALGORITHM_REGISTRY: dict[str, VariantSpec] = {
         params={"w1": 0.7, "w2": 0.3, "negative_penalty": 1.0},
         version="v1",
     ),
+    "recency-v1": VariantSpec(
+        algorithm_id="recency-v1",
+        feature_set_version=FEATURE_SET_VERSION,
+        combine_mode="recency_only",
+        params={"half_life_days": 365},
+        version="v1",
+    ),
 }

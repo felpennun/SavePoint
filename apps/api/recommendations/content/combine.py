@@ -78,12 +78,16 @@ def combine(
     spec: VariantSpec,
     *,
     negative_similarity: float = 0.0,
+    recency_score: float | None = None,
 ) -> float:
     """Dispatch to a named variant's deterministic score function."""
 
     cosine_similarity = max(0.0, min(1.0, cosine_similarity))
     candidate_rating_term = max(0.0, min(1.0, candidate_rating_term))
     negative_similarity = max(0.0, min(1.0, negative_similarity))
+    bounded_recency = (
+        None if recency_score is None else max(0.0, min(1.0, recency_score))
+    )
 
     if spec.combine_mode == "weighted_sum":
         return (
@@ -105,4 +109,6 @@ def combine(
         )
         penalty = float(spec.params.get("negative_penalty", 0.0)) * negative_similarity
         return max(0.0, positive - penalty)
+    if spec.combine_mode == "recency_only":
+        return bounded_recency or 0.0
     raise ValueError(f"Unsupported content combination mode: {spec.combine_mode}")

@@ -29,6 +29,10 @@
 - La reimportación y publicación de una nueva versión del corpus gobernado se
   revisan después de verificar esta extensión del contrato; el corpus actual
   y sus artefactos permanecen inmutables.
+- `recency_score` se calcula con decaimiento exponencial desde la fecha de
+  lanzamiento, semivida de 365 días, y solo para obras ya publicadas con
+  valoración externa observada. Solo `recency-v1` usa esta puntuación: no se
+  mezcla con contenido, rating ni PopScore en las demás variantes.
 
 ### Corpus gobernado y cobertura de valoraciones
 

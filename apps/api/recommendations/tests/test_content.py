@@ -72,6 +72,7 @@ def test_algorithm_registry_has_the_named_positive_and_negative_variants() -> No
         "content-cbf-multiplicative-v1",
         "content-cbf-twostage-v1",
         "content-cbf-neg-v1",
+        "recency-v1",
     }
     assert all(isinstance(spec, VariantSpec) for spec in ALGORITHM_REGISTRY.values())
     assert [spec.combine_mode for spec in ALGORITHM_REGISTRY.values()] == [
@@ -79,6 +80,7 @@ def test_algorithm_registry_has_the_named_positive_and_negative_variants() -> No
         "multiplicative",
         "two_stage",
         "negative_weighted_sum",
+        "recency_only",
     ]
 
 

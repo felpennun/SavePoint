@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from typing import Any
 
 from django.contrib.auth.models import AbstractBaseUser
@@ -25,6 +25,7 @@ from recommendations.content.features import (
     normalise_rating_volume,
 )
 from recommendations.content.profile import ProfileInputs, build_profile_inputs
+from recommendations.content.recency import recency_score
 from recommendations.content.similarity import cosine
 from recommendations.content.variants import ALGORITHM_REGISTRY, VariantSpec
 from recommendations.models import WorkFeatureVector
@@ -115,6 +116,7 @@ def _candidate_signals(
     snapshot_stats: dict[object, tuple[float, int]],
     volume_ceiling: int,
     popscore_by_work: dict[object, float],
+    recency_by_work: dict[object, float],
 ) -> dict:
     """Return only scalar signals backed by the frozen local snapshot."""
 
@@ -126,7 +128,28 @@ def _candidate_signals(
             normalise_rating_volume(rating_count, volume_ceiling) if has_snapshot else None
         ),
         "release_date": work.first_release_date.isoformat() if work.first_release_date else None,
+        "recency_score": recency_by_work.get(work.id),
         "popscore": popscore_by_work.get(work.id),
+    }
+
+
+def _recency_by_work(
+    works: list[GameWork],
+    snapshot_stats: dict[object, tuple[float | None, int]],
+    eligibility_cutoff_date: date,
+    half_life_days: int,
+) -> dict[object, float]:
+    return {
+        work.id: score
+        for work in works
+        if (
+            score := recency_score(
+                work.first_release_date,
+                eligibility_cutoff_date=eligibility_cutoff_date,
+                has_external_rating=snapshot_stats.get(work.id, (None, 0))[0] is not None,
+                half_life_days=half_life_days,
+            )
+        ) is not None
     }
 
 
@@ -201,6 +224,7 @@ def _cold_start_results(
     snapshot_stats: dict[object, tuple[float, int]],
     genre_profile: dict[str, float],
     popscore_by_work: dict[object, float],
+    recency_by_work: dict[object, float],
 ) -> list[dict]:
     vectors = _load_candidate_vectors(works, spec, corpus_version)
     volume_ceiling = max((count for _rating, count in snapshot_stats.values()), default=0)
@@ -216,13 +240,22 @@ def _cold_start_results(
             candidate_rating_term=rt,
             rating_term_is_fallback=fallback,
         )
+        score = combine(
+            0.0,
+            rt,
+            None,
+            spec,
+            recency_score=recency_by_work.get(work.id),
+        )
         item = _base_item(
             work,
-            rt,
+            score,
             evidence,
-            _candidate_signals(work, snapshot_stats, volume_ceiling, popscore_by_work),
+            _candidate_signals(
+                work, snapshot_stats, volume_ceiling, popscore_by_work, recency_by_work
+            ),
         )
-        scored.append((rt, work.canonical_slug, item))
+        scored.append((score, work.canonical_slug, item))
     scored.sort(key=lambda row: (-row[0], row[1]))
     return [item for _score, _slug, item in scored[:limit]]
 
@@ -234,6 +267,7 @@ def rank_content_v1(
     corpus_version: str | None = None,
     candidate_ids: set[object] | tuple[object, ...] | None = None,
     generated_at: datetime | None = None,
+    eligibility_cutoff_date: date | None = None,
     min_rating_count: int | None = _MIN_RATING_COUNT,
     genre_profile: dict[str, float] | None = None,
     prepared: dict[str, Any] | None = None,
@@ -243,6 +277,10 @@ def rank_content_v1(
     spec = ALGORITHM_REGISTRY[algorithm_id]
     limit = _clamp_limit(limit)
     generated_at = generated_at or datetime.now(timezone.utc)
+    eligibility_cutoff_date = eligibility_cutoff_date or generated_at.date()
+    effective_min_rating_count = (
+        None if spec.combine_mode == "recency_only" else min_rating_count
+    )
 
     seen_ids = set(LibraryEntry.objects.filter(user=user).values_list("work_id", flat=True))
     requested_ids = set(candidate_ids) if candidate_ids is not None else None
@@ -251,7 +289,10 @@ def rank_content_v1(
             work
             for work in prepared["works"]
             if (requested_ids is None or work.id in requested_ids)
-            and (min_rating_count is None or (work.total_rating_count or 0) >= min_rating_count)
+            and (
+                effective_min_rating_count is None
+                or (work.total_rating_count or 0) >= effective_min_rating_count
+            )
         ]
         snapshot_sha256 = prepared.get("snapshot_sha256", "")
     else:
@@ -260,8 +301,8 @@ def rank_content_v1(
             candidate_query = candidate_query.filter(id__in=requested_ids)
         else:
             candidate_query = candidate_query.exclude(id__in=seen_ids)
-        if min_rating_count is not None:
-            candidate_query = candidate_query.filter(total_rating_count__gte=min_rating_count)
+        if effective_min_rating_count is not None:
+            candidate_query = candidate_query.filter(total_rating_count__gte=effective_min_rating_count)
         candidates = list(
             candidate_query.filter(genres__isnull=False)
             .prefetch_related("genres", "releases__platform", "franchises", "developers")
@@ -300,6 +341,12 @@ def rank_content_v1(
         popscore_by_work = normalised_popscore_by_work(
             corpus_version, [work.id for work in candidates]
         )
+        recency_by_work = _recency_by_work(
+            candidates,
+            snapshot_stats,
+            eligibility_cutoff_date,
+            int(spec.params.get("half_life_days", 365)),
+        )
         results = _cold_start_results(
             candidates,
             limit,
@@ -309,6 +356,7 @@ def rank_content_v1(
             snapshot_stats,
             resolved_genre_profile,
             popscore_by_work,
+            recency_by_work,
         )
         return _dto(
             spec,
@@ -330,6 +378,12 @@ def rank_content_v1(
     )
     volume_ceiling = max((count for _rating, count in snapshot_stats.values()), default=0)
     popscore_by_work = normalised_popscore_by_work(corpus_version, [work.id for work in candidates])
+    recency_by_work = _recency_by_work(
+        candidates,
+        snapshot_stats,
+        eligibility_cutoff_date,
+        int(spec.params.get("half_life_days", 365)),
+    )
     scored: list[tuple[float, str, dict]] = []
     for work in candidates:
         vector = vectors[work.id]
@@ -346,6 +400,7 @@ def rank_content_v1(
             None,
             spec,
             negative_similarity=negative_similarity,
+            recency_score=recency_by_work.get(work.id),
         )
         evidence = explain(
             vector,
@@ -360,7 +415,9 @@ def rank_content_v1(
             work,
             score,
             evidence,
-            _candidate_signals(work, snapshot_stats, volume_ceiling, popscore_by_work),
+            _candidate_signals(
+                work, snapshot_stats, volume_ceiling, popscore_by_work, recency_by_work
+            ),
         )
         scored.append((score, work.canonical_slug, item))
 
