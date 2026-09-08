@@ -1,10 +1,11 @@
 ---
 phase: "03"
 slug: "explainable-content-recommenders-and-baseline-comparison"
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: "2026-09-08"
+reviewed_at: "2026-09-08"
 ---
 
 # Fase 03 — Contrato de diseño UI
@@ -29,6 +30,9 @@ inspeccionados son `apps/web/app/[locale]/recommendations/page.tsx`,
 ---
 
 ## Alcance visual bloqueado
+
+El foco visual principal es la primera sección de recomendaciones y su primera tarjeta; el
+encabezado de la página establece el contexto y el primer resultado real debe atraer la mirada.
 
 1. La página mantiene el `AppShell`, la navegación autenticada, el selector de idioma, el selector
    de tema y el comportamiento mobile existentes sin alterar orden de foco, etiquetas ni
@@ -82,7 +86,7 @@ Se reutilizan literalmente los tokens existentes; no se crea ningún valor nuevo
 |-------|-------|------------------|
 | `xs` | 4px | Separación interna mínima y gap de señales inline |
 | `sm` | 8px | Título–metadatos de tarjeta y padding inferior del track |
-| `ctl` | 12px | Padding de controles heredados del shell |
+| `ctl` | 16px | Padding de controles heredados del shell |
 | `md` | 16px | Separación título–lista y gap constante entre tarjetas |
 | `lg` | 24px | Padding horizontal de página y paneles de estado |
 | `xl` | 32px | Padding superior de página |
@@ -132,7 +136,7 @@ La distribución 60/30/10 y los pares light/dark existentes no cambian.
 | Accent (10%) | `--color-accent`: `#8b7cf6` / `#6d5cd6`; strong `#a394ff` / `#5a49c0` | Solo CTA primario de estados, enlaces de texto, navegación activa y selección/foco heredados |
 | Destructivo | `--color-danger`: `#f87171` / `#c62828` | Token heredado; **sin uso en esta fase** porque no hay acciones destructivas |
 
-Accent reservado para: CTA «Explorar el catálogo», control «Reintentar», enlaces de texto,
+Accent reservado para: CTA «Explorar el catálogo», control «Cargar recomendaciones», enlaces de texto,
 marcador de navegación activa y estados seleccionados heredados. No se usa para colorear scores,
 rangos, carátulas, títulos de sección ni razones; el orden del ranking no depende del color.
 El ring global de foco sigue siendo `2px solid --color-focus-ring` con offset de 2px.
@@ -156,7 +160,7 @@ Toda cadena nueva o modificada se incorpora con paridad estricta en `es.ts`, `en
 | Empty state heading | `Aún no hay suficiente actividad` | `Not enough activity yet` |
 | Empty state body | `Valora o completa algunos juegos y aquí aparecerán recomendaciones.` | `Rate or complete a few games and recommendations will appear here.` |
 | Error state | `No se pudieron cargar tus recomendaciones. Inténtalo de nuevo.` | `We couldn't load your recommendations. Try again.` |
-| Reintento | `Reintentar` | `Try again` |
+| Reintento | `Cargar recomendaciones` | `Reload recommendations` |
 | Destructive confirmation | No hay acciones destructivas; no se muestra confirmación. | No destructive actions; no confirmation is shown. |
 
 Copy prohibida en esta fase, aunque queden claves históricas en el diccionario:
@@ -256,8 +260,8 @@ de UI de terceros.
 | Populated | Secciones reales, títulos visibles, listas semánticas y orden del backend intacto. No aparece prosa adicional entre título y lista. |
 | Empty parcial | Una sección opcional sin resultados se omite por completo, incluido su `<h2>`; no deja un hueco extra ni una lista vacía. |
 | Empty total | Si ninguna sección tiene resultados reales, se muestra el empty state y CTA del Copywriting Contract; nunca tarjetas de relleno. |
-| Error parcial | La sección afectada conserva su `<h2>` y muestra el error breve con «Reintentar»; las demás secciones reales permanecen visibles. No se sustituye por otro ranking. |
-| Error total | Se muestra un único `role="alert"`, el error y «Reintentar». El shell continúa operativo. |
+| Error parcial | La sección afectada conserva su `<h2>` y muestra el error breve con «Cargar recomendaciones»; las demás secciones reales permanecen visibles. No se sustituye por otro ranking. |
+| Error total | Se muestra un único `role="alert"`, el error y «Cargar recomendaciones». El shell continúa operativo. |
 | Datos incompletos | Carátula ausente usa placeholder fijo; metadatos ausentes dejan su slot; razón ausente no se inventa. |
 | Unauthorized | Redirección existente a `/{locale}/login?next=...`; no se expone contenido personal antes ni después del redirect. |
 
@@ -320,12 +324,12 @@ contrato aprobado de la Fase 2.
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
-- [ ] Dimension 7 Inventory Provenance: PASS — no aplica con `Tool: none`
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS (FLAG no bloqueante resuelto declarando el foco visual)
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
+- [x] Dimension 7 Inventory Provenance: PASS — no aplica con `Tool: none`
 
-**Approval:** pending
+**Approval:** approved
