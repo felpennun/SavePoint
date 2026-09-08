@@ -107,3 +107,13 @@ La decisión sigue un proceso reproducible: metadata oficial del registro, versi
 - **Alcance de la autorización:** únicamente el paquete directo `gunicorn==23.0.0` y su transitiva `packaging`. Sin cambios en el resto del conjunto.
 - **Comando de arranque:** `exec gunicorn config.wsgi:application --bind "0.0.0.0:${PORT:-10000}" --workers 2 --timeout 30 --access-logfile - --error-logfile -`. Los cuatro pasos idempotentes previos (`migrate` / `import_catalogue` / `bootstrap_demo_account` / `seed_demo`) se conservan sin cambios y siguen siendo fail-closed.
 - **Verificación:** `scripts/check-dependencies.ps1` (allowlist Python actualizada con `gunicorn==23.0.0`, `uv.lock` comprobado exacto) termina con código 0; `apps/api/tests/test_render_startup.py` actualizado y en verde; `python -c "import gunicorn"` + `gunicorn --version` dentro de la imagen reconstruida.
+
+## Alta de `numpy` y `scipy` para la estadística de la Fase 3
+
+**Fecha:** 2026-09-08. **Autorización humana:** el autor aprobó explícitamente la incorporación de NumPy/SciPy para la Fase 3.
+
+- **Alcance:** `numpy==2.5.3` y `scipy==1.18.1`, ambos con versión exacta; NumPy se usa también como dependencia explícita para hacer visible y reproducible la base numérica.
+- **Motivo:** bootstrap, intervalos de confianza, Friedman, Wilcoxon y ajuste de Holm en el harness de evaluación. Las métricas del proyecto siguen implementadas y testeadas desde sus definiciones, sin delegar su semántica a la biblioteca.
+- **Evidencia oficial:** [NumPy 2.5.3 en PyPI](https://pypi.org/project/numpy/2.5.3/) — release estable, Python 3.13 compatible, licencia BSD-3-Clause/0BSD/MIT/Zlib/CC0 y publicación con Trusted Publishing; [SciPy 1.18.1 en PyPI](https://pypi.org/project/scipy/1.18.1/) — release exacta del proyecto SciPy. La documentación de las funciones estadísticas queda registrada en `03-RESEARCH.md`.
+- **Resolución:** añadir los pins al `pyproject.toml` y regenerar `uv.lock` con uv 0.12.9; el lock no se edita manualmente.
+- **Limitación:** la aprobación cubre estas versiones exactas y su árbol transitivo resuelto; cualquier versión posterior o dependencia directa distinta exige repetir el gate humano.

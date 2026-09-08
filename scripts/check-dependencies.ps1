@@ -27,8 +27,10 @@ $approvedPython = [ordered]@{
     "Django" = "5.2.17"
     "djangorestframework" = "3.18.0"
     "gunicorn" = "23.0.0"
+    "numpy" = "2.5.3"
     "psycopg[binary]" = "3.3.5"
     "requests" = "2.34.2"
+    "scipy" = "1.18.1"
     "pytest" = "9.1.1"
     "pytest-django" = "4.14.0"
 }
