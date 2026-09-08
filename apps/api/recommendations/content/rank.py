@@ -77,6 +77,7 @@ def _snapshot_sha256(corpus_version: str | None, work_ids: set[object]) -> str:
 def _load_candidate_vectors(
     works: list[GameWork],
     spec: VariantSpec,
+    corpus_version: str | None,
     prepared_vectors: dict[object, dict[str, float]] | None = None,
 ) -> dict[object, dict[str, float]]:
     if prepared_vectors is not None:
@@ -85,15 +86,26 @@ def _load_candidate_vectors(
             for work in works
             if work.id in prepared_vectors
         }
+    availability = coverage_report(corpus_version)
     work_ids = [work.id for work in works]
-    cached = {
-        row["work_id"]: row["vector_json"]
-        for row in WorkFeatureVector.objects.filter(
-            work_id__in=work_ids, feature_set_version=spec.feature_set_version
-        ).values("work_id", "vector_json")
-    }
+    cached: dict[object, dict[str, float]] = {}
+    if not (availability["include_franchise"] or availability["include_developer"]):
+        cached = {
+            row["work_id"]: row["vector_json"]
+            for row in WorkFeatureVector.objects.filter(
+                work_id__in=work_ids, feature_set_version=spec.feature_set_version
+            ).values("work_id", "vector_json")
+        }
     for work in works:
-        cached.setdefault(work.id, feature_vector(work, feature_set_version=FEATURE_SET_VERSION))
+        cached.setdefault(
+            work.id,
+            feature_vector(
+                work,
+                include_franchise=availability["include_franchise"],
+                include_developer=availability["include_developer"],
+                feature_set_version=FEATURE_SET_VERSION,
+            ),
+        )
     return cached
 
 
@@ -187,7 +199,7 @@ def _cold_start_results(
     snapshot_stats: dict[object, tuple[float, int]],
     genre_profile: dict[str, float],
 ) -> list[dict]:
-    vectors = _load_candidate_vectors(works, spec)
+    vectors = _load_candidate_vectors(works, spec, corpus_version)
     volume_ceiling = max((count for _rating, count in snapshot_stats.values()), default=0)
     scored: list[tuple[float, str, dict]] = []
     for work in works:
@@ -249,7 +261,7 @@ def rank_content_v1(
             candidate_query = candidate_query.filter(total_rating_count__gte=min_rating_count)
         candidates = list(
             candidate_query.filter(genres__isnull=False)
-            .prefetch_related("genres", "releases__platform")
+            .prefetch_related("genres", "releases__platform", "franchises", "developers")
             .distinct()
         )
         snapshot_sha256 = _snapshot_sha256(corpus_version, {work.id for work in candidates} | seen_ids)
@@ -302,7 +314,12 @@ def rank_content_v1(
             limitation=_COLD_START_LIMITATION,
         )
 
-    vectors = _load_candidate_vectors(candidates, spec, prepared_vectors=(prepared or {}).get("vectors"))
+    vectors = _load_candidate_vectors(
+        candidates,
+        spec,
+        corpus_version,
+        prepared_vectors=(prepared or {}).get("vectors"),
+    )
     volume_ceiling = max((count for _rating, count in snapshot_stats.values()), default=0)
     scored: list[tuple[float, str, dict]] = []
     for work in candidates:

@@ -21,6 +21,8 @@ from django.db import DatabaseError, IntegrityError, transaction
 from catalogue.igdb import IgdbClient, IgdbClientError, redact
 from catalogue.models import (
     AssetAttribution,
+    Developer,
+    Franchise,
     GameAlias,
     GameRelease,
     GameWork,
@@ -132,6 +134,8 @@ def _game(
     summary: str | None = None,
     alternative_names: tuple[str, ...] = (),
     title_en: str | None = None,
+    franchises: tuple[tuple[int, str], ...] = (),
+    developers: tuple[tuple[int, str], ...] = (),
 ) -> dict:
     row: dict = {"id": igdb_id, "name": name, "slug": slug or name.lower().replace(" ", "-")}
     row["url"] = f"https://www.igdb.com/games/{row['slug']}"
@@ -155,6 +159,13 @@ def _game(
         row["alternative_names"] = [{"name": value} for value in alternative_names]
     if title_en is not None:
         row["title_en"] = title_en
+    if franchises:
+        row["franchises"] = [{"id": item_id, "name": name} for item_id, name in franchises]
+    if developers:
+        row["involved_companies"] = [
+            {"company": {"id": item_id, "name": name}, "developer": True}
+            for item_id, name in developers
+        ]
     return row
 
 
@@ -224,6 +235,29 @@ def test_igdb_import_keeps_omitted_rating_fields_null() -> None:
     assert work.rating is None
     assert work.rating_count is None
     assert work.total_rating_count is None
+
+
+@pytest.mark.django_db
+def test_igdb_import_persists_stable_franchises_and_developers() -> None:
+    _run_import(
+        FakeIgdbClient(
+            [[
+                _game(
+                    911,
+                    "Signal Quest",
+                    franchises=((77, "Signal Saga"),),
+                    developers=((88, "Signal Studio"),),
+                )
+            ]],
+            eligible=1,
+        )
+    )
+
+    work = GameWork.objects.get(canonical_slug="signal-quest")
+    assert list(work.franchises.values_list("igdb_id", "slug")) == [(77, "signal-saga")]
+    assert list(work.developers.values_list("igdb_id", "slug")) == [(88, "signal-studio")]
+    assert Franchise.objects.count() == 1
+    assert Developer.objects.count() == 1
 
 
 class FakeIgdbClient:

@@ -18,7 +18,15 @@ import pytest
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
 
-from catalogue.models import CorpusRatingSnapshot, GameRelease, GameWork, Genre, Platform
+from catalogue.models import (
+    CorpusRatingSnapshot,
+    Developer,
+    Franchise,
+    GameRelease,
+    GameWork,
+    Genre,
+    Platform,
+)
 from library.models import LibraryEntry
 from recommendations.content.features import (
     FEATURE_SET_VERSION,
@@ -26,7 +34,7 @@ from recommendations.content.features import (
     feature_vector,
     genre_rating_profile,
 )
-from recommendations.content.profile import build_profile
+from recommendations.content.profile import build_profile, build_profile_inputs
 from recommendations.models import WorkFeatureVector
 
 User = get_user_model()
@@ -146,6 +154,24 @@ def test_coverage_report_decides_inclusion_from_measured_coverage(genres) -> Non
     assert 0.0 < report["franchise_threshold"] <= 1.0
 
 
+@pytest.mark.django_db
+def test_franchise_and_developer_features_activate_only_above_measured_coverage(genres) -> None:  # noqa: ANN001
+    franchise = Franchise.objects.create(igdb_id=111, name="Quest Saga", slug="quest-saga")
+    developer = Developer.objects.create(igdb_id=222, name="Quest Studio", slug="quest-studio")
+    works = [_work(f"facet-{idx}", genres["rpg"]) for idx in range(4)]
+    for work in works[:2]:
+        work.franchises.add(franchise)
+        work.developers.add(developer)
+
+    report = coverage_report(_CORPUS)
+    assert report["include_franchise"] is True
+    assert report["include_developer"] is True
+
+    vector = feature_vector(works[0], include_franchise=True, include_developer=True)
+    assert vector["franchise:quest-saga"] == pytest.approx(1.0)
+    assert vector["developer:quest-studio"] == pytest.approx(1.0)
+
+
 # --------------------------------------------------------------------------- #
 # genre_rating_profile (corpus statistic, snapshot-derived)                    #
 # --------------------------------------------------------------------------- #
@@ -191,6 +217,19 @@ def test_profile_uses_positive_rated_completed_and_playing_entries(user_a, genre
     assert profile["genre:role-playing-rpg"] > profile["genre:shooter"]
     assert profile["genre:role-playing-rpg"] == pytest.approx(4.0 / 6.8)
     assert profile["genre:shooter"] == pytest.approx(2.8 / 6.8)
+
+
+@pytest.mark.django_db
+def test_profile_records_own_seed_ratings_as_preference_intensity(user_a, genres) -> None:  # noqa: ANN001
+    _own(user_a, _work("rated-rpg", genres["rpg"]), status="completed", rating=10)
+    _own(user_a, _work("rated-shooter", genres["shooter"]), status="completed", rating=7)
+
+    inputs = build_profile_inputs(user_a, _CORPUS)
+
+    assert inputs.positive_entry_count == 2
+    assert inputs.positive_rating_sum_half_steps == 17
+    assert inputs.as_dict()["positive_rating_mean_half_steps"] == pytest.approx(8.5)
+    assert inputs.as_dict()["own_rating_role"] == "seed_preference_intensity"
 
 
 @pytest.mark.django_db

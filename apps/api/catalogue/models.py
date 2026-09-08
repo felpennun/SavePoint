@@ -35,6 +35,36 @@ class Genre(models.Model):
         return self.name
 
 
+class Franchise(models.Model):
+    """A stable IGDB franchise facet used only when the governed data covers it."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    igdb_id = models.PositiveIntegerField(unique=True)
+    name = models.CharField(max_length=200, unique=True)
+    slug = models.SlugField(max_length=200, unique=True)
+
+    class Meta:
+        ordering = ("name",)
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class Developer(models.Model):
+    """An IGDB company explicitly marked as a developer for a work."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    igdb_id = models.PositiveIntegerField(unique=True)
+    name = models.CharField(max_length=200, unique=True)
+    slug = models.SlugField(max_length=200, unique=True)
+
+    class Meta:
+        ordering = ("name",)
+
+    def __str__(self) -> str:
+        return self.name
+
+
 class GameWork(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     canonical_slug = models.SlugField(max_length=200, unique=True)
@@ -62,6 +92,8 @@ class GameWork(models.Model):
     # remains intact in ``summary``; the API never displays it as Spanish.
     summary_es = models.TextField(blank=True)
     genres = models.ManyToManyField(Genre, blank=True, related_name="works")
+    franchises = models.ManyToManyField(Franchise, blank=True, related_name="works")
+    developers = models.ManyToManyField(Developer, blank=True, related_name="works")
 
     class Meta:
         ordering = ("original_title", "id")
@@ -243,6 +275,43 @@ class CorpusRatingSnapshot(models.Model):
             models.UniqueConstraint(
                 fields=("work", "corpus_version", "source"),
                 name="catalogue_unique_rating_snapshot",
+            )
+        ]
+
+
+class CorpusPopularitySnapshot(models.Model):
+    """One immutable IGDB PopScore primitive captured for a corpus version.
+
+    IGDB exposes primitives rather than one canonical aggregate.  Persisting
+    them separately preserves the original measurement and leaves any future
+    composition explicit, reproducible and independently ablatable.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    work = models.ForeignKey(
+        GameWork, on_delete=models.CASCADE, related_name="popularity_snapshots"
+    )
+    corpus_version = models.CharField(max_length=32)
+    popularity_type_id = models.PositiveIntegerField()
+    popularity_type_name = models.CharField(max_length=120)
+    external_source = models.CharField(max_length=120, blank=True)
+    value = models.FloatField()
+    calculated_at = models.DateTimeField(null=True, blank=True)
+    source_updated_at = models.DateTimeField(null=True, blank=True)
+    retrieved_at = models.DateTimeField()
+    payload_sha256 = models.CharField(max_length=64)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=("work", "corpus_version", "popularity_type_id"),
+                name="catalogue_unique_popularity_snapshot",
+            )
+        ]
+        indexes = [
+            models.Index(
+                fields=("corpus_version", "popularity_type_id"),
+                name="catalogue_pop_ver_type_idx",
             )
         ]
 

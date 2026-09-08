@@ -30,14 +30,17 @@ import requests
 TOKEN_URL = "https://id.twitch.tv/oauth2/token"
 GAMES_URL = "https://api.igdb.com/v4/games"
 GAMES_COUNT_URL = "https://api.igdb.com/v4/games/count"
+POPULARITY_PRIMITIVES_URL = "https://api.igdb.com/v4/popularity_primitives"
+POPULARITY_TYPES_URL = "https://api.igdb.com/v4/popularity_types"
 
 # Apicalypse field list -- dot expansion keeps genres/platforms/cover to a
 # single request per page (ADR-006 anti-pattern: no N+1 per-game lookups).
 GAME_FIELDS = (
     "id,name,slug,url,first_release_date,total_rating,total_rating_count,"
     "rating,rating_count,summary,genres.id,genres.name,platforms.id,platforms.name,"
-    "alternative_names.name,franchises.name,collections.name,"
-    "involved_companies.company.name,involved_companies.developer,cover.image_id"
+    "alternative_names.name,franchises.id,franchises.name,collections.name,"
+    "involved_companies.company.id,involved_companies.company.name,"
+    "involved_companies.developer,cover.image_id"
 )
 
 DEFAULT_TIMEOUT = (10, 45)          # (connect, read) seconds
@@ -229,6 +232,45 @@ class IgdbClient:
             raise IgdbClientError("games response was not JSON") from None
         if not isinstance(rows, list):
             raise IgdbClientError("games response was not a JSON array")
+        return rows
+
+    def fetch_popularity_types(self) -> list[dict]:
+        """Return the current IGDB primitive-type dictionary for one capture."""
+
+        resp = self._post(
+            POPULARITY_TYPES_URL,
+            "fields id,name,external_popularity_source,updated_at; sort id asc; limit 500;",
+        )
+        try:
+            rows = resp.json()
+        except ValueError as exc:
+            raise IgdbClientError(
+                f"popularity types response was not JSON: {self._scrub(exc)}"
+            ) from None
+        if not isinstance(rows, list):
+            raise IgdbClientError("popularity types response was not a JSON array")
+        return rows
+
+    def fetch_popularity_page(self, after_id: int, page_size: int = 500) -> list[dict]:
+        """Fetch one stable-id page of raw PopScore primitives.
+
+        The caller freezes the returned rows locally; this method is never a
+        request-time recommendation dependency.
+        """
+
+        body = (
+            "fields id,game_id,popularity_type,value,calculated_at,updated_at,checksum; "
+            f"where id > {int(after_id)}; sort id asc; limit {int(page_size)};"
+        )
+        resp = self._post(POPULARITY_PRIMITIVES_URL, body)
+        try:
+            rows = resp.json()
+        except ValueError as exc:
+            raise IgdbClientError(
+                f"popularity primitives response was not JSON: {self._scrub(exc)}"
+            ) from None
+        if not isinstance(rows, list):
+            raise IgdbClientError("popularity primitives response was not a JSON array")
         return rows
 
     def iter_pages(

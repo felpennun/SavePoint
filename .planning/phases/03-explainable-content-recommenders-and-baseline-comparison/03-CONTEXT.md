@@ -11,6 +11,22 @@
 > planner deben reconciliar el resto del documento con este bloque antes de
 > producir los planes de la Fase 3.
 
+## Decisión del autor — 2026-09-09
+
+- La **valoración propia de cada juego semilla** entra de forma explícita en
+  el perfil del usuario como intensidad de preferencia. No es una predicción
+  de la nota del candidato ni se mezcla con la valoración externa: el
+  artefacto debe poder mostrar por separado cuántas semillas positivas se
+  usaron y su media de `rating_half_steps`.
+- La captura de PopScore conserva primero las **primitivas crudas** que IGDB
+  publica, con tipo, fuente, fecha, valor y hash por observación. Esto no
+  elige una composición ni un peso: ambas decisiones se revisarán antes de
+  activar una variante y antes de ejecutar la comparación. Nunca se sustituye
+  un dato ausente por cero ni se consulta IGDB durante un ranking.
+- La reimportación y publicación de una nueva versión del corpus gobernado se
+  revisan después de verificar esta extensión del contrato; el corpus actual
+  y sus artefactos permanecen inmutables.
+
 ### Corpus gobernado y cobertura de valoraciones
 
 - La Fase 3 comienza actualizando y versionando el corpus gobernado **antes de

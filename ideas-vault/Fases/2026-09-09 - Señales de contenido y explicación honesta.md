@@ -21,6 +21,22 @@ Las razones son tokens deterministas de género o plataforma presentes en el res
 La API los convierte a nombres canónicos y la interfaz reutiliza la plantilla localizada
 aprobada; cuando no hay evidencia devuelve una razón ausente.
 
+## Reapertura de contrato — 2026-09-09
+
+El autor añade que la valoración propia de cada juego semilla debe figurar
+explícitamente como intensidad de preferencia. `ProfileInputs` registra el
+número de semillas positivas, la suma y la media de sus `rating_half_steps`;
+no confunde esa señal personal con el rating externo del candidato.
+
+Franquicia y desarrolladora pasan a persistirse con su ID IGDB estable. Solo
+entran en `fs-v3` si su cobertura medida en el corpus gobernado llega al 50 %.
+PopScore se prepara como instantánea de primitivas crudas por obra, tipo,
+fecha, fuente y hash; no existe aún una fórmula compuesta ni un peso activo.
+
+No se ha consultado IGDB, ni se ha reimportado o gobernado un corpus nuevo, ni
+se han ejecutado experimentos. La decisión siguiente es revisar esta base y,
+solo después, publicar un nuevo corpus y capturar sus instantáneas.
+
 ## Evidencia canónica
 
 - [[../../.planning/phases/03-explainable-content-recommenders-and-baseline-comparison/03-02-PLAN|Plan 03-02]]
@@ -40,3 +56,4 @@ aprobada; cuando no hay evidencia devuelve una razón ausente.
 - [[2026-09-08 - Tracer v2 de recomendaciones]]
 - [[Explicabilidad]]
 - [[Fase 3 - Recomendadores explicables y baselines]]
+- [[../../.planning/phases/03-explainable-content-recommenders-and-baseline-comparison/03-CONTEXT|Contexto de fase 03]]

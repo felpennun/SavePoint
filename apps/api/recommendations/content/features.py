@@ -25,13 +25,13 @@ from __future__ import annotations
 import math
 
 from catalogue.corpus import ALLOWLIST_SLUGS, governed_works
-from catalogue.models import CorpusRatingSnapshot, GameWork, Genre
+from catalogue.models import CorpusPopularitySnapshot, CorpusRatingSnapshot, GameWork, Genre
 
 # Bump when the vector-building rules below change (part of the DTO, REC-09).
 # v2 keeps the sparse categorical representation but makes the absence of
 # unpersisted facets explicit in the signal manifest.  Cached v1 rows must not
 # be reused: their provenance did not record that decision.
-FEATURE_SET_VERSION = "fs-v2"
+FEATURE_SET_VERSION = "fs-v3"
 
 # D-11: a facet is only worth adding as a feature dimension if enough governed
 # works actually carry it. 50 % is the documented floor -- below it the facet
@@ -58,21 +58,12 @@ def _platform_slugs(work: GameWork) -> list[str]:
     )
 
 
-def _franchise_slugs(work: GameWork) -> list[str]:  # noqa: ARG001
-    """Franchise slugs for ``work`` -- empty until the importer fetches them.
-
-    D-11: no ``Franchise`` model or denormalised field exists this phase
-    (that is CAT-05 / Phase 6 scope). Kept as a seam so :func:`feature_vector`
-    needs no change when ``franchises.name`` starts being imported.
-    """
-
-    return []
+def _franchise_slugs(work: GameWork) -> list[str]:
+    return sorted({franchise.slug for franchise in work.franchises.all()})
 
 
-def _developer_slugs(work: GameWork) -> list[str]:  # noqa: ARG001
-    """Developer slugs for ``work`` -- empty until the importer fetches them."""
-
-    return []
+def _developer_slugs(work: GameWork) -> list[str]:
+    return sorted({developer.slug for developer in work.developers.all()})
 
 
 def feature_vector(
@@ -120,12 +111,10 @@ def coverage_report(corpus_version: str | None = None) -> dict:
     decide whether each facet is worth emitting (D-11).
     """
 
-    works = list(
-        governed_works(corpus_version).prefetch_related("genres", "releases__platform")
-    )
-    total = len(works)
-    franchise_present = sum(1 for work in works if _franchise_slugs(work))
-    developer_present = sum(1 for work in works if _developer_slugs(work))
+    works = governed_works(corpus_version)
+    total = works.count()
+    franchise_present = works.filter(franchises__isnull=False).distinct().count()
+    developer_present = works.filter(developers__isnull=False).distinct().count()
 
     franchise_coverage = franchise_present / total if total else 0.0
     developer_coverage = developer_present / total if total else 0.0
@@ -143,8 +132,12 @@ def coverage_report(corpus_version: str | None = None) -> dict:
         "include_franchise": franchise_coverage >= FRANCHISE_COVERAGE_THRESHOLD,
         "include_developer": developer_coverage >= DEVELOPER_COVERAGE_THRESHOLD,
         # These scalar families deliberately stay outside cosine similarity.
-        # PopScore cannot be represented until a dated, governed snapshot is
-        # persisted (rather than queried from an external API at rank time).
+        # A raw primitive snapshot is deliberately not an aggregate score.
+        # Composition and its recommender weight require a later approved
+        # variant, never an ad-hoc request-time calculation.
+        "popscore_primitives_available": CorpusPopularitySnapshot.objects.filter(
+            corpus_version=corpus_version
+        ).exists(),
         "rating_available": True,
         "rating_volume_available": True,
         "release_recency_available": True,

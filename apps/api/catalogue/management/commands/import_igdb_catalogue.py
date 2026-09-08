@@ -48,6 +48,8 @@ from django.utils.text import slugify
 from catalogue.igdb import IgdbClient, redact
 from catalogue.models import (
     AssetAttribution,
+    Developer,
+    Franchise,
     GameAlias,
     GameRelease,
     GameWork,
@@ -158,11 +160,17 @@ class Command(BaseCommand):
             if value:
                 alternative_names.append(value)
 
-        franchises = [
-            str(item.get("name") or "").strip()
-            for item in row.get("franchises") or []
-            if isinstance(item, dict) and str(item.get("name") or "").strip()
-        ]
+        franchises = []
+        for item in row.get("franchises") or []:
+            if not isinstance(item, dict):
+                continue
+            try:
+                franchise_id = int(item["id"])
+            except (KeyError, TypeError, ValueError):
+                continue
+            franchise_name = str(item.get("name") or "").strip()
+            if franchise_name:
+                franchises.append((franchise_id, franchise_name))
         collections = [
             str(item.get("name") or "").strip()
             for item in row.get("collections") or []
@@ -174,9 +182,13 @@ class Command(BaseCommand):
                 continue
             company = item.get("company") or {}
             company_name = str(company.get("name") or "").strip() if isinstance(company, dict) else ""
-            if company_name:
+            try:
+                company_id = int(company["id"])
+            except (KeyError, TypeError, ValueError):
+                continue
+            if company_name and bool(item.get("developer")):
                 involved_companies.append(
-                    {"name": company_name, "developer": bool(item.get("developer"))}
+                    {"id": company_id, "name": company_name}
                 )
 
         genres = []
@@ -209,7 +221,9 @@ class Command(BaseCommand):
             "alternative_names": sorted(set(alternative_names)),
             "franchises": sorted(set(franchises)),
             "collections": sorted(set(collections)),
-            "involved_companies": involved_companies,
+            "developers": sorted(
+                {(item["id"], item["name"]) for item in involved_companies}
+            ),
             "genres": genres,
             "platforms": sorted(set(platforms)),
             "cover_url": cover_url,
@@ -231,7 +245,7 @@ class Command(BaseCommand):
             "alternative_names": norm["alternative_names"],
             "franchises": norm["franchises"],
             "collections": norm["collections"],
-            "involved_companies": norm["involved_companies"],
+            "developers": norm["developers"],
             "genres": sorted(gid for gid, _ in norm["genres"]),
             "platforms": norm["platforms"],
             "cover": norm["cover_url"],
@@ -305,6 +319,29 @@ class Command(BaseCommand):
             genre.save(update_fields=["name", "slug"])
         return genre
 
+    @staticmethod
+    def _facet_slug(base: str, igdb_id: int, model: Any) -> str:
+        slug = slugify(base)[:200] or f"igdb-{igdb_id}"
+        if model.objects.filter(slug=slug).exclude(igdb_id=igdb_id).exists():
+            slug = f"{slug[:180]}-{igdb_id}"
+        return slug
+
+    def _franchise_for(self, franchise_id: int, name: str) -> Franchise:
+        slug = self._facet_slug(name, franchise_id, Franchise)
+        franchise, _ = Franchise.objects.update_or_create(
+            igdb_id=franchise_id,
+            defaults={"name": name, "slug": slug},
+        )
+        return franchise
+
+    def _developer_for(self, developer_id: int, name: str) -> Developer:
+        slug = self._facet_slug(name, developer_id, Developer)
+        developer, _ = Developer.objects.update_or_create(
+            igdb_id=developer_id,
+            defaults={"name": name, "slug": slug},
+        )
+        return developer
+
     def _upsert(self, norm: dict, now: datetime) -> str:
         existing = (
             SourceRecord.objects.select_related("work")
@@ -369,6 +406,12 @@ class Command(BaseCommand):
         )
 
         work.genres.set([self._genre_for(gid, gname) for gid, gname in norm["genres"]])
+        work.franchises.set(
+            [self._franchise_for(franchise_id, name) for franchise_id, name in norm["franchises"]]
+        )
+        work.developers.set(
+            [self._developer_for(developer_id, name) for developer_id, name in norm["developers"]]
+        )
 
         # IGDB is the owner of the English alias set. The legacy Wikidata
         # importer also uses locale=en/es but its Spanish aliases are kept;

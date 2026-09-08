@@ -80,7 +80,8 @@ coverage:
 
 duration: 98min
 completed: 2026-09-09
-status: complete
+reopened: 2026-09-09
+status: in_progress
 ---
 
 # Fase 3 Plan 02: señales de contenido y explicaciones deterministas
@@ -101,6 +102,26 @@ status: complete
 - `ProfileInputs` separa la afinidad positiva de `completed`/`playing` valorados al menos 3,5 de una señal negativa de género, activada solo con tres experiencias bajas.
 - Se añadió `content-cbf-neg-v1`, con parámetros visibles, orden estable y penalización independiente de las tres variantes positivas.
 - Las explicaciones producen tokens ordenados de género o plataforma y la API los convierte a nombres localizados; cuando no hay evidencia disponible devuelve `null`.
+
+## Reapertura de señales acordadas — 2026-09-09
+
+La issue #41 se reabre porque el criterio del plan requería señales activas
+con procedencia, no solo ausencias declaradas. Esta extensión añade el modelo
+de franquicia y desarrolladora con identidad estable de IGDB, los persiste en
+el importador y los incorpora a `fs-v3` cuando la cobertura medida alcanza el
+umbral publicado. También añade `snapshot_corpus_popularity`, que congela las
+primitivas de PopScore por tipo y versión de corpus sin crear una composición
+ni asignar un peso arbitrario.
+
+La valoración propia de los juegos semilla queda trazada en `ProfileInputs`
+como intensidad de preferencia (`positive_rating_sum_half_steps` y media),
+separada de `rating` y `rating_count` externos. No se ha llamado a IGDB, no se
+ha reimportado el catálogo, no se ha publicado una nueva versión de corpus ni
+se ha ejecutado ningún algoritmo durante esta reapertura.
+
+La activación de una composición de PopScore y sus pesos queda pendiente de la
+revisión del autor. La captura real se hará solo para una nueva versión del
+corpus gobernado, manteniendo intactos los artefactos existentes.
 
 ## Commits de tareas
 
