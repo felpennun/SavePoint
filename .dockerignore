@@ -33,4 +33,5 @@ apps/api/.evaluation-test-run.json
 # Authoring/tooling material is not needed by either runtime image.
 thesis
 vault
+ideas-vault
 skills-lock.json

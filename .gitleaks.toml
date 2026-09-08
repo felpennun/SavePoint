@@ -1,0 +1,15 @@
+title = "SavePoint secret scanning"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Generated GSD manifests contain only file paths and SHA-256 checksums."
+paths = ['''(^|/)(\.agents|\.claude|\.codex|\.github)/gsd-file-manifest\.json$''']
+
+[[allowlists]]
+description = "Deterministic non-secret synthetic fixture identifier."
+condition = "AND"
+regexTarget = "line"
+paths = ['''(^|/)apps/api/evaluation/tests/test_synthetic\.py$''']
+regexes = ['''seed_key="synthetic-invalid-1"''']

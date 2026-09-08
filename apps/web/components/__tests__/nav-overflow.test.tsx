@@ -10,6 +10,7 @@ import { getDictionary } from "../../i18n";
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
   usePathname: () => "/es",
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 // Use the already approved Playwright dependency for real DOM/accessibility
