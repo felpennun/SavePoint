@@ -1,8 +1,8 @@
 ---
 gsd_state_version: 1.0
-status: ready_to_plan
-stopped_at: Phase 2 complete, ready to plan Phase 03
-last_updated: "2026-09-08T20:17:52.370Z"
+status: ready_to_execute
+stopped_at: Phase 3 planning complete and GitHub issue/board synchronization verified
+last_updated: "2026-09-08T22:45:00.000Z"
 state_head: fa9cca1dbd183b7b6b3022993a8f786367b43413
 progress:
   total_phases: 8
@@ -13,7 +13,7 @@ progress:
 last_activity: 2026-09-08
 next_phase: 3
 next_phase_name: Explainable Content Recommenders and Baseline Comparison
-next_action: /gsd-plan-phase 3
+next_action: /gsd-execute-phase 3
 current_phase: 03
 current_phase_name: Explainable Content Recommenders and Baseline Comparison
 last_activity_desc: "Fase 2 aceptada por Felipe: 13/13 planes, verificación y seguridad cerradas; primera simulación conservada con sus limitaciones. Preparando la planificación de la Fase 3."
@@ -218,27 +218,16 @@ blocking-human checkpoint: IGDB final governed-corpus user-rating coverage measu
 (N=10000) or record IGDB-only in ADR-008. RAWG code + ADR committed in wip commit a718e8d.
 
 Resume file: .planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/.continue-here.md
-Handoff: .planning/HANDOFF.json (structured, one-shot — delete after resumption)
+Handoff: eliminado tras la reanudación; el checkpoint de Fase 3 sigue en `.planning/phases/03-explainable-content-recommenders-and-baseline-comparison/.continue-here.md`
 
 ## Continuidad de esta sesión
 
-Último estado comprobado: **Wave 4 de la Fase 2 ejecutada** (2026-09-07). Hay 10/13 planes
-con `SUMMARY.md`: 02-01, 02-02, 02-03, 02-04, 02-05, 02-07, 02-08, 02-09, 02-10 y
-02-11. Permanecen pendientes 02-06, 02-12 y 02-13; la Wave 5 es el siguiente bloque.
+Último estado comprobado: **Fase 3 preparada para ejecución** (2026-09-08). Los cuatro
+planes están creados, validados y enlazados a sus issues: `03-01` → #42, `03-02` → #41,
+`03-03` → #39 y `03-04` → #40. Los cuatro elementos están en el board SavePoint con estado
+`Todo`.
 
-La documentación LaTeX de la Fase 2 y la revisión académica están incorporadas en el
-árbol de trabajo (`thesis/`), con tablas adaptables, referencias revisadas y la memoria
-de algoritmos, ratings, decisiones previas al laboratorio, protocolo y limitaciones. La
-compilación final se hará en Overleaf porque TeX Live/MiKTeX no queda instalado localmente;
-el ZIP definitivo se generó y los cambios de aplicación y tesis están sincronizados en
-`origin/main` mediante `2ea3a8c`.
+La autenticación de GitHub CLI funciona desde el contexto elevado necesario para el keyring y
+el scope `project` está concedido. No se han publicado credenciales ni logs sensibles.
 
-**Demo local solicitada por el autor:** la Wave 3 ya está cerrada. El siguiente paso
-operativo es levantar el entorno con `docker compose -f infra/compose.yaml up --build` y
-abrir `http://localhost:3000` para el walkthrough. Comprobar antes que `api` y `web` estén
-healthy y mantener a mano las tres cuentas demo definidas en `infra/compose.yaml`.
-
-**Reanudación 2026-09-07:** el repositorio está en `2ea3a8c` (`main` y `origin/main`),
-sin agentes interrumpidos ni `HANDOFF.json`. La Wave 4 se completó en el árbol de trabajo;
-la acción siguiente es ejecutar la Wave 5 con `/clear` y después
-`$gsd-execute-phase 2 --wave 5`.
+Siguiente acción: ejecutar `/gsd-execute-phase 3`, empezando por la Ola 1 (`03-01`).
