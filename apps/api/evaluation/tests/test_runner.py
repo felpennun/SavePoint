@@ -35,7 +35,8 @@ def runner_fixture(db):
         GameWork.objects.create(
             canonical_slug=f"runner-work-{index}",
             original_title=f"Runner Work {index}",
-            rating=80.0 if index == 0 else None,
+            rating=80.0 if index == 0 else (101.0 if index == 3 else None),
+            rating_count=None if index == 0 else (1 if index == 1 else None),
             in_corpus=True,
             corpus_version=CORPUS_VERSION,
         )
@@ -75,8 +76,25 @@ def test_build_returns_one_shared_candidate_set(runner_fixture, frozen_protocol)
     )
 
     assert heldout_id == works[0].id
-    assert set(candidate_ids) == {work.id for work in works}
+    assert set(candidate_ids) == {works[0].id, works[1].id}
+    assert works[2].id not in candidate_ids
+    assert works[3].id not in candidate_ids
     assert candidate_sha256
+
+
+def test_build_skips_user_without_eligible_positive(runner_fixture, frozen_protocol):
+    _user, works, _identity = runner_fixture
+    user = User.objects.create_user(username="runner-unrated-only")
+    DemoAccountIdentity.objects.create(
+        id=demo_identity_anchor_id("runner-unrated-only"),
+        seed_key="runner-unrated-only",
+        user=user,
+        marker="synthetic-eval-user",
+        display_label="Synthetic unrated-only fixture",
+    )
+    LibraryEntry.objects.create(user=user, work=works[2], current_status="completed")
+
+    assert build(user, frozen_protocol, CORPUS_VERSION) is None
 
 
 def test_runner_asserts_algorithms_receive_same_candidate_set(runner_fixture, frozen_protocol):

@@ -63,13 +63,21 @@ def test_checked_in_protocol_loads_with_frozen_keys() -> None:
     assert frozen.metrics == EXPECTED_METRICS
     assert frozen.relevance == {"completed": True, "rating_half_steps_gte": 7}
     assert frozen.split["strategy"] == "leave_one_out_per_user"
-    assert frozen.candidate_set == "governed_corpus_minus_user_library_plus_heldout"
+    assert frozen.candidate_set == (
+        "eligible_governed_corpus_rating_count_gte_1_or_valid_rating_"
+        "minus_user_library_plus_heldout"
+    )
     assert frozen.exclusions == "any_library_entry"
     assert frozen.simulation is True
     assert frozen.limitation.strip()
-    # placeholders resolved later in Plan 02-13
-    assert frozen.corpus_version is None
-    assert frozen.snapshot_sha256 is None
+    # Plan 02-13 freezes the governed corpus and its evidence fingerprint.
+    assert frozen.corpus_version == "2026.09.1"
+    assert frozen.snapshot_sha256 == "648df3ded83dfab9e6f479a0d80291d3690e783e7b25f424b8e1e4260d839f01"
+    assert frozen.protocol_version == 2
+    assert frozen.candidate_set == (
+        "eligible_governed_corpus_rating_count_gte_1_or_valid_rating_"
+        "minus_user_library_plus_heldout"
+    )
 
 
 def test_checked_in_grid_is_18_configs_within_budget() -> None:

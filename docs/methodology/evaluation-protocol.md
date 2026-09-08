@@ -158,3 +158,13 @@ aborta si la cobertura del snapshot sobre la vista gobernada no es del 100 %.
   `apps/api/evaluation/tests/test_metrics.py`, `apps/api/evaluation/tests/test_splits.py`.
 - Decisiones de origen: `.planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/02-CONTEXT.md`
   (D-17..D-22) y `02-RESEARCH.md` "Pattern 6: Frozen evaluation harness".
+
+## Regla de elegibilidad del evaluador
+
+Desde `protocol_version: 2`, el universo que puntuan los algoritmos se limita
+a las obras gobernadas con `rating_count >= 1` o con un `rating` externo valido
+en el intervalo `[0, 100]`, aunque su recuento sea cero o nulo. Las obras sin
+ninguna de esas señales siguen disponibles para busqueda y coleccion, pero no
+se devuelven como recomendaciones ni participan en las metricas. El item
+retirado del leave-one-out tambien debe cumplir esta regla; de lo contrario,
+el usuario no participa en ese split.

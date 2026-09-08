@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import os
 import subprocess
 from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
@@ -14,7 +15,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 
 from accounts.models import DemoAccountIdentity
-from catalogue.corpus import governed_works
+from catalogue.corpus import evaluation_candidate_works, governed_works
 from catalogue.models import CorpusRatingSnapshot, CorpusVersion
 from evaluation.candidates import build
 from evaluation.metrics import map_at_k, ndcg_at_k, precision_at_k, recall_at_k
@@ -67,7 +68,7 @@ def validate_snapshot_coverage(corpus_version: str) -> None:
             f"corpus_version {corpus_version!r} is not the active CorpusVersion"
         )
 
-    governed = governed_works(corpus_version)
+    governed = evaluation_candidate_works(corpus_version)
     rated_ids = set(governed.filter(rating__isnull=False).values_list("id", flat=True))
     if not rated_ids:
         return
@@ -99,6 +100,9 @@ def validate_snapshot_coverage(corpus_version: str) -> None:
 
 
 def _code_commit() -> str:
+    supplied_commit = os.environ.get("SAVEPOINT_CODE_COMMIT", "").strip()
+    if supplied_commit:
+        return supplied_commit
     repo_root = Path(settings.BASE_DIR).parent.parent
     try:
         return subprocess.check_output(
@@ -206,8 +210,13 @@ def run(
     user_ids = set(getattr(partition, split))
     selected_users = [user for user in users if user.pk in user_ids]
     candidates_by_user: list[tuple[Any, list[Any], Any, str]] = []
+    skipped_user_count = 0
     for user in selected_users:
-        candidate_ids, heldout_id, candidate_hash = build(user, protocol, corpus_version)
+        built = build(user, protocol, corpus_version)
+        if built is None:
+            skipped_user_count += 1
+            continue
+        candidate_ids, heldout_id, candidate_hash = built
         candidates_by_user.append((user, list(candidate_ids), heldout_id, candidate_hash))
     if not candidates_by_user:
         raise ValueError(f"no evaluable synthetic users in {split} split")
@@ -216,7 +225,7 @@ def run(
     algorithm_artifacts: dict[str, Any] = {}
     evaluation_genre_profile = genre_rating_profile(corpus_version)
     evaluation_works = list(
-        governed_works(corpus_version)
+        evaluation_candidate_works(corpus_version)
         .filter(genres__isnull=False)
         .prefetch_related("genres", "releases__platform")
     )
@@ -317,6 +326,12 @@ def run(
             "user_split": protocol.user_split_seed,
         },
         "split": split,
+        "evaluation_population": {
+            "requested_user_count": len(selected_users),
+            "evaluated_user_count": len(candidates_by_user),
+            "skipped_user_count": skipped_user_count,
+            "skipped_reason": "no eligible positive item for leave-one-out",
+        },
         "split_manifest_sha256": split_manifest_hash,
         "algorithms": algorithm_artifacts,
         "simulation": True,

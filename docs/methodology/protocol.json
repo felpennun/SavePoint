@@ -1,5 +1,5 @@
 {
-  "protocol_version": 1,
+  "protocol_version": 2,
   "frozen_on": "2026-09-07",
   "ratified_by": "Felipe — 02-08 Task 1 checkpoint:decision, option ratify-as-proposed, 2026-09-07",
   "simulation": true,
@@ -15,7 +15,7 @@
     "seed": 20260907,
     "heldout_returned_to_candidates": true
   },
-  "candidate_set": "governed_corpus_minus_user_library_plus_heldout",
+  "candidate_set": "eligible_governed_corpus_rating_count_gte_1_or_valid_rating_minus_user_library_plus_heldout",
   "exclusions": "any_library_entry",
   "metrics": ["precision@k", "recall@k", "ndcg@k", "map@k"],
   "tuning": {
@@ -49,6 +49,6 @@
     "test": 40,
     "seed": 20260908
   },
-  "corpus_version": null,
-  "snapshot_sha256": null
+  "corpus_version": "2026.09.1",
+  "snapshot_sha256": "648df3ded83dfab9e6f479a0d80291d3690e783e7b25f424b8e1e4260d839f01"
 }

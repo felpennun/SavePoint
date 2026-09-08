@@ -2,9 +2,10 @@
 partition (EVAL-01, EVAL-02; D-17, D-18, D-21).
 
 The candidate set built here is identical for every algorithm given the same
-user and seed (EVAL-01): ``governed_works(corpus_version)`` minus the user's
-*remaining* library, plus the single held-out item (D-18, RESEARCH Pitfall 6).
-Its ``sha256`` is returned so a run can freeze the per-user candidate manifest.
+user and seed (EVAL-01): eligible governed works (at least one rating or a
+valid external rating) minus the user's *remaining* library, plus the single
+eligible held-out item (D-18, RESEARCH Pitfall 6). Its ``sha256`` is returned
+so a run can freeze the per-user candidate manifest.
 
 Leakage note (EVAL-02): the genre rating profile (D-13) is a *corpus* statistic
 derived from the immutable ``CorpusRatingSnapshot`` of the active
@@ -21,7 +22,7 @@ import random
 import uuid
 from typing import NamedTuple
 
-from catalogue.corpus import governed_works
+from catalogue.corpus import evaluation_candidate_works
 from library.models import LibraryEntry
 
 
@@ -47,7 +48,7 @@ class UserSplit(NamedTuple):
     test: tuple[int, ...]
 
 
-def relevant_positive_ids(user, protocol) -> set[int]:
+def relevant_positive_ids(user, protocol, corpus_version: str | None = None) -> set[object]:
     """Work ids the user counts as a positive under the frozen relevance rule.
 
     D-17: ``current_status == "completed"`` **or** ``rating_half_steps`` at or
@@ -58,12 +59,17 @@ def relevant_positive_ids(user, protocol) -> set[int]:
     want_completed = bool(rule.get("completed"))
     floor = int(rule["rating_half_steps_gte"])
 
-    positives: set[int] = set()
+    positives: set[object] = set()
     for work_id, status, rating in LibraryEntry.objects.filter(user=user).values_list(
         "work_id", "current_status", "rating_half_steps"
     ):
         if (want_completed and status == "completed") or (rating is not None and rating >= floor):
             positives.add(work_id)
+    if corpus_version is not None:
+        eligible_ids = set(
+            evaluation_candidate_works(corpus_version).values_list("id", flat=True)
+        )
+        positives &= eligible_ids
     return positives
 
 
@@ -78,7 +84,7 @@ def leave_one_out(user, seed, protocol, corpus_version: str | None = None) -> Le
     produce the same held-out item and the same candidate manifest hash.
     """
 
-    positives = relevant_positive_ids(user, protocol)
+    positives = relevant_positive_ids(user, protocol, corpus_version)
     if not positives:
         return None
 
@@ -90,8 +96,10 @@ def leave_one_out(user, seed, protocol, corpus_version: str | None = None) -> Le
     )
     remaining_library_ids = library_ids - {heldout}
 
-    governed_ids = set(governed_works(corpus_version).values_list("id", flat=True))
-    candidate_ids = (governed_ids - remaining_library_ids) | {heldout}
+    eligible_ids = set(
+        evaluation_candidate_works(corpus_version).values_list("id", flat=True)
+    )
+    candidate_ids = (eligible_ids - remaining_library_ids) | {heldout}
 
     manifest = hashlib.sha256(
         json.dumps(sorted(str(cid) for cid in candidate_ids), separators=(",", ":")).encode("utf-8")

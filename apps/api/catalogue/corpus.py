@@ -86,3 +86,17 @@ def governed_works(corpus_version: str | None = None) -> QuerySet[GameWork]:
     if corpus_version is not None:
         queryset = queryset.filter(corpus_version=corpus_version)
     return queryset
+
+
+def evaluation_candidate_works(corpus_version: str | None = None) -> QuerySet[GameWork]:
+    """Return governed works with an observable rating signal.
+
+    The evaluation harness keeps the full governed catalogue searchable, but
+    it must not score unrated works as recommendation candidates. A work is
+    eligible when it has at least one user rating, or when its external rating
+    is a valid IGDB value even if the provider did not expose a rating count.
+    """
+
+    return governed_works(corpus_version).filter(
+        Q(rating_count__gte=1) | Q(rating__gte=0, rating__lte=100)
+    )
