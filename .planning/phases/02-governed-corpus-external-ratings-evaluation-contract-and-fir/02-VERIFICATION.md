@@ -1,6 +1,6 @@
 ---
 phase: 02-governed-corpus-external-ratings-evaluation-contract-and-fir
-status: human_needed
+status: passed
 verified_at: 2026-09-08
 verifier: Codex
 ---
@@ -32,14 +32,14 @@ verifier: Codex
 6. Documentación, amenazas a la validez y controles AGENT-04: cubierto por
    `evaluation-protocol.md`, `agent-methodology-controls.md`, ADR-008 y este informe.
 
-## Revisión humana pendiente
+## Revisión humana completada
 
 El artefacto muestra `nDCG@10 = 0.000` para los cinco algoritmos. El resultado se ha
 conservado como hallazgo de simulación, sin repetir el test ni ajustar el protocolo después
-de observarlo. Antes de marcar la fase como aceptada, el autor debe confirmar que acepta esta
-interpretación y las limitaciones: población sintética, un único positivo por usuario,
-catálogo elegible amplio y ausencia de evidencia sobre usuarios reales.
+de observarlo. Felipe acepta esta interpretación y sus limitaciones: población sintética,
+un único positivo por usuario, catálogo elegible amplio y ausencia de evidencia sobre
+usuarios reales. La firma completa queda en `docs/verification/phase-02-signoff.md`.
 
 <human-check>
-Estado: pendiente de firma del autor.
+Estado: firmado y aceptado por el autor el 2026-09-08.
 </human-check>

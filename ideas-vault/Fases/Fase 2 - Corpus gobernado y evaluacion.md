@@ -4,9 +4,9 @@ tags: [fase/2, roadmap, tema/datos, tema/evaluacion, tema/recomendadores]
 
 # Fase 2 - Corpus gobernado y evaluacion
 
-**Estado:** el cierre técnico de `02-13` está completado; el cierre formal de la fase global
-sigue pendiente de la firma del autor y de integrar los resúmenes paralelos restantes.
-**Nota:** esta actualización resume el estado canónico y no modifica el trabajo paralelo.
+**Estado:** ACEPTADA por Felipe el 2026-09-08. Los 13 planes están integrados; el primer
+resultado simulado (`nDCG@10 = 0.000`) se conserva sin repetir el test ni alterar el
+protocolo después de observarlo.
 
 Meta: un investigador puede confiar en el corpus gobernado y sus ratings
 externos; un visitante tiene busqueda tolerante y filtrado multi-seleccion sobre
@@ -28,5 +28,6 @@ recomendacion consciente de ratings producida bajo un protocolo de evaluacion
 
 - [[ADR-008 - Ratings externos gobernados y RAWG]]
 - [[Auditoria de seguridad 2026-09-08]]
+- `docs/verification/phase-02-signoff.md` (fuente canónica de la firma)
 - [[Requisitos - Datos y procedencia]] · [[Requisitos - Experimentacion y evaluacion]]
 - [[Requisitos - Recomendaciones]]

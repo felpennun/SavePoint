@@ -16,7 +16,7 @@ SavePoint begins with a three-day, publicly deployed vertical demonstration, the
 ## Phases
 
 - [x] **Phase 1: Three-Day Public Demo Slice** - Deploy a lawful, locally reproducible controlled demo with catalogue, backlog, rating, inventory, public profile, and popularity recommendations. (completed 2026-09-05)
-- [ ] **Phase 2: Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender** - Prune the corpus to a governed platform/quality allowlist (Steam included), ingest external ratings with provenance and experiment isolation, fix tolerant search over the real corpus, add multi-select filters and a product-grade UI pass, freeze the simulation-aware evaluation protocol, and ship a first ratings-aware content recommender evaluated under it. Technical work complete 2026-09-08; pending author review/sign-off of the simulated result.
+- [x] **Phase 2: Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender** - Prune the corpus to a governed platform/quality allowlist (Steam included), ingest external ratings with provenance and experiment isolation, fix tolerant search over the real corpus, add multi-select filters and a product-grade UI pass, freeze the simulation-aware evaluation protocol, and ship a first ratings-aware content recommender evaluated under it. Accepted by the author on 2026-09-08; simulated limitations retained explicitly.
 - [ ] **Phase 3: Explainable Content Recommenders and Baseline Comparison** - Run the frozen harness over random/popularity baselines and content recommenders with cold-start routing, exclusions, deterministic explanations, the full metric suite, cohort reporting, and independently recalculable artifacts.
 - [ ] **Phase 4: Collaborative and Hybrid Comparison** - Compare collaborative and hybrid methods under the already-frozen protocol and document bounded conclusions.
 - [ ] **Phase 5: Complete Collection Workflows and Portability** - Complete profiles, comments, lists, copy details, and safe deterministic import/export.
@@ -161,7 +161,7 @@ Plans (execution order follows the author's locked D-01 -> D-02 -> D-03 -> D-04 
   5. A signed-in user receives a ranked recommendation from a first ratings-aware recommender that combines their own recorded genre affinity with the aggregate external ratings of comparable games, excludes already-consumed titles, shows a deterministic explanation grounded in persisted features, records the model, feature, and input-data versions of every published result, and gives a sparse-history user an explicit cold-start fallback instead of an empty list; a random baseline is available as the comparison floor.
   6. The phase records the dataset, API, data-model, and normalisation documentation, the protocol, metrics, and threats to validity, and the controls against leakage, hallucination, bias, error, and information exposure, plus the author decisions behind them.
 
-**Plans**: 11/13 plans integrated (6 waves); 02-06 and 02-12 remain in parallel working-tree changes
+**Plans**: 13/13 plans integrated (6 waves); accepted by the author on 2026-09-08
 **UI hint**: yes
 
 Plans:
@@ -190,12 +190,12 @@ Plans:
 
 **Wave 5** *(blocked on Wave 4)*
 
-- [ ] 02-06-PLAN.md — Ficha de juego product-grade (sinopsis, rating relabelado) + estantes "Novedades" y "Para tus juegos"
+- [x] 02-06-PLAN.md — Ficha de juego product-grade (sinopsis, rating relabelado) + estantes "Novedades" y "Para tus juegos"
 - [x] 02-13-PLAN.md — Primera comparación completa `run_evaluation` (EVAL-01) + controles metodológicos (AGENT-04) + reconciliación (DATA-07)
 
 **Wave 6** *(blocked on Wave 5)*
 
-- [ ] 02-12-PLAN.md — Página de recomendaciones: 3 secciones etiquetadas que coexisten (contenido / género / DLC)
+- [x] 02-12-PLAN.md — Página de recomendaciones: 3 secciones etiquetadas que coexisten (contenido / género / DLC)
 
 ### Phase 3: Explainable Content Recommenders and Baseline Comparison
 
@@ -286,7 +286,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Three-Day Public Demo Slice | 16/16 | Complete    | 2026-09-05 |
 | 01.1. Real-Scale Catalogue and Product Experience (inserted) | 10/10 | Complete    | 2026-09-06 |
-| 2. Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender | 2/13 | In Progress|  |
+| 2. Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender | 13/13 | Complete    | 2026-09-08 |
 | 3. Explainable Content Recommenders and Baseline Comparison | 0/TBD | Not started | - |
 | 4. Collaborative and Hybrid Comparison | 0/TBD | Not started | - |
 | 5. Complete Collection Workflows and Portability | 0/TBD | Not started | - |
