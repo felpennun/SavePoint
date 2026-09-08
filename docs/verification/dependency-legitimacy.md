@@ -15,8 +15,8 @@ Se priorizan soporte mantenido, adecuación al dominio relacional, reproducibili
 
 | Tecnología exacta | Finalidad y razón de elección | Alternativas y consecuencias | Compatibilidad y riesgo de suministro | Evidencia oficial |
 |---|---|---|---|---|
-| Node.js 24.13.0 | Runtime LTS común para construir y servir Next.js. Reduce diferencias entre desarrollo, CI y despliegue. | Node 22 sería más conservador, pero 24 satisface el motor declarado por Vitest 5 y la línea acordada. | Imagen fijada por digest; ejecutar dependencias con scripts mínimos y lock congelado. | [nodejs.org](https://nodejs.org/), `node:24.13.0-slim@sha256:4660b1ca8b28d6d1906fd644abe34b2ed81d15434d26d845ef0aced307cf4b6f` |
-| pnpm 11.25.0 | Gestor reproducible, estricto y eficiente; un único lock para el workspace. | npm reduce herramientas, pero pnpm detecta mejor dependencias fantasma. | Paquete oficial `pnpm`, motor Node >=22.13; `packageManager` exacto. | [npm](https://www.npmjs.com/package/pnpm), [proyecto](https://github.com/pnpm/pnpm) |
+| Node.js 24.20.0 | Runtime LTS común para construir y servir Next.js. Reduce diferencias entre desarrollo, CI y despliegue. | Node 22 sería más conservador, pero 24 satisface el motor declarado por Vitest 5 y la línea acordada. | Imagen fijada por digest; el runtime retira npm y Corepack después de preparar pnpm para reducir superficie. | [nodejs.org](https://nodejs.org/), `node:24.20.0-slim@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e` |
+| pnpm 11.26.0 | Gestor reproducible, estricto y eficiente; un único lock para el workspace. | npm reduce herramientas, pero pnpm detecta mejor dependencias fantasma. | Paquete oficial `pnpm`, motor Node >=22.13; `packageManager` exacto. | [npm](https://www.npmjs.com/package/pnpm), [proyecto](https://github.com/pnpm/pnpm) |
 | Next.js 16.3.4 | SSR, rutas y metadatos de portada/perfiles con UI React interactiva. Es la corrección estable más próxima dentro del major 16 autorizada tras detectar vulnerabilidades en 16.2.12. | Conservar 16.2.12 incumplía el umbral de seguridad; una versión canary/preview no es apropiada para producción; cambiar de major o de framework ampliaría el riesgo y el alcance. | Requiere Node >=20.9; npm confirma el repositorio oficial de Vercel, el tag estable `latest` y la integridad `sha512-/Ztf6CeRH+ejEXUrYtqI4gkS66eFIHuSwqi60RgcpWKodxFZx2/dqVCMKBwILfAHXQ+F1b1vAudgj3mnxqtoIA==`. | [npm](https://www.npmjs.com/package/next/v/16.3.4), [proyecto](https://github.com/vercel/next.js), [avisos](https://github.com/vercel/next.js/security/advisories) |
 | React / React DOM 19.2.7 | Componentes accesibles compartidos y modelo declarativo estable compatible con Next 16.3. | Vue/Svelte serían válidos, pero romperían la integración y el material investigado. | Ambos paquetes proceden del repositorio oficial React y se fijan a la misma patch. | [React](https://react.dev/versions), [npm react](https://www.npmjs.com/package/react) |
 | TypeScript 6.0.3 | Contratos estrictos para estados, DTO y bilingüismo; reduce fallos de integración. | JavaScript acelera el inicio, pero desplaza errores al runtime y debilita la documentación técnica. | Se evita TypeScript 7 para no introducir un cambio mayor no evaluado; origen Microsoft verificado. | [npm](https://www.npmjs.com/package/typescript), [proyecto](https://github.com/microsoft/TypeScript) |
@@ -27,7 +27,7 @@ Se priorizan soporte mantenido, adecuación al dominio relacional, reproducibili
 
 | Tecnología exacta | Finalidad y razón de elección | Alternativas y consecuencias | Compatibilidad y riesgo de suministro | Evidencia oficial |
 |---|---|---|---|---|
-| Python 3.13.7 | Unifica backend y futuros experimentos de recomendación conservando compatibilidad de wheels. | 3.14 es el host disponible, pero no se usa para resolver el entorno; 3.13 reduce riesgo científico. | Imagen oficial fijada por digest y restricción `==3.13.*`. | [Python](https://www.python.org/), `python:3.13.7-slim@sha256:5f55cdf0c5d9dc1a415637a5ccc4a9e18663ad203673173b8cda8f8dcacef689` |
+| Python 3.13.15 | Unifica backend y futuros experimentos de recomendación conservando compatibilidad de wheels. | 3.14 es el host disponible, pero no se usa para resolver el entorno; 3.13 reduce riesgo científico. | Imagen oficial fijada por digest y restricción `==3.13.*`; pip se elimina del runtime final tras construir el entorno bloqueado. | [Python](https://www.python.org/), `python:3.13.15-slim@sha256:9d2e5553305c7c7b0097999bb17187c69b921ccd6bc9d40e4bb5ebe652c00285` |
 | uv 0.12.9 | Resolución rápida y lock universal con versión de herramienta fijada. | pip-tools es maduro, pero separa más pasos; Poetry impone empaquetado innecesario. | PyPI declara Python >=3.8; el propio `pyproject.toml` exige esta versión exacta. | [PyPI](https://pypi.org/project/uv/), [proyecto](https://github.com/astral-sh/uv) |
 | Django 5.2.17 LTS | ORM, migraciones, sesiones, CSRF, validación y admin para un dominio CRUD relacional. | FastAPI ofrece una API ligera, pero obliga a ensamblar auth/admin/ORM; Django 6 no es LTS acordada. | PyPI confirma Python >=3.10 y enlaces oficiales; se conserva la LTS investigada. | [PyPI](https://pypi.org/project/Django/), [Django](https://www.djangoproject.com/download/) |
 | Django REST Framework 3.18.0 | Serialización, permisos y API coherentes con Django. | Django Ninja es más liviano, pero tiene menor continuidad con el diseño ya estudiado. | PyPI declara Python >=3.10; versión exacta compatible con Django 5.2. | [PyPI](https://pypi.org/project/djangorestframework/), [proyecto](https://www.django-rest-framework.org/) |
@@ -48,6 +48,25 @@ Se priorizan soporte mantenido, adecuación al dominio relacional, reproducibili
 5. `scripts/check-dependencies.ps1` falla ante dependencias directas fuera de la allowlist, versiones flotantes, ausencia de locks, divergencia de runtime o digests no documentados.
 
 La verificación de legitimidad reduce el riesgo de *dependency confusion*, typosquatting y deriva, pero no demuestra ausencia absoluta de vulnerabilidades. Los planes posteriores deben añadir auditoría de vulnerabilidades, SBOM, actualización deliberada y CI con instalación congelada. La autoría de la decisión es humana; la evidencia y el primer borrador técnico son asistidos por agente y quedan sujetos a revisión del autor del TFG.
+
+## Revalidación de imágenes de ejecución (2026-09-08)
+
+La auditoría integral solicitada por el autor detectó que las dependencias directas y los
+lockfiles estaban limpios, pero las imágenes construidas conservaban paquetes corregibles de
+las bases antiguas. Trivy 0.74.0 encontró vulnerabilidades altas y críticas en la imagen de la
+API y en las herramientas de empaquetado incluidas en la imagen web. No se aceptó ese riesgo.
+
+Se actualizaron las bases a Python 3.13.15 y Node.js 24.20.0 con índices OCI fijados por digest,
+y pnpm a la última corrección compatible de su major, 11.26.0. La imagen final de la API ya no
+conserva el `pip` global; la imagen web mantiene el ejecutable fijado de pnpm, pero retira npm y
+Corepack después de prepararlo. Una nueva construcción y un escaneo de ambas imágenes con
+Trivy 0.74.0 y base de vulnerabilidades actualizada devolvieron **0 hallazgos HIGH y 0
+CRITICAL**. El escaneo independiente de `uv.lock` y `pnpm-lock.yaml` con OSV Scanner 2.4.0
+también devolvió cero vulnerabilidades conocidas.
+
+La actualización no añade dependencias de aplicación ni cambia los algoritmos: sustituye
+runtime y herramientas de construcción por correcciones mantenidas, conserva el major
+acordado y actualiza el gate determinista en el mismo commit.
 
 ## Revisión de seguridad posterior al gate
 

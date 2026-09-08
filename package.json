@@ -2,9 +2,9 @@
   "name": "savepoint",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@11.25.0",
+  "packageManager": "pnpm@11.26.0",
   "engines": {
-    "node": "24.13.0"
+    "node": "24.20.0"
   },
   "scripts": {
     "test": "vitest run",

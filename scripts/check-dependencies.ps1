@@ -75,8 +75,8 @@ foreach ($entry in $actualNpm.GetEnumerator()) {
 foreach ($entry in $approvedNpm.GetEnumerator()) {
     if (-not $actualNpm.Contains($entry.Key)) { throw "Approved npm dependency missing: $($entry.Key)" }
 }
-if ($package.packageManager -ne "pnpm@11.25.0") { throw "pnpm must be fixed at 11.25.0" }
-if ($package.engines.node -ne "24.13.0") { throw "Node must be fixed at 24.13.0" }
+if ($package.packageManager -ne "pnpm@11.26.0") { throw "pnpm must be fixed at 11.26.0" }
+if ($package.engines.node -ne "24.20.0") { throw "Node must be fixed at 24.20.0" }
 
 $toml = Get-Content -Raw (Join-Path $root "pyproject.toml")
 foreach ($entry in $approvedPython.GetEnumerator()) {
@@ -117,8 +117,8 @@ foreach ($entry in $approvedPython.GetEnumerator()) {
 
 $docs = Get-Content -Raw (Join-Path $root "docs/verification/dependency-legitimacy.md")
 foreach ($needle in @(
-    "sha256:5f55cdf0c5d9dc1a415637a5ccc4a9e18663ad203673173b8cda8f8dcacef689",
-    "sha256:4660b1ca8b28d6d1906fd644abe34b2ed81d15434d26d845ef0aced307cf4b6f",
+    "sha256:9d2e5553305c7c7b0097999bb17187c69b921ccd6bc9d40e4bb5ebe652c00285",
+    "sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e",
     "sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280",
     "sha256:dcc5531e97840b9b5e794f2814476b21571c5124a3fca2267d73041f56e7580e"
 )) {
