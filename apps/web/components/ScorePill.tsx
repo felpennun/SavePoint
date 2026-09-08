@@ -10,28 +10,28 @@ export function ScorePill({
   ariaLabelTemplate,
   className,
   withLabel,
-  labelPrefix = "IGDB",
+  label,
 }: {
   rating: number | null | undefined;
-  /** e.g. dict.card.score.aria = "IGDB rating {n} out of 100" */
+  /** e.g. dict.card.score.aria = "Rating {n} out of 100" */
   ariaLabelTemplate: string;
   className?: string;
-  /** Show a textual "IGDB {n}" instead of the bare number (detail page). */
+  /** Show a localized textual label next to the number (detail page). */
   withLabel?: boolean;
-  labelPrefix?: string;
+  label?: string;
 }) {
   if (rating == null || Number.isNaN(rating)) return null;
   const value = Math.round(rating);
   const tier = value < 40 ? "weak" : value < 75 ? "fair" : "strong";
-  const label = ariaLabelTemplate.replace("{n}", String(value));
+  const ariaLabel = ariaLabelTemplate.replace("{n}", String(value));
 
   return (
     <span
       className={`sp-score-pill sp-score-${tier}${className ? ` ${className}` : ""}`}
       role="img"
-      aria-label={label}
+      aria-label={ariaLabel}
     >
-      {withLabel ? `${labelPrefix} ${value}` : value}
+      {withLabel ? `${label ?? ""} ${value}`.trim() : value}
     </span>
   );
 }

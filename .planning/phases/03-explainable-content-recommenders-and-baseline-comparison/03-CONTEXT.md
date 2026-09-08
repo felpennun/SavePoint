@@ -3,6 +3,189 @@
 **Gathered:** 2026-09-07
 **Status:** Ready for planning
 
+## Actualización del autor — 2026-09-08
+
+> Esta actualización **prevalece sobre cualquier decisión anterior que entre en
+> conflicto con ella**, especialmente D-01, la anterior exclusión de señales de
+> mercado y las ideas que aplazaban «Tendencia» a la Fase 6. El research y el
+> planner deben reconciliar el resto del documento con este bloque antes de
+> producir los planes de la Fase 3.
+
+### Corpus gobernado y cobertura de valoraciones
+
+- La Fase 3 comienza actualizando y versionando el corpus gobernado **antes de
+  ejecutar nuevos experimentos**. El corpus de la Fase 2 y sus resultados no se
+  reescriben: permanecen como evidencia histórica con su hash y versión.
+- El objetivo es **maximizar de forma demostrable el número de juegos con una
+  valoración externa observada**. Los 100.000 juegos dejan de ser un gate duro:
+  se acepta el máximo legal, trazable y reproducible que pueda obtenerse, pero
+  debe mejorar la cobertura actual y acompañarse de un informe antes/después.
+- Medición exploratoria del 2026-09-08 sobre IGDB: 312.638 juegos primarios;
+  20.833 con `rating`, 13.588 con `aggregated_rating` y 25.656 con alguna de las
+  dos señales. Estas cifras se vuelven a medir y se registran al planificar o
+  ejecutar, porque el origen es mutable.
+- **RAWG no se vuelve a consultar**: la cuota disponible está agotada. Los datos
+  y pruebas ya obtenidos en la Fase 2 se conservan únicamente como evidencia
+  histórica; no se diseña la ampliación del corpus dependiendo de nuevas
+  peticiones a RAWG.
+- No se hará scraping directo de Metacritic ni de OpenCritic. Una fuente solo
+  entra si existe una vía de acceso autorizada y documentable para este uso.
+- Candidatos que el research de planificación debe verificar con una prueba de
+  cobertura pequeña y sin incorporar aún datos al corpus:
+  1. **Steam User Reviews**, principal candidato: Valve documenta el endpoint
+     `GET store.steampowered.com/appreviews/<appid>?json=1`, que devuelve
+     `review_score`, `total_positive`, `total_negative` y `total_reviews`.
+     Debe enlazarse por Steam App ID obtenido de `external_games`/`websites` de
+     IGDB y pasar una revisión de los términos de la Steam Web API, atribución,
+     caché y límites antes de una extracción completa.
+  2. **OpenCritic**, solo mediante API, exportación o permiso oficial. Es una
+     señal de crítica útil (`topCriticScore`, porcentaje recomendado y número de
+     reseñas), pero la cobertura pública localizada es de miles, no de cien mil,
+     y no se ha verificado una API pública oficial con condiciones suficientes.
+     El planner debe tratarlo como opcional y solicitar permiso si procede; no
+     debe basarse en scrapers o datasets de terceros extraídos sin autorización.
+  3. **IMDb Non-Commercial Datasets**, posible fuente secundaria de puntuación y
+     votos para títulos clasificados como videojuegos. Su uso exige confirmar
+     compatibilidad con la demo académica no comercial y medir la tasa de enlace
+     fiable con IGDB; las uniones ambiguas por título/año se rechazan o quedan en
+     una cola de revisión, nunca se aceptan silenciosamente.
+  4. **MobyGames**, solo con licencia o permiso que cubra expresamente la API y
+     este software. Su API anuncia Moby Score, Critic Score y Player Score, pero
+     la suscripción y sus términos impiden asumir que el acceso web general
+     autoriza una extracción masiva o su integración en una herramienta con IA.
+  5. **Giant Bomb** queda descartado por ahora: su API de juegos no está
+     disponible tras la migración de plataforma.
+- Cada observación se almacena por separado con `source`, `source_game_id`, tipo
+  (`user`, `critic` o recomendación binaria), escala original, valor, número de
+  votos/reseñas, fecha de captura, URL o endpoint, licencia/términos y hash de la
+  instantánea. **No se promedian sin más puntuaciones heterogéneas.** El research
+  debe proponer una calibración a 0–100, prioridad de fuentes, deduplicación y
+  confianza según volumen; las ablaciones compararán el resultado con IGDB solo.
+- El informe de cobertura debe distinguir: juegos totales, con cualquier
+  valoración, con recuento conocido, enlazados automáticamente, ambiguos,
+  rechazados, cobertura por fuente, solapamientos y cobertura final única.
+
+### PopScore, tendencia y novedades
+
+- Se obtendrá **PopScore para todos los juegos elegibles para los que IGDB lo
+  proporcione**, no solo para una muestra de juegos ya valorados.
+- PopScore alimenta una vista u ordenación **«Tendencia»** del catálogo y una
+  señal de contexto del recomendador. En el recomendador tendrá un efecto
+  pequeño, acotado y auditable; no sustituye a la afinidad con la colección.
+- Los datos de popularidad se capturan en instantáneas fechadas e inmutables. La
+  web usa la instantánea vigente y cada experimento fija explícitamente la
+  instantánea y su hash; ningún experimento llama a una API en vivo.
+- El research debe decidir si se conserva el PopScore compuesto ofrecido por
+  IGDB, sus primitivas (visitas IGDB, actividad y reseñas de Steam, Twitch,
+  listas de ventas/deseos) o ambas cosas. Debe documentar normalización,
+  caducidad, ausencias y evitar que la falta de PopScore se interprete como
+  impopularidad observada.
+- **Novedad de producto** se modela como recencia desde la fecha de lanzamiento
+  y solo puede beneficiar a un juego ya publicado que tenga al menos una
+  valoración. Se denomina `recency_score` para no confundirla con la métrica
+  académica de novedad de recomendación (`self-information`) de EVAL-05.
+
+### Elegibilidad temporal común
+
+- Catálogo, búsqueda, facetas, recomendaciones, colección y sus contadores solo
+  muestran juegos cuya fecha conocida de lanzamiento no sea posterior al día
+  actual. Esta regla también se aplica a candidatos, DLC y relaciones.
+- Los registros futuros ya guardados se ocultan de los resultados y contadores,
+  pero no se borran de la base de datos; vuelven a ser elegibles al llegar su
+  fecha. Los registros sin fecha conocida no reciben el impulso de recencia.
+- En producto el corte es dinámico (`current_date`). En experimentos se congela
+  como `eligibility_cutoff_date` dentro del protocolo y del manifiesto para que
+  una repetición posterior no incorpore lanzamientos nuevos.
+
+### Señales y comportamiento del recomendador
+
+- Se separan explícitamente dos universos:
+  - **Universo explorable:** todas las obras del corpus gobernado que superen las
+    reglas generales de fecha y edición (en torno a 200.000). Pueden buscarse,
+    abrirse, guardarse en una colección y utilizarse como juegos semilla para
+    encontrar contenido parecido.
+  - **Universo de salida del recomendador:** solo obras con al menos una
+    valoración contabilizada (`rating_count >= 1`) **o** con un rating externo
+    válido aunque su fuente no proporcione un recuento utilizable. Una obra sin
+    ninguna señal de rating puede influir mediante sus metadatos si está en la
+    colección del usuario, pero nunca se devuelve como recomendación.
+- Esta reducción se aplica a los candidatos que puntúan los algoritmos, no al
+  catálogo completo. Debe reducir coste de cómputo ahora que se incorporan más
+  familias de señales, sin impedir que una biblioteca contenga juegos poco
+  documentados. El manifiesto de cada ejecución registra el tamaño y hash de
+  ambos universos para poder reproducir la comparación.
+- «Rating válido» significa una observación numérica finita, dentro de la escala
+  declarada por su fuente y aceptada por las reglas de procedencia. Un cero real
+  no se confunde con dato ausente; un valor imputado o estimado no convierte por
+  sí solo un juego en candidato elegible.
+- El vector actual **solo implementa géneros y plataformas**. Saga/franquicia y
+  desarrollador se solicitan a IGDB en parte del importador, pero todavía no se
+  persisten ni participan realmente en la similitud; la afirmación anterior de
+  D-01 que los daba por presentes queda corregida.
+- Las familias de señales candidatas de la Fase 3 son: rating externo, géneros,
+  saga/franquicia, desarrollador, plataformas, número total de valoraciones,
+  recencia y tendencia/PopScore. Rating, volumen, recencia y tendencia se
+  modelan separados de la similitud de contenido para poder explicarlos y
+  ablacionarlos.
+- La entrada personal procede de la colección del usuario. Los juegos
+  `completed` y `playing` pueden aportar perfil positivo cuando su valoración
+  propia es al menos 3,5/5. Una valoración inferior a 3,5 no aporta afinidad
+  positiva; si existen al menos tres juegos mal valorados que comparten género,
+  ese patrón genera una señal negativa acotada para juegos similares.
+- Los pesos exactos, umbrales temporales y multiplicadores **no se fijan por
+  intuición ahora**: el plan define variantes y rejilla de parámetros, el ajuste
+  usa validación y el test final permanece ciego. Se exige una ablación por
+  familia de señales para justificar su aportación en el TFG.
+- La página web de recomendaciones debe consumir el mismo resultado versionado
+  del algoritmo que se evalúa. Las listas de relleno actuales se eliminan; los
+  juegos con mayor puntuación final son los que se muestran, junto con razones
+  explicables derivadas de sus señales.
+- La Fase 3 continúa siendo la comparación **basada en contenido**. Deja el
+  contrato de señales y artefactos preparado para la Fase 4, donde se añadirá la
+  información colaborativa y el híbrido sin fingir que una colección individual
+  contiene señal de otros usuarios.
+
+### Trabajo obligatorio para el research y el planner
+
+1. Ejecutar un *spike* de cobertura, términos y enlace de cada fuente candidata,
+   comenzando por Steam, y producir una matriz aceptar/rechazar/pendiente.
+2. Diseñar el modelo de procedencia y observaciones multi-fuente antes del
+   importador; nunca sobrescribir un rating de origen con otro sin conservar
+   ambos.
+3. Versionar un corpus nuevo y un snapshot de PopScore, con hashes, corte
+   temporal y estadísticas de cobertura reproducibles.
+4. Diseñar las variantes del recomendador y sus ablaciones; someter pesos,
+   umbrales y dependencias nuevas al checkpoint de decisión correspondiente.
+5. Sustituir el placeholder web por resultados reales solo después de validar el
+   contrato común de ranking, evitando que producto y laboratorio calculen
+   fórmulas divergentes.
+
+### Búsqueda del catálogo y exclusión de ediciones
+
+- Cuando existe una consulta por nombre, el catálogo ordena por **similitud
+  textual con el nombre y sus alias**, no por relevancia externa, rating ni
+  número de valoraciones. La ruta de búsqueda no aplica el escalonado de
+  relevancia; prioriza coincidencia exacta normalizada, prefijo y después una
+  medida tolerante a pequeñas diferencias o erratas. Las reglas globales de
+  elegibilidad temporal y exclusión de ediciones sí permanecen activas.
+- El planner debe concretar y probar la técnica de similitud (preferentemente
+  PostgreSQL `pg_trgm` si su disponibilidad y reproducibilidad quedan
+  verificadas) y un umbral que evite resultados sin relación. Los filtros de
+  género/plataforma seleccionados expresamente por el usuario pueden combinarse
+  con la búsqueda, pero nunca desplazan la similitud del nombre como criterio de
+  orden principal.
+- Se excluyen de catálogo y recomendaciones las filas que representen ediciones
+  comerciales alternativas del mismo juego. La detección usa primero metadatos
+  estructurados de IGDB (`version_parent`/`version_title` o equivalentes) y,
+  como defensa para registros mal clasificados, tokens normalizados de título:
+  `edition`, `edición` y `deluxe`. Esto cubre, entre otras, Special Edition,
+  Collector's Edition, Gold Edition y Deluxe.
+- La exclusión es una regla del corpus gobernado, **no un borrado de los datos
+  importados**. Cada fila excluida conserva su fuente y un motivo auditable
+  (`alternate_edition`) para poder medir falsos positivos y revertir o afinar la
+  regla. Antes de congelar el corpus nuevo se genera una muestra de excluidos y
+  el recuento de obras retiradas para revisión.
+
 <domain>
 ## Phase Boundary
 

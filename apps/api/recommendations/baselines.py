@@ -48,6 +48,7 @@ def rank_random_v1(
     limit: int | None = _DEFAULT_LIMIT,
     *,
     corpus_version: str | None = None,
+    candidate_ids: set[object] | tuple[object, ...] | None = None,
     generated_at: datetime | None = None,
 ) -> dict:
     """Rank ``limit`` governed works drawn uniformly at random for ``user``.
@@ -66,11 +67,12 @@ def rank_random_v1(
         for row in LibraryEntry.objects.filter(user=user).values("work_id")
     }
 
-    candidates = list(
-        governed_works(corpus_version)
-        .exclude(id__in=seen_ids)
-        .values_list("id", "canonical_slug", "title_en", "original_title")
-    )
+    candidate_query = governed_works(corpus_version)
+    if candidate_ids is not None:
+        candidate_query = candidate_query.filter(id__in=set(candidate_ids))
+    else:
+        candidate_query = candidate_query.exclude(id__in=seen_ids)
+    candidates = list(candidate_query.values_list("id", "canonical_slug", "title_en", "original_title"))
     # Canonical order before the seeded draw so the result depends only on
     # ``seed`` and the candidate *set*, never on the DB's row order.
     candidates.sort(key=lambda row: str(row[0]))

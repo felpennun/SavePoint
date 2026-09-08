@@ -9,10 +9,27 @@ gobernado (`is_dlc = false`, `in_corpus = true`) con `summary` no vacío y
 (`total_rating_count` desc, luego `rating_count` desc, luego `canonical_slug`).
 La cola larga (`< 20`) queda en inglés por ahora.
 
-**Estado actual (2026-09-07): 183 / 5.559 traducidas y cargadas** (181 automáticas
-por `claude-sonnet-5` + 2 curadas a mano). Las 183 primeras de la cola por
-popularidad — los títulos más jugados — ya devuelven sinopsis en español en
-`/es`. Quedan **5.376** por traducir. Reanuda con el bucle de abajo.
+**Estado actual (2026-09-07): 1.898 / 5.559 traducidas y cargadas** (1.896
+automáticas por `claude-sonnet-5` + 2 curadas a mano). Las 1.896 primeras de la
+cola por popularidad — los títulos más jugados — ya devuelven sinopsis en español
+en `/es`. Quedan **3.663** por traducir. Reanuda con el bucle de abajo.
+
+**Punto de control de la sesión del 2026-09-07 (se acabaron los tokens):**
+- `data/localization/summaries-es.work.jsonl` versionado con 1.896 líneas
+  (`claude-sonnet-5`); `summaries-es.json` regenerado y cargado en la BD del
+  contenedor (`load_localized_summaries` → "Loaded 1898 Spanish game summaries").
+- Progreso por lotes de 115: el último cargado deja la cola en `1897/5559`.
+- Para continuar: `PYTHONUTF8=1 python scripts/next_es_batch.py 115 > data/localization/_batches/todo.jsonl`,
+  leer ese fichero, escribir las traducciones en `data/localization/_batches/in.json`
+  como objeto plano `{slug: "texto es"}`, y luego
+  `PYTHONUTF8=1 python scripts/append_es_batch.py data/localization/_batches/in.json --engine claude-sonnet-5`
+  seguido de `PYTHONUTF8=1 python scripts/build_summaries_es.py && docker compose -f infra/compose.yaml exec -T api python manage.py load_localized_summaries`.
+- `_pending-es.jsonl` y `_batches/` están gitignored; `summaries-es.work.jsonl`,
+  `summaries-es.curated.json`, `summaries-es.json` y `summaries-es.provenance.json`
+  se versionan y son la fuente de verdad para reanudar.
+- Pendiente sin hacer: ADR-009 (origen de la TA), pasar `load_localized_summaries`
+  a `bulk_update`, y el fallback del serializer al inglés para las ~3.663 obras aún
+  sin `summary_es`.
 
 **Windows:** ejecuta los scripts Python con `PYTHONUTF8=1` por delante
 (`PYTHONUTF8=1 python scripts/next_es_batch.py 120`), o la salida no ASCII se

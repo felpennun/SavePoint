@@ -93,14 +93,23 @@ export const es: Dictionary = {
   },
   card: {
     score: {
-      aria: "Valoración IGDB {n} de 100",
-      none: "Sin valoración IGDB",
+      label: "Valoración",
+      aria: "Valoración {n} de 100",
+      none: "Sin valoración",
     },
     rating: {
       aria: "Tu valoración: {n} de 5",
     },
   },
   detail: {
+    synopsis: {
+      heading: "Sinopsis",
+      showMore: "Mostrar más",
+      showLess: "Mostrar menos",
+    },
+    ratingBreakdown: "Basada en la valoración de {igdb} usuarios de IGDB y {savepoint} de SavePoint.",
+    ratingBreakdownExternalOnly: "Basada en la valoración de {igdb} usuarios de IGDB.",
+    ratingBreakdownLocalOnly: "Basada en la valoración de {savepoint} usuarios de SavePoint.",
     summary: "Sinopsis",
     summaryUnavailable: "No hay una sinopsis disponible en español para este juego.",
     ratings: "Valoraciones",
@@ -135,6 +144,12 @@ export const es: Dictionary = {
     emptyBody: "Valora o completa algunos juegos y aquí aparecerán sugerencias por género.",
     emptyCta: "Explorar el catálogo",
     error: "No se pudieron generar tus recomendaciones. Inténtalo de nuevo.",
+    contentHeading: "Recomendado para ti",
+    dlc: {
+      heading: "Para tus juegos",
+      intro: "Contenido descargable de juegos que ya tienes en tu colección.",
+      baseGameLabel: "DLC de {game}",
+    },
   },
   collection: {
     heading: "Colección",
@@ -207,6 +222,10 @@ export const es: Dictionary = {
     valueProposition:
       "Catálogo de videojuegos personal, controlado y reproducible, con recomendaciones explicables.",
     sampleHeading: "Una muestra del catálogo",
+    newReleases: {
+      heading: "Novedades",
+      explainer: "Juegos del corpus gobernado lanzados recientemente.",
+    },
     signedIn: {
       greeting: "Hola de nuevo, {alias}",
       continueHeading: "Retoma donde lo dejaste",
@@ -229,6 +248,7 @@ export const es: Dictionary = {
   common: {
     retry: "Reintentar",
     showMore: "Mostrar más",
+    showLess: "Mostrar menos",
     coverMissing: "Carátula no disponible",
   },
   status: {

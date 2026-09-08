@@ -41,6 +41,7 @@ def _work(slug: str, *genre_objs: Genre) -> GameWork:
     work = GameWork.objects.create(
         canonical_slug=slug,
         original_title=slug.replace("-", " ").title(),
+        total_rating_count=1000,
         in_corpus=True,
         corpus_version=_CORPUS,
     )
@@ -217,6 +218,27 @@ def test_cold_start_returns_fallback_and_keeps_seen_work_out(user_a, genres) -> 
 
 
 @pytest.mark.django_db
+def test_rank_excludes_candidates_with_fewer_than_one_thousand_ratings(user_a, genres) -> None:  # noqa: ANN001
+    excluded = _work("low-confidence-candidate", genres["rpg"])
+    excluded.total_rating_count = 999
+    excluded.save(update_fields=["total_rating_count"])
+    _snapshot(excluded, rating=99.0, rating_count=999)
+
+    included = _work("high-confidence-candidate", genres["rpg"])
+    included.total_rating_count = 1000
+    included.save(update_fields=["total_rating_count"])
+    _snapshot(included, rating=80.0, rating_count=1000)
+
+    result = rank_content_v1(
+        user_a, "content-cbf-weighted-v1", limit=10, corpus_version=_CORPUS
+    )
+
+    slugs = {item["slug"] for item in result["results"]}
+    assert "high-confidence-candidate" in slugs
+    assert "low-confidence-candidate" not in slugs
+
+
+@pytest.mark.django_db
 def test_versioned_dto_and_item_evidence(user_a, genres) -> None:  # noqa: ANN001
     for index in range(3):
         owned = _work(f"dto-owned-{index}", genres["rpg"])
@@ -309,6 +331,9 @@ def test_content_view_validates_algorithm_and_clamps_limit(user_a, genres) -> No
             "contributions",
             "rating_term",
             "rating_term_is_fallback",
+            "year",
+            "platform_summary",
+            "cover",
         }
         for item in body["results"]
     )

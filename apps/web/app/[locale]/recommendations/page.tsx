@@ -3,20 +3,25 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { RecommendationShelf } from "@/components/RecommendationShelf";
+import { ContentRecommendationShelf } from "@/components/ContentRecommendationShelf";
+import { OwnedGamesDlcShelf } from "@/components/OwnedGamesDlcShelf";
 import { getDictionary } from "@/i18n";
-import { getPersonalRecommendations, groupRecommendationsByGenre } from "@/lib/api";
+import {
+  getContentRecommendations,
+  getOwnedDlc,
+  getPersonalRecommendations,
+  groupRecommendationsByGenre,
+} from "@/lib/api";
 
 /**
  * Recommendations (01.1-UI-SPEC Screen Contract 4, REC-10, NEW).
  *
  * The independent D-04 personalized page: it wires the D-09 backend
  * contract (`GET /api/recommendations/genre-taste/`, `IsAuthenticated`)
- * into genre-grouped horizontal shelves (D-UI-4), each with a
- * localized visible heading. The API retains the
- * explicit `algorithm_id` + `limitation` disclosure so it can never be
- * confused with the public popularity baseline (REC-02, still shown
- * separately as `RecommendationStrip`) or the Phase 6 research recommender
- * (REC-03).
+ * into horizontal shelves for the content recommender, genre taste, and
+ * owned downloadable content. Each shelf has a localized visible heading;
+ * algorithm explanations remain in the thesis and are not mixed into this
+ * product surface.
  *
  * Auth-gated exactly like `/collection`: no `sessionid` cookie -> redirect
  * to login; cookie present but the API denies (401/403) -> same redirect.
@@ -43,18 +48,25 @@ export default async function RecommendationsPage({
     .map((c) => `${c.name}=${c.value}`)
     .join("; ");
 
-  const response = await getPersonalRecommendations(cookieHeader);
-  if (response.kind === "unauthorized") {
+  const [genreResponse, contentResponse, ownedDlcResponse] = await Promise.all([
+    getPersonalRecommendations(cookieHeader),
+    getContentRecommendations(cookieHeader),
+    getOwnedDlc(cookieHeader).catch(() => ({ groups: [] })),
+  ]);
+  if (genreResponse.kind === "unauthorized" || contentResponse.kind === "unauthorized") {
     redirect(loginRedirect);
   }
 
-  const data = response.kind === "ok" ? response.data : null;
-  const shelves = data && !data.insufficient_history ? groupRecommendationsByGenre(data) : [];
-  const showEmpty = data != null && (data.insufficient_history || shelves.length === 0);
+  const genreData = genreResponse.kind === "ok" ? genreResponse.data : null;
+  const contentData = contentResponse.kind === "ok" ? contentResponse.data : null;
+  const genreShelves = genreData && !genreData.insufficient_history ? groupRecommendationsByGenre(genreData) : [];
+  const contentItems = contentData && !contentData.insufficient_history ? contentData.results : [];
+  const hasRecommendations = contentItems.length > 0 || genreShelves.length > 0 || ownedDlcResponse.groups.length > 0;
 
   return (
     <main className="sp-page">
-      {response.kind === "error" ? (
+      <h1 className="sp-h1">{r.nav}</h1>
+      {!hasRecommendations && (genreResponse.kind === "error" || contentResponse.kind === "error") ? (
         <div className="sp-empty" role="alert">
           <p className="sp-lead" style={{ marginInline: "auto" }}>
             {r.error}
@@ -63,28 +75,25 @@ export default async function RecommendationsPage({
             {dict.common.retry}
           </Link>
         </div>
+      ) : hasRecommendations ? (
+        <div className="sp-recommendation-shelves">
+          <ContentRecommendationShelf items={contentItems} locale={locale} heading={r.contentHeading} />
+          {genreShelves.map((shelf) => (
+            <RecommendationShelf key={shelf.genreSlug} shelf={shelf} locale={locale} />
+          ))}
+          <OwnedGamesDlcShelf
+            groups={ownedDlcResponse.groups}
+            locale={locale}
+            labels={r.dlc}
+            status={ownedDlcResponse.groups.length > 0 ? "populated" : "empty"}
+          />
+        </div>
       ) : (
-        <>
-          {showEmpty ? (
-            <div className="sp-empty">
-              <p className="sp-h2" style={{ margin: 0 }}>
-                {r.emptyHeading}
-              </p>
-              <p className="sp-lead" style={{ marginInline: "auto" }}>
-                {r.emptyBody}
-              </p>
-              <Link href={`/${locale}/catalogue`} className="sp-btn-primary">
-                {r.emptyCta}
-              </Link>
-            </div>
-          ) : (
-            <div className="sp-recommendation-shelves">
-              {shelves.map((shelf) => (
-                <RecommendationShelf key={shelf.genreSlug} shelf={shelf} locale={locale} />
-              ))}
-            </div>
-          )}
-        </>
+        <div className="sp-empty">
+          <p className="sp-h2" style={{ margin: 0 }}>{r.emptyHeading}</p>
+          <p className="sp-lead" style={{ marginInline: "auto" }}>{r.emptyBody}</p>
+          <Link href={`/${locale}/catalogue`} className="sp-btn-primary">{r.emptyCta}</Link>
+        </div>
       )}
     </main>
   );

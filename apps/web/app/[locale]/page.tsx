@@ -3,8 +3,9 @@ import { cookies } from "next/headers";
 
 import { BrandLockup } from "@/components/BrandLockup";
 import { GameCard } from "@/components/GameCard";
+import { NewReleasesShelf } from "@/components/NewReleasesShelf";
 import { getDictionary } from "@/i18n";
-import { fetchAccountMe, fetchCatalogueList, fetchMyLibrary } from "@/lib/api";
+import { fetchAccountMe, fetchCatalogueList, fetchMyLibrary, getNewReleases } from "@/lib/api";
 
 /** Home (01.1-UI-SPEC Screen Contract 1). Logged-out: wordmark + value
  * proposition + CTA row + catalogue sample. Signed-in: greeting + "pick up
@@ -30,6 +31,14 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     sample = result.results.slice(0, 8);
   } catch {
     sampleFailed = true;
+  }
+
+  let newReleases: Awaited<ReturnType<typeof getNewReleases>> = [];
+  let newReleasesFailed = false;
+  try {
+    newReleases = await getNewReleases();
+  } catch {
+    newReleasesFailed = true;
   }
 
   let continueItems: Awaited<ReturnType<typeof fetchMyLibrary>>["items"] = [];
@@ -128,6 +137,15 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           </section>
         </>
       )}
+
+      <div style={{ borderTop: "1px solid var(--color-surface-border)", marginTop: "var(--space-2xl)", paddingTop: "var(--space-2xl)" }}>
+        <NewReleasesShelf
+          items={newReleases}
+          locale={locale}
+          status={newReleasesFailed ? "error" : newReleases.length === 0 ? "empty" : "populated"}
+          labels={dict.home.newReleases}
+        />
+      </div>
 
     </main>
   );

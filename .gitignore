@@ -23,6 +23,7 @@ data/snapshots/
 .rawg-evidence*.json
 apps/api/.rawg-evidence*.json
 **/.rawg-evidence*.json
+apps/api/.evaluation-test-run.json
 
 # Editor / agent tooling state (machine- and session-local, not project source)
 .gsd/

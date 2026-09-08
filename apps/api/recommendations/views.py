@@ -14,7 +14,8 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from catalogue.models import CorpusVersion
+from catalogue.models import CorpusVersion, GameWork
+from catalogue.serializers import _cover, _platform_summary, _release_year
 from recommendations.content.rank import rank_content_v1
 from recommendations.content.variants import ALGORITHM_REGISTRY
 from recommendations.genre_heuristic import rank_genre_taste_v1
@@ -103,6 +104,9 @@ class ContentRecsView(APIView):
         "contributions",
         "rating_term",
         "rating_term_is_fallback",
+        "year",
+        "platform_summary",
+        "cover",
     )
 
     def get(self, request: Request) -> Response:
@@ -136,11 +140,26 @@ class ContentRecsView(APIView):
             limit=limit,
             corpus_version=corpus_version,
         )
+        work_ids = [item["work_id"] for item in payload["results"]]
+        works = {
+            str(work.id): work
+            for work in GameWork.objects.filter(id__in=work_ids)
+            .prefetch_related("assets", "releases__platform")
+        }
         return Response(
             {
                 **{key: payload[key] for key in self._DTO_KEYS if key != "results"},
                 "results": [
-                    {key: item[key] for key in self._ITEM_KEYS}
+                    {
+                        **{
+                            key: item[key]
+                            for key in self._ITEM_KEYS
+                            if key not in {"year", "platform_summary", "cover"}
+                        },
+                        "year": _release_year(works[item["work_id"]]),
+                        "platform_summary": _platform_summary(works[item["work_id"]]),
+                        "cover": _cover(works[item["work_id"]]),
+                    }
                     for item in payload["results"]
                 ],
             }

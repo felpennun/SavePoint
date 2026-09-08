@@ -74,6 +74,7 @@ export interface Dictionary {
   };
   card: {
     score: {
+      label: string;
       aria: string;
       none: string;
     };
@@ -82,6 +83,14 @@ export interface Dictionary {
     };
   };
   detail: {
+    synopsis: {
+      heading: string;
+      showMore: string;
+      showLess: string;
+    };
+    ratingBreakdown: string;
+    ratingBreakdownExternalOnly: string;
+    ratingBreakdownLocalOnly: string;
     igdbRating: string;
     genres: string;
     platforms: string;
@@ -101,6 +110,7 @@ export interface Dictionary {
   };
   recommendations: {
     nav: string;
+    contentHeading: string;
     heading: string;
     intro: string;
     excludedNote: string;
@@ -118,6 +128,11 @@ export interface Dictionary {
     emptyBody: string;
     emptyCta: string;
     error: string;
+    dlc: {
+      heading: string;
+      intro: string;
+      baseGameLabel: string;
+    };
   };
   collection: {
     heading: string;
@@ -175,6 +190,10 @@ export interface Dictionary {
   home: {
     valueProposition: string;
     sampleHeading: string;
+    newReleases: {
+      heading: string;
+      explainer: string;
+    };
     signedIn: {
       greeting: string;
       continueHeading: string;
@@ -197,6 +216,7 @@ export interface Dictionary {
   common: {
     retry: string;
     showMore: string;
+    showLess: string;
     coverMissing: string;
   };
   status: {

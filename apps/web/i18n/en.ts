@@ -90,14 +90,23 @@ export const en: Dictionary = {
   },
   card: {
     score: {
-      aria: "IGDB rating {n} out of 100",
-      none: "No IGDB rating",
+      label: "Rating",
+      aria: "Rating {n} out of 100",
+      none: "No rating",
     },
     rating: {
       aria: "Your rating: {n} of 5",
     },
   },
   detail: {
+    synopsis: {
+      heading: "Summary",
+      showMore: "Show more",
+      showLess: "Show less",
+    },
+    ratingBreakdown: "Based on ratings from {igdb} IGDB users and {savepoint} SavePoint users.",
+    ratingBreakdownExternalOnly: "Based on ratings from {igdb} IGDB users.",
+    ratingBreakdownLocalOnly: "Based on ratings from {savepoint} SavePoint users.",
     summary: "Synopsis",
     summaryUnavailable: "No synopsis is available for this game.",
     ratings: "Ratings",
@@ -132,6 +141,12 @@ export const en: Dictionary = {
     emptyBody: "Rate or complete a few games and genre suggestions will appear here.",
     emptyCta: "Browse the catalogue",
     error: "We couldn't build your recommendations. Try again.",
+    contentHeading: "Recommended for you",
+    dlc: {
+      heading: "For games you own",
+      intro: "Downloadable content for games already in your collection.",
+      baseGameLabel: "DLC for {game}",
+    },
   },
   collection: {
     heading: "Collection",
@@ -204,6 +219,10 @@ export const en: Dictionary = {
     valueProposition:
       "A controlled, reproducible personal video-game catalogue, with explainable recommendations.",
     sampleHeading: "A catalogue sample",
+    newReleases: {
+      heading: "New releases",
+      explainer: "Recently released games from the governed corpus.",
+    },
     signedIn: {
       greeting: "Welcome back, {alias}",
       continueHeading: "Pick up where you left off",
@@ -226,6 +245,7 @@ export const en: Dictionary = {
   common: {
     retry: "Try again",
     showMore: "Show more",
+    showLess: "Show less",
     coverMissing: "Cover not available",
   },
   status: {

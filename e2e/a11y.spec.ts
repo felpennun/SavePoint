@@ -144,6 +144,104 @@ test.describe("reduced motion is respected", () => {
 });
 
 // ---------------------------------------------------------------------------
+// Phase 02-06: product-grade home/detail contracts. These checks deliberately
+// use the public catalogue flow so they remain useful without fixture-only
+// data or authenticated credentials.
+// ---------------------------------------------------------------------------
+async function setTheme(page: Page, theme: "dark" | "light") {
+  const current = await page.locator("html").getAttribute("data-theme");
+  if (current !== theme) {
+    const targetLabel = theme === "light" ? /Cambiar al tema claro|Switch to light theme/ : /Cambiar al tema oscuro|Switch to dark theme/;
+    await page.getByRole("button", { name: targetLabel }).click();
+  }
+  await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+}
+
+async function assertNoPageOverflow(page: Page, label: string) {
+  const dimensions = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    clientWidth: document.documentElement.clientWidth,
+  }));
+  expect(dimensions.scrollWidth, `${label} must not overflow horizontally`).toBeLessThanOrEqual(dimensions.clientWidth + 1);
+}
+
+test.describe("Phase 02-06 home and detail product contracts", () => {
+  test.use({ viewport: { width: 320, height: 800 } });
+
+  test("home has one clean axe pass per theme and keeps shelf overflow internal", async ({ page }) => {
+    await page.goto("/es");
+
+    for (const theme of ["dark", "light"] as const) {
+      await setTheme(page, theme);
+      const violations = await runAxeScan(page);
+      expect(violations, `home (${theme}) must have no axe violations`).toEqual([]);
+      await assertNoPageOverflow(page, `home (${theme})`);
+    }
+
+    const newReleases = page.getByRole("heading", { name: "Novedades" });
+    if (await newReleases.count()) {
+      await expect(newReleases).toBeVisible();
+      await expect(page.locator(".sp-shelf-track").first()).toBeVisible();
+    } else {
+      await expect(page.locator("text=Novedades")).toHaveCount(0);
+    }
+
+    const shelves = page.locator(".sp-shelf-track");
+    for (let index = 0; index < await shelves.count(); index += 1) {
+      await expect(shelves.nth(index)).toHaveCSS("overflow-x", /auto|scroll/);
+    }
+  });
+
+  test("detail follows P3 order, supports synopsis expansion, and stays within the viewport", async ({ page }) => {
+    await page.goto("/en/catalogue");
+    await page.locator("main ul.sp-grid li a").first().click();
+    await page.waitForURL(/\/en\/games\//);
+
+    const content = page.locator(".sp-detail-content");
+    const headings = await content.locator("h1, h2").allTextContents();
+    const indexOf = (text: string) => headings.findIndex((heading) => heading.trim() === text);
+    expect(indexOf("Summary") === -1 || indexOf("Summary") > 0).toBe(true);
+    expect(indexOf("Genres") === -1 || indexOf("Summary") === -1 || indexOf("Genres") > indexOf("Summary")).toBe(true);
+    expect(indexOf("Platforms") === -1 || indexOf("Genres") === -1 || indexOf("Platforms") > indexOf("Genres")).toBe(true);
+
+    const synopsis = page.locator("#game-synopsis-heading");
+    if (await synopsis.count()) {
+      const toggle = page.getByRole("button", { name: "Show more" });
+      if (await toggle.count()) {
+        const before = await page.locator("#game-synopsis-heading").locator("..").boundingBox();
+        await toggle.click();
+        await expect(toggle).toHaveAttribute("aria-expanded", "true");
+        await expect(page.getByRole("button", { name: "Show less" })).toBeVisible();
+        const after = await page.locator("#game-synopsis-heading").locator("..").boundingBox();
+        expect(after?.height).toBeGreaterThanOrEqual(before?.height ?? 0);
+      }
+    } else {
+      await expect(page.locator("#game-synopsis-heading")).toHaveCount(0);
+    }
+
+    const score = page.locator(".sp-detail-content .sp-score-pill--inline");
+    if (await score.count()) {
+      await expect(score).toContainText("Rating");
+    } else {
+      await expect(page.getByText("No rating", { exact: true })).toBeVisible();
+    }
+    await expect(page.locator(".sp-detail-rating-breakdown [title]")).toHaveCount(0);
+
+    for (const theme of ["dark", "light"] as const) {
+      await setTheme(page, theme);
+      const violations = await runAxeScan(page);
+      expect(violations, `detail (${theme}) must have no axe violations`).toEqual([]);
+      await assertNoPageOverflow(page, `detail (${theme})`);
+    }
+
+    const shelves = page.locator(".sp-shelf-track");
+    for (let index = 0; index < await shelves.count(); index += 1) {
+      await expect(shelves.nth(index)).toHaveCSS("overflow-x", /auto|scroll/);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Plan 01.1-10: complete automated product evidence for the four D-01..D-04
 // surfaces at the approved desktop AND mobile viewports. Real functional
 // assertions + keyboard/focus + axe + mobile reflow + cover fallback, each

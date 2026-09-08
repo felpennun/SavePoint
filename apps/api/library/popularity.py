@@ -28,7 +28,12 @@ SYNTHETIC_EVAL_USER_MARKER = "synthetic-eval-user"
 _STATUS_WEIGHTS = {"completed": 3, "playing": 2, "pending": 1, "abandoned": 0}
 
 
-def rank_popularity_v1(cutoff: datetime | None = None) -> dict:
+def rank_popularity_v1(
+    cutoff: datetime | None = None,
+    *,
+    candidate_ids: set[object] | tuple[object, ...] | None = None,
+    limit: int | None = None,
+) -> dict:
     cutoff = cutoff or datetime.now(timezone.utc)
 
     # Restrict to seeded + simulated demo accounts (a `demo_anchor` from
@@ -50,10 +55,13 @@ def rank_popularity_v1(cutoff: datetime | None = None) -> dict:
             updated_at__lte=cutoff,
         ).values("work_id", "current_status", "rating_half_steps")
     )
+    allowed_ids = {str(work_id) for work_id in candidate_ids} if candidate_ids is not None else None
 
     scores: dict[str, float] = {}
     for entry in entries:
         work_key = str(entry["work_id"])
+        if allowed_ids is not None and work_key not in allowed_ids:
+            continue
         weight = _STATUS_WEIGHTS.get(entry["current_status"] or "", 0)
         rating_contribution = (entry["rating_half_steps"] or 0) / 10
         scores[work_key] = scores.get(work_key, 0.0) + weight + rating_contribution
@@ -90,7 +98,7 @@ def rank_popularity_v1(cutoff: datetime | None = None) -> dict:
         "algorithm_id": ALGORITHM_ID,
         "generated_at": cutoff.isoformat(),
         "input_snapshot_sha256": input_snapshot_sha256,
-        "results": results,
+        "results": results if limit is None else results[: max(1, int(limit))],
         "limitation": (
             "Deterministic aggregate of demo-account interactions only. "
             "Not personalized, not a recommendation of taste, and not "

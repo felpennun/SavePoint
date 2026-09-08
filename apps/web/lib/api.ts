@@ -36,6 +36,8 @@ export interface GameCard {
   cover: Cover;
   /** IGDB total_rating (0-100). Absent -> no ScorePill. */
   total_rating?: number | null;
+  /** Mixed external + SavePoint product score (D-09). */
+  display_rating?: number | null;
   /** Number of IGDB user/critic ratings used by the relevance threshold. */
   total_rating_count?: number | null;
   /** IGDB genres for this work (CAT-02). */
@@ -122,6 +124,7 @@ export interface GameDetail {
   rating: number | null;
   rating_count: number | null;
   total_rating_count: number | null;
+  display_rating: number | null;
   rating_breakdown: { igdb_count: number; savepoint_count: number };
   cover: Cover;
   releases: Release[];
@@ -131,6 +134,23 @@ export interface GameDetail {
   genres?: GenreRef[];
   /** IGDB total_rating (0-100). Wired by Plan 03; absent -> no ScorePill. */
   total_rating?: number | null;
+}
+
+export interface OwnedDlcItem {
+  work_id: string;
+  slug: string;
+  title: string;
+  cover: Cover;
+  relation: "dlc" | "expansion";
+}
+
+export interface OwnedDlcGroup {
+  base_game: { slug: string; title: string };
+  dlc: OwnedDlcItem[];
+}
+
+export interface OwnedDlcResult {
+  groups: OwnedDlcGroup[];
 }
 
 export async function fetchCatalogueList(params: CatalogueListParams = {}): Promise<CatalogueListResult> {
@@ -274,6 +294,70 @@ export interface PersonalRecommendationItem {
   platform_summary: string;
   cover: Cover;
   matched_genres: RecommendationMatchedGenre[];
+}
+
+export interface ContentRecommendationItem {
+  work_id: string;
+  slug: string;
+  title: string;
+  score: number;
+  contributions: { genre: string; contribution_pct: number }[];
+  rating_term: number;
+  rating_term_is_fallback: boolean;
+  year: number | null;
+  platform_summary: string;
+  cover: Cover;
+}
+
+export interface ContentRecommendationsResult {
+  algorithm_id: string;
+  generated_at: string;
+  input_snapshot_sha256: string;
+  feature_set_version: string;
+  corpus_version: string | null;
+  snapshot_sha256: string;
+  insufficient_history: boolean;
+  limitation: string;
+  results: ContentRecommendationItem[];
+}
+
+export type ContentRecommendationsResponse =
+  | { kind: "ok"; data: ContentRecommendationsResult }
+  | { kind: "unauthorized" }
+  | { kind: "error" };
+
+export async function getContentRecommendations(
+  cookieHeader: string,
+  limit = 20,
+): Promise<ContentRecommendationsResponse> {
+  const url = new URL("/api/recommendations/content/", API_BASE);
+  url.searchParams.set("limit", String(limit));
+  try {
+    const response = await fetch(url, { cache: "no-store", headers: { Cookie: cookieHeader } });
+    if (response.status === 401 || response.status === 403) return { kind: "unauthorized" };
+    if (!response.ok) return { kind: "error" };
+    return { kind: "ok", data: (await response.json()) as ContentRecommendationsResult };
+  } catch {
+    return { kind: "error" };
+  }
+}
+
+export async function getNewReleases(): Promise<GameCard[]> {
+  const url = new URL("/api/catalogue/new-releases/", API_BASE);
+  const response = await fetch(url, { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error(`Failed to load new releases (status ${response.status})`);
+  }
+  return (await response.json()) as GameCard[];
+}
+
+export async function getOwnedDlc(cookieHeader: string): Promise<OwnedDlcResult> {
+  const url = new URL("/api/catalogue/owned-dlc/", API_BASE);
+  const response = await fetch(url, { cache: "no-store", headers: { Cookie: cookieHeader } });
+  if (!response.ok) {
+    throw new Error(`Failed to load owned DLC (status ${response.status})`);
+  }
+  return (await response.json()) as OwnedDlcResult;
 }
 
 /** The allowlisted DTO of the authenticated genre-taste recommender

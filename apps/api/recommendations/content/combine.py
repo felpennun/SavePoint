@@ -40,6 +40,7 @@ def rating_term(
     work: GameWork,
     corpus_version: str | None,
     genre_profile: dict[str, float] | None = None,
+    snapshot_stats: dict[object, tuple[float, int]] | None = None,
 ) -> tuple[float, bool]:
     """Return a bounded external-rating signal and whether it is imputed.
 
@@ -51,7 +52,10 @@ def rating_term(
 
     profile = genre_profile if genre_profile is not None else genre_rating_profile(corpus_version)
     genre_values = [profile[genre.slug] for genre in work.genres.all() if genre.slug in profile]
-    own_rating, rating_count = _candidate_snapshot_rating(work, corpus_version)
+    if snapshot_stats is None:
+        own_rating, rating_count = _candidate_snapshot_rating(work, corpus_version)
+    else:
+        own_rating, rating_count = snapshot_stats.get(work.id, (None, 0))
 
     if own_rating is None:
         if not genre_values:

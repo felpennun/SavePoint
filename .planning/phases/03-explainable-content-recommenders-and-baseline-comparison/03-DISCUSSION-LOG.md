@@ -1,5 +1,50 @@
 # Phase 3: Explainable Content Recommenders and Baseline Comparison - Discussion Log
 
+## Ampliación posterior del alcance — 2026-09-08
+
+El autor amplió la preparación de la Fase 3 antes de los experimentos:
+
+- Actualizar el corpus gobernado y aumentar su cobertura de juegos valorados.
+  La aspiración inicial de 100.000 juegos deja de ser un gate obligatorio; se
+  acepta el máximo legal, trazable y reproducible, siempre que se demuestre una
+  mejora sobre la cobertura actual.
+- No realizar más peticiones a RAWG por agotamiento de cuota. Se investigarán
+  Steam User Reviews, OpenCritic, IMDb y MobyGames con un spike previo de
+  cobertura y condiciones. Metacritic/OpenCritic no se raspan y Giant Bomb se
+  descarta mientras su API de juegos permanezca indisponible.
+- Capturar PopScore de todos los juegos elegibles para los que IGDB lo ofrezca,
+  usarlo en «Tendencia» del catálogo y como señal pequeña del recomendador,
+  siempre mediante snapshots fechados y reproducibles.
+- Excluir de todas las superficies los lanzamientos posteriores al día actual;
+  congelar la fecha de corte en los experimentos.
+- Ampliar las señales a rating, géneros, saga, desarrollador, plataforma,
+  volumen de valoraciones, recencia y tendencia; validar pesos mediante
+  variantes y ablaciones en vez de fijarlos por intuición.
+- Incluir `playing` en el perfil positivo, exigir valoración propia ≥ 3,5/5 y
+  generar una señal negativa de género solo cuando existan al menos tres juegos
+  mal valorados que compartan dicho género.
+- Hacer que la web presente el ranking real del algoritmo y reservar la señal
+  colaborativa/híbrida para la Fase 4.
+- Separar el corpus explorable del conjunto de salida: las aproximadamente
+  200.000 obras gobernadas siguen disponibles para búsqueda, colección y como
+  semillas de similitud, pero el recomendador solo puede devolver juegos con al
+  menos una valoración o con un rating externo válido cuyo recuento no esté
+  disponible.
+- Cuando hay texto de búsqueda, ordenar por similitud de nombre/alias y no por
+  relevancia, rating ni volumen de votos. Los filtros elegidos por el usuario
+  pueden acotar resultados, pero la coincidencia textual gobierna el orden.
+- Excluir del catálogo y de las recomendaciones las ediciones alternativas,
+  usando metadatos de versión y los tokens `edition`, `edición` y `deluxe` como
+  salvaguarda. Se marcan como excluidas; no se borran de la importación.
+
+La investigación inicial encontró que Steam ofrece documentación oficial para
+obtener `review_score`, positivos, negativos y total de reseñas por App ID. La
+cobertura y el enlace con IGDB todavía deben medirse. OpenCritic parece útil como
+fuente crítica adicional, pero no se verificó una vía oficial pública que
+autorice una extracción completa; queda condicionado a permiso o API oficial.
+CONTEXT.md contiene el contrato detallado y prevalece sobre las decisiones
+anteriores incompatibles.
+
 > **Audit trail only.** Do not use as input to planning, research, or execution agents.
 > Decisions are captured in CONTEXT.md — this log preserves the alternatives considered.
 

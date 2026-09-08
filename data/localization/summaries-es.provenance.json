@@ -4,10 +4,25 @@
   "src_sha256": "9d4b46a2ed21d266161befe47876f7008d88c8d07380d3a4164963f0ca363ce7",
   "translated_at": "2026-09-07T14:02:53+00:00"
  },
+ "13-sentinels-aegis-rim": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "f3d3e5db2c09267862cc810eb0ad005493fea172dcf360f7a0d1eeb31ba0579b",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "1942": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "37811d2064608c297f041ee77a0cc7212d4e289c374068a063d13ae52169f3cc",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "7-days-to-die": {
   "engine": "claude-sonnet-5",
   "src_sha256": "ebc97dfaa8ddfc29f7df71b35c2f2cbd874904c4cfca4e9d03391cedbe847d84",
   "translated_at": "2026-09-07T13:55:12+00:00"
+ },
+ "a-bird-story": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "89d906692580d214e9a70221d69080ea604165366eddc88c3570b0dd82189e3a",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "a-hat-in-time": {
   "engine": "claude-sonnet-5",
@@ -44,10 +59,30 @@
   "src_sha256": "9780b737e4278ac6799fbd7c6bee6d6e50f73879865823b3aa331147ce4e1853",
   "translated_at": "2026-09-07T13:37:02+00:00"
  },
+ "ace-attorney-investigations-miles-edgeworth": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "489da957c6fa25094a45f33e8180253b399cf2816e8f5e56d2519e875c0670b1",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "ace-combat-7-skies-unknown": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "32d0dbc3dfcc31208a13bf43ba9822da208fb06b6c8ca622d676c05bf79dfae3",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "advance-wars": {
   "engine": "claude-sonnet-5",
   "src_sha256": "28079d4b35d5a74d22b631b797f21f69468af78f1d9db83f69c75a2ec58f1e58",
   "translated_at": "2026-09-07T14:15:10+00:00"
+ },
+ "adventure-capitalist": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "52cf1c8afb5460b320f70b06b49818868ef229deb5b89cb442353e257f1c3876",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "agar-dot-io": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "0187b178e2948802d177e8d0bb0abf8d1fe6f9c65eb7086368d353f46a98c179",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "age-of-empires": {
   "engine": "claude-sonnet-5",
@@ -74,6 +109,11 @@
   "src_sha256": "1ac167f6d8f0efcbb62c420771f039df6056b11180e929948a79a488371f8e24",
   "translated_at": "2026-09-07T13:37:02+00:00"
  },
+ "ai-the-somnium-files": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "46cb3274e33215dea59e0afd95e0e29aa19aa41d4f76581c80406158f56c1591",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "alan-wake": {
   "engine": "claude-sonnet-5",
   "src_sha256": "167d2f816274b87e1734c81d4579441432f5aae992a862375c536b20e31960b4",
@@ -99,30 +139,70 @@
   "src_sha256": "82ba135549ef5c96af339ea5b1656ba150b06e3c52e855df422b36ec3299aab9",
   "translated_at": "2026-09-07T13:29:26+00:00"
  },
+ "aliens-colonial-marines": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "9d2ab6e4c5252d107c56231d5f93ec52d8b1534326d262eb8b69900d1010408d",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "aliens-versus-predator-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "25738e7392c12b10671172b538ebbc165f7ad7c925cd2cb416979198c90bf747",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "aliens-vs-predator": {
   "engine": "claude-sonnet-5",
   "src_sha256": "96d3c943f75e88db2dd89170b4fde2d753daebca3e05e5dcb531621321da69f2",
   "translated_at": "2026-09-07T14:02:53+00:00"
+ },
+ "alone-in-the-dark": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "00d75fe79729c89a2abccf2df9db38d67858a2597f25b68425a4728bb0d5184f",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "alone-in-the-dark-2-1958": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "5d2dd7323672298b51e048750863604e45776dfae9c276b76c0f168c80c6340d",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "alpha-protocol": {
   "engine": "claude-sonnet-5",
   "src_sha256": "498239190c0355685a250dbb158865a41312e6582888f9866c4f59a5e65bd010",
   "translated_at": "2026-09-07T14:09:34+00:00"
  },
+ "altered-beast": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "5bab6112f67d8eb5961e8f1043dd7c5af143f023ff1241e4b548ed3312c128f8",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "american-mcgee-s-alice": {
   "engine": "claude-sonnet-5",
   "src_sha256": "a40e5451f931fbabf0a26e59f8cdf7de02ca57f0b04891f3d34785c147e6df76",
   "translated_at": "2026-09-07T14:07:55+00:00"
+ },
+ "american-truck-simulator": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "6c9aec359ae16f8ef6ca60a2bd30eb1a651161036d593bc6c4e55b0b5dc2fe68",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "amnesia-a-machine-for-pigs": {
   "engine": "claude-sonnet-5",
   "src_sha256": "d1d4ac6222c26af0f1624caecbfe196fba6a02712b7a6e01407f23d5e9bfaef1",
   "translated_at": "2026-09-07T13:48:17+00:00"
  },
+ "amnesia-rebirth": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "a5a23f171ce2621648b48d5a33ba30783c650594c93923b83bd58e50923c2e40",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "amnesia-the-dark-descent": {
   "engine": "claude-sonnet-5",
   "src_sha256": "c41bafe83e78380d9ceedfed0b25481398848be3aeb0ecabf58dd3e964977c27",
   "translated_at": "2026-09-07T13:31:15+00:00"
+ },
+ "among-the-sleep": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "d5f9bdcb81dfc5db06256485e44a25ecaa5a7f3d655c9feba4ed1b1487f08136",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "among-us": {
   "engine": "claude-sonnet-5",
@@ -133,6 +213,16 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "390fc6ba031db0f29b30d2f27dc1864b6ee13cfe6a662514ae3442b6053bfedb",
   "translated_at": "2026-09-07T13:53:38+00:00"
+ },
+ "angry-birds-star-wars": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "9991e30562baf6688f7c550608377c4eefa625e79f0eb91501975917c67843c9",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "animal-crossing-city-folk": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "afd4c237dac073095f6aa1c8d2abcdcc695c4ad4683ca3fe6d2112212fcdb33b",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "animal-crossing-new-horizons": {
   "engine": "claude-sonnet-5",
@@ -159,6 +249,11 @@
   "src_sha256": "9649b9c4ede3859bf1a82e19ce2c3cb6586e99c4d513b3f9a8a6040919c37ef5",
   "translated_at": "2026-09-07T14:15:10+00:00"
  },
+ "anno-2070": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "55ce7ea2ca4ade687f1c89bcbcee573f501ffbf1f002e45f8190b1843c0f599c",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "anthem": {
   "engine": "claude-sonnet-5",
   "src_sha256": "4c6957700bb062d08e9420d361d5d653939cc29ea3081c86d23fcc7d400c8da4",
@@ -168,6 +263,21 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "f0fa8ceec0e66ebe92932657e23f513a7f3b237a9cef886c127bee1c2ba2f1ab",
   "translated_at": "2026-09-07T14:00:29+00:00"
+ },
+ "ape-escape": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "85686e14204581516ae17ceb771707a639c8ba6d9b7bf0f4a55135cbe7a9e9f9",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "ape-out": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "be294da388cd70b343fcc27ea0e42873a1c6bcf9c45d37e2bb0c6e31649f2f04",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "aperture-desk-job": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "59dfeb979e71df56bf3b460d85f5db169f29a6dd1958fbb2e146725e3586278a",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "apex-legends": {
   "engine": "claude-sonnet-5",
@@ -179,10 +289,25 @@
   "src_sha256": "516b365a85dba83d87a1257480d173c04ab5275e25c7a7cbe946dea1abef7f8b",
   "translated_at": "2026-09-07T14:15:10+00:00"
  },
+ "apotheon": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "7f18186ce6c28e4b5eb1a364d0aedf97aab1470c3c68fb8f8660ef28d9c327c8",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "aragami": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "0cccdd1b5af78ef6dbc1183c4b1c0d00d91d94b89ea53ebdc043e67f3da63dd5",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "arc-raiders": {
   "engine": "claude-sonnet-5",
   "src_sha256": "88c1fc8755036bc110eb6ef819817a65219c60171f11920258c0a3e691496ccb",
   "translated_at": "2026-09-07T13:48:17+00:00"
+ },
+ "arcania-gothic-4": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "3188dec71d82d5c091a08df4c5d4fa7c8ac3ad1bd58f27170bd809be5a38ee33",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "arcanum-of-steamworks-and-magick-obscura": {
   "engine": "claude-sonnet-5",
@@ -204,6 +329,26 @@
   "src_sha256": "14ba8dd5041cafb4f7c50f91b231a48570abdb540be8b98a98e6d6eb080b450b",
   "translated_at": "2026-09-07T14:15:10+00:00"
  },
+ "armored-core-vi-fires-of-rubicon": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "bf237fc959c48841c46527fa663964944a41bed58322b8866c458180c1052435",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "arms": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "798d07b13c86acfa0bbecc7c76053206bdd0ba3e15c679ba7fad4247bd11a364",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "army-of-two": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "20009d5eb88e853bd0c82d7460378b70297126f21771042fd40b102a74951b01",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "as-dusk-falls": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "949d7385b8f59a845dde1b4f5e7db782453bdac3ed791cc21aec538677ff5bdf",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "assassin-s-creed": {
   "engine": "claude-sonnet-5",
   "src_sha256": "980fd490aea108c44b7aa823672a13336e6638a88f43a5c443d99648e41b9aad",
@@ -224,6 +369,11 @@
   "src_sha256": "2b56793a3fcaab6e477fcddce4184840f55aef0be38e3b662b167ca1aaf84683",
   "translated_at": "2026-09-07T14:00:29+00:00"
  },
+ "assassins-creed-bloodlines": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "1106f63b348965ec7da7bf5bd897de28aa7434174af01de5eed7760b7392d0ef",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "assassins-creed-brotherhood": {
   "engine": "claude-sonnet-5",
   "src_sha256": "b07e87fdec9c597e7d52db8aebf7f69190af30add765cfd696d5ee9fa4b10747",
@@ -233,6 +383,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "c49d359a25817226e9dd749830a1335f9d788a78f4492abce8ebc62096048b1a",
   "translated_at": "2026-09-07T14:20:57+00:00"
+ },
+ "assassins-creed-chronicles-india": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "046ec4b4ed4bd52a1112c347e4318ea5d3fc3af72e77684793091bbb2e45fa96",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "assassins-creed-iv-black-flag": {
   "engine": "claude-sonnet-5",
@@ -284,6 +439,16 @@
   "src_sha256": "c916cda4efe7f13c8d2c5384936e4e15a3f50d2913fd47ca696c2d799430dc45",
   "translated_at": "2026-09-07T13:37:02+00:00"
  },
+ "assetto-corsa": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "affb2ece6d24211e61a1de3efdefd5d45a1d3219356e7c883e9ec0fddae67d40",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "astral-chain": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "ce49cf03386d4cefad302f27ebd40c9a91bb3b59fa543616342cb64d7f624e8b",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "astro-bot": {
   "engine": "claude-sonnet-5",
   "src_sha256": "ac2de8f91df4fd1114cb7dc15315ee613f9d60987327d752ed48fbf6e3741f41",
@@ -299,6 +464,11 @@
   "src_sha256": "073c4989a4ec0d03de104d43fc60c9f8e431ea89d6da8f16c88b5367feab4fed",
   "translated_at": "2026-09-07T13:42:31+00:00"
  },
+ "asura-s-wrath": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "516ce16ffead9b6c5c9ec0f9843a74fbfc8e4dbc1a2d89ce7aa769befd3f127a",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "atomic-heart": {
   "engine": "claude-sonnet-5",
   "src_sha256": "da5784a62be9adefaeafcb66332f9477f0107586ae6455f47ca6e10190118859",
@@ -308,6 +478,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "9f4a99e4abf92dbbd665a7aa7cd346fd5f857a0cba5e729000c03ee500744d57",
   "translated_at": "2026-09-07T14:15:10+00:00"
+ },
+ "avowed": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "78de30ae662738bd7c332bdcc762a75cf06eb55228fb4767d6eeddd5290eaf4f",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "axiom-verge": {
   "engine": "claude-sonnet-5",
@@ -324,6 +499,11 @@
   "src_sha256": "fc20fa598a0898bd7a6f383511d844fc0a6043ed2ff7824885821a5bdbd39a2c",
   "translated_at": "2026-09-07T14:20:57+00:00"
  },
+ "back-to-the-future-the-game": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "345cdb55bd61ae99647f0cf147fc738c87ae86e48727453282703c45cefc5659",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "balatro": {
   "engine": "claude-sonnet-5",
   "src_sha256": "54029f170b9b7347574155bc05555081954bbd85c47c1363e57a7ac9f15fa6d5",
@@ -333,6 +513,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "1b7014cb4ddde1f1d2ad87d61512675e0ab5f4c11502bd4075ecc1f103331d2e",
   "translated_at": "2026-09-07T13:42:31+00:00"
+ },
+ "baldur-s-gate-dark-alliance": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "d061e45d3589b047ba1883c7cadb195aa6a58c47c294d14dc94be5287f10e86f",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "baldurs-gate-ii-shadows-of-amn": {
   "engine": "claude-sonnet-5",
@@ -348,6 +533,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "0cdaac0e1560364bd3c0e0f263a7dd5d95ee9a2ad703913b4e1654faaca37ccb",
   "translated_at": "2026-09-07T14:00:29+00:00"
+ },
+ "banishers-ghosts-of-new-eden": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "517edb09931e889aa7230b813abcfed8c01280594cc68f2107c31d9235e991b2",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "banjo-kazooie": {
   "engine": "claude-sonnet-5",
@@ -394,6 +584,11 @@
   "src_sha256": "62d307f163ecf1ffdd642a0f8a2163e25f219bf3869fd23f362e16cabacbd024",
   "translated_at": "2026-09-07T13:37:02+00:00"
  },
+ "battle-city": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "537a0c658b51e7e2c675a9b625b36148e231cee3f78f3912628109c79b3b10cb",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "battleblock-theater": {
   "engine": "claude-sonnet-5",
   "src_sha256": "3a8bc42ffde7de6e8e6f4b16c2f75bd1a63fc12d56135a08117894292a33b2fd",
@@ -418,6 +613,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "b766599d4415b1c1e7d7e576346bef3ea46f18ff9b5c203fb43051c3712bf33a",
   "translated_at": "2026-09-07T14:15:10+00:00"
+ },
+ "battlefield-2142": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "67859d37fdd1f0417742737de1e85884439d670074c467d90f9e57a0d82aac58",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "battlefield-3": {
   "engine": "claude-sonnet-5",
@@ -454,6 +654,16 @@
   "src_sha256": "9c89d7bc036504b4c27426a98930a4ba4a9146f0e31707e0917a0e6228c5f41d",
   "translated_at": "2026-09-07T13:37:02+00:00"
  },
+ "battlefield-vietnam": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "5e22d98f3c3de6c122e7b2eabe496313ec5a4dfcdd0ca22ced205a081c3b51af",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "battlerite": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "c73989dc12b4406bb49704bacc31843251b3dbcbedbc5dd25e961161c48d7834",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "bayonetta": {
   "engine": "claude-sonnet-5",
   "src_sha256": "efb5cb67d9c3e90b312513cec0b55cf1a57b987948e3cb6c2a31e8f582ee3008",
@@ -464,10 +674,25 @@
   "src_sha256": "0038ca8e283d241982a140677f3c911e3c986174ca44a4fb417c02c047e1134b",
   "translated_at": "2026-09-07T13:48:17+00:00"
  },
+ "beamng-dot-drive": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "333fc4173ff0b7015d127bf5d1ba5f27f66deca7baaf2b9f254772b229c06ac8",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "before-your-eyes": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "fe83ad479a1b58d48a75a7abb50627fdbc481720056d6138f23b8f0d3a11a570",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "beholder": {
   "engine": "claude-sonnet-5",
   "src_sha256": "2219d98c97f5e42bb44fd3819966d3b0c2ed183812c033dba2dac72639b9f70e",
   "translated_at": "2026-09-07T14:20:57+00:00"
+ },
+ "beneath-a-steel-sky": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "de745e11bbde24a75c0b0d5b0f7ab6fde5391196972a10ec21306e87e9fd0343",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "beyond-good-evil": {
   "engine": "claude-sonnet-5",
@@ -478,6 +703,16 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "eafd1599e54994fabd380361740f184ebcb928b349a1fcff8f0168fc519e64a4",
   "translated_at": "2026-09-07T13:29:26+00:00"
+ },
+ "binary-domain": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "a7fc2abb136bb780f3b134a949da6cad16ab350f16b06f3a4962f6ffd65fd2c2",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "biomutant": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "16c3c0ba4c0789bdcbee1e57c802b9087f67d3df4a778c652640615fe2ce7a89",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "bioshock": {
   "engine": "claude-sonnet-5",
@@ -494,6 +729,11 @@
   "src_sha256": "a762a152bdebee16105e774fb4fee84d9a264fabc6d99bbca679e4231311ec07",
   "translated_at": "2026-09-07T13:17:43+00:00"
  },
+ "black": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "ed600a8180c0465bb5847d409ac1bc5820ec1a7151040b9f7b00e56c1414cc63",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "black-desert": {
   "engine": "claude-sonnet-5",
   "src_sha256": "fac916469463aa154bb7070c7b578af27ff091ddb5570e804dcbe58a9dbd5429",
@@ -509,6 +749,11 @@
   "src_sha256": "b950c0b31a7482a7ed0eeed961d968842042e06604f6f4a5aaa5596421ac28c5",
   "translated_at": "2026-09-07T14:15:10+00:00"
  },
+ "blade-runner": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "d88aa3482de8aafb80a5a3954e1ef65123562fba59bf2db09e369d47a983de03",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "blair-witch": {
   "engine": "claude-sonnet-5",
   "src_sha256": "743603e4d29b680fb1b32f26319299f8a2e600d58ef3df7ccedc705a87b4a55a",
@@ -519,6 +764,16 @@
   "src_sha256": "42320c90d3f6494f8420b4c98912518550523943ade0d098277363c928a87fa8",
   "translated_at": "2026-09-07T13:42:31+00:00"
  },
+ "blasphemous-ii": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "23f8aef216817c88e051377f439e4ab6e1cd978e06b1c0f8692b47c90ed1fdf5",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "blood": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "034c57dab3d72d3af6e2413a6f2241792deb9fbcf821e2f2c4a9eced424a43a2",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "bloodborne": {
   "engine": "claude-sonnet-5",
   "src_sha256": "c21b018634010575142abbb72b7625ec1c6a3e4bcfeb5c2bf3644e7487d3df44",
@@ -528,6 +783,16 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "e8f6c6c0bc8d451fc6887f324633d75c57cbc35e4e1d735b5455797be4a9045f",
   "translated_at": "2026-09-07T14:15:10+00:00"
+ },
+ "bloodrayne-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "5b4965bd202ad4cf101e6da18bdffae37084f2b21ed10dca98ec409c6afc0be9",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "bloodstained-curse-of-the-moon": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "5f2167beb62623541f7d52b6e8545cd3dd3887730fe58f3a83f935b0068db5fa",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "bloodstained-ritual-of-the-night": {
   "engine": "claude-sonnet-5",
@@ -579,10 +844,25 @@
   "src_sha256": "49d1c3e8f498103ab6928f7a2e5c7b34ba56b6a67b95390f708336fc13420580",
   "translated_at": "2026-09-07T13:29:26+00:00"
  },
+ "bramble-the-mountain-king": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "f14657cad5eff33e908faed3bf93bbffe36ab889a2bb6ab5d9c092156b1e5617",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "brawl-stars": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "a98f7328df059c308f46b246980d29a066dfd2ce7658fabd3179dde2dfb8a6c1",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "brawlhalla": {
   "engine": "claude-sonnet-5",
   "src_sha256": "cb2af833fcbf7a104ec2c18553cce1aa89d9c9a2cecdb3545a649a9f38e5d309",
   "translated_at": "2026-09-07T13:48:17+00:00"
+ },
+ "brink": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "16bd067e80d89f675ef619155708094308c5cab0a52e3abae7935882a63b9a36",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "broforce": {
   "engine": "claude-sonnet-5",
@@ -593,6 +873,16 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "2337a9c227ac2bb07dc9c92da5fa7e93f29a71cdb5f2f0e74cbc6b02cdfc8dcb",
   "translated_at": "2026-09-07T14:00:29+00:00"
+ },
+ "broken-sword-5-the-serpents-curse": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "e6487d339d471972c6855d4c776d53f6b0d1a6fd39cd543ebad98e076df0dffe",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "broken-sword-the-sleeping-dragon": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "8abd6c242a546a811e3bff4db7607f8da51c565f518496915ff0028e24d37810",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "broken-sword-the-smoking-mirror": {
   "engine": "claude-sonnet-5",
@@ -609,6 +899,16 @@
   "src_sha256": "a9a9cc797071e8b73a15543e38336abc34e5a8afbd5f0f1c39410e3b956504b5",
   "translated_at": "2026-09-07T13:29:26+00:00"
  },
+ "brothers-in-arms-hell-s-highway": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "ad8eb54c8cb93822065ae6c949d4491b9e1511d37b9f301dc85dad8bba8719b4",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "brothers-in-arms-road-to-hill-30": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "aa4515e0956e6535ae35ddf604489bf8ebfd2a36785af1bfe77af98da308580d",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "brutal-legend": {
   "engine": "claude-sonnet-5",
   "src_sha256": "36b2549687a7acb2e1ba8fe1acc6d9fb96daaad37b8c1ab4ce5e2a68d61044c4",
@@ -618,6 +918,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "ea99163e3d4eab128b7de32fafed5a8cd5c74d0054cf5a9dc5da848d7c3aaa2e",
   "translated_at": "2026-09-07T14:15:10+00:00"
+ },
+ "bugs-bunny-lost-in-time": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "ef5fc05a01531ae2177689188b281821a8c22d0e64bb96d8f875da52f38cdca7",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "bulletstorm": {
   "engine": "claude-sonnet-5",
@@ -638,6 +943,16 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "96ee5fb85870fd97f0bc5646b5265301a551c9a4bd31313b8783081f1967a9de",
   "translated_at": "2026-09-07T13:37:02+00:00"
+ },
+ "burnout-revenge": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "ed2db153a092b9b4332ade74c41803c3f919f5b9b5f25d8b9400414ef574647d",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "caesar-iii": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "0b8b4c2124ae5f6e99c2660350b9ba5ca197497b545a30597e9ca11369ad2147",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "call-of-cthulhu": {
   "engine": "claude-sonnet-5",
@@ -744,6 +1059,11 @@
   "src_sha256": "cb2b12c4cbcc6eac964e343dc830670e7c9c66cae12c4cf9afea2cb638b08317",
   "translated_at": "2026-09-07T14:02:53+00:00"
  },
+ "call-of-duty-vanguard": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "a0ccb58722daf1b348e129659bdaaf360161237735f5a0162c219fcaec440f57",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "call-of-duty-world-at-war": {
   "engine": "claude-sonnet-5",
   "src_sha256": "594108f1a43bbaff5ad741f9cf2ad40b0db6fa9cf954e74871e046deddb71741",
@@ -784,6 +1104,11 @@
   "src_sha256": "cb450cdc72281c926b473a5b77c9f093581d19ecb498a360a3ad46ab4347ff6b",
   "translated_at": "2026-09-07T14:02:53+00:00"
  },
+ "carmageddon-ii-carpocalypse-now": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "f44167ccde7f27781e3704254659f343bb432743e40950cd39fd6527f286430b",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "carrion": {
   "engine": "claude-sonnet-5",
   "src_sha256": "75d19f8a7b9bca59eaabe684e5c3513a8b5775d9209e18512ba2f5620b42a5a4",
@@ -804,6 +1129,21 @@
   "src_sha256": "dbfb3711965ee2d669f2ea03bdf4b40dc0fecc7b48fd2dd6262ad024ae847c23",
   "translated_at": "2026-09-07T13:53:38+00:00"
  },
+ "castlevania-circle-of-the-moon": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "6ae053dbaced293028bede45c3e0f860b643acaa604e2d85b60748f9b1d126e7",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "castlevania-dawn-of-sorrow": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "fd055cab6ef7cca352aa61a06163cbf200332b3f53518540829e9f5af52b92d2",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "castlevania-harmony-of-dissonance": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "eb4a39cbfd52d046346c48746d233b4120446bd786e2f5c39bbb7bef04590da9",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "castlevania-ii-simon-s-quest": {
   "engine": "claude-sonnet-5",
   "src_sha256": "e4542e7015573ca7748df6c2fbc46d161abb13a7e67aff48e68ad791e5e1b5f0",
@@ -819,10 +1159,30 @@
   "src_sha256": "1e193136c11c47b34907482ffb28a8a0a322031c06070fb4a390b9b01e290601",
   "translated_at": "2026-09-07T14:15:10+00:00"
  },
+ "castlevania-order-of-ecclesia": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "051bbf4adfb81392e77f2e14f2f2fbd1f5fcdd8e711db9d10688c0bbf2dfed53",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "castlevania-portrait-of-ruin": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "f731a7b1a792f04bb14a3c8fabc8019f39544a5a5ac97bdd7989ac46d20fb51a",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "castlevania-rondo-of-blood-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "d9651992ce961c0682f91ccf7025618717f2e533216c8b3ed21d7929b7635847",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "castlevania-symphony-of-the-night": {
   "engine": "claude-sonnet-5",
   "src_sha256": "72d9f8e76bb46906bc95d92c7a4ed7872c742f219a6b94439dbf3b8eb82033fb",
   "translated_at": "2026-09-07T13:22:34+00:00"
+ },
+ "cat-quest": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "bd3a55d2fe7221c9d650a69ee6652cba9fb0ebd3b05485cabbb4a6f2bc50241c",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "catherine": {
   "engine": "claude-sonnet-5",
@@ -838,6 +1198,16 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "3a86c8fe80fd7c9978e97922d235fddabc9613257e829e8e570b98820e24c176",
   "translated_at": "2026-09-07T13:17:43+00:00"
+ },
+ "chants-of-sennaar": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "7babd878eb35a0ada3d819dc80a979c20bf3cf33fcec0ff16cc9cc1c96d13171",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "chaos-on-deponia": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "ae8a370b1194abc8604af61ea92cdcf5d581a579abaa294b7ea385a0f68f386c",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "child-of-light": {
   "engine": "claude-sonnet-5",
@@ -874,6 +1244,11 @@
   "src_sha256": "ae03c3cbb7be6a91860de75165b0af955ded66dfa9f0ec2dc6a181ebd3b10b06",
   "translated_at": "2026-09-07T13:29:26+00:00"
  },
+ "citizen-sleeper": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "3f30ca7e1f7d0bb5a8c4be11d40f035bd5d613278d074098e2743582d2b81080",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "clair-obscur-expedition-33": {
   "engine": "claude-sonnet-5",
   "src_sha256": "fd5afad6c239aeba621a7f2b538d7ccb5f19b46d9d9508d698930b367f6d2bbd",
@@ -889,6 +1264,21 @@
   "src_sha256": "31a49d1bc932300f6744224fcf59ee8fa6aafa74fd27abba48ea4660b2d29b06",
   "translated_at": "2026-09-07T14:00:29+00:00"
  },
+ "clive-barker-s-jericho": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "1460b7b9a31bd214c41053465ac0bc494ff545a3397c3c8ff45fae74d6438dfc",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "clive-barker-s-undying": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "7490d0d8b78a040020bf8f534c51ff9700c20bacb536cb08ce5d2500dfca4406",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "clustertruck": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "976ea224a0285dc29216a5cb0f9d412aec76b35d2ed2ada7cb70ad2bccd3bb75",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "cocoon": {
   "engine": "claude-sonnet-5",
   "src_sha256": "6cbea96f241e07e16c931f997d351f50a647e3210ee2e10e75398e1a0d8b3bc0",
@@ -899,10 +1289,25 @@
   "src_sha256": "384a426f2a09b36da9ecafc814b8e49964e0e93109072ae3a863b235325ac76b",
   "translated_at": "2026-09-07T14:00:29+00:00"
  },
+ "coffee-talk": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "bb000503a007336c5239b8c9921a0e5845bc1302bd6ebc89538780d223516662",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "colin-mcrae-dirt": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "068c495e0427075b8b6d4b6b218f365af17997760387c84356f84737ffbaed3d",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "colin-mcrae-dirt-2": {
   "engine": "claude-sonnet-5",
   "src_sha256": "fa9531573e97c9424d99832e3e8f688f1d89ad7a289e4fe852f562abf2fdc9a0",
   "translated_at": "2026-09-07T14:15:10+00:00"
+ },
+ "colin-mcrae-rally": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "f492ec513536b5638586508933e9c40717b4f2b34b96ca1d960ddbe077a815ac",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "colin-mcrae-rally-2-0": {
   "engine": "claude-sonnet-5",
@@ -944,6 +1349,11 @@
   "src_sha256": "30cf090666e30a9afa2343d2715089e4b3ea9dda354731a7cd62e25e89180a95",
   "translated_at": "2026-09-07T13:53:38+00:00"
  },
+ "command-conquer-renegade": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "be0b93faff7ce5d3308694e3f8738899d0b28d704fc0d74618d1b2830b31e7ad",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "command-conquer-tiberian-sun": {
   "engine": "claude-sonnet-5",
   "src_sha256": "31c3daeffa8e5541fcf43a7261cb08514d1249e72bd2cb0b65084a92eaf71901",
@@ -953,6 +1363,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "db7f6cd1224522d6e4d0b2d2f8112b7f1d414f40db8f4dd1a309ddc4ed1ec8d0",
   "translated_at": "2026-09-07T14:02:53+00:00"
+ },
+ "commandos-3-destination-berlin": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "2c88d2d95936c1317906879afd1c76c7632175371f5270e138a9dd1830ad8d32",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "commandos-behind-enemy-lines": {
   "engine": "claude-sonnet-5",
@@ -969,6 +1384,11 @@
   "src_sha256": "2b28b2da46bdc5b597758ca9400f078cb2f4f370e32e8fd1fbb2f4fa30be829b",
   "translated_at": "2026-09-07T14:15:10+00:00"
  },
+ "conan-exiles": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "ffb52fc0648bb05f4f2b1fd4ab0a785602553cd2025eed1f0f1f00ec32d64842",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "condemned-criminal-origins": {
   "engine": "claude-sonnet-5",
   "src_sha256": "e832b85efcb8937b57f66832755d3147c6c0d71654e08ca5456d3dd16c086061",
@@ -984,10 +1404,25 @@
   "src_sha256": "7d3b6a1ecf53beeb1e50365f27901e7f022ec66732bc05b4ee66484b6a5fa0ed",
   "translated_at": "2026-09-07T14:20:57+00:00"
  },
+ "contrast": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "46acf9aa6d1e205a98c7ed2d8407765b43e42e6fb2693ed450bd3004ab25fa08",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "control": {
   "engine": "claude-sonnet-5",
   "src_sha256": "c76c557a925e2dda332d4cbcd6b37f04589f1c32fa552d89e2b4cc3595a35eea",
   "translated_at": "2026-09-07T13:22:34+00:00"
+ },
+ "cookie-clicker": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "2d44e16d14b9408da87ac2de97545de226979090f11695645d1f4b76acc3d892",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "costume-quest": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "764d1732752d587e69a1a6512d42102314b2cfb8c05cb309fa31a1bd7bbb49e5",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "counter-strike": {
   "engine": "claude-sonnet-5",
@@ -1008,6 +1443,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "c21701a98a6739a7fb5ea7e3db0a2556871d989e630a424f7a02ddf996ff3891",
   "translated_at": "2026-09-07T13:17:43+00:00"
+ },
+ "crackdown": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "6381d53a5624431a0e25b1c542f00d501668c4778dcd7e408df9896c48223c3b",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "crash-bandicoot": {
   "engine": "claude-sonnet-5",
@@ -1039,6 +1479,16 @@
   "src_sha256": "39dd6d2ca716e26627c5668d2c29c314724d1f2fc5a2da32caed5bc2a4bf5b55",
   "translated_at": "2026-09-07T14:02:53+00:00"
  },
+ "crash-of-the-titans": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "00de7f6196fcf7d016cc76921f0c76154b3e6ac8638fc8f3a1d63e7445d13a62",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "crash-tag-team-racing": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "993c5d55a7be79380abc006d897ba45a43b31c2ea45118a97e5d8a90a56b85e7",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "crash-team-racing": {
   "engine": "claude-sonnet-5",
   "src_sha256": "a02d9cc6eea80ae8985be807ef46c995560612d579a276a7258200ec2c077a3f",
@@ -1054,10 +1504,20 @@
   "src_sha256": "65dbca368af0d12b0246ebc1b011ed40a50ba92c3167c5554728057a109de04c",
   "translated_at": "2026-09-07T13:53:38+00:00"
  },
+ "crimson-desert": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "771bbccfe1324f1df08d3e0689b928c6f8e9954b845a91ac54fdaa96ad946e2a",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "crisis-core-final-fantasy-vii": {
   "engine": "claude-sonnet-5",
   "src_sha256": "909be523d8e44807f10df421f24ec4865df683a170d9d1e50d75a7eed4c44283",
   "translated_at": "2026-09-07T14:07:55+00:00"
+ },
+ "crosscode": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "783dec6edb72214c31fb0e174a71d9be85c59aececd713dafa8f77b591957300",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "crusader-kings-ii": {
   "engine": "claude-sonnet-5",
@@ -1068,6 +1528,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "82b823db29dac8992b4a37e6769ff0bb71a75bbb926ce2565f844191fcfae411",
   "translated_at": "2026-09-07T14:00:29+00:00"
+ },
+ "cry-of-fear": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "104445607d1b4a89432b6f8e4db09a55c20cb224134f2270d6ae3dc4837fe442",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "crypt-of-the-necrodancer": {
   "engine": "claude-sonnet-5",
@@ -1099,6 +1564,11 @@
   "src_sha256": "b39a789fc05d6662e5d3d919fd0f6110e424f4e07e6031214c1d8e83d2bffd33",
   "translated_at": "2026-09-07T13:22:34+00:00"
  },
+ "cut-the-rope": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "516cb50d8d569724fb1597d280e1db13d0370bc8eeb61042f768157e1cb2d4bd",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "cyberpunk-2077": {
   "engine": "claude-sonnet-5",
   "src_sha256": "5757636617aaa9b7955b13611a7bf6018aaa0b4dd411e369c89c360ef48c9fb0",
@@ -1108,6 +1578,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "b7714e0a9c3dc69d1d743aeb931377e2defe0cd32ce261fa36d7cffd0d58df0e",
   "translated_at": "2026-09-07T13:48:17+00:00"
+ },
+ "danganronpa-another-episode-ultra-despair-girls": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "93a2b2a0a67bef08f096add93c3a77990139a99662673dd54045871a346e142c",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "danganronpa-trigger-happy-havoc": {
   "engine": "claude-sonnet-5",
@@ -1128,6 +1603,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "8d87898c1bbf2cd782e00088f77136c1508c79d44fb827d1888ac54d82527843",
   "translated_at": "2026-09-07T13:53:38+00:00"
+ },
+ "dark-sector": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "fc54c4b2053dc024a4622424ab1afa8fd26c21bdedc0d4a149b9c8884fe57932",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "dark-souls": {
   "engine": "claude-sonnet-5",
@@ -1154,6 +1634,11 @@
   "src_sha256": "9b34b146314233e1b262a0616fba6628e91405ac4ef49d183115fd3f7b8c1b71",
   "translated_at": "2026-09-07T13:37:02+00:00"
  },
+ "darksiders-genesis": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "44485adc90e65680393896803486f3ee46c982dd827d1879331e84c5f949a4b4",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "darksiders-ii": {
   "engine": "claude-sonnet-5",
   "src_sha256": "2bf845e0a6f7aba85ed35a3599e403e9c4d7f279b335b97d284cd7a7eb364a7d",
@@ -1163,6 +1648,16 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "e2d0904fed6157768e08bbbd37c9080c653d2bbe35c3fc29a14fac3e4788be82",
   "translated_at": "2026-09-07T14:15:10+00:00"
+ },
+ "darkwood": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "2ac1881e523d937fc7c186853d11f2840aa8938fce9839fc10c496b4538c23ff",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "dauntless": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "63dbac13d3952e6802a79469a05a236c0a70e033647a40da77b59691ed63ac47",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "dave-the-diver": {
   "engine": "claude-sonnet-5",
@@ -1254,6 +1749,11 @@
   "src_sha256": "209e0734f1e1fc7489325be550dbde3547de7fd9773b7242d9900aa44b6e3f37",
   "translated_at": "2026-09-07T13:22:34+00:00"
  },
+ "death-stranding-2-on-the-beach": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "05e9946bf7636b760e6f81ed73c43c6ffce4c6d40a939ad62185bc82941e15fe",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "deathloop": {
   "engine": "claude-sonnet-5",
   "src_sha256": "bba909e917c5c66dfda4267282f7d2182c3843bfe07df05984c543586df8d6b6",
@@ -1269,6 +1769,26 @@
   "src_sha256": "69e4bd52843e57aa46a723408503ff10a4389ffbe95859f56889378efc1dbe22",
   "translated_at": "2026-09-07T13:48:17+00:00"
  },
+ "def-jam-fight-for-ny": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "f3583344c498a8809287d1b5f3910fabb86cbc28dd178d944668135dde3c4120",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "deliver-us-the-moon": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "3dd30f9208c95d8ae0f1964f4e9893ba3dd6848dbdb601ff5ced098fb37de7bc",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "delta-force-1": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "e67a323e3d94761d52d0082891c65669c365e291a2746f417189767d8b047bf1",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "deltarune": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "eb82d186f767f0143b9c9425f4e7b8c5c5441f1c713162c57142d6da2d94f345",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "demon-s-souls": {
   "engine": "claude-sonnet-5",
   "src_sha256": "74036ccc08fe07317949101a883cef2edabf73e955dcfd91e2302ef47ddbd246",
@@ -1279,6 +1799,16 @@
   "src_sha256": "1e1b5b53ffc13e5ac023547d28cc96f3545bbef82cbbdd20e1825336b43c59ae",
   "translated_at": "2026-09-07T14:00:29+00:00"
  },
+ "desperados-iii": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "c52b74c2b4394fc58499d4699a534bd4c95bcf6f75cac09f092ded7d752a89e4",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "desperados-wanted-dead-or-alive": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "e759f6bf147f34cc5027826bff1c524ddec1460489c6a36606c3fcb0a6214bb4",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "destiny": {
   "engine": "claude-sonnet-5",
   "src_sha256": "d5d05d3cdfcbc9d0f7f130c33169eb299e6cc76b8b13e78061d83b7fa9fdfe27",
@@ -1288,6 +1818,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "4fbeec7929d7b65c26182f54f180b0e9174a11d20aba653499992982d153388a",
   "translated_at": "2026-09-07T13:29:26+00:00"
+ },
+ "detention": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "940f0db25cf0c77f5152b47d36e14d95089561719c1dfd509c66fb29d39722a1",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "detroit-become-human-1": {
   "engine": "claude-sonnet-5",
@@ -1303,6 +1838,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "fef3d2b84d8309fd90b23c33778dd86ebfb5fe773e8e6f516e067465263a933e",
   "translated_at": "2026-09-07T13:22:34+00:00"
+ },
+ "deus-ex-invisible-war": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "cf80e8139e7a0b7b67d86af1714732ba20168475d7600d6360ad4fc714a846db",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "deus-ex-mankind-divided": {
   "engine": "claude-sonnet-5",
@@ -1349,6 +1889,11 @@
   "src_sha256": "5756c43b3919215288f1d5790a0b3f945b3862bc2d4c1596790f50a30f5462ee",
   "translated_at": "2026-09-07T13:22:34+00:00"
  },
+ "diablo-immortal": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "8d97d67250b3fcee6183a875a6974dbd58b3a4ba50304e9b37b3ab4227bd3320",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "diablo-iv": {
   "engine": "claude-sonnet-5",
   "src_sha256": "ae32756183828503f8a1ca6b60461e9aed903a1a6501cc60b7aee90eb405e88f",
@@ -1358,6 +1903,16 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "74a8c0d6d7d50276a4d2b022451e2e5e097d58e292c0ae33fbe97dedf6684a4c",
   "translated_at": "2026-09-07T14:00:29+00:00"
+ },
+ "dig-dug": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "7801235afe9347608ddba7bd299f5ee9168fbfb7274e30d342dc3fe0f18e76ab",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "digimon-world": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "799c36538554925ee9df27f50fcfa425485ec3616da3cb1c3c428fadcfe2ddbd",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "dino-crisis": {
   "engine": "claude-sonnet-5",
@@ -1378,6 +1933,16 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "1294b4c580943e1619a21db3898e20985761b2eee24f3d4b7bf6fab3643bff6d",
   "translated_at": "2026-09-07T14:09:34+00:00"
+ },
+ "dirt-rally-2-dot-0": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "0b1829f2e25269bff938e19612da118f833032b96774247e1eaf2b5da6e0b4f5",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "dirt-showdown": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "0020e1a044c1711d5615dcbf370616e95857cf05c25ab21eb541fd4918a62e1d",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "disco-elysium": {
   "engine": "claude-sonnet-5",
@@ -1499,6 +2064,11 @@
   "src_sha256": "e6441832520fdfc0c3200fbd101981b653a6717b8f9ecdbb9d972030850f0940",
   "translated_at": "2026-09-07T13:37:02+00:00"
  },
+ "doom-64": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "527d9f540a1dc710320b4c8a4dbfb0fb8347a240a0c4c164992cd888cb964502",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "doom-eternal": {
   "engine": "claude-sonnet-5",
   "src_sha256": "d41b7bb8de2ba391e53474e353efd9f3e69b03a6929b45e5c4a2d72a4659084f",
@@ -1528,6 +2098,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "d9b277a01d761e40871e9f6292bea80991a058b1dbd01cfddbf572d7dfc487f1",
   "translated_at": "2026-09-07T14:20:57+00:00"
+ },
+ "dr-langeskov-the-tiger-and-the-terribly-cursed-emerald-a-whirlwind-heist": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "43dc427060d71d9ab2688047f132bf2b155ab3807dfdc8d7c8865740d41d19ec",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "dr-mario": {
   "engine": "claude-sonnet-5",
@@ -1559,6 +2134,16 @@
   "src_sha256": "3f83aac7e2ae1c3a396404ae52e74001d05e9e50743b2c15a46f05e5e7fce38c",
   "translated_at": "2026-09-07T13:53:38+00:00"
  },
+ "dragon-ball-gt-final-bout": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "67340343e652a0d47682df02ac58b39c6ede602a6d0028bac607979d07e818fd",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "dragon-ball-sparking-zero": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "ed15dfb105db727dcf1620e59b4e57df5c330cd46b8e85422d13f2980fc3fee5",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "dragon-ball-xenoverse": {
   "engine": "claude-sonnet-5",
   "src_sha256": "8c8fd6c621c5e54ed1a4247087545a577494de5a65747944a44134abcfb8aca7",
@@ -1569,15 +2154,40 @@
   "src_sha256": "6210ef546ff54d19cae2240d34b487a9e45ec4e04e10236ffc63fb852547ac23",
   "translated_at": "2026-09-07T14:15:10+00:00"
  },
+ "dragon-ball-z-budokai": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "346afe8ee6159ed6033ff99b40b0affff6a5764af718141d8c4315c92b0778e1",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "dragon-ball-z-budokai-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "fe7594130fdf552c7953833aaf11d203c9c61a1ec38db659eada73f625ab0b6b",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "dragon-ball-z-budokai-3": {
   "engine": "claude-sonnet-5",
   "src_sha256": "8dd136650d7d71d2b71d1f606e689256caee3cd7a0a472bc33b5c2e4b8bcadff",
   "translated_at": "2026-09-07T14:15:10+00:00"
  },
+ "dragon-ball-z-budokai-tenkaichi": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "6ebe6ece8df4d7206c931ab79b394fd9cc36242f1503522c33ac796c0d095812",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "dragon-ball-z-budokai-tenkaichi-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "0b7da4e8dbb35dba574713abeda7ffc583a0fbd10117899bf0da763573efc4a9",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "dragon-ball-z-budokai-tenkaichi-3": {
   "engine": "claude-sonnet-5",
   "src_sha256": "b73e0c3bb9b223dc6cc2349f75a78e0b9d72d6e0f14f29c2d68ed9843303148a",
   "translated_at": "2026-09-07T13:48:17+00:00"
+ },
+ "dragon-ball-z-kakarot": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "c065b87192f8c48bb06a6d713e834f73f50c9e1d47303ed7f4337ad56ee11921",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "dragon-quest-viii-journey-of-the-cursed-king": {
   "engine": "claude-sonnet-5",
@@ -1589,6 +2199,21 @@
   "src_sha256": "4e1ef0c9a9a9d6f8958af0f24fb69d2478e2790124071cb8521104286cb3aa24",
   "translated_at": "2026-09-07T14:15:10+00:00"
  },
+ "dragon-s-dogma": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "dd4b696b4505577cd6960ffe6169210e9bb9d56a416991e67041d9b59ccddbd0",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "dragons-dogma-ii": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "1ccb8202852c5dcadbb8e3deb0bd007619e547d188affaa9d55946015e15b632",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "dreamfall-chapters": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "fe6108649ef717a2fd9c0602cea6cafcdf5d0e55ffc2f942a7c98ec7bcb586ef",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "dreamfall-the-longest-journey": {
   "engine": "claude-sonnet-5",
   "src_sha256": "8c954b5c7edc50192c0dfa48a0fdd6c50248ebf2fd8eeca3e0d8d86f990c3119",
@@ -1599,15 +2224,35 @@
   "src_sha256": "a17782458184052fe2c17405b0729b0ff8981ab18d4bf7b1a8cf40b207754815",
   "translated_at": "2026-09-07T13:53:38+00:00"
  },
+ "driv3r": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "a47ffffcf0d641204b7170b4fa0c641e62acc29021c8a73a561a5f546f73a45c",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "driveclub": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "69a878f7686c62c0e74b146ac29960229b0ad31a7e9a354ca9d6fe4e8f0fc099",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "driver": {
   "engine": "claude-sonnet-5",
   "src_sha256": "703d3d65af1fee473b791c1f06d0f4ddfddcf0a60246f2e6783412f1078f1130",
   "translated_at": "2026-09-07T13:53:38+00:00"
  },
+ "driver-2-back-on-the-streets": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "44239ee7f798ac5dd8291eafec314309e8b053367aed2284da4a6866ff11bc40",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "driver-san-francisco": {
   "engine": "claude-sonnet-5",
   "src_sha256": "7eaa8a59f6c6eb00acf37b8795bf052970acaac684fddbe93685f858dbb28e8b",
   "translated_at": "2026-09-07T14:02:53+00:00"
+ },
+ "duck-game": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "79060df9bc6c936a8981e3a2567dc814b09f2965a1368864e9df6d2ce6afad30",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "duck-hunt": {
   "engine": "claude-sonnet-5",
@@ -1639,6 +2284,16 @@
   "src_sha256": "b0559a0b50086cb4511e23765cfca2fabd20ef674200670bdd228a94fb00af94",
   "translated_at": "2026-09-07T14:20:57+00:00"
  },
+ "dungeon-siege-ii": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "299a48160e864168176ee5523721609f3113939c1efcb24faecfa95eb9d36db7",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "dusk": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "937b7d8583ad2fe760017398fa2859008eb304e8327fddde938dd44bf110a2aa",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "dust-an-elysian-tail": {
   "engine": "claude-sonnet-5",
   "src_sha256": "661693f1122df875f12f7ceb72e2d22d816a951e356090198a426e19150261c0",
@@ -1659,6 +2314,11 @@
   "src_sha256": "84e48bf866978a66d674d19a57277acc5133241eeb9bba76d3c2e82b8ef81034",
   "translated_at": "2026-09-07T14:15:10+00:00"
  },
+ "ea-sports-fc-25": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "575747c5329dcafce3ece985d0db18df14f2ba3967e3e290d18a2fef4fda13fb",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "earthbound": {
   "engine": "claude-sonnet-5",
   "src_sha256": "e22fd5477dec2fd358911915655a05487577f6c055bc367ec18761b068dff350",
@@ -1669,15 +2329,35 @@
   "src_sha256": "120d1068ed1379ace97756a19f252984ac48ff33a2bd59e8c862cac72e64dacf",
   "translated_at": "2026-09-07T13:53:38+00:00"
  },
+ "earthworm-jim-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "8b60e777ae939cb53e92a34f3e909ed00598897335ea2522e3665f30d85670aa",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "ecco-the-dolphin": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "39a907a8ee8a9636bfc05199cdb84d6c98770a16dacf3f9f617a85c43b39c25b",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "elden-ring": {
   "engine": "human-reviewed",
   "src_sha256": null,
   "translated_at": null
  },
+ "elden-ring-nightreign": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "1753dae7fdb30527b3eabebac8c2d7142878b732d40ac3c25979cb5fc4d8ba9e",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "elden-ring-shadow-of-the-erdtree": {
   "engine": "human-reviewed",
   "src_sha256": null,
   "translated_at": null
+ },
+ "elex": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "b8b54dacd038dd9f559e9b0687be330bb85122aabf62c0d6dc6a924eb9ab5beb",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "elite-dangerous": {
   "engine": "claude-sonnet-5",
@@ -1734,6 +2414,11 @@
   "src_sha256": "6d4c82caa5c900e378d5a110cec68e39a578fe1390af6bbd6f086de3bcac7a87",
   "translated_at": "2026-09-07T13:48:17+00:00"
  },
+ "eve-online": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "a356139875284794ff3685d0e4ba4ac11d3dbdc0be0ed24d49228ef713fffaa7",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "everlasting-summer": {
   "engine": "claude-sonnet-5",
   "src_sha256": "8f26536f3528f060fa92459489619da8a6f4dee0f50870d7ed038a9a56141b5b",
@@ -1743,6 +2428,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "ee6aaa6216e741d4ec0ff3690dd3402d8c6c1a24c5cdf462b7daec33cf9c7a1c",
   "translated_at": "2026-09-07T14:00:29+00:00"
+ },
+ "evolve": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "f535906f0015ef20833e45d14b8189030afe97a064e4079627712ead648ffcad",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "excitebike": {
   "engine": "claude-sonnet-5",
@@ -1768,6 +2458,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "0f8ef0b7bc74402a1d97632d77d94b018f8fc4ff12c58a216270b1c9006e3d04",
   "translated_at": "2026-09-07T14:00:29+00:00"
+ },
+ "f-zero-x": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "ead507820b4d6a749c1287b6da4734b79cbbab47854e8032866c498de8e50990",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "fable": {
   "engine": "claude-sonnet-5",
@@ -1828,6 +2523,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "a7f5c1785638a2cd52c496c5b5ea7c43d61a6a9e6ff2a66bc961aa6154557faf",
   "translated_at": "2026-09-07T13:37:02+00:00"
+ },
+ "fallout-tactics-brotherhood-of-steel": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "49edf1f2208bf33693761ec036db1ec179b232da09c5726393efa473d5419e49",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "far-cry": {
   "engine": "claude-sonnet-5",
@@ -1919,10 +2619,45 @@
   "src_sha256": "8c41b12d65de15a5ed2971f687cd4e9174dd86b1ecdd716cc6f72575c228a3b2",
   "translated_at": "2026-09-07T14:20:57+00:00"
  },
+ "fifa-22": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "89b82b00dffd97505da79b7064502dfc57f1f6017d277c714b3a520350c848cc",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "fifa-23": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "48704cab608705d8f7a59207e7f951a226b790eb1a77d144a4e06641f0e1ecc3",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "fifa-99": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "d812d3b7097dd558b1929e69747714f815f6d929cfadc99e5b85b55163c0a32c",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "fifa-road-to-world-cup-98": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "dc57c6cf8d1395826c175ae48a4f81051dec8ed05c995da479600b9a8b5ca25d",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "fifa-soccer-07": {
   "engine": "claude-sonnet-5",
   "src_sha256": "8aa0828a541a27643fb44644280c0cffcb409a287d25df3071509857b69491e2",
   "translated_at": "2026-09-07T14:20:57+00:00"
+ },
+ "fifa-soccer-08": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "62ed77b3fd5778ac99d60949ca6ad02b55f01255d7cd915128d564c655f912d0",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "fifa-soccer-09": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "e6b980070301305af04493a2d97e7506e1371c68681dc0c16d7dd658cd184057",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "fifa-soccer-10": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "ef95ccf96e927dc1c9f822f74c2853df46899e46abce0d774650ed64c1f743c3",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "fifa-soccer-11": {
   "engine": "claude-sonnet-5",
@@ -1938,6 +2673,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "88a8ca9e9f4255c2b5bd0b15580af1d8db92451aaf78536d4d3596f96a2104f3",
   "translated_at": "2026-09-07T13:53:38+00:00"
+ },
+ "fifa-soccer-2005-1": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "21e30722e869ecd427744e87b67ddc678400ca7698deb5449677b78d19b443c6",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "final-fantasy": {
   "engine": "claude-sonnet-5",
@@ -2024,6 +2764,11 @@
   "src_sha256": "6810c8b23a72921bab2c8baded55c4fabbb501bec59cab9bc40e1ae282a14bdd",
   "translated_at": "2026-09-07T14:15:10+00:00"
  },
+ "finding-paradise": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "4efabae1c3117f4d0f17320c2cdd7ddc7716d0f14409ee6e96932ca3e233752d",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "fire-emblem": {
   "engine": "claude-sonnet-5",
   "src_sha256": "eda2754ad7742ef7fda558840491866a5da9748f07d1f3effcb27b309e2b7e76",
@@ -2033,6 +2778,26 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "716ad06ff156f05bac474850eb52c788dc65fc54d7cc57a5197f23d300f5a2dd",
   "translated_at": "2026-09-07T13:48:17+00:00"
+ },
+ "fire-emblem-fates-birthright": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "c7adc596dc3d636ff24ba6381da7e714246ee53bdd7d30a3de78cef98fe8f0cc",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "fire-emblem-fates-conquest": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "939aaf613c829a9df68a93701278490225ce8eed340ba67037c1d08d5d13432a",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "fire-emblem-heroes": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "62c4a7d463def368d0df659a9c2db7c95c1a68ec3e5e60825b9987bae741e6f1",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "fire-emblem-radiant-dawn": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "c565d3c9dccf89ae47d403a0435985fddddf7b20fbc7d4c5443c3f28a124668a",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "fire-emblem-the-sacred-stones": {
   "engine": "claude-sonnet-5",
@@ -2059,6 +2824,21 @@
   "src_sha256": "343b5e0aba786a3e6963169b6fcb0d9e5992a6dbd6de9bed491672b370090fc5",
   "translated_at": "2026-09-07T14:20:57+00:00"
  },
+ "five-nights-at-freddys-3": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "cc9b4b5223bf5d395516f6f364ec085be0f74742a5061795bc0ea41ed56a08dd",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "five-nights-at-freddys-4": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "6f281eeefcac618cf5bb94d9ded7320ba740d38fe2b7510d852551a1548c666e",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "flashback-the-quest-for-identity": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "049af67f35629c90f88da8bad4f193d60b78a924913be1c0dd8939847d6b521e",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "flatout": {
   "engine": "claude-sonnet-5",
   "src_sha256": "28e5f5ceb430b0d316674b0e89b11053f3db85a1e8f04217899ae59998bddab9",
@@ -2074,6 +2854,11 @@
   "src_sha256": "36c5d76fa85614f450805ee60c39271647efc8f24fc5a64148a66a4b03e304a9",
   "translated_at": "2026-09-07T14:20:57+00:00"
  },
+ "flow": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "d3715df1ee4cdc30023eb660a132c5c4ab22f01140631cb2e5cd02e8cd000694",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "flower": {
   "engine": "claude-sonnet-5",
   "src_sha256": "5ded9977e98f187259dbc24982de569c49c7164a845090caaf2e4c3e8ac686dd",
@@ -2083,6 +2868,16 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "a482c31287215ffa8a2dc3692ef6dbcddc1d14f75eaf319012b5a396044d45fb",
   "translated_at": "2026-09-07T13:48:17+00:00"
+ },
+ "for-the-king": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "4faf437b919d2722bfb9e130d6903019e48aa4254d78759dddc20999c412b055",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "forager": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "0edebd1bcfb514c24dc67028fc8031f568153c93823756dd29d54eec9ec27eaa",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "fortnite": {
   "engine": "claude-sonnet-5",
@@ -2114,15 +2909,45 @@
   "src_sha256": "11077d936227df71c4945228a011e3d5b57d1fdf4c7a1c84feef4d3c0d9f4b50",
   "translated_at": "2026-09-07T13:42:31+00:00"
  },
+ "forza-horizon-6": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "44d8d729bc92cb545e0ac654fd25f84d1526810fef763e758d9d890bf0cd515f",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "forza-motorsport-4": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "9252a5af5f095a771d80cf68802eb49ce23b431b0ae0bf2b5abdc341278ce01f",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "forza-motorsport-7": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "23ccb67ded62b1a1790937e57470c047949df2fbdf6bd39782a6cef20a8620c2",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "fran-bow": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "aac377d7afcdaa99bb5ccdefa0503af97f077914431649f503f779a1fe81c1c1",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "freedom-fighters": {
   "engine": "claude-sonnet-5",
   "src_sha256": "bc9e9c01c0a10f86bb503752e24331b400ff44f8d5b016549e1b793ff294a049",
   "translated_at": "2026-09-07T14:20:57+00:00"
  },
+ "friday-the-13th-the-game": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "99b6449da5edf5ce3332462043f547315b6c676e44f3fb44bd75d433740127b2",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "frostpunk": {
   "engine": "claude-sonnet-5",
   "src_sha256": "e083b10bf94cd378c22da6040a8d7c5aceece63264e2c157e14707b00cea2360",
   "translated_at": "2026-09-07T13:37:02+00:00"
+ },
+ "fruit-ninja": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "70d5cf96c998a125e12ac738d8f34a57c8a57a58927a69ad5c086937cd4f2682",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "ftl-faster-than-light": {
   "engine": "claude-sonnet-5",
@@ -2194,6 +3019,11 @@
   "src_sha256": "578d51a3519e49f52eb0d7fa786b949280599359a907d1661a3aa94b0fd4e663",
   "translated_at": "2026-09-07T14:09:34+00:00"
  },
+ "gemini-rue": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "0ddeadc5814a2c2cbddd66e19926866825b44ba64be1167b47789bde5b13dbae",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "genshin-impact": {
   "engine": "claude-sonnet-5",
   "src_sha256": "cea330afcd440c7c5fd05184195a2bf553db09129d958168fcb3e53d6718ea24",
@@ -2213,6 +3043,16 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "28be702bb6e7f068d48da2e81b219fd7b3e00c97202a030a053c16f041920f2a",
   "translated_at": "2026-09-07T13:22:34+00:00"
+ },
+ "ghost-of-yotei": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "e42eab975777d744e7a38d93bf42813b13514ea1fc85766a4cfb450eab7d17fb",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "ghost-trick-phantom-detective": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "bb177518d8934fac745f881755e3a8d589c5fc54020ef255dd7da4a00ab7c070",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "ghostrunner": {
   "engine": "claude-sonnet-5",
@@ -2279,6 +3119,11 @@
   "src_sha256": "3b41bfc665c012d4b346ad3802a472d11c70400ae5cd5f964b68253cf6f5a1ee",
   "translated_at": "2026-09-07T14:15:10+00:00"
  },
+ "golden-sun-the-lost-age": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "bbee577866fddf36eb4c23ed99940a0396bdcf5d734f768a4eb9aba8dcc09968",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "goldeneye-007": {
   "engine": "claude-sonnet-5",
   "src_sha256": "70bc9773f53ecb15bba2e56bb64cb1e51ee8845fbd1415c1216407c0b8876356",
@@ -2293,6 +3138,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "95ee52436a9528bae9c0930d865e574ff41a7285ee5c98dce1f5f1a99ebe2d42",
   "translated_at": "2026-09-07T13:31:15+00:00"
+ },
+ "goodbye-deponia": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "f3903c95571f70090feac51accd3ffa71d4912e7fd1e710baa335b1c067ca011",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "gorogoa": {
   "engine": "claude-sonnet-5",
@@ -2328,6 +3178,21 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "442147051eca7244da2e9b7587fce6d2c2424b3460c90936409c3ac2d78b0789",
   "translated_at": "2026-09-07T14:20:57+00:00"
+ },
+ "gran-turismo-6": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "9f6308adf7e04aa0df598a34628e764bfe9340f643c1b4c9a52c4837aa26c07d",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "gran-turismo-7": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "1dcbfe672cfe2cb0f84fc3a9e6fc8ffefadff49299012260aed75df639be369d",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "gran-turismo-sport": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "96373adb2955882864e0fc3cca90bbd128ff5201f8e68d534640beda1901b854",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "grand-theft-auto": {
   "engine": "claude-sonnet-5",
@@ -2369,6 +3234,11 @@
   "src_sha256": "3b267091a9733bac5bc7d4f4ec3ca2bb6d45702e9ce3735769502976f807c94e",
   "translated_at": "2026-09-07T13:17:43+00:00"
  },
+ "grand-theft-auto-v-special-edition": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "99a851edba51882e75289130827203bc9ecb25202511e7762d0cfc80438d2200",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "grand-theft-auto-vice-city": {
   "engine": "claude-sonnet-5",
   "src_sha256": "18fbe3fc55839c45973651b24faf2430c59da3cc33e02a96baa4a2ed7613b9e9",
@@ -2378,6 +3248,21 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "df17867a5ee1b79fbc5bf5e74f1d2471f934dfbbba6ee0c609b4c14825c881b5",
   "translated_at": "2026-09-07T13:53:38+00:00"
+ },
+ "graveyard-keeper": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "1da12d080a89d1c0ff1f67d18becf3e62fc7f8b4724de6c3072ae2f22b286635",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "gravity-rush": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "d8829fb0904de1ea30384b232bc1ddf1236795c280dd0a59d99b35373f9fd37f",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "gravity-rush-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "d34df034c6e880dc900564be26f45c3b2a3e014cf9ca76f844ea2f6c3809f00c",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "greedfall": {
   "engine": "claude-sonnet-5",
@@ -2409,15 +3294,35 @@
   "src_sha256": "2ad377eeae216a3c55bd2e67af8211bcfc1d03b21e87c8a162fe6c09f57ae849",
   "translated_at": "2026-09-07T14:20:57+00:00"
  },
+ "grow-home": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "e50e07e214beca0ba2414d89ae49423628a77771237093e31ce41eb4f386caab",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "guacamelee": {
   "engine": "claude-sonnet-5",
   "src_sha256": "637b11a4be850f78eb0208281d30304c0d2019acbbe0f21ac724be19a88b436e",
   "translated_at": "2026-09-07T14:00:29+00:00"
  },
+ "guacamelee-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "e7a6e07639ae4374f1b17ea8c158d2a6fe2b78bc4eee081b8a4cc1225938429d",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "guild-wars": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "5acb431cb7a126cfc6f4cbf3ed0468aa0d04d17841dbdf5bb50b2ffb1c02ea7f",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "guild-wars-2": {
   "engine": "claude-sonnet-5",
   "src_sha256": "9f74c0561ddb4377409ec1757125d35939010a61d4641b5338e7a98ed0d7ad47",
   "translated_at": "2026-09-07T13:42:31+00:00"
+ },
+ "guitar-hero": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "eae86ea4b66ed04b05a90e25933ac039436840d7368587fa5889c701b1e7ea29",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "guitar-hero-ii": {
   "engine": "claude-sonnet-5",
@@ -2438,6 +3343,16 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "1da3d49431a6dc19c2a722c2e2dc4269192158a56e471f4bcba969e83e97edaf",
   "translated_at": "2026-09-07T14:15:10+00:00"
+ },
+ "gunpoint": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "9168c6beb736ada6a5de1ee8981ac9c87f814ef6f6344e55cc26dd7a86d539cd",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "gunstar-heroes": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "a075f034ef2f199349265c16654404c82f5efc9de09e1c66eb4dbe1f1a17e6d8",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "gwent-the-witcher-card-game": {
   "engine": "claude-sonnet-5",
@@ -2514,6 +3429,11 @@
   "src_sha256": "755bbf6552c4ba4040151297ff7b015f3bf9f4e0250e80f738064b0bd3fcc64a",
   "translated_at": "2026-09-07T14:15:10+00:00"
  },
+ "hand-of-fate": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "250fca709525800c718ed9152b9edbdb4f46245fd878d4e570d4e6fa6b578d2a",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "harry-potter-and-the-chamber-of-secrets": {
   "engine": "claude-sonnet-5",
   "src_sha256": "e2d1b6abb10031a5942cbd66fa82df9efaea3bf9121031f2ab36ab2322b4af68",
@@ -2523,6 +3443,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "3b894f9db1e497fc5494a40e6430052855b67802324b4a9720f9c3dbf858b134",
   "translated_at": "2026-09-07T14:07:55+00:00"
+ },
+ "harry-potter-and-the-half-blood-prince": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "254a88405d7403eb7b44d3636784f884fca1c2ade8ffd129107d407d8e785f2e",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "harry-potter-and-the-order-of-the-phoenix": {
   "engine": "claude-sonnet-5",
@@ -2538,6 +3463,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "7a126e25130433d35b9bdb44f177f56be6c081e8e8d095bc2e9ad74847441b2d",
   "translated_at": "2026-09-07T13:48:17+00:00"
+ },
+ "heart-of-darkness": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "46f7afeee96fcab761cc457b7e72b385cd837c1284baf2ca45f36d1f86d5beba",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "hearthstone": {
   "engine": "claude-sonnet-5",
@@ -2564,10 +3494,20 @@
   "src_sha256": "4844fda4aac26a850d233fd7dcceecbf75410703269526512fc0ee23ec8f938b",
   "translated_at": "2026-09-07T13:22:34+00:00"
  },
+ "helldivers": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "ec68cce8aee9f3605c54463a3afcdf24c11125cad9f7eeeaa3b2e205c99ebd6b",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "helldivers-2": {
   "engine": "claude-sonnet-5",
   "src_sha256": "4e5c2d1d9e36fef54f57db50052f5ca2287c4e70ad1c5724bd545b07903e061a",
   "translated_at": "2026-09-07T13:42:31+00:00"
+ },
+ "hello-neighbor": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "5b7b1ce1bf7b79b2abe5c942d8d6682fafdc58ae839dd5fb8104c44037cdce09",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "helltaker": {
   "engine": "claude-sonnet-5",
@@ -2578,6 +3518,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "1196486a071617650c985d558254652daff5fc8ba894488c7ab82f29c20fd6e4",
   "translated_at": "2026-09-07T13:48:17+00:00"
+ },
+ "heretic": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "d9c78d85dae2f32108bc3d408833e793b8b8274a51ba25dc15d7bae1d5a88d4f",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "heroes-of-might-and-magic-ii-the-succession-wars": {
   "engine": "claude-sonnet-5",
@@ -2654,6 +3599,11 @@
   "src_sha256": "4dbdaf284aefa747f99506a995c5c2d448434d2d6deea5afdfe0873665d215e1",
   "translated_at": "2026-09-07T13:42:31+00:00"
  },
+ "hitman-go": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "6739cb92dd5ec189b4f47ca90dc9e49054414b5ba9e17a06c8b03cf9e92ceacb",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "hogwarts-legacy": {
   "engine": "claude-sonnet-5",
   "src_sha256": "a68c252e53bc359f24454eda1ff608c26d6e452900ea1718acf5307e9e50ad11",
@@ -2673,6 +3623,16 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "445f8ae54a2a876ebf33fa59cfe949c7eda1938c2c9a587654781837c047165b",
   "translated_at": "2026-09-07T13:55:12+00:00"
+ },
+ "homefront-the-revolution": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "c7296e947b1b03fb94d2c0294553092636106ca8850a899e169c87c577c6ebbc",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "honkai-impact-3rd": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "030327bcb41696f6567d9019d1b93039b948a9bd4a48de44286e743eca2a278b",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "honkai-star-rail": {
   "engine": "claude-sonnet-5",
@@ -2699,6 +3659,16 @@
   "src_sha256": "175540632c6783d0a7b7fb0dec290347fc030ceb1218c58523947e7178633571",
   "translated_at": "2026-09-07T13:37:02+00:00"
  },
+ "house-flipper": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "befe33e22c15aad36af9e470f01c0c1073bff15a338cc9109e73a58d5fcfa3d4",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "hue": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "9469a01f98a56d3a06962f69e47be2008dc951933507fca2edd352568f0da6b1",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "human-fall-flat": {
   "engine": "claude-sonnet-5",
   "src_sha256": "3718f63e1fa55773c474cc44dd422c071301c81e7a79ff6d2dee0d290a8c0eba",
@@ -2724,10 +3694,35 @@
   "src_sha256": "c178bf01180a7622ac7d2877ff2e9be104faaf2aebc8995b51f18e0c6953a3c7",
   "translated_at": "2026-09-07T14:20:57+00:00"
  },
+ "hytale": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "371030386e909bd524282a751a81d2e1d2305009a9801df7bab4ef75d27dd580",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "i-am-alive": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "2ee883109e09bb082cd9c75ad0cc4b50ed0f01e5d3975302106924f2053ca3fe",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "icewind-dale": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "ccfabd0146ccae971cb515349dd3083542cfcd4ac724b2672ffd2d010031db03",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "icewind-dale-ii": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "48f1b2110bac8cc706c789845558ca16439f47c51c5056466b8fe1aefff2bad0",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "ico": {
   "engine": "claude-sonnet-5",
   "src_sha256": "0e7dfd379c31a85d0b7bacd7e463aac5d61d03a9a21ed90c89c216981484e66e",
   "translated_at": "2026-09-07T13:48:17+00:00"
+ },
+ "iconoclasts": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "f76a8dec442463be185f48ed5f8496492f91658a1128532cc1de0c5afdbdd5d5",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "immortals-fenyx-rising": {
   "engine": "claude-sonnet-5",
@@ -2748,6 +3743,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "867b39ca18309235b52558838c21312f08ad1df34bcebc2b77ea039bc4871ce2",
   "translated_at": "2026-09-07T13:37:02+00:00"
+ },
+ "indika": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "9062e0b07ca712c90fd7775a6a7defd83d7a204b23a6a65109da6911dce416f7",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "infamous": {
   "engine": "claude-sonnet-5",
@@ -2794,10 +3794,20 @@
   "src_sha256": "f521d6496699309d795e25113418e69a209dc04c426a89131698979f4bfc1cf7",
   "translated_at": "2026-09-07T13:48:17+00:00"
  },
+ "invisible-inc": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "92e4cc87062e26af8c288fe20f0729ef9b470f15915330f93e7fc37d9aaeb023",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "it-takes-two": {
   "engine": "claude-sonnet-5",
   "src_sha256": "05a968136dc832c25b65fc778748a4e2b43315a3028e1d0f00e5ded52043efef",
   "translated_at": "2026-09-07T13:22:34+00:00"
+ },
+ "jade-empire": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "bd339928b2b949cf7baeb6aa108e0ceea95b6f07da8bef3a12e5192412bbe90e",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "jak-3": {
   "engine": "claude-sonnet-5",
@@ -2819,15 +3829,45 @@
   "src_sha256": "d0195048146bc667b335b1c9c367ee3164130a3a4f0feef4807499706cb8abdd",
   "translated_at": "2026-09-07T14:20:57+00:00"
  },
+ "james-bond-007-quantum-of-solace": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "6a2eb55db019a3f9a5b1a5e1b78d4b9d3a9c099e34c87c3e8c5722b488222e54",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "jazz-jackrabbit-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "471419675837bca9ac6f9b76ea6904f7d33b0f371ee14d535d1bed1ebe178bf3",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "jetpack-joyride": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "d86780565510fbb1ba998ed8edfd03388fbbc6cbf156878b534ef25da45b6c5d",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "journey": {
   "engine": "claude-sonnet-5",
   "src_sha256": "bd25780c960458a91683d4b8fc4317f557fea75d5ff1ef8a1b6423b13e85d634",
   "translated_at": "2026-09-07T13:17:43+00:00"
  },
+ "judgment": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "d7873f599fbbaacf733cf5235b2976f42aa0f2f6e8e98b8274f4cd6f9baee2d2",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "jump-force": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "933b300004bfd5f99ddd499aee678d1f51c035b823f491f1898afbc1f1da8d23",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "jurassic-world-evolution": {
   "engine": "claude-sonnet-5",
   "src_sha256": "da1d8f1e075eb35ba05537066fdb5da0a6f443774d69c9a5ea650fd140dcd1fa",
   "translated_at": "2026-09-07T14:20:57+00:00"
+ },
+ "jusant": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "1da79a05bb4f0301bae90d6c3c0d3d1d7c1a1a830f99ae3ce595156901fc65ff",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "just-cause": {
   "engine": "claude-sonnet-5",
@@ -2869,15 +3909,40 @@
   "src_sha256": "880d96481101bd8428ad59afe976c6d5ce583b4944639a32a8bc448928683c0e",
   "translated_at": "2026-09-07T13:42:31+00:00"
  },
+ "katawa-shoujo": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "a261f92231c68b02c9030fa9cc990d9b258f1eb670cd161cd6693a8000f3c61b",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "keep-talking-and-nobody-explodes": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "a182110146a5faf28dd6dd86d9ed930472c5b5ff709f8c1d1568455859443d2d",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "kena-bridge-of-spirits": {
   "engine": "claude-sonnet-5",
   "src_sha256": "4090ac0a0ba6b75ce60bdf1f8e2e908059f0a3296f2540eb401c4228d2e45d5f",
   "translated_at": "2026-09-07T13:53:38+00:00"
  },
+ "kentucky-route-zero": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "05a93ad90c60eacb1ae70651b6138080222d0bcb2f0eec50e62eebaee3876e3f",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "kerbal-space-program": {
   "engine": "claude-sonnet-5",
   "src_sha256": "a2d4204b0b828c397946e27cf743d273bdab9baee6f637ed250dc9d1459173d8",
   "translated_at": "2026-09-07T14:00:29+00:00"
+ },
+ "kid-icarus-uprising": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "799677dfa75855430fec7480e6219b33065e54a01c9a0fe9ebeed7a584ef5d1a",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "killer-is-dead": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "1127818ab0a9643dec6c00e9ee1f1595bfe3f1f78ecc54001bdcc72da310b159",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "killing-floor": {
   "engine": "claude-sonnet-5",
@@ -2909,6 +3974,16 @@
   "src_sha256": "e98c701d3c9a161ed8ca9a60abb40a61829c84b442f030e6ece2fa73be8f8974",
   "translated_at": "2026-09-07T14:07:55+00:00"
  },
+ "king-s-bounty-the-legend": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "e18dc50d2b8be770192f128bf277734b55b7aaef8d41f70aee9b4317ccc4eb2f",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "kingdom-classic-1": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "339dfa3856f984c2a07476efa229d9c7829ae9207e1913889d0b761fca79c591",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "kingdom-come-deliverance": {
   "engine": "claude-sonnet-5",
   "src_sha256": "2af7164b43bf45a0331cb7ebb6a8d43ecf95cb72a407a9caf17c5f003ac4627a",
@@ -2923,6 +3998,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "2ddfeb639ec3053e1a65842580fca38617f69b9a375f1961ad45260f1b930805",
   "translated_at": "2026-09-07T14:20:57+00:00"
+ },
+ "kingdom-hearts-3d-dream-drop-distance": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "370b8467f98d26a51779e3ab016c8182dbe06448bdf5b6dea7e5ceefe43d2c8a",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "kingdom-hearts-birth-by-sleep": {
   "engine": "claude-sonnet-5",
@@ -2944,10 +4024,35 @@
   "src_sha256": "270c35054d5d36adaf6bffcd4362573d6640fc33c0c2ea3b4bfb4c33a1c951c0",
   "translated_at": "2026-09-07T13:53:38+00:00"
  },
+ "kingdom-new-lands": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "311c51afec95cdccdcc65bd57a943944c79b96bb99bb2f7256891135e47eb25b",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "kingdom-rush": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "4c536de97195662c5082eff83dd3795609835ec646dda86be26d9612d6bfa037",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "kingdoms-of-amalur-reckoning": {
   "engine": "claude-sonnet-5",
   "src_sha256": "294b19050e3e2869a6288faa7de4fbd13482db380bd5dd05130b38d89fdc741e",
   "translated_at": "2026-09-07T14:00:29+00:00"
+ },
+ "kirby-64-the-crystal-shards": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "3b9b3992defdd0aec1b690961337f5f4fa58528f046bb028f78fe239a3e356c2",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "kirby-and-the-amazing-mirror": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "c13d5439a8f7e7019325316e7630b759b441650f5f3d3c77d237b12017819929",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "kirby-and-the-forgotten-land": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "c26105ca3c83392c65e87fe9f31b4ddf651674354e4c9651a3e8df96cb983650",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "kirby-s-adventure": {
   "engine": "claude-sonnet-5",
@@ -2958,6 +4063,26 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "6ba62de455bf4741ba42f23682088444f9ce7b15ca3f26841fe61ec04d538874",
   "translated_at": "2026-09-07T14:02:53+00:00"
+ },
+ "kirby-s-epic-yarn": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "22ba0cb42be0df8ff52292badac8fd83a6f111f4458c26260fafe25c2447263a",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "kirby-star-allies": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "09e755929c24e20f39ae62770bf8457a147fdd82ac4199a2b64deea59867b58f",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "klonoa-door-to-phantomile": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "7f5adad87440d8b7c9aa9cb2e40eab6e5c0255965592fc3f605f171ce146791c",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "knack": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "6a185ca0edb6edcb4604a4247507b23c16a15ab90a968862015553f917ac5969",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "l-a-noire": {
   "engine": "claude-sonnet-5",
@@ -2973,6 +4098,21 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "cc481ac5fb14f5e83f78c32682cc82d54fda0fd0265116ec3527840eb24c155b",
   "translated_at": "2026-09-07T14:20:57+00:00"
+ },
+ "lara-croft-go": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "dec332140466ca16473d66c0dad54d0f3e3a05e5a95693228529bdea6bf6de19",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "last-day-of-june": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "38a6649606dd9e2a506222eae8cb9c9a4227398c207636e7fa588042bba3109e",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "last-epoch": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "6b6d38f477d8a73fa2af6ac0b9776d85e19f8980cd77dfffb38eb1dd7ea5c73d",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "layers-of-fear": {
   "engine": "claude-sonnet-5",
@@ -2999,15 +4139,35 @@
   "src_sha256": "64cca4ed14cee17487cc6606f3e2e041c1a0b54077d9caab3b3da1bb384dae92",
   "translated_at": "2026-09-07T14:02:53+00:00"
  },
+ "legacy-of-kain-soul-reaver-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "3b86c02972de09234afcd4db6754a23c5eb8f683a9dafdc7df4251e16449e2bb",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "legend-of-grimrock": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "6558313e5a3533167c1239d2455d5f890e1a8b5e7c8b325d6138b1c206786ddf",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "lego-batman-2-dc-super-heroes": {
   "engine": "claude-sonnet-5",
   "src_sha256": "c2e11f9678230b1673848879a06356415e31ece2f6d76f45873137fa35487a72",
   "translated_at": "2026-09-07T14:07:55+00:00"
  },
+ "lego-batman-3-beyond-gotham": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "e9634e100cdcf68841b5bfe98e53d0135f17018593619681d4fe8bfaa52425c3",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "lego-batman-the-videogame": {
   "engine": "claude-sonnet-5",
   "src_sha256": "cf7d4728b351ba3875e5313f1a74978eb05af550615af61a0ac48a1d521629ca",
   "translated_at": "2026-09-07T13:48:17+00:00"
+ },
+ "lego-city-undercover": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "1c5a043d14124c4ed1f6cbe8bd80f1ed3d7886d1cd67ebe8d10dda60f07d0433",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "lego-harry-potter-years-1-4": {
   "engine": "claude-sonnet-5",
@@ -3019,20 +4179,40 @@
   "src_sha256": "43c909ac6a77f60a87169a096147b007c9912a85dc5ed16889f5e506231df597",
   "translated_at": "2026-09-07T14:20:57+00:00"
  },
+ "lego-indiana-jones-2-the-adventure-continues": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "36a4ede6c240ff722173e7da14f9f2fc365f756062ef1b98731c7c6e875c1df3",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "lego-indiana-jones-the-original-adventures": {
   "engine": "claude-sonnet-5",
   "src_sha256": "a38a43d3050f1f20cb9263552af26bc5c6270722adecc3a2355ca65a9c9e74b9",
   "translated_at": "2026-09-07T13:53:38+00:00"
+ },
+ "lego-jurassic-world": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "45fa7733845e6bc9d49791fee6053d7a204cc911dcf2874dade07c62fea1532d",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "lego-marvel-super-heroes": {
   "engine": "claude-sonnet-5",
   "src_sha256": "9a369268c63fa1aee2e0bea921b000d72407f6aed59f77f4171cae4eece18261",
   "translated_at": "2026-09-07T13:48:17+00:00"
  },
+ "lego-marvels-avengers": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "415dbd49d7c94c7d05166c37bf8ab8a31b8611353352024d075f9019a4e7d1f1",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "lego-pirates-of-the-caribbean-the-video-game": {
   "engine": "claude-sonnet-5",
   "src_sha256": "9629312dc5af88af2848c30ffe3912eb90701887a42f19bc83969e47515d5c3d",
   "translated_at": "2026-09-07T14:15:10+00:00"
+ },
+ "lego-racers": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "7a3a2e813379b833ae960f83598ccab686081dbd5fc13f90fe7b7590b1543b2e",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "lego-star-wars-ii-the-original-trilogy": {
   "engine": "claude-sonnet-5",
@@ -3104,6 +4284,11 @@
   "src_sha256": "e851a062de37804cab5ebb452dc798365ffeac8303faacea100f55984d066334",
   "translated_at": "2026-09-07T13:53:38+00:00"
  },
+ "lightning-returns-final-fantasy-xiii": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "46a50da84503868bf6192c7423e61606c484f53a03b70516d8cb65ed0859e1da",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "limbo": {
   "engine": "claude-sonnet-5",
   "src_sha256": "a550f89dea3a72d06d9db76b6ecc3bd1f951734a7c800d9ca690579d62f58ae8",
@@ -3149,6 +4334,16 @@
   "src_sha256": "c64ca5c0a8fb2fe0d94d69407e800bd210d5d40ea40b2064f06dc730261527bc",
   "translated_at": "2026-09-07T14:20:57+00:00"
  },
+ "lollipop-chainsaw": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "3ffbb17ec60762e9e02d5d4dd1c594c91e0bc1f876bd55a08b735149d4e8922b",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "loom": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "21398487928f74549b363ac92c7bb3b8871746f15107ea439558eaad346e854c",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "loop-hero": {
   "engine": "claude-sonnet-5",
   "src_sha256": "cd0e403b42b6d53edd390eb0fc88747ba48794ad017cf7e5334409c8d8ed903c",
@@ -3159,15 +4354,35 @@
   "src_sha256": "a86191037f4ac493eaf1a86711578c3c063af1e915fa53cfce6a59233f7278a1",
   "translated_at": "2026-09-07T14:07:55+00:00"
  },
+ "lords-of-the-fallen-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "62a003dae412b881f1314600060e0d38318de0953f8db7287ca38039b690d8c9",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "lost-ark": {
   "engine": "claude-sonnet-5",
   "src_sha256": "9bfe1978d3281fcac01379b58b013e452bb40cfa702625e84e601b3738bd2097",
   "translated_at": "2026-09-07T14:20:57+00:00"
  },
+ "lost-planet-extreme-condition": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "b912736225b63a95fcbebcce0fdc41ad2cd375053e8f0dfefa2c5157663bb8b5",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "lovers-in-a-dangerous-spacetime": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "4aca5e889bc683cdb880ad532951aa3a511c35b574bf33f159c6723999229aea",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "luigi-s-mansion": {
   "engine": "claude-sonnet-5",
   "src_sha256": "0e98b3d1cc9b90760d4d5108d4da8ea74a9ec79ca48e08f15d8709be07ec4c4e",
   "translated_at": "2026-09-07T13:48:17+00:00"
+ },
+ "luigi-s-mansion-dark-moon": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "8eb2bbcc51b38127d94aeca54e827f6edfd7962570e92f8aa899dda66e192bf2",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "luigis-mansion-3": {
   "engine": "claude-sonnet-5",
@@ -3184,6 +4399,11 @@
   "src_sha256": "516c404f6fce02f75992aa36a9b2653bc7c07251c0a19a6d618546a7b393cd45",
   "translated_at": "2026-09-07T13:29:26+00:00"
  },
+ "madagascar": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "37b68ef7f86663164cb0fd0a4cf4602191f3e954bcd8abcd4cae3f10c734b65e",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "mafia": {
   "engine": "claude-sonnet-5",
   "src_sha256": "a4dccc934da70b1f0de1872a68be742561bde29bf0c9f07b8e334861219f7718",
@@ -3199,15 +4419,35 @@
   "src_sha256": "3866121c7222de07e308a4086cf7e6c969756d018029b250f6bf7c6b3e23d32d",
   "translated_at": "2026-09-07T13:37:02+00:00"
  },
+ "mafia-the-old-country": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "d180732b030ef239f393fdc4694320d30ec0760e2b4ced064897c7eef0b221fb",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "magicka": {
   "engine": "claude-sonnet-5",
   "src_sha256": "34dfaa3e912276b393d11d9682c6ced586a2aef0c6d0c04ad308edcec3802537",
   "translated_at": "2026-09-07T13:55:12+00:00"
  },
+ "magicka-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "aac5458b6ff6085a6e1593a53a8a5e424c5c3bd5a16dcd2d8526451c9c66235f",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "maneater": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "6114a26f8612a36e51242ae14ff9fda51fece36479e5b0c8ad4d17d193c618fe",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "manhunt": {
   "engine": "claude-sonnet-5",
   "src_sha256": "e5d871c50ec1c7e60405d8dc2445c991a9aade84860a713a9e7b166d6e0eee0d",
   "translated_at": "2026-09-07T13:53:38+00:00"
+ },
+ "manhunt-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "a774f080ca6ed0498b0ee92442f858c4aeac60e5a96828512d2f09539f30b0d8",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "maniac-mansion": {
   "engine": "claude-sonnet-5",
@@ -3249,6 +4489,11 @@
   "src_sha256": "06c3ee7af536e26cd0fbbb081fa52e78c36d8e887abc140c99fb2804c4718781",
   "translated_at": "2026-09-07T14:09:34+00:00"
  },
+ "mario-luigi-dream-team": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "de9724e9f1389b99b810f971dbfeb4678da72675c1a3f7482ff72accd789a064",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "mario-luigi-partners-in-time": {
   "engine": "claude-sonnet-5",
   "src_sha256": "e32d74f069668e7b4fee79bce421cf2c84383890162341e867f70b6e267a46b8",
@@ -3269,10 +4514,20 @@
   "src_sha256": "f6b0dd9c0803df3500096fc1c3131a1e9712f7b7d358106ca360a0488c0c8e71",
   "translated_at": "2026-09-07T14:15:10+00:00"
  },
+ "mario-party-3": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "6f94a565dfe49d54b43ee86bfe972dfb6d678cda8c32541156f14faa9b4cd929",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "mario-party-8": {
   "engine": "claude-sonnet-5",
   "src_sha256": "e210c287fc7982e5a70244dbf32fe1a94130877525e89fd8613495889e5a0711",
   "translated_at": "2026-09-07T14:20:57+00:00"
+ },
+ "mario-party-ds": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "3af7358584cbba57b76f35e0efc046380d7e9cc16371b2e06d509ce6ee127661",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "mario-plus-rabbids-kingdom-battle": {
   "engine": "claude-sonnet-5",
@@ -3284,6 +4539,11 @@
   "src_sha256": "fb5e26a8cc51e461fead339fa110c3472da85f5ef5c9303d5578eee83cd95637",
   "translated_at": "2026-09-07T14:20:57+00:00"
  },
+ "mario-tennis-aces": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "6b433c054d748cafb61b0bb71fab3f03cb69cc7f37de7f2b4e7bc80f87354c4e",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "mark-of-the-ninja": {
   "engine": "claude-sonnet-5",
   "src_sha256": "f2faf48598df2d2da8972b27d5f27648822aff383868c20bad84ab43a9362e94",
@@ -3294,15 +4554,30 @@
   "src_sha256": "8d2674b18d846bf430dddb6cdd3f0676b2eee21130321de6cc813845bc57daec",
   "translated_at": "2026-09-07T13:42:31+00:00"
  },
+ "marvel-snap": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "60f7b1eaa8672a4ebb7a2da07aa7d02c84c80b9c099a1f1cc1ff7ff42ff999c2",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "marvel-ultimate-alliance": {
   "engine": "claude-sonnet-5",
   "src_sha256": "f766ac207f746e742bde78cdbc5d0ce7c6736f72f8bd921789b1fbe90e4d661d",
   "translated_at": "2026-09-07T14:02:53+00:00"
  },
+ "marvel-ultimate-alliance-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "ca50f763ea4bdcd08aa13ed67dde9da2354726ee0f9f07359ae6a5d75462904f",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "marvel-vs-capcom-2-new-age-of-heroes": {
   "engine": "claude-sonnet-5",
   "src_sha256": "4a134de1ac80de8b6a39866e5fb21ae73829a0fb45daba5cef2a2ac98768330a",
   "translated_at": "2026-09-07T14:20:57+00:00"
+ },
+ "marvel-vs-capcom-clash-of-super-heroes": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "a4351a94737ccfef5ecc66b4eb955dcdbb7523e507a91dc47d7b8b70829ad3a1",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "marvels-avengers": {
   "engine": "claude-sonnet-5",
@@ -3313,6 +4588,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "9f25d1fba19854a3f2b2f4985e7a066a23c316fb0ddf9002a1fb60431666d828",
   "translated_at": "2026-09-07T13:37:02+00:00"
+ },
+ "marvels-guardians-of-the-galaxy-the-telltale-series": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "6a4a1c4de5d92cd566c16e7c658f8a0de4ca64320cbf10fc61836c2476a7418c",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "marvels-spider-man": {
   "engine": "claude-sonnet-5",
@@ -3359,6 +4639,11 @@
   "src_sha256": "32b6bba217d76892bc394c80ead54903acd0fc5f237f09727a09865d1c040ca2",
   "translated_at": "2026-09-07T13:22:34+00:00"
  },
+ "mdk": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "ce0cd8bc1427d8253c4a4ce7a79236e79c85d688794440c47d841bca1aa584cd",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "medal-of-honor": {
   "engine": "claude-sonnet-5",
   "src_sha256": "3dfd9d14a2797f086ee03f5161d8dc5234b533e416d3f55fbf27f037f9f95456",
@@ -3389,6 +4674,16 @@
   "src_sha256": "6c39bddd9d0aaec13707c3ff49c6a0f0e4aad77eb18ef67801d5360016fdea1f",
   "translated_at": "2026-09-07T14:07:55+00:00"
  },
+ "medal-of-honor-rising-sun": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "d51b53a12f2ebf3f1e4c4ec7ccbba6deecf0692a78e16d11991b3ea7dcc3eaa0",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "medal-of-honor-underground": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "07dff29e10fc05fa0e24e23206a1067cf4e068c1c6c2c78049b2e991750af5d7",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "medal-of-honor-warfighter": {
   "engine": "claude-sonnet-5",
   "src_sha256": "02c1af1ef8a1af9b1ed32ad48f1c67817cfb672edfe00396fab2701345c7ebb6",
@@ -3398,6 +4693,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "43c5c636afe9b02199243f4aae734b76b8f85f88cee4fe840808f8e5d2260724",
   "translated_at": "2026-09-07T13:53:38+00:00"
+ },
+ "medieval-total-war": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "b4c3b8e663d2b38f1fd6165d439985a6f86c3b4d936656bb26af80e8b83dcf59",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "medievil": {
   "engine": "claude-sonnet-5",
@@ -3419,6 +4719,26 @@
   "src_sha256": "4dc6b3fd7cced0e35d2aeba6628b70d9cc1be17b32640be31b6dda97de7ea062",
   "translated_at": "2026-09-07T14:20:57+00:00"
  },
+ "mega-man-5": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "b532d01f7bd3cd5778a3b6a1ae5bd1e98cda9989f5053a8017b8c2877aca2fea",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "mega-man-6": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "7f6c4ccb4165af88ff7bbe950491a07de9c76f088dbad570a2e9379e94883181",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "mega-man-7": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "86bfdf4ea21d00744b8145cb694130d9170d37fff07d746bc38e72d64bce7d6d",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "mega-man-8": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "65847994534daed84ba7baa499e465d42b5bd5f2cc6bb40ef8ca85a26918bd6f",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "mega-man-x": {
   "engine": "claude-sonnet-5",
   "src_sha256": "87d2dfc245955cbe800f9789224f38ea0a5a5616b7291162c687ad4e4ca0ced5",
@@ -3439,10 +4759,25 @@
   "src_sha256": "1310704e9c9db3c54454e6c4e256bdfef27360c0d74ef77be44f6412428b389f",
   "translated_at": "2026-09-07T14:15:10+00:00"
  },
+ "mega-man-x5": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "0bb73dd8e5a8f938fc5a3748a82d8dce47714e79c471c41c1f51f392753a6943",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "mega-man-zero": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "ab422fe33df7321d3484a045a0d758491b71f4caca123c1c2124dac607a3d1e8",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "metal-gear": {
   "engine": "claude-sonnet-5",
   "src_sha256": "8fc81bd455b7b3597353e86a649fc51449eb64b3f8944035c7816d287b5d4afb",
   "translated_at": "2026-09-07T14:15:10+00:00"
+ },
+ "metal-gear-2-solid-snake": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "0b76207aee531076efb4e2f9cc7fd26dbcaa2856e571686351396c612fd473d4",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "metal-gear-rising-revengeance": {
   "engine": "claude-sonnet-5",
@@ -3479,6 +4814,11 @@
   "src_sha256": "2a4db74f79ed8e7664639e7267201c9a470d637b073bbae6e34f20ab581cb34e",
   "translated_at": "2026-09-07T13:17:43+00:00"
  },
+ "metal-hellsinger": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "11e6bba5f428a5608c7c73304e358ad533522e6763d95dd40b9f07f2bc6f9361",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "metal-slug": {
   "engine": "claude-sonnet-5",
   "src_sha256": "6dacf18f3d481a64268151addbe200c9c404c5a2c599697c122ff1c9175dec8b",
@@ -3493,6 +4833,21 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "9c6cf64b0dd3420ea883a4554648c73499e8c300b4cb8a1faca1ceb1e82c3c59",
   "translated_at": "2026-09-07T14:00:29+00:00"
+ },
+ "metal-slug-4": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "5b207071bf510feb8c443731a5b531b786147f1af7f73453c276697ad5f883af",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "metaphor-refantazio": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "a3f46db710c5d7a9b44fd76a83a131a087c78c83d07e338ea7e3f8e60cf6cade",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "metin2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "89c04de77bf33377a91b734cc39aa999f6eb909b7c5ee746e960ca10d0e68b1b",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "metro-2033": {
   "engine": "claude-sonnet-5",
@@ -3519,10 +4874,30 @@
   "src_sha256": "52806f755049d08e892b873901a66f6433b1436cc4c1603f31716e7eb4104071",
   "translated_at": "2026-09-07T13:42:31+00:00"
  },
+ "metroid-ii-return-of-samus": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "8a4e6ce6a58a5f4302d62941fc9f0e814c44a48f53b0d4035db02702985aa936",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "metroid-other-m": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "5c2760ad6a338ff5cd480592821cadb22be71c5719786fd8002bacff0bd151c3",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "metroid-prime-3-corruption": {
   "engine": "claude-sonnet-5",
   "src_sha256": "0c559b597879940189da1d2a431970abaa928fa3a2cdf59c8fb902284c18adf9",
   "translated_at": "2026-09-07T14:15:10+00:00"
+ },
+ "microsoft-flight-simulator": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "3cadc3b5ad2bf123d028ff6b1e6ae741b9b95914eaefa9b22120fcffe3780c3f",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "microsoft-minesweeper": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "b84f82509fc27716fc6ab87450a03d92096ab7204de111159a146e654d874d3d",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "middle-earth-shadow-of-mordor": {
   "engine": "claude-sonnet-5",
@@ -3533,6 +4908,16 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "2168b2eb37ca495198192b325e43555395abb1fe51869308e4aa4db916b36c6f",
   "translated_at": "2026-09-07T13:37:02+00:00"
+ },
+ "might-magic-heroes-vi": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "77fdd5cec4b936794ce0313e1fd598b1293d384d2a8131517e464e78921750f3",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "milk-inside-a-bag-of-milk-inside-a-bag-of-milk": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "eaa48b471ab1dbbcda09ff6accbc8c6ff618451533560b541b8c30bdf0e0baf5",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "minecraft-dungeons": {
   "engine": "claude-sonnet-5",
@@ -3599,6 +4984,11 @@
   "src_sha256": "98bb7810a08768e6ca1599bd37cdeb782dff43b14b9f41f41d07fca668328a97",
   "translated_at": "2026-09-07T13:53:38+00:00"
  },
+ "monument-valley-ii": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "dbde801982b1c6f9bf38a2176e817d0a8e7ba012ec9f5ba1e8ac062395dbc139",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "moonlighter": {
   "engine": "claude-sonnet-5",
   "src_sha256": "464c7b52d47981945b388b56d3ad01d2be795f85f93e905974d5bed4c460122e",
@@ -3608,6 +4998,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "025420a9240b7474e9361fe875c683dc6a0582fbef26bc03731a5b154d4f041e",
   "translated_at": "2026-09-07T13:37:02+00:00"
+ },
+ "mortal-kombat-1-1": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "62e83670a63a5dac6172f899fe7f6c763bc6cd6b6bf51a3d5a8ee9f2cdd8c309",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "mortal-kombat-11": {
   "engine": "claude-sonnet-5",
@@ -3629,6 +5024,16 @@
   "src_sha256": "1bab5038c7e653b8febfa439c9509ca7df681a9980ca7c7d7287650854709faa",
   "translated_at": "2026-09-07T14:20:57+00:00"
  },
+ "mortal-kombat-deadly-alliance": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "c0e2c7bed68591a34c741b97fd0bd5921ffe101668542d8116f3417139eab0d0",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "mortal-kombat-deception": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "7cbc8e2923e4cfc94ac5bd89cfe7c852b8d730918932cf91831858aeaaf8d199",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "mortal-kombat-ii": {
   "engine": "claude-sonnet-5",
   "src_sha256": "e2964185d636d1878ec52d4e942e3c2ac69eaabe9087d721e63651138dce82d6",
@@ -3639,10 +5044,20 @@
   "src_sha256": "fc51068b9d4410864ab215fdd18f0cc99b4a8bc3e0edeb8836b27c3e4742814a",
   "translated_at": "2026-09-07T14:20:57+00:00"
  },
+ "mortal-kombat-vs-dc-universe": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "fd0b3df250eae92b78d1c55adf87aca8c88e6604a053205d2cf33994733084fe",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "mortal-kombat-x": {
   "engine": "claude-sonnet-5",
   "src_sha256": "bc1609fafd1f18e5fc97d456ddaa16052641903f58656f7a17e7d1e75bd04854",
   "translated_at": "2026-09-07T13:37:02+00:00"
+ },
+ "mortal-shell": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "c0bb0625d33c4d261dfb15dd3f492affad0bf22227303126a0ad8189893d5905",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "mother-3": {
   "engine": "claude-sonnet-5",
@@ -3664,10 +5079,35 @@
   "src_sha256": "90ec93657729746870c66b02b73dcda4b5ed87254b78b50d835f02ebd7088133",
   "translated_at": "2026-09-07T13:37:02+00:00"
  },
+ "mouthwashing": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "4765d23d5a519e8999fbc9047193338912bc3aec9a020d7216b0fbba0f518aa5",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "ms-pac-man": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "a00171e48aba683958be5e4cea4a37b66ac07acd274f7518f425483ed75467c5",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "multiversus": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "1c8675595e691549ec970969ff088b1b86bf7531cba8f78a3bd28e2af666bedc",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "murdered-soul-suspect": {
   "engine": "claude-sonnet-5",
   "src_sha256": "376f6825979308af79441dcf1a4814aa6705c0b6f97102743dbf0adfa5d60753",
   "translated_at": "2026-09-07T13:48:17+00:00"
+ },
+ "muse-dash-1": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "bcc62c0409040ec09ad2b20772ea40c69746fe68b7308e998486338c73451cd1",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "mutant-year-zero-road-to-eden": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "47fea6fa09b173d2ddbd97166e8045a11fe3267f9f0fdac448dbd7764af30106",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "my-friend-pedro": {
   "engine": "claude-sonnet-5",
@@ -3679,10 +5119,25 @@
   "src_sha256": "98bbfcd6ee0408c5314a88f704be8d9701b18af04241d66b0aa40680ebf87da7",
   "translated_at": "2026-09-07T14:00:29+00:00"
  },
+ "my-time-at-portia": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "728a0e2921d1391e7e1760d1a565bccd4d192b1fa6bc842db8aaa662da5de30a",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "myst": {
   "engine": "claude-sonnet-5",
   "src_sha256": "f06d6a6d0d3c3bdf82e40dcc6485e5fc47f6576d87a136ec29f0e5dba3af6df5",
   "translated_at": "2026-09-07T14:02:53+00:00"
+ },
+ "napoleon-total-war": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "a2520b5cc7e925b5990dd1dbffdb5dc6d22a696d405013ad7cb6fca124d781ab",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "naruto-shippuden-ultimate-ninja-storm-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "bb9bddad79a054ef70c9dd418b9de29aaf99c79c328910f66d7c7692db8b9260",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "naruto-shippuden-ultimate-ninja-storm-3": {
   "engine": "claude-sonnet-5",
@@ -3693,6 +5148,16 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "2ea3c0515d4333643126b90e6e07d27aaf77efec2562d4a5862bc650e1b45554",
   "translated_at": "2026-09-07T14:00:29+00:00"
+ },
+ "naruto-shippuden-ultimate-ninja-storm-revolution": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "a909f0b47340534c3c141fb311fc9dfdbc3f13e4f99e9524ed385bfae33671a4",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "naruto-ultimate-ninja-storm": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "d11a6d00716ab42f099470857498d2f121f0697b1622913ae0c8b03439bfbb31",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "need-for-speed": {
   "engine": "claude-sonnet-5",
@@ -3708,6 +5173,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "49d6c3d0e1bf3590d52c7349b420c71656dc65480915e43da22db7ee92185c01",
   "translated_at": "2026-09-07T13:53:38+00:00"
+ },
+ "need-for-speed-high-stakes": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "69b3a105a33919c80270f0466d10cc17a631444dc7a85120163a99e0ff225cc6",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "need-for-speed-hot-pursuit": {
   "engine": "claude-sonnet-5",
@@ -3764,10 +5234,20 @@
   "src_sha256": "44ff35df3f920cf754dfbcf8943ca9cd63ab299b2aef803f1f78e5fe19066ca8",
   "translated_at": "2026-09-07T13:53:38+00:00"
  },
+ "need-for-speed-shift-2-unleashed": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "a25eb6be68fe8420e70b0418677d80985650a7360092f084df406833127ddee6",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "need-for-speed-the-run": {
   "engine": "claude-sonnet-5",
   "src_sha256": "e890934ab0ee2b1f92529aa69f6ecdbe623c1c5a8d5d62b848b1c54206ef5c7c",
   "translated_at": "2026-09-07T13:48:17+00:00"
+ },
+ "need-for-speed-unbound": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "e265aaf0e3757792f69955074febbc7c5f5f7e837db425821868a045a8f3fec7",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "need-for-speed-undercover": {
   "engine": "claude-sonnet-5",
@@ -3784,10 +5264,20 @@
   "src_sha256": "3753d4e92eb34f31150f3dfee23611db8ae665a9ca9913b5d8c0c5ac764d6f93",
   "translated_at": "2026-09-07T13:22:34+00:00"
  },
+ "need-for-speed-world": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "6a70eeddbab0bf27f0620016cc5c38a70ca06016857188c9fb6744403819d7af",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "neighbours-from-hell-1": {
   "engine": "claude-sonnet-5",
   "src_sha256": "fa9d66822961f53af432f757baf5bb07e071ad85714939e43928b1d0fd575ab7",
   "translated_at": "2026-09-07T14:07:55+00:00"
+ },
+ "neighbours-from-hell-2-on-vacation": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "b805acc3eb2a248950f4395817d2605f1994f427964ba5fb20b62859396e4e2b",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "neon-white": {
   "engine": "claude-sonnet-5",
@@ -3798,6 +5288,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "1d78b09cda6a3fa82df356706707407ba057396ca78d251959b2a98bce9ee410",
   "translated_at": "2026-09-07T14:02:53+00:00"
+ },
+ "neverwinter": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "f0280d8e99dffacf73172bb8ec47021a4b794a5778932c7d1eda8b7435b9d5cb",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "neverwinter-nights": {
   "engine": "claude-sonnet-5",
@@ -3829,10 +5324,20 @@
   "src_sha256": "8bc3cb321b79d087e3822b7082fced45dbd89ca19885f679db458849f38b908e",
   "translated_at": "2026-09-07T13:42:31+00:00"
  },
+ "new-world-aeternum-1": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "0747d6764fa930dd71220a7868531f9cf05fafd743b034df19c766040825a24c",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "ni-no-kuni-ii-revenant-kingdom-1": {
   "engine": "claude-sonnet-5",
   "src_sha256": "20b7cb4fca21b695aaf33c58d7d1ba00a79794c94babb03339ba5b32e50e3f13",
   "translated_at": "2026-09-07T14:15:10+00:00"
+ },
+ "nidhogg": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "7e3b04304ba1f94084262e5f1b4d2b78839fad8b8ae419cf2ce92e110afce4ff",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "nier": {
   "engine": "claude-sonnet-5",
@@ -3854,10 +5359,20 @@
   "src_sha256": "ccb41adaf9d3dad206c93fc63a30cfaa0abbdb2e077fde162fa8f27a306414ba",
   "translated_at": "2026-09-07T14:00:29+00:00"
  },
+ "nine-sols": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "a18f0d37e7cd96417243b02a73b75e236a4ceb65948fef3b7e2e45397f5b0d53",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "ninja-gaiden-1": {
   "engine": "claude-sonnet-5",
   "src_sha256": "b7912b477225a7ff7560e6d5e4d2e7c265798274f3b4cd78fd22f2746939218d",
   "translated_at": "2026-09-07T14:20:57+00:00"
+ },
+ "nintendo-land": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "ede8a88ae82699f004577a195c25ead58568980a12b5434611e152c5a87c89cb",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "nioh": {
   "engine": "claude-sonnet-5",
@@ -3874,10 +5389,45 @@
   "src_sha256": "a11419d9a7d84d0a02ae7c24212f4fb04dc40341ccfe5ad99217a6d8f8bd428e",
   "translated_at": "2026-09-07T14:20:57+00:00"
  },
+ "no-one-lives-forever-2-a-spy-in-h-a-r-m-s-way": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "8cc5ff653adfdff96c4ff363f890a18f39a87d380ff9dfdbddffbfdf015ae60d",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "noita": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "27b7180aac7bede96ce80f43f7b3e7dd02012185f97148e0ed1ea4228d2c1abb",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "northgard": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "9613d4d6449403a5e100ab587047574b1b56fc9e55431fc5ac7877220b585cdc",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "nuclear-throne": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "8c006cb2baa71062f17765d1cb851fb66055f4d609ae7bf3c6fd65cd79cd5757",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "obscure": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "ed75d18933990f57df11c23cbf7aa4686adc792d70c504239b622fe921c5a1b1",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "observation": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "0af83f3efd8fdb59b5eb94a6d67db1433aca555f6b20e5c5a3c910370034363d",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "observer": {
   "engine": "claude-sonnet-5",
   "src_sha256": "78fc5b70e18c4d33982575d5eff85a621455856bd9c3a79663a962b7ec95dc5c",
   "translated_at": "2026-09-07T14:07:55+00:00"
+ },
+ "octodad-dadliest-catch": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "51814b5ee0859fafc0287c51dfb34012c5246accb9e23f1d951ac342f23a9133",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "octopath-traveler": {
   "engine": "claude-sonnet-5",
@@ -3899,10 +5449,50 @@
   "src_sha256": "d89146beab16ee1aeb81e0fbfd7fe3580ce6bdcf5da166cd4fcf19f90cab18ff",
   "translated_at": "2026-09-07T13:48:17+00:00"
  },
+ "old-mans-journey": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "11abd63f218fdd81f5ee4b3b78178259d5702e55d3f23f9f754021ff6393b725",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "old-school-runescape": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "ced6655265cc349604f6f190f5651994fea78d891549bc25d57f6832d80dc5ba",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "omori": {
   "engine": "claude-sonnet-5",
   "src_sha256": "9e3a3c70debd888267191e71b379ec39ed7a3c8c65bb18c8a9a341f816da3897",
   "translated_at": "2026-09-07T14:00:29+00:00"
+ },
+ "once-human": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "04624191552311c6ce1ad1b99494a8e78e2ac4c5fed34adf9c7fa6cbf92afceb",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "oni": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "fd6219cfe746276faba3dafed2f764b82799aea6cc6bbdc338b520f148201e23",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "onimusha-3-demon-siege": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "f247cd805808ccdd2958e6b7e56db8e21bdba749bc9a84395494a22f4d6190c0",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "onimusha-warlords": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "de656cb2cf870cbb4df036c6080a1f6d5f07781b19812ef7506a64a6981130e1",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "orcs-must-die-1": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "3dce9668f3827403c12375ef112c92b0d3d253a302973bfbff720b82d11550e8",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "orcs-must-die-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "a09ebc638d397622460cfef107bc6685f9ebe63a2e07788e1d12a48ab5498556",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "ori-and-the-blind-forest": {
   "engine": "claude-sonnet-5",
@@ -3943,6 +5533,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "bca39c83a72949802a6cfc96b3814a39430b65513f9149d3795408ce05729035",
   "translated_at": "2026-09-07T13:48:17+00:00"
+ },
+ "outriders": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "9f5e39393bc7829d4ebabe8c88334150d015a41e5e8a5c686ec7a49c99cf6c2c",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "overcooked": {
   "engine": "claude-sonnet-5",
@@ -4004,10 +5599,35 @@
   "src_sha256": "5f3ce54052ed02b6ba416761b5615a44d54e3f2b6ed19537a0ced8fc598e1294",
   "translated_at": "2026-09-07T13:48:17+00:00"
  },
+ "paperboy": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "11d763ce4b8ba1090e1d960cd1917c54f3cb1241913e1e048fe09e1ac0263ad5",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "papers-please": {
   "engine": "claude-sonnet-5",
   "src_sha256": "8ea203560755df8a23613028f7c661f384963a1ed9f896b8607e2aabfa97e99c",
   "translated_at": "2026-09-07T13:29:26+00:00"
+ },
+ "parappa-the-rapper": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "0907ebcffa6577bbe85bc0f6b75584921f997e52bfda9e51db479bf95e07597b",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "parasite-eve": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "b408dea5a8d75906a4ae8f6e5974cba0fe24eaa948645835baaed351ab03189f",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "parasite-eve-ii": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "3fc14c0ce4b1bf21cee093d99094a92887109525f445e13e72004ecb4f15f8b8",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "party-hard": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "90cf483ecb9df834b586eeceb75258096d0a1e213d46743347d184b3e42479dd",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "path-of-exile": {
   "engine": "claude-sonnet-5",
@@ -4018,6 +5638,16 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "b20061163222226f3519b21c4cb099451188dadce0a2d9254828833dcea87914",
   "translated_at": "2026-09-07T14:00:29+00:00"
+ },
+ "pathfinder-kingmaker": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "21cfbe0d58de957664d879d211428117fd5f2be14339ed0c6a68cf1fee9e7dd4",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "pathologic-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "6140469e07606ca0a63f74976d2c7823a0c31b30279c6326b30ac1bfc22c11bc",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "payday-2": {
   "engine": "claude-sonnet-5",
@@ -4033,6 +5663,26 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "bd406eb9f4b35e500a5b2b0a81e2620fa298a1e396fd0009775e44fbe3762141",
   "translated_at": "2026-09-07T14:15:10+00:00"
+ },
+ "peggle": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "c362b36d6f758ca947b3e8e180372da7319542225729eb24897d6cc771a24883",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "pentiment": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "551ff65d5c3ed4c5cd89422352ec384abc7207dcffac1b09525c2b1952265147",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "penumbra-black-plague": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "c8271f60272269c45ad9117a82e4e92634c6e10043a1ff4d183ae251c4e5a2a8",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "penumbra-overture": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "68b8c4ff7c55389e3800b61f09d7044698984af5d1c65e02f323f98ba75b5991",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "perfect-dark": {
   "engine": "claude-sonnet-5",
@@ -4054,6 +5704,11 @@
   "src_sha256": "459e7287c96d1c8900daadfd1e245e20c898fb952d9fabd9ac0c0ca0a06e8461",
   "translated_at": "2026-09-07T13:22:34+00:00"
  },
+ "persona-5-strikers": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "3ec3cadfb786fdc776c428b4cfea4d0c273dae4ebcf35b488a20c1703082d041",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "peter-jackson-s-king-kong-the-official-game-of-the-movie": {
   "engine": "claude-sonnet-5",
   "src_sha256": "9e8b15a0ef366bd3640728c6dcdae33df464c6f2ae13ee3494c28fc9ae2e53b6",
@@ -4064,6 +5719,16 @@
   "src_sha256": "72199218494dc0146c5eb73a6431d5cd3bb06a2554ee2a2e5cdde3ae8b0a853a",
   "translated_at": "2026-09-07T13:53:38+00:00"
  },
+ "phoenix-wright-ace-attorney-dual-destinies": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "631ea7188df9f25ffbb75a25b6f7f3b36b48f6e32e3e70ff81f9f7438bf3cafb",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "pikmin-3": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "11ef7800dd8e8046307f04c4b1b2e48b9864c5e1bcd5294002ceb86e8c62853a",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "pikuniku": {
   "engine": "claude-sonnet-5",
   "src_sha256": "a3880422a3fa9e8b65766b54951af3c49cbac6728c88039daef8c76277a0133d",
@@ -4073,6 +5738,16 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "2c9c9c682d29c0e67faac55a3a045adbf10477d1409f6ff93582e41988491130",
   "translated_at": "2026-09-07T13:42:31+00:00"
+ },
+ "pillars-of-eternity-ii-deadfire": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "be7ee8af1bd94d5f9e046d0daaf6a4e7dc9fce61efb221576c34ea3f51cb8fd7",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "pitfall": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "9ed3167fd7d618f901e5d9eadb271a453500900bcf2c6b83b70ae739f8a33f96",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "plague-inc": {
   "engine": "claude-sonnet-5",
@@ -4089,10 +5764,35 @@
   "src_sha256": "6049ed0ec83b9c609cdce0f1ee7d354a19a9df77844e9a7d891476000d975cec",
   "translated_at": "2026-09-07T14:20:57+00:00"
  },
+ "planet-of-lana": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "434bdcdcab6c020eb2f084c9c775deb666140827107611ed24edb98fe1dcaf2e",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "planet-zoo": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "bc102807a6419f78fdae143fd9625e7514759ed16ff7a9071fd7d22778c98806",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "planetside-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "3c1dfb083c70a68b21d6c11ff7592d3bebc6f047ba3a5f91e197126c476d6878",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "plants-vs-zombies": {
   "engine": "claude-sonnet-5",
   "src_sha256": "07e6d5ab26349a906ee5c04cc6cafb16ef5c94d05071a6ce3c1fd2ce952ab62a",
   "translated_at": "2026-09-07T13:29:26+00:00"
+ },
+ "plants-vs-zombies-2-it-s-about-time": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "5f383fdf7b0827aa46f9be24a376dca4611e29b1ee18e4295683f74a98f08516",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "plants-vs-zombies-garden-warfare-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "09709336616da45af1d98f1fd9fa819ec88f312d0f851d637eb7da24b300a40a",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "plants-vs-zombies-garden-warfare-2e561d33-2b92-408a-92f2-ec79ddcc6c2b": {
   "engine": "claude-sonnet-5",
@@ -4139,10 +5839,30 @@
   "src_sha256": "f24959e6c5502079456b16dd3e8aa693d7999ef515ee2ad60082a3040c876dcc",
   "translated_at": "2026-09-07T13:48:17+00:00"
  },
+ "pokemon-mystery-dungeon-blue-rescue-team": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "de4f68a143e32c8b39552db414ebb81d1a59730009b45f165bb48dd98ad18803",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "pokemon-mystery-dungeon-red-rescue-team": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "de4f68a143e32c8b39552db414ebb81d1a59730009b45f165bb48dd98ad18803",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "pokemon-pearl-version": {
   "engine": "claude-sonnet-5",
   "src_sha256": "52acfa386625ea3ab0fc8db5e8bb17482ce5aa1072a4ee54612d84a411813b42",
   "translated_at": "2026-09-07T13:53:38+00:00"
+ },
+ "pokemon-pinball": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "e0ea069dbeb636d33a28932211751f23e84f848334063f3ab77160d097e9b21d",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "pokemon-ranger": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "1108128e4478670629bbd3dba0ab2a552f5fe67398a87b261002ebb75a855372",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "pokemon-red-version": {
   "engine": "claude-sonnet-5",
@@ -4158,6 +5878,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "e3d60bf192e77cdb099953b6df151146a6748459b167ec4327afa4fcc174fa7e",
   "translated_at": "2026-09-07T13:42:31+00:00"
+ },
+ "pokemon-scarlet": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "13ff32ed93994bd2e08cf12d5e5d1c59dadacab4c89fb34c52d98d6ac0447e6e",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "pokemon-shield": {
   "engine": "claude-sonnet-5",
@@ -4199,6 +5924,11 @@
   "src_sha256": "bdf6bd7b0379e893b1d8060bf8f69dfb8ba1ed3863b506c78b4df2775ad6bbe6",
   "translated_at": "2026-09-07T14:15:10+00:00"
  },
+ "pokemon-unite": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "3eca9c995d8178b71fcb56cce0364a66635f088fc21e7c9df0ccfa3a286b8131",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "pokemon-violet": {
   "engine": "claude-sonnet-5",
   "src_sha256": "c7d081380a33945ff397aedd01a6f99527ec557d038bcacc24e5b35f6b0139a2",
@@ -4234,6 +5964,11 @@
   "src_sha256": "744cb719f6c4bee387c1320659abae7eb89471841744156637d1672fde555506",
   "translated_at": "2026-09-07T14:15:10+00:00"
  },
+ "poppy-playtime": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "66bd890cfb09a913aeb960660ccbc3f9fbefb5049d7e1ffa54809b460de35ab9",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "portal": {
   "engine": "claude-sonnet-5",
   "src_sha256": "e97b63342859b6be3801d87222a6224b25ee6629dbbfda0e9c8a36c99f7bbf34",
@@ -4244,10 +5979,20 @@
   "src_sha256": "43175e1ee36c4b69f0c3709ddaa1c7c8a43cac55c24d32d85818e93becfda017",
   "translated_at": "2026-09-07T13:17:43+00:00"
  },
+ "postal": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "09ee377eaee1f59d228792e12985011fdef40f7610723b20df92bc4236068f5c",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "postal-2": {
   "engine": "claude-sonnet-5",
   "src_sha256": "dddb7300f73a2919b8f907f1ba10b8d072f5c17873f3e625f2666df66ca45d88",
   "translated_at": "2026-09-07T13:42:31+00:00"
+ },
+ "powerwash-simulator": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "a9b2082446a3c23b06295dde1c4698ff4b68cd11446c6dbf5ee0f275fb5d817b",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "pragmata": {
   "engine": "claude-sonnet-5",
@@ -4299,15 +6044,75 @@
   "src_sha256": "5f7dc19a9d34bf6671a39923361de9a449fe6521bffa3faabf90f390742166ce",
   "translated_at": "2026-09-07T14:00:29+00:00"
  },
+ "pro-evolution-soccer-2009": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "9b6c5fd50e7f628c5d891fd57ed0e8d51357b668e500f102d618aab5642e0450",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "pro-evolution-soccer-2010": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "c1d238594868990e1e3e771ceff7eeeaff694d4cb3f783aff6eb3557b7983bf6",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "pro-evolution-soccer-2011": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "00d00d88c3822ba3d20d8c395293fdfb797c70ecb2b1a297e16db4bfad38b98a",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "pro-evolution-soccer-2013": {
   "engine": "claude-sonnet-5",
   "src_sha256": "d699e19f7181adb36b6a2b918fd73180da90d2a0014ad58f2f42a4af345e17fd",
   "translated_at": "2026-09-07T14:20:57+00:00"
  },
+ "pro-evolution-soccer-2015": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "d8e0361718d9478ba83381580294638d210d140842884cc9aa191c7de6d722f7",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "pro-evolution-soccer-2016": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "9f4ccf58c3ca7fa986123375d50f6ca6fb386ea417c47c5625fe09971256c352",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "pro-evolution-soccer-2017": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "71296e4168217190505d4b005614ac1a36d9eb60e2bb1595199ef1583a2a2535",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "pro-evolution-soccer-2018": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "014ae9fb9e5b3600a5cc858b1530ef78143ed7d9c9dbb32d198bba16074c1501",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "pro-evolution-soccer-2019": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "c5e6c158913fea232860804aa5bd91f68754099ee6e2c545a1f3164f0cda33d6",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "professor-layton-and-the-curious-village": {
   "engine": "claude-sonnet-5",
   "src_sha256": "80935ea586550c935243b58379bed545251af5ee0359145d2ec2d76ac4da8367",
   "translated_at": "2026-09-07T14:00:29+00:00"
+ },
+ "professor-layton-and-the-diabolical-box": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "9c6299b7652015afdd61a358d5aa8ad3cb682490e3b150494c4cb243965e9a4a",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "professor-layton-and-the-unwound-future": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "863d5de78ab841caee7e894c8aba2be0f83ee94427ec2d2df5b8eb046b1cba92",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "project-cars": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "e42170d09d0b48da5bea570a3105cab7f0e35af420732bf29bc184057d9d6209",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "project-i-dot-g-i-dot-im-going-in": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "c4a2a17fe6d855304a6b07285bb9c20030eea92735bc827c9c9ac68ec08d3a91",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "project-zomboid": {
   "engine": "claude-sonnet-5",
@@ -4334,6 +6139,11 @@
   "src_sha256": "9da19bab339b8385d21950bf4fcaf757d02e0724c1295ba9a2d2434c87829856",
   "translated_at": "2026-09-07T14:00:29+00:00"
  },
+ "pt": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "ac3965fc209ec3ee4f88623049de372f87a8b4ad4a84cd30e2bbea6bb96218a7",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "pubg-battlegrounds": {
   "engine": "claude-sonnet-5",
   "src_sha256": "5240adf00906be8c180fe58b25ebcdec4c6e3cc8f7a4927cf2d9effd499acb3b",
@@ -4343,6 +6153,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "ab745cbfa8491ff49ba42f7efd5d45bae68d5c0ea31aa2c3991f91c1898502a7",
   "translated_at": "2026-09-07T14:15:10+00:00"
+ },
+ "punch-club": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "a93b06a33e9224d9b81dd5e30d703d45f8e07411ab5cbc6555b5fe767de1c489",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "pyre": {
   "engine": "claude-sonnet-5",
@@ -4358,6 +6173,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "627eea5246b2fcb36655a6fce33c8f1530f6841905a3c7bf2322017e8a08eccf",
   "translated_at": "2026-09-07T13:53:38+00:00"
+ },
+ "quake-champions": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "78c8b188a9c0aa8d008e6e5f91f26a4d6c9d3451ed3caacda243bf343a0bd77c",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "quake-ii": {
   "engine": "claude-sonnet-5",
@@ -4394,6 +6214,11 @@
   "src_sha256": "87a3ef688db905b4b67f95d48c7fb8ac779fa70dee0f9927afb5609fe0737351",
   "translated_at": "2026-09-07T13:53:38+00:00"
  },
+ "rain-world": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "b82cabbfde2e224965a35e8f5bbff077d9a33491d66133e25632024f0d43a160",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "rainbow-six-siege": {
   "engine": "claude-sonnet-5",
   "src_sha256": "f15265d03db842e32cbe5467473ef91e7b82e97a95484200766608d5e72f8f80",
@@ -4424,10 +6249,25 @@
   "src_sha256": "19fb0795235a849a231457832d56dcbdd397e89b3184c250b50b5c29e67f9c1e",
   "translated_at": "2026-09-07T14:02:53+00:00"
  },
+ "ratchet-clank-into-the-nexus": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "bd9b4159835c70e1def0d9a258bd5246f5a75430384b6043946aea6828e280fb",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "ratchet-clank-size-matters": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "4bf3e7c9dd00f9cb761d4119b821dc8426bdb41bdbf63df3164166c167a6f1b8",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "ratchet-clank-up-your-arsenal": {
   "engine": "claude-sonnet-5",
   "src_sha256": "ec2374e60b8323d398016a9f1bab00f95859ff090d042bdcda75ea03a0a6b02c",
   "translated_at": "2026-09-07T14:00:29+00:00"
+ },
+ "ratchet-deadlocked": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "a6ac53f1b4ba0cf3e388ee737e88cb2efd4220195325c671688064a7ffe56337",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "rayman": {
   "engine": "claude-sonnet-5",
@@ -4449,6 +6289,26 @@
   "src_sha256": "4d86240e92ebf1a788631bb23dfa833b9878dd05a8820c44b34086fea1c3826c",
   "translated_at": "2026-09-07T13:37:02+00:00"
  },
+ "rayman-raving-rabbids": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "599b14e4f78941d4ab67d679a87040f683b97157f932d45e9103d2f97274c527",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "re-volt": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "41baceefda5b49dd924a714080b2465ecbcd77dbdad7a7c9b422016f37aa7d0d",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "ready-or-not": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "a955551049101983bea6219788afe0c9903c3057baba767bd6934e0207355b0a",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "reanimal": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "418b0528c68ac0a57ce65f8768baf9746a7e6d8eb72972d90fa77af669a3cdb2",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "red-dead-redemption": {
   "engine": "claude-sonnet-5",
   "src_sha256": "eb38a16756c417c4eee6c39aec48216d2db74101f6aa4b8c237b1e4c99d5f197",
@@ -4459,15 +6319,30 @@
   "src_sha256": "2abe098ac3332bd9674fcf48b613e82042f7b2c77a8ed37756978b7533c340de",
   "translated_at": "2026-09-07T13:17:43+00:00"
  },
+ "red-dead-revolver": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "3a8fe3e7ceb77d5c1f37eb126bb266b48ffc8022cc3ad287da0fd11482e70b9d",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "red-faction": {
   "engine": "claude-sonnet-5",
   "src_sha256": "cd1595dc7b554cc76b4a23d7660adb0f11f47aae2a60575e8c7e3d1e47bc02ea",
   "translated_at": "2026-09-07T14:09:34+00:00"
  },
+ "red-faction-armageddon": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "d07e5c0fbe54534e8c423413d5736fd07fefe35455b949fe86fd3ca5408116c1",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "red-faction-guerrilla": {
   "engine": "claude-sonnet-5",
   "src_sha256": "2e5eb086f0259c0b9bd718a34417b671b33d16fca3a05869ebb4a54b04018e48",
   "translated_at": "2026-09-07T14:07:55+00:00"
+ },
+ "reigns": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "56155879860736624445e3701d3f03022ff3fd0a17926a053d8a7d16eee1c123",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "remember-me": {
   "engine": "claude-sonnet-5",
@@ -4478,6 +6353,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "6779f508c30ba79da5d2b81e85f3c00272cb7ed6e62121555a63a63a8cba959e",
   "translated_at": "2026-09-07T13:42:31+00:00"
+ },
+ "remnant-ii": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "1c8927b16ec28f11ae154776698b9bc5c7be559f3a7c3b70b9a3986032bfbcfa",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "repo": {
   "engine": "claude-sonnet-5",
@@ -4514,6 +6394,11 @@
   "src_sha256": "a2a49737041c145c5a0bc19e16edba3c0552d3fc30162a06b7a29a693370e8eb",
   "translated_at": "2026-09-07T13:22:34+00:00"
  },
+ "resident-evil-operation-raccoon-city": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "31a7c70a3d6e2415b3693c2a3e4511aa42d129d26d604dedb0980731b18cc9d9",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "resident-evil-requiem": {
   "engine": "claude-sonnet-5",
   "src_sha256": "e7cb9525a3a8f37ac99a9d4d4e2a182732e011974cd6c23ad33c7f7a18ba6db2",
@@ -4534,10 +6419,25 @@
   "src_sha256": "24ef1c0a137771ed8a04776ce8358f28b3bcde859a6403b2e2d1192e6a83315e",
   "translated_at": "2026-09-07T13:29:26+00:00"
  },
+ "resistance-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "8956bc65c1fbe702daf6fce386519f9bbd367c95ff4c499dbfc4ea838d8b74b3",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "resistance-3": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "654f4334cdecddc45baa83adeddb7527b41f7c4f444f09a4fc336c68fef5c3ed",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "resistance-fall-of-man": {
   "engine": "claude-sonnet-5",
   "src_sha256": "de2f5e60d5610d4330715e0ed3a255e6ef68ea72863cd93c345b3d855667a12a",
   "translated_at": "2026-09-07T14:20:57+00:00"
+ },
+ "resogun": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "24960be45c038bcf670a69bcef88b63193242b19822391a9999305297363a367",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "return-of-the-obra-dinn": {
   "engine": "claude-sonnet-5",
@@ -4548,6 +6448,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "5841485467b799b7229374ea7a561ab7cda5987861720cca28682c69088c6d44",
   "translated_at": "2026-09-07T13:37:02+00:00"
+ },
+ "return-to-monkey-island": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "b684a44e259526e1273da0a3229f6a35e93e50cb77b8215fc2054088cbc73f67",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "returnal": {
   "engine": "claude-sonnet-5",
@@ -4579,6 +6484,11 @@
   "src_sha256": "5c67c80abc7a54764adfbe2af8ccdc99ab04687e4ef26d18ffc451eb3ed4cdc7",
   "translated_at": "2026-09-07T14:02:53+00:00"
  },
+ "risen-2-dark-waters": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "8342e89e4e811d137ff3be0b4b1d37c2bf1219bb6d97e0c77600663b02c964f1",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "risk-of-rain": {
   "engine": "claude-sonnet-5",
   "src_sha256": "df5a818a1340dd2469d0fbe4931340579d058e5d1cfcafba4e3c61562a4be657",
@@ -4588,6 +6498,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "16ef69506dba36e5fc10ac7f7f0a88e8b1e4174d51422e251107db54d821fe2e",
   "translated_at": "2026-09-07T13:48:17+00:00"
+ },
+ "riven-the-sequel-to-myst": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "20357800befc9e36be808a6553fc5c12bf05f7fe535d84403d5150924b0cd78e",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "road-96": {
   "engine": "claude-sonnet-5",
@@ -4603,6 +6518,21 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "5d1b99b405d3232e2d7ceb41f12ad10566521d344b0f4dae96725c8a8cdb54ba",
   "translated_at": "2026-09-07T14:15:10+00:00"
+ },
+ "rock-band": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "7471e640a92d2b79083b1c361f4815978009281341d67ec88d873bc0849e8f98",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "rock-band-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "3c3a1ee1ccfb35c10a9daf890a933c2672de20baa512eddc104249233705829c",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "rock-n-roll-racing": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "e1037b7468128866a430ad9b1b794e378e6e939ed8dcedd2b8d088592e71804f",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "rocket-league": {
   "engine": "claude-sonnet-5",
@@ -4624,6 +6554,11 @@
   "src_sha256": "8d8ff8dbe8466cef45e93d3ac43ff32cedd83d659964819d25471da6f8483b3b",
   "translated_at": "2026-09-07T14:07:55+00:00"
  },
+ "rollercoaster-tycoon-3": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "319dc9d0dbb5b71335b79acbcea22a6a178deeee756ece6e14877d7a8e486fd9",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "rome-total-war": {
   "engine": "claude-sonnet-5",
   "src_sha256": "ca985208ac338c5fc9847f05f468373c469ec7ce9ced51dd434e9cc667292c88",
@@ -4644,6 +6579,16 @@
   "src_sha256": "cc0a6188a4613a9c4d19f156c862dad81dfae68bb24a09d1d077bcda24ccec18",
   "translated_at": "2026-09-07T13:48:17+00:00"
  },
+ "rusty-lake-hotel": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "eca2dfcdf4c7f8ee8eba22e43e0d0efe59497df8e95a5749c05e8a693e894ede",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "rusty-lake-roots": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "faa0f1daa3e75bae41971265205cfe30ef15a4b9940351f0054fd6cc0edf3314",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "ryse-son-of-rome": {
   "engine": "claude-sonnet-5",
   "src_sha256": "eab99dc9bf3a38a31d736de4d33b09f60b55042e2531c42ed420e525fa33948f",
@@ -4663,6 +6608,21 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "674cf90550c69d68a14e1bc5ad4faab318fea554d228a014d67db461f2a5e475",
   "translated_at": "2026-09-07T13:37:02+00:00"
+ },
+ "sackboy-a-big-adventure": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "2ba47ba66f14793b1a96f5af94c8e90504a1b9243bde98eb3a6c53887a8b8e5e",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "sacred": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "06f12eab460596dfd286bc590d802bdfd4c2468af2598882a32fc3f729e679f2",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "saints-row": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "5f92328057e406c9d7c5805cd9b08811c81fae2025d1aca0c74ac5bf64bec6c0",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "saints-row-2": {
   "engine": "claude-sonnet-5",
@@ -4689,10 +6649,50 @@
   "src_sha256": "35c7e24fb551683cca743b5d8b7c7a9c19b87d4588c3f9ad18e8c6b973ff84b9",
   "translated_at": "2026-09-07T14:07:55+00:00"
  },
+ "samorost": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "808c38b59285828e7f1d027e87437c7123a5ba220b2e32239696b05423b0c51d",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "samorost-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "2183b934d3b3d5a983b63455f57c631ff7fdddc75b207aba7f92b0df239a8fb2",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "samorost-3": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "cfbee941a88e0a39a4bf21cfc97e688aae1d74c70de073dea1e06bbf124e26d8",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "sanitarium": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "fe86934184dacaf507ed57c82ff8d86c9a31f3d50a9869edbef633c7b89b4981",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "satisfactory": {
   "engine": "claude-sonnet-5",
   "src_sha256": "25f0342b901380d0a0954e1b2ea882ff800301dd28ff385c1f135a65d563c366",
   "translated_at": "2026-09-07T14:00:29+00:00"
+ },
+ "saya-no-uta": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "eee7d2739df89b7694c6cc99bd20fed25c521b97d2c0ae32b2bea9b340e5f440",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "sayonara-wild-hearts": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "dc788eb47b2324d02cfa909dc95b3ea5cb692be453431ebbd6bab9e9f3b7e010",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "scarlet-nexus": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "f742e2ddca8c7bc576a53eacaa18ad9d917246bc0c468c9374a36cf7ea1cb058",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "schedule-i": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "a26a603bf6a2db295f34526f466354982c21c87882b9833bbb018fe40d41929f",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "scorn": {
   "engine": "claude-sonnet-5",
@@ -4759,6 +6759,16 @@
   "src_sha256": "408b50f44080895ed0f7bdb247e1de9c7c47bc7896a4e3bb32b5fbc74b8b6024",
   "translated_at": "2026-09-07T14:00:29+00:00"
  },
+ "shadow-the-hedgehog": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "fe6ff60c9c8d06a882942556d162923e2ceaabd5c3308fb642707f507d16df19",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "shadow-warrior": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "56532f087fdaf96bae555c280262253e581489759a60fd1b137a05a37331c70d",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "shadow-warrior-2": {
   "engine": "claude-sonnet-5",
   "src_sha256": "3b99428f7df4f05553067bc78be66fb4652e6828b9f1d506910fc99e8ac3813d",
@@ -4774,20 +6784,50 @@
   "src_sha256": "6beb39d7c508ceb90eec6c8f6d57ff1ab0e27e4c456395b2d9b62e0f3c18296f",
   "translated_at": "2026-09-07T14:00:29+00:00"
  },
+ "shank": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "0ff4e8cf6a47f3829a6700de11eb6c7552787b5441d5bfeeddec8a16157e37cd",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "shantae-and-the-pirates-curse": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "7e249c8e01ddef4fa807f2e767a5f8bb54167cf91106663682c6caabf9a0873b",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "shenmue": {
   "engine": "claude-sonnet-5",
   "src_sha256": "91232ebf19296bed54d648d6b0b3bef19346ab7e6af67cdb59d930ccf925d1cd",
   "translated_at": "2026-09-07T14:15:10+00:00"
+ },
+ "shenmue-ii": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "1329d845fa150b5b2e2d1c8f1f318a1ad17319329aa7865effedff9f5c9222cd",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "sherlock-holmes-crimes-punishments": {
   "engine": "claude-sonnet-5",
   "src_sha256": "ad520e155c30a30bc8cd294105566d98e2477b7a01591536bf9940d093362f52",
   "translated_at": "2026-09-07T14:00:29+00:00"
  },
+ "sherlock-holmes-the-devils-daughter": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "bc04fbb77bff4dcbe9c0c48c43d685add0999e0cba7221a6a23f74a965cff58f",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "shin-megami-tensei-iv": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "54f4baea9256677937bae49f813f37aa5c5fb0b72d14c77180861a9693f8f98a",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "shovel-knight": {
   "engine": "claude-sonnet-5",
   "src_sha256": "6695e265b062f583c24cfe44286fa6c9443dcfc5d1a96eaf278c46fb254e949f",
   "translated_at": "2026-09-07T13:31:15+00:00"
+ },
+ "shrek-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "891c4831942e3d854c53c3e8042db59aff64f0d487d57f6d51ece6c5abebd864",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "sid-meier-s-civilization-iii": {
   "engine": "claude-sonnet-5",
@@ -4808,6 +6848,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "e68a79a5ca4f5b430f90c497c86e64f501e2b4e082173a83988753db9c258769",
   "translated_at": "2026-09-07T13:48:17+00:00"
+ },
+ "sid-meiers-civilization-beyond-earth": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "73f2701bd8c5a33ac477297a69e776338a11afa55dbbde26ff71a671f256ee01",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "sid-meiers-civilization-ii": {
   "engine": "claude-sonnet-5",
@@ -4849,6 +6894,16 @@
   "src_sha256": "6cea7a2393301a29a78eb83b1b03044d73cf1d7edd34d4ad0d23ca52713a1895",
   "translated_at": "2026-09-07T13:48:17+00:00"
  },
+ "silent-hill-downpour": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "ce0016cedf36695f4304f7f7738b6d63637c89c8e2255c9ca13f777694e8e5d7",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "silent-hill-f": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "8beb058a660f9fc5a1cf876e56207be1c3a720cda9560da6612918bb901ae29b",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "silent-hill-homecoming": {
   "engine": "claude-sonnet-5",
   "src_sha256": "244d5da4f192041d230e92e8775107a20f25e3694b61fbf760c7baf6960b91d4",
@@ -4858,6 +6913,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "c7822d09c99e130242ccfb0f6188a8a9a061728615abf9a7a5e13f0fbe2d0f03",
   "translated_at": "2026-09-07T14:20:57+00:00"
+ },
+ "silent-hill-shattered-memories": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "cf27aa93f56cb2e4c6cb182caaf85757f2847c80bea8881b96f72ad3c2007bbb",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "simcity": {
   "engine": "claude-sonnet-5",
@@ -4894,6 +6954,11 @@
   "src_sha256": "2f5ee8afc3d77ac7cfed1ec2b8eb7676eea98ee138050facba1a1bef91e6a76e",
   "translated_at": "2026-09-07T14:15:10+00:00"
  },
+ "skullgirls": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "0a18a88a6997ad2b9a1b89296723ae0d8385b20574d6b3b7aa40022afb70aa8d",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "slay-the-spire": {
   "engine": "claude-sonnet-5",
   "src_sha256": "7d5cf94ff6826e2c43e97f05caebf20d9a597decc36b5acc62218eebf4830138",
@@ -4914,15 +6979,30 @@
   "src_sha256": "a856efe8bab6a819f94478cbd79df92605b9c2e1a70e03b942eb3d249fac4216",
   "translated_at": "2026-09-07T14:09:34+00:00"
  },
+ "sly-3-honor-among-thieves": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "2eae845f129cc4662b0cbd6271dcb5c01b77358bbc19c2393f41147b9af10240",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "sly-cooper-and-the-thievius-raccoonus": {
   "engine": "claude-sonnet-5",
   "src_sha256": "9b0f99d98082f94c3644e1605cf95b0748bf367c012b21d48f8a8e7738a71d81",
   "translated_at": "2026-09-07T14:07:55+00:00"
  },
+ "sly-cooper-thieves-in-time": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "64f62e37a19369479a3f2f8644e24b0a3db5ea80c12e29232d3770a0c7f539d1",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "smite": {
   "engine": "claude-sonnet-5",
   "src_sha256": "96bc8202c3d537f349b4310cee98c0b1e5871f42f7e5b6fa4925250724c3dac8",
   "translated_at": "2026-09-07T14:00:29+00:00"
+ },
+ "sniper-elite": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "ce6f23961c446893d85f4be6dec273533310dfcd81d48d24263fee9b54701f43",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "sniper-elite-4": {
   "engine": "claude-sonnet-5",
@@ -4939,6 +7019,16 @@
   "src_sha256": "98dbdcbeadc6695f599b9a03ae5c4de8056aaa28b0e58f3ffc5ec09216aaa31c",
   "translated_at": "2026-09-07T13:53:38+00:00"
  },
+ "sniper-ghost-warrior": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "ad88d8a2644b0b79fd3d33791b345ffc0ff18476047fdc5f7a98a3e75e752de0",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "sniper-ghost-warrior-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "67bd2b411214a1cafb7bde304adf98df0fd6067a474ff615d5449b0e8ebd3c45",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "soldier-of-fortune": {
   "engine": "claude-sonnet-5",
   "src_sha256": "f64d27f9e67a08daf7cc5012834afef8d67467f23850fd8cf2be94a7be655e9a",
@@ -4948,6 +7038,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "a4b40dbc9dcccf26eb8345cfa6c91ea50d98434748b925303db680061d979326",
   "translated_at": "2026-09-07T13:29:26+00:00"
+ },
+ "sonic-3d-blast": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "51153d1cc69d4b29811a37ccf9eb587fb496faf6e6dcd36b43953dd555dc0a7a",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "sonic-advance": {
   "engine": "claude-sonnet-5",
@@ -4974,6 +7069,21 @@
   "src_sha256": "21dff0f41dd28e62e845c768dadaf2429b45cd02b0fff094b50d74776b78f779",
   "translated_at": "2026-09-07T14:07:55+00:00"
  },
+ "sonic-colors": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "61a90c9a519415bbe118bd8c886193f6c95295705a336c5324f2cdf711a3c3ee",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "sonic-forces": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "527ca3b7176bb6d7d0fc5e0996246635d6be510011ca933eb765ff7f9d51f23e",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "sonic-frontiers": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "570c0c4487c80cd059a93ad97b5683ec056fad79e4a0e38479735df680f55022",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "sonic-generations": {
   "engine": "claude-sonnet-5",
   "src_sha256": "b1c16bed9cd5b8d816c0f0e05409f8c4ef8ce67591ded9ad437448469e84f9e6",
@@ -4988,6 +7098,16 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "2266150bce03996e9679da1e2a8747ed9ded88ec472175deed13e0ff48ad907a",
   "translated_at": "2026-09-07T13:42:31+00:00"
+ },
+ "sonic-riders": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "5b10cd6ca9e32c214e9c80ea10d24460aaa6308850d73e0b45b4b5501435d8c8",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "sonic-rush": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "cb5f9fbd050f09821e8c472eeda4bfdb06501dad646d625e1889f2f4b12d7f53",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "sonic-the-hedgehog": {
   "engine": "claude-sonnet-5",
@@ -5004,10 +7124,20 @@
   "src_sha256": "ca4464fa6211251d2794bf20c147ffe32d6d5bca40e30f5076fcc24230a3060f",
   "translated_at": "2026-09-07T13:48:17+00:00"
  },
+ "sonic-the-hedgehog-473de878-5a9f-402e-a282-86a7460fc1d2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "baf05c552855d85b4dfcd3e9faad4257201cd55af1bc28a60803c3994ecf83c8",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "sonic-unleashed": {
   "engine": "claude-sonnet-5",
   "src_sha256": "ff7f9b0cc87b3dc42eef7e2b3665d2afa9bd0b423b238d9f652a78662e18e85f",
   "translated_at": "2026-09-07T14:15:10+00:00"
+ },
+ "sons-of-the-forest": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "03e0850004efac6005607f05241e39da8091d01c1f3021f4d04ac6d3b86756bb",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "soulcalibur": {
   "engine": "claude-sonnet-5",
@@ -5023,6 +7153,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "3b6f10d40ef73c9c77628c2a9bbde2a0a36a51f73dbe507125a66a19bd3b2446",
   "translated_at": "2026-09-07T14:20:57+00:00"
+ },
+ "soulcalibur-v": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "8d7e5f2d6fe0f037b21ac826ebd63c757d400d0231bb7993c9df265240cb5fe0",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "soulcalibur-vi": {
   "engine": "claude-sonnet-5",
@@ -5049,6 +7184,11 @@
   "src_sha256": "6b97a0de917c93b374d73bcc48f85f2cf82cd6ab9d5ea89a71f61dd80799426c",
   "translated_at": "2026-09-07T13:22:34+00:00"
  },
+ "speedrunners": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "1d321e697585298591ff9713f76f28259911788b76847c1aafef7a73c24f13e5",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "spider-man-1": {
   "engine": "claude-sonnet-5",
   "src_sha256": "51904f7bdb40ca339e0d83fe1498a5325b10c0e98dac612a4ff85b1742a6c1db",
@@ -5058,6 +7198,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "ae37aeb4e9ac80d60a1455cf0ebb0f1287c7c5e6f753e412c761a4130668371f",
   "translated_at": "2026-09-07T13:48:17+00:00"
+ },
+ "spider-man-2-enter-electro": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "f30fbc48b554c140de416b006b2599f52b5e8741bce6ec463ad6a9f02327c32f",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "spider-man-3": {
   "engine": "claude-sonnet-5",
@@ -5094,10 +7239,20 @@
   "src_sha256": "464b23d79bdd59d2548ba5b94553d521f43d4895c9697e34f56b8b8134241226",
   "translated_at": "2026-09-07T13:55:12+00:00"
  },
+ "splatoon-3": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "221f69724d3e289b610a8c801a6124f4e9f27e015ff5e6bf5764192518efb914",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "split-fiction": {
   "engine": "claude-sonnet-5",
   "src_sha256": "1fb1e5ad7da5f0b4bb76c429c46f257e9df09b7ef347e4fe91ee809773bdddd9",
   "translated_at": "2026-09-07T13:53:38+00:00"
+ },
+ "split-second": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "c4030fba59bcd79680ccfdc852fec43bc48397dfdcf87c421c3cf5d130ceb9a0",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "spongebob-squarepants-battle-for-bikini-bottom": {
   "engine": "claude-sonnet-5",
@@ -5124,10 +7279,30 @@
   "src_sha256": "5601932c681fe8a210b434ae6660a3c1fb39b682ba3feceefadd87c78ad391c0",
   "translated_at": "2026-09-07T13:55:12+00:00"
  },
+ "squad": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "2eae412745d4d99cb5606495724ef25d0071ac0d03213b7a3c13f48f2277a792",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "ssx-3": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "73923bb78fda8e28caea13e10faf9cee3651edaaa7a20e3b690a1fa6d0bd5a77",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "stalker-2-heart-of-chornobyl": {
   "engine": "claude-sonnet-5",
   "src_sha256": "a026a0cca9f822341a6a7ee34bd28130db885123a2e3175d2b78de34cf811ace",
   "translated_at": "2026-09-07T14:15:10+00:00"
+ },
+ "stalzone": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "4384061620973c6aa4a1dc126cfe1cefe0c23c984d554b70486c341830b05ad8",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "star-citizen": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "bc03040e9ebf0f746852a82b9208b46ab30819d9c430cd71cb9b5f67e5d714fa",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "star-fox-64": {
   "engine": "claude-sonnet-5",
@@ -5159,15 +7334,35 @@
   "src_sha256": "a52a407687965bc14a6433d7dcc62814f788be994ef40ea21bebfcd83a420931",
   "translated_at": "2026-09-07T14:07:55+00:00"
  },
+ "star-wars-empire-at-war": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "96407184174ce2336c5eb9384ba34a93161d874e05f51514a6964f34023d8c71",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "star-wars-episode-i-racer": {
   "engine": "claude-sonnet-5",
   "src_sha256": "fe20af2ec9374eb67cedea01d8934696bca71134f97bd77d318b56bcbe496104",
   "translated_at": "2026-09-07T14:00:29+00:00"
  },
+ "star-wars-episode-i-the-phantom-menace": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "4e79c61e1cbd92c8687ba7d7127aa66000cb42e9d4210901c04e48b70438e26b",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "star-wars-episode-iii-revenge-of-the-sith": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "6bbe0033118d8984d71c5b1d150a10432f6b305f24e8c3487b65e80101dfd47f",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "star-wars-jedi-fallen-order": {
   "engine": "claude-sonnet-5",
   "src_sha256": "189c10bf886d6daedfb808543adca1d4ac3c70319b30a2449acb82ee38f1d0fd",
   "translated_at": "2026-09-07T13:22:34+00:00"
+ },
+ "star-wars-jedi-knight-dark-forces-ii": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "86033b151324bb740fd2fabb1434dd024e993e20748f9cdc315efd3460dc5f8f",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "star-wars-jedi-knight-ii-jedi-outcast": {
   "engine": "claude-sonnet-5",
@@ -5194,6 +7389,11 @@
   "src_sha256": "592f9500dbcec23e5be6aa0debae8bd26221024f0d686fafd2ca293f5e03fae4",
   "translated_at": "2026-09-07T13:29:26+00:00"
  },
+ "star-wars-outlaws": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "42e07c6726d8222eee5d9ad85d441eebf9047937f2efc96dbe20eee6b66a3659",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "star-wars-republic-commando": {
   "engine": "claude-sonnet-5",
   "src_sha256": "4447656f9941bddb82dca00cfc877aab0d198bc86e91bdf404fb18522135e848",
@@ -5203,6 +7403,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "ec27fceb403cf45f591efbcaa43aca911d9142f1e84e44fc56a1f6965358bd48",
   "translated_at": "2026-09-07T14:20:57+00:00"
+ },
+ "star-wars-shadows-of-the-empire": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "a849e67283e16abff429405e8c6447dbeedafa3eecb3b4db063492f0cd86502e",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "star-wars-squadrons": {
   "engine": "claude-sonnet-5",
@@ -5269,6 +7474,11 @@
   "src_sha256": "0d17c6b314305133ff67a39d348c8aa19b45718d403f9cd70ba98b7cef3ffc0c",
   "translated_at": "2026-09-07T14:00:29+00:00"
  },
+ "steamworld-heist": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "8564283c0a052ba2ed9626e26585d0e72d45066137b84e981156c078bf4b36bd",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "steep": {
   "engine": "claude-sonnet-5",
   "src_sha256": "e2fd78669d22b128a1d0f4e9783d11583ef6fbd6f682ac0a3c294ef346f3c185",
@@ -5294,10 +7504,45 @@
   "src_sha256": "413ce1e08a43b0f5d649b8c6149762c6eee09dbe19e9cf74ac4f186ad7bab043",
   "translated_at": "2026-09-07T14:20:57+00:00"
  },
+ "still-life": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "82699dbc437ac4e7e8643e61dd8d8bcd8d48b8dd38b295dee5839f2f120cafa1",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "still-wakes-the-deep": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "5bb961fc9424e0272bba0649434d0b8502d8069a10792822e7892393051296fa",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "stories-the-path-of-destinies": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "1891b5e82f36bb3520c541b61f73722c7a13ec5c4c3fe6dc4b570a9c6f0f2c80",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "stories-untold": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "2113d9b25a3a7fa278eb14efe593c52420079d439224894e7e00efa1cf5f49d5",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "stranglehold": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "b6a4e57a7ec40660e611863de21d47f003c409ec6d1072be81c341b276b0a58a",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "stray": {
   "engine": "claude-sonnet-5",
   "src_sha256": "ef2dc2e53aa738772a7905442c109540841a66edb4fbf19acc3f37f6dff6cc4d",
   "translated_at": "2026-09-07T13:29:26+00:00"
+ },
+ "street-fighter": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "4f28a09fb36990ab2f09674426626ae6e851018d7f735a7556743030b435e155",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "street-fighter-6": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "40404f63e3b289f5f282327a9bd3f1770be8809f7226c8e23b72ac3c30bcf09f",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "street-fighter-iv": {
   "engine": "claude-sonnet-5",
@@ -5308,6 +7553,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "4aad73e108d727ddf8482099e3b13442df2818abecaa72579b90cc96fe698415",
   "translated_at": "2026-09-07T14:02:53+00:00"
+ },
+ "street-fighter-x-tekken": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "8cd8fb837bed5268eb07ec7fc1c1ec896e4c4f1723fe389084be8dbb74c857a0",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "streets-of-rage": {
   "engine": "claude-sonnet-5",
@@ -5324,6 +7574,11 @@
   "src_sha256": "1ac5db9c856e7d83987f1a23417b0e4467828762573ac4e29c6d2f5e9a7156ee",
   "translated_at": "2026-09-07T14:00:29+00:00"
  },
+ "strider": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "2b149327ad589d4035ba330f6e369a451ece4dc5144d9686d817e32f9a85b518",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "stronghold": {
   "engine": "claude-sonnet-5",
   "src_sha256": "55ef23eba7f122e4b7c7843dd3ef61834910681e7d608310a8b09fc01d69dc4f",
@@ -5333,6 +7588,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "876c0a2bcac142d7edf9fb98556b3af2b080da7acfbc430958a6a1a0d2d892ea",
   "translated_at": "2026-09-07T14:02:53+00:00"
+ },
+ "styx-master-of-shadows": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "75eb1202fa2b75f136fa010c85e389c11405d3ed5ea6117a0c73e559de6cccd9",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "subnautica": {
   "engine": "claude-sonnet-5",
@@ -5344,10 +7604,40 @@
   "src_sha256": "714bfe0c581cf5bbfc8a9e6e1b7e788ff96d2e46c019cd84368485146e9af70c",
   "translated_at": "2026-09-07T14:15:10+00:00"
  },
+ "suikoden": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "597f16d4fb96e02146c345599b46b107cb2bdca6c1bb994b04e3bb59b5e4b221",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "suikoden-ii": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "2a62c76a7070b6072d28eb8692b1ddc9c9b435a412b83d2b97ec19635ccffeb5",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "sunflower-land": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "e5e28699c055fd44ffd5c30cedb0aa4cd2699a52ff9933ae0e147e2a843d2902",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "sunless-sea": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "1108686e949734602b28af820df8533c65daaffa306c67bf87de8f3310fb4542",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "sunset-overdrive": {
   "engine": "claude-sonnet-5",
   "src_sha256": "4bf38670305f91b1becfa742da227b11b9a6329761ed8a10a47c60548f5bc22a",
   "translated_at": "2026-09-07T14:02:53+00:00"
+ },
+ "super-contra": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "4c48c96ff29d0b8bbfb184f810513e12fde71608a6e66fa6b495890ced49177d",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "super-ghoulsn-ghosts": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "eef87db82c44ea436ac7b205cfa9113fe3a1cb16fecf9d3fefdda08b194b2f6c",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "super-hexagon": {
   "engine": "claude-sonnet-5",
@@ -5489,15 +7779,35 @@
   "src_sha256": "8c2100f06ae3aeb77a53099612d96a1f9182d3ec8b9fd3d8875e1290ecc16134",
   "translated_at": "2026-09-07T13:22:34+00:00"
  },
+ "superbrothers-sword-sworcery-ep": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "59fcbae48073592c1054f3813919ef9527f17763bfdf2d2480ba91f1b7e92058",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "superhot": {
   "engine": "claude-sonnet-5",
   "src_sha256": "d19a22f3e1fd1556caebf00343c3d2c5e7a0b96cbe8f0fe8f386b37e61df710b",
   "translated_at": "2026-09-07T13:31:15+00:00"
  },
+ "superhot-mind-control-delete": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "df88285f1d3c65d9df988af8802061c31d7850952b52e5ab3d2c1971474226e9",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "superliminal": {
   "engine": "claude-sonnet-5",
   "src_sha256": "cdc581e162892666babe19994a8936724493d6f403547acdeb9dffe2db3dd786",
   "translated_at": "2026-09-07T13:48:17+00:00"
+ },
+ "supermarket-simulator-3": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "e3cb850f9fb90eb3a12b8411f7884bb3ceae68eff7dcba7fa1e12292ec8f6407",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "surviving-mars": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "8f9134ce0a56d31c86d2bd9c373e0b1ce1ca9a2da0f2f68f15424ad08362af84",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "swat-4": {
   "engine": "claude-sonnet-5",
@@ -5519,10 +7829,30 @@
   "src_sha256": "0a7b6aae7b393ce41d72547058ff9cab7cb43d4a31510f6b33f44b67248e84cb",
   "translated_at": "2026-09-07T14:15:10+00:00"
  },
+ "syphon-filter": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "54b8be2fc83d5d8558c39f6b5f1bcaae8c68864dd894896c8808bdf01714354c",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "syphon-filter-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "ef71fd08cce2d230c6427a6bac5e7079c17864a2cc2bf01a4b3d77dd79ab16d0",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "system-shock": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "512f1b262be7acac2cbffbf8854d556c7b39bb8fe4586b5ee37c5a21c3025085",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "system-shock-2": {
   "engine": "claude-sonnet-5",
   "src_sha256": "3474eab718ac37329aae6c4b9d9b0753c7fe5f3ea28167411ab96197e2022e41",
   "translated_at": "2026-09-07T13:42:31+00:00"
+ },
+ "tabletop-simulator": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "4425a6e6855665e7ef2d330fadcd27b01b9c6be0ab7794a9d3be6febf13c77a0",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "tacoma": {
   "engine": "claude-sonnet-5",
@@ -5539,10 +7869,25 @@
   "src_sha256": "b43ccbbbc340c23ce9a1518e075b7144db12a7d52b823a8cca1633719f31f09a",
   "translated_at": "2026-09-07T13:29:26+00:00"
  },
+ "tales-of-arise": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "822e627f7eb35d26812510c0e70bf5910b00145c0340333c763022e1dc4cb471",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "tales-of-berseria": {
   "engine": "claude-sonnet-5",
   "src_sha256": "e5dc2ef91877316c6ae618d0a9d70714900cd97bbeb29bda34071ec3f40487db",
   "translated_at": "2026-09-07T14:15:10+00:00"
+ },
+ "tales-of-monkey-island": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "55cde4de8918715d0d10ee10a002ebe44c1396c1f34d4e69fa6bedae459a1c3e",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "tales-of-zestiria": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "4031541c1af55e1129417075fd7595893025ed2d7e3cfd0a6b52d1d62c58494c",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "team-fortress-2": {
   "engine": "claude-sonnet-5",
@@ -5553,6 +7898,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "5c95228da756d90190ec5993c72e563ec2f37c1081d82a62bcb321eb60a94a85",
   "translated_at": "2026-09-07T14:20:57+00:00"
+ },
+ "teenage-mutant-ninja-turtles": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "e05407624f822901e9fd1ddf3711e2ebb8fc1470793d7fdd197bb393bb13dad8",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "teenage-mutant-ninja-turtles-shredders-revenge": {
   "engine": "claude-sonnet-5",
@@ -5574,10 +7924,55 @@
   "src_sha256": "e3b593aaf9d01e6fd19181d3210c29a7021b1bf5d7a56ba265566d37fce8a9a5",
   "translated_at": "2026-09-07T14:15:10+00:00"
  },
+ "tera": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "f1ae9eaabe56226f05179997dfedd55d49ff61e800a0011fb55bb09ffa7165a8",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "terraria": {
   "engine": "claude-sonnet-5",
   "src_sha256": "f9f3f814523ad19e1841fbcd439108890086255b225759db4fe23b29619aed17",
   "translated_at": "2026-09-07T13:22:34+00:00"
+ },
+ "test-drive-unlimited": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "ec7b47d7bf409afc39d818cf2a96def4f0a4f322e381885e6b16513214ed68cc",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "test-drive-unlimited-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "2d7707131394a450acf76e3463a7f00dfa0b1f3b7f43017c5cc0adec6321ff49",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "tetris-99": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "4dcff9166a57670edef551819b0b8806d3b18107be2aca50fa29008bbd8fe941",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "tetris-effect": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "3d4cf4a7756153a98e641839ea11a81c8d6d936ff8b6394c71459ed9a15e6ee3",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "the-alters": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "2995826ba37c53fa201affd7f0eaf955d6393d3857c006910b78ab4a1ce75142",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "the-amazing-spider-man": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "2ecf10fb5e68bf514488e7f6776dcc295f5242edeb348989ce577e9bd03f9486",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "the-amazing-spider-man-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "eba70380d76ae491bc9582e6be7abe50fc75a68d0e8a50423abb1db30c7d68b2",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "the-ascent": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "bfe4bf20f783bccfeaa7d572b2e4a7c05ae1dc5109b78ae9bc24419e83d3da55",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "the-banner-saga": {
   "engine": "claude-sonnet-5",
@@ -5599,15 +7994,40 @@
   "src_sha256": "8ee3521ade8d49fe953f1f30cc3c20f57702bfdd10fe5051b37486c52db2ad92",
   "translated_at": "2026-09-07T13:37:02+00:00"
  },
+ "the-bridge": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "be2cdd372dca358e2f24d3d716eac501f98e1134c2ea0e7c5e00a1abc5be3f0a",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "the-bureau-xcom-declassified": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "0fbea349c99967eb398fddcb6341702c90fa7b45267123955bd314683b55830e",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "the-callisto-protocol": {
   "engine": "claude-sonnet-5",
   "src_sha256": "bdb1dfa856c1c99005692ab8c5b8c06e3187cb2a479e013ffa065d0391047f04",
   "translated_at": "2026-09-07T14:07:55+00:00"
  },
+ "the-case-of-the-golden-idol": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "27c4c39c813a9321b6a5be17852c21e2aa7002b79dc022c285a5991aa32d3900",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "the-cat-lady": {
   "engine": "claude-sonnet-5",
   "src_sha256": "e3e1765149fae59d009392edb06145931f4e8746626bda7b3fa77b45f5c0f387",
   "translated_at": "2026-09-07T14:07:55+00:00"
+ },
+ "the-cave": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "f4a0477dd764aeb7aea102d8ae72deb9a588844992e772ac11c36e198a0dee79",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "the-chronicles-of-riddick-assault-on-dark-athena": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "da280a308e1e42eba8f08318acf75d08cffdc30334faad2fda63f5caf9c6e4ab",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "the-chronicles-of-riddick-escape-from-butcher-bay": {
   "engine": "claude-sonnet-5",
@@ -5644,10 +8064,30 @@
   "src_sha256": "c01b8db12745b7a51da8c9c37ada99256c684114c96a8972492158c26bbd3ece",
   "translated_at": "2026-09-07T13:48:17+00:00"
  },
+ "the-dark-pictures-anthology-the-devil-in-me": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "8bdd512addc3dd5cc30afe95f519b8819e41aaf31d331a9d5171056daec8fcae",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "the-darkness": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "ea96fe06e21731a1c4ea2010a445d5ac735344c6357e54cbc43474f77b22a3d6",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "the-darkness-ii": {
   "engine": "claude-sonnet-5",
   "src_sha256": "2554a671e8cb95d7e39237ee35d4ae1b9c4d1381de28917d7d676605c4dd873f",
   "translated_at": "2026-09-07T13:48:17+00:00"
+ },
+ "the-dig": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "dce4e8299b6db69645d28de2a7b1a07811289e3f037988192ec606d01ffc77f9",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "the-elder-scrolls-ii-daggerfall": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "d647b3df4980525e21017e7fd5abd4f683a07671744fcd32756257d73c03b98b",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "the-elder-scrolls-iii-morrowind": {
   "engine": "claude-sonnet-5",
@@ -5669,6 +8109,16 @@
   "src_sha256": "daabc23ecacedc173bdd6a404fe0a0b33bc474d41f1d00f385cefc60c5ccc478",
   "translated_at": "2026-09-07T13:17:43+00:00"
  },
+ "the-escapists": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "7fb8e34cbeeef2583bdeb74dd637dd79c6b193582cbbf7a667fa1c046ce69c52",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "the-escapists-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "c29afd250538eae584df8c1419c06b0d326c9452204ccbf231d8cf601443a73a",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "the-evil-within": {
   "engine": "claude-sonnet-5",
   "src_sha256": "272fb73fb5aab5dfc0b21012706bc366d3983d482baf4f419d20532bb414a592",
@@ -5684,6 +8134,11 @@
   "src_sha256": "f6c2ef4f6e5970faaa262be9d42fae7ce205a3d5b5786d4c113f016a3d59e9bd",
   "translated_at": "2026-09-07T13:48:17+00:00"
  },
+ "the-first-descendant": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "3386213196c3c6163dc759d5c8fa9ae7abb77ccb0b37eeff7e95474c9d8543ce",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "the-forest": {
   "engine": "claude-sonnet-5",
   "src_sha256": "dec66a4d53a9db097c67a8d71d3d4dcc32e64b53304b7ebfb5fef3e5b752be39",
@@ -5694,10 +8149,30 @@
   "src_sha256": "6a5c9445ca719a4b29229bcd0938b3986566c949318fa7475108d7df05e20f6f",
   "translated_at": "2026-09-07T14:07:55+00:00"
  },
+ "the-gardens-between": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "1b965d0e008d9edabf1291887cce17a7c04fc1fc36a010df25bba60030df2f81",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "the-godfather-1": {
   "engine": "claude-sonnet-5",
   "src_sha256": "f0c036ce5ee49ed928f07ce3d70cd30e84a96387e521d0bc8cfb5d40be869187",
   "translated_at": "2026-09-07T14:15:10+00:00"
+ },
+ "the-godfather-ii": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "450a5231c3257396c5c5ac81d805591b032a189691761fda4c84f663330c9a64",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "the-invincible": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "5e751fffbd80471ef4e9de03083814ab48fd0e1ba3ad1723b0369d4c0492eada",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "the-jackbox-party-pack-3": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "e7cc0ce26eda9946d00291fd28ef6b43d22435472b5b995f25cdd199660db388",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "the-last-guardian": {
   "engine": "claude-sonnet-5",
@@ -5713,6 +8188,16 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "bb7c60c38d3148d9a4c9696624cded6b1b9fe4e56af113fec38bd6d3e63dc924",
   "translated_at": "2026-09-07T13:17:43+00:00"
+ },
+ "the-legend-of-dragoon": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "906aa23b5d5ae484866a271e134d161348dc66c04c29194b2487cecdcf144e95",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "the-legend-of-heroes-trails-in-the-sky": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "bd6d82a7baf7cee0d231c8c5e97b16d61ce3e26e30094bf5215f6f82ce788e76",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "the-legend-of-zelda": {
   "engine": "claude-sonnet-5",
@@ -5733,6 +8218,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "a853a86e0f3b486349d52cc4ccfd47acd2b91b6fe8a37e32cc53d74dbb32c45d",
   "translated_at": "2026-09-07T13:17:43+00:00"
+ },
+ "the-legend-of-zelda-echoes-of-wisdom": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "b0aac986e89259529f04f82d7e63d1de6f16e6bfe1b2771506d436185fba4fae",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "the-legend-of-zelda-links-awakening": {
   "engine": "claude-sonnet-5",
@@ -5784,6 +8274,11 @@
   "src_sha256": "27f2df79d159d56d21d381d65c0fdedfcf1e4d73b6d567dc5a1d2640d9adf358",
   "translated_at": "2026-09-07T13:37:02+00:00"
  },
+ "the-lego-movie-videogame": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "37819e02001cb16d084be7774d785b6cbd3b0bf4782b9125f41cac56d71a9158",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "the-lion-king": {
   "engine": "claude-sonnet-5",
   "src_sha256": "a12b52e37ef8a0116c66a09d9794932d1206c6a63f02a43567f007c4e1d9817c",
@@ -5798,6 +8293,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "0c9620f7e55658e881a54f82ea4ab7164b83aa1f221da663262855fa4d2078a2",
   "translated_at": "2026-09-07T14:00:29+00:00"
+ },
+ "the-lord-of-the-rings-conquest": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "9e4a8dc0a010d09551862f43153d93b28e1db4d7d5ea30279b725468078dcd1c",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "the-lord-of-the-rings-online": {
   "engine": "claude-sonnet-5",
@@ -5829,6 +8329,11 @@
   "src_sha256": "e6fb85519bdcdad735805e012224fed921c9c050983e24aff3473fbf26bf90fe",
   "translated_at": "2026-09-07T14:07:55+00:00"
  },
+ "the-matrix-path-of-neo": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "553ab6415fed3ce226978ceb1de39fcf79467b87c218edf75758bf52250c79ff",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "the-medium": {
   "engine": "claude-sonnet-5",
   "src_sha256": "80857a754fe4619f7ad846f91a780469a092fc04c987d1db106d9f1e34e3f2df",
@@ -5843,6 +8348,16 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "502a884dbe09fb30a80f012ee0a70ad47b03f72acad96f241589771caf22f552",
   "translated_at": "2026-09-07T14:20:57+00:00"
+ },
+ "the-need-for-speed": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "d2d68b2160b2baf3730975e1ba35a5c745076a0294a6b3eadf8c9addf991aa03",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "the-neverhood-1": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "c2ac648ea28fcbe5c25b734f25bd8c5fa5b7fa0cf1076d82bdf9b1e02f7177f5",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "the-operative-no-one-lives-forever": {
   "engine": "claude-sonnet-5",
@@ -5859,15 +8374,30 @@
   "src_sha256": "ddb9c7df34d67ea09c7de2426167f651d79a042600f7c234028b0ebc18bae99c",
   "translated_at": "2026-09-07T13:29:26+00:00"
  },
+ "the-punisher-1": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "cf40b2a945b989f9b1d3fe0c44784d4ac24dfbd6bb67b165211f3e7ab5432e20",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "the-quarry": {
   "engine": "claude-sonnet-5",
   "src_sha256": "8a94f1345de41c6145ff008c55af5b75b3faca129d0e1a8d74baa6bfee1e371d",
   "translated_at": "2026-09-07T13:53:38+00:00"
  },
+ "the-red-strings-club": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "3af0600fe5dfc8cedf10ff1aa69cbc2109af9820f35382f20d68a5bdab128329",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "the-room-1": {
   "engine": "claude-sonnet-5",
   "src_sha256": "08998ea6a9969ee49af2dd9e39a18c64cdc682e572de7fddf06f1d98cd7bbd01",
   "translated_at": "2026-09-07T13:53:38+00:00"
+ },
+ "the-room-three": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "1266ae98c0d5aeea2f36f68d764c2219b2d6b707cf31584dab5ee48cd18b05c2",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "the-room-two": {
   "engine": "claude-sonnet-5",
@@ -5883,6 +8413,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "a16bf6574b93d9be47a46f6f5d5c513956d7bdf802b28ca64fe77dc32e885725",
   "translated_at": "2026-09-07T13:37:02+00:00"
+ },
+ "the-simpsons-game": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "fe05150bb94386f05026816e23a502f97b7d873139bec7002afd334237f0cec9",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "the-simpsons-hit-run": {
   "engine": "claude-sonnet-5",
@@ -5914,6 +8449,16 @@
   "src_sha256": "204a2898e3ccf07463b2ec27d1c14d4810196022c83b2d3acfc150b509e8e900",
   "translated_at": "2026-09-07T14:15:10+00:00"
  },
+ "the-suffering": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "f650a426985736d36831a932cd32d0d926c3c35e2b8d0d94cda2b531b2a82187",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "the-surge": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "cb043ad886e98bfff5dc7c83183519838856bdc5bfcfc0b021e64148f76e3a41",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "the-swapper": {
   "engine": "claude-sonnet-5",
   "src_sha256": "b17782b429b1160358882a70d03a1544295585e97f8cb51a3617ac214d3a1611",
@@ -5923,6 +8468,21 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "78c6bdad4280afa753992afef3e06bfeebb16b6707d089ba31f8623cda3fa7cb",
   "translated_at": "2026-09-07T13:37:02+00:00"
+ },
+ "the-testament-of-sherlock-holmes": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "62b5db7f27025fb853a815cc8cab91aee0a18f3f9132079536d751700f499e46",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "the-turing-test": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "19edbca6b0bb9c7f33f4e0cc50b2a521e5f93ea84ab51f9e6c5ac0148a51883d",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "the-unfinished-swan": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "9fb921d69c72cfe41a738d48e1020e48dd7ad38a45e5562b43a037d29f3a8f8b",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "the-vanishing-of-ethan-carter": {
   "engine": "claude-sonnet-5",
@@ -5979,10 +8539,20 @@
   "src_sha256": "7e1bf105678471b21c84ae3c9d52b82f2506027343c66db19aa7a28b38e19ba1",
   "translated_at": "2026-09-07T13:17:43+00:00"
  },
+ "the-world-ends-with-you": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "7c9f2672e635f9836751659cf80fd94e41ea69ae60c5d5f0c0871e132e58a0e7",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "theme-hospital": {
   "engine": "claude-sonnet-5",
   "src_sha256": "006239e4cbe6d507d2d0a8a042bda937e93fb141fcd7625d4008881a1bb32615",
   "translated_at": "2026-09-07T13:53:38+00:00"
+ },
+ "theme-park": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "14548263b22cdc5569d513013233fcfc734c8d66f97299af8f9b3135a8c161d8",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "thief": {
   "engine": "claude-sonnet-5",
@@ -6024,15 +8594,45 @@
   "src_sha256": "bbf5516f1296927966703306f5a10727066b23e95fc24d85e3897b35552a78ad",
   "translated_at": "2026-09-07T14:00:29+00:00"
  },
+ "thumper": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "a3e0eeceb1611109f7a833206d509e7573a0ef2ff3837e3ea1470f73ac0789cf",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "tibia": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "1b819fb46697543d9d613a95ad45fd1473cf10534abbdfc6b4db5dfe8d32c0be",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "timeshift": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "60560d650a93dbaf511c9b8db2dc3901523a04af9580538635953e6a0e54a78b",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "timesplitters-2": {
   "engine": "claude-sonnet-5",
   "src_sha256": "4756738f0274b96cfcd8469d26269fb0ea5e755594db9c30dbef1f7a4dee30fc",
   "translated_at": "2026-09-07T14:15:10+00:00"
  },
+ "timesplitters-future-perfect": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "5b9cd5946e0883629615dce5d6d849886ecdd29511aced6553d4b3a5c3d49f2d",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "tiny-tinas-wonderlands": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "76acf666185d14eb3a3d01e54910ec8217fa01fe39b4b444679810ed8c2fc73a",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "titan-quest": {
   "engine": "claude-sonnet-5",
   "src_sha256": "c1667e48b0cee19c904d521541698772ba42f26ad9e52952ea8e4c8a04f58487",
   "translated_at": "2026-09-07T14:00:29+00:00"
+ },
+ "titan-souls": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "cb168e14748b97c1b5ce5e951ce691fa87a374076ddee06605bb3e102211ef47",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "titanfall": {
   "engine": "claude-sonnet-5",
@@ -6048,6 +8648,16 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "2f0fbd2711b2b029035ed9ed438fcceacbbfe352fd233630afa92bbd28b5582e",
   "translated_at": "2026-09-07T13:37:02+00:00"
+ },
+ "tom-clancy-s-ghost-recon": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "220dceadbf89bf92956bda78df1b33ea036cb24d369c7626a9691ce45c35cc24",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "tom-clancy-s-ghost-recon-future-soldier": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "863f090d65e1d06481b25c39cc479b928d0b8e72ada2f31fd8c521964adef7d0",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "tom-clancy-s-rainbow-six-vegas": {
   "engine": "claude-sonnet-5",
@@ -6094,6 +8704,11 @@
   "src_sha256": "01f623d3bf34ea68e586dd0683c00dd84d822792e506d4ca92c0acbbe315621e",
   "translated_at": "2026-09-07T13:37:02+00:00"
  },
+ "tom-clancys-ghost-recon-breakpoint": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "3255127ae1d747d2ddc0940d9e8bdd639eaef8c21b14625a2c161fb32923a9b7",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "tom-clancys-ghost-recon-wildlands": {
   "engine": "claude-sonnet-5",
   "src_sha256": "323f29c99f03a162972e61e914ed5768e39de742c9b9d6ec783b92cea6f1c2c1",
@@ -6114,6 +8729,11 @@
   "src_sha256": "1889431bc6324f704f68404d30d215949653b10a6b8323514597a6073de89c93",
   "translated_at": "2026-09-07T13:17:43+00:00"
  },
+ "tomb-raider-chronicles": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "77a74cfb32f48264f66e9abe77c7574b5e1666f8c8f29eeee034ecb533b35521",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "tomb-raider-ii": {
   "engine": "claude-sonnet-5",
   "src_sha256": "f8810bcd61b435b1f9b5e5990f1b20ed5a747a5a5df65fb93da20a0fd39e0390",
@@ -6129,6 +8749,11 @@
   "src_sha256": "b5cbcd7f79d90492971b7a95920bc9e21da4d272a650d5a4be2cd20f13b0147c",
   "translated_at": "2026-09-07T13:42:31+00:00"
  },
+ "tomb-raider-the-angel-of-darkness": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "dea7771f5847b985d4749cc687b180d4347caed497f9863b59c236d37e711a0c",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "tomb-raider-the-last-revelation": {
   "engine": "claude-sonnet-5",
   "src_sha256": "34982750d09a3b39a568eaed450db508b9fcfafe876091f00d327fd2d59adeff",
@@ -6138,6 +8763,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "63cc775eec84aceef2acbeed0e3534aff1e86b89be62471b7e5a4313580ef781",
   "translated_at": "2026-09-07T13:48:17+00:00"
+ },
+ "tony-hawk-s-american-wasteland": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "28b6eacf2b988f8ee7e97d0e7f0af2b5a68c7dde7e884233209b3bd66a7366d8",
+  "translated_at": "2026-09-07T14:26:28+00:00"
  },
  "tony-hawk-s-pro-skater": {
   "engine": "claude-sonnet-5",
@@ -6179,6 +8809,21 @@
   "src_sha256": "c7ab703388ec202c5527e4f9fa3eb2a9c3ebe29f91d7b6aaec55113d29feb208",
   "translated_at": "2026-09-07T13:42:31+00:00"
  },
+ "torment-tides-of-numenera": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "acbf7b78e8a8bfde663d9c3de8d1abf391ca3adfd55219b80fcfb549798c0b35",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "total-overdose": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "0e0ed358d4fdf90d9c773fd517316916134113829d9329ef087fa8dfef691ab8",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "total-war-attila": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "bb0bec18758d2a18d739ec8b63457c14f9c98cd2f88c63c095832f40b541585b",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "total-war-rome-ii": {
   "engine": "claude-sonnet-5",
   "src_sha256": "370b1849f1abd8636f3ad3dc7e6ce33a490c3c708dc123648c126d0716806818",
@@ -6194,20 +8839,60 @@
   "src_sha256": "315856cfb96c5b7a6e99d56b30ec1e395525506bdd7f00538401c6dfd16d679e",
   "translated_at": "2026-09-07T14:15:10+00:00"
  },
+ "total-war-warhammer-ii": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "036082d95eb87115460475682f073c24a6511735ab5a7c10d2f2d42c0b0c3f44",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "totally-accurate-battle-simulator": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "4d96c12ee68d042c240172c382c0fa5f88b8dec00d5808be124d35b9c38ca41b",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "toy-story-2-buzz-lightyear-to-the-rescue": {
   "engine": "claude-sonnet-5",
   "src_sha256": "cd0f8d1182c118bdd0211a613068706f6094b8675570c17f6946e79b091d2b33",
   "translated_at": "2026-09-07T14:20:57+00:00"
+ },
+ "trackmania-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "2c1a91c593d2195dca81161a9a10189b11c0175393a62a8d722f43b3ed891a54",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "trackmania-turbo": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "1a502d36c7eb4b08675770ea96ffaf67f3881d5cff91150098fafe8b44a5fc29",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "transformers-devastation": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "73aa719ad9bb4c2d61aac381eec422d064ce580148d635ca189c55aaf6b8d16a",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "transformers-war-for-cybertron": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "334736d86613bbe3c95ccc14634195bc369be004f7159e1ba79859ecbcc406e1",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "transistor": {
   "engine": "claude-sonnet-5",
   "src_sha256": "e53f6eb8484966d51d4e32d4572803a7595efedd65f4a0c21ae793caefeb31db",
   "translated_at": "2026-09-07T13:37:02+00:00"
  },
+ "trek-to-yomi": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "d3f96d4667c1f171be716a565408223cd9395192ab63ac01a0b7680cd29acc79",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "trials-fusion": {
   "engine": "claude-sonnet-5",
   "src_sha256": "68be1f5cfb0397cf6f8caf2801d11ee62c65f876689cd3e364165d3795e65777",
   "translated_at": "2026-09-07T14:20:57+00:00"
+ },
+ "tricky-towers": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "b732d60d00b287581fb014de6c8c3936eea74d41033adf0538e57ec05a2112eb",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "trine": {
   "engine": "claude-sonnet-5",
@@ -6219,6 +8904,16 @@
   "src_sha256": "dca2556ba6c3e0e497877fb80cf52e37f7be984672e967ed6e1628e02eea48c0",
   "translated_at": "2026-09-07T13:48:17+00:00"
  },
+ "trine-3-the-artifacts-of-power": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "14752a3d6a07ffb2ca3ef48d056d3db24228a669eb4772a7d69273e9cc80be93",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "trine-4-the-nightmare-prince": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "6d8d360e7ab7066c8640b17b701db82fa3232f88ec769ab7b5d9466af4a05d5b",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "tropico-4": {
   "engine": "claude-sonnet-5",
   "src_sha256": "1ccdd9a508d09ce81eb7703de28bfd81a6934bb1efca247d65124712eb4c33ef",
@@ -6229,15 +8924,30 @@
   "src_sha256": "ab425d9f7b75207ce93c0a82546f54b9da596563f22391c2a1fd26f5487e45dd",
   "translated_at": "2026-09-07T14:20:57+00:00"
  },
+ "true-crime-streets-of-la": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "7194c0ff9bece3b3ce8d77321bf85ac7d13d0c5456cd4dfc62cf011bc1c2c325",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "tunic": {
   "engine": "claude-sonnet-5",
   "src_sha256": "2136133e354897df105175708dfe73733b7ebca19f5fbf027f7b62e8295d766b",
   "translated_at": "2026-09-07T13:53:38+00:00"
  },
+ "turok-dinosaur-hunter": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "f0db277295ab82624152745804038aaf3f625e2c669212298303bc600b948827",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
  "twelve-minutes": {
   "engine": "claude-sonnet-5",
   "src_sha256": "b066a71d2d198b3422f4294bc12a9c7b9c009545542c2e562c72bcf8152abe19",
   "translated_at": "2026-09-07T13:53:38+00:00"
+ },
+ "twisted-metal-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "df5e8e9acf6ad097b767a4bbfc9600c5caa0bb503fdace9526e21217ecfe2642",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "two-point-hospital": {
   "engine": "claude-sonnet-5",
@@ -6258,6 +8968,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "6328bf35dbb840b823045086c4b3a785c8909540086a36d46c2a77a59a079410",
   "translated_at": "2026-09-07T14:07:55+00:00"
+ },
+ "ultrakill": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "dd7e238d3807cd4a0bdc3620ab2816bb20710f7c067fee3ffb3e863ea6a19540",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "uncharted-2-among-thieves": {
   "engine": "claude-sonnet-5",
@@ -6339,10 +9054,20 @@
   "src_sha256": "4bd36a8db4828c6207d6a0c085163d51e157121505a11c2ad795c81931fc096b",
   "translated_at": "2026-09-07T14:07:55+00:00"
  },
+ "v-rising": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "8e8ad97d2213ccc915b1cfe8716a18f4a00cbe31e8b369ea94f53038f1788bf7",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "va-11-hall-a-cyberpunk-bartender-action": {
   "engine": "claude-sonnet-5",
   "src_sha256": "f3913f85963de7ac58b169920bb9e30aaac32eef3df0ba641cbc0d4322789069",
   "translated_at": "2026-09-07T14:09:34+00:00"
+ },
+ "vagrant-story": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "9f34f6eb577751e90f69654969e3446e256bb62010024fb1b6b319ea33a454a7",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "valheim": {
   "engine": "claude-sonnet-5",
@@ -6384,6 +9109,26 @@
   "src_sha256": "405bda8ceb9957ad98109571f42fd7ec04c3027c7b30e9e4a7603a368487e7f5",
   "translated_at": "2026-09-07T13:53:38+00:00"
  },
+ "viewfinder": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "12a45a1b62a00e3467f0c85a7da62b2d3b38657dc5178d9eea1483675c20be91",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "virginia": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "8706323055758cfddaaf7e1064b6b5dc2d2bf6c67126872b08250f97cb47b076",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "visage": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "5aa005e39c162f5e310a4f85bf4295091c4ea3dd718908902f93cb61f4349ffb",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "vrchat": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "1933ffc985a55841e621100d7a0938237fa8ec4c800916d4301af6ceebd5cb83",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "vvvvvv": {
   "engine": "claude-sonnet-5",
   "src_sha256": "4bb77aeee7d75c4edfeb8bb50a1c7dec89f35a7ad7e058d627256ff9d14c0f4f",
@@ -6408,6 +9153,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "2b47eba6f65ac557d27e03c411b7dbd96ffe696c21b182fbdf013e793cb49107",
   "translated_at": "2026-09-07T14:07:55+00:00"
+ },
+ "warface": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "8bedc91c424dfba475e240333d0ede52239a6bc3a35b8bba9c4a2f00f27ed47b",
+  "translated_at": "2026-09-07T15:00:58+00:00"
  },
  "warframe": {
   "engine": "claude-sonnet-5",
@@ -6444,6 +9194,31 @@
   "src_sha256": "8abd1b2f8ef99cc75d171553776038dfe7c69f6d4413605dc01d54c58f9ea51e",
   "translated_at": "2026-09-07T14:20:57+00:00"
  },
+ "warioware-inc-dot-mega-microgame": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "fdafde385199a3cb4788be30ef6c96dce0a7f9918d8c6c5e4a627cc4735281a9",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "warioware-smooth-moves": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "68ccd0911ffe585537603a7176631dcd1328bdfaee0761176ca98bdeeb12da7b",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "warioware-touched": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "5cc743c004abcc47b421b7643973b67d647246e689022eab64448f4ec0587dff",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "wasteland-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "6bd0e322cb8656602da0e42c14017a4b21b69afd628494f35e8020dcf8c1fe04",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "wasteland-3": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "9e2925530b9f4522d3c1a314706b8cd15c8eb60225c22597bbbeb8a7a569321c",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
  "watch-dogs": {
   "engine": "claude-sonnet-5",
   "src_sha256": "119209cedff20d7206feeeedf1d268f1007e98b96ef3ab7716d54f21a3bcd971",
@@ -6459,6 +9234,16 @@
   "src_sha256": "42c07825464ab042ff1f13e331fa192f5dd7c38a60d46b37f629ce6219bdf2bf",
   "translated_at": "2026-09-07T14:07:55+00:00"
  },
+ "wave-race-64": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "03536918e2421390c0839daf1e6dcefdb7265107023dbd43de5936bbbfaf401e",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "we-happy-few": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "2ece2a5bc3228f5ebd134240b49030d65f085802c0fca9351e18f8b83537b56a",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "we-were-here": {
   "engine": "claude-sonnet-5",
   "src_sha256": "8a3ae8936cacb44c9c0748e2ba07193b2b1077f2e08de68a2ee0d6571dab8040",
@@ -6468,6 +9253,16 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "a9fc3b364a7adf6c151baaf675fdf1d83f9e836b676e1f0479517a33044a0e04",
   "translated_at": "2026-09-07T13:22:34+00:00"
+ },
+ "where-winds-meet": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "eab3d9b0d5f9af63b09a18a52448473263852f5ed883d38efcd7f4e0e3eb6856",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
+ "wii-play": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "ed522d8eb32df4a2a9806795dec26dfc29b1737bac6276fea825f6894c69605e",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "wii-sports": {
   "engine": "claude-sonnet-5",
@@ -6519,6 +9314,11 @@
   "src_sha256": "e369a45489fdac5f4ec870ba762ffe3504b23e277d385254672cd35646dd2043",
   "translated_at": "2026-09-07T13:22:34+00:00"
  },
+ "world-of-warships": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "dc3191f1b39b31b9d24b682221c4f689c2de81fd86c219fc995ba512f1216e64",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "world-war-z": {
   "engine": "claude-sonnet-5",
   "src_sha256": "f233103dc0291d3fb7e0dadfc638615b5e90b45849bf5de4154b84c88eb0bd1a",
@@ -6528,6 +9328,16 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "e7f934e08675757402b3015d5d5a0bfbe284801325e5c268280bcc22a23c210b",
   "translated_at": "2026-09-07T13:55:12+00:00"
+ },
+ "worms-2": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "e130bf46b37a8c10a50e6e40501eb75e9b64dd32603cf822ac52ce74d71900e1",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "worms-3d": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "5ed8bdd2e2f474d6b0fd0a7e6bae1226730d2bef8115ce12f7b09b407c27db12",
+  "translated_at": "2026-09-07T14:32:01+00:00"
  },
  "worms-armageddon": {
   "engine": "claude-sonnet-5",
@@ -6549,15 +9359,30 @@
   "src_sha256": "1c15e7c55eb438ea009e8517560f6b5ea51ff21e0e4ee255a67373a48a0cc2f5",
   "translated_at": "2026-09-07T13:48:17+00:00"
  },
+ "wwe-smackdown-vs-raw-2011": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "1f6d9fcef1a518d3a8ac202b48d83a04be7d0abf12588f3697094cc634e670e0",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
  "x-com-ufo-defense": {
   "engine": "claude-sonnet-5",
   "src_sha256": "ba30b3b641bc4f107767f4626eb137365c67b697155c1ab4e23f5524937f6198",
   "translated_at": "2026-09-07T14:20:57+00:00"
  },
+ "x-men-origins-wolverine": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "4f39858085da4db96b577f63c263d841ae74d135c1c78a30dc8ebe0fe0904cbe",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "xcom-2": {
   "engine": "claude-sonnet-5",
   "src_sha256": "e486c8303e0a944896d6bedfbed784aef7eb75dd8c79e214746534d49b290a45",
   "translated_at": "2026-09-07T13:37:02+00:00"
+ },
+ "xdefiant": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "08bde70d798bcde63842220f34cc0ee63895468c0fc41dfc0fcd59c6233bcb7c",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "xenoblade-chronicles": {
   "engine": "claude-sonnet-5",
@@ -6568,6 +9393,11 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "6600b80bedd9e6f29e26f553980292363e15df93cfb5e7b38e533285616abd24",
   "translated_at": "2026-09-07T14:00:29+00:00"
+ },
+ "xenoblade-chronicles-x": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "76cd04c2e3b53d1c29005e30bf38885f51daf2d6fedca566a0c3f36703899973",
+  "translated_at": "2026-09-07T14:55:19+00:00"
  },
  "xenogears": {
   "engine": "claude-sonnet-5",
@@ -6584,15 +9414,50 @@
   "src_sha256": "55e87dd85fcb40150c1e060f7cd0e6c62bb69e378f060b7356ff733182aee4dd",
   "translated_at": "2026-09-07T13:31:15+00:00"
  },
+ "yakuza-6-the-song-of-life": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "2fdb00874d68d8238543af4c9dc22797770a71dc3bdfdda3f2d6d82c4032d02a",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
  "yakuza-like-a-dragon": {
   "engine": "claude-sonnet-5",
   "src_sha256": "b980f51655f403f501d11b20abd6461864bb7ff6985f35725eae28c0247528fc",
   "translated_at": "2026-09-07T14:02:53+00:00"
  },
+ "yokus-island-express": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "16b3d60a19d8af848fb4f8c88521b4ba1ad33e7633d04f90cf8beacbe01b2756",
+  "translated_at": "2026-09-07T14:26:28+00:00"
+ },
  "yooka-laylee": {
   "engine": "claude-sonnet-5",
   "src_sha256": "c06f5a29a5aab8202c8ba5539f83c8265cafca5584fe47de0e45ce3817ea0171",
   "translated_at": "2026-09-07T14:20:57+00:00"
+ },
+ "yoshi-s-story": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "b8be30ae9b35fbce1ae79ce249b40cdf0fd669994d3e404d7c5e1840aee85a29",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "ys-viii-lacrimosa-of-dana": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "696c8eb843a4d431412ba2f5b8a44808bdc3835345e3d41c4842482f8f1b70b5",
+  "translated_at": "2026-09-07T15:00:58+00:00"
+ },
+ "yu-gi-oh-duel-links": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "884796240c42ac0907084e0a2b985f4a28e06fd88dc59e15a482fe429918c785",
+  "translated_at": "2026-09-07T14:55:19+00:00"
+ },
+ "yu-gi-oh-forbidden-memories": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "31d67a94d0f6a6fe541668d8da678ae13e30418a07863951af542372825dc52b",
+  "translated_at": "2026-09-07T14:39:28+00:00"
+ },
+ "yume-nikki": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "a05a541413509fca7e5ab9aabe4d023ed9d7afb881435ff76c6c8299ae8d188b",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  },
  "zelda-ii-the-adventure-of-link": {
   "engine": "claude-sonnet-5",
@@ -6613,5 +9478,15 @@
   "engine": "claude-sonnet-5",
   "src_sha256": "e552a4177a2694c3c7f84b2060c8f6ef8da09b9a6a8d1e1f6e9b81dfc1f7c714",
   "translated_at": "2026-09-07T14:15:10+00:00"
+ },
+ "zombies-ate-my-neighbors": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "c308909cf49f83664523a74f8c980371e6767a99b2e2bff8a3e0b5075b0dd67b",
+  "translated_at": "2026-09-07T14:32:01+00:00"
+ },
+ "zoo-tycoon": {
+  "engine": "claude-sonnet-5",
+  "src_sha256": "8adc8a98c5f7e08ca279e86569ffa16c9c2fd403f511668cc11b9c37c58d4df3",
+  "translated_at": "2026-09-07T14:39:28+00:00"
  }
 }

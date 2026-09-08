@@ -4,17 +4,16 @@ import { notFound } from "next/navigation";
 
 import { CoverImage } from "@/components/CoverImage";
 import { LibraryControls } from "@/components/LibraryControls";
+import { OwnedGamesDlcShelf } from "@/components/OwnedGamesDlcShelf";
+import { RatingBreakdownLine } from "@/components/RatingBreakdownLine";
 import { ScorePill } from "@/components/ScorePill";
+import { Synopsis } from "@/components/Synopsis";
 import { getDictionary } from "@/i18n";
-import { fetchGameDetail } from "@/lib/api";
+import { fetchGameDetail, getOwnedDlc, type OwnedDlcGroup } from "@/lib/api";
 
-/**
- * Game detail (01.1-UI-SPEC Screen Contract 3, redesign only). Three columns
- * on wide screens: cover hero left, game information in the centre, and the
- * game configuration panel on the right. Missing cover -> first-party placeholder
- * (CoverImage onError). Missing score/genres/platforms -> the row is omitted,
- * never an empty heading.
- */
+/** Game detail follows the P3 product order while retaining the existing
+ * cover/content/configure layout: metadata first, then controls and related
+ * surfaces in the sticky configuration column. */
 export default async function GameDetailPage({
   params,
 }: {
@@ -25,17 +24,38 @@ export default async function GameDetailPage({
   const dict = getDictionary(locale);
 
   const game = await fetchGameDetail(id, locale);
-  if (!game) {
-    notFound();
-  }
+  if (!game) notFound();
 
   const cookieStore = await cookies();
   const isAuthenticated = cookieStore.has("sessionid");
+  const cookieHeader = cookieStore
+    .getAll()
+    .map((cookie) => `${cookie.name}=${cookie.value}`)
+    .join("; ");
+
+  let ownedDlcGroups: OwnedDlcGroup[] = [];
+  let ownedDlcStatus: "populated" | "empty" | "error" = "empty";
+  if (isAuthenticated) {
+    try {
+      const result = await getOwnedDlc(cookieHeader);
+      ownedDlcGroups = result.groups.filter((group) => group.base_game.slug === game.slug);
+      ownedDlcStatus = ownedDlcGroups.length > 0 ? "populated" : "empty";
+    } catch {
+      ownedDlcStatus = "error";
+    }
+  }
 
   const platforms = Array.from(
-    new Set(game.releases.map((r) => r.platform).filter((p): p is string => Boolean(p))),
+    new Set(game.releases.map((release) => release.platform).filter((platform): platform is string => Boolean(platform))),
   );
   const genres = game.genres ?? [];
+  const releaseDate = game.releases
+    .map((release) => release.release_date)
+    .filter((date): date is string => Boolean(date))
+    .sort()[0];
+  const formattedReleaseDate = releaseDate
+    ? new Intl.DateTimeFormat(locale, { dateStyle: "long" }).format(new Date(`${releaseDate}T00:00:00Z`))
+    : null;
 
   return (
     <main className="sp-page sp-game-page">
@@ -62,58 +82,83 @@ export default async function GameDetailPage({
           </div>
 
           <div className="sp-detail-content">
-          <h1 className="sp-h1">
-            {game.title}{" "}
-            {game.year != null ? (
-              <span style={{ color: "var(--color-text-secondary)", fontWeight: 400 }}>({game.year})</span>
-            ) : null}
-          </h1>
+            <h1 className="sp-h1">
+              {game.title}{" "}
+              {game.year != null ? (
+                <span style={{ color: "var(--color-text-secondary)", fontWeight: 400 }}>({game.year})</span>
+              ) : null}
+            </h1>
 
-          {game.total_rating != null ? (
             <div style={{ margin: "var(--space-sm) 0" }}>
-              <ScorePill
-                rating={game.total_rating}
-                ariaLabelTemplate={dict.card.score.aria}
-                withLabel
-                className="sp-score-pill--inline"
-              />
+              {game.display_rating != null ? (
+                <>
+                  <ScorePill
+                    rating={game.display_rating}
+                    ariaLabelTemplate={dict.card.score.aria}
+                    withLabel
+                    label={dict.card.score.label}
+                    className="sp-score-pill--inline"
+                  />
+                  <RatingBreakdownLine
+                    igdbCount={game.rating_breakdown.igdb_count}
+                    savepointCount={game.rating_breakdown.savepoint_count}
+                    locale={locale}
+                  />
+                </>
+              ) : (
+                <p className="sp-meta">{dict.card.score.none}</p>
+              )}
             </div>
-          ) : (
-            <span className="visually-hidden">{dict.card.score.none}</span>
-          )}
 
-          {game.total_rating_count != null || game.rating_count != null ? (
-            <p className="sp-meta sp-detail-rating-count" aria-label={dict.detail.ratings}>
-              {dict.detail.ratings}: {game.total_rating_count ?? game.rating_count}
-            </p>
-          ) : null}
+            <Synopsis text={game.summary} labels={dict.detail.synopsis} />
 
-          {genres.length > 0 ? (
-            <>
-              <h2 className="sp-h2">{dict.detail.genres}</h2>
-              <div className="sp-chip-row">
-                {genres.map((g) => (
-                  <Link key={g.slug} href={`/${locale}/catalogue?genre=${encodeURIComponent(g.slug)}`} className="sp-chip">
-                    {g.name}
-                  </Link>
-                ))}
-              </div>
-            </>
-          ) : null}
+            {genres.length > 0 ? (
+              <>
+                <h2 className="sp-h2">{dict.detail.genres}</h2>
+                <div className="sp-chip-row">
+                  {genres.map((genre) => (
+                    <Link
+                      key={genre.slug}
+                      href={`/${locale}/catalogue?genre=${encodeURIComponent(genre.slug)}`}
+                      className="sp-chip"
+                    >
+                      {genre.name}
+                    </Link>
+                  ))}
+                </div>
+              </>
+            ) : null}
 
-          {platforms.length > 0 ? (
-            <>
-              <h2 className="sp-h2">{dict.detail.platforms}</h2>
-              <p className="sp-kv">{platforms.join(", ")}</p>
-            </>
-          ) : null}
+            {platforms.length > 0 ? (
+              <>
+                <h2 className="sp-h2">{dict.detail.platforms}</h2>
+                <p className="sp-kv">{platforms.join(", ")}</p>
+              </>
+            ) : null}
 
-          {game.summary || locale === "es" ? (
-            <section>
-              <h2 className="sp-h2">{dict.detail.summary}</h2>
-              <p className="sp-detail-summary">{game.summary || dict.detail.summaryUnavailable}</p>
-            </section>
-          ) : null}
+            {formattedReleaseDate ? (
+              <>
+                <h2 className="sp-h2">{dict.detail.releaseDate}</h2>
+                <p className="sp-kv">{formattedReleaseDate}</p>
+              </>
+            ) : null}
+          </div>
+        </div>
+
+        <aside
+          className="sp-game-config"
+          aria-label={locale === "es" ? "Configuración del videojuego" : "Game configuration"}
+        >
+          <div className="sp-surface">
+            <LibraryControls workId={game.id} locale={locale} isAuthenticated={isAuthenticated} releases={game.releases} />
+          </div>
+
+          <OwnedGamesDlcShelf
+            groups={ownedDlcGroups}
+            locale={locale}
+            status={ownedDlcStatus}
+            labels={dict.recommendations.dlc}
+          />
 
           {game.related_content.length > 0 ? (
             <section aria-label={dict.detail.relatedContent}>
@@ -150,13 +195,13 @@ export default async function GameDetailPage({
             </section>
           ) : null}
 
-          {game.provenance ? (
+            {game.provenance ? (
             <section aria-label={dict.provenance.heading} className="sp-provenance">
               <h2 className="sp-h2" style={{ fontSize: "var(--text-meta)", margin: "0 0 var(--space-xs)" }}>
                 {dict.provenance.heading}
               </h2>
               <p style={{ margin: 0 }}>
-                {game.provenance.source} · {game.provenance.source_id} · {game.provenance.licence} ·{" "}
+                {game.provenance.source} · {game.provenance.source_id} · {game.provenance.licence} · {" "}
                 {new Date(game.provenance.retrieved_at).toISOString().slice(0, 10)}
               </p>
               <p style={{ margin: "var(--space-xs) 0 0" }}>
@@ -167,13 +212,6 @@ export default async function GameDetailPage({
               </p>
             </section>
           ) : null}
-          </div>
-        </div>
-
-        <aside className="sp-game-config" aria-label={locale === "es" ? "Configuración del videojuego" : "Game configuration"}>
-          <div className="sp-surface">
-            <LibraryControls workId={game.id} locale={locale} isAuthenticated={isAuthenticated} releases={game.releases} />
-          </div>
         </aside>
       </div>
     </main>

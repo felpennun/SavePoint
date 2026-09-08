@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from datetime import datetime, timezone
 from typing import Any
 
@@ -25,6 +26,7 @@ _MIN_LIMIT = 1
 _MAX_LIMIT = 50
 _DEFAULT_LIMIT = 20
 _COLD_START_ENTRIES = 3
+_MIN_RATING_COUNT = 1000
 
 _LIMITATION = (
     "Deterministic content-based ranking over the frozen corpus and external "
@@ -65,7 +67,17 @@ def _snapshot_sha256(corpus_version: str | None, work_ids: set[object]) -> str:
     return _hash_payload(rows)
 
 
-def _load_candidate_vectors(works: list[GameWork], spec: VariantSpec) -> dict[object, dict[str, float]]:
+def _load_candidate_vectors(
+    works: list[GameWork],
+    spec: VariantSpec,
+    prepared_vectors: dict[object, dict[str, float]] | None = None,
+) -> dict[object, dict[str, float]]:
+    if prepared_vectors is not None:
+        return {
+            work.id: prepared_vectors[work.id]
+            for work in works
+            if work.id in prepared_vectors
+        }
     work_ids = [work.id for work in works]
     cached = {
         row["work_id"]: row["vector_json"]
@@ -136,13 +148,14 @@ def _cold_start_results(
     spec: VariantSpec,
     corpus_version: str | None,
     profile: dict[str, float],
+    snapshot_stats: dict[object, tuple[float, int]],
+    genre_profile: dict[str, float],
 ) -> list[dict]:
-    genre_profile = genre_rating_profile(corpus_version)
     vectors = _load_candidate_vectors(works, spec)
     scored: list[tuple[float, str, dict]] = []
     for work in works:
         vector = vectors[work.id]
-        rt, fallback = rating_term(work, corpus_version, genre_profile)
+        rt, fallback = rating_term(work, corpus_version, genre_profile, snapshot_stats)
         evidence = explain(
             vector,
             profile,
@@ -162,7 +175,11 @@ def rank_content_v1(
     algorithm_id: str,
     limit: int | None = _DEFAULT_LIMIT,
     corpus_version: str | None = None,
+    candidate_ids: set[object] | tuple[object, ...] | None = None,
     generated_at: datetime | None = None,
+    min_rating_count: int | None = _MIN_RATING_COUNT,
+    genre_profile: dict[str, float] | None = None,
+    prepared: dict[str, Any] | None = None,
 ) -> dict:
     """Rank governed unseen works for the authenticated owner."""
 
@@ -177,18 +194,66 @@ def rank_content_v1(
         .distinct()
         .count()
     )
-    candidates = list(
-        governed_works(corpus_version)
-        .exclude(id__in=seen_ids)
-        .filter(genres__isnull=False)
-        .prefetch_related("genres", "releases__platform")
-        .distinct()
-    )
-    snapshot_sha256 = _snapshot_sha256(corpus_version, {work.id for work in candidates} | seen_ids)
+    requested_ids = set(candidate_ids) if candidate_ids is not None else None
+    if prepared is not None:
+        candidates = [
+            work
+            for work in prepared["works"]
+            if (requested_ids is None or work.id in requested_ids)
+            and (min_rating_count is None or (work.total_rating_count or 0) >= min_rating_count)
+        ]
+        snapshot_sha256 = prepared.get("snapshot_sha256", "")
+    else:
+        candidate_query = governed_works(corpus_version)
+        if requested_ids is not None:
+            candidate_query = candidate_query.filter(id__in=requested_ids)
+        else:
+            candidate_query = candidate_query.exclude(id__in=seen_ids)
+        if min_rating_count is not None:
+            candidate_query = candidate_query.filter(total_rating_count__gte=min_rating_count)
+        candidates = list(
+            candidate_query.filter(genres__isnull=False)
+            .prefetch_related("genres", "releases__platform")
+            .distinct()
+        )
+        snapshot_sha256 = _snapshot_sha256(corpus_version, {work.id for work in candidates} | seen_ids)
     profile = build_profile(user, corpus_version)
+    resolved_genre_profile = (
+        genre_profile
+        if genre_profile is not None
+        else (prepared.get("genre_profile") if prepared is not None else None)
+    ) or genre_rating_profile(corpus_version)
+    if prepared is not None and "snapshot_stats" in prepared:
+        snapshot_stats = prepared["snapshot_stats"]
+    else:
+        snapshot_rows = CorpusRatingSnapshot.objects.filter(
+            work_id__in=[work.id for work in candidates], rating__isnull=False
+        )
+        if corpus_version is not None:
+            snapshot_rows = snapshot_rows.filter(corpus_version=corpus_version)
+        per_work_snapshots: dict[object, list[tuple[float, int]]] = {}
+        for work_id, rating, rating_count in snapshot_rows.values_list("work_id", "rating", "rating_count"):
+            per_work_snapshots.setdefault(work_id, []).append((rating, rating_count))
+        snapshot_stats = {
+            work_id: (
+                math.fsum(rating * count for rating, count in rows) / sum(count for _rating, count in rows)
+                if sum(count for _rating, count in rows)
+                else math.fsum(rating for rating, _count in rows) / len(rows),
+                sum(count for _rating, count in rows),
+            )
+            for work_id, rows in per_work_snapshots.items()
+        }
 
     if history_count < _COLD_START_ENTRIES:
-        results = _cold_start_results(candidates, limit, spec, corpus_version, profile)
+        results = _cold_start_results(
+            candidates,
+            limit,
+            spec,
+            corpus_version,
+            profile,
+            snapshot_stats,
+            resolved_genre_profile,
+        )
         return _dto(
             spec,
             generated_at,
@@ -200,8 +265,7 @@ def rank_content_v1(
             limitation=_COLD_START_LIMITATION,
         )
 
-    genre_profile = genre_rating_profile(corpus_version)
-    vectors = _load_candidate_vectors(candidates, spec)
+    vectors = _load_candidate_vectors(candidates, spec, prepared_vectors=(prepared or {}).get("vectors"))
     scored: list[tuple[float, str, dict]] = []
     for work in candidates:
         vector = vectors[work.id]
@@ -210,7 +274,7 @@ def rank_content_v1(
             key: profile[key] * vector[key]
             for key in profile.keys() & vector.keys()
         }
-        rt, fallback = rating_term(work, corpus_version, genre_profile)
+        rt, fallback = rating_term(work, corpus_version, resolved_genre_profile, snapshot_stats)
         score = combine(similarity, rt, None, spec)
         evidence = explain(
             vector,
