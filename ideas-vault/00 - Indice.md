@@ -22,6 +22,10 @@ izquierda) para ver la nube completa.
 - [[Mapa - Metodologia con agentes]]
 - [[Mapa - Fases (roadmap)]]
 
+## Auditorías
+
+- [[Auditoria de seguridad 2026-09-08]]
+
 ## Fases
 
 - [[Fase 1 - Demo publico de tres dias]]

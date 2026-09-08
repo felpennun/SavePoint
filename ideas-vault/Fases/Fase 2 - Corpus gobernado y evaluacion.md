@@ -27,5 +27,6 @@ recomendacion consciente de ratings producida bajo un protocolo de evaluacion
 ## Enlaces
 
 - [[ADR-008 - Ratings externos gobernados y RAWG]]
+- [[Auditoria de seguridad 2026-09-08]]
 - [[Requisitos - Datos y procedencia]] · [[Requisitos - Experimentacion y evaluacion]]
 - [[Requisitos - Recomendaciones]]
