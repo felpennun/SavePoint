@@ -13,6 +13,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from catalogue.models import GameWork
@@ -239,6 +240,8 @@ class PopularityView(APIView):
     """
 
     permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "popularity"
 
     def get(self, request: Request) -> Response:
         return Response(rank_popularity_v1())

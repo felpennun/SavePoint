@@ -11,14 +11,26 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 
 import pytest
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.test import APIClient
 
 from catalogue.models import AssetAttribution, GameWork, Genre
 from library.models import LibraryEntry
 from recommendations.genre_heuristic import ALGORITHM_ID, rank_genre_taste_v1
+from recommendations.views import ContentRecsView, RecommendationsView
 
 User = get_user_model()
+
+
+def test_expensive_recommendation_endpoints_share_a_scoped_rate_limit() -> None:
+    assert RecommendationsView.throttle_classes == [ScopedRateThrottle]
+    assert ContentRecsView.throttle_classes == [ScopedRateThrottle]
+    assert RecommendationsView.throttle_scope == "recommendations"
+    assert ContentRecsView.throttle_scope == "recommendations"
+    rates = settings.REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"]
+    assert rates["recommendations"] == "30/min"
 
 
 # --------------------------------------------------------------------------- #

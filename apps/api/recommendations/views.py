@@ -12,6 +12,7 @@ from __future__ import annotations
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from catalogue.models import CorpusVersion, GameWork
@@ -55,6 +56,8 @@ class RecommendationsView(APIView):
     """
 
     permission_classes = [IsAuthenticated]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "recommendations"
 
     def get(self, request: Request) -> Response:
         raw_limit = request.query_params.get("limit")
@@ -84,6 +87,8 @@ class ContentRecsView(APIView):
     """GET /api/recommendations/content/ for the signed-in owner only."""
 
     permission_classes = [IsAuthenticated]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "recommendations"
 
     _DTO_KEYS = (
         "algorithm_id",

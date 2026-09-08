@@ -121,6 +121,8 @@ AUTH_PASSWORD_VALIDATORS = [
 #                   threat T-01.1-07)
 #   login        -- blunts online password-guessing against LoginView (H-01/M-01)
 #   public_profile -- blunts unauthenticated alias enumeration (M-03)
+#   recommendations -- caps authenticated CPU/DB-heavy ranking runs
+#   popularity      -- caps the public aggregate ranking endpoint
 # ScopedRateThrottle keys on the client IP. Behind the deployed
 # browser -> Vercel rewrite -> Render chain, REMOTE_ADDR is a single
 # upstream address, so per-IP scoping only works if NUM_PROXIES matches the
@@ -136,6 +138,8 @@ REST_FRAMEWORK = {
         "registration": "5/hour",
         "login": "10/min",
         "public_profile": "30/min",
+        "recommendations": "30/min",
+        "popularity": "60/min",
         # Generous enough for real catalogue browsing/typing; caps a scripted
         # `?q=<random>` loop that would otherwise drive an unauthenticated
         # trigram scan on every hit (M-05).

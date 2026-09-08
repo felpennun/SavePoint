@@ -6,8 +6,10 @@ import threading
 from datetime import datetime, timezone
 
 import pytest
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import connections
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.test import APIClient
 
 from accounts.models import DemoAccountAnchor, DemoAccountIdentity
@@ -15,8 +17,16 @@ from catalogue.models import GameWork
 from library import services
 from library.models import LibraryEntry
 from library.popularity import rank_popularity_v1
+from library.views import PopularityView
 
 User = get_user_model()
+
+
+def test_public_popularity_endpoint_has_a_scoped_rate_limit() -> None:
+    assert PopularityView.throttle_classes == [ScopedRateThrottle]
+    assert PopularityView.throttle_scope == "popularity"
+    rates = settings.REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"]
+    assert rates["popularity"] == "60/min"
 
 
 def _demo_user(username: str, password: str):  # noqa: ANN001, ANN202
