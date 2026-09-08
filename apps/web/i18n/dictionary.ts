@@ -124,10 +124,13 @@ export interface Dictionary {
     shelfEvidence: string;
     /** "{genres}" -> the comma-joined overlap genres; per-card evidence. */
     cardEvidence: string;
+    /** "{reasons}" -> the bounded signals returned by the v2 ranker. */
+    contentCardEvidence: string;
     emptyHeading: string;
     emptyBody: string;
     emptyCta: string;
     error: string;
+    retry: string;
     dlc: {
       heading: string;
       intro: string;

@@ -137,10 +137,12 @@ export const en: Dictionary = {
     shelfEvidence:
       "These games share the {genre} genre with titles you've rated or set a status on.",
     cardEvidence: "Shares your genres: {genres}",
+    contentCardEvidence: "Matches your taste in {reasons}.",
     emptyHeading: "Not enough activity yet",
     emptyBody: "Rate or complete a few games and genre suggestions will appear here.",
     emptyCta: "Browse the catalogue",
-    error: "We couldn't build your recommendations. Try again.",
+    error: "We couldn't load your recommendations. Try again.",
+    retry: "Reload recommendations",
     contentHeading: "Recommended for you",
     dlc: {
       heading: "For games you own",

@@ -32,6 +32,7 @@ izquierda) para ver la nube completa.
 - [[Fase 01.1 - Catalogo a escala real]]
 - [[Fase 2 - Corpus gobernado y evaluacion]]
 - [[Fase 3 - Recomendadores explicables y baselines]]
+- [[2026-09-08 - Tracer v2 de recomendaciones]]
 - [[Fase 4 - Colaborativo e hibrido]]
 - [[Fase 5 - Coleccion y portabilidad]]
 - [[Fase 6 - Descubrimiento publico]]

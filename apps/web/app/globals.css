@@ -551,6 +551,8 @@ textarea {
 
 .sp-shelf {
   min-width: 0;
+  display: grid;
+  gap: var(--space-md);
 }
 
 .sp-recommendation-shelves .sp-h2 {
@@ -591,6 +593,18 @@ textarea {
 
 .sp-shelf-track .sp-card-meta {
   min-height: 1.35rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sp-shelf-track .sp-card-evidence {
+  min-height: 2.8em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .sp-empty {

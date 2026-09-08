@@ -73,22 +73,31 @@ def is_valid_name(name: str | None) -> bool:
     return bool(value) and len(re.findall(r"[^\W_]", value, flags=re.UNICODE)) >= 2
 
 
-def governed_works(corpus_version: str | None = None) -> QuerySet[GameWork]:
+def governed_works(
+    corpus_version: str | None = None,
+    *,
+    eligibility_cutoff_date: date | None = None,
+) -> QuerySet[GameWork]:
     """Return the canonical governed view, optionally pinned to one version."""
 
+    cutoff = eligibility_cutoff_date or MAX_CATALOGUE_RELEASE_DATE
     queryset = GameWork.objects.filter(
         is_dlc=False,
         in_corpus=True,
     ).filter(
         Q(first_release_date__isnull=True)
-        | Q(first_release_date__lte=MAX_CATALOGUE_RELEASE_DATE)
+        | Q(first_release_date__lte=cutoff)
     )
     if corpus_version is not None:
         queryset = queryset.filter(corpus_version=corpus_version)
     return queryset
 
 
-def evaluation_candidate_works(corpus_version: str | None = None) -> QuerySet[GameWork]:
+def evaluation_candidate_works(
+    corpus_version: str | None = None,
+    *,
+    eligibility_cutoff_date: date | None = None,
+) -> QuerySet[GameWork]:
     """Return governed works with an observable rating signal.
 
     The evaluation harness keeps the full governed catalogue searchable, but
@@ -97,6 +106,8 @@ def evaluation_candidate_works(corpus_version: str | None = None) -> QuerySet[Ga
     is a valid IGDB value even if the provider did not expose a rating count.
     """
 
-    return governed_works(corpus_version).filter(
+    return governed_works(
+        corpus_version, eligibility_cutoff_date=eligibility_cutoff_date
+    ).filter(
         Q(rating_count__gte=1) | Q(rating__gte=0, rating__lte=100)
     )

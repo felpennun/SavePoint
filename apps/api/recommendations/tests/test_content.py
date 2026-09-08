@@ -292,7 +292,9 @@ def test_content_view_validates_algorithm_and_clamps_limit(user_a, genres) -> No
     for index in range(3):
         _own(user_a, _work(f"view-owned-{index}", genres["rpg"]))
     for index in range(2):
-        _work(f"view-candidate-{index}", genres["rpg"])
+        candidate = _work(f"view-candidate-{index}", genres["rpg"])
+        candidate.rating_count = 1
+        candidate.save(update_fields=["rating_count"])
     client = APIClient()
     client.force_authenticate(user=user_a)
 
@@ -310,12 +312,17 @@ def test_content_view_validates_algorithm_and_clamps_limit(user_a, genres) -> No
     assert clamped.status_code == 200
     body = clamped.json()
     assert set(body) == {
+        "protocol_version",
         "algorithm_id",
         "generated_at",
         "input_snapshot_sha256",
         "feature_set_version",
         "corpus_version",
         "snapshot_sha256",
+        "candidate_manifest_sha256",
+        "candidate_count",
+        "explorable_count",
+        "eligibility_cutoff_date",
         "insufficient_history",
         "limitation",
         "results",
@@ -334,6 +341,7 @@ def test_content_view_validates_algorithm_and_clamps_limit(user_a, genres) -> No
             "year",
             "platform_summary",
             "cover",
+            "reason",
         }
         for item in body["results"]
     )

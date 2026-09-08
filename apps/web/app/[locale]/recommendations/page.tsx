@@ -60,7 +60,7 @@ export default async function RecommendationsPage({
   const genreData = genreResponse.kind === "ok" ? genreResponse.data : null;
   const contentData = contentResponse.kind === "ok" ? contentResponse.data : null;
   const genreShelves = genreData && !genreData.insufficient_history ? groupRecommendationsByGenre(genreData) : [];
-  const contentItems = contentData && !contentData.insufficient_history ? contentData.results : [];
+  const contentItems = contentData ? contentData.results : [];
   const hasRecommendations = contentItems.length > 0 || genreShelves.length > 0 || ownedDlcResponse.groups.length > 0;
 
   return (
@@ -77,7 +77,14 @@ export default async function RecommendationsPage({
         </div>
       ) : hasRecommendations ? (
         <div className="sp-recommendation-shelves">
-          <ContentRecommendationShelf items={contentItems} locale={locale} heading={r.contentHeading} />
+          <ContentRecommendationShelf
+            items={contentItems}
+            locale={locale}
+            heading={r.contentHeading}
+            error={contentResponse.kind === "error" ? r.error : undefined}
+            retryHref={`/${locale}/recommendations`}
+            retryLabel={r.retry}
+          />
           {genreShelves.map((shelf) => (
             <RecommendationShelf key={shelf.genreSlug} shelf={shelf} locale={locale} />
           ))}

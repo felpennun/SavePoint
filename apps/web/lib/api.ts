@@ -304,18 +304,29 @@ export interface ContentRecommendationItem {
   contributions: { genre: string; contribution_pct: number }[];
   rating_term: number;
   rating_term_is_fallback: boolean;
+  reason: ContentRecommendationReason | null;
   year: number | null;
   platform_summary: string;
   cover: Cover;
 }
 
+export interface ContentRecommendationReason {
+  kind: "genre_overlap";
+  genres: { slug: string; name: string }[];
+}
+
 export interface ContentRecommendationsResult {
+  protocol_version: 2;
   algorithm_id: string;
   generated_at: string;
   input_snapshot_sha256: string;
   feature_set_version: string;
   corpus_version: string | null;
   snapshot_sha256: string;
+  candidate_manifest_sha256: string;
+  candidate_count: number;
+  explorable_count: number;
+  eligibility_cutoff_date: string;
   insufficient_history: boolean;
   limitation: string;
   results: ContentRecommendationItem[];

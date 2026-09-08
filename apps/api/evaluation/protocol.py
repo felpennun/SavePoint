@@ -23,7 +23,7 @@ from __future__ import annotations
 import hashlib
 import json
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -78,6 +78,19 @@ class Protocol:
     simulation: bool
     limitation: str
     raw: dict[str, Any]
+
+    @property
+    def eligibility_cutoff_date(self) -> date | None:
+        """Return the optional frozen eligibility date from protocol v2.
+
+        The signed Phase 2 contract predates this field, so the property is
+        optional for backwards compatibility. Product requests use the
+        current date when the field is absent; experiment manifests must
+        provide an explicit date before they are persisted.
+        """
+
+        value = self.raw.get("eligibility_cutoff_date")
+        return date.fromisoformat(value) if value is not None else None
 
     @property
     def grid(self) -> list[dict[str, Any]]:
@@ -164,6 +177,16 @@ def from_mapping(mapping: dict[str, Any]) -> Protocol:
     """Validate a protocol from an in-memory mapping (used by tests)."""
 
     return _build(dict(mapping))
+
+
+def require_version(protocol: Protocol, expected: int) -> Protocol:
+    """Fail closed when a caller uses a contract version it does not support."""
+
+    if protocol.protocol_version != expected:
+        raise ProtocolError(
+            f"expected protocol_version {expected}, got {protocol.protocol_version}."
+        )
+    return protocol
 
 
 def record_test_run(marker_path: str | Path, protocol: Protocol) -> None:
@@ -274,6 +297,17 @@ def _build(raw: Any) -> Protocol:
         raise ProtocolError("protocol.corpus_version must be a string or null (resolved in 02-13).")
     if snapshot_sha256 is not None and not isinstance(snapshot_sha256, str):
         raise ProtocolError("protocol.snapshot_sha256 must be a string or null (resolved in 02-13).")
+
+    cutoff = raw.get("eligibility_cutoff_date")
+    if cutoff is not None:
+        if not isinstance(cutoff, str):
+            raise ProtocolError("protocol.eligibility_cutoff_date must be an ISO date string.")
+        try:
+            date.fromisoformat(cutoff)
+        except ValueError as exc:
+            raise ProtocolError(
+                "protocol.eligibility_cutoff_date must be an ISO date string."
+            ) from exc
 
     simulation = raw.get("simulation")
     if simulation is not True:

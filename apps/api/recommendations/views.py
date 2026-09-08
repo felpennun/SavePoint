@@ -15,9 +15,8 @@ from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
-from catalogue.models import CorpusVersion, GameWork
-from catalogue.serializers import _cover, _platform_summary, _release_year
-from recommendations.content.rank import rank_content_v1
+from evaluation.protocol import ProtocolError
+from recommendations.service import RecommendationServiceError, recommend_for_user
 from recommendations.content.variants import ALGORITHM_REGISTRY
 from recommendations.genre_heuristic import rank_genre_taste_v1
 
@@ -91,12 +90,17 @@ class ContentRecsView(APIView):
     throttle_scope = "recommendations"
 
     _DTO_KEYS = (
+        "protocol_version",
         "algorithm_id",
         "generated_at",
         "input_snapshot_sha256",
         "feature_set_version",
         "corpus_version",
         "snapshot_sha256",
+        "candidate_manifest_sha256",
+        "candidate_count",
+        "explorable_count",
+        "eligibility_cutoff_date",
         "insufficient_history",
         "limitation",
         "results",
@@ -112,6 +116,7 @@ class ContentRecsView(APIView):
         "year",
         "platform_summary",
         "cover",
+        "reason",
     )
 
     def get(self, request: Request) -> Response:
@@ -133,38 +138,21 @@ class ContentRecsView(APIView):
         if algorithm_id not in ALGORITHM_REGISTRY:
             return Response({"detail": "unknown algorithm_id"}, status=400)
 
-        corpus_version = (
-            CorpusVersion.objects.filter(is_active=True)
-            .order_by("-created_at")
-            .values_list("version", flat=True)
-            .first()
-        )
-        payload = rank_content_v1(
-            request.user,
-            algorithm_id,
-            limit=limit,
-            corpus_version=corpus_version,
-        )
-        work_ids = [item["work_id"] for item in payload["results"]]
-        works = {
-            str(work.id): work
-            for work in GameWork.objects.filter(id__in=work_ids)
-            .prefetch_related("assets", "releases__platform")
-        }
+        try:
+            payload = recommend_for_user(
+                request.user,
+                algorithm_id,
+                limit=limit,
+            )
+        except (ProtocolError, RecommendationServiceError):
+            return Response(
+                {"detail": "recommendations are temporarily unavailable"}, status=503
+            )
         return Response(
             {
                 **{key: payload[key] for key in self._DTO_KEYS if key != "results"},
                 "results": [
-                    {
-                        **{
-                            key: item[key]
-                            for key in self._ITEM_KEYS
-                            if key not in {"year", "platform_summary", "cover"}
-                        },
-                        "year": _release_year(works[item["work_id"]]),
-                        "platform_summary": _platform_summary(works[item["work_id"]]),
-                        "cover": _cover(works[item["work_id"]]),
-                    }
+                    {key: item[key] for key in self._ITEM_KEYS}
                     for item in payload["results"]
                 ],
             }

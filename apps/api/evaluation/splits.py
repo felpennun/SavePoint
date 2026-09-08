@@ -20,6 +20,7 @@ import hashlib
 import json
 import random
 import uuid
+from datetime import date
 from typing import NamedTuple
 
 from catalogue.corpus import evaluation_candidate_works
@@ -48,7 +49,12 @@ class UserSplit(NamedTuple):
     test: tuple[int, ...]
 
 
-def relevant_positive_ids(user, protocol, corpus_version: str | None = None) -> set[object]:
+def relevant_positive_ids(
+    user,
+    protocol,
+    corpus_version: str | None = None,
+    eligibility_cutoff_date: date | None = None,
+) -> set[object]:
     """Work ids the user counts as a positive under the frozen relevance rule.
 
     D-17: ``current_status == "completed"`` **or** ``rating_half_steps`` at or
@@ -65,15 +71,24 @@ def relevant_positive_ids(user, protocol, corpus_version: str | None = None) -> 
     ):
         if (want_completed and status == "completed") or (rating is not None and rating >= floor):
             positives.add(work_id)
-    if corpus_version is not None:
+    if corpus_version is not None or eligibility_cutoff_date is not None:
         eligible_ids = set(
-            evaluation_candidate_works(corpus_version).values_list("id", flat=True)
+            evaluation_candidate_works(
+                corpus_version,
+                eligibility_cutoff_date=eligibility_cutoff_date,
+            ).values_list("id", flat=True)
         )
         positives &= eligible_ids
     return positives
 
 
-def leave_one_out(user, seed, protocol, corpus_version: str | None = None) -> LeaveOneOut | None:
+def leave_one_out(
+    user,
+    seed,
+    protocol,
+    corpus_version: str | None = None,
+    eligibility_cutoff_date: date | None = None,
+) -> LeaveOneOut | None:
     """Hold one relevant-positive item out for ``user`` and build its candidate set.
 
     Returns ``None`` when the user has no relevant-positive item — the caller
@@ -84,7 +99,12 @@ def leave_one_out(user, seed, protocol, corpus_version: str | None = None) -> Le
     produce the same held-out item and the same candidate manifest hash.
     """
 
-    positives = relevant_positive_ids(user, protocol, corpus_version)
+    positives = relevant_positive_ids(
+        user,
+        protocol,
+        corpus_version,
+        eligibility_cutoff_date,
+    )
     if not positives:
         return None
 
@@ -97,7 +117,10 @@ def leave_one_out(user, seed, protocol, corpus_version: str | None = None) -> Le
     remaining_library_ids = library_ids - {heldout}
 
     eligible_ids = set(
-        evaluation_candidate_works(corpus_version).values_list("id", flat=True)
+        evaluation_candidate_works(
+            corpus_version,
+            eligibility_cutoff_date=eligibility_cutoff_date,
+        ).values_list("id", flat=True)
     )
     candidate_ids = (eligible_ids - remaining_library_ids) | {heldout}
 

@@ -140,10 +140,12 @@ export const es: Dictionary = {
     shelfEvidence:
       "Estos juegos comparten el género {genre} con títulos que has valorado o a los que has puesto un estado.",
     cardEvidence: "Comparte tus géneros: {genres}",
+    contentCardEvidence: "Coincide contigo en {reasons}.",
     emptyHeading: "Aún no hay suficiente actividad",
     emptyBody: "Valora o completa algunos juegos y aquí aparecerán sugerencias por género.",
     emptyCta: "Explorar el catálogo",
-    error: "No se pudieron generar tus recomendaciones. Inténtalo de nuevo.",
+    error: "No se pudieron cargar tus recomendaciones. Inténtalo de nuevo.",
+    retry: "Cargar recomendaciones",
     contentHeading: "Recomendado para ti",
     dlc: {
       heading: "Para tus juegos",
