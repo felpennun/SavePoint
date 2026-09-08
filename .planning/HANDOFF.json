@@ -1,0 +1,72 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-09-08T15:10:42.289Z",
+  "phase": "03",
+  "phase_name": "explainable-content-recommenders-and-baseline-comparison",
+  "phase_dir": ".planning/phases/03-explainable-content-recommenders-and-baseline-comparison",
+  "plan": null,
+  "task": null,
+  "total_tasks": 0,
+  "status": "paused",
+  "completed_tasks": [
+    {
+      "id": 1,
+      "name": "Firmar y cerrar la Fase 2",
+      "status": "done",
+      "commit": "b8fb7d6"
+    },
+    {
+      "id": 2,
+      "name": "Redactar el contrato visual de la Fase 3",
+      "status": "done",
+      "commit": "89be8aa"
+    }
+  ],
+  "remaining_tasks": [
+    {
+      "id": 3,
+      "name": "Validar 03-UI-SPEC.md con gsd-ui-checker y resolver UI Considerations",
+      "status": "not_started"
+    },
+    {
+      "id": 4,
+      "name": "Completar 03-RESEARCH.md usando las preguntas ya guardadas",
+      "status": "not_started"
+    },
+    {
+      "id": 5,
+      "name": "Crear 03-VALIDATION.md y 03-PATTERNS.md",
+      "status": "not_started"
+    },
+    {
+      "id": 6,
+      "name": "Redactar, verificar y sincronizar los planes de la Fase 3 con GitHub",
+      "status": "not_started"
+    }
+  ],
+  "blockers": [],
+  "async_jobs": [],
+  "human_actions_pending": [],
+  "decisions": [
+    {
+      "decision": "La Fase 2 queda firmada y congelada; no se recalcula ni se ajusta su primer resultado.",
+      "rationale": "El autor aceptó el resultado como evidencia reproducible, incluido nDCG@10 igual a 0,000.",
+      "phase": "02"
+    },
+    {
+      "decision": "La Fase 3 tendrá un contrato visual antes de generar sus PLAN.md.",
+      "rationale": "La página de recomendaciones cambia de placeholders a rankings reales y necesita estados, tamaños, espaciado y accesibilidad verificables.",
+      "phase": "03"
+    },
+    {
+      "decision": "El dashboard experimental no forma parte de la Fase 3.",
+      "rationale": "Permanece diferido a la Fase 7; la Fase 3 solo cubre la superficie de recomendaciones que consume resultados reales.",
+      "phase": "03"
+    }
+  ],
+  "uncommitted_files": [
+    ".planning/phases/03-explainable-content-recommenders-and-baseline-comparison/.research-plan-input.json"
+  ],
+  "next_action": "Reanudar con $gsd-resume-work, ejecutar el checker de 03-UI-SPEC.md y después relanzar la investigación técnica usando .research-plan-input.json sin repetir la firma de la Fase 2.",
+  "context_notes": "03-CONTEXT.md y 03-DISCUSSION-LOG.md ya contienen la discusión completa. 03-UI-SPEC.md fue creado y comprometido en 89be8aa, pero sigue con status draft y Approval pending. El investigador técnico fue detenido por petición del usuario antes de producir 03-RESEARCH.md; solo dejó el inventario de preguntas .research-plan-input.json. El gate ui-plan-gate detectó frontend=true, hasUiSpec=false antes de crear el contrato; debe volver a ejecutarse tras la validación. El precheck de drift avisó que el mapa del código está desactualizado, pero es no bloqueante y no debe convertirse en una auditoría completa nueva."
+}

@@ -1,0 +1,23 @@
+{
+  "ecosystem": "pypi",
+  "config": {
+    "exa_search": false,
+    "brave_search": false,
+    "firecrawl": false,
+    "tavily_search": false
+  },
+  "questions": [
+    {"text": "SciPy official documentation for scipy.stats.bootstrap percentile confidence intervals, paired resampling, reproducibility, and degenerate distributions", "kind": "docs", "library": "scipy", "version": "current"},
+    {"text": "SciPy official documentation for friedmanchisquare assumptions, minimum samples, and interpretation", "kind": "docs", "library": "scipy", "version": "current"},
+    {"text": "SciPy official documentation for wilcoxon paired signed-rank test, zero_method, method, ties, and assumptions", "kind": "docs", "library": "scipy", "version": "current"},
+    {"text": "Holm 1979 sequentially rejective multiple test procedure primary paper family-wise error algorithm", "kind": "web"},
+    {"text": "Primary recommender-systems research definitions for catalog coverage, intra-list diversity using cosine distance, and novelty as self-information", "kind": "web"},
+    {"text": "Python official documentation time.perf_counter_ns resource.getrusage ru_maxrss platform and importlib.metadata for reproducible run identity", "kind": "docs", "library": "python", "version": "3.13"},
+    {"text": "IGDB official API documentation popularity primitives popularity types external_games Steam IDs and rate limits", "kind": "web"},
+    {"text": "Steam official store reviews endpoint appreviews response fields terms caching attribution and rate limits", "kind": "web"},
+    {"text": "IMDb official non-commercial datasets terms titleType videoGame ratings votes data usage", "kind": "web"},
+    {"text": "MobyGames official API documentation licensing terms scores and commercial or AI restrictions", "kind": "web"},
+    {"text": "OpenCritic official API documentation terms access and score fields", "kind": "web"},
+    {"text": "OWASP ASVS controls applicable to offline experiment artifacts integrity input validation secrets logs and resource exhaustion", "kind": "web"}
+  ]
+}
