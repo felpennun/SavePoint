@@ -214,7 +214,7 @@ Plans:
 **Plans**: 4 plans in 3 waves
 
 **Plan files**:
-- [ ] 03-01-PLAN.md (Wave 1) — Tracer de ranking real, candidatos comunes y contrato v2.
+- [x] 03-01-PLAN.md (Wave 1) — Tracer de ranking real, candidatos comunes y contrato v2 — completado 2026-09-08; `03-01-SUMMARY.md`, servicio v2, manifiesto común hashado y 403 pruebas backend.
 - [ ] 03-02-PLAN.md (Wave 2) — Señales de contenido, variantes y explicaciones deterministas.
 - [ ] 03-03-PLAN.md (Wave 2) — Métricas beyond-accuracy, incertidumbre y contrastes estadísticos.
 - [ ] 03-04-PLAN.md (Wave 3) — Runner multi-semilla, evidencia, integración web y vault.
@@ -293,7 +293,7 @@ Plans:
 | 1. Three-Day Public Demo Slice | 16/16 | Complete    | 2026-09-05 |
 | 01.1. Real-Scale Catalogue and Product Experience (inserted) | 10/10 | Complete    | 2026-09-06 |
 | 2. Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender | 13/13 | Complete    | 2026-09-08 |
-| 3. Explainable Content Recommenders and Baseline Comparison | 0/TBD | Not started | - |
+| 3. Explainable Content Recommenders and Baseline Comparison | 1/4 | In Progress | - |
 | 4. Collaborative and Hybrid Comparison | 0/TBD | Not started | - |
 | 5. Complete Collection Workflows and Portability | 0/TBD | Not started | - |
 | 6. Public Discovery and Resilient Enrichment | 0/TBD | Not started | - |
