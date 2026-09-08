@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 status: awaiting_author_signoff
 stopped_at: Fase 2 técnicamente completada; pendiente la revisión y firma del autor sobre el resultado simulado de 02-13.
 last_updated: "2026-09-08T12:30:00+02:00"
-state_head: working-tree-phase-02-close
+state_head: 233d3f9
 progress:
   total_phases: 8
   completed_phases: 2
