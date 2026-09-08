@@ -45,27 +45,27 @@
 - [x] **DATA-02**: Dataset records its version, licence, source URL, retrieval date, and checksum.
 - [x] **DATA-03**: Project generates a data dictionary and a quality/missing-fields report for the fixed corpus.
 - [x] **DATA-04**: Enrichment API is selected through a documented comparison of coverage, platforms, licence, attribution, quotas, stability, and cost.
-- [ ] **DATA-05**: Each enriched value retains its source and retrieval date.
+- [x] **DATA-05**: Each enriched value retains its source and retrieval date.
 - [x] **DATA-06**: Mutable API data cannot retrospectively alter completed experiments.
-- [ ] **DATA-07**: System uses deterministic rules to reconcile source identifiers and conflicting values.
+- [x] **DATA-07**: System uses deterministic rules to reconcile source identifiers and conflicting values.
 - [x] **DATA-08**: Thesis evidence explains the dataset and API choices, limitations, and redistribution rights.
 
 ### Recommendations
 
-- [ ] **REC-01**: System produces a random recommendation baseline.
+- [x] **REC-01**: System produces a random recommendation baseline.
 - [x] **REC-02**: System produces a popularity recommendation baseline.
-- [ ] **REC-03**: System implements a content-based recommender.
+- [x] **REC-03**: System implements a content-based recommender.
 - [ ] **REC-04**: System implements at least one collaborative-filtering method.
 - [ ] **REC-05**: System implements a hybrid recommender.
-- [ ] **REC-06**: User without sufficient history receives recommendations through an explicit cold-start strategy.
-- [ ] **REC-07**: Recommendations exclude already-consumed games according to configured rules.
-- [ ] **REC-08**: Each recommendation presents a deterministic explanation grounded in actual model evidence.
-- [ ] **REC-09**: Published recommendation results retain the model, feature, and input-data versions used.
+- [x] **REC-06**: User without sufficient history receives recommendations through an explicit cold-start strategy.
+- [x] **REC-07**: Recommendations exclude already-consumed games according to configured rules.
+- [x] **REC-08**: Each recommendation presents a deterministic explanation grounded in actual model evidence.
+- [x] **REC-09**: Published recommendation results retain the model, feature, and input-data versions used.
 - [ ] **REC-10**: A dedicated recommendations page exposes genre-oriented suggestions reflecting the signed-in user's own recorded tastes, distinct from the public popularity baseline.
 
 ### Experimentation and Evaluation
 
-- [ ] **EVAL-01**: All algorithms are compared with the same users, candidates, exclusions, and split manifests.
+- [x] **EVAL-01**: All algorithms are compared with the same users, candidates, exclusions, and split manifests.
 - [x] **EVAL-02**: Transformations fit training data only and the test set remains isolated from tuning.
 - [x] **EVAL-03**: Protocol fixes relevance, K, splits, metrics, and tuning budget before algorithm comparison.
 - [ ] **EVAL-04**: Evaluation calculates justified accuracy and ranking metrics.
@@ -113,13 +113,13 @@
 - [x] **DOC-01**: Architecture and technology decisions record alternatives and rationale.
 - [x] **DOC-02**: Dataset, API, data model, and normalisation processes are documented.
 - [ ] **DOC-03**: Each algorithm documents its theory, formulation, parameters, and limitations.
-- [ ] **DOC-04**: Experimental protocol, metrics, results, and threats to validity are documented.
+- [x] **DOC-04**: Experimental protocol, metrics, results, and threats to validity are documented.
 - [ ] **DOC-05**: Thesis tables and figures are generated from immutable experiment artifacts.
 - [ ] **DOC-06**: Future example theses, formatting rules, and lecturer annotations are registered as canonical project references.
 - [x] **AGENT-01**: Project records the roles and responsibilities of agents used.
 - [x] **AGENT-02**: Project retains relevant protocols or prompts, configuration, models, tools, and generated artifacts.
 - [x] **AGENT-03**: Evidence distinguishes agent proposals, automated verification, and author decisions.
-- [ ] **AGENT-04**: Methodology documents controls against hallucination, bias, error, and information exposure.
+- [x] **AGENT-04**: Methodology documents controls against hallucination, bias, error, and information exposure.
 - [ ] **AGENT-05**: Methodology analyses reproducibility, costs, limitations, and threats to validity of agent-assisted work.
 - [ ] **AGENT-06**: AI use is disclosed according to future university rules and lecturer guidance.
 
@@ -188,24 +188,24 @@
 | REC-10 | Phase 01.1 | Pending |
 | QUAL-05 | Phase 01.1 | Pending |
 | DATA-03 | Phase 2 | Complete |
-| DATA-05 | Phase 2 | Pending |
+| DATA-05 | Phase 2 | Complete |
 | DATA-06 | Phase 2 | Complete |
-| DATA-07 | Phase 2 | Pending |
+| DATA-07 | Phase 2 | Complete |
 | DATA-08 | Phase 2 | Complete |
-| EVAL-01 | Phase 2 | Pending |
+| EVAL-01 | Phase 2 | Complete |
 | EVAL-02 | Phase 2 | Complete |
 | EVAL-03 | Phase 2 | Complete |
 | EVAL-09 | Phase 2 | Complete (Plan 02-09) |
 | EVAL-10 | Phase 2 | Complete (Plan 02-09) |
-| REC-01 | Phase 2 | Pending |
-| REC-03 | Phase 2 | Pending |
-| REC-06 | Phase 2 | Pending |
-| REC-07 | Phase 2 | Pending |
-| REC-08 | Phase 2 | Pending |
-| REC-09 | Phase 2 | Pending |
+| REC-01 | Phase 2 | Complete |
+| REC-03 | Phase 2 | Complete |
+| REC-06 | Phase 2 | Complete |
+| REC-07 | Phase 2 | Complete |
+| REC-08 | Phase 2 | Complete |
+| REC-09 | Phase 2 | Complete |
 | DOC-02 | Phase 2 | Complete |
-| DOC-04 | Phase 2 | Pending |
-| AGENT-04 | Phase 2 | Pending |
+| DOC-04 | Phase 2 | Complete |
+| AGENT-04 | Phase 2 | Complete |
 | EVAL-04 | Phase 3 | Pending |
 | EVAL-05 | Phase 3 | Pending |
 | EVAL-06 | Phase 3 | Pending |

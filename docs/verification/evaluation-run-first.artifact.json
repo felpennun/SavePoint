@@ -1,0 +1,3529 @@
+{
+  "algorithms": {
+    "content-cbf-multiplicative-v1": {
+      "aggregates": {
+        "10": {
+          "map": 0.0,
+          "ndcg": 0.0,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "20": {
+          "map": 0.0,
+          "ndcg": 0.0,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "5": {
+          "map": 0.0,
+          "ndcg": 0.0,
+          "precision": 0.0,
+          "recall": 0.0
+        }
+      },
+      "algorithm_id": "content-cbf-multiplicative-v1",
+      "per_user": [
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "6276263d-1b0b-42e1-8c90-b01796410377",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "27"
+        },
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "b5c77a7f-5f84-46d3-ba42-688c0a7e8871",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "36"
+        },
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "e59b04d8-3ee7-4f27-b9bf-a1be2969af00",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "45"
+        },
+        {
+          "candidate_sha256": "ba87904b5f7934c7c0523b628079458e044f400255cc17eb610e7f0a6fafee6b",
+          "heldout_rank": null,
+          "heldout_work_id": "6618bb85-bc46-44c7-a928-6d9774556284",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "49"
+        },
+        {
+          "candidate_sha256": "967a3bdff25d544eed0ceed7a5c8c3141f582bfe483b98a40a8c6471fc717e8e",
+          "heldout_rank": null,
+          "heldout_work_id": "61cdf22f-3902-4497-aa53-0ea8733a7c1c",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "67"
+        },
+        {
+          "candidate_sha256": "71c67c37a6b54134579fe6473f3f2d43d4fd558942556a887efab7121f52391c",
+          "heldout_rank": null,
+          "heldout_work_id": "861fe0b9-ff6c-4c6e-b9ae-bc66d3798687",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "71"
+        },
+        {
+          "candidate_sha256": "0de50c3001f27b0fb6197a127d8f4d194ceff6e34b31055e9e2572cdfe8b6dfd",
+          "heldout_rank": null,
+          "heldout_work_id": "49388f2a-5fea-4a2f-8c7b-f63555f928e5",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "74"
+        },
+        {
+          "candidate_sha256": "6632e898f3ac9da0d9d6e376b64bfa6bb94c12d0cccb305adfd41231af442528",
+          "heldout_rank": null,
+          "heldout_work_id": "1c22b778-639c-49dd-b954-015f92ffff9e",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "79"
+        },
+        {
+          "candidate_sha256": "8acb2ec07ea40d4bbaa0ada3656463fec34c1373fe3d64987180a01bd68e6a1b",
+          "heldout_rank": null,
+          "heldout_work_id": "52223d3d-5a67-4ded-9cf7-f277a16293e5",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "81"
+        },
+        {
+          "candidate_sha256": "ee04dd4ff606a94cd474fb6fee1bb22bcd7290c91357052eb147113665b3c522",
+          "heldout_rank": null,
+          "heldout_work_id": "7f0fc4ca-a6b3-4516-9e4d-f4f2dacfd10b",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "84"
+        },
+        {
+          "candidate_sha256": "48912245e8d746eaf780eaccbeb03444f13ed52fe39c2db8b3a1cf804faada9c",
+          "heldout_rank": null,
+          "heldout_work_id": "91998f0d-37f8-426f-b928-d1152e280b56",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "85"
+        },
+        {
+          "candidate_sha256": "c4aae864f1bd5e989b7d6847f947410e273ef81034a4732d7d85322cd1081b35",
+          "heldout_rank": null,
+          "heldout_work_id": "122d7df6-0a6b-4f11-99fa-74d8e5f57552",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "87"
+        },
+        {
+          "candidate_sha256": "4802577faabcaa1169697363dce842bf156b0dcf1b44298d0923db5e1a78f49a",
+          "heldout_rank": null,
+          "heldout_work_id": "56e4eb08-7d92-40a8-b23d-89f673177165",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "89"
+        },
+        {
+          "candidate_sha256": "83c9e2bb151178473d02519690a014fade6228be9fb3dcb1b9aeaa4c395371d1",
+          "heldout_rank": null,
+          "heldout_work_id": "eee7ac9d-1d6a-44b1-b1e6-745990433d91",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "106"
+        },
+        {
+          "candidate_sha256": "da9e968d7271f359520e7f35058b0161cc397135fe7c59c54051cd8fc2795d36",
+          "heldout_rank": null,
+          "heldout_work_id": "956d95fd-86a2-4d2b-a7ad-e416323d3124",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "107"
+        },
+        {
+          "candidate_sha256": "a26422dc3aee31025206206a94a47e932545b99fbcef13fefcc2cc97f6070aa0",
+          "heldout_rank": null,
+          "heldout_work_id": "616bed67-6c7e-4f2f-b1e0-8a6890de00b1",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "110"
+        },
+        {
+          "candidate_sha256": "0700054345d02163e7e17adce925c1c7a9514c33e66e136cb3b50938763bb5b0",
+          "heldout_rank": null,
+          "heldout_work_id": "e46dc10e-134b-4147-967f-92addfd2acd3",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "118"
+        },
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "cb61baf9-4de3-4535-b635-4bc9d3e6ceda",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "121"
+        },
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "1cc9823c-6c7f-4405-b3b4-a95cad82b120",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "124"
+        },
+        {
+          "candidate_sha256": "2f59e5e0a4f76e8d8678dc7420e2ece4792ab8f1de149a8500abf487798a07eb",
+          "heldout_rank": null,
+          "heldout_work_id": "784a910e-5ad8-43d8-8fee-bb0017643fca",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "143"
+        },
+        {
+          "candidate_sha256": "5c84612013378c87e55bfc8178f4d3e696e0f8f72938862925e65b34efcb6f80",
+          "heldout_rank": null,
+          "heldout_work_id": "c46c8662-ada3-44d0-9159-26fd2b58900b",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "145"
+        },
+        {
+          "candidate_sha256": "bb49d9922f778dd6e50d64f9158c42120d40c6614efce38c59b3249a0b2ec137",
+          "heldout_rank": null,
+          "heldout_work_id": "bf6bc049-2ca1-4d80-8b91-eb0b2168b9e5",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "146"
+        },
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "8c9068aa-e23d-4724-9bec-9d1818ffb12c",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "177"
+        },
+        {
+          "candidate_sha256": "3fa799534467302cf0625925bcdd049fc14dcda5e782fe9b8e8d8623049836ba",
+          "heldout_rank": null,
+          "heldout_work_id": "1bab7657-cc7a-497a-b239-4b235e19f500",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "192"
+        },
+        {
+          "candidate_sha256": "dba24dc67866199cbf342036a8a695242fe1828cd409f1aeb1cdd3f8c138f603",
+          "heldout_rank": null,
+          "heldout_work_id": "b1c80970-b982-42b6-9ba5-97df5c9f5f47",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "212"
+        },
+        {
+          "candidate_sha256": "b987db50ff36321361ea61cfbc65160fa617c44198bdb367151738b36aa9442f",
+          "heldout_rank": null,
+          "heldout_work_id": "a346d317-3b14-4382-9251-324745eecad7",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "215"
+        }
+      ]
+    },
+    "content-cbf-twostage-v1": {
+      "aggregates": {
+        "10": {
+          "map": 0.0,
+          "ndcg": 0.0,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "20": {
+          "map": 0.0,
+          "ndcg": 0.0,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "5": {
+          "map": 0.0,
+          "ndcg": 0.0,
+          "precision": 0.0,
+          "recall": 0.0
+        }
+      },
+      "algorithm_id": "content-cbf-twostage-v1",
+      "per_user": [
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "6276263d-1b0b-42e1-8c90-b01796410377",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "27"
+        },
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "b5c77a7f-5f84-46d3-ba42-688c0a7e8871",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "36"
+        },
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "e59b04d8-3ee7-4f27-b9bf-a1be2969af00",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "45"
+        },
+        {
+          "candidate_sha256": "ba87904b5f7934c7c0523b628079458e044f400255cc17eb610e7f0a6fafee6b",
+          "heldout_rank": null,
+          "heldout_work_id": "6618bb85-bc46-44c7-a928-6d9774556284",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "49"
+        },
+        {
+          "candidate_sha256": "967a3bdff25d544eed0ceed7a5c8c3141f582bfe483b98a40a8c6471fc717e8e",
+          "heldout_rank": null,
+          "heldout_work_id": "61cdf22f-3902-4497-aa53-0ea8733a7c1c",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "67"
+        },
+        {
+          "candidate_sha256": "71c67c37a6b54134579fe6473f3f2d43d4fd558942556a887efab7121f52391c",
+          "heldout_rank": null,
+          "heldout_work_id": "861fe0b9-ff6c-4c6e-b9ae-bc66d3798687",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "71"
+        },
+        {
+          "candidate_sha256": "0de50c3001f27b0fb6197a127d8f4d194ceff6e34b31055e9e2572cdfe8b6dfd",
+          "heldout_rank": null,
+          "heldout_work_id": "49388f2a-5fea-4a2f-8c7b-f63555f928e5",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "74"
+        },
+        {
+          "candidate_sha256": "6632e898f3ac9da0d9d6e376b64bfa6bb94c12d0cccb305adfd41231af442528",
+          "heldout_rank": null,
+          "heldout_work_id": "1c22b778-639c-49dd-b954-015f92ffff9e",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "79"
+        },
+        {
+          "candidate_sha256": "8acb2ec07ea40d4bbaa0ada3656463fec34c1373fe3d64987180a01bd68e6a1b",
+          "heldout_rank": null,
+          "heldout_work_id": "52223d3d-5a67-4ded-9cf7-f277a16293e5",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "81"
+        },
+        {
+          "candidate_sha256": "ee04dd4ff606a94cd474fb6fee1bb22bcd7290c91357052eb147113665b3c522",
+          "heldout_rank": null,
+          "heldout_work_id": "7f0fc4ca-a6b3-4516-9e4d-f4f2dacfd10b",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "84"
+        },
+        {
+          "candidate_sha256": "48912245e8d746eaf780eaccbeb03444f13ed52fe39c2db8b3a1cf804faada9c",
+          "heldout_rank": null,
+          "heldout_work_id": "91998f0d-37f8-426f-b928-d1152e280b56",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "85"
+        },
+        {
+          "candidate_sha256": "c4aae864f1bd5e989b7d6847f947410e273ef81034a4732d7d85322cd1081b35",
+          "heldout_rank": null,
+          "heldout_work_id": "122d7df6-0a6b-4f11-99fa-74d8e5f57552",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "87"
+        },
+        {
+          "candidate_sha256": "4802577faabcaa1169697363dce842bf156b0dcf1b44298d0923db5e1a78f49a",
+          "heldout_rank": null,
+          "heldout_work_id": "56e4eb08-7d92-40a8-b23d-89f673177165",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "89"
+        },
+        {
+          "candidate_sha256": "83c9e2bb151178473d02519690a014fade6228be9fb3dcb1b9aeaa4c395371d1",
+          "heldout_rank": null,
+          "heldout_work_id": "eee7ac9d-1d6a-44b1-b1e6-745990433d91",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "106"
+        },
+        {
+          "candidate_sha256": "da9e968d7271f359520e7f35058b0161cc397135fe7c59c54051cd8fc2795d36",
+          "heldout_rank": null,
+          "heldout_work_id": "956d95fd-86a2-4d2b-a7ad-e416323d3124",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "107"
+        },
+        {
+          "candidate_sha256": "a26422dc3aee31025206206a94a47e932545b99fbcef13fefcc2cc97f6070aa0",
+          "heldout_rank": null,
+          "heldout_work_id": "616bed67-6c7e-4f2f-b1e0-8a6890de00b1",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "110"
+        },
+        {
+          "candidate_sha256": "0700054345d02163e7e17adce925c1c7a9514c33e66e136cb3b50938763bb5b0",
+          "heldout_rank": null,
+          "heldout_work_id": "e46dc10e-134b-4147-967f-92addfd2acd3",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "118"
+        },
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "cb61baf9-4de3-4535-b635-4bc9d3e6ceda",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "121"
+        },
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "1cc9823c-6c7f-4405-b3b4-a95cad82b120",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "124"
+        },
+        {
+          "candidate_sha256": "2f59e5e0a4f76e8d8678dc7420e2ece4792ab8f1de149a8500abf487798a07eb",
+          "heldout_rank": null,
+          "heldout_work_id": "784a910e-5ad8-43d8-8fee-bb0017643fca",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "143"
+        },
+        {
+          "candidate_sha256": "5c84612013378c87e55bfc8178f4d3e696e0f8f72938862925e65b34efcb6f80",
+          "heldout_rank": null,
+          "heldout_work_id": "c46c8662-ada3-44d0-9159-26fd2b58900b",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "145"
+        },
+        {
+          "candidate_sha256": "bb49d9922f778dd6e50d64f9158c42120d40c6614efce38c59b3249a0b2ec137",
+          "heldout_rank": null,
+          "heldout_work_id": "bf6bc049-2ca1-4d80-8b91-eb0b2168b9e5",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "146"
+        },
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "8c9068aa-e23d-4724-9bec-9d1818ffb12c",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "177"
+        },
+        {
+          "candidate_sha256": "3fa799534467302cf0625925bcdd049fc14dcda5e782fe9b8e8d8623049836ba",
+          "heldout_rank": null,
+          "heldout_work_id": "1bab7657-cc7a-497a-b239-4b235e19f500",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "192"
+        },
+        {
+          "candidate_sha256": "dba24dc67866199cbf342036a8a695242fe1828cd409f1aeb1cdd3f8c138f603",
+          "heldout_rank": null,
+          "heldout_work_id": "b1c80970-b982-42b6-9ba5-97df5c9f5f47",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "212"
+        },
+        {
+          "candidate_sha256": "b987db50ff36321361ea61cfbc65160fa617c44198bdb367151738b36aa9442f",
+          "heldout_rank": null,
+          "heldout_work_id": "a346d317-3b14-4382-9251-324745eecad7",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "215"
+        }
+      ]
+    },
+    "content-cbf-weighted-v1": {
+      "aggregates": {
+        "10": {
+          "map": 0.0,
+          "ndcg": 0.0,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "20": {
+          "map": 0.0,
+          "ndcg": 0.0,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "5": {
+          "map": 0.0,
+          "ndcg": 0.0,
+          "precision": 0.0,
+          "recall": 0.0
+        }
+      },
+      "algorithm_id": "content-cbf-weighted-v1",
+      "per_user": [
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "6276263d-1b0b-42e1-8c90-b01796410377",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "27"
+        },
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "b5c77a7f-5f84-46d3-ba42-688c0a7e8871",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "36"
+        },
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "e59b04d8-3ee7-4f27-b9bf-a1be2969af00",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "45"
+        },
+        {
+          "candidate_sha256": "ba87904b5f7934c7c0523b628079458e044f400255cc17eb610e7f0a6fafee6b",
+          "heldout_rank": null,
+          "heldout_work_id": "6618bb85-bc46-44c7-a928-6d9774556284",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "49"
+        },
+        {
+          "candidate_sha256": "967a3bdff25d544eed0ceed7a5c8c3141f582bfe483b98a40a8c6471fc717e8e",
+          "heldout_rank": null,
+          "heldout_work_id": "61cdf22f-3902-4497-aa53-0ea8733a7c1c",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "67"
+        },
+        {
+          "candidate_sha256": "71c67c37a6b54134579fe6473f3f2d43d4fd558942556a887efab7121f52391c",
+          "heldout_rank": null,
+          "heldout_work_id": "861fe0b9-ff6c-4c6e-b9ae-bc66d3798687",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "71"
+        },
+        {
+          "candidate_sha256": "0de50c3001f27b0fb6197a127d8f4d194ceff6e34b31055e9e2572cdfe8b6dfd",
+          "heldout_rank": null,
+          "heldout_work_id": "49388f2a-5fea-4a2f-8c7b-f63555f928e5",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "74"
+        },
+        {
+          "candidate_sha256": "6632e898f3ac9da0d9d6e376b64bfa6bb94c12d0cccb305adfd41231af442528",
+          "heldout_rank": null,
+          "heldout_work_id": "1c22b778-639c-49dd-b954-015f92ffff9e",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "79"
+        },
+        {
+          "candidate_sha256": "8acb2ec07ea40d4bbaa0ada3656463fec34c1373fe3d64987180a01bd68e6a1b",
+          "heldout_rank": null,
+          "heldout_work_id": "52223d3d-5a67-4ded-9cf7-f277a16293e5",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "81"
+        },
+        {
+          "candidate_sha256": "ee04dd4ff606a94cd474fb6fee1bb22bcd7290c91357052eb147113665b3c522",
+          "heldout_rank": null,
+          "heldout_work_id": "7f0fc4ca-a6b3-4516-9e4d-f4f2dacfd10b",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "84"
+        },
+        {
+          "candidate_sha256": "48912245e8d746eaf780eaccbeb03444f13ed52fe39c2db8b3a1cf804faada9c",
+          "heldout_rank": null,
+          "heldout_work_id": "91998f0d-37f8-426f-b928-d1152e280b56",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "85"
+        },
+        {
+          "candidate_sha256": "c4aae864f1bd5e989b7d6847f947410e273ef81034a4732d7d85322cd1081b35",
+          "heldout_rank": null,
+          "heldout_work_id": "122d7df6-0a6b-4f11-99fa-74d8e5f57552",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "87"
+        },
+        {
+          "candidate_sha256": "4802577faabcaa1169697363dce842bf156b0dcf1b44298d0923db5e1a78f49a",
+          "heldout_rank": null,
+          "heldout_work_id": "56e4eb08-7d92-40a8-b23d-89f673177165",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "89"
+        },
+        {
+          "candidate_sha256": "83c9e2bb151178473d02519690a014fade6228be9fb3dcb1b9aeaa4c395371d1",
+          "heldout_rank": null,
+          "heldout_work_id": "eee7ac9d-1d6a-44b1-b1e6-745990433d91",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "106"
+        },
+        {
+          "candidate_sha256": "da9e968d7271f359520e7f35058b0161cc397135fe7c59c54051cd8fc2795d36",
+          "heldout_rank": null,
+          "heldout_work_id": "956d95fd-86a2-4d2b-a7ad-e416323d3124",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "107"
+        },
+        {
+          "candidate_sha256": "a26422dc3aee31025206206a94a47e932545b99fbcef13fefcc2cc97f6070aa0",
+          "heldout_rank": null,
+          "heldout_work_id": "616bed67-6c7e-4f2f-b1e0-8a6890de00b1",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "110"
+        },
+        {
+          "candidate_sha256": "0700054345d02163e7e17adce925c1c7a9514c33e66e136cb3b50938763bb5b0",
+          "heldout_rank": null,
+          "heldout_work_id": "e46dc10e-134b-4147-967f-92addfd2acd3",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "118"
+        },
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "cb61baf9-4de3-4535-b635-4bc9d3e6ceda",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "121"
+        },
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "1cc9823c-6c7f-4405-b3b4-a95cad82b120",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "124"
+        },
+        {
+          "candidate_sha256": "2f59e5e0a4f76e8d8678dc7420e2ece4792ab8f1de149a8500abf487798a07eb",
+          "heldout_rank": null,
+          "heldout_work_id": "784a910e-5ad8-43d8-8fee-bb0017643fca",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "143"
+        },
+        {
+          "candidate_sha256": "5c84612013378c87e55bfc8178f4d3e696e0f8f72938862925e65b34efcb6f80",
+          "heldout_rank": null,
+          "heldout_work_id": "c46c8662-ada3-44d0-9159-26fd2b58900b",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "145"
+        },
+        {
+          "candidate_sha256": "bb49d9922f778dd6e50d64f9158c42120d40c6614efce38c59b3249a0b2ec137",
+          "heldout_rank": null,
+          "heldout_work_id": "bf6bc049-2ca1-4d80-8b91-eb0b2168b9e5",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "146"
+        },
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "8c9068aa-e23d-4724-9bec-9d1818ffb12c",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "177"
+        },
+        {
+          "candidate_sha256": "3fa799534467302cf0625925bcdd049fc14dcda5e782fe9b8e8d8623049836ba",
+          "heldout_rank": null,
+          "heldout_work_id": "1bab7657-cc7a-497a-b239-4b235e19f500",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "192"
+        },
+        {
+          "candidate_sha256": "dba24dc67866199cbf342036a8a695242fe1828cd409f1aeb1cdd3f8c138f603",
+          "heldout_rank": null,
+          "heldout_work_id": "b1c80970-b982-42b6-9ba5-97df5c9f5f47",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "212"
+        },
+        {
+          "candidate_sha256": "b987db50ff36321361ea61cfbc65160fa617c44198bdb367151738b36aa9442f",
+          "heldout_rank": null,
+          "heldout_work_id": "a346d317-3b14-4382-9251-324745eecad7",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "215"
+        }
+      ]
+    },
+    "popularity-v1": {
+      "aggregates": {
+        "10": {
+          "map": 0.0,
+          "ndcg": 0.0,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "20": {
+          "map": 0.0,
+          "ndcg": 0.0,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "5": {
+          "map": 0.0,
+          "ndcg": 0.0,
+          "precision": 0.0,
+          "recall": 0.0
+        }
+      },
+      "algorithm_id": "popularity-v1",
+      "per_user": [
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "6276263d-1b0b-42e1-8c90-b01796410377",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "27"
+        },
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "b5c77a7f-5f84-46d3-ba42-688c0a7e8871",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "36"
+        },
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "e59b04d8-3ee7-4f27-b9bf-a1be2969af00",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "45"
+        },
+        {
+          "candidate_sha256": "ba87904b5f7934c7c0523b628079458e044f400255cc17eb610e7f0a6fafee6b",
+          "heldout_rank": null,
+          "heldout_work_id": "6618bb85-bc46-44c7-a928-6d9774556284",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "49"
+        },
+        {
+          "candidate_sha256": "967a3bdff25d544eed0ceed7a5c8c3141f582bfe483b98a40a8c6471fc717e8e",
+          "heldout_rank": null,
+          "heldout_work_id": "61cdf22f-3902-4497-aa53-0ea8733a7c1c",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "67"
+        },
+        {
+          "candidate_sha256": "71c67c37a6b54134579fe6473f3f2d43d4fd558942556a887efab7121f52391c",
+          "heldout_rank": null,
+          "heldout_work_id": "861fe0b9-ff6c-4c6e-b9ae-bc66d3798687",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "71"
+        },
+        {
+          "candidate_sha256": "0de50c3001f27b0fb6197a127d8f4d194ceff6e34b31055e9e2572cdfe8b6dfd",
+          "heldout_rank": null,
+          "heldout_work_id": "49388f2a-5fea-4a2f-8c7b-f63555f928e5",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "74"
+        },
+        {
+          "candidate_sha256": "6632e898f3ac9da0d9d6e376b64bfa6bb94c12d0cccb305adfd41231af442528",
+          "heldout_rank": null,
+          "heldout_work_id": "1c22b778-639c-49dd-b954-015f92ffff9e",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "79"
+        },
+        {
+          "candidate_sha256": "8acb2ec07ea40d4bbaa0ada3656463fec34c1373fe3d64987180a01bd68e6a1b",
+          "heldout_rank": null,
+          "heldout_work_id": "52223d3d-5a67-4ded-9cf7-f277a16293e5",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "81"
+        },
+        {
+          "candidate_sha256": "ee04dd4ff606a94cd474fb6fee1bb22bcd7290c91357052eb147113665b3c522",
+          "heldout_rank": null,
+          "heldout_work_id": "7f0fc4ca-a6b3-4516-9e4d-f4f2dacfd10b",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "84"
+        },
+        {
+          "candidate_sha256": "48912245e8d746eaf780eaccbeb03444f13ed52fe39c2db8b3a1cf804faada9c",
+          "heldout_rank": null,
+          "heldout_work_id": "91998f0d-37f8-426f-b928-d1152e280b56",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "85"
+        },
+        {
+          "candidate_sha256": "c4aae864f1bd5e989b7d6847f947410e273ef81034a4732d7d85322cd1081b35",
+          "heldout_rank": null,
+          "heldout_work_id": "122d7df6-0a6b-4f11-99fa-74d8e5f57552",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "87"
+        },
+        {
+          "candidate_sha256": "4802577faabcaa1169697363dce842bf156b0dcf1b44298d0923db5e1a78f49a",
+          "heldout_rank": null,
+          "heldout_work_id": "56e4eb08-7d92-40a8-b23d-89f673177165",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "89"
+        },
+        {
+          "candidate_sha256": "83c9e2bb151178473d02519690a014fade6228be9fb3dcb1b9aeaa4c395371d1",
+          "heldout_rank": null,
+          "heldout_work_id": "eee7ac9d-1d6a-44b1-b1e6-745990433d91",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "106"
+        },
+        {
+          "candidate_sha256": "da9e968d7271f359520e7f35058b0161cc397135fe7c59c54051cd8fc2795d36",
+          "heldout_rank": null,
+          "heldout_work_id": "956d95fd-86a2-4d2b-a7ad-e416323d3124",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "107"
+        },
+        {
+          "candidate_sha256": "a26422dc3aee31025206206a94a47e932545b99fbcef13fefcc2cc97f6070aa0",
+          "heldout_rank": null,
+          "heldout_work_id": "616bed67-6c7e-4f2f-b1e0-8a6890de00b1",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "110"
+        },
+        {
+          "candidate_sha256": "0700054345d02163e7e17adce925c1c7a9514c33e66e136cb3b50938763bb5b0",
+          "heldout_rank": null,
+          "heldout_work_id": "e46dc10e-134b-4147-967f-92addfd2acd3",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "118"
+        },
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "cb61baf9-4de3-4535-b635-4bc9d3e6ceda",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "121"
+        },
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "1cc9823c-6c7f-4405-b3b4-a95cad82b120",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "124"
+        },
+        {
+          "candidate_sha256": "2f59e5e0a4f76e8d8678dc7420e2ece4792ab8f1de149a8500abf487798a07eb",
+          "heldout_rank": null,
+          "heldout_work_id": "784a910e-5ad8-43d8-8fee-bb0017643fca",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "143"
+        },
+        {
+          "candidate_sha256": "5c84612013378c87e55bfc8178f4d3e696e0f8f72938862925e65b34efcb6f80",
+          "heldout_rank": null,
+          "heldout_work_id": "c46c8662-ada3-44d0-9159-26fd2b58900b",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "145"
+        },
+        {
+          "candidate_sha256": "bb49d9922f778dd6e50d64f9158c42120d40c6614efce38c59b3249a0b2ec137",
+          "heldout_rank": null,
+          "heldout_work_id": "bf6bc049-2ca1-4d80-8b91-eb0b2168b9e5",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "146"
+        },
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "8c9068aa-e23d-4724-9bec-9d1818ffb12c",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "177"
+        },
+        {
+          "candidate_sha256": "3fa799534467302cf0625925bcdd049fc14dcda5e782fe9b8e8d8623049836ba",
+          "heldout_rank": null,
+          "heldout_work_id": "1bab7657-cc7a-497a-b239-4b235e19f500",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "192"
+        },
+        {
+          "candidate_sha256": "dba24dc67866199cbf342036a8a695242fe1828cd409f1aeb1cdd3f8c138f603",
+          "heldout_rank": null,
+          "heldout_work_id": "b1c80970-b982-42b6-9ba5-97df5c9f5f47",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "212"
+        },
+        {
+          "candidate_sha256": "b987db50ff36321361ea61cfbc65160fa617c44198bdb367151738b36aa9442f",
+          "heldout_rank": null,
+          "heldout_work_id": "a346d317-3b14-4382-9251-324745eecad7",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "215"
+        }
+      ]
+    },
+    "random-v1": {
+      "aggregates": {
+        "10": {
+          "map": 0.0,
+          "ndcg": 0.0,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "20": {
+          "map": 0.0,
+          "ndcg": 0.0,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "5": {
+          "map": 0.0,
+          "ndcg": 0.0,
+          "precision": 0.0,
+          "recall": 0.0
+        }
+      },
+      "algorithm_id": "random-v1",
+      "per_user": [
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "6276263d-1b0b-42e1-8c90-b01796410377",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "27"
+        },
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "b5c77a7f-5f84-46d3-ba42-688c0a7e8871",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "36"
+        },
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "e59b04d8-3ee7-4f27-b9bf-a1be2969af00",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "45"
+        },
+        {
+          "candidate_sha256": "ba87904b5f7934c7c0523b628079458e044f400255cc17eb610e7f0a6fafee6b",
+          "heldout_rank": null,
+          "heldout_work_id": "6618bb85-bc46-44c7-a928-6d9774556284",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "49"
+        },
+        {
+          "candidate_sha256": "967a3bdff25d544eed0ceed7a5c8c3141f582bfe483b98a40a8c6471fc717e8e",
+          "heldout_rank": null,
+          "heldout_work_id": "61cdf22f-3902-4497-aa53-0ea8733a7c1c",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "67"
+        },
+        {
+          "candidate_sha256": "71c67c37a6b54134579fe6473f3f2d43d4fd558942556a887efab7121f52391c",
+          "heldout_rank": null,
+          "heldout_work_id": "861fe0b9-ff6c-4c6e-b9ae-bc66d3798687",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "71"
+        },
+        {
+          "candidate_sha256": "0de50c3001f27b0fb6197a127d8f4d194ceff6e34b31055e9e2572cdfe8b6dfd",
+          "heldout_rank": null,
+          "heldout_work_id": "49388f2a-5fea-4a2f-8c7b-f63555f928e5",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "74"
+        },
+        {
+          "candidate_sha256": "6632e898f3ac9da0d9d6e376b64bfa6bb94c12d0cccb305adfd41231af442528",
+          "heldout_rank": null,
+          "heldout_work_id": "1c22b778-639c-49dd-b954-015f92ffff9e",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "79"
+        },
+        {
+          "candidate_sha256": "8acb2ec07ea40d4bbaa0ada3656463fec34c1373fe3d64987180a01bd68e6a1b",
+          "heldout_rank": null,
+          "heldout_work_id": "52223d3d-5a67-4ded-9cf7-f277a16293e5",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "81"
+        },
+        {
+          "candidate_sha256": "ee04dd4ff606a94cd474fb6fee1bb22bcd7290c91357052eb147113665b3c522",
+          "heldout_rank": null,
+          "heldout_work_id": "7f0fc4ca-a6b3-4516-9e4d-f4f2dacfd10b",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "84"
+        },
+        {
+          "candidate_sha256": "48912245e8d746eaf780eaccbeb03444f13ed52fe39c2db8b3a1cf804faada9c",
+          "heldout_rank": null,
+          "heldout_work_id": "91998f0d-37f8-426f-b928-d1152e280b56",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "85"
+        },
+        {
+          "candidate_sha256": "c4aae864f1bd5e989b7d6847f947410e273ef81034a4732d7d85322cd1081b35",
+          "heldout_rank": null,
+          "heldout_work_id": "122d7df6-0a6b-4f11-99fa-74d8e5f57552",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "87"
+        },
+        {
+          "candidate_sha256": "4802577faabcaa1169697363dce842bf156b0dcf1b44298d0923db5e1a78f49a",
+          "heldout_rank": null,
+          "heldout_work_id": "56e4eb08-7d92-40a8-b23d-89f673177165",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "89"
+        },
+        {
+          "candidate_sha256": "83c9e2bb151178473d02519690a014fade6228be9fb3dcb1b9aeaa4c395371d1",
+          "heldout_rank": null,
+          "heldout_work_id": "eee7ac9d-1d6a-44b1-b1e6-745990433d91",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "106"
+        },
+        {
+          "candidate_sha256": "da9e968d7271f359520e7f35058b0161cc397135fe7c59c54051cd8fc2795d36",
+          "heldout_rank": null,
+          "heldout_work_id": "956d95fd-86a2-4d2b-a7ad-e416323d3124",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "107"
+        },
+        {
+          "candidate_sha256": "a26422dc3aee31025206206a94a47e932545b99fbcef13fefcc2cc97f6070aa0",
+          "heldout_rank": null,
+          "heldout_work_id": "616bed67-6c7e-4f2f-b1e0-8a6890de00b1",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "110"
+        },
+        {
+          "candidate_sha256": "0700054345d02163e7e17adce925c1c7a9514c33e66e136cb3b50938763bb5b0",
+          "heldout_rank": null,
+          "heldout_work_id": "e46dc10e-134b-4147-967f-92addfd2acd3",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "118"
+        },
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "cb61baf9-4de3-4535-b635-4bc9d3e6ceda",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "121"
+        },
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "1cc9823c-6c7f-4405-b3b4-a95cad82b120",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "124"
+        },
+        {
+          "candidate_sha256": "2f59e5e0a4f76e8d8678dc7420e2ece4792ab8f1de149a8500abf487798a07eb",
+          "heldout_rank": null,
+          "heldout_work_id": "784a910e-5ad8-43d8-8fee-bb0017643fca",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "143"
+        },
+        {
+          "candidate_sha256": "5c84612013378c87e55bfc8178f4d3e696e0f8f72938862925e65b34efcb6f80",
+          "heldout_rank": null,
+          "heldout_work_id": "c46c8662-ada3-44d0-9159-26fd2b58900b",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "145"
+        },
+        {
+          "candidate_sha256": "bb49d9922f778dd6e50d64f9158c42120d40c6614efce38c59b3249a0b2ec137",
+          "heldout_rank": null,
+          "heldout_work_id": "bf6bc049-2ca1-4d80-8b91-eb0b2168b9e5",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "146"
+        },
+        {
+          "candidate_sha256": "d205d9704a0387dab8a7839af15789e011f287aeea5e6ba99b6ea482d713737a",
+          "heldout_rank": null,
+          "heldout_work_id": "8c9068aa-e23d-4724-9bec-9d1818ffb12c",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "177"
+        },
+        {
+          "candidate_sha256": "3fa799534467302cf0625925bcdd049fc14dcda5e782fe9b8e8d8623049836ba",
+          "heldout_rank": null,
+          "heldout_work_id": "1bab7657-cc7a-497a-b239-4b235e19f500",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "192"
+        },
+        {
+          "candidate_sha256": "dba24dc67866199cbf342036a8a695242fe1828cd409f1aeb1cdd3f8c138f603",
+          "heldout_rank": null,
+          "heldout_work_id": "b1c80970-b982-42b6-9ba5-97df5c9f5f47",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "212"
+        },
+        {
+          "candidate_sha256": "b987db50ff36321361ea61cfbc65160fa617c44198bdb367151738b36aa9442f",
+          "heldout_rank": null,
+          "heldout_work_id": "a346d317-3b14-4382-9251-324745eecad7",
+          "metrics": {
+            "10": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "20": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            },
+            "5": {
+              "map": 0.0,
+              "ndcg": 0.0,
+              "precision": 0.0,
+              "recall": 0.0
+            }
+          },
+          "user_id": "215"
+        }
+      ]
+    }
+  },
+  "code_commit": "9f167cf",
+  "corpus_version": "2026.09.1",
+  "evaluation_population": {
+    "evaluated_user_count": 26,
+    "requested_user_count": 40,
+    "skipped_reason": "no eligible positive item for leave-one-out",
+    "skipped_user_count": 14
+  },
+  "feature_set_version": "fs-v1",
+  "limitation": "Frozen offline evaluation protocol scored over seeded synthetic users. Every number produced under this protocol is simulation evidence about parameterised archetypes, not evidence about real SavePoint users (EVAL-10).",
+  "protocol_sha256": "9a313dcd2673c96793db823e3cc06ebb4b07e7b0e7359d9c4a951b370ae089ff",
+  "protocol_version": 2,
+  "seeds": {
+    "leave_one_out": 20260907,
+    "user_split": 20260908
+  },
+  "simulation": true,
+  "snapshot_sha256": "648df3ded83dfab9e6f479a0d80291d3690e783e7b25f424b8e1e4260d839f01",
+  "split": "test",
+  "split_manifest_sha256": "f7550e3bef4730dbbaf120a8dd002950aef510543c74bcf0670ce30e6fe69aea"
+}

@@ -46,8 +46,36 @@ acotado a `N=10.000` obras por ejecución y al corpus gobernado activo. El coman
   payload normalizado;
 - usa solo `rating` y `ratings_count` de RAWG, convirtiendo la escala 0–5 a 0–100.
 
-En cualquier comparación futura, IGDB gana los empates de procedencia; RAWG solo
-rellena la ausencia de una observación IGDB para la misma obra y versión de corpus.
+### Reconciliación determinista de identificadores y conflictos (DATA-07)
+
+La identidad canónica de una obra es el `id` de IGDB enlazado mediante
+`SourceRecord(source="igdb")`. Una respuesta RAWG solo puede asociarse a esa obra mediante
+esta secuencia, aplicada en orden y sin coincidencias difusas:
+
+1. igualdad exacta entre el `slug` RAWG y el `canonical_slug` procedente de IGDB;
+2. si no hay coincidencia, igualdad simultánea entre el título normalizado y el año de
+   `first_release_date`;
+3. si sigue sin haber una coincidencia única, descartar la respuesta y contabilizarla como
+   no emparejada. Nunca se elige arbitrariamente entre dos candidatas.
+
+Las observaciones de cada proveedor se conservan separadas por `source`; no se sobrescribe
+una con otra. Cuando un consumidor necesite resolverlas a un único rating, aplicará esta regla
+ejecutable y determinista, con un suelo de confianza de **1.000 votos**:
+
+1. usar IGDB si su `rating_count >= 1000`;
+2. en otro caso, usar la fuente disponible con mayor `rating_count`;
+3. si los conteos empatan, preferir IGDB por ser la fuente canónica;
+4. si ninguna fuente aporta un rating usable, usar la mediana declarada de los géneros de la
+   obra y marcar explícitamente el valor como fallback, nunca como rating observado.
+
+Toda superficie que publique un valor o imagen procedente de RAWG debe mostrar un backlink
+activo a `https://rawg.io`. El artefacto de evaluación mantiene las observaciones inmutables
+por fuente y `corpus_version`; esta regla define la resolución no destructiva de conflictos
+para consumidores que exijan un único valor.
+
+En cualquier comparación futura, por tanto, IGDB tiene prioridad al superar el suelo de
+confianza; RAWG puede resolver observaciones IGDB ausentes o de menor respaldo sin cambiar la
+identidad canónica.
 El comando se ejecutó de forma autenticada el 2026-09-07 (resultados en
 *Resultado autenticado*, más abajo).
 

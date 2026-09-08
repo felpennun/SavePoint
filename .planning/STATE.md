@@ -1,22 +1,22 @@
 ---
 gsd_state_version: 1.0
-status: in_progress
-stopped_at: Fase 2, ola 4 ejecutada (02-04 + 02-11 completados). Ola 5 desbloqueada. Pendiente RAWG pasada 2 (juegos sin rating, 2022-2026, por popularidad — ratificado por el autor).
-last_updated: "2026-09-07T18:40:00+02:00"
-state_head: 2ea3a8c
+status: awaiting_author_signoff
+stopped_at: Fase 2 técnicamente completada; pendiente la revisión y firma del autor sobre el resultado simulado de 02-13.
+last_updated: "2026-09-08T12:30:00+02:00"
+state_head: working-tree-phase-02-close
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 39
-  completed_plans: 36
-  percent: 92
-last_activity: 2026-09-07
-next_phase: 2
-next_phase_name: Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender
-next_action: /gsd-execute-phase 2 --wave 4
+  completed_plans: 37
+  percent: 95
+last_activity: 2026-09-08
+next_phase: 3
+next_phase_name: Explainable Content Recommenders and Baseline Comparison
+next_action: /gsd-plan-phase 3
 current_phase: 2
 current_phase_name: Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender
-last_activity_desc: Ola 4 ejecutada. 02-04 incorporó facetas multi-selección del catálogo con parámetros GET repetidos y 02-11 incorporó el recomendador de contenido versionado, explicable y owner-scoped. Verificación: 10 tests frontend, build de Next.js y 61 tests de recomendaciones en verde. El pase E2E queda pendiente porque el contenedor no declara el proyecto Chromium.
+last_activity_desc: 02-13 completado técnicamente: artefacto v2 validado, informe de resultados, AGENT-04, DATA-07 y verificación formal preparados. Los planes 02-06 y 02-12 siguen como cambios paralelos no integrados; después queda la revisión y firma humana del autor.
 ---
 
 # Project State
