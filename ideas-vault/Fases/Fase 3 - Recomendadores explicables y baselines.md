@@ -42,6 +42,19 @@ no es una fase planificada ni ejecutada.
 Fuentes canónicas: [`03-CONTEXT.md`](../../.planning/phases/03-explainable-content-recommenders-and-baseline-comparison/03-CONTEXT.md) y
 [`03-DISCUSSION-LOG.md`](../../.planning/phases/03-explainable-content-recommenders-and-baseline-comparison/03-DISCUSSION-LOG.md).
 
+## Planificación de la fase
+
+La planificación se ha preparado el 2026-09-08 en cuatro planes y tres ondas:
+
+- [[../../.planning/phases/03-explainable-content-recommenders-and-baseline-comparison/03-01-PLAN|03-01]]: tracer, candidatos compartidos y protocolo v2.
+- [[../../.planning/phases/03-explainable-content-recommenders-and-baseline-comparison/03-02-PLAN|03-02]]: señales, variantes y explicaciones.
+- [[../../.planning/phases/03-explainable-content-recommenders-and-baseline-comparison/03-03-PLAN|03-03]]: métricas beyond-accuracy y estadística; contiene un checkpoint humano para SciPy/NumPy.
+- [[../../.planning/phases/03-explainable-content-recommenders-and-baseline-comparison/03-04-PLAN|03-04]]: runner, evidencia, web y sincronización del vault.
+
+Artefactos de preparación: [[../../.planning/phases/03-explainable-content-recommenders-and-baseline-comparison/03-RESEARCH|investigación]], [[../../.planning/phases/03-explainable-content-recommenders-and-baseline-comparison/03-VALIDATION|contrato Nyquist]], [[../../.planning/phases/03-explainable-content-recommenders-and-baseline-comparison/03-PATTERNS|mapa de patrones]] y [[../../.planning/phases/03-explainable-content-recommenders-and-baseline-comparison/03-UI-SPEC|contrato visual aprobado]].
+
+La planificación mantiene la decisión del proyecto de actualizar este vault con cada nueva decisión o información relevante. No se ha añadido una matriz API porque la fase usa snapshots gobernados y no integra una API externa nueva.
+
 ## Enlaces
 
 - [[Metricas de ranking]] · [[Diversidad y novedad]] · [[Cohortes de usuario]]

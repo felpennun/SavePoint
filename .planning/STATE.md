@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 status: ready_to_plan
 stopped_at: Phase 2 complete, ready to plan Phase 03
-last_updated: "2026-09-08T19:13:35.470Z"
-state_head: 0aed1a3d86fe2271797493349bca7d147209461a
+last_updated: "2026-09-08T20:04:00.935Z"
+state_head: a55edb43b2c389cff80f7c4290cc3834697f54c3
 progress:
   total_phases: 8
   completed_phases: 2
-  total_plans: 39
+  total_plans: 43
   completed_plans: 39
   percent: 25
 last_activity: 2026-09-08
@@ -193,11 +193,11 @@ TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<ver
 
 ## Registro histórico de sesiones (prevalece el checkpoint de ejecución actual)
 
-**Stopped at:** Sesion reanudada; restaurado checkpoint de Fase 3 y continuando con validacion del contrato UI
+**Stopped at:** Planificacion de Fase 3 preparada; pendientes sincronizacion de issues/board por token GitHub invalido y aprobacion humana del checkpoint SciPy/NumPy
 
 **Resume (after the rate-limit reset):** `/gsd-plan-phase 2` re-spawns the planner from scratch. All inputs are committed: `02-CONTEXT.md`, `02-UI-SPEC.md` (verified 7/7), `02-RESEARCH.md`, `02-VALIDATION.md`, `02-PATTERNS.md`, `02-COVERAGE.md`. Then `gsd-plan-checker` → revision loop → present → `/gsd-execute-phase 2`. Full detail in `.planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/.continue-here.md`.
 
-Last session: 2026-09-08T19:13:34.543Z
+Last session: 2026-09-08T20:04:00.459Z
 
 ### Done this session (2026-09-06, all committed on `main`)
 
@@ -206,7 +206,7 @@ Last session: 2026-09-08T19:13:34.543Z
 - **Roadmap restructure** — `85e98ba`: Phase 2 enlarged (governed corpus + external ratings + evaluation contract + first advanced recommender + search/filters + UI pass); former phases 5+6 merged; 3/4/7/8 renumbered to 5/6/4/7. Requirement coverage 91/91.
 - **Phase 2 planning inputs** — `02-CONTEXT.md` `f5d65e7` (discuss-phase, D-01..D-24), `02-UI-SPEC.md` `e548a2e` (ui-phase, checker 7/7, `## UI Considerations` 45 explicit + 10 backstop), `02-RESEARCH.md` `a78510f`, `02-VALIDATION.md` `53b173f`, `02-PATTERNS.md` `df45a33`, `02-COVERAGE.md` `15006b3` (rescued from the rate-limited planner).
 
-Resume file: .planning/phases/03-explainable-content-recommenders-and-baseline-comparison/.continue-here.md
+Resume file: .planning\phases\03-explainable-content-recommenders-and-baseline-comparison\.continue-here.md
 
 ## Session Continuity
 

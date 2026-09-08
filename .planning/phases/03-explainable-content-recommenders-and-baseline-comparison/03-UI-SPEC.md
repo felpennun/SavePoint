@@ -12,7 +12,7 @@ reviewed_at: "2026-09-08"
 
 > Contrato visual y de interacción para la Fase 3. Extiende el sistema de diseño de primera
 > parte ya implementado; no abre un rediseño ni un panel de investigación. Generado por
-> `gsd-ui-researcher` y pendiente de validación por `gsd-ui-checker`.
+> `gsd-ui-researcher` y validado por `gsd-ui-checker` el 2026-09-08.
 
 La superficie de producto en alcance es `/{locale}/recommendations`. Debe mostrar datos reales
 del backend y conservar exactamente el orden descendente de puntuación publicado por cada

@@ -211,7 +211,13 @@ Plans:
   4. Comparisons use multiple seeds, uncertainty estimates, and justified statistical tests, and failed-run states are visible and cannot silently yield partial published evidence.
   5. Metric rationale, limitations, agent work, verification, and author interpretation are captured for direct thesis use.
 
-**Plans**: TBD
+**Plans**: 4 plans in 3 waves
+
+**Plan files**:
+- [ ] 03-01-PLAN.md (Wave 1) — Tracer de ranking real, candidatos comunes y contrato v2.
+- [ ] 03-02-PLAN.md (Wave 2) — Señales de contenido, variantes y explicaciones deterministas.
+- [ ] 03-03-PLAN.md (Wave 2) — Métricas beyond-accuracy, incertidumbre y contrastes estadísticos.
+- [ ] 03-04-PLAN.md (Wave 3) — Runner multi-semilla, evidencia, integración web y vault.
 **UI hint**: yes
 
 ### Phase 4: Collaborative and Hybrid Comparison
