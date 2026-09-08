@@ -23,7 +23,10 @@ last_activity_desc: 02-13 completado técnicamente: artefacto v2 validado, infor
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-09-04)
+See: .planning/PROJECT.md (updated 2026-09-08)
+
+Living project mirror: `ideas-vault/` (see `CONVENTIONS.md` and its README for the update
+rule that applies to every LLM and collaborator).
 
 **Core value:** Users receive useful and explainable video-game recommendations from a well-organised collection, while every algorithmic result remains reproducible and defensible in the thesis.
 **Current focus:** Fase 2 en ejecución, ola 4. Registro vigente: `.planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/02-EXECUTION-CHECKPOINT.md`.

@@ -14,16 +14,24 @@ Documento canónico: `CONVENTIONS.md` (raíz). Léelo antes de trabajar. Lo esen
 
 ## Idioma (vigente desde 2026-09-06)
 
-- **Español**: toda la documentación de la tesis (`docs/**`), toda la conversación con el
-  autor, todos los prompts que escribas para otra IA, y la prosa nueva en `.planning/**`.
-- **Inglés**: el código — identificadores, comentarios de código, mensajes de commit, nombres
-  de tests, cadenas de log, nombres de rama.
-- **Se conservan en su idioma original**: las citas legales textuales (Twitch DSA / FAQ de
-  IGDB), y los tokens neutrales de idioma (IDs de requisito, rutas, hashes, URLs, nombres de
-  variables de entorno, comandos).
-- Al traducir un documento con gate determinista (`scripts/verify-igdb-*.ps1`), actualiza los
-  patrones del gate en el mismo commit; si está fijado por hash en
-  `docs/methodology/agent-ledger.jsonl`, refresca el pin. Ver `CONVENTIONS.md` §1.
+Antes de trabajar, lee `CONVENTIONS.md`, `AGENTS.md`, `.planning/` y el vault
+`ideas-vault/`. El proyecto usa español para la documentación de tesis, la planificación y
+la conversación; el código, identificadores, comentarios de código, tests, logs y mensajes de
+commit se mantienen en inglés.
 
-Este fichero se lee automáticamente al inicio de cada sesión; no hace falta ningún comando.
-Empujón manual: *"Antes de empezar, lee `CONVENTIONS.md` y revisa `.planning/`."*
+## Vault vivo de Obsidian
+
+`ideas-vault/` es un espejo conceptual vivo, no una fuente canónica. Cada LLM o colaborador
+debe consultarlo al comenzar una tarea y actualizarlo antes de terminarla si produce
+información nueva, una decisión, un requisito, un resultado experimental, una limitación o un
+cambio relevante de arquitectura o producto. Las notas deben enlazar con la fuente canónica
+correspondiente (`CONVENTIONS.md`, `AGENTS.md`, `docs/` o `.planning/`) y con notas relacionadas
+cuando proceda.
+
+En trabajo paralelo, no sobrescribas notas ajenas: añade una nota fechada o edita únicamente
+el apartado afectado. Marca las propuestas como `Propuesta` hasta su aprobación. Nunca guardes
+en el vault secretos, cookies, tokens, credenciales, datos personales ni logs brutos.
+
+Consulta [`ideas-vault/README.md`](../ideas-vault/README.md) y la plantilla
+[`ideas-vault/Conceptos/Vault vivo y sincronizacion.md`](../ideas-vault/Conceptos/Vault%20vivo%20y%20sincronizacion.md)
+para el procedimiento completo.

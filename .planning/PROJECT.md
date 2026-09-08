@@ -63,6 +63,15 @@ Every consequential implementation choice must leave usable evidence for the the
 - **No fixed stack**: Architecture and technologies remain open until researched — selections must be justified rather than inherited without evidence.
 - **Language convention (since 2026-09-06)**: thesis documentation (`docs/**`), all conversation with the author, all prompts written for other AIs, and new prose in `.planning/**` are in **Spanish**; code (identifiers, code comments, commit messages, test names, log strings, branch names) stays in **English**. Verbatim legal quotations and language-neutral tokens (requirement IDs, paths, hashes, URLs, env-var names, commands) are kept as-is. Canonical doc: `CONVENTIONS.md`. No command needed — instruction files load per session; `/gsd-resume-work` reloads planning context.
 
+## Vault vivo de Obsidian
+
+`ideas-vault/` es un espejo conceptual vivo para Obsidian. Todas las LLM y colaboradores
+deben consultarlo al iniciar una tarea y actualizarlo con la información, decisiones,
+requisitos, resultados, limitaciones y cambios relevantes que produzcan. Cada entrada debe
+enlazar con su fuente canónica y nunca incluir secretos, credenciales, datos personales ni
+logs brutos. Las fuentes canónicas siguen siendo `CONVENTIONS.md`, `AGENTS.md`, `docs/` y
+`.planning/`; la política operativa está en `ideas-vault/README.md`.
+
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
@@ -94,4 +103,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-09-04 after initialization*
+*Last updated: 2026-09-08 after Phase 3 discussion and Obsidian vault policy update*

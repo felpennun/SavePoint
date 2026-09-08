@@ -23,6 +23,17 @@ No hace falta ningún comando para recargar esto: `CLAUDE.md` y `AGENTS.md` se c
 de cada sesión, y la memoria automática guarda `language-conventions.md` fijada. Para GSD,
 `/gsd-resume-work` recarga el contexto de planificación.
 
+## Vault vivo de Obsidian
+
+Antes de trabajar, consulta `ideas-vault/`. Al terminar, actualiza el vault con cada
+información, decisión, requisito, resultado, limitación o cambio relevante que hayas
+producido. Enlaza siempre con la fuente canónica y no guardes secretos, credenciales,
+datos personales ni logs brutos. La política completa está en
+[`ideas-vault/README.md`](ideas-vault/README.md) y la plantilla en
+[`ideas-vault/Conceptos/Vault vivo y sincronizacion.md`](ideas-vault/Conceptos/Vault vivo y sincronizacion.md).
+El vault es un espejo conceptual vivo: `CONVENTIONS.md`, `AGENTS.md`, `docs/` y `.planning/`
+siguen siendo las fuentes canónicas.
+
 ## Contexto del proyecto y stack
 
 Ver [`AGENTS.md`](AGENTS.md) (proyecto, stack, requisitos, arquitectura) y `.planning/`

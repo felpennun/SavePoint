@@ -70,6 +70,28 @@ Si en algún momento quieres un empujón manual para *cualquier* IA, una frase s
 - **Commits:** convencionales, en inglés; los mensajes de commit de un asistente terminan con
   `Co-Authored-By: <modelo> <noreply@anthropic.com>` cuando aplique.
 
+## 4. Vault vivo de Obsidian
+
+`ideas-vault/` es el registro conceptual vivo de SavePoint y su carpeta de vault para
+Obsidian. Todas las LLM y colaboradores deben consultarlo cuando comiencen una tarea y
+actualizarlo antes de terminarla si producen información nueva, una decisión, un requisito,
+un resultado experimental, una limitación o un cambio relevante de arquitectura o producto.
+
+- La nota debe colocarse en la carpeta temática adecuada (`ADR/`, `Conceptos/`, `Fases/`,
+  `Mapas/` o `Requisitos/`) y enlazarse desde una nota relacionada cuando proceda.
+- Las decisiones importantes deben enlazar a su ADR, `CONTEXT`, `DISCUSSION-LOG`, plan,
+  artefacto o evidencia canónica; el vault resume y conecta, pero no sustituye esas fuentes.
+- Los cambios del vault se conservan en Git junto con el trabajo que los motiva cuando sea
+  posible. En trabajo paralelo se evita sobrescribir notas ajenas: se añade una nota fechada
+  o se edita solo el apartado afectado.
+- Nunca se escriben en el vault secretos, cookies, tokens, credenciales, datos personales ni
+  logs brutos. Si una decisión aún es propuesta, debe marcarse como propuesta y no como
+  aceptada.
+
+La política operativa y la plantilla mínima están en `ideas-vault/README.md` y
+`ideas-vault/Conceptos/Vault vivo y sincronizacion.md`. Las fuentes canónicas siguen siendo
+`CONVENTIONS.md`, `AGENTS.md`, `docs/` y `.planning/`.
+
 ---
 
 *Creado 2026-09-06. Cambiar esta convención requiere una decisión del autor y actualizar los

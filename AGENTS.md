@@ -51,6 +51,24 @@ No hay ningún comando para "recargar convenciones": este fichero se lee automá
 inicio de cada sesión. Para GSD, `/gsd-resume-work` recarga STATE + contexto de planificación.
 Empujón manual para cualquier IA: *"Antes de empezar, lee `CONVENTIONS.md` y revisa `.planning/`."*
 
+### Vault vivo de Obsidian
+
+`ideas-vault/` es el registro conceptual vivo de SavePoint y su carpeta de vault para
+Obsidian. Todas las LLM y colaboradores deben consultarlo al comenzar una tarea y
+actualizarlo antes de terminarla si producen información nueva, una decisión, un requisito,
+un resultado experimental, una limitación o un cambio relevante de arquitectura o producto.
+
+La nota debe situarse en la carpeta temática adecuada (`ADR/`, `Conceptos/`, `Fases/`,
+`Mapas/` o `Requisitos/`) y enlazarse desde una nota relacionada cuando proceda. Las
+decisiones importantes deben enlazar a su fuente canónica (`docs/`, `.planning/`, ADR,
+`CONTEXT`, `DISCUSSION-LOG`, plan o evidencia). El vault conecta y resume, pero no sustituye
+a esas fuentes. En trabajo paralelo, evita sobrescribir notas ajenas: añade una nota fechada
+o edita únicamente el apartado afectado. Nunca guardes secretos, cookies, tokens,
+credenciales, datos personales ni logs brutos.
+
+La política y plantilla están en [`ideas-vault/README.md`](ideas-vault/README.md) y
+[`ideas-vault/Conceptos/Vault vivo y sincronizacion.md`](ideas-vault/Conceptos/Vault vivo y sincronizacion.md).
+
 <!-- /Non-GSD section -->
 
 <!-- GSD:stack-start source:research/STACK.md -->
