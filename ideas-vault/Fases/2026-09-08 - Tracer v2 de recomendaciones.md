@@ -33,3 +33,4 @@ entorno de ejecucion.
 - [[Conjunto de candidatos compartido]]
 - [[Explicabilidad]]
 - [[Fase 3 - Recomendadores explicables y baselines]]
+- [[2026-09-09 - Señales de contenido y explicación honesta]]

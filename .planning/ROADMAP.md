@@ -215,7 +215,7 @@ Plans:
 
 **Plan files**:
 - [x] 03-01-PLAN.md (Wave 1) — Tracer de ranking real, candidatos comunes y contrato v2 — completado 2026-09-08; `03-01-SUMMARY.md`, servicio v2, manifiesto común hashado y 403 pruebas backend.
-- [ ] 03-02-PLAN.md (Wave 2) — Señales de contenido, variantes y explicaciones deterministas.
+- [x] 03-02-PLAN.md (Wave 2) — Señales de contenido, variantes y explicaciones deterministas — completado 2026-09-09; `03-02-SUMMARY.md`, perfiles positivo/negativo, `fs-v2` y razones estructuradas.
 - [ ] 03-03-PLAN.md (Wave 2) — Métricas beyond-accuracy, incertidumbre y contrastes estadísticos.
 - [ ] 03-04-PLAN.md (Wave 3) — Runner multi-semilla, evidencia, integración web y vault.
 **UI hint**: yes
