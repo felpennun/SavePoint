@@ -40,4 +40,14 @@ ALGORITHM_REGISTRY: dict[str, VariantSpec] = {
         params={"bands": 5},
         version="v1",
     ),
+    "content-cbf-neg-v1": VariantSpec(
+        algorithm_id="content-cbf-neg-v1",
+        feature_set_version=FEATURE_SET_VERSION,
+        combine_mode="negative_weighted_sum",
+        # The positive part is the published weighted baseline.  The negative
+        # similarity is subtracted at full scale rather than hidden behind an
+        # uncalibrated multiplier; later tuning may publish a new variant id.
+        params={"w1": 0.7, "w2": 0.3, "negative_penalty": 1.0},
+        version="v1",
+    ),
 }

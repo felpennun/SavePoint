@@ -66,17 +66,19 @@ def _snapshot(work: GameWork, *, rating: float, rating_count: int = 100) -> None
     )
 
 
-def test_algorithm_registry_has_exactly_the_three_versioned_variants() -> None:
+def test_algorithm_registry_has_the_named_positive_and_negative_variants() -> None:
     assert set(ALGORITHM_REGISTRY) == {
         "content-cbf-weighted-v1",
         "content-cbf-multiplicative-v1",
         "content-cbf-twostage-v1",
+        "content-cbf-neg-v1",
     }
     assert all(isinstance(spec, VariantSpec) for spec in ALGORITHM_REGISTRY.values())
     assert [spec.combine_mode for spec in ALGORITHM_REGISTRY.values()] == [
         "weighted_sum",
         "multiplicative",
         "two_stage",
+        "negative_weighted_sum",
     ]
 
 
@@ -188,14 +190,20 @@ def test_explain_is_numeric_and_sorted_by_genre_contribution() -> None:
 
     assert set(result) == {
         "contributions",
+        "reason_signals",
         "rating_term",
         "rating_term_is_fallback",
+        "negative_similarity",
         "variant",
     }
     assert result["variant"] == spec.algorithm_id
     assert result["contributions"] == [
         {"genre": "rpg", "contribution_pct": round(0.4 / 0.52, 3)},
         {"genre": "shooter", "contribution_pct": round(0.1 / 0.52, 3)},
+    ]
+    assert result["reason_signals"] == [
+        {"kind": "genre", "value": "rpg", "contribution_pct": round(0.4 / 0.52, 3)},
+        {"kind": "genre", "value": "shooter", "contribution_pct": round(0.1 / 0.52, 3)},
     ]
     assert all("because" not in str(value).lower() for value in result.values())
 
@@ -242,7 +250,7 @@ def test_rank_excludes_candidates_with_fewer_than_one_thousand_ratings(user_a, g
 def test_versioned_dto_and_item_evidence(user_a, genres) -> None:  # noqa: ANN001
     for index in range(3):
         owned = _work(f"dto-owned-{index}", genres["rpg"])
-        _own(user_a, owned)
+        _own(user_a, owned, rating=8)
     candidate = _work("dto-candidate", genres["rpg"], genres["shooter"])
     _snapshot(candidate, rating=85.0, rating_count=200)
 
@@ -257,11 +265,14 @@ def test_versioned_dto_and_item_evidence(user_a, genres) -> None:  # noqa: ANN00
         "feature_set_version",
         "corpus_version",
         "snapshot_sha256",
+        "parameters",
+        "profile_inputs",
+        "signal_availability",
         "insufficient_history",
         "limitation",
         "results",
     }
-    assert result["feature_set_version"] == "fs-v1"
+    assert result["feature_set_version"] == "fs-v2"
     assert result["corpus_version"] == _CORPUS
     assert len(result["snapshot_sha256"]) == 64
     assert len(result["input_snapshot_sha256"]) == 64
@@ -274,6 +285,9 @@ def test_versioned_dto_and_item_evidence(user_a, genres) -> None:  # noqa: ANN00
         "contributions",
         "rating_term",
         "rating_term_is_fallback",
+        "reason_signals",
+        "negative_similarity",
+        "signals",
     }
     assert item["contributions"]
     assert "rating_term" in item

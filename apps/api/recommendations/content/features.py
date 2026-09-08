@@ -28,9 +28,10 @@ from catalogue.corpus import ALLOWLIST_SLUGS, governed_works
 from catalogue.models import CorpusRatingSnapshot, GameWork, Genre
 
 # Bump when the vector-building rules below change (part of the DTO, REC-09).
-# v1 = genre + allowlist-platform facets, 1/sqrt(k) per-facet weights,
-# franchise/developer gated by measured coverage (D-11).
-FEATURE_SET_VERSION = "fs-v1"
+# v2 keeps the sparse categorical representation but makes the absence of
+# unpersisted facets explicit in the signal manifest.  Cached v1 rows must not
+# be reused: their provenance did not record that decision.
+FEATURE_SET_VERSION = "fs-v2"
 
 # D-11: a facet is only worth adding as a feature dimension if enough governed
 # works actually carry it. 50 % is the documented floor -- below it the facet
@@ -141,7 +142,38 @@ def coverage_report(corpus_version: str | None = None) -> dict:
         "developer_threshold": DEVELOPER_COVERAGE_THRESHOLD,
         "include_franchise": franchise_coverage >= FRANCHISE_COVERAGE_THRESHOLD,
         "include_developer": developer_coverage >= DEVELOPER_COVERAGE_THRESHOLD,
+        # These scalar families deliberately stay outside cosine similarity.
+        # PopScore cannot be represented until a dated, governed snapshot is
+        # persisted (rather than queried from an external API at rank time).
+        "rating_available": True,
+        "rating_volume_available": True,
+        "release_recency_available": True,
+        "popscore_available": False,
     }
+
+
+def normalise_rating(value: float | None) -> float | None:
+    """Return an IGDB-scale rating in ``[0, 1]`` without imputing absence."""
+
+    if value is None or not math.isfinite(value):
+        return None
+    return max(0.0, min(1.0, value / 100.0))
+
+
+def normalise_rating_volume(value: int | None, ceiling: int | None) -> float | None:
+    """Normalise ``log1p(rating_count)`` against one frozen candidate view.
+
+    The caller supplies the maximum count observed in that view, which makes
+    the value reproducible and prevents an outlier from leaking a live global
+    statistic into a frozen run.
+    """
+
+    if value is None or ceiling is None or value < 0 or ceiling <= 0:
+        return None
+    denominator = math.log1p(ceiling)
+    if denominator == 0:
+        return 0.0
+    return math.log1p(value) / denominator
 
 
 def genre_rating_profile(corpus_version: str | None = None) -> dict[str, float]:

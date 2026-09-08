@@ -76,11 +76,14 @@ def combine(
     candidate_rating_term: float,
     own_rating: float | None,
     spec: VariantSpec,
+    *,
+    negative_similarity: float = 0.0,
 ) -> float:
     """Dispatch to a named variant's deterministic score function."""
 
     cosine_similarity = max(0.0, min(1.0, cosine_similarity))
     candidate_rating_term = max(0.0, min(1.0, candidate_rating_term))
+    negative_similarity = max(0.0, min(1.0, negative_similarity))
 
     if spec.combine_mode == "weighted_sum":
         return (
@@ -95,4 +98,11 @@ def combine(
         band = min(bands - 1, int(cosine_similarity * bands))
         # The integer band dominates; rating only orders candidates inside it.
         return band + (candidate_rating_term / (bands + 1))
+    if spec.combine_mode == "negative_weighted_sum":
+        positive = (
+            float(spec.params.get("w1", 0.0)) * cosine_similarity
+            + float(spec.params.get("w2", 0.0)) * candidate_rating_term
+        )
+        penalty = float(spec.params.get("negative_penalty", 0.0)) * negative_similarity
+        return max(0.0, positive - penalty)
     raise ValueError(f"Unsupported content combination mode: {spec.combine_mode}")

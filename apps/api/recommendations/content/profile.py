@@ -16,6 +16,7 @@ genre-bearing history profiles to ``{}``.
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass
 
 from django.contrib.auth.models import AbstractBaseUser
 
@@ -24,6 +25,34 @@ from library.models import LibraryEntry
 from recommendations._weights import _entry_weight
 from recommendations.content.features import FEATURE_SET_VERSION, feature_vector
 from recommendations.models import WorkFeatureVector
+
+
+_POSITIVE_STATUSES = {"completed", "playing"}
+_POSITIVE_RATING_MINIMUM = 7  # 3.5 / 5 in LibraryEntry half-steps.
+_NEGATIVE_GENRE_MINIMUM = 3
+
+
+@dataclass(frozen=True)
+class ProfileInputs:
+    """Serializable, bounded evidence used to construct a taste profile.
+
+    Low ratings never become negative values inside the ordinary profile.  A
+    separate, named algorithm may opt into ``negative`` after the three-work
+    safeguard, keeping the positive variants comparable and reversible.
+    """
+
+    positive: dict[str, float]
+    negative: dict[str, float]
+    positive_entry_count: int
+    negative_genres: tuple[str, ...]
+
+    def as_dict(self) -> dict:
+        return {
+            "positive_entry_count": self.positive_entry_count,
+            "positive_rating_minimum_half_steps": _POSITIVE_RATING_MINIMUM,
+            "negative_genre_minimum": _NEGATIVE_GENRE_MINIMUM,
+            "negative_genres": list(self.negative_genres),
+        }
 
 
 def _l2_normalize(vector: dict[str, float]) -> dict[str, float]:
@@ -54,7 +83,15 @@ def _load_vectors(work_ids: list[object]) -> dict[object, dict[str, float]]:
 def build_profile(
     user: AbstractBaseUser, corpus_version: str | None = None  # noqa: ARG001
 ) -> dict[str, float]:
-    """Return the activity-weighted, L2-normalised-input taste profile.
+    """Return the positive component of :func:`build_profile_inputs`."""
+
+    return build_profile_inputs(user, corpus_version).positive
+
+
+def build_profile_inputs(
+    user: AbstractBaseUser, corpus_version: str | None = None  # noqa: ARG001
+) -> ProfileInputs:
+    """Build separated positive and safeguarded negative taste evidence.
 
     ``corpus_version`` is accepted for call-site symmetry with the rest of the
     laboratory; the profile is built from the user's own library regardless of
@@ -67,23 +104,46 @@ def build_profile(
         )
     )
     if not entries:
-        return {}
+        return ProfileInputs({}, {}, 0, ())
 
     vectors = _load_vectors([entry["work_id"] for entry in entries])
 
     accumulator: dict[str, float] = {}
     total_weight = 0.0
+    positive_entry_count = 0
+    negative_genre_counts: dict[str, int] = {}
     for entry in entries:
-        weight = _entry_weight(entry["current_status"], entry["rating_half_steps"])
-        if weight <= 0:
+        status = entry["current_status"]
+        rating = entry["rating_half_steps"]
+        if status not in _POSITIVE_STATUSES or rating is None:
             continue
         normalized = _l2_normalize(vectors.get(entry["work_id"]) or {})
         if not normalized:
             continue
+
+        if rating < _POSITIVE_RATING_MINIMUM:
+            for key in normalized:
+                if key.startswith("genre:"):
+                    negative_genre_counts[key] = negative_genre_counts.get(key, 0) + 1
+            continue
+
+        weight = _entry_weight(entry["current_status"], entry["rating_half_steps"])
+        if weight <= 0:
+            continue
+        positive_entry_count += 1
         total_weight += weight
         for key, value in normalized.items():
             accumulator[key] = accumulator.get(key, 0.0) + weight * value
 
-    if total_weight <= 0 or not accumulator:
-        return {}
-    return {key: value / total_weight for key, value in accumulator.items()}
+    positive = (
+        {key: value / total_weight for key, value in accumulator.items()}
+        if total_weight > 0 and accumulator
+        else {}
+    )
+    negative_genres = tuple(
+        sorted(
+            key for key, count in negative_genre_counts.items() if count >= _NEGATIVE_GENRE_MINIMUM
+        )
+    )
+    negative = _l2_normalize({key: float(negative_genre_counts[key]) for key in negative_genres})
+    return ProfileInputs(positive, negative, positive_entry_count, negative_genres)

@@ -311,8 +311,8 @@ export interface ContentRecommendationItem {
 }
 
 export interface ContentRecommendationReason {
-  kind: "genre_overlap";
-  genres: { slug: string; name: string }[];
+  kind: "signal_overlap";
+  signals: { kind: "genre" | "platform"; slug: string; name: string }[];
 }
 
 export interface ContentRecommendationsResult {

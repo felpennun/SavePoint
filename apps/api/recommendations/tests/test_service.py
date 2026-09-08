@@ -132,7 +132,7 @@ def test_algorithms_share_the_same_manifest_and_payload_stays_score_ordered(
         all(left["score"] >= right["score"] for left, right in zip(payload["results"], payload["results"][1:]))
         for payload in payloads
     )
-    assert payloads[0]["results"][0]["reason"]["kind"] == "genre_overlap"
+    assert payloads[0]["results"][0]["reason"]["kind"] == "signal_overlap"
 
 
 @pytest.mark.django_db

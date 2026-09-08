@@ -63,7 +63,7 @@ function formatReason(
   reason: NonNullable<ContentRecommendationItem["reason"]>,
   locale: string,
 ): string | undefined {
-  const names = reason.genres.slice(0, 2).map((genre) => genre.name).filter(Boolean);
+  const names = reason.signals.slice(0, 2).map((signal) => signal.name).filter(Boolean);
   if (names.length === 0) return undefined;
   const joined = names.join(locale === "en" ? " and " : " y ");
   const template = getDictionary(locale).recommendations.contentCardEvidence;

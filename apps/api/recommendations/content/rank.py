@@ -15,8 +15,15 @@ from catalogue.models import CorpusRatingSnapshot, GameWork
 from library.models import LibraryEntry
 from recommendations.content.combine import combine, rating_term
 from recommendations.content.explain import explain
-from recommendations.content.features import FEATURE_SET_VERSION, feature_vector, genre_rating_profile
-from recommendations.content.profile import build_profile
+from recommendations.content.features import (
+    FEATURE_SET_VERSION,
+    coverage_report,
+    feature_vector,
+    genre_rating_profile,
+    normalise_rating,
+    normalise_rating_volume,
+)
+from recommendations.content.profile import ProfileInputs, build_profile_inputs
 from recommendations.content.similarity import cosine
 from recommendations.content.variants import ALGORITHM_REGISTRY, VariantSpec
 from recommendations.models import WorkFeatureVector
@@ -90,7 +97,28 @@ def _load_candidate_vectors(
     return cached
 
 
-def _base_item(work: GameWork, score: float, evidence: dict) -> dict:
+def _candidate_signals(
+    work: GameWork,
+    snapshot_stats: dict[object, tuple[float, int]],
+    volume_ceiling: int,
+) -> dict:
+    """Return only scalar signals backed by the frozen local snapshot."""
+
+    has_snapshot = work.id in snapshot_stats
+    rating, rating_count = snapshot_stats.get(work.id, (None, 0))
+    return {
+        "external_rating": normalise_rating(rating),
+        "rating_volume": (
+            normalise_rating_volume(rating_count, volume_ceiling) if has_snapshot else None
+        ),
+        "release_date": work.first_release_date.isoformat() if work.first_release_date else None,
+        # A dated PopScore snapshot has not been imported yet.  ``None`` is a
+        # material distinction from a low popularity value.
+        "popscore": None,
+    }
+
+
+def _base_item(work: GameWork, score: float, evidence: dict, signals: dict) -> dict:
     return {
         "work_id": str(work.id),
         "slug": work.canonical_slug,
@@ -99,6 +127,9 @@ def _base_item(work: GameWork, score: float, evidence: dict) -> dict:
         "contributions": evidence["contributions"],
         "rating_term": evidence["rating_term"],
         "rating_term_is_fallback": evidence["rating_term_is_fallback"],
+        "reason_signals": evidence["reason_signals"],
+        "negative_similarity": evidence["negative_similarity"],
+        "signals": signals,
     }
 
 
@@ -112,6 +143,8 @@ def _fingerprint(profile: dict[str, float], results: list[dict]) -> str:
                     item["score"],
                     item["rating_term"],
                     item["rating_term_is_fallback"],
+                    item["negative_similarity"],
+                    item["signals"],
                 )
                 for item in results
             ],
@@ -123,7 +156,7 @@ def _dto(
     generated_at: datetime,
     corpus_version: str | None,
     snapshot_sha256: str,
-    profile: dict[str, float],
+    profile_inputs: ProfileInputs,
     results: list[dict],
     *,
     insufficient_history: bool,
@@ -132,10 +165,13 @@ def _dto(
     return {
         "algorithm_id": spec.algorithm_id,
         "generated_at": generated_at.isoformat(),
-        "input_snapshot_sha256": _fingerprint(profile, results),
+        "input_snapshot_sha256": _fingerprint(profile_inputs.positive, results),
         "feature_set_version": spec.feature_set_version,
         "corpus_version": corpus_version,
         "snapshot_sha256": snapshot_sha256,
+        "parameters": spec.params,
+        "profile_inputs": profile_inputs.as_dict(),
+        "signal_availability": coverage_report(corpus_version),
         "insufficient_history": insufficient_history,
         "limitation": limitation,
         "results": results,
@@ -152,6 +188,7 @@ def _cold_start_results(
     genre_profile: dict[str, float],
 ) -> list[dict]:
     vectors = _load_candidate_vectors(works, spec)
+    volume_ceiling = max((count for _rating, count in snapshot_stats.values()), default=0)
     scored: list[tuple[float, str, dict]] = []
     for work in works:
         vector = vectors[work.id]
@@ -164,7 +201,12 @@ def _cold_start_results(
             candidate_rating_term=rt,
             rating_term_is_fallback=fallback,
         )
-        item = _base_item(work, rt, evidence)
+        item = _base_item(
+            work,
+            rt,
+            evidence,
+            _candidate_signals(work, snapshot_stats, volume_ceiling),
+        )
         scored.append((rt, work.canonical_slug, item))
     scored.sort(key=lambda row: (-row[0], row[1]))
     return [item for _score, _slug, item in scored[:limit]]
@@ -188,12 +230,6 @@ def rank_content_v1(
     generated_at = generated_at or datetime.now(timezone.utc)
 
     seen_ids = set(LibraryEntry.objects.filter(user=user).values_list("work_id", flat=True))
-    history_count = (
-        LibraryEntry.objects.filter(user=user, work__genres__isnull=False)
-        .values("work_id")
-        .distinct()
-        .count()
-    )
     requested_ids = set(candidate_ids) if candidate_ids is not None else None
     if prepared is not None:
         candidates = [
@@ -217,7 +253,8 @@ def rank_content_v1(
             .distinct()
         )
         snapshot_sha256 = _snapshot_sha256(corpus_version, {work.id for work in candidates} | seen_ids)
-    profile = build_profile(user, corpus_version)
+    profile_inputs = build_profile_inputs(user, corpus_version)
+    profile = profile_inputs.positive
     resolved_genre_profile = (
         genre_profile
         if genre_profile is not None
@@ -244,7 +281,7 @@ def rank_content_v1(
             for work_id, rows in per_work_snapshots.items()
         }
 
-    if history_count < _COLD_START_ENTRIES:
+    if profile_inputs.positive_entry_count < _COLD_START_ENTRIES or not profile:
         results = _cold_start_results(
             candidates,
             limit,
@@ -259,13 +296,14 @@ def rank_content_v1(
             generated_at,
             corpus_version,
             snapshot_sha256,
-            profile,
+            profile_inputs,
             results,
             insufficient_history=True,
             limitation=_COLD_START_LIMITATION,
         )
 
     vectors = _load_candidate_vectors(candidates, spec, prepared_vectors=(prepared or {}).get("vectors"))
+    volume_ceiling = max((count for _rating, count in snapshot_stats.values()), default=0)
     scored: list[tuple[float, str, dict]] = []
     for work in candidates:
         vector = vectors[work.id]
@@ -275,7 +313,14 @@ def rank_content_v1(
             for key in profile.keys() & vector.keys()
         }
         rt, fallback = rating_term(work, corpus_version, resolved_genre_profile, snapshot_stats)
-        score = combine(similarity, rt, None, spec)
+        negative_similarity = cosine(profile_inputs.negative, vector)
+        score = combine(
+            similarity,
+            rt,
+            None,
+            spec,
+            negative_similarity=negative_similarity,
+        )
         evidence = explain(
             vector,
             profile,
@@ -283,8 +328,14 @@ def rank_content_v1(
             spec,
             candidate_rating_term=rt,
             rating_term_is_fallback=fallback,
+            negative_similarity=negative_similarity,
         )
-        item = _base_item(work, score, evidence)
+        item = _base_item(
+            work,
+            score,
+            evidence,
+            _candidate_signals(work, snapshot_stats, volume_ceiling),
+        )
         scored.append((score, work.canonical_slug, item))
 
     scored.sort(key=lambda row: (-row[0], row[1]))
@@ -294,7 +345,7 @@ def rank_content_v1(
         generated_at,
         corpus_version,
         snapshot_sha256,
-        profile,
+        profile_inputs,
         results,
         insufficient_history=False,
         limitation=_LIMITATION,

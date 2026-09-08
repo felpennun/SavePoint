@@ -77,19 +77,26 @@ def build_candidate_manifest(
     )
 
 
-def _reason(item: dict, *, genre_names: dict[str, str]) -> dict | None:
+def _reason(
+    item: dict,
+    *,
+    genre_names: dict[str, str],
+    platform_names: dict[str, str],
+) -> dict | None:
     """Return bounded, signal-backed evidence; never manufacture an excuse."""
 
-    genres = []
-    for contribution in item.get("contributions", []):
-        slug = contribution.get("genre")
-        if slug in genre_names:
-            genres.append({"slug": slug, "name": genre_names[slug]})
-        if len(genres) == 2:
+    signals = []
+    for signal in item.get("reason_signals", []):
+        kind = signal.get("kind")
+        slug = signal.get("value")
+        names = genre_names if kind == "genre" else platform_names if kind == "platform" else {}
+        if slug in names:
+            signals.append({"kind": kind, "slug": slug, "name": names[slug]})
+        if len(signals) == 2:
             break
-    if not genres:
+    if not signals:
         return None
-    return {"kind": "genre_overlap", "genres": genres}
+    return {"kind": "signal_overlap", "signals": signals}
 
 
 def _limit(value: int | None) -> int | None:
@@ -156,7 +163,15 @@ def recommend_for_user(
                 "year": _release_year(work),
                 "platform_summary": _platform_summary(work),
                 "cover": _cover(work),
-                "reason": _reason(item, genre_names=genre_names),
+                "reason": _reason(
+                    item,
+                    genre_names=genre_names,
+                    platform_names={
+                        release.platform.slug: release.platform.name
+                        for release in work.releases.all()
+                        if release.platform is not None
+                    },
+                ),
             }
         )
 

@@ -181,16 +181,16 @@ def test_profile_of_a_monogenre_library_is_dominated_by_that_genre(user_a, genre
 
 
 @pytest.mark.django_db
-def test_profile_weights_by_entry_weight_verbatim(user_a, genres) -> None:  # noqa: ANN001
-    # completed (weight 3) RPG vs pending (weight 1) shooter -> RPG dominates.
-    _own(user_a, _work("owned-rpg", genres["rpg"]), status="completed", rating=None)
-    _own(user_a, _work("owned-shooter", genres["shooter"]), status="pending", rating=None)
+def test_profile_uses_positive_rated_completed_and_playing_entries(user_a, genres) -> None:  # noqa: ANN001
+    _own(user_a, _work("owned-rpg", genres["rpg"]), status="completed", rating=10)
+    _own(user_a, _work("owned-shooter", genres["shooter"]), status="playing", rating=8)
+    _own(user_a, _work("pending-puzzle", genres["puzzle"]), status="pending", rating=10)
 
     profile = build_profile(user_a, _CORPUS)
 
     assert profile["genre:role-playing-rpg"] > profile["genre:shooter"]
-    assert profile["genre:role-playing-rpg"] == pytest.approx(0.75)
-    assert profile["genre:shooter"] == pytest.approx(0.25)
+    assert profile["genre:role-playing-rpg"] == pytest.approx(4.0 / 6.8)
+    assert profile["genre:shooter"] == pytest.approx(2.8 / 6.8)
 
 
 @pytest.mark.django_db
