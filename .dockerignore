@@ -3,6 +3,11 @@
 .planning
 .codex
 .agents
+.claude
+.github
+.gsd
+.neon
+.venv
 .pnpm-store
 node_modules
 **/node_modules
@@ -14,4 +19,18 @@ node_modules
 .next
 test-results
 playwright-report
+*.tsbuildinfo
 
+# Local datasets and generated research state. These files are intentionally
+# absent from Git and must not enter the build context or an image layer.
+data/snapshots
+data/localization/_pending-es.jsonl
+data/localization/_batches
+data/localization/_export.err
+**/.rawg-evidence*.json
+apps/api/.evaluation-test-run.json
+
+# Authoring/tooling material is not needed by either runtime image.
+thesis
+vault
+skills-lock.json
