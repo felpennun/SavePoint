@@ -34,6 +34,17 @@ datos personales ni logs brutos. La política completa está en
 El vault es un espejo conceptual vivo: `CONVENTIONS.md`, `AGENTS.md`, `docs/` y `.planning/`
 siguen siendo las fuentes canónicas.
 
+## Ciclo global de issues de GitHub
+
+Aplica [`CONTRIBUTING.md`](CONTRIBUTING.md) y `CONVENTIONS.md` a cada tarea. Crea o reconcilia
+la issue correspondiente, usa `Refs #N` en avances y `Closes #N` solo al cerrar un plan
+verificado con su `SUMMARY`. Mantén abiertas las tareas paralelas no integradas y comprueba
+que el board y el frontmatter `github_issue` coinciden antes de cerrar una fase.
+
+La LLM responsable debe cerrar automáticamente la issue cuando la tarea esté completada,
+integrada y verificada, sin esperar otra instrucción del autor. Usa `Refs #N` para avances y
+`Closes #N` en el cierre; mantén abiertas las tareas pendientes o paralelas no integradas.
+
 ## Contexto del proyecto y stack
 
 Ver [`AGENTS.md`](AGENTS.md) (proyecto, stack, requisitos, arquitectura) y `.planning/`

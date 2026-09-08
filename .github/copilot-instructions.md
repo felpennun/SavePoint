@@ -35,3 +35,14 @@ en el vault secretos, cookies, tokens, credenciales, datos personales ni logs br
 Consulta [`ideas-vault/README.md`](../ideas-vault/README.md) y la plantilla
 [`ideas-vault/Conceptos/Vault vivo y sincronizacion.md`](../ideas-vault/Conceptos/Vault%20vivo%20y%20sincronizacion.md)
 para el procedimiento completo.
+
+La LLM responsable debe cerrar automáticamente la issue cuando la tarea esté completada,
+integrada y verificada, sin esperar otra instrucción del autor. Usa `Refs #N` para avances y
+`Closes #N` en el cierre; mantén abiertas las tareas pendientes o paralelas no integradas.
+
+## Ciclo global de issues de GitHub
+
+Aplica `CONTRIBUTING.md` y `CONVENTIONS.md` a todo trabajo no trivial. Cada plan GSD tiene una
+issue etiquetada, en el board y enlazada mediante `github_issue` en el frontmatter. Usa `Refs #N`
+para avances; usa `Closes #N` solo cuando el `SUMMARY` y la verificación del plan estén
+integrados. No cierres tareas paralelas no integradas ni ocultes fallos de sincronización.

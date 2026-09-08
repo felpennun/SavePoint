@@ -69,6 +69,18 @@ credenciales, datos personales ni logs brutos.
 La política y plantilla están en [`ideas-vault/README.md`](ideas-vault/README.md) y
 [`ideas-vault/Conceptos/Vault vivo y sincronizacion.md`](ideas-vault/Conceptos/Vault vivo y sincronizacion.md).
 
+### Ciclo global de issues de GitHub
+
+Aplica `CONTRIBUTING.md` y la sección 5 de `CONVENTIONS.md` a cualquier LLM. El trabajo no
+trivial se registra en una issue; cada `*-PLAN.md` planificado tiene una issue en el board y
+`github_issue` en su frontmatter. Usa `Refs #N` para avances y `Closes #N` únicamente en el
+commit que integra el `SUMMARY` y cumple la verificación del plan. No cierres issues de trabajo
+paralelo no integrado ni declares una fase cerrada mientras el board y los planes diverjan.
+
+La LLM responsable debe cerrar automáticamente la issue cuando la tarea esté completada,
+integrada y verificada, sin esperar otra instrucción del autor. Usa `Refs #N` para avances y
+`Closes #N` en el cierre; mantén abiertas las tareas pendientes o paralelas no integradas.
+
 <!-- /Non-GSD section -->
 
 <!-- GSD:stack-start source:research/STACK.md -->

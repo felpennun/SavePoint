@@ -13,7 +13,10 @@ Work beyond a trivial fix is tracked as a GitHub Issue on
 - `phase-01`, `phase-02`, ... label which GSD phase an issue belongs to.
 - `deployment`, `bug`, `documentation`, `enhancement`, etc. label the kind of work.
 
-### GSD planning → issue lifecycle
+### GSD planning → issue lifecycle (all agents)
+
+This lifecycle is global: every human or LLM collaborator follows it, including manual work
+outside an active GSD command.
 
 - When a phase is planned (`gsd-plan-phase`), create one GitHub Issue per generated `*-PLAN.md` (not per
   `<task>` block inside it — a plan with Task 1 and Task 2 is still a single issue), labelled with that
@@ -27,6 +30,10 @@ Work beyond a trivial fix is tracked as a GitHub Issue on
   `github_issue: <number>` in its frontmatter and have a matching board item before planning is reported
   complete. Re-running the synchronization reconciles existing `Plan <id>:` titles instead of creating
   duplicates.
+
+The responsible agent closes the issue automatically once the task is complete, integrated, and
+verified; no additional author instruction is required. Keep the issue open while work is
+pending or belongs to an unintegrated parallel change.
 
 ## Commit message format
 

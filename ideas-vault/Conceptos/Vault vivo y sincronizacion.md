@@ -43,6 +43,19 @@ cambios del vault se conservan en Git junto con el trabajo que los motiva cuando
 Si se regenera el vault, se revisan las notas manuales para no perder decisiones o enlaces
 incorporados desde la generacion inicial.
 
+## Issues de GitHub
+
+La política de [`CONTRIBUTING.md`](../../CONTRIBUTING.md) y la sección 5 de
+[`CONVENTIONS.md`](../../CONVENTIONS.md) son globales para todas las LLM y colaboradores.
+El trabajo no trivial se registra en una issue; cada plan GSD tiene una issue en el board y
+`github_issue` en el frontmatter. Los avances usan `Refs #N` y el cierre usa `Closes #N` solo
+cuando el `SUMMARY`, la integración y la verificación del plan están completos. Las tareas
+paralelas no integradas permanecen abiertas.
+
+La LLM responsable cierra automáticamente la issue cuando la tarea está completada, integrada
+y verificada, sin esperar otra instrucción del autor. Las tareas pendientes o paralelas no
+integradas permanecen abiertas.
+
 ## Plantilla minima
 
 ```markdown
@@ -66,4 +79,3 @@ Que decisiones, requisitos o tareas afecta.
 
 - [[Nota relacionada]]
 ```
-

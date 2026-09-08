@@ -92,6 +92,32 @@ La política operativa y la plantilla mínima están en `ideas-vault/README.md` 
 `ideas-vault/Conceptos/Vault vivo y sincronizacion.md`. Las fuentes canónicas siguen siendo
 `CONVENTIONS.md`, `AGENTS.md`, `docs/` y `.planning/`.
 
+## 5. Ciclo de vida global de issues de GitHub
+
+La política de [`CONTRIBUTING.md`](CONTRIBUTING.md) se aplica a todas las LLM y colaboradores,
+no solo al agente que ejecuta GSD. Todo trabajo superior a un arreglo trivial debe tener una
+issue en GitHub y, cuando proceda, un elemento en el board del proyecto.
+
+- En `gsd-plan-phase`, se crea o reconcilia **una issue por cada `*-PLAN.md`**, se etiqueta con
+  la fase, se añade al board y se escribe `github_issue: <number>` en el frontmatter.
+- Durante la ejecución, los commits parciales usan `Refs #N`. El commit que incorpora el
+  `*-SUMMARY.md` y cierra el plan usa `Closes #N`; si no existe un commit único de cierre, la
+  issue se cierra directamente después de verificar el resumen y sus criterios.
+- Una issue no se cierra porque exista código o un resumen provisional: hay que comprobar
+  integración, verificación y estado del plan. Las tareas paralelas no integradas permanecen
+  abiertas y se reconcilian antes de declarar cerrada la fase.
+- Antes de informar de una fase como cerrada, cada issue de sus planes debe estar en el estado
+  correcto y sincronizada con su elemento del board. Si GitHub no permite la operación, se
+  documenta el bloqueo y no se simula el cierre en el repositorio.
+
+La LLM responsable debe cerrar automáticamente la issue, sin esperar una instrucción adicional
+del autor, cuando la tarea esté completada, integrada y verificada. Si el trabajo sigue
+pendiente o pertenece a una rama paralela no integrada, la issue permanece abierta.
+
+No se incluyen credenciales, tokens, cookies, logs sin revisar ni datos sensibles en issues,
+elementos del board, commits o cuerpos de PR. El detalle operativo y los trailers canónicos
+están en `CONTRIBUTING.md`.
+
 ---
 
 *Creado 2026-09-06. Cambiar esta convención requiere una decisión del autor y actualizar los
