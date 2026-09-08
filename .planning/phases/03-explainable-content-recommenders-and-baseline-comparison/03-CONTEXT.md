@@ -18,11 +18,14 @@
   de la nota del candidato ni se mezcla con la valoración externa: el
   artefacto debe poder mostrar por separado cuántas semillas positivas se
   usaron y su media de `rating_half_steps`.
-- La captura de PopScore conserva primero las **primitivas crudas** que IGDB
-  publica, con tipo, fuente, fecha, valor y hash por observación. Esto no
-  elige una composición ni un peso: ambas decisiones se revisarán antes de
-  activar una variante y antes de ejecutar la comparación. Nunca se sustituye
-  un dato ausente por cero ni se consulta IGDB durante un ranking.
+- La captura de PopScore conserva las **primitivas crudas** de IGDB Visitas,
+  Want to Play, Playing y Played, con tipo, fuente, fecha, valor y hash por
+  observación. Cada familia se normaliza en el snapshot con `log1p` y
+  percentil de rango medio; el PopScore compuesto es la media simple de las
+  cuatro normalizadas y queda ausente si falta cualquiera. Su peso en el
+  recomendador se revisará antes de activar una variante y antes de ejecutar
+  la comparación. Nunca se sustituye un dato ausente por cero ni se consulta
+  IGDB durante un ranking.
 - La reimportación y publicación de una nueva versión del corpus gobernado se
   revisan después de verificar esta extensión del contrato; el corpus actual
   y sus artefactos permanecen inmutables.

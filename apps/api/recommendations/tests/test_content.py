@@ -263,16 +263,17 @@ def test_versioned_dto_and_item_evidence(user_a, genres) -> None:  # noqa: ANN00
         "generated_at",
         "input_snapshot_sha256",
         "feature_set_version",
-        "corpus_version",
-        "snapshot_sha256",
-        "parameters",
+            "corpus_version",
+            "snapshot_sha256",
+            "popscore_snapshot_sha256",
+            "parameters",
         "profile_inputs",
         "signal_availability",
         "insufficient_history",
         "limitation",
         "results",
     }
-    assert result["feature_set_version"] == "fs-v2"
+    assert result["feature_set_version"] == "fs-v3"
     assert result["corpus_version"] == _CORPUS
     assert len(result["snapshot_sha256"]) == 64
     assert len(result["input_snapshot_sha256"]) == 64

@@ -123,6 +123,16 @@ La activación de una composición de PopScore y sus pesos queda pendiente de la
 revisión del autor. La captura real se hará solo para una nueva versión del
 corpus gobernado, manteniendo intactos los artefactos existentes.
 
+### Normalización de las cuatro señales PopScore
+
+El autor fija cuatro primitivas IGDB: `Visits`, `Want to Play`, `Playing` y
+`Played`. Cada una se transforma con `log1p` y se normaliza a percentil de
+rango medio dentro de su tipo y snapshot. El compuesto
+`igdb-engagement-mean-v1` es la media no ponderada de las cuatro; solo se
+emite si todas están observadas. El DTO conserva tanto el valor compuesto como
+el hash de las primitivas utilizadas. No se ha activado todavía un peso de
+PopScore en el score final.
+
 ## Commits de tareas
 
 1. **Features y variantes explicables de contenido** — `3addc55` (`feat(03-02): add governed content signal variants`)

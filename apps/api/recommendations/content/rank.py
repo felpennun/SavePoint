@@ -12,6 +12,7 @@ from django.contrib.auth.models import AbstractBaseUser
 
 from catalogue.corpus import governed_works
 from catalogue.models import CorpusRatingSnapshot, GameWork
+from catalogue.popularity import normalised_popscore_by_work, popscore_snapshot_sha256
 from library.models import LibraryEntry
 from recommendations.content.combine import combine, rating_term
 from recommendations.content.explain import explain
@@ -113,6 +114,7 @@ def _candidate_signals(
     work: GameWork,
     snapshot_stats: dict[object, tuple[float, int]],
     volume_ceiling: int,
+    popscore_by_work: dict[object, float],
 ) -> dict:
     """Return only scalar signals backed by the frozen local snapshot."""
 
@@ -124,9 +126,7 @@ def _candidate_signals(
             normalise_rating_volume(rating_count, volume_ceiling) if has_snapshot else None
         ),
         "release_date": work.first_release_date.isoformat() if work.first_release_date else None,
-        # A dated PopScore snapshot has not been imported yet.  ``None`` is a
-        # material distinction from a low popularity value.
-        "popscore": None,
+        "popscore": popscore_by_work.get(work.id),
     }
 
 
@@ -168,6 +168,7 @@ def _dto(
     generated_at: datetime,
     corpus_version: str | None,
     snapshot_sha256: str,
+    popscore_snapshot_sha256: str | None,
     profile_inputs: ProfileInputs,
     results: list[dict],
     *,
@@ -181,6 +182,7 @@ def _dto(
         "feature_set_version": spec.feature_set_version,
         "corpus_version": corpus_version,
         "snapshot_sha256": snapshot_sha256,
+        "popscore_snapshot_sha256": popscore_snapshot_sha256,
         "parameters": spec.params,
         "profile_inputs": profile_inputs.as_dict(),
         "signal_availability": coverage_report(corpus_version),
@@ -198,6 +200,7 @@ def _cold_start_results(
     profile: dict[str, float],
     snapshot_stats: dict[object, tuple[float, int]],
     genre_profile: dict[str, float],
+    popscore_by_work: dict[object, float],
 ) -> list[dict]:
     vectors = _load_candidate_vectors(works, spec, corpus_version)
     volume_ceiling = max((count for _rating, count in snapshot_stats.values()), default=0)
@@ -217,7 +220,7 @@ def _cold_start_results(
             work,
             rt,
             evidence,
-            _candidate_signals(work, snapshot_stats, volume_ceiling),
+            _candidate_signals(work, snapshot_stats, volume_ceiling, popscore_by_work),
         )
         scored.append((rt, work.canonical_slug, item))
     scored.sort(key=lambda row: (-row[0], row[1]))
@@ -294,6 +297,9 @@ def rank_content_v1(
         }
 
     if profile_inputs.positive_entry_count < _COLD_START_ENTRIES or not profile:
+        popscore_by_work = normalised_popscore_by_work(
+            corpus_version, [work.id for work in candidates]
+        )
         results = _cold_start_results(
             candidates,
             limit,
@@ -302,12 +308,14 @@ def rank_content_v1(
             profile,
             snapshot_stats,
             resolved_genre_profile,
+            popscore_by_work,
         )
         return _dto(
             spec,
             generated_at,
             corpus_version,
             snapshot_sha256,
+            popscore_snapshot_sha256(corpus_version),
             profile_inputs,
             results,
             insufficient_history=True,
@@ -321,6 +329,7 @@ def rank_content_v1(
         prepared_vectors=(prepared or {}).get("vectors"),
     )
     volume_ceiling = max((count for _rating, count in snapshot_stats.values()), default=0)
+    popscore_by_work = normalised_popscore_by_work(corpus_version, [work.id for work in candidates])
     scored: list[tuple[float, str, dict]] = []
     for work in candidates:
         vector = vectors[work.id]
@@ -351,7 +360,7 @@ def rank_content_v1(
             work,
             score,
             evidence,
-            _candidate_signals(work, snapshot_stats, volume_ceiling),
+            _candidate_signals(work, snapshot_stats, volume_ceiling, popscore_by_work),
         )
         scored.append((score, work.canonical_slug, item))
 
@@ -362,6 +371,7 @@ def rank_content_v1(
         generated_at,
         corpus_version,
         snapshot_sha256,
+        popscore_snapshot_sha256(corpus_version),
         profile_inputs,
         results,
         insufficient_history=False,

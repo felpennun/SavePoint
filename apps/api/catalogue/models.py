@@ -296,6 +296,7 @@ class CorpusPopularitySnapshot(models.Model):
     popularity_type_name = models.CharField(max_length=120)
     external_source = models.CharField(max_length=120, blank=True)
     value = models.FloatField()
+    normalised_value = models.FloatField(null=True, blank=True)
     calculated_at = models.DateTimeField(null=True, blank=True)
     source_updated_at = models.DateTimeField(null=True, blank=True)
     retrieved_at = models.DateTimeField()

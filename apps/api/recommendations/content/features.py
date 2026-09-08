@@ -24,8 +24,11 @@ from __future__ import annotations
 
 import math
 
+from django.db.models import Count
+
 from catalogue.corpus import ALLOWLIST_SLUGS, governed_works
 from catalogue.models import CorpusPopularitySnapshot, CorpusRatingSnapshot, GameWork, Genre
+from catalogue.popularity import IGDB_ENGAGEMENT_TYPES
 
 # Bump when the vector-building rules below change (part of the DTO, REC-09).
 # v2 keeps the sparse categorical representation but makes the absence of
@@ -141,7 +144,15 @@ def coverage_report(corpus_version: str | None = None) -> dict:
         "rating_available": True,
         "rating_volume_available": True,
         "release_recency_available": True,
-        "popscore_available": False,
+        "popscore_available": CorpusPopularitySnapshot.objects.filter(
+            corpus_version=corpus_version,
+            popularity_type_name__in=IGDB_ENGAGEMENT_TYPES,
+            normalised_value__isnull=False,
+        )
+        .values("work_id")
+        .annotate(type_count=Count("popularity_type_name", distinct=True))
+        .filter(type_count=len(IGDB_ENGAGEMENT_TYPES))
+        .exists(),
     }
 
 

@@ -31,7 +31,13 @@ no confunde esa señal personal con el rating externo del candidato.
 Franquicia y desarrolladora pasan a persistirse con su ID IGDB estable. Solo
 entran en `fs-v3` si su cobertura medida en el corpus gobernado llega al 50 %.
 PopScore se prepara como instantánea de primitivas crudas por obra, tipo,
-fecha, fuente y hash; no existe aún una fórmula compuesta ni un peso activo.
+fecha, fuente y hash; todavía no tiene un peso activo en el recomendador.
+
+La composición acordada usa exclusivamente `Visits`, `Want to Play`,
+`Playing` y `Played` de IGDB. Cada tipo se normaliza con `log1p` y percentil de
+rango medio en su snapshot; `igdb-engagement-mean-v1` es la media simple de
+las cuatro y se declara ausente si falta una. El valor ya es trazable en el
+DTO, pero todavía no cambia la puntuación de ningún recomendador.
 
 No se ha consultado IGDB, ni se ha reimportado o gobernado un corpus nuevo, ni
 se han ejecutado experimentos. La decisión siguiente es revisar esta base y,

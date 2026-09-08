@@ -15,6 +15,7 @@ from django.db import connection, transaction
 from catalogue.corpus import governed_works
 from catalogue.igdb import IgdbClient, redact
 from catalogue.models import CorpusPopularitySnapshot, CorpusVersion, SourceRecord
+from catalogue.popularity import IGDB_ENGAGEMENT_TYPES
 
 
 SNAPSHOT_LOCK_KEY = 902_020_203
@@ -106,6 +107,7 @@ class Command(BaseCommand):
                 "work_id",
                 "popularity_type_id",
                 "value",
+                "normalised_value",
                 "calculated_at",
                 "source_updated_at",
                 "payload_sha256",
@@ -116,13 +118,69 @@ class Command(BaseCommand):
                 str(work_id),
                 type_id,
                 value,
+                normalised_value,
                 calculated_at.isoformat() if calculated_at else None,
                 source_updated_at.isoformat() if source_updated_at else None,
                 payload_sha256,
             )
-            for work_id, type_id, value, calculated_at, source_updated_at, payload_sha256 in rows
+            for (
+                work_id,
+                type_id,
+                value,
+                normalised_value,
+                calculated_at,
+                source_updated_at,
+                payload_sha256,
+            ) in rows
         )
         return _payload_sha256({"corpus_version": version, "primitives": normalized})
+
+    @staticmethod
+    def _engagement_type_ids(popularity_types: dict[int, dict[str, str]]) -> dict[str, int]:
+        by_name = {entry["name"].casefold(): type_id for type_id, entry in popularity_types.items()}
+        missing = [name for name in IGDB_ENGAGEMENT_TYPES if name.casefold() not in by_name]
+        if missing:
+            raise CommandError(
+                "PopScore type dictionary does not expose required IGDB engagement types: "
+                + ", ".join(missing)
+            )
+        return {name: by_name[name.casefold()] for name in IGDB_ENGAGEMENT_TYPES}
+
+    @staticmethod
+    def _normalise_engagement(version: str, type_ids: dict[str, int]) -> dict[str, int]:
+        """Apply log1p plus average-rank percentile per frozen primitive."""
+
+        counts: dict[str, int] = {}
+        for name, type_id in type_ids.items():
+            rows = list(
+                CorpusPopularitySnapshot.objects.filter(
+                    corpus_version=version,
+                    popularity_type_id=type_id,
+                    value__gte=0,
+                ).values_list("id", "value")
+            )
+            CorpusPopularitySnapshot.objects.filter(
+                corpus_version=version, popularity_type_id=type_id
+            ).update(normalised_value=None)
+            counts[name] = len(rows)
+            if not rows:
+                continue
+            ranked = sorted(
+                (math.log1p(value), str(snapshot_id), snapshot_id)
+                for snapshot_id, value in rows
+            )
+            denominator = len(ranked) - 1
+            start = 0
+            while start < len(ranked):
+                end = start + 1
+                while end < len(ranked) and ranked[end][0] == ranked[start][0]:
+                    end += 1
+                normalised = 0.5 if denominator == 0 else (start + end - 1) / (2 * denominator)
+                CorpusPopularitySnapshot.objects.filter(
+                    id__in=[row[2] for row in ranked[start:end]]
+                ).update(normalised_value=normalised)
+                start = end
+        return counts
 
     def handle(self, *args: Any, **options: Any) -> None:
         version = options["corpus_version"]
@@ -142,6 +200,7 @@ class Command(BaseCommand):
             raise CommandError(f"PopScore type lookup failed: {redact(str(exc))}") from None
         if not popularity_types:
             raise CommandError("PopScore type lookup returned no usable primitive types")
+        engagement_type_ids = self._engagement_type_ids(popularity_types)
 
         governed_ids = self._governed_igdb_work_ids(version)
         if not governed_ids:
@@ -210,6 +269,7 @@ class Command(BaseCommand):
                     if next_cursor <= cursor:
                         raise CommandError("PopScore cursor did not advance; refusing an incomplete snapshot")
                     cursor = next_cursor
+                normalised_counts = self._normalise_engagement(version, engagement_type_ids)
         except CommandError:
             raise
         except Exception as exc:  # noqa: BLE001 - provider errors must never expose credentials
@@ -221,15 +281,23 @@ class Command(BaseCommand):
             "captured_at": retrieved_at.isoformat(),
             "governed_igdb_work_count": len(governed_ids),
             "primitive_types": popularity_types,
+            "engagement_types": engagement_type_ids,
+            "normalised_observations_by_type": normalised_counts,
             "relevant_primitives_seen": seen_relevant,
             "snapshots_inserted": inserted,
             "snapshots_already_immutable": existing,
             "primitives_outside_governed_corpus": ignored_outside_corpus,
             "snapshot_sha256": self._snapshot_sha256(version),
-            "composition": None,
+            "composition": {
+                "id": "igdb-engagement-mean-v1",
+                "required_types": list(IGDB_ENGAGEMENT_TYPES),
+                "normalisation": "log1p then average-rank percentile within each frozen primitive type",
+                "formula": "mean of the four normalised primitive values",
+                "missing_policy": "no composition when any required primitive is absent",
+            },
             "limitation": (
-                "Raw PopScore primitives only. No aggregate score or recommender weight is active "
-                "until a versioned composition is approved."
+                "The normalised composition is stored for traceability only. No recommender "
+                "weight is active until a versioned algorithm variant is approved."
             ),
         }
         self._emit(options["evidence_json"], payload)
