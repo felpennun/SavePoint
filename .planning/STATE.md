@@ -1,9 +1,9 @@
 ---
 gsd_state_version: 1.0
 status: in_progress
-stopped_at: Phase 3 plan 03-02 completed and verified
-last_updated: "2026-09-09T01:23:00.000Z"
-state_head: 3addc55
+stopped_at: Phase 3 plan 03-02 reabierto; revisión del autor pendiente antes de un nuevo corpus
+last_updated: "2026-09-09T12:00:00.000Z"
+state_head: 81542ab
 progress:
   total_phases: 8
   completed_phases: 2
@@ -13,7 +13,7 @@ progress:
 last_activity: 2026-09-08
 next_phase: 3
 next_phase_name: Explainable Content Recommenders and Baseline Comparison
-next_action: /gsd-execute-phase 3 (resume at 03-03)
+next_action: Revisar el contrato de señales de 03-02 antes de gobernar un corpus nuevo o ejecutar 03-03
 current_phase: 03
 current_phase_name: Explainable Content Recommenders and Baseline Comparison
 last_activity_desc: "Fase 2 aceptada por Felipe: 13/13 planes, verificación y seguridad cerradas; primera simulación conservada con sus limitaciones. Preparando la planificación de la Fase 3."
