@@ -538,9 +538,11 @@ class _FakeSession:
     def __init__(self, responses: list) -> None:
         self._responses = list(responses)
         self.calls: list[str] = []
+        self.call_kwargs: list[dict] = []
 
     def post(self, url, **kwargs):  # noqa: ANN001, ANN003
         self.calls.append(url)
+        self.call_kwargs.append(kwargs)
         nxt = self._responses.pop(0)
         if isinstance(nxt, Exception):
             raise nxt
@@ -600,3 +602,15 @@ def test_client_reuses_token_across_pages() -> None:
     client.fetch_page(1)
 
     assert session.calls.count(TOKEN_URL := "https://id.twitch.tv/oauth2/token") == 1
+
+
+def test_client_refuses_redirects_for_token_and_authenticated_requests() -> None:
+    session = _FakeSession([
+        _FakeResponse(200, {"access_token": "tok", "expires_in": 5000}),
+        _FakeResponse(200, {"count": 1}),
+    ])
+    client = IgdbClient("cid", "csecret", session=session, sleep=lambda _s: None)
+
+    assert client.count_eligible() == 1
+    assert len(session.call_kwargs) == 2
+    assert all(call["allow_redirects"] is False for call in session.call_kwargs)

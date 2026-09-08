@@ -128,6 +128,7 @@ class IgdbClient:
                     "grant_type": "client_credentials",
                 },
                 timeout=DEFAULT_TIMEOUT,
+                allow_redirects=False,
             )
         except requests.RequestException as exc:
             raise IgdbClientError(f"token request failed: {self._scrub(exc)}") from None
@@ -154,7 +155,11 @@ class IgdbClient:
             }
             try:
                 resp = self._session.post(
-                    url, data=body.encode("utf-8"), headers=headers, timeout=DEFAULT_TIMEOUT
+                    url,
+                    data=body.encode("utf-8"),
+                    headers=headers,
+                    timeout=DEFAULT_TIMEOUT,
+                    allow_redirects=False,
                 )
             except requests.RequestException as exc:
                 if attempt == MAX_RETRIES:
