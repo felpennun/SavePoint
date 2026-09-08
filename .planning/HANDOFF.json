@@ -2,29 +2,31 @@
   "version": "1.0",
   "project": "SavePoint",
   "phase": "02-governed-corpus-external-ratings-evaluation-contract-and-fir",
-  "plan": "02-13",
-  "status": "evaluation_run_completed_pending_review",
-  "updated_at": "2026-09-08T11:26:00Z",
+  "plan": "security-audit-2026-09-08",
+  "status": "security_audit_done_closeout_incomplete",
+  "updated_at": "2026-09-08T12:16:00Z",
   "branch": "main",
-  "head_at_run_start": "c7fe48b",
+  "head": "258f764",
+  "issue": 30,
+  "follow_up_issue": 31,
   "completed_commits": [
-    {"hash": "708b0d3", "message": "test(02-13): cover shared-candidate evaluation harness"},
-    {"hash": "c7fe48b", "message": "feat(02-13): add reproducible evaluation runner"}
+    {"hash": "eb1cd21", "message": "security(AF-SEC-01): exclude local data from container builds"},
+    {"hash": "3f95d23", "message": "security(AF-SEC-02): refresh and harden runtime images"},
+    {"hash": "bc4ab78", "message": "security(AF-SEC-03): throttle expensive ranking endpoints"},
+    {"hash": "71a160c", "message": "security(AF-SEC-04): reject redirects in IGDB client"},
+    {"hash": "258f764", "message": "security(AF-SEC-05): automate repository security checks"}
   ],
-  "active_command": null,
-  "temporary_artifact_host_path": null,
-  "final_artifact_host_path": "docs/verification/evaluation-run-first.artifact.json",
-  "test_marker_host_path": "apps/api/.evaluation-test-run.json",
-  "monitor": [],
   "resume": [
-    "El run v2 terminó; revisar docs/verification/evaluation-run-first.artifact.json antes de firmar 02-13.",
-    "El artefacto registra 40 usuarios solicitados, 26 evaluados y 14 excluidos por falta de positivo elegible.",
-    "No usar --force-new-protocol ni lanzar otro test sobre este protocolo salvo que se versionen explícitamente sus cambios."
+    "No repetir la auditoria: ya esta ejecutada. El trabajo aun no ha terminado; continuar solo con el cierre descrito en .continue-here.md.",
+    "Actualizar 309 a 312 commits en los dos documentos pendientes; Gitleaks paso tras AF-SEC-05 con 310 commits, este checkpoint es el 311 y el commit documental sera el 312.",
+    "Anadir la Issue #31 al proyecto SavePoint; ya existe y debe quedar abierta como seguimiento no bloqueante.",
+    "Revisar y commitear los documentos pendientes con Closes #30; repetir solo los gates finales ligeros.",
+    "Actualizar la Issue #30, hacer push de main y confirmar #30 cerrada y #31 abierta."
   ],
   "constraints": [
-    "Do not use --force-new-protocol.",
-    "Do not make any new RAWG request; the former RAWG pass 2 is cancelled and does not block plan 02-13.",
-    "Do not stage or commit plan 02-06, plan 02-12, data/localization/**, or phase 03 context changes.",
-    "Preserve all unrelated working-tree changes."
+    "No repetir auditoria, Trivy, OSV, suites API/web ni build: ya pasaron 396 API, 34 web y el build de Next.js.",
+    "No borrar data/snapshots, lotes de localizacion, .env.local, volumenes Docker ni referencias de tesis.",
+    "El worktree huerfano se retiro; su rama worktree-agent-ade88e8511779fb69 permanece recuperable.",
+    "Preservar cualquier cambio paralelo no relacionado."
   ]
 }
