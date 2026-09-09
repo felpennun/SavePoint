@@ -42,10 +42,13 @@ FEATURE_SET_VERSION = "fs-v9"
 # Shared scalar-signal contract. The product workers and offline runner both
 # call the same ranker, so this version is included in the published
 # configuration fingerprint whenever the transformation changes.
-RATING_SIGNAL_VERSION = "rating-confidence-v3"
+RATING_SIGNAL_VERSION = "rating-confidence-v4-bayesian"
 RATING_QUALITY_POWER = 2.0
-RATING_VOLUME_BOOST = 0.20
-RATING_VOLUME_FLOOR = 1.0 - RATING_VOLUME_BOOST
+# Equivalent pseudo-observations used to shrink a sparse candidate rating
+# towards the frozen corpus mean.  It is deliberately a fixed contract value,
+# never a request-time or user-specific tuning parameter.
+RATING_BAYESIAN_PRIOR_COUNT = 25.0
+RATING_CONFIDENCE_PRIOR_COUNT = RATING_BAYESIAN_PRIOR_COUNT
 
 # These weights express the semantic hierarchy of the content signal. fs-v9
 # uses genre/platform as the core and saga/developer as bounded confirmation
@@ -196,9 +199,9 @@ def coverage_report(corpus_version: str | None = None) -> dict:
         "rating_signal": {
             "version": RATING_SIGNAL_VERSION,
             "quality_power": RATING_QUALITY_POWER,
-            "volume_source": "total_rating_count",
-            "volume_floor": RATING_VOLUME_FLOOR,
-            "volume_boost": RATING_VOLUME_BOOST,
+            "prior_source": "total_rating_count_weighted_frozen_corpus_mean",
+            "prior_count": RATING_BAYESIAN_PRIOR_COUNT,
+            "observation_count_source": "total_rating_count",
         },
         "governed_count": total,
         "algorithm_candidate_count": candidate_count,
@@ -236,7 +239,7 @@ def coverage_report(corpus_version: str | None = None) -> dict:
         "null_handling": {
             "categorical_features": "missing facet omitted from sparse vector",
             "external_user_rating_snapshot": "genre-median fallback only when candidate rating is absent",
-            "rating_volume_snapshot": "missing signal excluded and active weights renormalized",
+            "rating_volume_snapshot": "reported as evidence only; Bayesian shrinkage uses total_rating_count",
             "release_recency": "missing, future, or unrated release returns null",
             "popscore_complete": "missing primitive excludes composed PopScore",
         },
@@ -252,30 +255,85 @@ def normalise_rating(value: float | None) -> float | None:
 
 
 def rating_quality_signal(value: float | None) -> float | None:
-    """Emphasise high IGDB ratings while preserving the bounded scale."""
+    """Return the legacy raw-rating adapter for ``rating_quality``."""
 
-    normalised = normalise_rating(value)
-    return None if normalised is None else normalised**RATING_QUALITY_POWER
+    return rating_quality(normalise_rating(value))
+
+
+def rating_bayesian_normalized(
+    rating: float | None,
+    total_rating_count: int | None,
+    prior_mean: float | None,
+) -> float | None:
+    """Return the frozen Bayesian IGDB rating on the normalized scale."""
+
+    return normalise_rating(bayesian_rating(rating, total_rating_count, prior_mean))
+
+
+def rating_quality(rating_bayesian_normalized: float | None) -> float | None:
+    """Emphasize high Bayesian ratings without leaving the ``[0, 1]`` scale."""
+
+    if rating_bayesian_normalized is None or not math.isfinite(rating_bayesian_normalized):
+        return None
+    bounded = max(0.0, min(1.0, rating_bayesian_normalized))
+    return bounded**RATING_QUALITY_POWER
+
+
+def rating_confidence(total_rating_count: int | None) -> float:
+    """Return ``n / (n + m)`` for the frozen IGDB evidence count."""
+
+    count = max(0, total_rating_count or 0)
+    return count / (count + RATING_CONFIDENCE_PRIOR_COUNT)
+
+
+def rating_final(
+    rating_bayesian_normalized: float | None,
+    total_rating_count: int | None,
+) -> float | None:
+    """Combine Bayesian quality and evidence confidence exactly once."""
+
+    quality = rating_quality(rating_bayesian_normalized)
+    return None if quality is None else quality * rating_confidence(total_rating_count)
+
+
+def bayesian_rating(
+    rating: float | None,
+    total_rating_count: int | None,
+    prior_mean: float | None,
+) -> float | None:
+    """Shrink a candidate IGDB rating towards the frozen corpus mean.
+
+    The formula is the standard empirical-Bayes weighted mean:
+    ``(n * rating + m * prior_mean) / (n + m)``, where ``n`` is the
+    candidate's IGDB ``total_rating_count`` and ``m`` is the fixed prior
+    count.  Missing observations remain missing; they are not silently
+    converted into a quality signal.
+    """
+
+    if rating is None or not math.isfinite(rating):
+        return None
+    if prior_mean is None or not math.isfinite(prior_mean):
+        return rating
+    count = max(0, total_rating_count or 0)
+    return ((count * rating) + (RATING_BAYESIAN_PRIOR_COUNT * prior_mean)) / (
+        count + RATING_BAYESIAN_PRIOR_COUNT
+    )
 
 
 def compose_rating_confidence(
     rating_quality: float | None,
     rating_volume: float | None,
 ) -> float | None:
-    """Combine quality and volume without letting volume replace quality.
+    """Return a legacy candidate term without applying volume a second time.
 
-    ``rating_volume`` is already the corpus-view-normalised logarithmic
-    ``total_rating_count`` signal. Missing volume leaves the quality signal
-    unchanged; otherwise volume can boost it within a fixed 20% band.
+    ``rating_volume`` remains an explainability field in existing DTOs, but
+    must not be applied a second time: its raw count has already determined
+    the Bayesian rating before the quality transformation.
     """
 
     if rating_quality is None:
         return None
-    quality = max(0.0, min(1.0, rating_quality))
-    if rating_volume is None:
-        return quality
-    volume = max(0.0, min(1.0, rating_volume))
-    return quality * (RATING_VOLUME_FLOOR + RATING_VOLUME_BOOST * volume)
+    return max(0.0, min(1.0, rating_quality))
 
 
 def normalise_rating_volume(value: int | None, ceiling: int | None) -> float | None:
@@ -340,3 +398,38 @@ def genre_rating_profile(corpus_version: str | None = None) -> dict[str, float]:
     return {
         slug: math.fsum(values) / len(values) for slug, values in buckets.items()
     }
+
+
+def corpus_rating_prior(
+    corpus_version: str | None = None,
+    *,
+    eligibility_cutoff_date: date | None = None,
+) -> float | None:
+    """Return the ``total_rating_count``-weighted IGDB corpus mean.
+
+    This uses the immutable ``CorpusRatingSnapshot`` selected by the governed
+    corpus version, so the web workers and offline runner use the same prior.
+    A row without a usable count contributes one observation solely as a safe
+    fallback for legacy fixture data; governed recommendation candidates have
+    a count of at least five.
+    """
+
+    snapshots = CorpusRatingSnapshot.objects.filter(
+        work_id__in=governed_works(
+            corpus_version,
+            eligibility_cutoff_date=eligibility_cutoff_date,
+        ).values("id"),
+        rating__isnull=False,
+    )
+    if corpus_version is not None:
+        snapshots = snapshots.filter(corpus_version=corpus_version)
+
+    numerator = 0.0
+    denominator = 0
+    for rating, total_rating_count in snapshots.values_list("rating", "total_rating_count"):
+        if rating is None or not math.isfinite(rating):
+            continue
+        count = max(1, total_rating_count or 0)
+        numerator += rating * count
+        denominator += count
+    return numerator / denominator if denominator else None

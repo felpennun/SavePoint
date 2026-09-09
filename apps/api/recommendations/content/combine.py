@@ -6,7 +6,12 @@ import math
 from statistics import median
 
 from catalogue.models import CorpusRatingSnapshot, GameWork
-from recommendations.content.features import genre_rating_profile, rating_quality_signal, compose_rating_confidence
+from recommendations.content.features import (
+    bayesian_rating,
+    compose_rating_confidence,
+    genre_rating_profile,
+    rating_quality_signal,
+)
 from recommendations.content.variants import VariantSpec
 
 
@@ -37,6 +42,7 @@ def rating_term(
     corpus_version: str | None,
     genre_profile: dict[str, float] | None = None,
     snapshot_stats: dict[object, tuple[float | None, int, int | None]] | None = None,
+    rating_prior: float | None = None,
 ) -> tuple[float, bool]:
     """Return a bounded external-rating signal and whether it is imputed.
 
@@ -57,7 +63,9 @@ def rating_term(
             return 0.0, True
         return rating_quality_signal(float(median(genre_values))) or 0.0, True
 
-    return rating_quality_signal(own_rating) or 0.0, False
+    return rating_quality_signal(
+        bayesian_rating(own_rating, _total_rating_count, rating_prior)
+    ) or 0.0, False
 
 
 def combine(

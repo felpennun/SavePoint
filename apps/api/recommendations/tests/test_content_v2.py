@@ -10,10 +10,23 @@ from django.utils import timezone as django_timezone
 
 from catalogue.models import CorpusRatingSnapshot, GameWork, Genre
 from library.models import LibraryEntry
-from recommendations.content.features import normalise_rating, normalise_rating_volume
+from recommendations.cancellation import RecommendationComputationCancelled
+from recommendations.content.features import (
+    compose_rating_confidence,
+    rating_bayesian_normalized,
+    rating_confidence,
+    rating_final,
+    rating_quality,
+    normalise_rating,
+    normalise_rating_volume,
+    rating_quality_signal,
+)
 from recommendations.content.profile import build_profile_inputs
 from recommendations.content.recency import recency_score
 from recommendations.content.rank import rank_content_v1
+from recommendations.content.combine import combine
+from recommendations.content.variants import ALGORITHM_REGISTRY
+from recommendations._weights import _entry_weight
 
 
 CORPUS = "content-v2-test"
@@ -66,20 +79,85 @@ def snapshot(item: GameWork, rating: float, count: int) -> None:
 
 def test_normalised_snapshot_scalars_preserve_missing_values() -> None:
     assert normalise_rating(75.0) == pytest.approx(0.75)
+    assert rating_quality_signal(95.0) == pytest.approx(0.9025)
+    assert rating_quality_signal(85.0) == pytest.approx(0.7225)
+    assert rating_quality_signal(75.0) == pytest.approx(0.5625)
     assert normalise_rating(None) is None
+    assert rating_quality_signal(None) is None
     assert normalise_rating_volume(99, 99) == pytest.approx(1.0)
     assert normalise_rating_volume(None, 99) is None
     assert normalise_rating_volume(0, 0) is None
+
+
+def test_rating_confidence_does_not_apply_volume_twice() -> None:
+    high_quality = rating_quality_signal(95.0)
+    lower_quality = rating_quality_signal(85.0)
+
+    assert compose_rating_confidence(high_quality, 1.0) > compose_rating_confidence(lower_quality, 1.0)
+    assert compose_rating_confidence(high_quality, 1.0) == pytest.approx(
+        compose_rating_confidence(high_quality, 0.1)
+    )
+    assert compose_rating_confidence(high_quality, None) == pytest.approx(high_quality)
+
+
+def test_rating_signal_exposes_quality_confidence_and_final_once() -> None:
+    normalized = rating_bayesian_normalized(90.0, 25, 70.0)
+
+    assert normalized == pytest.approx(0.8)
+    assert rating_quality(normalized) == pytest.approx(0.64)
+    assert rating_confidence(25) == pytest.approx(0.5)
+    assert rating_final(normalized, 25) == pytest.approx(0.32)
+    assert 0.0 <= rating_final(normalized, 25) <= 1.0
+
+
+def test_personal_rating_intensity_prioritises_high_seed_ratings() -> None:
+    assert _entry_weight("completed", 10) == pytest.approx(4.0)
+    assert _entry_weight("completed", 8) == pytest.approx(3.64)
+    assert _entry_weight("completed", 7) == pytest.approx(3.49)
+    assert _entry_weight("completed", 10) > _entry_weight("completed", 8) > _entry_weight("completed", 7)
+
+
+def test_popscore_variants_penalise_missing_popscore_with_the_minimum_floor() -> None:
+    for algorithm_id in (
+        "content-cbf-weighted-pop-v1",
+        "content-cbf-multiplicative-pop-v1",
+        "content-cbf-twostage-pop-v1",
+        "content-cbf-neg-pop-v1",
+    ):
+        spec = ALGORITHM_REGISTRY[algorithm_id]
+        missing = combine(0.8, 0.8, None, spec, popscore=None)
+        maximum = combine(0.8, 0.8, None, spec, popscore=1.0)
+
+        assert spec.params["popscore_missing_floor"] == 0.0
+        assert missing < maximum
+
+    recency = ALGORITHM_REGISTRY["recency-v1"]
+    assert combine(0.8, 0.8, None, recency, popscore=None, recency_score=1.0) < combine(
+        0.8, 0.8, None, recency, popscore=1.0, recency_score=1.0
+    )
 
 
 def test_recency_score_is_bounded_and_requires_released_rated_work() -> None:
     cutoff = date(2026, 9, 9)
 
     assert recency_score(date(2026, 9, 9), eligibility_cutoff_date=cutoff, has_external_rating=True) == pytest.approx(1.0)
-    assert recency_score(date(2025, 9, 9), eligibility_cutoff_date=cutoff, has_external_rating=True) == pytest.approx(0.5)
+    assert recency_score(date(2025, 9, 9), eligibility_cutoff_date=cutoff, has_external_rating=True) == pytest.approx(0.35)
+    assert recency_score(date(2024, 9, 9), eligibility_cutoff_date=cutoff, has_external_rating=True) == pytest.approx(0.35**2)
+    assert recency_score(date(2011, 9, 9), eligibility_cutoff_date=cutoff, has_external_rating=True) < 1e-6
     assert recency_score(None, eligibility_cutoff_date=cutoff, has_external_rating=True) is None
     assert recency_score(date(2026, 10, 1), eligibility_cutoff_date=cutoff, has_external_rating=True) is None
     assert recency_score(date(2026, 9, 9), eligibility_cutoff_date=cutoff, has_external_rating=False) is None
+
+
+@pytest.mark.django_db
+def test_content_ranking_stops_before_work_when_cancelled(user) -> None:  # noqa: ANN001
+    with pytest.raises(RecommendationComputationCancelled):
+        rank_content_v1(
+            user,
+            "content-cbf-weighted-v1",
+            corpus_version=CORPUS,
+            should_continue=lambda: False,
+        )
 
 
 @pytest.mark.django_db
@@ -165,5 +243,7 @@ def test_recency_variant_adds_released_rated_age_to_the_other_signals(user, genr
 
     assert by_slug["recent"]["score"] > by_slug["older"]["score"]
     assert by_slug["recent"]["signals"]["recency_score"] == pytest.approx(1.0)
-    assert by_slug["older"]["signals"]["recency_score"] == pytest.approx(0.5)
+    assert by_slug["older"]["signals"]["recency_score"] == pytest.approx(0.35)
     assert by_slug["unrated"]["signals"]["recency_score"] is None
+    assert by_slug["unrated"]["signals"]["popscore"] == 0.0
+    assert by_slug["unrated"]["signals"]["popscore_imputed"] is True
