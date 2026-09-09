@@ -135,3 +135,6 @@ Fuente canónica: [[../../docs/verification/evaluation-runner-integration-2026-0
 - [[Requisitos - Experimentacion y evaluacion]]
 La inicialización de colecciones preexistentes se realiza con el comando idempotente
 `enqueue_recommendation_refreshes`, que solo crea la revisión y el trabajo pendiente.
+La limpieza de cuentas del 2026-09-09 dejó 600 usuarios sintéticos, tres cuentas demo y la
+cuenta personal simulada `felipe`. Se eliminaron siete cuentas residuales de pruebas E2E/probes,
+sin entradas ni copias.

@@ -90,3 +90,6 @@ Fuente de implementación: `apps/api/recommendations/jobs.py`,
 Para inicializar colecciones que ya existían antes del worker se usa el comando idempotente
 `python manage.py enqueue_recommendation_refreshes`; solo crea la revisión y el trabajo
 pendiente, sin modificar los datos de la biblioteca.
+La limpieza de cuentas del 2026-09-09 conservó las 600 identidades sintéticas, las tres
+cuentas demo simuladas y la cuenta personal simulada `felipe`. Se eliminaron siete cuentas
+residuales de pruebas E2E/probes; no tenían entradas ni copias.
