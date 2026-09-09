@@ -5,10 +5,11 @@
 La comparación offline y la página de recomendaciones comparten el catálogo
 publicable definido por `apps/api/recommendations/published.py`. No hay una
 implementación, conjunto de señales ni pesos alternativos para el worker web:
-el runner llama a `rank_content_v1` con los mismos `algorithm_id` y el mismo
-`ALGORITHM_REGISTRY` que consumen los workers personales.
+el runner y los workers consumen el mismo catálogo versionado de IDs y los
+rankers compartidos; las variantes de contenido usan `rank_content_v1` y las
+de Fase 4 sus rankers colaborativo e híbrido equivalentes.
 
-Las nueve variantes de contenido comparadas y publicadas son:
+Las once variantes de contenido y los dos algoritmos de Fase 4 comparados y publicados son:
 
 | `algorithm_id` | Estantería | Worker dedicado |
 |---|---|---|
@@ -21,6 +22,10 @@ Las nueve variantes de contenido comparadas y publicadas son:
 | `content-cbf-twostage-pop-v1` | Afinidad en dos etapas con popularidad | `recommendation-worker-twostage-pop` |
 | `content-cbf-neg-pop-v1` | Afinidad con preferencias y popularidad | `recommendation-worker-negative-pop` |
 | `recency-v1` | Novedades afines a ti | `recommendation-worker-recency` |
+| `content-cbf-mmr-v1` | Afinidad diversa por contenido | `recommendation-worker-mmr` |
+| `content-cbf-mmr-pop-v1` | Afinidad diversa con popularidad | `recommendation-worker-mmr-pop` |
+| `cf-user-knn-v1` | Coincidencia con usuarios similares | `recommendation-worker-collaborative` |
+| `hybrid-weighted-cf-v1` | Afinidad híbrida contenido + usuarios | `recommendation-worker-hybrid` |
 
 `random-v1` y `popularity-v1` son baselines de evaluación: se calculan para
 interpretar los resultados de investigación, pero no son recomendaciones
@@ -102,9 +107,9 @@ la valoración IGDB solo desempata y los empates finales usan el slug canónico.
 
 ## Publicación y consistencia
 
-Un cambio en la colección encola diez trabajos, uno por sección publicada.
+Un cambio en la colección encola catorce trabajos, uno por sección publicada.
 Cada worker reclama únicamente su `algorithm_id`. Sus resultados permanecen
-privados hasta que los diez han terminado correctamente; entonces se crea y
+privados hasta que los catorce han terminado correctamente; entonces se crea y
 activa un único `RecommendationSnapshot`. Si cambia la colección o la huella
 de configuración durante el cálculo, el resultado se marca obsoleto y no
 puede sustituir al snapshot anterior.
@@ -122,12 +127,12 @@ bucles costosos, abandonan el cálculo desfasado y cada worker dedicado reclama
 el trabajo de su mismo algoritmo para la revisión más reciente. Ningún trabajo
 obsoleto puede publicarse.
 
-La rejilla de 28 configuraciones de `docs/methodology/protocol.json` conserva
+La rejilla de 30 configuraciones de `docs/methodology/protocol.json` conserva
 su función de espacio de exploración y validación metodológica. No es un
 conjunto adicional de estanterías ni de workers: el conjunto realmente
-ejecutado para comparar y publicar es el catálogo versionado de nueve
-variantes publicables: conserva los baselines anteriores y añade las cuatro
-variantes PopScore descritas arriba.
+ejecutado para comparar y publicar es el catálogo versionado de trece
+variantes publicables: conserva los baselines anteriores, añade las cuatro
+variantes PopScore descritas arriba y las dos variantes MMR.
 
 ## Variantes PopScore publicables — actualización 2026-09-09
 
@@ -146,9 +151,9 @@ auditable la imputación. En la variante multiplicativa el rango es 0,85–1,15;
 las variantes aditivas el cero es una contribución/penalización real, y en dos
 etapas solo afecta al desempate dentro de la banda de similitud.
 
-El producto publica una estantería por cada una de las nueve variantes de contenido,
+El producto publica una estantería por cada una de las trece variantes personales,
 además de la estantería de género y la de DLC. Hay un worker dedicado por variante:
-los cuatro nuevos se añaden a los seis servicios existentes y todos comparten la
+los ocho nuevos se añaden a los seis servicios existentes y todos comparten la
 revisión de colección y la publicación atómica del snapshot.
 
 ## Verificación
@@ -157,5 +162,104 @@ revisión de colección y la publicación atómica del snapshot.
 - `docker compose -f infra/compose.yaml run --rm web pnpm --dir apps/web exec vitest run tests/recommendations.test.ts`: 9 passed.
 - `docker compose -f infra/compose.yaml run --rm web pnpm --dir apps/web exec tsc --noEmit`: correcto.
 - `python manage.py makemigrations --check --dry-run`: sin cambios pendientes.
+
+## Variantes MMR
+
+Se añaden dos variantes publicables: `content-cbf-mmr-v1`, basada en Weighted,
+y `content-cbf-mmr-pop-v1`, basada en Weighted-Pop. Primero calculan la
+relevancia de su algoritmo base y despues aplican MMR sobre el pool de las 100
+mejores candidatas, o cinco veces K cuando sea mayor. Con `lambda = 0,80`, cada
+seleccion maximiza `0,80 * relevancia - 0,20 * similitud_maxima` frente a los
+elementos ya seleccionados. La similitud es el coseno de los vectores fs-v9.
+El primer elemento siempre es el de mayor relevancia base; las siguientes
+posiciones reducen redundancia sin modificar las puntuaciones base.
+
+## Fase 4: colaborativo e híbrido — actualización 2026-09-09
+
+La arquitectura añade exactamente dos algoritmos personales, sin modificar las
+once variantes de contenido existentes:
+
+- `cf-user-knn-v1` centra las valoraciones explícitas de `LibraryEntry` por la
+  media de cada usuario y calcula coseno sobre al menos dos obras valoradas en
+  común. Usa los 20 vecinos positivos más similares y predice cada candidata
+  con la media ponderada de sus valoraciones. Si no hay vecindario suficiente,
+  usa la frecuencia global de interacción de la población de referencia.
+- `hybrid-weighted-cf-v1` combina `0,60 * content-cbf-weighted-v1` y
+  `0,40 * cf-user-knn-v1`. Cuando no existe señal colaborativa, conserva el
+  resultado de Weighted como fallback explícito.
+
+En la web, la referencia colaborativa excluye al usuario actual y cada
+algoritmo tiene su propio worker y estantería. En offline, la referencia es
+exclusivamente el split `train`, para impedir fuga desde validación o test.
+Ambos caminos reciben el mismo manifiesto de candidatas, exclusiones, corpus y
+semillas. La configuración se identifica con protocolo v9.
+
+La evaluación offline se ejecuta con `run_evaluation_parallel`: crea un proceso
+aislado por algoritmo, recoge estado, error y duración individual, y conserva
+el tiempo total de pared y la suma de tiempos de workers. Si falla uno, el
+artefacto queda marcado como fallido y no se registra el marcador de test.
+
+## Frontera metodológica de la Fase 4 y propuesta futura — 2026-09-09
+
+La comparación actual de la Fase 4 implementa únicamente `cf-user-knn-v1` y
+`hybrid-weighted-cf-v1`. Esta decisión no altera las variantes de contenido ya
+aceptadas, incluidas `content-cbf-mmr-v1` y `content-cbf-mmr-pop-v1`. La fase
+mantiene así un conjunto acotado de comparadores que puede auditarse con el
+corpus controlado y sintético disponible, valoraciones explícitas, el protocolo
+congelado, el contrato de candidatos y exclusiones, y el presupuesto de tuning
+ya fijado.
+
+Quedan fuera del alcance metodológico actual Item-KNN, los recomendadores
+neuronales y otros modelos complejos. El corpus controlado y sintético no
+aporta una base suficiente para atribuir diferencias a esos modelos sin
+introducir más supuestos; el uso de valoraciones explícitas favorece que la
+señal colaborativa vigente sea legible; y el protocolo congelado exige
+comparadores reproducibles dentro del mismo particionado, semillas y
+presupuesto. Añadir arquitecturas con más grados de libertad de tuning también
+ampliaría el espacio de decisiones y dificultaría separar una mejora del
+algoritmo de una ventaja de ajuste. La exclusión es, por tanto, una decisión de
+alcance y de validez de esta fase, no una afirmación de inferioridad
+algorítmica. No genera artefactos ejecutables ni resultados comparables para
+ninguno de esos modelos en esta fase.
+
+### `hybrid-mmr-v1`: propuesta no implementada
+
+Como línea de trabajo futura se propone `hybrid-mmr-v1`, con estado
+**Propuesta — no implementada**. Primero calcula la relevancia de
+`hybrid-weighted-cf-v1` con la composición exacta
+`0,60 * content-cbf-weighted-v1 + 0,40 * cf-user-knn-v1`; cuando falta señal
+colaborativa, conserva el fallback Weighted ya definido. Después aplica la
+misma regla MMR de contenido sobre las 100 mejores candidatas o `5 * K` cuando
+sea mayor: el primer elemento es el de mayor relevancia base y cada selección
+posterior maximiza `0,80 * relevancia - 0,20 * similitud_maxima`, con
+`lambda = 0,80` y similitud coseno sobre `fs-v9`. La profundidad de presentación
+propuesta es de 20 resultados.
+
+Esta propuesta se distingue de `content-cbf-mmr-v1`, que reordena la relevancia
+Weighted de contenido, y de `content-cbf-mmr-pop-v1`, que reordena
+Weighted-Pop; también se distingue de `hybrid-weighted-cf-v1`, que combina las
+señales pero no aplica la etapa MMR. `hybrid-mmr-v1` no tiene worker,
+estantería, registro, snapshot ni resultado de evaluación. Cualquier trabajo
+futuro deberá conservar el corpus, las exclusiones, las semillas y el contrato
+de evaluación vigentes, y documentar por separado cualquier cambio antes de
+convertir esta propuesta en una variante ejecutable.
+
+## Actualizacion v8: rating bayesiano
+
+`rating_confidence` usa `rating-confidence-v4-bayesian` tanto en web como en
+evaluacion offline. Se calcula `rating_bayes = (n * rating_igdb + 25 *
+media_corpus) / (n + 25)` y despues `(rating_bayes / 100)^2`. `n` es
+`total_rating_count`; `media_corpus` es la media IGDB ponderada por ese
+recuento en el snapshot congelado. Una candidata de poca evidencia se contrae
+hacia la media; una de evidencia amplia conserva su nota. No se aplica ya un
+multiplicador de volumen separado.
 - `docker compose -f infra/compose.yaml config --quiet`: configuración de los
-  diez workers válida.
+  catorce workers válida.
+
+## Verificación de la Fase 4
+
+La configuración actual declara 14 workers válidos: 13 secciones personales
+y la heurística de género. La actualización de Felipe en la revisión 14
+terminó con los 14 trabajos en `succeeded`; el snapshot activo contiene 13
+secciones personales y cada una entrega 20 resultados. La regresión backend
+completa pasó con 482 tests y TypeScript pasó con `tsc --noEmit`.

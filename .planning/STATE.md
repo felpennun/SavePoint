@@ -334,3 +334,43 @@ revision 14; la cache mantiene 190.479 vectores. Backend: 194 pruebas; web:
 TypeScript correcto. Reevaluacion archivada en
 `docs/verification/recommendation-fs-v9-comparison-felipe-2026-09-09.md`. No se
 ejecuto la evaluacion offline de los 400 usuarios.
+
+## Tarea rapida completada — 2026-09-09
+
+La señal de calidad IGDB pasa a `rating-confidence-v4-bayesian`: media previa
+del corpus congelado ponderada por `total_rating_count`, con 25
+pseudo-observaciones y posterior potencia cuadrática. Sustituye el
+multiplicador de volumen, sin cambiar candidatas, fs-v9 ni los pesos de los
+algoritmos. El protocolo se elevó a v8; los diez workers paralelos de Felipe
+terminaron y publicaron atómicamente la revisión 14. Backend: 195 pruebas;
+TypeScript correcto. Ver
+`.planning/quick/260909-tub-implement-a-reproducible-bayesian-rating/` y
+`docs/verification/recommendation-bayesian-rating-felipe-2026-09-09.md`.
+
+## Tarea rápida completada — 2026-09-09
+
+Se añadieron exactamente dos variantes nuevas de reordenación MMR, sin cambiar
+las nueve variantes publicables anteriores: `content-cbf-mmr-v1` parte de
+Weighted y `content-cbf-mmr-pop-v1` parte de Weighted-Pop. Ambas comparten el
+ranker entre web y offline, usan `lambda = 0,80` y coseno sobre fs-v9, tienen
+worker y estantería propios, y publican 20 resultados. La rejilla queda en 30
+configuraciones. Los 12 workers de Felipe terminaron en paralelo y publicaron
+el snapshot `ddef6ae3-6795-4049-b105-5d389e53d1e2`, revisión 14. Ver
+`.planning/quick/260909-udz-implement-two-shared-mmr-recommendation-/` y
+`docs/verification/recommendation-mmr-felipe-2026-09-09.md`.
+
+## Fase 4 — implementación preparada — 2026-09-09
+
+Se incorporaron `cf-user-knn-v1` y `hybrid-weighted-cf-v1` a la arquitectura
+web y offline, con workers y estanterías independientes. El protocolo pasa a
+v9 y declara la ejecución paralela por algoritmo. La revisión 14 de Felipe
+publicó 14 trabajos correctos y 13 estanterías personales con 20 resultados.
+La evaluación de los 400 usuarios aún no se ha ejecutado; el comando
+`run_evaluation_parallel` queda listo para hacerlo con tiempos individuales y
+totales. Ver `.planning/phases/04-collaborative-and-hybrid-comparison/`.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260909-wgm | Documentar la decisión de no implementar Item-KNN ni modelos complejos y definir hybrid-mmr-v1 como propuesta | 2026-09-09 | pendiente | [260909-wgm-documentar-la-decision-de-no-implementar](./quick/260909-wgm-documentar-la-decision-de-no-implementar/) |
