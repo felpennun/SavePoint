@@ -86,9 +86,13 @@ las cohortes y tests estadísticos son de la **Fase 3** y no forman parte de est
 
 ## Rejilla de tuning y aislamiento del test (D-21)
 
-- La población prevista es de 200 usuarios heredados de la Fase 2 más al menos 400 nuevos
-  usuarios sintéticos. Se parte en tres subconjuntos **disjuntos** por una semilla fija
-  (`user_split.seed`): `train` = 360, `validation` = 120, `test` = 120.
+- La población prevista es de 400 usuarios sintéticos nuevos que sustituyen a la población de
+  la Fase 2. Se parte en tres subconjuntos **disjuntos** por una semilla fija
+  (`user_split.seed`): `train` = 240, `validation` = 80, `test` = 80.
+  La población se regenera con la semilla titular `20260909` y su manifiesto de validación.
+- Las bibliotecas solo contienen obras con `rating_count >= 1`. La selección sin reemplazo
+  usa pesos escalonados `1/2/4/8/16/32` para los tramos `1–4`, `5–19`, `20–99`,
+  `100–499`, `500–1999` y `>=2000`, respectivamente.
 - La **rejilla de tuning** se declara entera en `protocol.json` **antes** de correr nada.
 Está congelada en **24 configuraciones** (tope duro: 24; `protocol.load()` lanza
 `ProtocolError` si `len(grid) > 24`):

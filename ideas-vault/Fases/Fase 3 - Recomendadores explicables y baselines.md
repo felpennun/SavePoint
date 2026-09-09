@@ -64,10 +64,11 @@ La planificación mantiene la decisión del proyecto de actualizar este vault co
 ## Estado de datos — 2026-09-09
 
 El corpus algorítmico activo es `2026.09.2`; sus hashes de ratings y PopScore están fijados en
-[`docs/methodology/protocol.json`](../../docs/methodology/protocol.json). La base contiene 200
-usuarios sintéticos actualmente. La discusión fija generar al menos 400 adicionales —600 en
-total— para la comparación principal, con cohortes de tamaño de biblioteca, historial escaso y
-sin historial; por tanto, todavía falta ampliar esa población antes de la evaluación.
+[`docs/methodology/protocol.json`](../../docs/methodology/protocol.json). La base contiene 400
+usuarios sintéticos activos para la comparación principal y conserva 200 usuarios históricos de
+Fase 2. La nueva población usa `rating_count >= 1` con ponderación escalonada creciente por
+volumen, y las cohortes 10/100/240/50 ya están verificadas; todavía no se ha ejecutado ningún
+algoritmo.
 
 ## Enlaces
 

@@ -18,11 +18,24 @@ from accounts.models import DemoAccountIdentity, demo_identity_anchor_id
 from catalogue.corpus import evaluation_candidate_works
 from evaluation.archetypes import Archetype, DEFAULT_ARCHETYPES, validate_archetypes
 from evaluation.protocol import load as load_protocol
-from library.models import BacklogStatus, LibraryEntry
+from library.models import BacklogStatus, CopyFormat, LibraryEntry, OwnedCopy
 
 
 SYNTHETIC_EVAL_USER_MARKER = "synthetic-eval-user"
+SYNTHETIC_PHASE2_MARKER = "synthetic-eval-user-phase2"
 SYNTHETIC_LOCK_KEY = 7250209
+LEGACY_PHASE2_ARCHETYPES = frozenset(
+    {
+        "monogenero-severo",
+        "monogenero-generoso",
+        "omnivoro-medio",
+        "completista-saga",
+        "explorador-novedades",
+        "coleccionista-pendientes",
+        "jugador-ocasional-cold-start",
+        "veterano-biblioteca-grande",
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -30,6 +43,9 @@ class SyntheticEntry:
     work_id: UUID
     current_status: str
     rating_half_steps: int | None
+    release_id: UUID | None = None
+    edition_id: UUID | None = None
+    owned_copy: bool = False
 
 
 @dataclass(frozen=True)
@@ -39,6 +55,7 @@ class SyntheticUser:
     ordinal: int
     seed_key: str
     entries: tuple[SyntheticEntry, ...]
+    no_history: bool = False
 
 
 @dataclass(frozen=True)
@@ -49,7 +66,11 @@ class SyntheticPopulation:
 
     @property
     def cold_start_users(self) -> tuple[SyntheticUser, ...]:
-        return tuple(user for user in self.users if len(user.entries) <= 3)
+        return tuple(user for user in self.users if 1 <= len(user.entries) <= 4)
+
+    @property
+    def no_history_users(self) -> tuple[SyntheticUser, ...]:
+        return tuple(user for user in self.users if not user.entries)
 
 
 @dataclass(frozen=True)
@@ -57,22 +78,44 @@ class _WorkCandidate:
     work_id: UUID
     genres: frozenset[str]
     first_release_date: date | None
+    rating_count: int
+    release_id: UUID | None
+    edition_id: UUID | None
 
 
 class SyntheticGenerationError(ValueError):
     """Raised before writes when the corpus cannot satisfy the scenario."""
 
 
-def _work_candidates(corpus_version: str | None) -> list[_WorkCandidate]:
-    works = evaluation_candidate_works(corpus_version).prefetch_related("genres").order_by("id")
-    return [
-        _WorkCandidate(
-            work_id=work.id,
-            genres=frozenset(genre.slug for genre in work.genres.all()),
-            first_release_date=work.first_release_date,
+def _work_candidates(
+    corpus_version: str | None,
+    *,
+    minimum_rating_count: int | None = None,
+) -> list[_WorkCandidate]:
+    queryset = evaluation_candidate_works(corpus_version)
+    if minimum_rating_count is not None:
+        queryset = queryset.filter(rating_count__gte=minimum_rating_count)
+    works = (
+        queryset
+        .prefetch_related("genres", "releases__editions")
+        .order_by("id")
+    )
+    candidates: list[_WorkCandidate] = []
+    for work in works:
+        releases = list(work.releases.all())
+        release = releases[0] if releases else None
+        editions = list(release.editions.all()) if release is not None else []
+        candidates.append(
+            _WorkCandidate(
+                work_id=work.id,
+                genres=frozenset(genre.slug for genre in work.genres.all()),
+                first_release_date=work.first_release_date,
+                rating_count=work.rating_count or 0,
+                release_id=release.id if release is not None else None,
+                edition_id=editions[0].id if editions else None,
+            )
         )
-        for work in works
-    ]
+    return candidates
 
 
 def _rating(rng: random.Random, generosity: str) -> int | None:
@@ -81,6 +124,43 @@ def _rating(rng: random.Random, generosity: str) -> int | None:
     ranges = {"severe": (2, 7), "medium": (4, 9), "generous": (6, 10)}
     low, high = ranges.get(generosity, ranges["medium"])
     return rng.randint(low, high)
+
+
+def _rating_count_weight(rating_count: int | None) -> float:
+    """Return the stepped collection weight for an IGDB user-rating count.
+
+    The weights are deliberately sublinear: popularity affects exposure, but
+    does not erase genre preferences or make the synthetic catalogue collapse
+    onto only the most rated works.
+    """
+
+    count = max(int(rating_count or 0), 1)
+    if count < 5:
+        return 1.0
+    if count < 20:
+        return 2.0
+    if count < 100:
+        return 4.0
+    if count < 500:
+        return 8.0
+    if count < 2000:
+        return 16.0
+    return 32.0
+
+
+def _weighted_sample_without_replacement(
+    pool: list[_WorkCandidate], size: int, rng: random.Random
+) -> list[_WorkCandidate]:
+    """Sample distinct works with an increasing, stepped rating-count bias."""
+
+    available = list(pool)
+    selected: list[_WorkCandidate] = []
+    for _ in range(size):
+        weights = [_rating_count_weight(work.rating_count) for work in available]
+        choice = rng.choices(available, weights=weights, k=1)[0]
+        selected.append(choice)
+        available.remove(choice)
+    return selected
 
 
 def _pool_for(
@@ -137,10 +217,11 @@ def generate(
     selected = tuple(archetypes)
     validate_archetypes(selected)
     protocol = load_protocol()
-    works = _work_candidates(corpus_version)
+    works = _work_candidates(corpus_version, minimum_rating_count=1)
     if not works:
-        raise SyntheticGenerationError("the governed corpus contains no works")
-
+        raise SyntheticGenerationError(
+            "the governed corpus contains no works with rating_count >= 1"
+        )
     available_genres = sorted({genre for work in works for genre in work.genres})
     users: list[SyntheticUser] = []
     for archetype in selected:
@@ -154,12 +235,12 @@ def generate(
             min_size, max_size = archetype.library_size_range
             requested_size = user_rng.randint(min_size, max_size)
             if archetype.cold_start:
-                requested_size = user_rng.randint(1, 3)
+                requested_size = user_rng.randint(1, 4)
             if requested_size > len(pool):
                 raise SyntheticGenerationError(
                     f"corpus has {len(pool)} candidates but {archetype.name} needs {requested_size}"
                 )
-            chosen = user_rng.sample(pool, requested_size)
+            chosen = _weighted_sample_without_replacement(pool, requested_size, user_rng)
             states = list(archetype.status_mix)
             weights = list(archetype.status_mix.values())
             entries = [
@@ -167,10 +248,26 @@ def generate(
                     work_id=work.work_id,
                     current_status=user_rng.choices(states, weights=weights, k=1)[0],
                     rating_half_steps=_rating(user_rng, archetype.rating_generosity),
+                    release_id=work.release_id,
+                    edition_id=work.edition_id,
+                    owned_copy=bool(work.release_id and user_rng.random() < 0.35),
                 )
                 for work in chosen
             ]
-            _ensure_positive(entries)
+            if entries:
+                _ensure_positive(entries)
+                if not any(entry.owned_copy for entry in entries):
+                    for index, entry in enumerate(entries):
+                        if entry.release_id is not None:
+                            entries[index] = SyntheticEntry(
+                                work_id=entry.work_id,
+                                current_status=entry.current_status,
+                                rating_half_steps=entry.rating_half_steps,
+                                release_id=entry.release_id,
+                                edition_id=entry.edition_id,
+                                owned_copy=True,
+                            )
+                            break
             users.append(
                 SyntheticUser(
                     archetype=archetype.name,
@@ -178,6 +275,7 @@ def generate(
                     ordinal=ordinal,
                     seed_key=f"synthetic-{archetype.name}-{ordinal}",
                     entries=tuple(entries),
+                    no_history=archetype.no_history,
                 )
             )
     generated = SyntheticPopulation(seed=seed, corpus_version=corpus_version, users=tuple(users))
@@ -195,11 +293,11 @@ def validate_population(population: SyntheticPopulation, *, relevance_floor: int
         if user.seed_key in seen_keys:
             raise SyntheticGenerationError("synthetic seed keys must be unique")
         seen_keys.add(user.seed_key)
-        if not user.entries:
-            raise SyntheticGenerationError("every synthetic user needs at least one library entry")
+        if not user.entries and not user.no_history:
+            raise SyntheticGenerationError("every non-empty synthetic user needs a library entry")
         if len({entry.work_id for entry in user.entries}) != len(user.entries):
             raise SyntheticGenerationError("a synthetic user cannot contain duplicate works")
-        if not any(
+        if user.entries and not any(
             entry.current_status == BacklogStatus.COMPLETED
             or (entry.rating_half_steps or 0) >= relevance_floor
             for entry in user.entries
@@ -218,6 +316,13 @@ def apply_population(population: SyntheticPopulation) -> dict[str, object]:
     with transaction.atomic():
         with connection.cursor() as cursor:
             cursor.execute("SELECT pg_advisory_xact_lock(%s)", [SYNTHETIC_LOCK_KEY])
+        # Retire the legacy Phase 2 population from the active evaluation
+        # marker while preserving its accounts and library data for audit.
+        for archetype_name in LEGACY_PHASE2_ARCHETYPES:
+            DemoAccountIdentity.objects.filter(
+                marker=SYNTHETIC_EVAL_USER_MARKER,
+                seed_key__startswith=f"synthetic-{archetype_name}-",
+            ).update(marker=SYNTHETIC_PHASE2_MARKER)
         for synthetic_user in population.users:
             anchor_id = demo_identity_anchor_id(synthetic_user.seed_key)
             identity = (
@@ -251,6 +356,7 @@ def apply_population(population: SyntheticPopulation) -> dict[str, object]:
                 )
             else:
                 updated += 1
+            OwnedCopy.objects.filter(user=identity.user).delete()
             LibraryEntry.objects.filter(user=identity.user).delete()
             LibraryEntry.objects.bulk_create(
                 [
@@ -261,6 +367,24 @@ def apply_population(population: SyntheticPopulation) -> dict[str, object]:
                         rating_half_steps=entry.rating_half_steps,
                     )
                     for entry in synthetic_user.entries
+                ]
+            )
+            OwnedCopy.objects.bulk_create(
+                [
+                    OwnedCopy(
+                        user=identity.user,
+                        work_id=entry.work_id,
+                        release_id=entry.release_id,
+                        edition_id=entry.edition_id,
+                        format=(
+                            CopyFormat.PHYSICAL
+                            if index % 2 == 0
+                            else CopyFormat.DIGITAL
+                        ),
+                        idempotency_key=f"{synthetic_user.seed_key}-{entry.work_id}",
+                    )
+                    for index, entry in enumerate(synthetic_user.entries)
+                    if entry.owned_copy and entry.release_id is not None
                 ]
             )
             anchor_ids.append(str(anchor_id))
@@ -278,7 +402,10 @@ def render_validation_report(population: SyntheticPopulation) -> str:
         f"- Semilla: `{population.seed}`",
         f"- Versión de corpus: `{population.corpus_version or 'no especificada'}`",
         f"- Usuarios generados: **{len(population.users)}**",
-        f"- Cohorte cold-start (1–3 juegos): **{len(population.cold_start_users)}**",
+        f"- Sin historial (0 juegos): **{len(population.no_history_users)}**",
+        f"- Cohorte cold-start (1–4 juegos): **{len(population.cold_start_users)}**",
+        f"- Historial normal (5–10 juegos): **{sum(5 <= len(user.entries) <= 10 for user in population.users)}**",
+        f"- Historial intensivo (>10 juegos): **{sum(len(user.entries) > 10 for user in population.users)}**",
         "",
         "## Resumen por arquetipo",
         "",
@@ -308,7 +435,7 @@ def render_validation_report(population: SyntheticPopulation) -> str:
             "",
             "## Interpretación",
             "",
-            "La misma semilla, versión de corpus y especificación de arquetipos deben producir los mismos identificadores de obra, estados y valoraciones. La cohorte cold-start se mantiene separada para evaluar el enrutamiento con historial insuficiente. La generación no incorpora datos personales ni pretende estimar la distribución de jugadores reales.",
+            "La misma semilla, versión de corpus y especificación de arquetipos deben producir los mismos identificadores de obra, estados y valoraciones. Las cohortes sin historial y cold-start se mantienen separadas para evaluar el enrutamiento con historial insuficiente. La generación no incorpora datos personales ni pretende estimar la distribución de jugadores reales.",
             "",
         ]
     )

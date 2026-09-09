@@ -384,7 +384,8 @@ producto o pulido de páginas de usuario final.
 > congelado.
 
 - **D-12:** La Fase 3 **genera una población sintética nueva y enriquecida de
-  ≥ 400 usuarios** (adicional a la de 200 de la Fase 2, con su **propia semilla y
+  400 usuarios exactos** (sustituye a la de 200 de la Fase 2 para la evaluación
+  de esta fase, con su **propia semilla y
   su propio manifiesto**), con esta composición pedida por el autor:
   - **10 usuarios con 0 juegos** (cohorte sin historial),
   - **100 usuarios con 1-4 juegos** (cohorte de historial escaso / cold-start),
@@ -394,19 +395,22 @@ producto o pulido de páginas de usuario final.
   Por usuario: **notas propias variadas** (distintas puntuaciones), **algunas
   cuentas con `OwnedCopy`** registradas y **otras sin ninguna**. Los juegos que
   entran en las bibliotecas se eligen del corpus gobernado con
-  **`rating_count` ≥ 10**, **salvo 1-2 usuarios sembrados por semilla** que tienen
-  a propósito un juego **sin ninguna valoración**, para ejercitar en evaluación
-  el camino "sin valoración" (D-07 de la Fase 2) y la mediana de género. El
-  research fija el umbral exacto de `rating_count` y la proporción de excepciones
-  contra la distribución real del corpus. Se **extiende** el generador de la
+  **`rating_count` ≥ 1**, con una selección escalonada cuya probabilidad aumenta
+  por tramos al subir el número de valoraciones: los juegos con pocos ratings
+  aparecen menos y los más valorados aparecen en más bibliotecas. La función de
+  peso por tramos queda fijada en el generador y en el informe. El snapshot
+  vigente no contiene obras con `rating_count >= 1` y `rating` IGDB nulo, por lo
+  que no se fuerzan excepciones incompatibles con el nuevo umbral. Se **extiende**
+  el generador de la
   Fase 2 (`apps/api/evaluation/synthetic.py`, `archetypes.py`,
-  `generate_synthetic_users.py`) de forma **aditiva**, sin cambiar el
-  comportamiento con el que se generó la población de 200.
+  `generate_synthetic_users.py`) de forma **aditiva en el código**, sin cambiar
+  el comportamiento histórico ni borrar los artefactos de la población de 200;
+  para la evaluación de Fase 3 solo se selecciona la población nueva de 400.
 - **D-13:** La Fase 3 **versiona el contrato de evaluación a `protocol_version: 2`**
   como entregable propio (no es una modificación retroactiva de la Fase 2; el
   freeze ya prevé esta evolución). El `protocol.json` v2:
-  1. **re-dimensiona `user_split`** para la población ≥ 400 — el research propone
-     las proporciones train/validación/test (orientativo ~60/20/20) de forma que
+  1. **fija `user_split` en 240/80/80** para los 400 usuarios — corresponde a
+     las proporciones train/validación/test (~60/20/20) de forma que
      **cada cohorte tenga un tamaño usable en el split de test**;
   2. define la **cohorte cold-start como "1-4" juegos** (la de la Fase 2 era
      "1-3"; la v1 no se toca);
@@ -423,10 +427,9 @@ producto o pulido de páginas de usuario final.
   y su `user_split` pasan a ser el contrato de evidencia de las comparaciones
   principales de las Fases 3 y 4; cambiarlos después invalida esas comparaciones
   y obliga a re-narrar el capítulo de evaluación.
-- **D-14:** El **tamaño total exacto** (≥ 400 es el piso; el research puede
-  proponer un número redondo mayor, p. ej. 400-500, para que las proporciones
-  train/val/test y de cohortes salgan limpias), las **proporciones del
-  `user_split` v2** y si `protocol.json` v2 se escribe **en el mismo fichero
+- **D-14:** El **tamaño total exacto es 400 usuarios**, con semilla titular
+  `20260909`, y las **proporciones del `user_split` son 240/80/80**. El
+  `protocol.json` v2 se escribe **en el mismo fichero
   versionado** o en un `protocol.v2.json` aparte, los fija el research en el PLAN
   y los **ratifica el autor** en un `checkpoint:decision`, dado que D-13 es
   `one-way`.
@@ -502,7 +505,7 @@ producto o pulido de páginas de usuario final.
 
 **Premisa fijada por el autor (2026-09-07):** la Fase 3 se ejecuta **después de
 que la Fase 2 esté terminada, y la Fase 2 no se modifica**. No hay puente de
-re-freeze previo; toda la ampliación (población ≥ 400, `protocol_version: 2`,
+re-freeze previo; toda la ampliación (población nueva de 400, `protocol_version: 2`,
 métricas beyond-accuracy, `robustness`) es trabajo interno de la Fase 3.
 
 1. **Precondición: la Fase 2 debe estar cerrada.** Hoy están hechas las olas 1-4
@@ -515,8 +518,8 @@ métricas beyond-accuracy, `robustness`) es trabajo interno de la Fase 3.
 2. **`protocol_version: 2` es un entregable de la Fase 3, no una re-apertura de
    la Fase 2.** El `protocol.json` v1, su hash y el artefacto de la comparación
    02-13 quedan **intactos** y se citan como primer resultado (ranking, 200
-   usuarios). La Fase 3 escribe v2 (D-13), genera su propia población ≥ 400
-   (D-12, semilla y manifiesto propios), extiende de forma **aditiva** el
+   usuarios). La Fase 3 escribe v2 (D-13), genera su propia población de 400
+   usuarios (D-12, semilla y manifiesto propios), extiende de forma **aditiva** el
    generador y `apps/api/evaluation/protocol.py`, y corre los cinco algoritmos
    bajo v2 con **su propio marcador de test consumido**. Nada de esto edita
    planes, artefactos ni el alcance entregado de la Fase 2.
@@ -525,11 +528,11 @@ métricas beyond-accuracy, `robustness`) es trabajo interno de la Fase 3.
    la estrategia de split **leave-one-out** (D-18 Fase 2), K ∈ {5,10,20}, la
    métrica titular `nDCG@10`, la rejilla de tuning de 24 configuraciones (tope
    24) y el aislamiento del test (una sola ejecución por versión, marcador de
-   consumo). v2 solo **re-dimensiona `user_split`**, **amplía `metrics`**,
+  consumo). v2 solo **fija `user_split` en 240/80/80**, **amplía `metrics`**,
    **añade `robustness`** y **redefine la banda cold-start a 1-4**.
 
 4. **La memoria del TFG cita dos comparaciones:** v1 (Fase 2, 200 usuarios,
-   solo ranking) como primer resultado, y **v2 (Fase 3, ≥ 400 usuarios, suite
+   solo ranking) como primer resultado, y **v2 (Fase 3, 400 usuarios, suite
    completa + cohortes + estadística) como comparación principal**. El capítulo
    de evaluación debe distinguirlas explícitamente.
 
@@ -584,7 +587,7 @@ métricas beyond-accuracy, `robustness`) es trabajo interno de la Fase 3.
   K, split, candidate set, exclusiones, lista de métricas, rejilla de tuning
   (tope 24), `user_split` (120/40/40), `corpus_version`, `snapshot_sha256`. La
   Fase 3 escribe **v2** (en este fichero versionado o en `protocol.v2.json`, D-14)
-  re-dimensionando `user_split` para ≥ 400 + ampliando `metrics` + añadiendo
+  fijando `user_split` en 240/80/80 para sus 400 usuarios + ampliando `metrics` + añadiendo
   `robustness`; **el v1 y su hash no se tocan** (D-13).
 - `docs/methodology/evaluation-protocol.md` — lectura en prosa del protocolo v1;
   §"Lista de métricas congelada" declara que ampliar el conjunto de métricas es
@@ -595,7 +598,7 @@ métricas beyond-accuracy, `robustness`) es trabajo interno de la Fase 3.
   `load()`, `frozen_hash()`, `record_test_run`, `_check_not_consumed`,
   `MAX_GRID = 24`, `REQUIRED_KEYS`, `_bump_protocol` / `--force-new-protocol`).
   Se **extiende de forma aditiva** para `metrics` ampliado, `robustness` y
-  `user_split` de ≥ 400, sin romper la carga de v1.
+  `user_split` de 400 usuarios, sin romper la carga de v1.
 
 ### Arnés de evaluación existente (a extender, no reescribir)
 - `apps/api/evaluation/runner.py` — `run(protocol, corpus_version, algorithms,
@@ -610,12 +613,12 @@ métricas beyond-accuracy, `robustness`) es trabajo interno de la Fase 3.
 - `apps/api/evaluation/splits.py` — `relevant_positive_ids`, `leave_one_out`,
   `user_split` (sizes desde `protocol.user_split`). `user_split` exige
   exactamente `train + validation + test` usuarios distintos — hay que
-  re-dimensionar para ≥ 400 (D-13).
+  fijar en 240/80/80 para los 400 usuarios nuevos (D-13).
 - `apps/api/evaluation/synthetic.py`, `apps/api/evaluation/archetypes.py`,
   `apps/api/evaluation/management/commands/generate_synthetic_users.py` —
   generación de usuarios sintéticos por arquetipo/semilla (EVAL-09). Base para
-  D-12 (≥ 400, composición de cohortes, notas variadas, `OwnedCopy`, filtro
-  `rating_count ≥ 10`, excepciones sembradas) y D-17 (etiqueta de cohorte en el
+  D-12 (400 exactos, composición de cohortes, notas variadas, `OwnedCopy`, filtro
+  `rating_count ≥ 1` con sesgo escalonado) y D-17 (etiqueta de cohorte en el
   manifiesto).
 - `apps/api/evaluation/management/commands/run_evaluation.py` — comando de run
   único (`--corpus-version`, `--split`, `--evidence-json`, marcador de test
@@ -683,7 +686,7 @@ métricas beyond-accuracy, `robustness`) es trabajo interno de la Fase 3.
   coseno de diversidad.
 - `apps/api/evaluation/{synthetic,archetypes}.py` + `generate_synthetic_users`:
   generación por arquetipo/semilla ya existe; la Fase 3 la **extiende de forma
-  aditiva** para generar una población nueva de ≥ 400 usuarios con la composición
+  aditiva** para generar una población nueva de 400 usuarios exactos con la composición
   de cohortes de D-12, sin cambiar cómo se generó la población de 200 de la
   Fase 2.
 - `accounts/` (`bootstrap_demo_accounts`, `DemoAccountIdentity` con marcador
@@ -725,8 +728,8 @@ métricas beyond-accuracy, `robustness`) es trabajo interno de la Fase 3.
   `complete`.
 - Nuevo comando/secuencia de **reproducción desde instalación limpia** (QUAL-02)
   + documento de verificación en español.
-- `generate_synthetic_users`: parametrización para ≥ 400 usuarios, composición de
-  cohortes, `OwnedCopy`, filtro `rating_count ≥ 10`, excepciones sembradas,
+- `generate_synthetic_users`: parametrización para 400 usuarios exactos, composición de
+  cohortes, `OwnedCopy`, filtro `rating_count ≥ 1` con sesgo escalonado,
   etiqueta de cohorte en el manifiesto.
 - Posible ADR nuevo para `scipy`/`numpy` (encabezados en español,
   `check-evidence.ps1`) y enmienda al agente-ledger si algún doc con SHA pineado
@@ -744,7 +747,7 @@ métricas beyond-accuracy, `robustness`) es trabajo interno de la Fase 3.
   y que los juegos de sus bibliotecas tengan **al menos 10 valoraciones totales**
   — con **algún usuario suelto, elegido al azar, con un juego sin valoraciones**
   para forzar ese camino.
-- El autor quiere **≥ 400 usuarios sintéticos** en total, con **10 sin juegos**,
+- El autor quiere **400 usuarios sintéticos nuevos** en total, con **10 sin juegos**,
   **100 con 1-4 juegos** y **50 con más de 10**.
 - El autor razona sobre la señal de rating en el algoritmo de contenido: una
   **nota propia baja debería bajar puntos de ese género**, salvo que sea el único

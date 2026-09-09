@@ -50,15 +50,24 @@
     ]
   },
   "user_split": {
-    "train": 360,
-    "validation": 120,
-    "test": 120,
+    "train": 240,
+    "validation": 80,
+    "test": 80,
     "seed": 20260908
   },
   "synthetic_population": {
-    "phase_2_existing": 200,
-    "phase_3_additional_minimum": 400,
-    "phase_3_target_total_minimum": 600,
+    "phase_3_population": 400,
+    "replaces_phase_2_population": true,
+    "seed": 20260909,
+    "rating_count_min": 1,
+    "rating_count_weight_buckets": [
+      {"max_exclusive": 5, "weight": 1},
+      {"max_exclusive": 20, "weight": 2},
+      {"max_exclusive": 100, "weight": 4},
+      {"max_exclusive": 500, "weight": 8},
+      {"max_exclusive": 2000, "weight": 16},
+      {"max_exclusive": null, "weight": 32}
+    ],
     "cohorts": {
       "no_history": 10,
       "sparse_history_1_to_4": 100,

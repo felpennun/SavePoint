@@ -17,11 +17,12 @@ class Archetype:
     rating_generosity: str
     status_mix: dict[str, float]
     cold_start: bool = False
+    no_history: bool = False
     release_bias: str | None = None
     saga_concentration: float = 0.0
 
 
-DEFAULT_ARCHETYPES: tuple[Archetype, ...] = (
+PHASE_2_ARCHETYPES: tuple[Archetype, ...] = (
     Archetype(
         name="monogenero-severo", label="Monogénero severo", n_users=25,
         genre_pref_range=(1, 2), library_size_range=(5, 15), rating_generosity="severe",
@@ -68,6 +69,62 @@ DEFAULT_ARCHETYPES: tuple[Archetype, ...] = (
 )
 
 
+# Phase 3 replaces the 200-user Phase 2 evaluation population with this
+# deterministic 400-user population.  The cohorts are explicit so the
+# resulting manifest can be checked without inferring them from labels.
+DEFAULT_ARCHETYPES: tuple[Archetype, ...] = (
+    Archetype(
+        name="sin-historial-monogenero", label="Sin historial monogénero", n_users=5,
+        genre_pref_range=(1, 2), library_size_range=(0, 0), rating_generosity="medium",
+        status_mix={"pending": 1.0}, no_history=True,
+    ),
+    Archetype(
+        name="sin-historial-omnivoro", label="Sin historial omnívoro", n_users=5,
+        genre_pref_range=(5, 8), library_size_range=(0, 0), rating_generosity="medium",
+        status_mix={"pending": 1.0}, no_history=True,
+    ),
+    Archetype(
+        name="cold-start-monogenero", label="Cold-start monogénero", n_users=33,
+        genre_pref_range=(1, 2), library_size_range=(1, 4), rating_generosity="severe",
+        status_mix={"completed": 0.55, "pending": 0.35, "abandoned": 0.10}, cold_start=True,
+    ),
+    Archetype(
+        name="cold-start-explorador", label="Cold-start explorador", n_users=33,
+        genre_pref_range=(3, 5), library_size_range=(1, 4), rating_generosity="medium",
+        status_mix={"completed": 0.35, "playing": 0.15, "pending": 0.40, "abandoned": 0.10},
+        cold_start=True, release_bias="recent",
+    ),
+    Archetype(
+        name="cold-start-generoso", label="Cold-start generoso", n_users=34,
+        genre_pref_range=(3, 6), library_size_range=(1, 4), rating_generosity="generous",
+        status_mix={"completed": 0.45, "playing": 0.15, "pending": 0.35, "abandoned": 0.05},
+        cold_start=True,
+    ),
+    Archetype(
+        name="normal-monogenero", label="Usuario normal monogénero", n_users=80,
+        genre_pref_range=(1, 3), library_size_range=(5, 10), rating_generosity="severe",
+        status_mix={"completed": 0.55, "playing": 0.10, "pending": 0.25, "abandoned": 0.10},
+    ),
+    Archetype(
+        name="normal-omnivoro", label="Usuario normal omnívoro", n_users=80,
+        genre_pref_range=(5, 8), library_size_range=(5, 10), rating_generosity="medium",
+        status_mix={"completed": 0.45, "playing": 0.15, "pending": 0.30, "abandoned": 0.10},
+        saga_concentration=0.35,
+    ),
+    Archetype(
+        name="normal-explorador", label="Usuario normal explorador", n_users=80,
+        genre_pref_range=(3, 5), library_size_range=(5, 10), rating_generosity="generous",
+        status_mix={"completed": 0.25, "playing": 0.25, "pending": 0.40, "abandoned": 0.10},
+        release_bias="recent",
+    ),
+    Archetype(
+        name="intensivo-veterano", label="Usuario intensivo veterano", n_users=50,
+        genre_pref_range=(5, 8), library_size_range=(11, 20), rating_generosity="generous",
+        status_mix={"completed": 0.55, "playing": 0.15, "pending": 0.20, "abandoned": 0.10},
+    ),
+)
+
+
 def validate_archetypes(archetypes: tuple[Archetype, ...] | list[Archetype]) -> None:
     """Validate the scenario contract before a generation can be persisted."""
 
@@ -82,9 +139,13 @@ def validate_archetypes(archetypes: tuple[Archetype, ...] | list[Archetype]) -> 
             raise ValueError("synthetic-user archetypes must contain at least one user")
         if archetype.genre_pref_range[0] < 1 or archetype.genre_pref_range[0] > archetype.genre_pref_range[1]:
             raise ValueError("invalid preferred-genre range")
-        if archetype.library_size_range[0] < 1 or archetype.library_size_range[0] > archetype.library_size_range[1]:
+        if archetype.library_size_range[0] < 0 or archetype.library_size_range[0] > archetype.library_size_range[1]:
             raise ValueError("invalid library-size range")
-        if archetype.cold_start and archetype.library_size_range[1] > 3:
-            raise ValueError("cold-start archetypes must have a maximum library size of three")
+        if archetype.no_history and archetype.library_size_range != (0, 0):
+            raise ValueError("no-history archetypes must have an empty library range")
+        if not archetype.no_history and archetype.library_size_range[0] < 1:
+            raise ValueError("non-empty archetypes must have at least one library entry")
+        if archetype.cold_start and archetype.library_size_range[1] > 4:
+            raise ValueError("cold-start archetypes must have a maximum library size of four")
         if abs(sum(archetype.status_mix.values()) - 1.0) > 1e-9:
             raise ValueError("status probabilities must sum to one")

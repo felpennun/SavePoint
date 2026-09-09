@@ -9,7 +9,7 @@ from django.core.management import call_command
 
 from accounts.models import DemoAccountIdentity, SIMULATED_ACCOUNT_MARKER
 from catalogue.models import GameWork, Genre
-from evaluation.archetypes import Archetype
+from evaluation.archetypes import Archetype, DEFAULT_ARCHETYPES
 from evaluation.synthetic import (
     SYNTHETIC_EVAL_USER_MARKER,
     SyntheticEntry,
@@ -18,6 +18,7 @@ from evaluation.synthetic import (
     SyntheticUser,
     generate,
     render_validation_report,
+    _rating_count_weight,
     validate_population,
 )
 from library.models import LibraryEntry
@@ -33,6 +34,8 @@ def _works(count: int = 80) -> None:
             canonical_slug=f"synthetic-work-{index}",
             original_title=f"Synthetic Work {index}",
             first_release_date=date(2010 + index % 15, 1, 1),
+            rating_count=10,
+            total_rating_count=1,
             in_corpus=True,
             corpus_version="test",
         )
@@ -62,6 +65,26 @@ def test_same_seed_produces_identical_histories(one_archetype) -> None:  # noqa:
     second = generate(20260907, one_archetype, "test")
     assert first == second
     assert [entry for user in first.users for entry in user.entries]
+
+
+@pytest.mark.parametrize(
+    ("lower", "higher"),
+    ((4, 5), (19, 20), (99, 100), (499, 500), (1999, 2000)),
+)
+def test_rating_count_weights_increase_by_bucket(lower: int, higher: int) -> None:
+    assert _rating_count_weight(lower) < _rating_count_weight(higher)
+
+
+@pytest.mark.django_db
+def test_default_phase3_population_has_the_frozen_cohorts(db) -> None:  # noqa: ANN001
+    _works()
+    population = generate(20260909, DEFAULT_ARCHETYPES, "test")
+    sizes = [len(user.entries) for user in population.users]
+    assert len(population.users) == 400
+    assert sum(size == 0 for size in sizes) == 10
+    assert sum(1 <= size <= 4 for size in sizes) == 100
+    assert sum(5 <= size <= 10 for size in sizes) == 240
+    assert sum(size > 10 for size in sizes) == 50
 
 
 @pytest.mark.django_db

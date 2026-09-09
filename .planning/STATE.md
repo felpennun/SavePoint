@@ -192,6 +192,7 @@ TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<ver
 | 2026-09-07 | Incorporación de la documentación de la Fase 2 en la memoria LaTeX | Protocolo, ratings, corpus gobernado, algoritmos y decisiones previas al laboratorio documentados; compilación pendiente de entorno TeX |
 | 2026-09-07 | Revisión académica y corrección de la memoria LaTeX | Tablas adaptables, prosa y referencias revisadas; compilación pendiente de entorno TeX |
 | 2026-09-09 | Actualización de rejillas y contrato de señales de la Fase 3 | Rejilla de 24 configuraciones; `recency-v1` combina las señales base y recencia; snapshot, hashes, protocolo y documentación actualizados; sin ejecutar algoritmos |
+| 2026-09-09 | Corrección y regeneración de población sintética de Fase 3 | Los 400 usuarios nuevos sustituyen a los 200 heredados como población activa; split 240/80/80, cohortes 10/100/240/50 y sesgo escalonado por `rating_count >= 1` verificados en BD; sin ejecutar algoritmos |
 
 ## Deferred Items
 

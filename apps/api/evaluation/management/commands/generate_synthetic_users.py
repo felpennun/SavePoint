@@ -63,6 +63,6 @@ class Command(BaseCommand):
             self.style.SUCCESS(
                 f"Synthetic population ready (users={len(population.users)}, "
                 f"created={result['created']}, updated={result['updated']}, "
-                f"anchors={result['anchor_ids']})"
+                f"anchors={len(result['anchor_ids'])})"
             )
         )

@@ -157,7 +157,17 @@ entre fases" reflejan ya este encaje.
 | Tú decides el umbral | | |
 
 **User's choice:** Filtro `rating_count ≥ 10` con 1-2 excepciones sembradas.
-**Notes:** Requisitos numéricos del autor: ≥ 400 usuarios; 10 con 0 juegos, 100 con 1-4 juegos, 50 con >10, resto 5-10; notas propias variadas; algunas cuentas con `OwnedCopy` y otras sin ninguna.
+**Notes:** Requisitos numéricos del autor: 400 usuarios nuevos; 10 con 0 juegos, 100 con 1-4 juegos, 50 con >10, resto 5-10; notas propias variadas; algunas cuentas con `OwnedCopy` y otras sin ninguna.
+
+**Enmienda del autor (2026-09-09):** sustituir el filtro fijo por
+`rating_count ≥ 1` y seleccionar las obras con una ponderación escalonada
+creciente por tramos de volumen, de forma que los juegos con pocos ratings
+aparezcan menos y los juegos con más ratings aparezcan en más bibliotecas. La
+implementación titular usa los tramos 1–4, 5–19, 20–99, 100–499, 500–1999 y
+≥2000, con pesos 1/2/4/8/16/32. Se mantiene la reproducibilidad por semilla y
+la población exacta de 400 usuarios. La revisión posterior del autor elimina
+las excepciones por debajo del umbral: se mantiene únicamente `rating_count ≥ 1`,
+porque el snapshot vigente no contiene obras con ese umbral y rating IGDB nulo.
 
 ### Señal negativa de notas propias bajas: ¿variante nueva?
 
