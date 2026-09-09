@@ -87,3 +87,6 @@ PostgreSQL como fuente de verdad.
 
 Fuente de implementación: `apps/api/recommendations/jobs.py`,
 `apps/api/recommendations/models.py` y `apps/web/components/RecommendationRefreshNotice.tsx`.
+Para inicializar colecciones que ya existían antes del worker se usa el comando idempotente
+`python manage.py enqueue_recommendation_refreshes`; solo crea la revisión y el trabajo
+pendiente, sin modificar los datos de la biblioteca.

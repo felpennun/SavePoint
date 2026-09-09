@@ -133,3 +133,5 @@ Fuente canónica: [[../../docs/verification/evaluation-runner-integration-2026-0
 - [[Artefacto de evaluacion reproducible]] · [[Versionado de resultados]]
 - [[Baseline aleatorio]] · [[Baseline de popularidad]] · [[Recomendador basado en contenido]]
 - [[Requisitos - Experimentacion y evaluacion]]
+La inicialización de colecciones preexistentes se realiza con el comando idempotente
+`enqueue_recommendation_refreshes`, que solo crea la revisión y el trabajo pendiente.
