@@ -30,8 +30,9 @@ está planificada, pero la comparación todavía no se ha ejecutado.
 - Usar únicamente `rating` como nota de usuarios IGDB. `total_rating` (la combinación con
   crítica) queda excluido para no contar dos veces la calidad; `total_rating_count` se conserva
   como volumen y regla de elegibilidad.
-- La rejilla queda en 24 configuraciones: 15 sumas ponderadas, 3 multiplicativas y 6 de dos
-  etapas. `recency-v1` combina contenido, rating de usuarios, volumen y PopScore, y añade
+- La rejilla queda en 28 configuraciones: 16 sumas ponderadas, 3 multiplicativas, 6 de dos
+  etapas y una configuración para cada variante PopScore multiplicativa, de dos etapas y
+  negativa. `recency-v1` combina contenido, rating de usuarios, volumen y PopScore, y añade
   `recency_score` con peso propio.
 - Basar la recomendación en la colección del usuario, incluyendo juegos en progreso; usar
   juegos con al menos una valoración o con rating válido aunque no tengan contador de votos.
@@ -113,7 +114,7 @@ Evidencia detallada: [[../../docs/verification/recommendation-input-audit-2026-0
 ## Caché personal y decisión sobre Redis — 2026-09-09
 
 La web adopta un flujo stale-while-revalidate por usuario. Cada cambio de colección crea una
-nueva revisión y un trabajo coalescido en PostgreSQL; el worker calcula las cinco variantes de
+nueva revisión y un trabajo coalescido en PostgreSQL; el worker calcula las nueve variantes de
 contenido y la heurística de género fuera de la petición. El bundle se publica de forma
 atómica, por lo que el usuario conserva la versión anterior hasta que el nuevo cálculo está
 completo. Si no hay snapshot previo, la interfaz muestra preparación y actualiza el estado
@@ -129,30 +130,94 @@ Fuente canónica: [[../../docs/verification/evaluation-runner-integration-2026-0
 
 ## Arquitectura compartida de evaluación y producto — 2026-09-09
 
-La comparación offline y el producto comparten el catálogo versionado de cinco
-variantes de contenido: suma ponderada, multiplicativa, dos etapas, señal
-negativa y recencia. El runner y cada worker consumen los mismos
+La comparación offline y el producto comparten el catálogo versionado de nueve
+variantes de contenido: cuatro baselines, cuatro variantes con PopScore y recencia.
+El runner y cada worker consumen los mismos
 `algorithm_id`, el mismo registro de variantes y los mismos pesos; los
 baselines aleatorio y de popularidad se quedan únicamente en la evaluación.
 
 Cada variante publicable tiene worker y estantería propios. La heurística por
 género se ejecuta también con worker dedicado, como sección complementaria de
-producto. Los seis trabajos de una revisión se publican de forma atómica: el
-snapshot anterior se conserva hasta que todos han terminado. `fs-v5` pondera
+producto. Los diez trabajos de una revisión se publican de forma atómica: el
+ snapshot anterior se conserva hasta que todos han terminado. `fs-v6` usa
+ género y plataforma como núcleo y conserva saga/desarrollador como bonus
+ personalizado únicamente cuando coinciden con el perfil; la ausencia de esos
+ metadatos no penaliza. Los pesos relativos siguen siendo
+ `0,50/0,25/0,15/0,10`.
 género/plataforma/saga/desarrollador como 0,50/0,25/0,15/0,10; PopScore v2 usa
 visitas/jugando/jugado/quiere jugar como 0,40/0,25/0,25/0,10.
 
 Fuente canónica: [[../../docs/verification/recommendation-architecture-2026-09-09|contrato compartido de algoritmos]].
 
+## Variantes PopScore con imputación mínima — 2026-09-09
+
+Se añaden cuatro variantes publicables, manteniendo intactos los baselines
+académicos: `content-cbf-weighted-pop-v1`, `content-cbf-multiplicative-pop-v1`,
+`content-cbf-twostage-pop-v1` y `content-cbf-neg-pop-v1`. Cada una incorpora
+PopScore con la misma fórmula en web y offline y tiene su propio worker y
+estantería localizada. La rejilla pasa de 24 a 28 configuraciones y el contrato
+sube a `protocol_version: 4` en la decisión de PopScore; la posterior modificación
+de valoración personal, recencia anual y umbral de candidatos queda congelada en
+`protocol_version: 6`.
+
+La ausencia de PopScore se trata de forma explícita: `popscore_missing_floor: 0.0`,
+sin renormalización. La obra recibe así una contribución mínima real y el payload
+marca `popscore_imputed: true`. En la variante multiplicativa equivale al factor
+mínimo 0,85; en las variantes ponderadas/negativa es cero dentro de la suma, y
+en dos etapas solo participa en el desempate de su banda. `recency-v1` adopta
+la misma imputación mientras conserva `recency_score` como señal adicional.
+
+La arquitectura activa queda en nueve estanterías de contenido, una de género y
+una de DLC, con diez workers dedicados y publicación atómica por revisión.
+
+Fuente canónica: [[../../docs/verification/recommendation-architecture-2026-09-09|contrato compartido de algoritmos]].
+
+## Señal compuesta de rating-confidence — 2026-09-09
+
+Se aprobó una señal compartida por web y offline: `rating_confidence` eleva el
+rating de usuario IGDB a potencia 2 y lo modula con el volumen normalizado de
+`total_rating_count` mediante `rating_quality * (0,80 + 0,20 * rating_volume)`.
+El volumen deja de sumarse como término independiente en `recency-v1` para no
+contarlo dos veces. `display_rating` y las valoraciones SavePoint siguen siendo
+exclusivamente de presentación.
+
+## `display_rating` en colección — 2026-09-09
+
+Las tarjetas de la colección y el bloque de continuación de la portada muestran
+el mismo `display_rating` combinado que el catálogo y la ficha. El rating propio
+del usuario continúa apareciendo por separado como estrellas y no altera el
+ranking de los recomendadores.
+
 ## Elegibilidad de calidad endurecida — 2026-09-09
 
 Las recomendaciones ya no aceptan la alternativa previa de una sola
 observación total o fallback de género sin nota propia. Toda obra recomendada
-debe tener `rating` de usuario IGDB y `total_rating_count >= 10`, además de
+debe tener `rating` de usuario IGDB y `total_rating_count >= 5`, además de
 pertenecer al corpus gobernado y no tener fecha futura. El catálogo conserva
 las obras restantes para exploración, pero no entran en ningún ranking.
 
 Fuente canónica: [[../../docs/verification/recommendation-architecture-2026-09-09|contrato compartido de algoritmos]].
+
+## Ajuste visual de estanterías — 2026-09-09
+
+Las tarjetas de contenido incluyen una explicación de hasta dos líneas. Su altura reservada pasa de 15rem a 18,25rem para impedir que la evidencia invada la estantería siguiente. El espacio vertical entre secciones pasa de 48px a 32px para que las siete estanterías mantengan una lectura continua y compacta. Las cabeceras y descripciones internas no aportan márgenes propios: la rejilla es la única fuente del ritmo vertical. Las listas ordenadas y no ordenadas comparten asimismo columnas de 120px y una única regla de 16px de separación horizontal, sin estilos inline que puedan divergir.
+En el catálogo no se muestra un control de ordenación: PopScore descendente es la ordenación fija interna. Los demás filtros siguen siendo combinables y compartibles por URL.
+
+## Consistencia de ratings entre superficies — 2026-09-09
+
+Se decidió que todas las superficies de producto deben mostrar `display_rating`: un
+valor combinado de IGDB y SavePoint calculado por la fórmula vigente. Las tarjetas del
+catálogo, inicio, novedades y recomendaciones deben coincidir con la ficha de juego;
+`total_rating` queda reservado para la señal IGDB sin combinar y para la ordenación del
+catálogo cuando corresponda.
+
+## Facetas de plataforma del catálogo — 2026-09-09
+
+Las facetas de plataforma deben limitarse a `ALLOWLIST_SLUGS`, igual que la regla de
+gobernanza. Una obra puede estar dentro del corpus por tener al menos una plataforma
+permitida y conservar además releases de plataformas excluidas; esos releases no deben
+crear opciones en el selector del catálogo. Se añadió una regresión para impedir que
+vuelvan a aparecer plataformas fuera del corpus.
 
 ## Enlaces
 
@@ -174,8 +239,45 @@ calculan para `K = 5`, `K = 10` y `K = 20`.
 
 La elegibilidad global ya es estricta para todos los algoritmos: obra gobernada,
 fecha no futura, ausencia en la colección, `rating` de usuario IGDB no nulo y
-`total_rating_count >= 10`. Por tanto, ni los ranking de contenido ni la
+`total_rating_count >= 5`. Por tanto, ni los ranking de contenido ni la
 heurística de género pueden publicar una obra sin nota IGDB o con un volumen
 inferior al umbral. El snapshot anterior de `felipe` se conserva hasta el
-próximo cambio de colección, momento en que los seis workers publicarán el
+próximo cambio de colección, momento en que los diez workers publicarán el
 bundle conforme a este contrato.
+
+## Worker paralelo y estantería de género única — 2026-09-09
+
+Los diez workers son paralelos y están especializados por `algorithm_id`. Una
+mutación de colección invalida inmediatamente los trabajos de revisiones
+anteriores; la cancelación cooperativa interrumpe los bucles de cálculo y el
+worker reinicia sobre la última revisión. Solo el bundle completo de esa
+revisión puede sustituir el snapshot visible.
+
+La heurística `genre-taste-v1` deja de mostrar varias estanterías. Escoge el
+género con más entradas en la biblioteca (empate por `slug`) y devuelve una
+única estantería de hasta 20 juegos de ese género. La frecuencia es deliberada:
+una valoración alta o estado de juego no puede hacer que un género minoritario
+sustituya al más presente en la biblioteca.
+Dentro de esa estantería, los resultados se ordenan por la puntuación exacta de
+gusto descendente; la valoración IGDB solo desempata y el slug canónico resuelve
+los empates finales.
+
+## Intensidad de la valoración personal y recencia anual — 2026-09-09
+
+La valoración de cada juego semilla sí influye en el perfil personal. Su intensidad se calcula
+como `(rating_half_steps / 10)^2` y se suma al peso del estado (`completed = 3`, `playing = 2`).
+Así una valoración 5/5 aporta más evidencia que una 4/5, mientras que los géneros repetidos
+acumulan la evidencia ponderada de todas las obras. Esta regla es común al ranker web, a los
+workers y al runner offline; los baselines públicos siguen siendo no personalizados.
+
+`recency-v1` usa tramos de año natural: el año del corte vale 1,0 y cada año anterior se multiplica
+por 0,35. Su peso pasa a ser 0,30 para contenido, 0,20 para rating-confidence, 0,10 para PopScore
+y 0,40 para recencia. Una obra de 2011 queda así prácticamente anulada por la señal de novedad,
+aunque pueda seguir siendo elegible para otros algoritmos. El protocolo reproducible se versiona
+a `protocol_version: 6` para separar cualquier resultado futuro de los artefactos anteriores
+y del cambio de universo candidato.
+
+Fuente canónica: [[../../docs/methodology/evaluation-protocol|protocolo de evaluación]] y
+[[../../docs/verification/recommendation-architecture-2026-09-09|contrato compartido de algoritmos]].
+
+Fuente canónica: [[../../docs/verification/recommendation-architecture-2026-09-09|contrato compartido de algoritmos]].

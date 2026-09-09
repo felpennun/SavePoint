@@ -10,7 +10,11 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Q
 
 from accounts.models import DemoAccountIdentity
-from catalogue.corpus import evaluation_candidate_works, governed_works
+from catalogue.corpus import (
+    MIN_RECOMMENDATION_TOTAL_RATING_COUNT,
+    evaluation_candidate_works,
+    governed_works,
+)
 from evaluation.protocol import load as load_protocol
 from evaluation.splits import user_split
 from evaluation.synthetic import SYNTHETIC_EVAL_USER_MARKER, SYNTHETIC_PHASE2_MARKER
@@ -48,7 +52,8 @@ class Command(BaseCommand):
             Q(first_release_date__isnull=True) | Q(first_release_date__gt=validation_date)
         ).count()
         candidate_invalid_rating_rule = candidates.filter(
-            ~Q(total_rating_count__gte=1), rating__isnull=True
+            Q(rating__isnull=True)
+            | Q(total_rating_count__lt=MIN_RECOMMENDATION_TOTAL_RATING_COUNT)
         ).count()
         if governed_invalid_dates:
             failures.append("governed corpus contains missing or future dates")
@@ -84,21 +89,32 @@ class Command(BaseCommand):
 
         grid = protocol.grid
         modes = {mode: sum(entry["combine_mode"] == mode for entry in grid) for mode in (
-            "weighted_sum", "multiplicative", "two_stage"
+            "weighted_sum",
+            "multiplicative",
+            "two_stage",
+            "multiplicative_popscore",
+            "two_stage_popscore",
+            "negative_weighted_sum_popscore",
         )}
         recency_count = sum("recency_score" in entry.get("signals", []) for entry in grid)
-        all_user_rating = all("user_rating" in entry.get("signals", []) for entry in grid)
-        no_combined_rating = all("total_rating" not in entry.get("signals", []) for entry in grid)
-        if len(grid) != 24 or modes != {"weighted_sum": 15, "multiplicative": 3, "two_stage": 6}:
-            failures.append("tuning grid does not match the frozen 24-configuration contract")
+        all_rating_confidence = all("rating_confidence" in entry.get("signals", []) for entry in grid)
+        if len(grid) != 28 or modes != {
+            "weighted_sum": 16,
+            "multiplicative": 3,
+            "two_stage": 6,
+            "multiplicative_popscore": 1,
+            "two_stage_popscore": 1,
+            "negative_weighted_sum_popscore": 1,
+        }:
+            failures.append("tuning grid does not match the frozen 28-configuration contract")
         if recency_count != 6:
             failures.append("recency signal is not limited to the six recency configurations")
-        if not all_user_rating or not no_combined_rating:
-            failures.append("rating signals violate the user-rating-only contract")
+        if not all_rating_confidence:
+            failures.append("rating signals violate the rating-confidence contract")
 
         signals = coverage_report(corpus_version)
-        if signals["feature_set_version"] != "fs-v5" or not signals["include_franchise"]:
-            failures.append("saga/franchise signal is not active in fs-v5")
+        if signals["feature_set_version"] != "fs-v6" or not signals["include_franchise"]:
+            failures.append("saga/franchise signal is not active in fs-v6")
 
         evidence = {
             "audit": "recommender-input-preflight",
@@ -125,8 +141,7 @@ class Command(BaseCommand):
                 "grid_count": len(grid),
                 "grid_mode_counts": modes,
                 "recency_configuration_count": recency_count,
-                "all_configurations_use_user_rating": all_user_rating,
-                "no_configuration_uses_combined_total_rating": no_combined_rating,
+                "all_configurations_use_rating_confidence": all_rating_confidence,
                 "feature_set_version": signals["feature_set_version"],
             },
             "signal_coverage": signals,

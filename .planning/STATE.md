@@ -2,7 +2,7 @@
 gsd_state_version: 1.0
 status: in_progress
 stopped_at: Phase 3 plan 03-02 reabierto; revisión del autor pendiente antes de un nuevo corpus
-last_updated: "2026-09-09T12:00:00.000Z"
+last_updated: "2026-09-09T16:10:01.451Z"
 state_head: 81542ab
 progress:
   total_phases: 8
@@ -124,7 +124,7 @@ Progreso global: 2/8 fases (25%).
 ### Estado actualizado — 2026-09-09
 
 La importación IGDB y la sincronización DLC/expansiones terminaron con política
-aditiva. El corpus activo `2026.09.2` contiene `190479` obras visibles y `30623`
+aditiva. El corpus activo `2026.09.2` contiene `190479` obras visibles y `13618`
 candidatas derivadas; ratings y PopScore están congelados y el PopScore compuesto
 está materializado para `9929` obras. No se han ejecutado rankings ni evaluaciones.
 
@@ -206,11 +206,23 @@ TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<ver
 
 | 2026-09-09 | Enmienda del contrato visual de recomendaciones | Página definida con cinco variantes de contenido, heurística por género y DLC; cada variante tendrá explicación breve y señales visibles; sin ejecutar algoritmos |
 
+| 2026-09-09 | Separación del rating visible y los algoritmos | `display_rating` mantiene la fórmula combinada IGDB+SavePoint solo para la presentación; tarjetas y ficha coinciden; 60 pruebas backend y 16 frontend correctas |
+
+| 2026-09-09 | Umbral común de candidatos para web y offline | El corpus conserva 190.479 obras y los algoritmos comparten 13.618 candidatas con `rating IS NOT NULL AND total_rating_count >= 5`; snapshot hash actualizado, protocolo v6 y preflight PASS; sin ejecutar rankings ni evaluación |
+
 ## Deferred Items
 
 | Category | Item | Status | Deferred At | Milestone |
 |----------|------|--------|-------------|-----------|
 | Hardening | Production-strength controls beyond the Phase 1 demo boundary | Planned | Roadmap creation | v1 |
+
+## Tarea rápida completada — 2026-09-09
+
+Se añadieron cuatro variantes PopScore con suelo mínimo explícito, preservando
+los baselines. Web y offline comparten la misma arquitectura y pesos; se
+incorporaron cuatro workers y cuatro estanterías, y `recency-v1` adoptó también
+la imputación mínima. El protocolo pasó a v4 con rejilla de 28 configuraciones.
+Ver `.planning/quick/260909-nej-a-adir-cuatro-variantes-popscore-con-imp/`.
 
 ## Registro histórico de sesiones (prevalece el checkpoint de ejecución actual)
 
@@ -259,3 +271,33 @@ Se adoptó el diseño de caché personal stale-while-revalidate en
 PostgreSQL, worker independiente, endpoint no bloqueante y cinco secciones de recomendaciones
 con explicación localizada. Redis queda pospuesto hasta disponer de una medición de latencia o
 concurrencia que justifique añadirlo. No se ejecutaron algoritmos experimentales.
+
+## Tarea rápida completada — 2026-09-09
+
+La colección y la continuación de la portada muestran `display_rating` mediante
+la respuesta owner-scoped de biblioteca, manteniendo separadas las estrellas
+personales. Ver resumen en `.planning/quick/260909-mdo-a-adir-display-rating-a-las-tarjetas-de-/`.
+
+## Tarea rápida completada — 2026-09-09
+
+Web y offline comparten la señal compuesta `rating_confidence`: rating IGDB con
+potencia 2 y volumen `total_rating_count` normalizado como refuerzo acotado del
+20 %. La rejilla y el contrato offline se actualizaron a protocolo v3. Ver
+resumen en `.planning/quick/260909-msb-reforzar-rating-igdb-y-volumen-de-valora/`.
+
+## Tarea rápida completada — 2026-09-09
+
+Se reforzó la intensidad de las valoraciones personales de los juegos semilla con una potencia
+cuadrática y se sustituyó la semivida diaria de `recency-v1` por una decaída explícita por año
+natural. Web, workers y offline comparten el cambio; el protocolo reproducible pasó a v5. No se
+ejecutaron algoritmos experimentales. Ver `.planning/quick/260909-o1u-reforzar-peso-de-valoraciones-personales/`.
+
+## Tarea rápida completada — 2026-09-09
+
+Se implementó `fs-v6`: similitud de género/plataforma como núcleo y bonus
+personalizado de saga/desarrollador solo por coincidencia con el perfil. La
+lógica es compartida por web, workers y offline; se materializaron 190.479
+vectores, se reiniciaron los workers para cargar la nueva versión y los diez
+jobs de `felipe` publicaron correctamente el snapshot `fs-v6`. 191 pruebas y
+TypeScript pasan; no se ejecutó la evaluación de los 400 usuarios. Ver
+`.planning/quick/260909-ptx-implement-fs-v6-facet-aware-content-simi/`.

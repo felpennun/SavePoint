@@ -6,7 +6,7 @@ import hashlib
 import json
 import math
 from datetime import date, datetime, timezone
-from typing import Any
+from typing import Any, Callable
 
 from django.contrib.auth.models import AbstractBaseUser
 
@@ -15,6 +15,7 @@ from catalogue.models import CorpusRatingSnapshot, GameWork
 from catalogue.popularity import normalised_popscore_by_work, popscore_snapshot_sha256
 from library.models import LibraryEntry
 from recommendations.content.combine import combine, rating_term
+from recommendations.cancellation import RecommendationComputationCancelled
 from recommendations.content.explain import explain
 from recommendations.content.features import (
     FEATURE_SET_VERSION,
@@ -23,10 +24,12 @@ from recommendations.content.features import (
     genre_rating_profile,
     normalise_rating,
     normalise_rating_volume,
+    rating_quality_signal,
+    compose_rating_confidence,
 )
 from recommendations.content.profile import ProfileInputs, build_profile_inputs
 from recommendations.content.recency import recency_score
-from recommendations.content.similarity import cosine
+from recommendations.content.similarity import facet_similarity
 from recommendations.content.variants import ALGORITHM_REGISTRY, VariantSpec
 from recommendations.models import WorkFeatureVector
 
@@ -35,6 +38,7 @@ _MIN_LIMIT = 1
 _MAX_LIMIT = 50
 _DEFAULT_LIMIT = 20
 _COLD_START_ENTRIES = 3
+_CANCELLATION_CHECK_INTERVAL = 128
 _LIMITATION = (
     "Deterministic content-based ranking over the frozen corpus and external "
     "rating snapshot. It is offline simulation evidence, not evidence about "
@@ -52,6 +56,11 @@ def _clamp_limit(limit: int | None) -> int:
     if limit is None:
         return _DEFAULT_LIMIT
     return max(_MIN_LIMIT, min(_MAX_LIMIT, int(limit)))
+
+
+def _ensure_current(should_continue: Callable[[], bool] | None) -> None:
+    if should_continue is not None and not should_continue():
+        raise RecommendationComputationCancelled
 
 
 def _hash_payload(payload: Any) -> str:
@@ -80,6 +89,7 @@ def _load_candidate_vectors(
     spec: VariantSpec,
     corpus_version: str | None,
     prepared_vectors: dict[object, dict[str, float]] | None = None,
+    should_continue: Callable[[], bool] | None = None,
 ) -> dict[object, dict[str, float]]:
     if prepared_vectors is not None:
         return {
@@ -97,7 +107,9 @@ def _load_candidate_vectors(
                 work_id__in=work_ids, feature_set_version=spec.feature_set_version
             ).values("work_id", "vector_json")
         }
-    for work in works:
+    for index, work in enumerate(works):
+        if index % _CANCELLATION_CHECK_INTERVAL == 0:
+            _ensure_current(should_continue)
         cached.setdefault(
             work.id,
             feature_vector(
@@ -123,6 +135,7 @@ def _candidate_signals(
     rating, _rating_count, total_rating_count = snapshot_stats.get(work.id, (None, 0, None))
     return {
         "external_rating": normalise_rating(rating),
+        "rating_quality": rating_quality_signal(rating),
         "rating_volume": (
             normalise_rating_volume(total_rating_count, volume_ceiling) if has_snapshot else None
         ),
@@ -132,11 +145,32 @@ def _candidate_signals(
     }
 
 
+def _scored_signals(
+    spec: VariantSpec,
+    work: GameWork,
+    snapshot_stats: dict[object, tuple[float | None, int, int | None]],
+    volume_ceiling: int,
+    popscore_by_work: dict[object, float],
+    recency_by_work: dict[object, float],
+    rating_term_value: float,
+) -> dict:
+    signals = _candidate_signals(work, snapshot_stats, volume_ceiling, popscore_by_work, recency_by_work)
+    missing_popscore_floor = spec.params.get("popscore_missing_floor")
+    signals["popscore_imputed"] = False
+    if signals["popscore"] is None and missing_popscore_floor is not None:
+        signals["popscore"] = max(0.0, min(1.0, float(missing_popscore_floor)))
+        signals["popscore_imputed"] = True
+    signals["rating_confidence"] = compose_rating_confidence(
+        rating_term_value, signals["rating_volume"]
+    )
+    return signals
+
+
 def _recency_by_work(
     works: list[GameWork],
     snapshot_stats: dict[object, tuple[float | None, int, int | None]],
     eligibility_cutoff_date: date,
-    half_life_days: int,
+    year_decay: float,
 ) -> dict[object, float]:
     return {
         work.id: score
@@ -146,7 +180,7 @@ def _recency_by_work(
                 work.first_release_date,
                 eligibility_cutoff_date=eligibility_cutoff_date,
                 has_external_rating=snapshot_stats.get(work.id, (None, 0, None))[0] is not None,
-                half_life_days=half_life_days,
+                year_decay=year_decay,
             )
         ) is not None
     }
@@ -224,22 +258,31 @@ def _cold_start_results(
     genre_profile: dict[str, float],
     popscore_by_work: dict[object, float],
     recency_by_work: dict[object, float],
+    should_continue: Callable[[], bool] | None,
 ) -> list[dict]:
-    vectors = _load_candidate_vectors(works, spec, corpus_version)
+    vectors = _load_candidate_vectors(
+        works, spec, corpus_version, should_continue=should_continue
+    )
     volume_ceiling = max(
         (total_count or 0 for _rating, _count, total_count in snapshot_stats.values()),
         default=0,
     )
     scored: list[tuple[float, str, dict]] = []
-    for work in works:
+    for index, work in enumerate(works):
+        if index % _CANCELLATION_CHECK_INTERVAL == 0:
+            _ensure_current(should_continue)
         vector = vectors[work.id]
         rt, fallback = rating_term(work, corpus_version, genre_profile, snapshot_stats)
+        signals = _scored_signals(
+            spec, work, snapshot_stats, volume_ceiling, popscore_by_work, recency_by_work, rt
+        )
+        similarity_evidence = facet_similarity(profile, vector)
         evidence = explain(
             vector,
             profile,
-            {key: 0.0 for key in vector},
+            similarity_evidence["parts"],
             spec,
-            candidate_rating_term=rt,
+            candidate_rating_term=signals["rating_confidence"] or 0.0,
             rating_term_is_fallback=fallback,
         )
         score = combine(
@@ -248,18 +291,14 @@ def _cold_start_results(
             None,
             spec,
             recency_score=recency_by_work.get(work.id),
-            rating_volume=_candidate_signals(
-                work, snapshot_stats, volume_ceiling, popscore_by_work, recency_by_work
-            )["rating_volume"],
-            popscore=popscore_by_work.get(work.id),
+            rating_volume=signals["rating_volume"],
+            popscore=signals["popscore"],
         )
         item = _base_item(
             work,
             score,
             evidence,
-            _candidate_signals(
-                work, snapshot_stats, volume_ceiling, popscore_by_work, recency_by_work
-            ),
+            signals,
         )
         scored.append((score, work.canonical_slug, item))
     scored.sort(key=lambda row: (-row[0], row[1]))
@@ -277,10 +316,12 @@ def rank_content_v1(
     min_rating_count: int | None = None,
     genre_profile: dict[str, float] | None = None,
     prepared: dict[str, Any] | None = None,
+    should_continue: Callable[[], bool] | None = None,
 ) -> dict:
     """Rank governed unseen works for the authenticated owner."""
 
     spec = ALGORITHM_REGISTRY[algorithm_id]
+    _ensure_current(should_continue)
     limit = _clamp_limit(limit)
     generated_at = generated_at or datetime.now(timezone.utc)
     eligibility_cutoff_date = eligibility_cutoff_date or generated_at.date()
@@ -305,6 +346,7 @@ def rank_content_v1(
             .distinct()
         )
         snapshot_sha256 = _snapshot_sha256(corpus_version, {work.id for work in candidates} | seen_ids)
+    _ensure_current(should_continue)
     profile_inputs = build_profile_inputs(user, corpus_version)
     profile = profile_inputs.positive
     resolved_genre_profile = (
@@ -352,7 +394,7 @@ def rank_content_v1(
             candidates,
             snapshot_stats,
             eligibility_cutoff_date,
-            int(spec.params.get("half_life_days", 365)),
+            float(spec.params.get("year_decay", 0.35)),
         )
         results = _cold_start_results(
             candidates,
@@ -364,6 +406,7 @@ def rank_content_v1(
             resolved_genre_profile,
             popscore_by_work,
             recency_by_work,
+            should_continue,
         )
         return _dto(
             spec,
@@ -382,6 +425,7 @@ def rank_content_v1(
         spec,
         corpus_version,
         prepared_vectors=(prepared or {}).get("vectors"),
+        should_continue=should_continue,
     )
     volume_ceiling = max(
         (total_count or 0 for _rating, _count, total_count in snapshot_stats.values()),
@@ -392,18 +436,21 @@ def rank_content_v1(
         candidates,
         snapshot_stats,
         eligibility_cutoff_date,
-        int(spec.params.get("half_life_days", 365)),
+        float(spec.params.get("year_decay", 0.35)),
     )
     scored: list[tuple[float, str, dict]] = []
-    for work in candidates:
+    for index, work in enumerate(candidates):
+        if index % _CANCELLATION_CHECK_INTERVAL == 0:
+            _ensure_current(should_continue)
         vector = vectors[work.id]
-        similarity = cosine(profile, vector)
-        parts = {
-            key: profile[key] * vector[key]
-            for key in profile.keys() & vector.keys()
-        }
+        similarity_evidence = facet_similarity(profile, vector)
+        similarity = similarity_evidence["score"]
+        parts = similarity_evidence["parts"]
         rt, fallback = rating_term(work, corpus_version, resolved_genre_profile, snapshot_stats)
-        negative_similarity = cosine(profile_inputs.negative, vector)
+        signals = _scored_signals(
+            spec, work, snapshot_stats, volume_ceiling, popscore_by_work, recency_by_work, rt
+        )
+        negative_similarity = facet_similarity(profile_inputs.negative, vector)["score"]
         score = combine(
             similarity,
             rt,
@@ -411,17 +458,15 @@ def rank_content_v1(
             spec,
             negative_similarity=negative_similarity,
             recency_score=recency_by_work.get(work.id),
-            rating_volume=_candidate_signals(
-                work, snapshot_stats, volume_ceiling, popscore_by_work, recency_by_work
-            )["rating_volume"],
-            popscore=popscore_by_work.get(work.id),
+            rating_volume=signals["rating_volume"],
+            popscore=signals["popscore"],
         )
         evidence = explain(
             vector,
             profile,
             parts,
             spec,
-            candidate_rating_term=rt,
+            candidate_rating_term=signals["rating_confidence"] or 0.0,
             rating_term_is_fallback=fallback,
             negative_similarity=negative_similarity,
         )
@@ -429,9 +474,7 @@ def rank_content_v1(
             work,
             score,
             evidence,
-            _candidate_signals(
-                work, snapshot_stats, volume_ceiling, popscore_by_work, recency_by_work
-            ),
+            signals,
         )
         scored.append((score, work.canonical_slug, item))
 

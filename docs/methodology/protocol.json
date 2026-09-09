@@ -1,12 +1,34 @@
 {
-  "protocol_version": 2,
+  "protocol_version": 6,
   "frozen_on": "2026-09-09",
-  "ratified_by": "Felipe — actualización de rejilla y señales, 2026-09-09",
+  "ratified_by": "Felipe — intensidad de valoración personal, recencia por año natural y umbral de candidatos >= 5, 2026-09-09",
   "simulation": true,
   "limitation": "Frozen offline evaluation protocol scored over seeded synthetic users. Every number produced under this protocol is simulation evidence about parameterised archetypes, not evidence about real SavePoint users (EVAL-10).",
   "relevance": {
     "completed": true,
     "rating_half_steps_gte": 7
+  },
+  "rating_signal": {
+    "version": "rating-confidence-v2",
+    "quality_power": 2.0,
+    "volume_source": "total_rating_count",
+    "volume_normalisation": "log1p_over_frozen_view_max",
+    "volume_floor": 0.8,
+    "volume_boost": 0.2,
+    "composition": "rating_quality * (volume_floor + volume_boost * rating_volume)"
+  },
+  "content_similarity": {
+    "feature_set_version": "fs-v6",
+    "core_facets": {
+      "genre": 0.5,
+      "platform": 0.25
+    },
+    "optional_confirmation_facets": {
+      "franchise": 0.15,
+      "developer": 0.1
+    },
+    "missing_metadata": "neutral",
+    "optional_match_rule": "positive_only_when_value_overlaps_weighted_user_profile"
   },
   "k_values": [5, 10, 20],
   "headline": "ndcg@10",
@@ -15,7 +37,7 @@
     "seed": 20260907,
     "heldout_returned_to_candidates": true
   },
-  "candidate_set": "eligible_governed_corpus_user_rating_present_and_total_rating_count_gte_10_minus_user_library_plus_heldout",
+  "candidate_set": "eligible_governed_corpus_user_rating_present_and_total_rating_count_gte_5_minus_user_library_plus_heldout",
   "exclusions": "any_library_entry",
   "metrics": ["precision@k", "recall@k", "ndcg@k", "map@k"],
   "tuning": {
@@ -23,30 +45,34 @@
     "select_split": "validation",
     "test_runs": 1,
     "grid": [
-      {"combine_mode": "weighted_sum", "feature_set": "genres_platform", "signals": ["content_similarity", "user_rating"], "params": {"w_content": 0.70, "w_rating": 0.30}},
-      {"combine_mode": "weighted_sum", "feature_set": "genres_platform", "signals": ["content_similarity", "user_rating", "total_rating_count"], "params": {"w_content": 0.60, "w_rating": 0.25, "w_volume": 0.15}},
-      {"combine_mode": "weighted_sum", "feature_set": "genres_platform", "signals": ["content_similarity", "user_rating", "total_rating_count", "popscore"], "params": {"w_content": 0.50, "w_rating": 0.25, "w_volume": 0.10, "w_popscore": 0.15}},
-      {"combine_mode": "weighted_sum", "feature_set": "genres_platform", "signals": ["content_similarity", "user_rating", "total_rating_count", "popscore", "recency_score"], "params": {"w_content": 0.45, "w_rating": 0.20, "w_volume": 0.10, "w_popscore": 0.10, "w_recency": 0.15}},
-      {"combine_mode": "weighted_sum", "feature_set": "genres_platform", "signals": ["content_similarity", "user_rating", "total_rating_count", "popscore", "recency_score"], "params": {"w_content": 0.40, "w_rating": 0.20, "w_volume": 0.10, "w_popscore": 0.10, "w_recency": 0.20}},
-      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer", "signals": ["content_similarity", "user_rating"], "params": {"w_content": 0.70, "w_rating": 0.30}},
-      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer", "signals": ["content_similarity", "user_rating", "total_rating_count"], "params": {"w_content": 0.60, "w_rating": 0.25, "w_volume": 0.15}},
-      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer", "signals": ["content_similarity", "user_rating", "total_rating_count", "popscore"], "params": {"w_content": 0.50, "w_rating": 0.25, "w_volume": 0.10, "w_popscore": 0.15}},
-      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer", "signals": ["content_similarity", "user_rating", "total_rating_count", "popscore", "recency_score"], "params": {"w_content": 0.45, "w_rating": 0.20, "w_volume": 0.10, "w_popscore": 0.10, "w_recency": 0.15}},
-      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer", "signals": ["content_similarity", "user_rating", "total_rating_count", "popscore", "recency_score"], "params": {"w_content": 0.40, "w_rating": 0.20, "w_volume": 0.10, "w_popscore": 0.10, "w_recency": 0.20}},
-      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer_franchise", "signals": ["content_similarity", "user_rating"], "params": {"w_content": 0.70, "w_rating": 0.30}},
-      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer_franchise", "signals": ["content_similarity", "user_rating", "total_rating_count"], "params": {"w_content": 0.60, "w_rating": 0.25, "w_volume": 0.15}},
-      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer_franchise", "signals": ["content_similarity", "user_rating", "total_rating_count", "popscore"], "params": {"w_content": 0.50, "w_rating": 0.25, "w_volume": 0.10, "w_popscore": 0.15}},
-      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer_franchise", "signals": ["content_similarity", "user_rating", "total_rating_count", "popscore", "recency_score"], "params": {"w_content": 0.45, "w_rating": 0.20, "w_volume": 0.10, "w_popscore": 0.10, "w_recency": 0.15}},
-      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer_franchise", "signals": ["content_similarity", "user_rating", "total_rating_count", "popscore", "recency_score"], "params": {"w_content": 0.40, "w_rating": 0.20, "w_volume": 0.10, "w_popscore": 0.10, "w_recency": 0.20}},
-      {"combine_mode": "multiplicative", "feature_set": "genres_platform", "signals": ["content_similarity", "user_rating"], "params": {}},
-      {"combine_mode": "multiplicative", "feature_set": "genres_platform_developer", "signals": ["content_similarity", "user_rating"], "params": {}},
-      {"combine_mode": "multiplicative", "feature_set": "genres_platform_developer_franchise", "signals": ["content_similarity", "user_rating"], "params": {}},
-      {"combine_mode": "two_stage", "feature_set": "genres_platform", "signals": ["content_similarity", "user_rating"], "params": {"bands": 3}},
-      {"combine_mode": "two_stage", "feature_set": "genres_platform", "signals": ["content_similarity", "user_rating"], "params": {"bands": 5}},
-      {"combine_mode": "two_stage", "feature_set": "genres_platform_developer", "signals": ["content_similarity", "user_rating"], "params": {"bands": 3}},
-      {"combine_mode": "two_stage", "feature_set": "genres_platform_developer", "signals": ["content_similarity", "user_rating"], "params": {"bands": 5}},
-      {"combine_mode": "two_stage", "feature_set": "genres_platform_developer_franchise", "signals": ["content_similarity", "user_rating"], "params": {"bands": 3}},
-      {"combine_mode": "two_stage", "feature_set": "genres_platform_developer_franchise", "signals": ["content_similarity", "user_rating"], "params": {"bands": 5}}
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform", "signals": ["content_similarity", "rating_confidence"], "params": {"w_content": 0.70, "w_rating": 0.30}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform", "signals": ["content_similarity", "rating_confidence"], "params": {"w_content": 0.60, "w_rating": 0.40}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform", "signals": ["content_similarity", "rating_confidence", "popscore"], "params": {"w_content": 0.50, "w_rating": 0.35, "w_popscore": 0.15}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform", "signals": ["content_similarity", "rating_confidence", "popscore", "recency_score"], "params": {"w_content": 0.30, "w_rating": 0.20, "w_popscore": 0.10, "w_recency": 0.40, "year_decay": 0.35}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform", "signals": ["content_similarity", "rating_confidence", "popscore", "recency_score"], "params": {"w_content": 0.25, "w_rating": 0.20, "w_popscore": 0.10, "w_recency": 0.45, "year_decay": 0.35}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer", "signals": ["content_similarity", "rating_confidence"], "params": {"w_content": 0.70, "w_rating": 0.30}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer", "signals": ["content_similarity", "rating_confidence"], "params": {"w_content": 0.60, "w_rating": 0.40}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer", "signals": ["content_similarity", "rating_confidence", "popscore"], "params": {"w_content": 0.50, "w_rating": 0.35, "w_popscore": 0.15}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer", "signals": ["content_similarity", "rating_confidence", "popscore", "recency_score"], "params": {"w_content": 0.30, "w_rating": 0.20, "w_popscore": 0.10, "w_recency": 0.40, "year_decay": 0.35}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer", "signals": ["content_similarity", "rating_confidence", "popscore", "recency_score"], "params": {"w_content": 0.25, "w_rating": 0.20, "w_popscore": 0.10, "w_recency": 0.45, "year_decay": 0.35}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer_franchise", "signals": ["content_similarity", "rating_confidence"], "params": {"w_content": 0.70, "w_rating": 0.30}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer_franchise", "signals": ["content_similarity", "rating_confidence"], "params": {"w_content": 0.60, "w_rating": 0.40}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer_franchise", "signals": ["content_similarity", "rating_confidence", "popscore"], "params": {"w_content": 0.50, "w_rating": 0.35, "w_popscore": 0.15}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer_franchise", "signals": ["content_similarity", "rating_confidence", "popscore", "recency_score"], "params": {"w_content": 0.30, "w_rating": 0.20, "w_popscore": 0.10, "w_recency": 0.40, "year_decay": 0.35}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer_franchise", "signals": ["content_similarity", "rating_confidence", "popscore", "recency_score"], "params": {"w_content": 0.25, "w_rating": 0.20, "w_popscore": 0.10, "w_recency": 0.45, "year_decay": 0.35}},
+      {"combine_mode": "multiplicative", "feature_set": "genres_platform", "signals": ["content_similarity", "rating_confidence"], "params": {}},
+      {"combine_mode": "multiplicative", "feature_set": "genres_platform_developer", "signals": ["content_similarity", "rating_confidence"], "params": {}},
+      {"combine_mode": "multiplicative", "feature_set": "genres_platform_developer_franchise", "signals": ["content_similarity", "rating_confidence"], "params": {}},
+      {"combine_mode": "two_stage", "feature_set": "genres_platform", "signals": ["content_similarity", "rating_confidence"], "params": {"bands": 3}},
+      {"combine_mode": "two_stage", "feature_set": "genres_platform", "signals": ["content_similarity", "rating_confidence"], "params": {"bands": 5}},
+      {"combine_mode": "two_stage", "feature_set": "genres_platform_developer", "signals": ["content_similarity", "rating_confidence"], "params": {"bands": 3}},
+      {"combine_mode": "two_stage", "feature_set": "genres_platform_developer", "signals": ["content_similarity", "rating_confidence"], "params": {"bands": 5}},
+      {"combine_mode": "two_stage", "feature_set": "genres_platform_developer_franchise", "signals": ["content_similarity", "rating_confidence"], "params": {"bands": 3}},
+      {"combine_mode": "two_stage", "feature_set": "genres_platform_developer_franchise", "signals": ["content_similarity", "rating_confidence"], "params": {"bands": 5}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform", "signals": ["content_similarity", "rating_confidence", "popscore"], "params": {"w_content": 0.60, "w_rating": 0.25, "w_popscore": 0.15, "popscore_missing_floor": 0.0}},
+      {"combine_mode": "multiplicative_popscore", "feature_set": "genres_platform", "signals": ["content_similarity", "rating_confidence", "popscore"], "params": {"popscore_missing_floor": 0.0, "popscore_swing": 0.15}},
+      {"combine_mode": "two_stage_popscore", "feature_set": "genres_platform", "signals": ["content_similarity", "rating_confidence", "popscore"], "params": {"bands": 5, "w_rating": 0.85, "w_popscore": 0.15, "popscore_missing_floor": 0.0}},
+      {"combine_mode": "negative_weighted_sum_popscore", "feature_set": "genres_platform", "signals": ["content_similarity", "rating_confidence", "popscore"], "params": {"w_content": 0.60, "w_rating": 0.25, "w_popscore": 0.15, "negative_penalty": 1.0, "popscore_missing_floor": 0.0}}
     ]
   },
   "user_split": {
@@ -76,6 +102,6 @@
     }
   },
   "corpus_version": "2026.09.2",
-  "snapshot_sha256": "53341af5c60af02b5fd8a8d83eac0dc7eff218627c0df93c22fecb210ecac79d",
+  "snapshot_sha256": "c42f46a42d091e11cd894c3f942b8979b77f611ac7a4b048d8d152bebe8ce3cc",
   "popscore_snapshot_sha256": "16de92f28fa5b3dd1b387110628561eb6330b271ed2b1e76a69a7e0f03083097"
 }

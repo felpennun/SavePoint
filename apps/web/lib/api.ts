@@ -242,6 +242,7 @@ export interface MyLibraryItem {
   work_title: string;
   status: string;
   rating_half_steps: number | null;
+  display_rating: number | null;
   owned_copy_count: number;
   year: number | null;
   platform_summary: string;
@@ -279,9 +280,7 @@ export interface RecommendationMatchedGenre {
   weight: number;
 }
 
-/** One ranked catalogue work from `GET /api/recommendations/genre-taste/`.
- * The endpoint returns a flat, score-ordered list; the page groups it into
- * per-genre shelves for display (D-UI-4). */
+/** One ranked catalogue work from `GET /api/recommendations/genre-taste/`. */
 export interface PersonalRecommendationItem {
   work_id: string;
   slug: string;
@@ -290,6 +289,8 @@ export interface PersonalRecommendationItem {
   /** IGDB catalogue rating used to order candidates; null means unrated. */
   catalogue_rating: number | null;
   catalogue_rating_count: number;
+  /** Product-facing blended rating, shared with the game detail page. */
+  display_rating: number | null;
   year: number | null;
   platform_summary: string;
   cover: Cover;
@@ -304,10 +305,15 @@ export interface ContentRecommendationItem {
   contributions: { genre: string; contribution_pct: number }[];
   rating_term: number;
   rating_term_is_fallback: boolean;
+  /** Product-facing blended rating, shared with catalogue and detail cards. */
+  display_rating: number | null;
   signals: {
     external_rating: number | null;
+    rating_quality: number | null;
+    rating_confidence: number | null;
     rating_volume: number | null;
     popscore: number | null;
+    popscore_imputed: boolean;
     recency_score: number | null;
   };
   reason: ContentRecommendationReason | null;
@@ -318,11 +324,15 @@ export interface ContentRecommendationItem {
 
 export interface ContentRecommendationReason {
   kind: "signal_overlap";
-  signals: { kind: "genre" | "platform"; slug: string; name: string }[];
+    signals: {
+      kind: "genre" | "platform" | "franchise" | "developer";
+      slug: string;
+      name: string;
+    }[];
 }
 
 export interface ContentRecommendationsResult {
-  protocol_version: 2;
+  protocol_version: 6;
   algorithm_id: string;
   generated_at: string;
   input_snapshot_sha256: string;
@@ -425,6 +435,12 @@ export interface PersonalRecommendationsResult {
   input_snapshot_sha256: string;
   insufficient_history: boolean;
   limitation: string;
+  primary_genre?: {
+    slug: string;
+    name: string;
+    entry_count: number;
+    weight: number;
+  } | null;
   results: PersonalRecommendationItem[];
 }
 
@@ -433,7 +449,7 @@ export type PersonalRecommendationsResponse =
   | { kind: "unauthorized" }
   | { kind: "error" };
 
-/** A genre-grouped shelf built from the flat DTO for display. */
+/** The single deterministic genre shelf shown in the product. */
 export interface PersonalRecommendationShelf {
   /** Display name of the taste genre this shelf is built around. */
   genre: string;
@@ -472,19 +488,12 @@ export async function getPersonalRecommendations(
   }
 }
 
-/**
- * Reshape the flat, score-ordered DTO into genre-grouped shelves (D-UI-4):
- * one shelf per top taste genre, ordered by the user's own genre-taste
- * weight (descending, `slug` ascending tie-break for determinism), capped
- * at `maxShelves`. A work that overlaps several taste genres appears on
- * each of those shelves. Within a shelf the DTO's score order is
- * preserved. Returns `[]` for the insufficient-history shape.
- */
-export function groupRecommendationsByGenre(
+/** Return only the dominant-library-genre shelf, capped at 20 items. */
+export function primaryGenreRecommendationShelf(
   result: PersonalRecommendationsResult,
-  { maxShelves = 4, maxItemsPerShelf = 12 }: { maxShelves?: number; maxItemsPerShelf?: number } = {},
-): PersonalRecommendationShelf[] {
-  if (result.insufficient_history || result.results.length === 0) return [];
+  { maxItems = 20 }: { maxItems?: number } = {},
+): PersonalRecommendationShelf | null {
+  if (result.insufficient_history || result.results.length === 0) return null;
 
   const genres = new Map<string, { name: string; weight: number }>();
   for (const item of result.results) {
@@ -496,18 +505,18 @@ export function groupRecommendationsByGenre(
     }
   }
 
-  return [...genres.entries()]
-    .sort(([slugA, a], [slugB, b]) => b.weight - a.weight || slugA.localeCompare(slugB))
-    .slice(0, maxShelves)
-    .map(([slug, { name, weight }]) => ({
-      genre: name,
-      genreSlug: slug,
-      tasteWeight: weight,
-      items: result.results
-        .filter((item) => item.matched_genres.some((genre) => genre.slug === slug))
-        .slice(0, maxItemsPerShelf),
-    }))
-    .filter((shelf) => shelf.items.length > 0);
+  const fallback = [...genres.entries()]
+    .sort(([slugA, a], [slugB, b]) => b.weight - a.weight || slugA.localeCompare(slugB))[0];
+  const primary = result.primary_genre ?? (fallback
+    ? { slug: fallback[0], name: fallback[1].name, weight: fallback[1].weight }
+    : null);
+  if (primary === null) return null;
+  const items = result.results
+    .filter((item) => item.matched_genres.some((genre) => genre.slug === primary.slug))
+    .slice(0, maxItems);
+  return items.length > 0
+    ? { genre: primary.name, genreSlug: primary.slug, tasteWeight: primary.weight, items }
+    : null;
 }
 
 export interface AccountMe {

@@ -32,15 +32,24 @@ from catalogue.corpus import ALLOWLIST_SLUGS, evaluation_candidate_works, govern
 from catalogue.models import CorpusPopularitySnapshot, CorpusRatingSnapshot, GameWork, Genre
 from catalogue.popularity import IGDB_ENGAGEMENT_TYPES
 
-# Bump when the vector-building rules below change (part of the DTO, REC-09).
-# fs-v5 assigns the approved descending facet weights (genre > platform >
-# franchise > developer). Cached fs-v4 rows must not be reused because their
-# dimensions had equal family weights.
-FEATURE_SET_VERSION = "fs-v5"
+# Bump when the vector-building or similarity rules change (part of the DTO,
+# REC-09). fs-v6 keeps the weighted sparse features but the ranker now compares
+# user-facing facet affinity instead of applying cosine directly to the raw
+# vector. Cached rows from earlier contracts must not be reused.
+FEATURE_SET_VERSION = "fs-v6"
 
-# These weights express the semantic hierarchy of the content signal. They
-# are applied before cosine normalisation and are therefore part of the
-# versioned feature-set contract, not request-time tuning parameters.
+# Shared scalar-signal contract. The product workers and offline runner both
+# call the same ranker, so this version is included in the published
+# configuration fingerprint whenever the transformation changes.
+RATING_SIGNAL_VERSION = "rating-confidence-v2"
+RATING_QUALITY_POWER = 2.0
+RATING_VOLUME_BOOST = 0.20
+RATING_VOLUME_FLOOR = 1.0 - RATING_VOLUME_BOOST
+
+# These weights express the semantic hierarchy of the content signal. fs-v6
+# uses genre/platform as the core and saga/developer as bounded confirmation
+# bonuses. They remain part of the versioned contract, not request-time tuning
+# parameters.
 FACET_WEIGHTS: dict[str, float] = {
     "genre": 0.50,
     "platform": 0.25,
@@ -183,6 +192,13 @@ def coverage_report(corpus_version: str | None = None) -> dict:
         "corpus_version": corpus_version,
         "feature_set_version": FEATURE_SET_VERSION,
         "facet_weights": FACET_WEIGHTS,
+        "rating_signal": {
+            "version": RATING_SIGNAL_VERSION,
+            "quality_power": RATING_QUALITY_POWER,
+            "volume_source": "total_rating_count",
+            "volume_floor": RATING_VOLUME_FLOOR,
+            "volume_boost": RATING_VOLUME_BOOST,
+        },
         "governed_count": total,
         "algorithm_candidate_count": candidate_count,
         "feature_coverage": {
@@ -227,11 +243,38 @@ def coverage_report(corpus_version: str | None = None) -> dict:
 
 
 def normalise_rating(value: float | None) -> float | None:
-    """Return an IGDB-scale rating in ``[0, 1]`` without imputing absence."""
+    """Return a linear IGDB rating in ``[0, 1]`` without imputing absence."""
 
     if value is None or not math.isfinite(value):
         return None
     return max(0.0, min(1.0, value / 100.0))
+
+
+def rating_quality_signal(value: float | None) -> float | None:
+    """Emphasise high IGDB ratings while preserving the bounded scale."""
+
+    normalised = normalise_rating(value)
+    return None if normalised is None else normalised**RATING_QUALITY_POWER
+
+
+def compose_rating_confidence(
+    rating_quality: float | None,
+    rating_volume: float | None,
+) -> float | None:
+    """Combine quality and volume without letting volume replace quality.
+
+    ``rating_volume`` is already the corpus-view-normalised logarithmic
+    ``total_rating_count`` signal. Missing volume leaves the quality signal
+    unchanged; otherwise volume can boost it within a fixed 20% band.
+    """
+
+    if rating_quality is None:
+        return None
+    quality = max(0.0, min(1.0, rating_quality))
+    if rating_volume is None:
+        return quality
+    volume = max(0.0, min(1.0, rating_volume))
+    return quality * (RATING_VOLUME_FLOOR + RATING_VOLUME_BOOST * volume)
 
 
 def normalise_rating_volume(value: int | None, ceiling: int | None) -> float | None:

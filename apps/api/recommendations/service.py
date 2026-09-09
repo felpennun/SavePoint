@@ -9,10 +9,11 @@ the same immutable manifest.
 from __future__ import annotations
 
 from datetime import date
+from typing import Callable
 
 from django.contrib.auth.models import AbstractBaseUser
 
-from catalogue.models import CorpusVersion, GameWork, Genre
+from catalogue.models import CorpusVersion, Developer, Franchise, GameWork, Genre
 from catalogue.serializers import _cover, _platform_summary, _release_year
 from evaluation.candidates import CandidateManifest, build_common
 from evaluation import protocol as evaluation_protocol
@@ -21,7 +22,7 @@ from recommendations.content.rank import rank_content_v1
 from recommendations.content.variants import ALGORITHM_REGISTRY
 
 
-PROTOCOL_VERSION = 2
+PROTOCOL_VERSION = 6
 MIN_LIMIT = 1
 MAX_LIMIT = 50
 
@@ -63,9 +64,9 @@ def build_candidate_manifest(
     """Build the common governed candidate set for one user.
 
     The explorable universe contains all governed, non-future primary works.
-    The output universe additionally requires a counted rating or a valid
-    external rating. Any library entry is excluded, including the user's
-    unrated and pending entries.
+    The output universe additionally requires a non-null IGDB user rating and
+    the shared minimum total rating volume. Any library entry is excluded,
+    including the user's unrated and pending entries.
     """
 
     resolved_corpus = _resolved_corpus_version(protocol, corpus_version)
@@ -82,6 +83,8 @@ def _reason(
     *,
     genre_names: dict[str, str],
     platform_names: dict[str, str],
+    franchise_names: dict[str, str],
+    developer_names: dict[str, str],
 ) -> dict | None:
     """Return bounded, signal-backed evidence; never manufacture an excuse."""
 
@@ -89,7 +92,17 @@ def _reason(
     for signal in item.get("reason_signals", []):
         kind = signal.get("kind")
         slug = signal.get("value")
-        names = genre_names if kind == "genre" else platform_names if kind == "platform" else {}
+        names = (
+            genre_names
+            if kind == "genre"
+            else platform_names
+            if kind == "platform"
+            else franchise_names
+            if kind == "franchise"
+            else developer_names
+            if kind == "developer"
+            else {}
+        )
         if slug in names:
             signals.append({"kind": kind, "slug": slug, "name": names[slug]})
         if len(signals) == 2:
@@ -113,6 +126,7 @@ def recommend_for_user(
     protocol: evaluation_protocol.Protocol | None = None,
     corpus_version: str | None = None,
     eligibility_cutoff_date: date | None = None,
+    should_continue: Callable[[], bool] | None = None,
 ) -> dict:
     """Rank one user's governed candidates and return the stable v2 DTO."""
 
@@ -120,12 +134,20 @@ def recommend_for_user(
         raise RecommendationServiceError("unknown algorithm_id")
     frozen = protocol or evaluation_protocol.load()
     evaluation_protocol.require_version(frozen, PROTOCOL_VERSION)
+    if should_continue is not None and not should_continue():
+        from recommendations.cancellation import RecommendationComputationCancelled
+
+        raise RecommendationComputationCancelled
     manifest = build_candidate_manifest(
         user,
         frozen,
         corpus_version=corpus_version,
         eligibility_cutoff_date=eligibility_cutoff_date,
     )
+    if should_continue is not None and not should_continue():
+        from recommendations.cancellation import RecommendationComputationCancelled
+
+        raise RecommendationComputationCancelled
     payload = rank_content_v1(
         user,
         algorithm_id,
@@ -133,6 +155,7 @@ def recommend_for_user(
         corpus_version=manifest.corpus_version,
         candidate_ids=manifest.candidate_ids,
         min_rating_count=None,
+        should_continue=should_continue,
     )
     result_ids = {item["work_id"] for item in payload["results"]}
     manifest_ids = {str(work_id) for work_id in manifest.candidate_ids}
@@ -148,10 +171,12 @@ def recommend_for_user(
     works = {
         str(work.id): work
         for work in GameWork.objects.filter(id__in=result_ids).prefetch_related(
-            "genres", "assets", "releases__platform"
+            "genres", "assets", "releases__platform", "franchises", "developers"
         )
     }
     genre_names = dict(Genre.objects.values_list("slug", "name"))
+    franchise_names = dict(Franchise.objects.values_list("slug", "name"))
+    developer_names = dict(Developer.objects.values_list("slug", "name"))
     results = []
     for item in payload["results"]:
         work = works.get(item["work_id"])
@@ -166,6 +191,8 @@ def recommend_for_user(
                 "reason": _reason(
                     item,
                     genre_names=genre_names,
+                    franchise_names=franchise_names,
+                    developer_names=developer_names,
                     platform_names={
                         release.platform.slug: release.platform.name
                         for release in work.releases.all()

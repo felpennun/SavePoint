@@ -1,12 +1,12 @@
-# Protocolo de evaluación congelado (Fase 2)
+# Protocolo de evaluación congelado (Fase 3)
 
-- **Estado:** Congelado el 2026-09-07.
+- **Estado:** Congelado como protocolo v6 el 2026-09-09.
 - **Ratificado por:** Felipe — Tarea 1 (`checkpoint:decision`, `blocking-human`) del Plan
   `02-08`, opción `ratify-as-proposed`, 2026-09-07. Registro en
   `.planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/02-08-CHECKPOINT.md`.
 - **Contrato legible por máquina:** [`protocol.json`](./protocol.json). El cargador
   `apps/api/evaluation/protocol.py` valida ese fichero y se niega a correr si la rejilla de
-  tuning excede las 24 combinaciones o si el split de test de ese protocolo ya fue consumido.
+  tuning excede las 28 combinaciones o si el split de test de ese protocolo ya fue consumido.
 - **Requisitos que cumple:** EVAL-01, EVAL-02, EVAL-03, EVAL-10, DOC-04. Decisiones de
   `02-CONTEXT.md`: D-17..D-22.
 - **Reversibilidad:** one-way. En cuanto una comparación citada en el TFG referencia
@@ -18,8 +18,8 @@
 ## Contexto
 
 La Fase 2 introduce el primer recomendador basado en contenido de la tesis (REC-03), un
-laboratorio paramétrico con tres modos de combinación (`weighted_sum`, `multiplicative`,
-`two_stage`) y varios conjuntos de features. Antes de que corra **cualquier** variante
+laboratorio paramétrico con modos de combinación (`weighted_sum`, `multiplicative`,
+`two_stage`) y cuatro variantes que incorporan PopScore. Antes de que corra **cualquier** variante
 avanzada hay que congelar el protocolo de comparación: qué cuenta como acierto, sobre qué
 candidatos, con qué métricas, con qué presupuesto de tuning y con qué aislamiento del
 conjunto de test. Ese contrato es `protocol.json`; este documento es su lectura en prosa.
@@ -29,6 +29,36 @@ por semilla, Plan `02-09`). Cualquier resultado producido bajo este protocolo es
 de simulación, no evidencia sobre usuarios reales de SavePoint (EVAL-10). Por eso
 `protocol.json` y todo artefacto derivado llevan la marca `simulation: true` y una cadena
 `limitation` explícita.
+
+## Señal compuesta de calidad y confianza
+
+El protocolo v6 y la web comparten la señal `rating_confidence`. El rating de usuario IGDB se
+normaliza con potencia 2 para separar mejor las notas altas. El volumen se calcula con
+`log1p(total_rating_count)` respecto al máximo de la vista congelada y actúa como refuerzo
+acotado:
+
+`rating_confidence = rating_quality * (0,80 + 0,20 * rating_volume)`.
+
+El catálogo gobernado completo permanece disponible para búsqueda. El universo que puede entrar
+en cualquier algoritmo es un subconjunto explícito: `rating IS NOT NULL AND total_rating_count >= 5`.
+La condición exige simultáneamente una nota de usuario IGDB y al menos cinco valoraciones totales
+de IGDB; no es una alternativa `OR`.
+
+El volumen no se suma como término independiente en `recency-v1`, evitando doble conteo.
+`display_rating` y las valoraciones SavePoint son datos de presentación y quedan fuera de la
+puntuación algorítmica. El cambio de fórmula incrementa la versión del protocolo y, por tanto,
+invalida cualquier artefacto calculado bajo la configuración anterior.
+
+La valoración personal de cada juego semilla sí forma parte del perfil de preferencias. Su
+intensidad se calcula como `(rating_half_steps / 10)^2`, sumada al peso de actividad del estado:
+`completed = 3`, `playing = 2`, `pending = 1`, `abandoned = 0`. El perfil solo usa como evidencia
+positiva juegos `completed` o `playing` con una valoración de al menos 3,5/5; de este modo una
+valoración 5/5 pesa más que una 4/5 y los géneros repetidos acumulan evidencia ponderada.
+
+`recency-v1` usa años naturales: una obra del año del corte recibe `recency_score = 1,0` y cada
+año anterior multiplica la señal por `0,35` (`1,0`, `0,35`, `0,1225`, ...). Su combinación oficial
+es contenido `0,30`, rating-confidence `0,20`, PopScore `0,10` y recencia `0,40`; así la novedad
+domina en esta estantería sin eliminar las señales de afinidad y calidad.
 
 ## Relevancia (D-17)
 
@@ -94,20 +124,34 @@ las cohortes y tests estadísticos son de la **Fase 3** y no forman parte de est
   usa pesos escalonados `1/2/4/8/16/32` para los tramos `1–4`, `5–19`, `20–99`,
   `100–499`, `500–1999` y `>=2000`, respectivamente.
 - La **rejilla de tuning** se declara entera en `protocol.json` **antes** de correr nada.
-Está congelada en **24 configuraciones** (tope duro: 24; `protocol.load()` lanza
-`ProtocolError` si `len(grid) > 24`):
-- `weighted_sum`: 5 perfiles de señales × 3 conjuntos de features = 15. Los
+Está congelada en **28 configuraciones** (tope duro: 28; `protocol.load()` lanza
+`ProtocolError` si `len(grid) > 28`):
+- `weighted_sum`: 5 perfiles de señales × 3 conjuntos de features = 15, más una
+  variante publicada con PopScore = 16. Los
   perfiles incorporan de forma progresiva similitud de contenido, rating de
   usuarios IGDB, `total_rating_count` como volumen y PopScore; los dos últimos
   añaden `recency_score` con peso explícito.
 - `multiplicative`: × 3 conjuntos de features = 3.
 - `two_stage`: bandas ∈ {3, 5} × 3 conjuntos de features = 6.
+- Además, la rejilla reserva una configuración para cada nueva forma de combinar PopScore:
+  `multiplicative_popscore`, `two_stage_popscore` y `negative_weighted_sum_popscore`.
+  Estas variantes usan `popscore_missing_floor = 0.0`, de modo que una obra sin PopScore
+  recibe una penalización explícita y no se beneficia de una renormalización.
 - Los conjuntos de features son `genres_platform`,
   `genres_platform_developer` y `genres_platform_developer_franchise`; la
   franquicia queda identificada como ablación exploratoria por su cobertura
   baja.
 - La rejilla se puntúa **solo sobre `validation`**, con la métrica titular `ndcg@10`. Se
   bloquea la configuración ganadora.
+
+La versión vigente de la similitud de contenido es `fs-v6`, común a web,
+workers y evaluación offline. Género y plataforma forman el núcleo de
+similitud; sus pesos `0,50` y `0,25` se normalizan entre las facetas
+disponibles. Saga/franquicia y desarrollador actúan como confirmaciones
+positivas con pesos relativos `0,15` y `0,10`: solo aportan cuando coinciden
+con valores presentes en el perfil ponderado del usuario. La mera presencia
+de una saga o un desarrollador no concede puntos, y la ausencia no se imputa
+ni penaliza.
 - El **conjunto de test se corre una sola vez** (`tuning.test_runs = 1`). Su consumo se
   registra en un marcador de run; `protocol.load()` se niega a volver a correr el test de un
   protocolo ya consumido salvo que se suba `protocol_version` (o se pase la bandera explícita

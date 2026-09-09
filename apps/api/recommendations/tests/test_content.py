@@ -75,6 +75,10 @@ def test_algorithm_registry_has_the_named_positive_and_negative_variants() -> No
         "content-cbf-multiplicative-v1",
         "content-cbf-twostage-v1",
         "content-cbf-neg-v1",
+        "content-cbf-weighted-pop-v1",
+        "content-cbf-multiplicative-pop-v1",
+        "content-cbf-twostage-pop-v1",
+        "content-cbf-neg-pop-v1",
         "recency-v1",
     }
     assert all(isinstance(spec, VariantSpec) for spec in ALGORITHM_REGISTRY.values())
@@ -83,6 +87,10 @@ def test_algorithm_registry_has_the_named_positive_and_negative_variants() -> No
         "multiplicative",
         "two_stage",
         "negative_weighted_sum",
+        "weighted_sum",
+        "multiplicative_popscore",
+        "two_stage_popscore",
+        "negative_weighted_sum_popscore",
         "weighted_sum",
     ]
 
@@ -99,8 +107,9 @@ def test_recency_variant_adds_recency_to_the_other_candidate_signals() -> None:
         recency_score=1.0,
     )
 
-    assert score == pytest.approx(0.8 * 0.45 + 0.7 * 0.20 + 0.6 * 0.10 + 0.5 * 0.10 + 1.0 * 0.15)
-    assert spec.params["w_recency"] == 0.15
+    rating_confidence = 0.7 * (0.8 + 0.2 * 0.6)
+    assert score == pytest.approx(0.8 * 0.30 + rating_confidence * 0.20 + 0.5 * 0.10 + 1.0 * 0.40)
+    assert spec.params["w_recency"] == 0.40
 
 
 @pytest.mark.django_db
@@ -114,14 +123,14 @@ def test_rating_term_uses_corpus_snapshot_and_confidence_blend(genres) -> None: 
         work, _CORPUS, {"role-playing-rpg": 60.0}
     )
 
-    assert term == pytest.approx(0.63)
+    assert term == pytest.approx(0.405)
     assert is_fallback is False
 
     # The mutable product field must not influence a frozen recommendation.
     work.total_rating = 100.0
     work.save(update_fields=["total_rating"])
     assert rating_term(work, _CORPUS, {"role-playing-rpg": 60.0}) == (
-        pytest.approx(0.63),
+        pytest.approx(0.405),
         False,
     )
 
@@ -136,7 +145,7 @@ def test_rating_term_falls_back_to_median_genre_profile(genres) -> None:  # noqa
         {"role-playing-rpg": 80.0, "shooter": 40.0},
     )
 
-    assert term == pytest.approx(0.6)
+    assert term == pytest.approx(0.36)
     assert is_fallback is True
 
 
@@ -294,7 +303,7 @@ def test_versioned_dto_and_item_evidence(user_a, genres) -> None:  # noqa: ANN00
         "limitation",
         "results",
     }
-    assert result["feature_set_version"] == "fs-v5"
+    assert result["feature_set_version"] == "fs-v6"
     assert result["corpus_version"] == _CORPUS
     assert len(result["snapshot_sha256"]) == 64
     assert len(result["input_snapshot_sha256"]) == 64
@@ -376,6 +385,7 @@ def test_content_view_validates_algorithm_and_clamps_limit(user_a, genres) -> No
             "contributions",
             "rating_term",
             "rating_term_is_fallback",
+            "display_rating",
             "year",
             "platform_summary",
             "cover",

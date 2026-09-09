@@ -13,6 +13,7 @@ import json
 from pathlib import Path
 
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 
 from catalogue.corpus import governed_works
 from recommendations.content.features import (
@@ -58,21 +59,45 @@ class Command(BaseCommand):
 
         created = 0
         updated = 0
+        batch: list[WorkFeatureVector] = []
+
+        def flush() -> None:
+            nonlocal created, updated
+            if not batch:
+                return
+            work_ids = [row.work_id for row in batch]
+            existing = set(
+                WorkFeatureVector.objects.filter(
+                    work_id__in=work_ids,
+                    feature_set_version=FEATURE_SET_VERSION,
+                ).values_list("work_id", flat=True)
+            )
+            WorkFeatureVector.objects.bulk_create(
+                batch,
+                update_conflicts=True,
+                update_fields=["vector_json", "updated_at"],
+                unique_fields=["work", "feature_set_version"],
+            )
+            created += len(work_ids) - len(existing)
+            updated += len(existing)
+            batch.clear()
+
         for work in queryset.iterator(chunk_size=batch_size):
-            vector = feature_vector(
-                work,
-                include_franchise=include_franchise,
-                include_developer=include_developer,
+            batch.append(
+                WorkFeatureVector(
+                    work=work,
+                    feature_set_version=FEATURE_SET_VERSION,
+                    vector_json=feature_vector(
+                        work,
+                        include_franchise=include_franchise,
+                        include_developer=include_developer,
+                    ),
+                    updated_at=timezone.now(),
+                )
             )
-            _, was_created = WorkFeatureVector.objects.update_or_create(
-                work=work,
-                feature_set_version=FEATURE_SET_VERSION,
-                defaults={"vector_json": vector},
-            )
-            if was_created:
-                created += 1
-            else:
-                updated += 1
+            if len(batch) >= batch_size:
+                flush()
+        flush()
 
         summary = {
             "feature_set_version": FEATURE_SET_VERSION,
