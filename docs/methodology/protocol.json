@@ -18,19 +18,25 @@
     "composition": "rating_quality * (volume_floor + volume_boost * rating_volume)"
   },
   "content_similarity": {
-    "feature_set_version": "fs-v7",
+    "feature_set_version": "fs-v8",
     "core_facets": {
       "genre": 0.5,
       "platform": 0.25
     },
     "optional_confirmation_facets": {
-      "franchise": 0.18,
-      "developer": 0.12
+      "franchise": 0.20,
+      "developer": 0.15
+    },
+    "core_affinity": {
+      "formula": "F_beta(profile_coverage, candidate_precision)",
+      "beta": 0.5,
+      "precision_priority": true,
+      "purpose": "reduce the advantage of candidates declaring many genres or platforms"
     },
     "missing_metadata": "neutral",
     "optional_match_rule": "positive_only_when_value_overlaps_weighted_user_profile",
     "optional_match_calibration": "overlap is scaled against the strongest profile value in each optional facet",
-    "similarity_rule_version": "facet-similarity-v3"
+    "similarity_rule_version": "facet-similarity-v4"
   },
   "k_values": [5, 10, 20],
   "headline": "ndcg@10",

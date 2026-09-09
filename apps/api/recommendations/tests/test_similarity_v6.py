@@ -1,4 +1,4 @@
-"""Tests for the fs-v6 facet-aware content similarity contract."""
+"""Tests for the fs-v8 facet-aware content similarity contract."""
 
 from __future__ import annotations
 
@@ -74,7 +74,51 @@ def test_optional_match_is_not_diluted_by_unrelated_profile_values() -> None:
     result = facet_similarity(profile, candidate)
 
     assert result["facet_scores"]["developer"] == pytest.approx(1.0)
-    assert result["optional_bonus"] == pytest.approx(0.12)
+    assert result["optional_bonus"] == pytest.approx(0.15)
+
+
+def test_optional_bonus_uses_the_new_saga_and_developer_maxima() -> None:
+    profile = {
+        "genre:rpg": 1.0,
+        "platform:pc": 1.0,
+        "franchise:trusted-saga": 1.0,
+        "developer:trusted-studio": 1.0,
+    }
+    candidate = {
+        "genre:rpg": 0.5,
+        "genre:shooter": 0.5,
+        "platform:console": 0.25,
+        "franchise:trusted-saga": 0.20,
+        "developer:trusted-studio": 0.15,
+    }
+
+    result = facet_similarity(profile, candidate)
+
+    assert result["optional_bonus"] == pytest.approx(0.35)
+
+
+def test_core_precision_favors_narrower_candidate_metadata() -> None:
+    profile = {
+        "genre:rpg": 0.7,
+        "genre:adventure": 0.3,
+        "platform:pc": 1.0,
+    }
+    narrow = {
+        "genre:rpg": 0.5,
+        "platform:pc": 0.25,
+    }
+    broad = {
+        "genre:rpg": 0.25,
+        "genre:adventure": 0.25,
+        "genre:shooter": 0.25,
+        "genre:puzzle": 0.25,
+        "platform:pc": 0.25,
+    }
+
+    narrow_result = facet_similarity(profile, narrow)
+    broad_result = facet_similarity(profile, broad)
+
+    assert narrow_result["facet_scores"]["genre"] > broad_result["facet_scores"]["genre"]
 
 
 def test_core_genre_similarity_survives_missing_optional_facets() -> None:

@@ -204,8 +204,8 @@ def test_platform_weight_is_lower_than_genre_and_higher_than_optional_facets(gen
     assert FACET_WEIGHTS == {
         "genre": 0.50,
         "platform": 0.25,
-        "franchise": 0.18,
-        "developer": 0.12,
+        "franchise": 0.20,
+        "developer": 0.15,
     }
 
 

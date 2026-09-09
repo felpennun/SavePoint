@@ -42,15 +42,15 @@ la calidad. `display_rating` y las valoraciones SavePoint no entran en este
 cálculo. El perfil de rating por género solo se usa como fallback cuando la obra
 no tiene rating IGDB observado, y queda marcado en `rating_term_is_fallback`.
 
-La similitud de contenido usa `fs-v7`. Género y plataforma forman el núcleo con
-pesos 0,50 y 0,25, y su afinidad combina cobertura ponderada del perfil con
-precisión de la obra mediante una media armónica; así una lista muy amplia de
-géneros o plataformas no obtiene ventaja por enumerar más valores. Saga/
-franquicia y desarrollador usan pesos 0,18 y 0,12, y actúan como bonus positivos
-solo cuando coinciden con valores presentes en el perfil ponderado del usuario.
-El bonus opcional máximo es 0,30, por lo que una coincidencia real puede ser
-significativa sin convertirse en un recomendador independiente. Tener una saga
-o desarrollador cualquiera no aporta puntos; una faceta ausente no se imputa ni
+La similitud de contenido usa `fs-v8` y la regla `facet-similarity-v4`. Género y
+plataforma forman el núcleo con pesos 0,50 y 0,25. Su afinidad combina cobertura
+ponderada del perfil con precisión de la obra mediante una media F0,5: la
+precisión tiene más influencia que la cobertura, por lo que una obra que declara
+muchos géneros o plataformas necesita que una proporción mayor de ellos coincida.
+Saga/franquicia y desarrollador usan pesos máximos 0,20 y 0,15, y actúan como
+bonus positivos solo cuando coinciden con valores presentes en el perfil
+ponderado del usuario. El bonus opcional máximo es 0,35; tener una saga o
+desarrollador cualquiera no aporta puntos y una faceta ausente no se imputa ni
 penaliza.
 
 PopScore usa `igdb-engagement-weighted-v2`: visitas 0,40; jugando 0,25;

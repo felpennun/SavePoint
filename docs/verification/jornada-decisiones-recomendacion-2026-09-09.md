@@ -171,3 +171,15 @@ Fuentes canónicas: [`protocol.json`](../methodology/protocol.json),
 [`evaluation-protocol.md`](../methodology/evaluation-protocol.md),
 [`recommendation-architecture-2026-09-09.md`](recommendation-architecture-2026-09-09.md)
 y [`feature-vector-cache-fs-v7-2026.09.2.json`](../../apps/api/feature-vector-cache-fs-v7-2026.09.2.json).
+
+## 8. Reevaluacion fs-v8
+
+La configuracion vigente posterior a la jornada usa `fs-v8` y
+`facet-similarity-v4`. Saga/franquicia tiene un bonus maximo de `0,20` y
+desarrollador de `0,15`, aplicados solo mediante coincidencia y afinidad.
+
+El nucleo genero/plataforma conserva los pesos `0,50` y `0,25`, pero su
+afinidad usa F0,5: la precision del candidato pesa mas que la cobertura del
+perfil. Esto reduce la ventaja de obras que enumeran muchos generos o
+plataformas. El cambio se aplica al vector versionado, al ranker compartido,
+los workers y el runner offline.

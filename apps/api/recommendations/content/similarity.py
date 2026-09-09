@@ -14,7 +14,12 @@ from recommendations.content.features import FACET_WEIGHTS
 
 FeatureVector = dict[str, float]
 
-SIMILARITY_RULE_VERSION = "facet-similarity-v3"
+SIMILARITY_RULE_VERSION = "facet-similarity-v4"
+
+# Values below one give candidate precision more influence than profile
+# coverage. This limits the advantage of broad works that list many genres or
+# platforms while retaining a reward for covering the user's weighted taste.
+CORE_PRECISION_BETA = 0.5
 
 _CORE_FACETS = ("genre", "platform")
 _OPTIONAL_FACETS = ("franchise", "developer")
@@ -52,15 +57,16 @@ def _facet_affinity(
         # retained when multiple optional values overlap.
         return min(1.0, math.fsum(overlap.values()) / max(profile_values.values())), overlap
 
-    # Core facets balance profile coverage with candidate precision. This
-    # prevents broad multi-genre or multi-platform works from winning merely
-    # by listing more metadata values.
+    # Core facets balance profile coverage with candidate precision. F0.5 gives
+    # precision more influence than coverage, preventing broad multi-genre or
+    # multi-platform works from winning merely by listing more metadata values.
     candidate_precision = len(overlap) / len(candidate_values)
     if profile_coverage <= 0 or candidate_precision <= 0:
         return 0.0, overlap
+    beta_squared = CORE_PRECISION_BETA**2
     return (
-        2.0 * profile_coverage * candidate_precision
-        / (profile_coverage + candidate_precision),
+        (1.0 + beta_squared) * profile_coverage * candidate_precision
+        / (beta_squared * candidate_precision + profile_coverage),
         overlap,
     )
 
@@ -68,12 +74,12 @@ def _facet_affinity(
 def facet_similarity(profile: FeatureVector, candidate: FeatureVector) -> dict:
     """Compare a candidate using fixed core weights and gated optional bonuses.
 
-    Genre and platform form the candidate's core similarity. Their F1-style
-    affinity balances weighted profile coverage with candidate precision, so
-    broad metadata lists do not win by default. Saga and developer cannot score
-    merely because a candidate has those fields: they contribute only when
-    their values overlap with the user's weighted profile. Missing optional
-    metadata is neutral and never redistributes a bonus to the work.
+    Genre and platform form the candidate's core similarity. Their F0.5-style
+    affinity gives candidate precision more influence than weighted profile
+    coverage, so broad metadata lists do not win by default. Saga and developer
+    cannot score merely because a candidate has those fields: they contribute
+    only when their values overlap with the user's weighted profile. Missing
+    optional metadata is neutral and never redistributes a bonus to the work.
     """
 
     facet_scores: dict[str, float] = {}
@@ -102,7 +108,7 @@ def facet_similarity(profile: FeatureVector, candidate: FeatureVector) -> dict:
         # compared with the strongest value in that family, so four unrelated
         # seed studios cannot dilute a genuine match into an invisible bonus.
         # Relative profile weight still matters when several optional values
-        # overlap, while the configured 0.18/0.12 weights remain the maximum.
+        # overlap, while the configured 0.20/0.15 weights remain the maximum.
         affinity, overlap = _facet_affinity(
             profile, candidate, facet, exact_match_scale=True
         )
@@ -115,7 +121,7 @@ def facet_similarity(profile: FeatureVector, candidate: FeatureVector) -> dict:
                 matched_parts[key] = FACET_WEIGHTS[facet] * value / profile_total
 
     # Optional facets are positive confirmation only. Their combined maximum
-    # is 0.30, enough to be visible without becoming a standalone recommender.
+    # is 0.35, enough to be visible without becoming a standalone recommender.
     score = min(1.0, core + optional_numerator)
     return {
         "score": score,

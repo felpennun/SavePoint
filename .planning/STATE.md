@@ -312,3 +312,13 @@ con bonus opcional máximo `0,30`. La señal de rating observado es
 fs-v7 contiene 190.479 vectores y los diez workers de `felipe` publicaron la
 revisión 14. Ver `docs/verification/jornada-decisiones-recomendacion-2026-09-09.md`
 y `docs/verification/recommendation-fs-v7-felipe-2026-09-09.md`.
+## Tarea rapida completada — 2026-09-09
+
+Se publico `fs-v8` / `facet-similarity-v4`: saga/franquicia tiene bonus maximo
+`0,20`, desarrollador `0,15`, y el nucleo genero/plataforma usa F0,5 para dar
+mas peso a la precision del candidato frente a listas amplias de metadatos.
+La cache contiene 190.479 vectores y los diez workers de `felipe` publicaron la
+revision 14. Backend: 194 pruebas; TypeScript correcto. Se archivo la
+comparacion fs-v8 entre Silksong y Terraria; no se ejecuto la evaluacion de los
+400 usuarios. Ver `.planning/quick/260909-rnf-raise-saga-and-developer-optional-bonuse/`
+y `docs/verification/recommendation-fs-v8-comparison-felipe-2026-09-09.md`.

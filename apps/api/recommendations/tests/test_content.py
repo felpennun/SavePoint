@@ -303,7 +303,7 @@ def test_versioned_dto_and_item_evidence(user_a, genres) -> None:  # noqa: ANN00
         "limitation",
         "results",
     }
-    assert result["feature_set_version"] == "fs-v7"
+    assert result["feature_set_version"] == "fs-v8"
     assert result["corpus_version"] == _CORPUS
     assert len(result["snapshot_sha256"]) == 64
     assert len(result["input_snapshot_sha256"]) == 64
