@@ -32,21 +32,26 @@ presenta como variante de la comparación de contenido.
 
 ## Señales y pesos congelados en esta configuración
 
-La señal de candidato `rating_confidence` es compartida por el producto y la
-evaluación offline. Primero transforma el rating de usuario IGDB con potencia
-2 (`rating_quality = (rating / 100)^2`) y después lo ajusta con el volumen
+La señal de candidato `rating_confidence` v3 es compartida por el producto y la
+evaluación offline. Para una obra con rating IGDB observado, usa directamente
+ese rating con potencia 2 (`rating_quality = (rating / 100)^2`) y después lo ajusta con el volumen
 normalizado logarítmicamente de `total_rating_count`: `rating_quality * (0,80 +
 0,20 * rating_volume)`. Así las notas altas se separan más y una nota alta con
 muchas valoraciones conserva ventaja, sin permitir que el volumen sustituya a
 la calidad. `display_rating` y las valoraciones SavePoint no entran en este
-cálculo.
+cálculo. El perfil de rating por género solo se usa como fallback cuando la obra
+no tiene rating IGDB observado, y queda marcado en `rating_term_is_fallback`.
 
-La similitud de contenido usa `fs-v6`. Género y plataforma forman el núcleo con
-pesos 0,50 y 0,25, normalizados solo entre las facetas disponibles. Saga/
-franquicia y desarrollador conservan pesos relativos 0,15 y 0,10, pero actúan
-como bonus acotados únicamente cuando coinciden con valores presentes en el
-perfil ponderado del usuario. Tener una saga o desarrollador cualquiera no
-aporta puntos; una faceta ausente no se imputa ni penaliza.
+La similitud de contenido usa `fs-v7`. Género y plataforma forman el núcleo con
+pesos 0,50 y 0,25, y su afinidad combina cobertura ponderada del perfil con
+precisión de la obra mediante una media armónica; así una lista muy amplia de
+géneros o plataformas no obtiene ventaja por enumerar más valores. Saga/
+franquicia y desarrollador usan pesos 0,18 y 0,12, y actúan como bonus positivos
+solo cuando coinciden con valores presentes en el perfil ponderado del usuario.
+El bonus opcional máximo es 0,30, por lo que una coincidencia real puede ser
+significativa sin convertirse en un recomendador independiente. Tener una saga
+o desarrollador cualquiera no aporta puntos; una faceta ausente no se imputa ni
+penaliza.
 
 PopScore usa `igdb-engagement-weighted-v2`: visitas 0,40; jugando 0,25;
 jugado 0,25; quiere jugar 0,10. Solo existe si están disponibles las cuatro
@@ -97,7 +102,8 @@ activa un único `RecommendationSnapshot`. Si cambia la colección o la huella
 de configuración durante el cálculo, el resultado se marca obsoleto y no
 puede sustituir al snapshot anterior.
 
-La huella de configuración incluye versión de features, pesos de faceta,
+La huella de configuración incluye versión de features, versión de regla de
+similitud, pesos de faceta,
 fórmula y pesos de PopScore, y los parámetros de cada variante. Por tanto, un
 cambio de arquitectura o pesos no puede reutilizar silenciosamente una
 recomendación calculada con la configuración anterior.
@@ -140,7 +146,7 @@ revisión de colección y la publicación atómica del snapshot.
 
 ## Verificación
 
-- `pytest /workspace/apps/api/recommendations/tests /workspace/apps/api/evaluation/tests -q`: 181 passed.
+- `pytest /workspace/apps/api/recommendations/tests /workspace/apps/api/evaluation/tests -q`: 192 passed.
 - `docker compose -f infra/compose.yaml run --rm web pnpm --dir apps/web exec vitest run tests/recommendations.test.ts`: 9 passed.
 - `docker compose -f infra/compose.yaml run --rm web pnpm --dir apps/web exec tsc --noEmit`: correcto.
 - `python manage.py makemigrations --check --dry-run`: sin cambios pendientes.

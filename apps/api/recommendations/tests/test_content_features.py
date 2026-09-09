@@ -204,8 +204,8 @@ def test_platform_weight_is_lower_than_genre_and_higher_than_optional_facets(gen
     assert FACET_WEIGHTS == {
         "genre": 0.50,
         "platform": 0.25,
-        "franchise": 0.15,
-        "developer": 0.10,
+        "franchise": 0.18,
+        "developer": 0.12,
     }
 
 
@@ -252,8 +252,8 @@ def test_profile_uses_positive_rated_completed_and_playing_entries(user_a, genre
     profile = build_profile(user_a, _CORPUS)
 
     assert profile["genre:role-playing-rpg"] > profile["genre:shooter"]
-    assert profile["genre:role-playing-rpg"] == pytest.approx(4.0 / 6.8)
-    assert profile["genre:shooter"] == pytest.approx(2.8 / 6.8)
+    assert profile["genre:role-playing-rpg"] == pytest.approx(4.0 / 6.64)
+    assert profile["genre:shooter"] == pytest.approx(2.64 / 6.64)
 
 
 @pytest.mark.django_db

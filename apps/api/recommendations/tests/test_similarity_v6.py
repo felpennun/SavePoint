@@ -56,6 +56,27 @@ def test_matching_saga_and_developer_add_only_a_personalised_bonus() -> None:
     assert result["facet_scores"]["developer"] == 1.0
 
 
+def test_optional_match_is_not_diluted_by_unrelated_profile_values() -> None:
+    profile = {
+        "genre:rpg": 1.0,
+        "platform:pc": 1.0,
+        "developer:team-cherry": 0.2,
+        "developer:supergiant-games": 0.2,
+        "developer:concernedape": 0.2,
+        "developer:fromsoftware": 0.2,
+    }
+    candidate = {
+        "genre:rpg": 0.5,
+        "platform:console": 0.25,
+        "developer:team-cherry": 0.1,
+    }
+
+    result = facet_similarity(profile, candidate)
+
+    assert result["facet_scores"]["developer"] == pytest.approx(1.0)
+    assert result["optional_bonus"] == pytest.approx(0.12)
+
+
 def test_core_genre_similarity_survives_missing_optional_facets() -> None:
     profile = {"genre:rpg": 1.0, "platform:pc": 1.0}
     candidate = {"genre:rpg": 0.5, "platform:console": 0.25}
@@ -66,4 +87,3 @@ def test_core_genre_similarity_survives_missing_optional_facets() -> None:
     assert result["score"] == pytest.approx(result["core_score"])
     assert result["facet_scores"]["franchise"] == 0.0
     assert result["facet_scores"]["developer"] == 0.0
-

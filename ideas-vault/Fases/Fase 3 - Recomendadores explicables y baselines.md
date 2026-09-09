@@ -149,6 +149,29 @@ visitas/jugando/jugado/quiere jugar como 0,40/0,25/0,25/0,10.
 
 Fuente canónica: [[../../docs/verification/recommendation-architecture-2026-09-09|contrato compartido de algoritmos]].
 
+## Ajuste fs-v7 y revisión de Felipe — 2026-09-09
+
+La revisión manual de Felipe mostró que el bonus de desarrollador era difícil
+de percibir y que las obras con muchos géneros podían ganar por enumerar más
+coincidencias. Se decidió versionar la similitud como `fs-v7` y la regla como
+`facet-similarity-v3`.
+
+El núcleo género/plataforma usa ahora una media armónica entre cobertura
+ponderada del perfil y precisión de la obra. El perfil conserva la frecuencia y
+la intensidad de las valoraciones de las semillas, mientras que la precisión
+evita premiar la amplitud de metadatos por sí misma. Saga/franquicia pasa a
+`0,18` y desarrollador a `0,12`, siempre por debajo de género `0,50` y
+plataforma `0,25`. El bonus opcional se suma con un máximo combinado de `0,30`;
+una coincidencia de desarrollador aporta hasta `0,12` y una de saga hasta
+`0,18`, sin sustituir al núcleo.
+
+El rating IGDB observado usa directamente `(rating / 100)^2` y el refuerzo de
+volumen `0,80 + 0,20 * rating_volume`; el perfil medio por género queda solo
+como fallback cuando falta el rating de la obra. El rating visible de
+SavePoint (`display_rating`) continúa fuera del cálculo.
+
+Fuente canónica: [[../../docs/verification/recommendation-architecture-2026-09-09|contrato compartido de algoritmos]] y [[../../docs/methodology/evaluation-protocol|protocolo de evaluación]].
+
 ## Variantes PopScore con imputación mínima — 2026-09-09
 
 Se añaden cuatro variantes publicables, manteniendo intactos los baselines

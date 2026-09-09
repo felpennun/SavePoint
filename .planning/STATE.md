@@ -301,3 +301,14 @@ vectores, se reiniciaron los workers para cargar la nueva versión y los diez
 jobs de `felipe` publicaron correctamente el snapshot `fs-v6`. 191 pruebas y
 TypeScript pasan; no se ejecutó la evaluación de los 400 usuarios. Ver
 `.planning/quick/260909-ptx-implement-fs-v6-facet-aware-content-simi/`.
+
+## Tarea rápida completada — 2026-09-09
+
+Se documentaron las decisiones de la jornada y se aplicó `fs-v7`: la similitud
+de género/plataforma usa media armónica entre cobertura del perfil y precisión
+del candidato; saga/franquicia y desarrollador pasan a pesos `0,18` y `0,12`,
+con bonus opcional máximo `0,30`. La señal de rating observado es
+`rating-confidence-v3`, sin dilución por el perfil medio del género. La caché
+fs-v7 contiene 190.479 vectores y los diez workers de `felipe` publicaron la
+revisión 14. Ver `docs/verification/jornada-decisiones-recomendacion-2026-09-09.md`
+y `docs/verification/recommendation-fs-v7-felipe-2026-09-09.md`.

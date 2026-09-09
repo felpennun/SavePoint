@@ -113,7 +113,7 @@ def test_recency_variant_adds_recency_to_the_other_candidate_signals() -> None:
 
 
 @pytest.mark.django_db
-def test_rating_term_uses_corpus_snapshot_and_confidence_blend(genres) -> None:  # noqa: ANN001
+def test_rating_term_uses_observed_corpus_snapshot_without_genre_dilution(genres) -> None:  # noqa: ANN001
     work = _work("snapshot-rated-rpg", genres["rpg"])
     work.total_rating = 1.0
     work.save(update_fields=["total_rating"])
@@ -123,14 +123,14 @@ def test_rating_term_uses_corpus_snapshot_and_confidence_blend(genres) -> None: 
         work, _CORPUS, {"role-playing-rpg": 60.0}
     )
 
-    assert term == pytest.approx(0.405)
+    assert term == pytest.approx(0.81)
     assert is_fallback is False
 
     # The mutable product field must not influence a frozen recommendation.
     work.total_rating = 100.0
     work.save(update_fields=["total_rating"])
     assert rating_term(work, _CORPUS, {"role-playing-rpg": 60.0}) == (
-        pytest.approx(0.405),
+        pytest.approx(0.81),
         False,
     )
 
@@ -303,7 +303,7 @@ def test_versioned_dto_and_item_evidence(user_a, genres) -> None:  # noqa: ANN00
         "limitation",
         "results",
     }
-    assert result["feature_set_version"] == "fs-v6"
+    assert result["feature_set_version"] == "fs-v7"
     assert result["corpus_version"] == _CORPUS
     assert len(result["snapshot_sha256"]) == 64
     assert len(result["input_snapshot_sha256"]) == 64

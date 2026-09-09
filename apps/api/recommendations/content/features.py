@@ -5,8 +5,8 @@ A feature vector is a sparse ``{feature_key: weight}`` dict over a governed
 
 * ``genre:<slug>``  -- weight 0.50; guaranteed for every governed work.
 * ``platform:<slug>`` -- weight 0.25; allowlist platforms only.
-* ``franchise:<slug>`` -- weight 0.15; IGDB saga signal when present.
-* ``developer:<slug>`` -- weight 0.10; emitted when the governed
+* ``franchise:<slug>`` -- weight 0.18; IGDB saga signal when present.
+* ``developer:<slug>`` -- weight 0.12; emitted when the governed
   view contains the facet. Franchise is the IGDB saga signal and has no
   minimum coverage gate: missing saga data is omitted per work. Developer
   coverage retains its 50 % gate (D-11).
@@ -33,28 +33,28 @@ from catalogue.models import CorpusPopularitySnapshot, CorpusRatingSnapshot, Gam
 from catalogue.popularity import IGDB_ENGAGEMENT_TYPES
 
 # Bump when the vector-building or similarity rules change (part of the DTO,
-# REC-09). fs-v6 keeps the weighted sparse features but the ranker now compares
-# user-facing facet affinity instead of applying cosine directly to the raw
-# vector. Cached rows from earlier contracts must not be reused.
-FEATURE_SET_VERSION = "fs-v6"
+# REC-09). fs-v7 adds candidate-breadth-aware core affinity and recalibrates
+# optional confirmation weights. Cached rows from earlier contracts must not be
+# reused.
+FEATURE_SET_VERSION = "fs-v7"
 
 # Shared scalar-signal contract. The product workers and offline runner both
 # call the same ranker, so this version is included in the published
 # configuration fingerprint whenever the transformation changes.
-RATING_SIGNAL_VERSION = "rating-confidence-v2"
+RATING_SIGNAL_VERSION = "rating-confidence-v3"
 RATING_QUALITY_POWER = 2.0
 RATING_VOLUME_BOOST = 0.20
 RATING_VOLUME_FLOOR = 1.0 - RATING_VOLUME_BOOST
 
-# These weights express the semantic hierarchy of the content signal. fs-v6
+# These weights express the semantic hierarchy of the content signal. fs-v7
 # uses genre/platform as the core and saga/developer as bounded confirmation
 # bonuses. They remain part of the versioned contract, not request-time tuning
 # parameters.
 FACET_WEIGHTS: dict[str, float] = {
     "genre": 0.50,
     "platform": 0.25,
-    "franchise": 0.15,
-    "developer": 0.10,
+    "franchise": 0.18,
+    "developer": 0.12,
 }
 
 # Saga/franchise is semantically meaningful even when sparse; absent facets are
@@ -234,7 +234,7 @@ def coverage_report(corpus_version: str | None = None) -> dict:
         "popscore_available": popscore_present > 0,
         "null_handling": {
             "categorical_features": "missing facet omitted from sparse vector",
-            "external_user_rating_snapshot": "genre-median fallback when absent",
+            "external_user_rating_snapshot": "genre-median fallback only when candidate rating is absent",
             "rating_volume_snapshot": "missing signal excluded and active weights renormalized",
             "release_recency": "missing, future, or unrated release returns null",
             "popscore_complete": "missing primitive excludes composed PopScore",

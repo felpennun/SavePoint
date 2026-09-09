@@ -9,7 +9,7 @@
     "rating_half_steps_gte": 7
   },
   "rating_signal": {
-    "version": "rating-confidence-v2",
+    "version": "rating-confidence-v3",
     "quality_power": 2.0,
     "volume_source": "total_rating_count",
     "volume_normalisation": "log1p_over_frozen_view_max",
@@ -18,17 +18,19 @@
     "composition": "rating_quality * (volume_floor + volume_boost * rating_volume)"
   },
   "content_similarity": {
-    "feature_set_version": "fs-v6",
+    "feature_set_version": "fs-v7",
     "core_facets": {
       "genre": 0.5,
       "platform": 0.25
     },
     "optional_confirmation_facets": {
-      "franchise": 0.15,
-      "developer": 0.1
+      "franchise": 0.18,
+      "developer": 0.12
     },
     "missing_metadata": "neutral",
-    "optional_match_rule": "positive_only_when_value_overlaps_weighted_user_profile"
+    "optional_match_rule": "positive_only_when_value_overlaps_weighted_user_profile",
+    "optional_match_calibration": "overlap is scaled against the strongest profile value in each optional facet",
+    "similarity_rule_version": "facet-similarity-v3"
   },
   "k_values": [5, 10, 20],
   "headline": "ndcg@10",

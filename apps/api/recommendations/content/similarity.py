@@ -14,6 +14,8 @@ from recommendations.content.features import FACET_WEIGHTS
 
 FeatureVector = dict[str, float]
 
+SIMILARITY_RULE_VERSION = "facet-similarity-v3"
+
 _CORE_FACETS = ("genre", "platform")
 _OPTIONAL_FACETS = ("franchise", "developer")
 
@@ -24,7 +26,11 @@ def _facet_values(vector: FeatureVector, facet: str) -> dict[str, float]:
 
 
 def _facet_affinity(
-    profile: FeatureVector, candidate: FeatureVector, facet: str
+    profile: FeatureVector,
+    candidate: FeatureVector,
+    facet: str,
+    *,
+    exact_match_scale: bool = False,
 ) -> tuple[float, dict[str, float]]:
     """Return the user's weighted affinity for candidate values in one facet."""
 
@@ -39,16 +45,35 @@ def _facet_affinity(
         key: profile_values[key]
         for key in profile_values.keys() & candidate_values.keys()
     }
-    return min(1.0, math.fsum(overlap.values()) / profile_total), overlap
+    profile_coverage = min(1.0, math.fsum(overlap.values()) / profile_total)
+    if exact_match_scale:
+        # A genuine optional match must not disappear because the user has
+        # several unrelated seed studios or sagas. Relative profile weight is
+        # retained when multiple optional values overlap.
+        return min(1.0, math.fsum(overlap.values()) / max(profile_values.values())), overlap
+
+    # Core facets balance profile coverage with candidate precision. This
+    # prevents broad multi-genre or multi-platform works from winning merely
+    # by listing more metadata values.
+    candidate_precision = len(overlap) / len(candidate_values)
+    if profile_coverage <= 0 or candidate_precision <= 0:
+        return 0.0, overlap
+    return (
+        2.0 * profile_coverage * candidate_precision
+        / (profile_coverage + candidate_precision),
+        overlap,
+    )
 
 
 def facet_similarity(profile: FeatureVector, candidate: FeatureVector) -> dict:
     """Compare a candidate using fixed core weights and gated optional bonuses.
 
-    Genre and platform form the candidate's core similarity. Saga and developer
-    cannot score merely because a candidate has those fields: they contribute
-    only when their values overlap with the user's weighted profile. Missing
-    optional metadata is neutral and never redistributes a bonus to the work.
+    Genre and platform form the candidate's core similarity. Their F1-style
+    affinity balances weighted profile coverage with candidate precision, so
+    broad metadata lists do not win by default. Saga and developer cannot score
+    merely because a candidate has those fields: they contribute only when
+    their values overlap with the user's weighted profile. Missing optional
+    metadata is neutral and never redistributes a bonus to the work.
     """
 
     facet_scores: dict[str, float] = {}
@@ -73,7 +98,14 @@ def facet_similarity(profile: FeatureVector, candidate: FeatureVector) -> dict:
 
     optional_numerator = 0.0
     for facet in _OPTIONAL_FACETS:
-        affinity, overlap = _facet_affinity(profile, candidate, facet)
+        # Optional facets are confirmation signals. A matching saga/studio is
+        # compared with the strongest value in that family, so four unrelated
+        # seed studios cannot dilute a genuine match into an invisible bonus.
+        # Relative profile weight still matters when several optional values
+        # overlap, while the configured 0.18/0.12 weights remain the maximum.
+        affinity, overlap = _facet_affinity(
+            profile, candidate, facet, exact_match_scale=True
+        )
         facet_scores[facet] = affinity
         optional_numerator += FACET_WEIGHTS[facet] * affinity
         profile_values = _facet_values(profile, facet)
@@ -82,10 +114,9 @@ def facet_similarity(profile: FeatureVector, candidate: FeatureVector) -> dict:
             for key, value in overlap.items():
                 matched_parts[key] = FACET_WEIGHTS[facet] * value / profile_total
 
-    # Optional facets are positive confirmation only. The headroom multiplier
-    # keeps them bounded and prevents a sparse saga/developer field from
-    # overturning the genre/platform signal.
-    score = min(1.0, core + ((1.0 - core) * optional_numerator))
+    # Optional facets are positive confirmation only. Their combined maximum
+    # is 0.30, enough to be visible without becoming a standalone recommender.
+    score = min(1.0, core + optional_numerator)
     return {
         "score": score,
         "core_score": core,

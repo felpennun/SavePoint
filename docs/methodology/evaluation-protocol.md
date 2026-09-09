@@ -32,8 +32,11 @@ de simulación, no evidencia sobre usuarios reales de SavePoint (EVAL-10). Por e
 
 ## Señal compuesta de calidad y confianza
 
-El protocolo v6 y la web comparten la señal `rating_confidence`. El rating de usuario IGDB se
-normaliza con potencia 2 para separar mejor las notas altas. El volumen se calcula con
+El protocolo v6 y la web comparten la señal `rating_confidence` v3. Cuando una obra candidata
+tiene rating IGDB observado, se usa directamente su calidad transformada; el perfil medio por
+género ya no reduce esa nota. El perfil por género queda reservado como fallback auditable para
+obras sin rating observado. La calidad del rating IGDB se normaliza con potencia 2 para separar
+mejor las notas altas. El volumen se calcula con
 `log1p(total_rating_count)` respecto al máximo de la vista congelada y actúa como refuerzo
 acotado:
 
@@ -46,8 +49,9 @@ de IGDB; no es una alternativa `OR`.
 
 El volumen no se suma como término independiente en `recency-v1`, evitando doble conteo.
 `display_rating` y las valoraciones SavePoint son datos de presentación y quedan fuera de la
-puntuación algorítmica. El cambio de fórmula incrementa la versión del protocolo y, por tanto,
-invalida cualquier artefacto calculado bajo la configuración anterior.
+puntuación algorítmica. La versión `rating-confidence-v3` invalida los resultados publicados con
+la mezcla anterior; el protocolo mantiene v6 porque no cambia el split, K, las métricas ni el
+conjunto de candidatos.
 
 La valoración personal de cada juego semilla sí forma parte del perfil de preferencias. Su
 intensidad se calcula como `(rating_half_steps / 10)^2`, sumada al peso de actividad del estado:

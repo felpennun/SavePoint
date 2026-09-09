@@ -6,16 +6,8 @@ import math
 from statistics import median
 
 from catalogue.models import CorpusRatingSnapshot, GameWork
-from recommendations.content.features import genre_rating_profile
+from recommendations.content.features import genre_rating_profile, rating_quality_signal, compose_rating_confidence
 from recommendations.content.variants import VariantSpec
-
-
-_RATING_SCALE = 100.0
-_CONFIDENCE_PRIOR = 1000.0
-
-
-def _normalise_rating(value: float) -> float:
-    return max(0.0, min(1.0, value / _RATING_SCALE))
 
 
 def _candidate_snapshot_rating(
@@ -48,31 +40,24 @@ def rating_term(
 ) -> tuple[float, bool]:
     """Return a bounded external-rating signal and whether it is imputed.
 
-    A candidate snapshot rating is blended with the mean rating of its genres.
-    Confidence is deliberately explicit and reproducible: 1,000 ratings is the
-    full-confidence prior. If the candidate has no snapshot rating, its genre
-    median is used and the result is flagged as a fallback.
+    An observed candidate snapshot rating is used directly after the shared
+    quality transformation. The corpus genre profile is only a fallback for a
+    candidate without an observed rating, and that result is flagged.
     """
 
     profile = genre_profile if genre_profile is not None else genre_rating_profile(corpus_version)
     genre_values = [profile[genre.slug] for genre in work.genres.all() if genre.slug in profile]
     if snapshot_stats is None:
-        own_rating, rating_count, _total_rating_count = _candidate_snapshot_rating(work, corpus_version)
+        own_rating, _rating_count, _total_rating_count = _candidate_snapshot_rating(work, corpus_version)
     else:
-        own_rating, rating_count, _total_rating_count = snapshot_stats.get(work.id, (None, 0, None))
+        own_rating, _rating_count, _total_rating_count = snapshot_stats.get(work.id, (None, 0, None))
 
     if own_rating is None:
         if not genre_values:
             return 0.0, True
-        return _normalise_rating(float(median(genre_values))), True
+        return rating_quality_signal(float(median(genre_values))) or 0.0, True
 
-    own_term = _normalise_rating(own_rating)
-    if not genre_values:
-        return own_term, False
-
-    genre_term = _normalise_rating(math.fsum(genre_values) / len(genre_values))
-    confidence = min(1.0, rating_count / _CONFIDENCE_PRIOR)
-    return (own_term * confidence) + (genre_term * (1.0 - confidence)), False
+    return rating_quality_signal(own_rating) or 0.0, False
 
 
 def combine(
@@ -100,15 +85,19 @@ def combine(
     bounded_popscore = (
         None if popscore is None else max(0.0, min(1.0, popscore))
     )
+    missing_popscore_floor = spec.params.get("popscore_missing_floor")
+    effective_popscore = bounded_popscore
+    if effective_popscore is None and missing_popscore_floor is not None:
+        effective_popscore = max(0.0, min(1.0, float(missing_popscore_floor)))
+    rating_confidence = compose_rating_confidence(candidate_rating_term, bounded_volume) or 0.0
 
     if spec.combine_mode == "weighted_sum":
         # ``w1``/``w2``/``w3`` remain accepted for v1 compatibility. New
         # protocol grids use names that identify the signal being weighted.
         weights = [
             (float(spec.params.get("w_content", spec.params.get("w1", 0.0))), cosine_similarity),
-            (float(spec.params.get("w_rating", spec.params.get("w2", 0.0))), candidate_rating_term),
-            (float(spec.params.get("w_volume", 0.0)), bounded_volume),
-            (float(spec.params.get("w_popscore", 0.0)), bounded_popscore),
+            (float(spec.params.get("w_rating", spec.params.get("w2", 0.0))), rating_confidence),
+            (float(spec.params.get("w_popscore", 0.0)), effective_popscore),
             (float(spec.params.get("w_recency", 0.0)), bounded_recency),
             (float(spec.params.get("w3", 0.0)), None if own_rating is None else max(0.0, min(1.0, own_rating))),
         ]
@@ -116,16 +105,40 @@ def combine(
         total_weight = math.fsum(weight for weight, _value in active)
         return math.fsum(weight * value for weight, value in active) / total_weight if total_weight else 0.0
     if spec.combine_mode == "multiplicative":
-        return cosine_similarity * candidate_rating_term
+        return cosine_similarity * rating_confidence
+    if spec.combine_mode == "multiplicative_popscore":
+        swing = max(0.0, min(1.0, float(spec.params.get("popscore_swing", 0.15))))
+        popscore_factor = 1.0 - swing + (2.0 * swing * (effective_popscore or 0.0))
+        return cosine_similarity * rating_confidence * popscore_factor
     if spec.combine_mode == "two_stage":
         bands = max(1, int(spec.params.get("bands", 5)))
         band = min(bands - 1, int(cosine_similarity * bands))
         # The integer band dominates; rating only orders candidates inside it.
-        return band + (candidate_rating_term / (bands + 1))
+        return band + (rating_confidence / (bands + 1))
+    if spec.combine_mode == "two_stage_popscore":
+        bands = max(1, int(spec.params.get("bands", 5)))
+        band = min(bands - 1, int(cosine_similarity * bands))
+        w_rating = max(0.0, float(spec.params.get("w_rating", 0.85)))
+        w_popscore = max(0.0, float(spec.params.get("w_popscore", 0.15)))
+        total = w_rating + w_popscore
+        tie_break = (
+            (w_rating * rating_confidence + w_popscore * (effective_popscore or 0.0)) / total
+            if total
+            else 0.0
+        )
+        return band + (tie_break / (bands + 1))
     if spec.combine_mode == "negative_weighted_sum":
         positive = (
             float(spec.params.get("w1", 0.0)) * cosine_similarity
-            + float(spec.params.get("w2", 0.0)) * candidate_rating_term
+            + float(spec.params.get("w2", 0.0)) * rating_confidence
+        )
+        penalty = float(spec.params.get("negative_penalty", 0.0)) * negative_similarity
+        return max(0.0, positive - penalty)
+    if spec.combine_mode == "negative_weighted_sum_popscore":
+        positive = (
+            float(spec.params.get("w_content", 0.60)) * cosine_similarity
+            + float(spec.params.get("w_rating", 0.25)) * rating_confidence
+            + float(spec.params.get("w_popscore", 0.15)) * (effective_popscore or 0.0)
         )
         penalty = float(spec.params.get("negative_penalty", 0.0)) * negative_similarity
         return max(0.0, positive - penalty)
