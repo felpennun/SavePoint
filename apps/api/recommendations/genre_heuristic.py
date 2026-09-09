@@ -33,6 +33,7 @@ from datetime import datetime, timezone
 from django.contrib.auth.models import AbstractBaseUser
 from django.db.models import Case, F, FloatField, Sum, Value, When
 
+from catalogue.corpus import evaluation_candidate_works
 from catalogue.models import GameWork
 from catalogue.serializers import _cover, _platform_summary, _release_year
 from library.models import LibraryEntry
@@ -172,9 +173,10 @@ def rank_genre_taste_v1(
     if not taste_weights or sum(taste_weights.values()) <= 0:
         return _insufficient_history(generated_at, taste_weights)
 
-    # 3. Rank unseen non-DLC works whose genres overlap the taste vector and
-    # have a sufficiently reliable catalogue rating sample. Null counts are
-    # excluded as they cannot demonstrate the 1,000-rating minimum.
+    # 3. Rank unseen governed candidates whose genres overlap the taste vector
+    # and have a sufficiently reliable catalogue rating sample. This heuristic
+    # shares the product candidate boundary: no future, DLC, ungoverned, or
+    # rating-ineligible work may bypass the content recommendation corpus.
     #    The through table is the driving relation: filtered by ``genre_id``
     #    (indexed) and grouped by work, so Postgres never scans the full
     #    catalogue -- and the bounded candidate slice caps the working set
@@ -194,9 +196,12 @@ def rank_genre_taste_v1(
         default=Value(0.0),
         output_field=FloatField(),
     )
+    governed_candidates = evaluation_candidate_works(
+        eligibility_cutoff_date=generated_at.date()
+    )
     ranked_rows = (
         through.objects.filter(genre_id__in=list(taste_weights))
-        .filter(gamework__is_dlc=False)
+        .filter(gamework_id__in=governed_candidates.values("id"))
         .filter(gamework__total_rating_count__gte=_MIN_CATALOGUE_RATING_COUNT)
         .exclude(gamework_id__in=list(seen_ids))
         .values("gamework_id")
@@ -210,7 +215,7 @@ def rank_genre_taste_v1(
     ordered_work_ids = [row["gamework_id"] for row in ranked_rows]
 
     works = (
-        GameWork.objects.filter(id__in=ordered_work_ids)
+        governed_candidates.filter(id__in=ordered_work_ids)
         .prefetch_related("genres", "assets", "releases__platform")
         .in_bulk()
     )

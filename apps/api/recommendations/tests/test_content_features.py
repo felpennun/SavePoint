@@ -30,6 +30,7 @@ from catalogue.models import (
 )
 from library.models import LibraryEntry
 from recommendations.content.features import (
+    FACET_WEIGHTS,
     FEATURE_SET_VERSION,
     coverage_report,
     feature_vector,
@@ -104,12 +105,12 @@ def test_feature_vector_is_a_sparse_dict_with_no_rating_dimension(user_a, genres
 
 
 @pytest.mark.django_db
-def test_genre_weights_are_one_over_sqrt_k(user_a, genres) -> None:  # noqa: ANN001
+def test_genre_weights_use_the_family_weight_over_sqrt_k(user_a, genres) -> None:  # noqa: ANN001
     work = _work("three-genre-rpg", genres["rpg"], genres["shooter"], genres["puzzle"])
 
     vector = feature_vector(work)
 
-    expected = 1 / math.sqrt(3)
+    expected = FACET_WEIGHTS["genre"] / math.sqrt(3)
     assert all(value == pytest.approx(expected) for value in vector.values())
 
 
@@ -166,7 +167,9 @@ def test_sparse_franchise_coverage_still_activates_the_saga_signal(genres) -> No
 
     assert report["franchise_coverage"] == pytest.approx(0.5)
     assert report["include_franchise"] is True
-    assert feature_vector(work, include_franchise=True)["franchise:sparse-saga"] == pytest.approx(1.0)
+    assert feature_vector(work, include_franchise=True)["franchise:sparse-saga"] == pytest.approx(
+        FACET_WEIGHTS["franchise"]
+    )
 
 
 @pytest.mark.django_db
@@ -183,8 +186,27 @@ def test_franchise_and_developer_features_activate_only_above_measured_coverage(
     assert report["include_developer"] is True
 
     vector = feature_vector(works[0], include_franchise=True, include_developer=True)
-    assert vector["franchise:quest-saga"] == pytest.approx(1.0)
-    assert vector["developer:quest-studio"] == pytest.approx(1.0)
+    assert vector["genre:role-playing-rpg"] == pytest.approx(FACET_WEIGHTS["genre"])
+    assert vector["franchise:quest-saga"] == pytest.approx(FACET_WEIGHTS["franchise"])
+    assert vector["developer:quest-studio"] == pytest.approx(FACET_WEIGHTS["developer"])
+
+
+@pytest.mark.django_db
+def test_platform_weight_is_lower_than_genre_and_higher_than_optional_facets(genres) -> None:  # noqa: ANN001
+    platform = Platform.objects.create(name="Windows", slug="pc-microsoft-windows")
+    work = _work("weighted-platform", genres["rpg"])
+    _release_on(work, platform)
+
+    vector = feature_vector(work)
+
+    assert vector["genre:role-playing-rpg"] == pytest.approx(FACET_WEIGHTS["genre"])
+    assert vector["platform:pc-microsoft-windows"] == pytest.approx(FACET_WEIGHTS["platform"])
+    assert FACET_WEIGHTS == {
+        "genre": 0.50,
+        "platform": 0.25,
+        "franchise": 0.15,
+        "developer": 0.10,
+    }
 
 
 # --------------------------------------------------------------------------- #
@@ -286,7 +308,9 @@ def test_rebuild_feature_vectors_populates_every_governed_work(genres) -> None: 
     assert WorkFeatureVector.objects.count() == 5
     for work in governed:
         row = WorkFeatureVector.objects.get(work=work, feature_set_version=FEATURE_SET_VERSION)
-        assert row.vector_json == {"genre:role-playing-rpg": pytest.approx(1.0)}
+        assert row.vector_json == {
+            "genre:role-playing-rpg": pytest.approx(FACET_WEIGHTS["genre"])
+        }
 
 
 @pytest.mark.django_db

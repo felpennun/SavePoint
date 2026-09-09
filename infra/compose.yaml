@@ -114,20 +114,46 @@ services:
       - ../docs:/workspace/docs:ro
       - ../e2e:/workspace/e2e:ro
 
-  recommendation-worker:
+  recommendation-worker-weighted:
     # PostgreSQL is both the durable queue and the recommendation snapshot
     # store for the local deployment. Redis remains an optional optimisation,
     # not a source of truth.
     extends:
       service: api
-    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2
-    ports: []
+    network_mode: "service:api"
+    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id content-cbf-weighted-v1
+    ports: !reset []
     healthcheck:
       disable: true
     depends_on:
       api:
         condition: service_healthy
     restart: unless-stopped
+
+  recommendation-worker-multiplicative:
+    extends:
+      service: recommendation-worker-weighted
+    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id content-cbf-multiplicative-v1
+
+  recommendation-worker-twostage:
+    extends:
+      service: recommendation-worker-weighted
+    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id content-cbf-twostage-v1
+
+  recommendation-worker-negative:
+    extends:
+      service: recommendation-worker-weighted
+    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id content-cbf-neg-v1
+
+  recommendation-worker-recency:
+    extends:
+      service: recommendation-worker-weighted
+    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id recency-v1
+
+  recommendation-worker-genre:
+    extends:
+      service: recommendation-worker-weighted
+    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id genre-taste-v1
 
   web:
     build:

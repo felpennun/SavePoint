@@ -127,6 +127,33 @@ la demo. Si se incorpora, será una aceleración efímera para lecturas o señal
 
 Fuente canónica: [[../../docs/verification/evaluation-runner-integration-2026-09-09|integración del runner y caché personal]].
 
+## Arquitectura compartida de evaluación y producto — 2026-09-09
+
+La comparación offline y el producto comparten el catálogo versionado de cinco
+variantes de contenido: suma ponderada, multiplicativa, dos etapas, señal
+negativa y recencia. El runner y cada worker consumen los mismos
+`algorithm_id`, el mismo registro de variantes y los mismos pesos; los
+baselines aleatorio y de popularidad se quedan únicamente en la evaluación.
+
+Cada variante publicable tiene worker y estantería propios. La heurística por
+género se ejecuta también con worker dedicado, como sección complementaria de
+producto. Los seis trabajos de una revisión se publican de forma atómica: el
+snapshot anterior se conserva hasta que todos han terminado. `fs-v5` pondera
+género/plataforma/saga/desarrollador como 0,50/0,25/0,15/0,10; PopScore v2 usa
+visitas/jugando/jugado/quiere jugar como 0,40/0,25/0,25/0,10.
+
+Fuente canónica: [[../../docs/verification/recommendation-architecture-2026-09-09|contrato compartido de algoritmos]].
+
+## Elegibilidad de calidad endurecida — 2026-09-09
+
+Las recomendaciones ya no aceptan la alternativa previa de una sola
+observación total o fallback de género sin nota propia. Toda obra recomendada
+debe tener `rating` de usuario IGDB y `total_rating_count >= 10`, además de
+pertenecer al corpus gobernado y no tener fecha futura. El catálogo conserva
+las obras restantes para exploración, pero no entran en ningún ranking.
+
+Fuente canónica: [[../../docs/verification/recommendation-architecture-2026-09-09|contrato compartido de algoritmos]].
+
 ## Enlaces
 
 - [[Metricas de ranking]] · [[Diversidad y novedad]] · [[Cohortes de usuario]]
@@ -141,16 +168,14 @@ sin entradas ni copias.
 
 ## Comprobación de recomendaciones publicadas — 2026-09-09
 
-El snapshot activo de `felipe` publica cinco estanterías de contenido: suma ponderada,
-multiplicativa, dos etapas, penalización negativa y recencia. El filtro de candidatos exige
-obra gobernada, fecha no futura, ausencia en la colección y `total_rating_count >= 1` **o**
-`rating` IGDB no nulo. Por tanto, una obra puede entrar con `rating` IGDB nulo si conserva al
-menos una observación en `total_rating_count`; en ese caso el ranker usa el rating mediano de
-su género como fallback y no una valoración propia de la obra.
+Cada estantería web publica como máximo los 20 resultados con mayor puntuación.
+Esta profundidad de producto no altera la evaluación offline: sus métricas se
+calculan para `K = 5`, `K = 10` y `K = 20`.
 
-La comprobación del snapshot mostró 100 resultados de contenido, 32 sin `rating` de usuario,
-pero ninguno sin `rating` ni volumen (`total_rating_count` nulo o cero). Además, las tarjetas de
-contenido no muestran actualmente rating ni volumen, de modo que la ausencia visual no distingue
-entre un juego sin rating IGDB y uno cuyo rating existe pero no se renderiza. Si el producto debe
-mostrar exclusivamente obras con rating visible, hay que endurecer el filtro o añadir una
-indicación explícita de volumen; no debe cambiarse silenciosamente el contrato gobernado.
+La elegibilidad global ya es estricta para todos los algoritmos: obra gobernada,
+fecha no futura, ausencia en la colección, `rating` de usuario IGDB no nulo y
+`total_rating_count >= 10`. Por tanto, ni los ranking de contenido ni la
+heurística de género pueden publicar una obra sin nota IGDB o con un volumen
+inferior al umbral. El snapshot anterior de `felipe` se conserva hasta el
+próximo cambio de colección, momento en que los seis workers publicarán el
+bundle conforme a este contrato.

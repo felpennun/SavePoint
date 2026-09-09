@@ -324,7 +324,7 @@ class CorpusPopularitySnapshot(models.Model):
 
 
 class CorpusPopularityScore(models.Model):
-    """Materialised unweighted PopScore for one work and corpus version."""
+    """Materialised versioned PopScore for one work and corpus version."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     work = models.ForeignKey(

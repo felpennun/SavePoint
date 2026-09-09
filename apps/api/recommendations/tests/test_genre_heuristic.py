@@ -8,7 +8,7 @@ popularity baseline (REC-02) and must never fall back to it.
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 
 import pytest
 from django.conf import settings
@@ -60,7 +60,12 @@ def _work(slug: str, *genre_objs: Genre, is_dlc: bool = False) -> GameWork:
         canonical_slug=slug,
         original_title=slug.replace("-", " ").title(),
         is_dlc=is_dlc,
+        rating=80.0 if not is_dlc else None,
+        rating_count=100 if not is_dlc else None,
         total_rating_count=1000,
+        in_corpus=not is_dlc,
+        corpus_version="genre-test" if not is_dlc else "",
+        first_release_date=date(2020, 1, 1),
     )
     if genre_objs:
         work.genres.set(genre_objs)
@@ -151,6 +156,17 @@ def test_dlc_is_excluded_from_candidates(user_a, genres) -> None:  # noqa: ANN00
 
     assert "unseen-rpg-dlc" not in _slugs(result)
     assert "unseen-rpg" in _slugs(result)
+
+
+@pytest.mark.django_db
+def test_outside_governed_corpus_is_excluded_from_candidates(user_a, genres) -> None:  # noqa: ANN001
+    _own(user_a, _work("owned-rpg", genres["rpg"]), status="completed", rating=10)
+    outside = _work("outside-corpus-rpg", genres["rpg"])
+    outside.in_corpus = False
+    outside.save(update_fields=["in_corpus"])
+    _work("governed-rpg", genres["rpg"])
+
+    assert _slugs(rank_genre_taste_v1(user_a, limit=10)) == ["governed-rpg"]
 
 
 @pytest.mark.django_db

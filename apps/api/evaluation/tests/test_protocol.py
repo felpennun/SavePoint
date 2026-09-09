@@ -64,7 +64,7 @@ def test_checked_in_protocol_loads_with_frozen_keys() -> None:
     assert frozen.relevance == {"completed": True, "rating_half_steps_gte": 7}
     assert frozen.split["strategy"] == "leave_one_out_per_user"
     assert frozen.candidate_set == (
-        "eligible_governed_corpus_total_rating_count_gte_1_or_valid_user_rating_"
+        "eligible_governed_corpus_user_rating_present_and_total_rating_count_gte_10_"
         "minus_user_library_plus_heldout"
     )
     assert frozen.exclusions == "any_library_entry"
@@ -73,15 +73,11 @@ def test_checked_in_protocol_loads_with_frozen_keys() -> None:
     # Plan 02-13 freezes the governed corpus and its evidence fingerprint.
     assert frozen.corpus_version == "2026.09.2"
     assert frozen.snapshot_sha256 == "53341af5c60af02b5fd8a8d83eac0dc7eff218627c0df93c22fecb210ecac79d"
-    assert frozen.raw["popscore_snapshot_sha256"] == "a1a6078bc3dd9cb139f177224b32cb6c6292e34f5309f90490b681c1726a0864"
+    assert frozen.raw["popscore_snapshot_sha256"] == "16de92f28fa5b3dd1b387110628561eb6330b271ed2b1e76a69a7e0f03083097"
     assert frozen.protocol_version == 2
     assert frozen.user_split == {"train": 240, "validation": 80, "test": 80, "seed": 20260908}
     assert frozen.raw["synthetic_population"]["phase_3_population"] == 400
     assert frozen.raw["synthetic_population"]["rating_count_min"] == 1
-    assert frozen.candidate_set == (
-        "eligible_governed_corpus_total_rating_count_gte_1_or_valid_user_rating_"
-        "minus_user_library_plus_heldout"
-    )
 
 
 def test_checked_in_grid_is_24_configs_within_budget() -> None:

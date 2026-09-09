@@ -97,8 +97,8 @@ class Command(BaseCommand):
             failures.append("rating signals violate the user-rating-only contract")
 
         signals = coverage_report(corpus_version)
-        if signals["feature_set_version"] != "fs-v4" or not signals["include_franchise"]:
-            failures.append("saga/franchise signal is not active in fs-v4")
+        if signals["feature_set_version"] != "fs-v5" or not signals["include_franchise"]:
+            failures.append("saga/franchise signal is not active in fs-v5")
 
         evidence = {
             "audit": "recommender-input-preflight",

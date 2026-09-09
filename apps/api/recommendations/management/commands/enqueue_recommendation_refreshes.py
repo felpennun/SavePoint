@@ -24,6 +24,6 @@ class Command(BaseCommand):
             if state.collection_revision == 0:
                 state.collection_revision = 1
                 state.save(update_fields=["collection_revision", "updated_at"])
-            if enqueue_latest_refresh(user.id) is not None:
+            if enqueue_latest_refresh(user.id):
                 enqueued += 1
         self.stdout.write(self.style.SUCCESS(f"Enqueued {enqueued} recommendation refresh(es)."))

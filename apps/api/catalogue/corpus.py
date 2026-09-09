@@ -11,7 +11,7 @@ from __future__ import annotations
 import re
 from datetime import date
 
-from django.db.models import Q, QuerySet
+from django.db.models import QuerySet
 
 from catalogue.models import GameWork
 
@@ -59,6 +59,7 @@ PLATFORM_ALLOWLIST: tuple[tuple[int, str, str], ...] = (
 )
 
 ALLOWLIST_SLUGS = frozenset(slug for _igdb_id, slug, _display_name in PLATFORM_ALLOWLIST)
+MIN_RECOMMENDATION_TOTAL_RATING_COUNT = 10
 
 def is_valid_name(name: str | None) -> bool:
     """Return whether a title has at least two alphanumeric characters."""
@@ -93,12 +94,13 @@ def evaluation_candidate_works(
 ) -> QuerySet[GameWork]:
     """Return catalogue works eligible for recommendation algorithms.
 
-    The full governed catalogue remains searchable. A candidate needs either
-    one observation in IGDB's combined rating or a non-null IGDB user rating.
+    The full governed catalogue remains searchable. A recommendation candidate
+    needs a non-null IGDB user rating and at least ten total IGDB ratings.
     """
 
     return governed_works(
         corpus_version, eligibility_cutoff_date=eligibility_cutoff_date
     ).filter(
-        Q(total_rating_count__gte=1) | Q(rating__isnull=False)
+        rating__isnull=False,
+        total_rating_count__gte=MIN_RECOMMENDATION_TOTAL_RATING_COUNT,
     )

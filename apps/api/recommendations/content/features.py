@@ -1,17 +1,19 @@
 """Per-work content feature vectors and the corpus rating statistic (D-11/D-13).
 
 A feature vector is a sparse ``{feature_key: weight}`` dict over a governed
-``GameWork``:
+``GameWork``. Facets have a deliberately descending semantic importance:
 
-* ``genre:<slug>``  -- guaranteed; every governed work has at least one genre.
-* ``platform:<slug>`` -- allowlist platforms only (``catalogue.corpus``).
-* ``franchise:<slug>`` / ``developer:<slug>`` -- emitted when the governed
+* ``genre:<slug>``  -- weight 0.50; guaranteed for every governed work.
+* ``platform:<slug>`` -- weight 0.25; allowlist platforms only.
+* ``franchise:<slug>`` -- weight 0.15; IGDB saga signal when present.
+* ``developer:<slug>`` -- weight 0.10; emitted when the governed
   view contains the facet. Franchise is the IGDB saga signal and has no
   minimum coverage gate: missing saga data is omitted per work. Developer
   coverage retains its 50 % gate (D-11).
 
-Within each facet the weight is ``1 / sqrt(k)`` for ``k`` keys in that facet,
-so a many-genre work does not dominate the cosine numerator.
+Within each facet the configured facet weight is divided by ``sqrt(k)`` for
+``k`` keys in that facet, so a work with many values in one family does not
+dominate the cosine numerator.
 
 The **rating term is NOT a vector dimension** (threat T-02-10-01). The
 corpus-level genre rating statistic lives in :func:`genre_rating_profile`,
@@ -31,9 +33,20 @@ from catalogue.models import CorpusPopularitySnapshot, CorpusRatingSnapshot, Gam
 from catalogue.popularity import IGDB_ENGAGEMENT_TYPES
 
 # Bump when the vector-building rules below change (part of the DTO, REC-09).
-# fs-v4 enables the observed IGDB franchise facet as the saga signal. Cached
-# fs-v3 rows must not be reused because they were built with that facet gated.
-FEATURE_SET_VERSION = "fs-v4"
+# fs-v5 assigns the approved descending facet weights (genre > platform >
+# franchise > developer). Cached fs-v4 rows must not be reused because their
+# dimensions had equal family weights.
+FEATURE_SET_VERSION = "fs-v5"
+
+# These weights express the semantic hierarchy of the content signal. They
+# are applied before cosine normalisation and are therefore part of the
+# versioned feature-set contract, not request-time tuning parameters.
+FACET_WEIGHTS: dict[str, float] = {
+    "genre": 0.50,
+    "platform": 0.25,
+    "franchise": 0.15,
+    "developer": 0.10,
+}
 
 # Saga/franchise is semantically meaningful even when sparse; absent facets are
 # omitted from each work vector instead of excluding the whole signal family.
@@ -43,8 +56,10 @@ FRANCHISE_COVERAGE_THRESHOLD = 0.0
 DEVELOPER_COVERAGE_THRESHOLD = 0.5
 
 
-def _facet_weight(count: int) -> float:
-    return 1.0 / math.sqrt(count) if count else 0.0
+def _facet_weight(facet: str, count: int) -> float:
+    """Return the configured family weight split across its observed values."""
+
+    return FACET_WEIGHTS[facet] / math.sqrt(count) if count else 0.0
 
 
 def _genre_slugs(work: GameWork) -> list[str]:
@@ -85,24 +100,24 @@ def feature_vector(
     vector: dict[str, float] = {}
 
     genre_slugs = _genre_slugs(work)
-    genre_weight = _facet_weight(len(genre_slugs))
+    genre_weight = _facet_weight("genre", len(genre_slugs))
     for slug in genre_slugs:
         vector[f"genre:{slug}"] = genre_weight
 
     platform_slugs = _platform_slugs(work)
-    platform_weight = _facet_weight(len(platform_slugs))
+    platform_weight = _facet_weight("platform", len(platform_slugs))
     for slug in platform_slugs:
         vector[f"platform:{slug}"] = platform_weight
 
     if include_franchise:
         franchise_slugs = _franchise_slugs(work)
-        franchise_weight = _facet_weight(len(franchise_slugs))
+        franchise_weight = _facet_weight("franchise", len(franchise_slugs))
         for slug in franchise_slugs:
             vector[f"franchise:{slug}"] = franchise_weight
 
     if include_developer:
         developer_slugs = _developer_slugs(work)
-        developer_weight = _facet_weight(len(developer_slugs))
+        developer_weight = _facet_weight("developer", len(developer_slugs))
         for slug in developer_slugs:
             vector[f"developer:{slug}"] = developer_weight
 
@@ -167,6 +182,7 @@ def coverage_report(corpus_version: str | None = None) -> dict:
     return {
         "corpus_version": corpus_version,
         "feature_set_version": FEATURE_SET_VERSION,
+        "facet_weights": FACET_WEIGHTS,
         "governed_count": total,
         "algorithm_candidate_count": candidate_count,
         "feature_coverage": {

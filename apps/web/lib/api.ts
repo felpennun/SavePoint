@@ -304,6 +304,12 @@ export interface ContentRecommendationItem {
   contributions: { genre: string; contribution_pct: number }[];
   rating_term: number;
   rating_term_is_fallback: boolean;
+  signals: {
+    external_rating: number | null;
+    rating_volume: number | null;
+    popscore: number | null;
+    recency_score: number | null;
+  };
   reason: ContentRecommendationReason | null;
   year: number | null;
   platform_summary: string;

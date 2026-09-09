@@ -39,7 +39,8 @@ def work(slug: str, *genres: Genre) -> GameWork:
         original_title=slug,
         in_corpus=True,
         corpus_version=CORPUS,
-        total_rating_count=1,
+        rating=80.0,
+        total_rating_count=10,
         first_release_date=date(2020, 1, 1),
     )
     item.genres.set(genres)
@@ -150,8 +151,8 @@ def test_recency_variant_adds_released_rated_age_to_the_other_signals(user, genr
     unrated = work("unrated", genres["rpg"])
     unrated.first_release_date = date(2026, 9, 9)
     unrated.save(update_fields=["first_release_date"])
-    snapshot(recent, 80.0, 5)
-    snapshot(older, 80.0, 5)
+    snapshot(recent, 80.0, 10)
+    snapshot(older, 80.0, 10)
 
     payload = rank_content_v1(
         user,

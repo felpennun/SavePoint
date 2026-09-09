@@ -9,7 +9,11 @@ from django.core.management import call_command
 from django.utils import timezone
 
 from catalogue.models import CorpusPopularityScore, CorpusPopularitySnapshot, CorpusVersion, GameWork, SourceRecord
-from catalogue.popularity import normalised_popscore_by_work
+from catalogue.popularity import (
+    POPSCORE_FORMULA_VERSION,
+    POPSCORE_WEIGHTS,
+    normalised_popscore_by_work,
+)
 
 
 class FakePopularityClient:
@@ -98,7 +102,7 @@ def test_popularity_snapshot_is_primitive_level_governed_and_immutable() -> None
         work.id: pytest.approx(1.0),
         other_work.id: pytest.approx(0.0),
     }
-    assert '"id": "igdb-engagement-mean-v1"' in output.getvalue()
+    assert f'"id": "{POPSCORE_FORMULA_VERSION}"' in output.getvalue()
 
     call_command(
         "snapshot_corpus_popularity",
@@ -130,8 +134,14 @@ def test_materialize_popscore_persists_the_composed_signal() -> None:
 
     call_command("materialize_popscore", corpus_version=version, stdout=StringIO())
     score = CorpusPopularityScore.objects.get(work=work, corpus_version=version)
-    assert score.score == pytest.approx(0.25)
-    assert score.formula_version == "igdb-engagement-mean-v1"
+    assert score.score == pytest.approx(0.235)
+    assert score.formula_version == POPSCORE_FORMULA_VERSION
+    assert POPSCORE_WEIGHTS == {
+        "Visits": 0.40,
+        "Playing": 0.25,
+        "Played": 0.25,
+        "Want to Play": 0.10,
+    }
 
 
 @pytest.mark.django_db

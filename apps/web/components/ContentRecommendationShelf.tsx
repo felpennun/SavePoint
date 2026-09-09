@@ -58,6 +58,11 @@ export function ContentRecommendationShelf({
                 cover: item.cover,
               }}
               locale={locale}
+              score={
+                item.signals?.external_rating == null
+                  ? null
+                  : item.signals.external_rating * 100
+              }
               evidence={item.reason ? formatReason(item.reason, locale) : undefined}
               coverVariant="shelf"
             />

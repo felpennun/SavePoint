@@ -247,7 +247,7 @@ def test_cold_start_returns_fallback_and_keeps_seen_work_out(user_a, genres) -> 
 
 
 @pytest.mark.django_db
-def test_rank_includes_user_rated_candidates_below_the_old_volume_threshold(user_a, genres) -> None:  # noqa: ANN001
+def test_rank_excludes_candidates_below_the_total_rating_volume_threshold(user_a, genres) -> None:  # noqa: ANN001
     user_rated = _work("low-volume-user-rated-candidate", genres["rpg"])
     user_rated.total_rating_count = None
     user_rated.save(update_fields=["total_rating_count"])
@@ -264,7 +264,7 @@ def test_rank_includes_user_rated_candidates_below_the_old_volume_threshold(user
 
     slugs = {item["slug"] for item in result["results"]}
     assert "high-confidence-candidate" in slugs
-    assert "low-volume-user-rated-candidate" in slugs
+    assert "low-volume-user-rated-candidate" not in slugs
 
 
 @pytest.mark.django_db
@@ -294,7 +294,7 @@ def test_versioned_dto_and_item_evidence(user_a, genres) -> None:  # noqa: ANN00
         "limitation",
         "results",
     }
-    assert result["feature_set_version"] == "fs-v4"
+    assert result["feature_set_version"] == "fs-v5"
     assert result["corpus_version"] == _CORPUS
     assert len(result["snapshot_sha256"]) == 64
     assert len(result["input_snapshot_sha256"]) == 64
@@ -329,8 +329,9 @@ def test_content_view_validates_algorithm_and_clamps_limit(user_a, genres) -> No
         _own(user_a, _work(f"view-owned-{index}", genres["rpg"]))
     for index in range(2):
         candidate = _work(f"view-candidate-{index}", genres["rpg"])
+        candidate.rating = 80.0
         candidate.rating_count = 1
-        candidate.save(update_fields=["rating_count"])
+        candidate.save(update_fields=["rating", "rating_count"])
     client = APIClient()
     client.force_authenticate(user=user_a)
 

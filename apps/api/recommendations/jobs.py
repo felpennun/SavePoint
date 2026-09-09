@@ -12,7 +12,6 @@ from django.utils import timezone
 
 from evaluation import protocol as evaluation_protocol
 from library.models import LibraryEntry, OwnedCopy
-from recommendations.content.variants import ALGORITHM_REGISTRY
 from recommendations.content.features import FEATURE_SET_VERSION
 from recommendations.genre_heuristic import rank_genre_taste_v1
 from recommendations.models import (
@@ -22,6 +21,13 @@ from recommendations.models import (
     RecommendationState,
 )
 from recommendations.service import active_corpus_version, recommend_for_user
+from recommendations.published import (
+    CONTENT_ALGORITHM_IDS,
+    GENRE_ALGORITHM_ID,
+    PUBLISHED_RESULT_LIMIT,
+    SECTION_ALGORITHM_IDS,
+    configuration_fingerprint,
+)
 
 
 def collection_fingerprint(user_id: int, revision: int) -> str:
@@ -49,60 +55,83 @@ def collection_fingerprint(user_id: int, revision: int) -> str:
     ).hexdigest()
 
 
-def enqueue_latest_refresh(user_id: int) -> RecommendationRefreshJob | None:
-    """Create or re-open exactly one job for the user's current revision."""
+def enqueue_latest_refresh(user_id: int) -> list[RecommendationRefreshJob]:
+    """Create or re-open one durable job for every published section."""
 
     state = RecommendationState.objects.filter(user_id=user_id).first()
     if state is None or state.collection_revision == 0:
-        return None
+        return []
     now = timezone.now()
-    job, created = RecommendationRefreshJob.objects.get_or_create(
-        user_id=user_id,
-        requested_revision=state.collection_revision,
-        defaults={"available_at": now},
-    )
-    if not created and job.status in {RecommendationJobStatus.FAILED, RecommendationJobStatus.OBSOLETE}:
-        job.status = RecommendationJobStatus.QUEUED
-        job.available_at = now
-        job.last_error = ""
-        job.save(update_fields=["status", "available_at", "last_error", "updated_at"])
-    return job
+    fingerprint = configuration_fingerprint()
+    jobs = []
+    for algorithm_id in SECTION_ALGORITHM_IDS:
+        job, created = RecommendationRefreshJob.objects.get_or_create(
+            user_id=user_id,
+            requested_revision=state.collection_revision,
+            configuration_fingerprint=fingerprint,
+            algorithm_id=algorithm_id,
+            defaults={"available_at": now},
+        )
+        if not created and job.status in {
+            RecommendationJobStatus.FAILED,
+            RecommendationJobStatus.OBSOLETE,
+        }:
+            job.status = RecommendationJobStatus.QUEUED
+            job.available_at = now
+            job.locked_at = None
+            job.last_error = ""
+            job.result_payload = None
+            job.save(
+                update_fields=[
+                    "status",
+                    "available_at",
+                    "locked_at",
+                    "last_error",
+                    "result_payload",
+                    "updated_at",
+                ]
+            )
+        jobs.append(job)
+    return jobs
 
 
-def build_recommendation_bundle(user: Any, corpus_version: str | None) -> dict[str, Any]:
-    """Compute every product section as one unpublished bundle."""
+def build_recommendation_section(
+    user: Any, corpus_version: str | None, algorithm_id: str
+) -> dict[str, Any]:
+    """Compute exactly one product section under the shared algorithm catalog."""
 
-    frozen = evaluation_protocol.load(allow_consumed_test=True)
-    content = {
-        algorithm_id: recommend_for_user(
+    if algorithm_id in CONTENT_ALGORITHM_IDS:
+        frozen = evaluation_protocol.load(allow_consumed_test=True)
+        return recommend_for_user(
             user,
             algorithm_id,
             protocol=frozen,
             corpus_version=corpus_version,
-            limit=20,
+            limit=PUBLISHED_RESULT_LIMIT,
         )
-        for algorithm_id in ALGORITHM_REGISTRY
-    }
-    return {
-        "content": content,
-        "genre": rank_genre_taste_v1(user, limit=20),
-    }
+    if algorithm_id == GENRE_ALGORITHM_ID:
+        return rank_genre_taste_v1(user, limit=PUBLISHED_RESULT_LIMIT)
+    raise ValueError("unknown published recommendation section")
 
 
-def _claim_next_job() -> str | None:
+def _claim_next_job(algorithm_id: str | None = None) -> str | None:
     now = timezone.now()
     stale_before = now - timedelta(minutes=10)
     with transaction.atomic():
-        RecommendationRefreshJob.objects.filter(
+        stale_jobs = RecommendationRefreshJob.objects.filter(
             status=RecommendationJobStatus.RUNNING,
             locked_at__lt=stale_before,
-        ).update(status=RecommendationJobStatus.QUEUED, locked_at=None)
-        job = (
+        )
+        if algorithm_id is not None:
+            stale_jobs = stale_jobs.filter(algorithm_id=algorithm_id)
+        stale_jobs.update(status=RecommendationJobStatus.QUEUED, locked_at=None)
+        queued_jobs = (
             RecommendationRefreshJob.objects.select_for_update(skip_locked=True)
             .filter(status=RecommendationJobStatus.QUEUED, available_at__lte=now)
-            .order_by("available_at", "created_at")
-            .first()
         )
+        if algorithm_id is not None:
+            queued_jobs = queued_jobs.filter(algorithm_id=algorithm_id)
+        job = queued_jobs.order_by("available_at", "created_at").first()
         if job is None:
             return None
         job.status = RecommendationJobStatus.RUNNING
@@ -112,42 +141,109 @@ def _claim_next_job() -> str | None:
         return str(job.id)
 
 
-def process_one_job() -> bool:
-    """Process one job; stale results are discarded rather than published."""
+def _publish_if_complete(
+    *,
+    user_id: int,
+    state: RecommendationState,
+    requested_revision: int,
+    input_fingerprint: str,
+    config_fingerprint: str,
+    corpus_version: str | None,
+) -> None:
+    """Publish the new bundle only when all independent sections succeeded."""
 
-    job_id = _claim_next_job()
+    section_jobs = list(
+        RecommendationRefreshJob.objects.select_for_update()
+        .filter(
+            user_id=user_id,
+            requested_revision=requested_revision,
+            configuration_fingerprint=config_fingerprint,
+            algorithm_id__in=SECTION_ALGORITHM_IDS,
+        )
+        .order_by("algorithm_id")
+    )
+    if len(section_jobs) != len(SECTION_ALGORITHM_IDS) or any(
+        section.status != RecommendationJobStatus.SUCCEEDED or section.result_payload is None
+        for section in section_jobs
+    ):
+        return
+
+    payload = {
+        "content": {
+            section.algorithm_id: section.result_payload
+            for section in section_jobs
+            if section.algorithm_id in CONTENT_ALGORITHM_IDS
+        },
+        "genre": next(
+            section.result_payload
+            for section in section_jobs
+            if section.algorithm_id == GENRE_ALGORITHM_ID
+        ),
+    }
+    snapshot, _ = RecommendationSnapshot.objects.get_or_create(
+        user_id=user_id,
+        collection_revision=requested_revision,
+        input_fingerprint=input_fingerprint,
+        configuration_fingerprint=config_fingerprint,
+        defaults={
+            "corpus_version": corpus_version,
+            "feature_set_version": FEATURE_SET_VERSION,
+            "payload": payload,
+            "generated_at": timezone.now(),
+        },
+    )
+    state.active_snapshot = snapshot
+    state.save(update_fields=["active_snapshot", "updated_at"])
+
+
+def process_one_job(algorithm_id: str | None = None) -> bool:
+    """Process one named section; stale results are never published."""
+
+    if algorithm_id is not None and algorithm_id not in SECTION_ALGORITHM_IDS:
+        raise ValueError("unknown published recommendation section")
+    job_id = _claim_next_job(algorithm_id)
     if job_id is None:
         return False
     job = RecommendationRefreshJob.objects.select_related("user").get(id=job_id)
     try:
         state = RecommendationState.objects.get(user_id=job.user_id)
-        fingerprint = collection_fingerprint(job.user_id, job.requested_revision)
+        input_fingerprint = collection_fingerprint(job.user_id, job.requested_revision)
         corpus_version = active_corpus_version()
-        payload = build_recommendation_bundle(job.user, corpus_version)
+        payload = build_recommendation_section(job.user, corpus_version, job.algorithm_id)
         with transaction.atomic():
             state = RecommendationState.objects.select_for_update().get(user_id=job.user_id)
             current_fingerprint = collection_fingerprint(job.user_id, state.collection_revision)
-            if state.collection_revision != job.requested_revision or current_fingerprint != fingerprint:
+            if (
+                state.collection_revision != job.requested_revision
+                or current_fingerprint != input_fingerprint
+                or job.configuration_fingerprint != configuration_fingerprint()
+            ):
                 job.status = RecommendationJobStatus.OBSOLETE
                 job.locked_at = None
                 job.save(update_fields=["status", "locked_at", "updated_at"])
                 transaction.on_commit(lambda: enqueue_latest_refresh(job.user_id))
                 return True
-            snapshot = RecommendationSnapshot.objects.create(
-                user_id=job.user_id,
-                collection_revision=state.collection_revision,
-                input_fingerprint=fingerprint,
-                corpus_version=corpus_version,
-                feature_set_version=FEATURE_SET_VERSION,
-                payload=payload,
-                generated_at=timezone.now(),
-            )
-            state.active_snapshot = snapshot
-            state.save(update_fields=["active_snapshot", "updated_at"])
             job.status = RecommendationJobStatus.SUCCEEDED
             job.locked_at = None
             job.last_error = ""
-            job.save(update_fields=["status", "locked_at", "last_error", "updated_at"])
+            job.result_payload = payload
+            job.save(
+                update_fields=[
+                    "status",
+                    "locked_at",
+                    "last_error",
+                    "result_payload",
+                    "updated_at",
+                ]
+            )
+            _publish_if_complete(
+                user_id=job.user_id,
+                state=state,
+                requested_revision=job.requested_revision,
+                input_fingerprint=input_fingerprint,
+                config_fingerprint=job.configuration_fingerprint,
+                corpus_version=corpus_version,
+            )
         return True
     except Exception as exc:  # noqa: BLE001 - persist failure and keep old snapshot
         RecommendationRefreshJob.objects.filter(id=job_id).update(

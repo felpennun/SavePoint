@@ -15,7 +15,11 @@ from django.db import connection, transaction
 from catalogue.corpus import governed_works
 from catalogue.igdb import IgdbClient, redact
 from catalogue.models import CorpusPopularitySnapshot, CorpusVersion, SourceRecord
-from catalogue.popularity import IGDB_ENGAGEMENT_TYPES
+from catalogue.popularity import (
+    IGDB_ENGAGEMENT_TYPES,
+    POPSCORE_FORMULA_VERSION,
+    POPSCORE_WEIGHTS,
+)
 
 
 SNAPSHOT_LOCK_KEY = 902_020_203
@@ -289,10 +293,11 @@ class Command(BaseCommand):
             "primitives_outside_governed_corpus": ignored_outside_corpus,
             "snapshot_sha256": self._snapshot_sha256(version),
             "composition": {
-                "id": "igdb-engagement-mean-v1",
+                "id": POPSCORE_FORMULA_VERSION,
                 "required_types": list(IGDB_ENGAGEMENT_TYPES),
                 "normalisation": "log1p then average-rank percentile within each frozen primitive type",
-                "formula": "mean of the four normalised primitive values",
+                "weights": POPSCORE_WEIGHTS,
+                "formula": "weighted sum of the four normalised primitive values",
                 "missing_policy": "no composition when any required primitive is absent",
             },
             "limitation": (

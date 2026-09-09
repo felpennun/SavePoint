@@ -69,14 +69,15 @@ def v2_protocol():
 
 @pytest.mark.django_db
 def test_manifest_excludes_seen_future_and_unrated_works(service_user, service_genres) -> None:  # noqa: ANN001
-    owned = make_work("owned", service_genres["rpg"], total_rating_count=1)
-    counted = make_work("counted", service_genres["rpg"], total_rating_count=1)
-    valid_without_count = make_work("valid-without-count", service_genres["shooter"], rating=0.0)
-    unrated = make_work("unrated", service_genres["rpg"])
+    owned = make_work("owned", service_genres["rpg"], rating=80.0, total_rating_count=10)
+    counted = make_work("counted", service_genres["rpg"], rating=80.0, total_rating_count=10)
+    low_volume = make_work("low-volume", service_genres["shooter"], rating=80.0, total_rating_count=9)
+    unrated = make_work("unrated", service_genres["rpg"], total_rating_count=10)
     future = make_work(
         "future",
         service_genres["rpg"],
-        total_rating_count=1,
+        rating=80.0,
+        total_rating_count=10,
         first_release_date=date(2026, 9, 9),
     )
     LibraryEntry.objects.create(user=service_user, work=owned, current_status="pending")
@@ -89,7 +90,7 @@ def test_manifest_excludes_seen_future_and_unrated_works(service_user, service_g
     )
 
     assert str(counted.id) in {str(value) for value in manifest.candidate_ids}
-    assert str(valid_without_count.id) in {str(value) for value in manifest.candidate_ids}
+    assert str(low_volume.id) not in {str(value) for value in manifest.candidate_ids}
     assert str(owned.id) not in {str(value) for value in manifest.candidate_ids}
     assert str(unrated.id) not in {str(value) for value in manifest.candidate_ids}
     assert str(future.id) not in {str(value) for value in manifest.explorable_ids}
@@ -106,7 +107,7 @@ def test_algorithms_share_the_same_manifest_and_payload_stays_score_ordered(
     service_user, service_genres
 ) -> None:  # noqa: ANN001
     for index in range(3):
-        make_work(f"seed-{index}", service_genres["rpg"], total_rating_count=1)
+        make_work(f"seed-{index}", service_genres["rpg"], rating=80.0, total_rating_count=10)
         LibraryEntry.objects.create(
             user=service_user,
             work=GameWork.objects.get(canonical_slug=f"seed-{index}"),
@@ -114,7 +115,7 @@ def test_algorithms_share_the_same_manifest_and_payload_stays_score_ordered(
             rating_half_steps=8,
         )
     for slug in ("z-last", "a-first"):
-        candidate = make_work(slug, service_genres["rpg"], total_rating_count=1)
+        candidate = make_work(slug, service_genres["rpg"], rating=80.0, total_rating_count=10)
         add_snapshot(candidate)
 
     payloads = [
@@ -138,9 +139,9 @@ def test_algorithms_share_the_same_manifest_and_payload_stays_score_ordered(
 
 @pytest.mark.django_db
 def test_service_rejects_ranker_result_outside_manifest(service_user, service_genres, monkeypatch) -> None:  # noqa: ANN001
-    candidate = make_work("real-candidate", service_genres["rpg"], total_rating_count=1)
+    candidate = make_work("real-candidate", service_genres["rpg"], rating=80.0, total_rating_count=10)
     add_snapshot(candidate)
-    external = make_work("external", service_genres["rpg"], total_rating_count=1, in_corpus=False)
+    external = make_work("external", service_genres["rpg"], rating=80.0, total_rating_count=10, in_corpus=False)
 
     def fake_ranker(*args, **kwargs):  # noqa: ANN002, ANN003
         return {

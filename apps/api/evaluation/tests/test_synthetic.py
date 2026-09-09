@@ -34,8 +34,9 @@ def _works(count: int = 80) -> None:
             canonical_slug=f"synthetic-work-{index}",
             original_title=f"Synthetic Work {index}",
             first_release_date=date(2010 + index % 15, 1, 1),
+            rating=80.0,
             rating_count=10,
-            total_rating_count=1,
+            total_rating_count=10,
             in_corpus=True,
             corpus_version="test",
         )

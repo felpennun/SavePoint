@@ -15,7 +15,7 @@
     "seed": 20260907,
     "heldout_returned_to_candidates": true
   },
-  "candidate_set": "eligible_governed_corpus_total_rating_count_gte_1_or_valid_user_rating_minus_user_library_plus_heldout",
+  "candidate_set": "eligible_governed_corpus_user_rating_present_and_total_rating_count_gte_10_minus_user_library_plus_heldout",
   "exclusions": "any_library_entry",
   "metrics": ["precision@k", "recall@k", "ndcg@k", "map@k"],
   "tuning": {
@@ -77,5 +77,5 @@
   },
   "corpus_version": "2026.09.2",
   "snapshot_sha256": "53341af5c60af02b5fd8a8d83eac0dc7eff218627c0df93c22fecb210ecac79d",
-  "popscore_snapshot_sha256": "a1a6078bc3dd9cb139f177224b32cb6c6292e34f5309f90490b681c1726a0864"
+  "popscore_snapshot_sha256": "16de92f28fa5b3dd1b387110628561eb6330b271ed2b1e76a69a7e0f03083097"
 }

@@ -13,8 +13,15 @@ from accounts.models import DemoAccountIdentity, demo_identity_anchor_id
 from catalogue.models import CorpusRatingSnapshot, CorpusVersion, GameWork
 from evaluation import protocol as protocol_module
 from evaluation.candidates import build
-from evaluation.runner import SnapshotCoverageError, run, validate_active_population, validate_snapshot_coverage
+from evaluation.runner import (
+    SnapshotCoverageError,
+    default_algorithms,
+    run,
+    validate_active_population,
+    validate_snapshot_coverage,
+)
 from library.models import LibraryEntry
+from recommendations.published import CONTENT_ALGORITHM_IDS
 
 User = get_user_model()
 CORPUS_VERSION = "runner-test"
@@ -39,7 +46,7 @@ def runner_fixture(db):
             original_title=f"Runner Work {index}",
             rating=80.0 if index == 0 else None,
             rating_count=None if index == 0 else (1 if index == 1 else None),
-            total_rating_count=1 if index == 1 else None,
+            total_rating_count=10 if index == 0 else (1 if index == 1 else None),
             in_corpus=True,
             corpus_version=CORPUS_VERSION,
             first_release_date=date(2020, 1, 1),
@@ -80,7 +87,8 @@ def test_build_returns_one_shared_candidate_set(runner_fixture, frozen_protocol)
     )
 
     assert heldout_id == works[0].id
-    assert set(candidate_ids) == {works[0].id, works[1].id}
+    assert set(candidate_ids) == {works[0].id}
+    assert works[1].id not in candidate_ids
     assert works[2].id not in candidate_ids
     assert works[3].id not in candidate_ids
     assert candidate_sha256
@@ -90,6 +98,14 @@ def test_runner_population_contract_matches_active_split(runner_fixture, frozen_
     user, _works, _identity = runner_fixture
     report = validate_active_population([user], frozen_protocol, CORPUS_VERSION)
     assert report == {"active_user_count": 1, "expected_user_count": 1, "split_total": 1}
+
+
+def test_offline_runner_uses_the_product_content_algorithm_catalog() -> None:
+    assert set(default_algorithms()) == {
+        "random-v1",
+        "popularity-v1",
+        *CONTENT_ALGORITHM_IDS,
+    }
 
 
 def test_build_skips_user_without_eligible_positive(runner_fixture, frozen_protocol):
@@ -153,7 +169,8 @@ def test_snapshot_coverage_ignores_governed_unrated_work(runner_fixture):
 def test_snapshot_coverage_rejects_missing_live_rating_snapshot(runner_fixture):
     _user, works, _identity = runner_fixture
     works[1].rating = 75.0
-    works[1].save(update_fields=["rating"])
+    works[1].total_rating_count = 10
+    works[1].save(update_fields=["rating", "total_rating_count"])
 
     with pytest.raises(SnapshotCoverageError, match="missing"):
         validate_snapshot_coverage(CORPUS_VERSION)
@@ -170,7 +187,8 @@ def test_snapshot_coverage_rejects_version_mismatch(runner_fixture):
         retrieved_at=datetime(2026, 9, 7, tzinfo=timezone.utc),
     )
     works[1].rating = 75.0
-    works[1].save(update_fields=["rating"])
+    works[1].total_rating_count = 10
+    works[1].save(update_fields=["rating", "total_rating_count"])
 
     with pytest.raises(SnapshotCoverageError, match="mismatch"):
         validate_snapshot_coverage(CORPUS_VERSION)

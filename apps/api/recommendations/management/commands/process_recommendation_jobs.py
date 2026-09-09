@@ -7,6 +7,7 @@ import time
 from django.core.management.base import BaseCommand
 
 from recommendations.jobs import process_one_job
+from recommendations.published import SECTION_ALGORITHM_IDS
 
 
 class Command(BaseCommand):
@@ -16,11 +17,16 @@ class Command(BaseCommand):
         parser.add_argument("--loop", action="store_true", help="Keep polling for new jobs.")
         parser.add_argument("--poll-seconds", type=float, default=2.0)
         parser.add_argument("--max-jobs", type=int, default=0, help="Stop after N jobs; 0 means no limit.")
+        parser.add_argument(
+            "--algorithm-id",
+            choices=SECTION_ALGORITHM_IDS,
+            help="Process only this published recommendation section.",
+        )
 
     def handle(self, *args, **options) -> None:  # noqa: ANN002, ANN003
         processed = 0
         while True:
-            if process_one_job():
+            if process_one_job(options["algorithm_id"]):
                 processed += 1
                 if options["max_jobs"] and processed >= options["max_jobs"]:
                     break

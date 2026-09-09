@@ -39,6 +39,9 @@ def _governed_work(slug: str, *, is_dlc: bool = False) -> GameWork:
         is_dlc=is_dlc,
         in_corpus=not is_dlc,
         corpus_version="test-corpus" if not is_dlc else "",
+        rating=80.0 if not is_dlc else None,
+        rating_count=10 if not is_dlc else None,
+        total_rating_count=10 if not is_dlc else None,
     )
 
 

@@ -44,6 +44,7 @@ def governed_corpus(db):
                 corpus_version=CORPUS_VERSION,
                 rating=80.0,
                 rating_count=1,
+                total_rating_count=10,
             )
         )
     works.append(
@@ -53,6 +54,7 @@ def governed_corpus(db):
             is_dlc=False,
             in_corpus=True,
             corpus_version=CORPUS_VERSION,
+            total_rating_count=10,
         )
     )
     works.append(
@@ -63,6 +65,7 @@ def governed_corpus(db):
             in_corpus=True,
             corpus_version=CORPUS_VERSION,
             rating=101.0,
+            total_rating_count=9,
         )
     )
     # an ungoverned work, to prove it never leaks into the candidate set
@@ -146,13 +149,13 @@ def test_candidate_set_excludes_remaining_library_but_includes_heldout(
     assert result.candidate_ids.isdisjoint(remaining_owned)
     assert result.remaining_library_ids == frozenset(remaining_owned)
     # unowned eligible governed works are candidates; unrated and ungoverned
-    # works never are. A non-null IGDB rating satisfies the frozen rule even
-    # when this fixture deliberately uses an out-of-range value.
+    # works never are. A rating without the required total volume also fails
+    # the frozen eligibility rule.
     unowned_governed = {w.id for w in governed_corpus[5:12]}
     assert unowned_governed <= result.candidate_ids
     assert governed_corpus[-1].id not in result.candidate_ids
     assert governed_corpus[12].id not in result.candidate_ids
-    assert governed_corpus[13].id in result.candidate_ids
+    assert governed_corpus[13].id not in result.candidate_ids
 
 
 def test_completed_unrated_work_is_not_an_evaluation_positive(

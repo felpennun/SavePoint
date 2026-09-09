@@ -16,7 +16,6 @@ from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from evaluation.protocol import ProtocolError
-from recommendations.jobs import enqueue_latest_refresh
 from recommendations.models import (
     RecommendationJobStatus,
     RecommendationState,
@@ -24,6 +23,7 @@ from recommendations.models import (
 from recommendations.service import RecommendationServiceError, recommend_for_user
 from recommendations.content.variants import ALGORITHM_REGISTRY
 from recommendations.genre_heuristic import rank_genre_taste_v1
+from recommendations.published import SECTION_ALGORITHM_IDS, configuration_fingerprint
 
 # Allowlist echoed back verbatim so a future change to the service DTO can
 # never widen the wire contract without a deliberate edit here.
@@ -173,30 +173,34 @@ class RecommendationSnapshotView(APIView):
     def get(self, request: Request) -> Response:
         state, _ = RecommendationState.objects.get_or_create(user=request.user)
         snapshot = state.active_snapshot
-        job = (
+        config_fingerprint = configuration_fingerprint()
+        jobs = list(
             state.user.recommendation_refresh_jobs.filter(
                 requested_revision=state.collection_revision,
+                configuration_fingerprint=config_fingerprint,
+                algorithm_id__in=SECTION_ALGORITHM_IDS,
             )
-            .order_by("-created_at")
-            .first()
+            .order_by("algorithm_id")
         )
-        if job is not None and job.status in {
-            RecommendationJobStatus.FAILED,
-            RecommendationJobStatus.OBSOLETE,
-        }:
-            job = enqueue_latest_refresh(request.user.id)
+        complete_job_set = len(jobs) == len(SECTION_ALGORITHM_IDS)
+        job_statuses = {job.status for job in jobs}
+        current_snapshot = (
+            snapshot is not None
+            and snapshot.collection_revision == state.collection_revision
+            and snapshot.configuration_fingerprint == config_fingerprint
+        )
         if state.collection_revision == 0 and snapshot is None:
             status = "empty"
+        elif current_snapshot:
+            status = "ready"
         elif snapshot is None:
             # A collection may predate the asynchronous worker. Do not create
             # work merely because the user opened the page; a new library
             # mutation will create the next revision and enqueue it via the
             # signal. Existing users therefore see the onboarding state until
             # they update their catalogue.
-            status = "building" if job is not None else "needs_refresh"
-        elif snapshot.collection_revision == state.collection_revision:
-            status = "ready"
-        elif job is None:
+            status = "building" if jobs else "needs_refresh"
+        elif not complete_job_set:
             status = "needs_refresh"
         else:
             status = "stale"
@@ -207,8 +211,12 @@ class RecommendationSnapshotView(APIView):
                 "current_revision": state.collection_revision,
                 "published_revision": snapshot.collection_revision if snapshot else None,
                 "generated_at": snapshot.generated_at.isoformat() if snapshot else None,
-                "job_status": job.status if job else None,
-                "error": "refresh_failed" if job and job.status == RecommendationJobStatus.FAILED else None,
+                "job_status": "failed" if RecommendationJobStatus.FAILED in job_statuses else (
+                    "running" if RecommendationJobStatus.RUNNING in job_statuses else (
+                        "queued" if RecommendationJobStatus.QUEUED in job_statuses else None
+                    )
+                ),
+                "error": "refresh_failed" if RecommendationJobStatus.FAILED in job_statuses else None,
                 "sections": snapshot.payload if snapshot else None,
             }
         )

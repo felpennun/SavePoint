@@ -39,7 +39,7 @@ from recommendations.content.features import (
     genre_rating_profile,
 )
 from recommendations.content.rank import rank_content_v1
-from recommendations.content.variants import ALGORITHM_REGISTRY
+from recommendations.published import CONTENT_ALGORITHM_IDS
 from recommendations.baselines import rank_random_v1
 from library.popularity import rank_popularity_v1
 from library.models import LibraryEntry
@@ -197,7 +197,7 @@ def default_algorithms() -> dict[str, Callable[..., Any]]:
         "random-v1": _random_algorithm,
         "popularity-v1": _popularity_algorithm,
     }
-    algorithms.update({algorithm_id: _content_algorithm for algorithm_id in ALGORITHM_REGISTRY})
+    algorithms.update({algorithm_id: _content_algorithm for algorithm_id in CONTENT_ALGORITHM_IDS})
     return algorithms
 
 

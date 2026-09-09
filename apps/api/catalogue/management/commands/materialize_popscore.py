@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
-import math
 from datetime import datetime, timezone
 from typing import Any
 
@@ -12,14 +10,17 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
 from catalogue.models import CorpusPopularityScore, CorpusPopularitySnapshot, CorpusVersion
-from catalogue.popularity import IGDB_ENGAGEMENT_TYPES, popscore_snapshot_sha256
-
-
-FORMULA_VERSION = "igdb-engagement-mean-v1"
+from catalogue.popularity import (
+    IGDB_ENGAGEMENT_TYPES,
+    POPSCORE_FORMULA_VERSION,
+    POPSCORE_WEIGHTS,
+    compose_popscore,
+    popscore_snapshot_sha256,
+)
 
 
 class Command(BaseCommand):
-    help = "Materialise the unweighted mean of the four normalised IGDB engagement signals."
+    help = "Materialise the weighted composition of four normalised IGDB engagement signals."
     requires_system_checks: list = []
 
     def add_arguments(self, parser: Any) -> None:
@@ -46,17 +47,15 @@ class Command(BaseCommand):
         materialised = 0
         with transaction.atomic():
             for work_id, parts in values.items():
-                if not all(name in parts for name in IGDB_ENGAGEMENT_TYPES):
+                score = compose_popscore(parts)
+                if score is None:
                     continue
-                score = math.fsum(parts[name] for name in IGDB_ENGAGEMENT_TYPES) / len(
-                    IGDB_ENGAGEMENT_TYPES
-                )
                 CorpusPopularityScore.objects.update_or_create(
                     work_id=work_id,
                     corpus_version=version,
                     defaults={
                         "score": score,
-                        "formula_version": FORMULA_VERSION,
+                        "formula_version": POPSCORE_FORMULA_VERSION,
                         "calculated_at": calculated_at,
                         "source_snapshot_sha256": source_hash,
                     },
@@ -65,10 +64,11 @@ class Command(BaseCommand):
 
         evidence = {
             "corpus_version": version,
-            "formula_version": FORMULA_VERSION,
+            "formula_version": POPSCORE_FORMULA_VERSION,
             "required_signals": list(IGDB_ENGAGEMENT_TYPES),
             "normalisation": "log1p then average-rank percentile per primitive",
-            "composition": "unweighted arithmetic mean of the four normalised primitives",
+            "weights": POPSCORE_WEIGHTS,
+            "composition": "weighted sum of the four normalised primitives",
             "missing_policy": "no score row when any required primitive is absent",
             "source_snapshot_sha256": source_hash,
             "scores_materialised": materialised,

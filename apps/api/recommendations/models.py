@@ -51,6 +51,7 @@ class RecommendationSnapshot(models.Model):
     )
     collection_revision = models.PositiveBigIntegerField()
     input_fingerprint = models.CharField(max_length=64)
+    configuration_fingerprint = models.CharField(max_length=64, default="legacy-v1")
     corpus_version = models.CharField(max_length=64, null=True, blank=True)
     feature_set_version = models.CharField(max_length=64)
     payload = models.JSONField()
@@ -61,7 +62,12 @@ class RecommendationSnapshot(models.Model):
         ordering = ("-created_at",)
         constraints = [
             models.UniqueConstraint(
-                fields=("user", "collection_revision", "input_fingerprint"),
+                fields=(
+                    "user",
+                    "collection_revision",
+                    "input_fingerprint",
+                    "configuration_fingerprint",
+                ),
                 name="recommendations_unique_snapshot_revision",
             )
         ]
@@ -94,13 +100,15 @@ class RecommendationJobStatus(models.TextChoices):
 
 
 class RecommendationRefreshJob(models.Model):
-    """PostgreSQL-backed queue item; jobs are coalesced by collection revision."""
+    """One durable section calculation, coalesced by revision and configuration."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="recommendation_refresh_jobs"
     )
     requested_revision = models.PositiveBigIntegerField()
+    configuration_fingerprint = models.CharField(max_length=64, default="legacy-v1")
+    algorithm_id = models.CharField(max_length=64, default="legacy-bundle-v1")
     status = models.CharField(
         max_length=16, choices=RecommendationJobStatus.choices, default=RecommendationJobStatus.QUEUED
     )
@@ -108,6 +116,7 @@ class RecommendationRefreshJob(models.Model):
     available_at = models.DateTimeField()
     locked_at = models.DateTimeField(null=True, blank=True)
     last_error = models.TextField(blank=True)
+    result_payload = models.JSONField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -115,8 +124,14 @@ class RecommendationRefreshJob(models.Model):
         ordering = ("available_at", "created_at")
         constraints = [
             models.UniqueConstraint(
-                fields=("user", "requested_revision"),
-                name="recommendations_unique_refresh_revision",
+                fields=("user", "requested_revision", "configuration_fingerprint", "algorithm_id"),
+                name="recommendations_unique_refresh_section",
             )
         ]
-        indexes = [models.Index(fields=("status", "available_at"))]
+        indexes = [
+            models.Index(fields=("status", "available_at")),
+            models.Index(
+                fields=("algorithm_id", "status", "available_at"),
+                name="recommendat_algorit_d0ff28_idx",
+            ),
+        ]

@@ -53,7 +53,7 @@ class Command(BaseCommand):
         include_developer = report["include_developer"]
 
         queryset = governed_works(corpus_version).prefetch_related(
-            "genres", "releases__platform"
+            "genres", "releases__platform", "franchises", "developers"
         )
 
         created = 0
