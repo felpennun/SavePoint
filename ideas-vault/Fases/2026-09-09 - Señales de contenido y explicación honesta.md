@@ -28,10 +28,16 @@ explícitamente como intensidad de preferencia. `ProfileInputs` registra el
 número de semillas positivas, la suma y la media de sus `rating_half_steps`;
 no confunde esa señal personal con el rating externo del candidato.
 
-Franquicia y desarrolladora pasan a persistirse con su ID IGDB estable. Solo
-entran en `fs-v3` si su cobertura medida en el corpus gobernado llega al 50 %.
+Franquicia y desarrolladora pasan a persistirse con su ID IGDB estable. La
+franquicia se interpreta como saga y entra en `fs-v4` siempre que exista en
+alguna obra; no se descarta por cobertura global. El desarrollador mantiene el
+umbral del 50 %.
 PopScore se prepara como instantánea de primitivas crudas por obra, tipo,
 fecha, fuente y hash; todavía no tiene un peso activo en el recomendador.
+
+La decisión del autor de 2026-09-09 trata `franchise` de IGDB como la señal de saga. Se
+incluye aunque su cobertura sea baja; las obras sin franquicia omiten esa dimensión, sin
+imputación ni exclusión global.
 
 La composición acordada usa exclusivamente `Visits`, `Want to Play`,
 `Playing` y `Played` de IGDB. Cada tipo se normaliza con `log1p` y percentil de

@@ -4,8 +4,9 @@
 Pure Python + stdlib (Task 1 ``checkpoint:decision`` = ``pure-python``).
 The feature vector is a sparse ``{feature_key: weight}`` dict with ``genre:``
 (guaranteed) and ``platform:`` (allowlist only) facets; ``franchise:`` /
-``developer:`` are emitted only when measured coverage over the governed view
-clears a documented threshold (D-11). The rating term is NEVER a vector
+``developer:`` is emitted only when measured coverage over the governed view
+clears a documented threshold (D-11); ``franchise:`` represents IGDB saga and
+is emitted whenever observed. The rating term is NEVER a vector
 dimension -- it lives in ``combine.py`` (Plan 02-11), fed from
 ``CorpusRatingSnapshot``.
 """
@@ -151,7 +152,21 @@ def test_coverage_report_decides_inclusion_from_measured_coverage(genres) -> Non
     assert report["developer_coverage"] == 0.0
     assert report["include_franchise"] is False
     assert report["include_developer"] is False
-    assert 0.0 < report["franchise_threshold"] <= 1.0
+    assert report["franchise_threshold"] == 0.0
+
+
+@pytest.mark.django_db
+def test_sparse_franchise_coverage_still_activates_the_saga_signal(genres) -> None:  # noqa: ANN001
+    franchise = Franchise.objects.create(igdb_id=333, name="Sparse Saga", slug="sparse-saga")
+    work = _work("sparse-franchise", genres["rpg"])
+    work.franchises.add(franchise)
+    _work("without-franchise", genres["rpg"])
+
+    report = coverage_report(_CORPUS)
+
+    assert report["franchise_coverage"] == pytest.approx(0.5)
+    assert report["include_franchise"] is True
+    assert feature_vector(work, include_franchise=True)["franchise:sparse-saga"] == pytest.approx(1.0)
 
 
 @pytest.mark.django_db

@@ -28,13 +28,13 @@
         "present": 190479
       }
     },
-    "feature_set_version": "fs-v3",
+    "feature_set_version": "fs-v4",
     "franchise_coverage": 0.06066285522288546,
     "franchise_present": 11555,
-    "franchise_threshold": 0.5,
+    "franchise_threshold": 0.0,
     "governed_count": 190479,
     "include_developer": true,
-    "include_franchise": false,
+    "include_franchise": true,
     "null_handling": {
       "categorical_features": "missing facet omitted from sparse vector",
       "external_user_rating_snapshot": "genre-median fallback when absent",

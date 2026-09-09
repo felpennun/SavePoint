@@ -35,6 +35,15 @@
   señal adicional: combina contenido, rating de usuarios, volumen total y
   PopScore, y añade `recency_score` con peso propio.
 
+### Enmienda de señal de saga — 2026-09-09
+
+- `franchise` de IGDB se interpreta como la saga/franquicia de la obra.
+- La saga no se excluye por cobertura global baja: se incluye como dimensión
+  categórica cuando existe y se omite únicamente en las obras sin dato.
+- La cobertura de desarrolladores conserva su umbral del 50 %; esta excepción
+  es deliberada y solo afecta a la señal de saga.
+- El vector pasa a `fs-v4` para invalidar cachés construidas con la regla anterior.
+
 ### Decisión de frontera de catálogo y recomendación — 2026-09-09
 
 - Una única tabla de obras conserva el catálogo y sus metadatos; no se duplican

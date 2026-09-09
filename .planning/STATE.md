@@ -196,6 +196,8 @@ TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<ver
 
 | 2026-09-09 | Manifiesto, aislamiento y auditoría de señales de Fase 3 | Manifiesto hash-pinned de 400 usuarios; 200 históricos preservados sin solapamiento; split 240/80/80 verificado; cobertura y política de nulos de todas las señales documentadas; sin ejecutar algoritmos |
 
+| 2026-09-09 | Inclusión de franquicia IGDB como saga | `franchise` se incluye como dimensión de `fs-v4` aunque su cobertura sea 6,07 %; se omite solo por obra cuando falta; auditoría y pruebas actualizadas; sin ejecutar algoritmos |
+
 ## Deferred Items
 
 | Category | Item | Status | Deferred At | Milestone |

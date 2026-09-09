@@ -5,11 +5,10 @@ A feature vector is a sparse ``{feature_key: weight}`` dict over a governed
 
 * ``genre:<slug>``  -- guaranteed; every governed work has at least one genre.
 * ``platform:<slug>`` -- allowlist platforms only (``catalogue.corpus``).
-* ``franchise:<slug>`` / ``developer:<slug>`` -- only when measured coverage
-  over the governed view clears ``FRANCHISE_COVERAGE_THRESHOLD`` /
-  ``DEVELOPER_COVERAGE_THRESHOLD`` (D-11). The importer does not fetch
-  ``franchises`` / ``involved_companies`` yet, so this phase measures 0 %
-  coverage and emits neither -- the seam is here for when the data lands.
+* ``franchise:<slug>`` / ``developer:<slug>`` -- emitted when the governed
+  view contains the facet. Franchise is the IGDB saga signal and has no
+  minimum coverage gate: missing saga data is omitted per work. Developer
+  coverage retains its 50 % gate (D-11).
 
 Within each facet the weight is ``1 / sqrt(k)`` for ``k`` keys in that facet,
 so a many-genre work does not dominate the cosine numerator.
@@ -32,15 +31,15 @@ from catalogue.models import CorpusPopularitySnapshot, CorpusRatingSnapshot, Gam
 from catalogue.popularity import IGDB_ENGAGEMENT_TYPES
 
 # Bump when the vector-building rules below change (part of the DTO, REC-09).
-# v2 keeps the sparse categorical representation but makes the absence of
-# unpersisted facets explicit in the signal manifest.  Cached v1 rows must not
-# be reused: their provenance did not record that decision.
-FEATURE_SET_VERSION = "fs-v3"
+# fs-v4 enables the observed IGDB franchise facet as the saga signal. Cached
+# fs-v3 rows must not be reused because they were built with that facet gated.
+FEATURE_SET_VERSION = "fs-v4"
 
-# D-11: a facet is only worth adding as a feature dimension if enough governed
-# works actually carry it. 50 % is the documented floor -- below it the facet
-# is mostly-absent noise that only inflates the vector.
-FRANCHISE_COVERAGE_THRESHOLD = 0.5
+# Saga/franchise is semantically meaningful even when sparse; absent facets are
+# omitted from each work vector instead of excluding the whole signal family.
+FRANCHISE_COVERAGE_THRESHOLD = 0.0
+# D-11: developer remains gated at 50 % because its sparse coverage is treated
+# differently from the explicitly requested saga signal.
 DEVELOPER_COVERAGE_THRESHOLD = 0.5
 
 
@@ -111,8 +110,11 @@ def feature_vector(
 
 
 def coverage_report(corpus_version: str | None = None) -> dict:
-    """Measure franchise / developer coverage over the governed view and
-    decide whether each facet is worth emitting (D-11).
+    """Measure facet coverage and decide which signal families are emitted.
+
+    IGDB ``franchise`` is the saga signal and is included whenever at least one
+    governed work carries it; missing values remain sparse rather than imputed.
+    Developer keeps the documented 50 % coverage gate.
     """
 
     works = governed_works(corpus_version)
@@ -185,7 +187,7 @@ def coverage_report(corpus_version: str | None = None) -> dict:
         "developer_coverage": developer_coverage,
         "franchise_threshold": FRANCHISE_COVERAGE_THRESHOLD,
         "developer_threshold": DEVELOPER_COVERAGE_THRESHOLD,
-        "include_franchise": franchise_coverage >= FRANCHISE_COVERAGE_THRESHOLD,
+        "include_franchise": franchise_present > 0,
         "include_developer": developer_coverage >= DEVELOPER_COVERAGE_THRESHOLD,
         # These scalar families deliberately stay outside cosine similarity.
         # A raw primitive snapshot is deliberately not an aggregate score.

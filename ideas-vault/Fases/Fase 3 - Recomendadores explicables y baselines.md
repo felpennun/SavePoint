@@ -68,7 +68,9 @@ El corpus algorítmico activo es `2026.09.2`; sus hashes de ratings y PopScore e
 usuarios sintéticos activos para la comparación principal y conserva 200 usuarios históricos de
 Fase 2. La nueva población usa `rating_count >= 1` con ponderación escalonada creciente por
 volumen, y las cohortes 10/100/240/50 ya están verificadas; todavía no se ha ejecutado ningún
-algoritmo.
+algoritmo. Las franquicias de IGDB se tratan como la señal de saga y se incluyen cuando
+existen, sin excluirlas por su cobertura global del 6,07 %; las obras sin saga simplemente
+no reciben esa dimensión dispersa.
 
 La auditoría previa a algoritmos confirma 400 usuarios activos, 200 históricos preservados,
 0 solapamiento y split 240/80/80. El manifiesto reproducible tiene hash

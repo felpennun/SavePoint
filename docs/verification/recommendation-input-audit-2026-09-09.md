@@ -49,7 +49,7 @@ comando `audit_recommendation_signals` dejan el recuento reproducible. Sobre las
 | Géneros | 190.479 | 100,00 % | incluir |
 | Plataformas permitidas | 190.479 | 100,00 % | incluir |
 | Desarrolladores | 101.018 | 53,03 % | incluir |
-| Franquicias | 11.555 | 6,07 % | excluir de los vectores |
+| Franquicias/saga IGDB | 11.555 | 6,07 % | incluir cuando exista; omitir si falta |
 | Rating de usuarios IGDB | 27.036 | 14,19 % | usar cuando exista |
 | `total_rating_count` | 30.623 | 16,08 % | usar como volumen |
 | `recency_score` elegible | 27.036 | 14,19 % | usar solo en la variante de recencia |
@@ -61,6 +61,7 @@ combina con `total_rating` de críticos. `total_rating_count` solo expresa volum
 ### Política de nulos
 
 - Facetas categóricas ausentes: se omiten del vector disperso.
+- `franchise` de IGDB se interpreta como saga y no se descarta por su cobertura global baja.
 - Rating externo ausente: se aplica fallback a la mediana por género cuando corresponda.
 - Volumen ausente: se excluye la señal y se renormalizan los pesos activos.
 - Recencia ausente, futura o sin rating: devuelve `null` y no aporta puntuación.
