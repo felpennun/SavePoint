@@ -138,3 +138,19 @@ La inicialización de colecciones preexistentes se realiza con el comando idempo
 La limpieza de cuentas del 2026-09-09 dejó 600 usuarios sintéticos, tres cuentas demo y la
 cuenta personal simulada `felipe`. Se eliminaron siete cuentas residuales de pruebas E2E/probes,
 sin entradas ni copias.
+
+## Comprobación de recomendaciones publicadas — 2026-09-09
+
+El snapshot activo de `felipe` publica cinco estanterías de contenido: suma ponderada,
+multiplicativa, dos etapas, penalización negativa y recencia. El filtro de candidatos exige
+obra gobernada, fecha no futura, ausencia en la colección y `total_rating_count >= 1` **o**
+`rating` IGDB no nulo. Por tanto, una obra puede entrar con `rating` IGDB nulo si conserva al
+menos una observación en `total_rating_count`; en ese caso el ranker usa el rating mediano de
+su género como fallback y no una valoración propia de la obra.
+
+La comprobación del snapshot mostró 100 resultados de contenido, 32 sin `rating` de usuario,
+pero ninguno sin `rating` ni volumen (`total_rating_count` nulo o cero). Además, las tarjetas de
+contenido no muestran actualmente rating ni volumen, de modo que la ausencia visual no distingue
+entre un juego sin rating IGDB y uno cuyo rating existe pero no se renderiza. Si el producto debe
+mostrar exclusivamente obras con rating visible, hay que endurecer el filtro o añadir una
+indicación explícita de volumen; no debe cambiarse silenciosamente el contrato gobernado.
