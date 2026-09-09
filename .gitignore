@@ -74,3 +74,7 @@ data/localization/_export.err
 
 # Local design-system import drop (Claude Design zips / extracted .dc.html)
 .design-import/
+
+# next dev auto-generates these per-app agent files
+apps/web/AGENTS.md
+apps/web/CLAUDE.md

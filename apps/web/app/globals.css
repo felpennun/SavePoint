@@ -571,37 +571,93 @@ textarea {
   margin: 2px 0 0;
 }
 
-/* Score pill -- Nocturne treats the IGDB critic score as data: JetBrains
-   Mono numerals in a soft 8px "slot", the tier carried by a tinted ground
-   + a same-tone border and text (never the accent). */
+/* Score pill -- Nocturne treats the IGDB critic score as data sitting
+   INSIDE the "save slot": a JetBrains Mono numeral over the shell, which
+   is filled with a tinted tier ground and stroked in the tier colour.
+   Five tramos, each tier sets --sp-score-fg / --sp-score-bg. */
 .sp-score-pill {
   position: absolute;
   top: var(--space-sm);
   right: var(--space-sm);
-  font-family: var(--font-mono);
-  background: var(--color-surface-overlay);
-  border: 1px solid currentColor;
-  border-radius: var(--radius-control);
-  padding: 2px var(--space-sm);
-  font-size: var(--text-meta);
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
 }
 
-.sp-score-pill--inline {
+.sp-score-pill--inline,
+.sp-score-pill--labelled {
   position: static;
 }
 
-.sp-score-strong {
-  color: var(--color-score-strong);
-  background: var(--color-score-strong-bg);
+.sp-score-slot {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.125rem;
+  height: 2.125rem;
+  flex: none;
+}
+
+.sp-score-slot svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.sp-score-slot svg path {
+  fill: var(--sp-score-bg);
+  stroke: var(--sp-score-fg);
+  stroke-width: 2.5;
+}
+
+.sp-score-slot-value {
+  position: relative;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: var(--text-meta);
+  line-height: 1;
+  color: var(--sp-score-fg);
+}
+
+.sp-score-pill-label {
+  font-size: var(--text-meta);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.sp-score-pill--inline .sp-score-slot,
+.sp-score-pill--labelled .sp-score-slot {
+  width: 3rem;
+  height: 3rem;
+}
+
+.sp-score-pill--inline .sp-score-slot-value,
+.sp-score-pill--labelled .sp-score-slot-value {
+  font-size: var(--text-body);
+}
+
+.sp-score-essential {
+  --sp-score-fg: var(--color-accent-text);
+  --sp-score-bg: var(--color-accent-soft);
+}
+.sp-score-great {
+  --sp-score-fg: var(--color-success);
+  --sp-score-bg: var(--color-success-bg);
 }
 .sp-score-fair {
-  color: var(--color-score-fair);
-  background: var(--color-score-fair-bg);
+  --sp-score-fg: var(--color-text-primary);
+  --sp-score-bg: var(--color-surface-overlay);
 }
-.sp-score-weak {
-  color: var(--color-score-weak);
-  background: var(--color-score-weak-bg);
+.sp-score-poor {
+  --sp-score-fg: var(--color-status-pending);
+  --sp-score-bg: var(--color-status-pending-bg);
+}
+.sp-score-bad {
+  --sp-score-fg: var(--color-danger);
+  --sp-score-bg: var(--color-danger-bg);
 }
 
 /* Status pill -- icon (from StatusPill.tsx) + text + a tinted tier ground,
