@@ -53,10 +53,13 @@ imputa un valor. El desarrollador mantiene su umbral de cobertura del 50 %. El r
 calcular vectores bajo demanda y el comando de reconstrucción puede completar la caché antes de
 una ejecución experimental futura.
 
-La reconstrucción de la caché `fs-v4` se inició previamente y se detuvo antes de esta
-integración. No borra datos de catálogo ni de ratings y no afecta a la corrección del código:
-solo significa que pueden existir filas parciales de `fs-v4`; la regeneración completa queda
-como paso operativo separado antes de medir tiempos o lanzar la comparación.
+La reconstrucción de la caché `fs-v4` se completó el 2026-09-09 sobre las 190.479 obras
+gobernadas: se crearon 186.211 filas, se actualizaron 4.268 y no queda ninguna obra sin vector
+`fs-v4`. La operación no borra datos de catálogo ni de ratings; `update_or_create` mantiene la
+fila correspondiente a cada pareja obra-versión.
+
+La evidencia completa está en
+[`feature-vector-cache-2026.09.2.json`](../../apps/api/feature-vector-cache-2026.09.2.json).
 
 Fuentes canónicas: [`recommendation-input-audit-2026-09-09.md`](recommendation-input-audit-2026-09-09.md),
 [`protocol.json`](../methodology/protocol.json) y el código de

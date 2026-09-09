@@ -202,6 +202,8 @@ TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<ver
 
 | 2026-09-09 | Integración del runner y métricas pendientes | Runner con métricas beyond-accuracy, hash de PopScore, valores por usuario y evidencias del corpus integrados; 120 tests pasados; caché fs-v4 documentada; sin ejecutar algoritmos |
 
+| 2026-09-09 | Reconstrucción de caché fs-v4 | 190.479/190.479 vectores materializados; 186.211 creados, 4.268 actualizados, 0 ausentes; evidencia archivada; sin ejecutar algoritmos |
+
 ## Deferred Items
 
 | Category | Item | Status | Deferred At | Milestone |

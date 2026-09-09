@@ -93,8 +93,9 @@ No se ha lanzado ninguna evaluación experimental.
 `fs-v4` es el namespace versionado de los vectores dispersos de contenido. Incluye la faceta
 `franchise` de IGDB como señal de saga, además de géneros, plataformas y desarrolladores cuando
 corresponde. El cambio de `fs-v3` a `fs-v4` impide reutilizar vectores creados con reglas antiguas;
-una obra sin saga simplemente omite esa dimensión. La reconstrucción completa de la caché se
-mantiene como paso operativo independiente antes de ejecutar la comparación.
+una obra sin saga simplemente omite esa dimensión. La reconstrucción se completó para las
+190.479 obras gobernadas: 186.211 vectores creados, 4.268 actualizados y 0 ausentes. La evidencia
+está en [[../../apps/api/feature-vector-cache-2026.09.2.json|la evidencia de caché]].
 
 Evidencia detallada: [[../../docs/verification/recommendation-input-audit-2026-09-09.md|auditoría de entradas de recomendación]].
 
