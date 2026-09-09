@@ -1,11 +1,10 @@
 /**
- * BrandLockup (design/brand "Cristal" identity, wired in plan 01.1-06).
- * The mark + "SavePoint" wordmark drawn entirely as outlined <path> data
- * (no font dependency), single ink via `currentColor` so it theme-swaps
- * for free with the header text color -- the small violet inner diamond
- * is the only reserved-accent use (10% rule). Geometry is
- * design/brand/logo-lockup-mono.svg verbatim; the inner-diamond accent
- * path is tinted with --color-accent per the brand README.
+ * BrandLockup (Nocturne visual-identity import). The isotype is the "save
+ * slot" -- a memory-card notch holding a solid checkpoint marker -- next
+ * to the "SavePoint" wordmark drawn entirely as outlined <path> data (no
+ * font dependency). The slot outline uses `currentColor` so it theme-swaps
+ * for free with the header text colour; the marker is the only
+ * reserved-accent use (10% rule), tinted with --color-accent.
  */
 export function BrandLockup({ title = "SavePoint" }: { title?: string }) {
   return (
@@ -19,16 +18,16 @@ export function BrandLockup({ title = "SavePoint" }: { title?: string }) {
       style={{ display: "block" }}
     >
       <path
-        d="M32 4 L52 28 L32 52 L12 28 Z M32 16 L22 28 L32 40 L42 28 Z M20 56 H44 V60 H20 Z"
-        fill="currentColor"
-        fillRule="evenodd"
-        transform="translate(8 12) scale(1)"
+        d="M6 12a6 6 0 0 1 6-6h20l10 10v20a6 6 0 0 1-6 6H12a6 6 0 0 1-6-6V12Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        transform="translate(6 5) scale(1.2)"
       />
       <path
-        d="M32 22 L38 28 L32 34 L26 28 Z"
+        d="M24 15l8 9-8 9-8-9 8-9Z"
         fill="var(--color-accent)"
-        fillRule="evenodd"
-        transform="translate(8 12) scale(1)"
+        transform="translate(6 5) scale(1.2)"
       />
       <path
         d="M59 21 C48 13 33 12 22 16 C11 20 5 29 5 40 C5 53 14 60 30 64 L40 67 C47 69 50 72 50 77 C50 84 44 88 34 88 C23 88 13 84 5 78 V92 C13 98 23 101 34 101 C53 101 65 92 65 76 C65 63 58 56 42 52 L31 49 C23 47 19 44 19 39 C19 32 25 28 34 28 C43 28 51 31 59 36 Z"

@@ -1,10 +1,30 @@
 import type { ReactNode } from "react";
 import { cookies } from "next/headers";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
 
 import "../globals.css";
 import { AppShell } from "@/components/AppShell";
 import { SUPPORTED_LOCALES, type Locale } from "@/middleware";
+
+/** Nocturne identity: Inter for display and body, JetBrains Mono for
+ * figures, identifiers and the score pill. next/font self-hosts both from
+ * this origin (build-time download) so the `font-src 'self'` CSP holds --
+ * no Google Fonts network hop at runtime. The variables feed
+ * --font-sans / --font-mono, which globals.css already consumes. */
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-sans",
+  weight: ["400", "500", "600"],
+});
+
+const jetBrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-mono",
+  weight: ["400", "500", "700"],
+});
 
 export const metadata = {
   title: "SavePoint",
@@ -40,7 +60,7 @@ export default async function LocaleLayout({
   const theme = cookieStore.get("sp-theme")?.value === "light" ? "light" : "dark";
 
   return (
-    <html lang={locale} data-theme={theme}>
+    <html lang={locale} data-theme={theme} className={`${inter.variable} ${jetBrainsMono.variable}`}>
       <body>
         <AppShell locale={locale} isAuthenticated={isAuthenticated}>
           {children}

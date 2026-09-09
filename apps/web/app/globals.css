@@ -15,60 +15,100 @@
  * themes (QUAL-03 / QUAL-05).
  */
 @theme {
-  /* Surfaces, dark-first (D-17: dark, cover-led catalogue). */
-  --color-surface-base: #0d0d12;
-  --color-surface-raised: #17171f;
-  --color-surface-overlay: #1f1f2b;
-  --color-surface-border: #2c2c3a;
+  /* Surfaces -- Nocturne visual-identity import: a near-neutral blue-grey
+     ground, dark-first (D-17: dark, cover-led catalogue). Contrast comes
+     from the tonal ramp, not saturation. */
+  --color-surface-base: #161826;
+  --color-surface-raised: #232532;
+  --color-surface-overlay: #292b31;
+  --color-surface-border: #3a3d49;
 
-  --shadow-overlay: 0 6px 20px -4px rgba(0, 0, 0, 0.45);
+  --shadow-overlay: 0 6px 20px -4px rgba(0, 0, 0, 0.5);
   --color-skeleton-base: var(--color-surface-overlay);
   --color-skeleton-sheen: var(--color-surface-raised);
 
-  /* Text -- off-white on dark, never pure #fff/#000 (harsh contrast). */
-  --color-text-primary: #f2f2f5;
-  --color-text-secondary: #b8b8c4;
-  --color-text-muted: #8a8a99;
+  /* Text -- off-white on the blue-grey ground, never pure #fff/#000. */
+  --color-text-primary: #e9e9ed;
+  --color-text-secondary: #c9cad2;
+  --color-text-muted: #a9abb5;
 
-  /* Accent -- reserved list only (primary action fill, prose links,
-     active nav, pagination current, select/chip selected outline). */
-  --color-accent: #8b7cf6;
-  --color-accent-strong: #a394ff;
-  --color-accent-on: #16121f;
+  /* Accent -- the product blurple. Reserved list only (primary action,
+     prose links, active nav, pagination current, chip selected outline).
+     --color-accent-text is the accent worn as text on a transparent or
+     tinted ground (outlined buttons, active chips, score/status pills). */
+  --color-accent: #9184d9;
+  --color-accent-strong: #b5abfc;
+  --color-accent-text: #d2cefd;
+  --color-accent-soft: #2b2741;
+  --color-accent-edge: #423a6a;
+  --color-accent-on: #161826;
 
-  /* Status -- backlog states (D-14), each with a text-safe pairing. */
-  --color-status-pending: #f0b429;
-  --color-status-playing: #38bdf8;
-  --color-status-completed: #34d399;
-  --color-status-abandoned: #94a3b8;
+  /* Secondary -- deep indigo, used as presence at page scale (hero ground,
+     section dividers) and as the eyebrow/kicker label colour. */
+  --color-secondary: #262a60;
+  --color-secondary-mid: #9690c9;
+
+  /* Status -- backlog states (D-14). Each carries a tinted ground + border
+     for the pill, plus a text-safe foreground, in BOTH themes. */
+  --color-status-pending: #e0a24a;
+  --color-status-pending-bg: #332612;
+  --color-status-pending-border: #57411d;
+  --color-status-playing: #78aee0;
+  --color-status-playing-bg: #1b2634;
+  --color-status-playing-border: #2c405c;
+  --color-status-completed: #5cc08d;
+  --color-status-completed-bg: #16301f;
+  --color-status-completed-border: #245036;
+  --color-status-abandoned: #a9abb5;
+  --color-status-abandoned-bg: #23252f;
+  --color-status-abandoned-border: #3a3d49;
 
   /* Feedback. */
-  --color-danger: #f87171;
-  --color-success: #34d399;
+  --color-danger: #f0808a;
+  --color-danger-bg: #361d21;
+  --color-danger-border: #5c2f35;
+  --color-success: #5cc08d;
+  --color-success-bg: #16301f;
+  --color-success-border: #245036;
+  --color-info: #78aee0;
+  --color-info-bg: #1b2634;
+  --color-info-border: #2c405c;
 
-  /* Focus ring -- 2px, high-visibility, never suppressed. */
-  --color-focus-ring: #ffd166;
+  /* Focus ring -- 2px accent outline + 2px offset, both themes, never
+     suppressed (Nocturne interaction-states rule). */
+  --color-focus-ring: #9184d9;
 
-  /* Personal rating star fill -- gold, deliberately NOT the accent purple. */
-  --color-rating: #f5b544;
+  /* Personal rating star fill -- the amber accent, deliberately NOT the
+     blurple. */
+  --color-rating: #e0a24a;
 
-  /* IGDB critic-score pill ramp (total_rating is 0-100). Tier text/border
-     color; pill background is always --color-surface-overlay. */
-  --color-score-weak: #b8b8c4; /* total_rating < 40 */
-  --color-score-fair: #f0b429; /* 40 <= total_rating < 75 */
-  --color-score-strong: #34d399; /* total_rating >= 75 */
+  /* IGDB critic-score pill ramp (total_rating is 0-100). Tier
+     text/border colour + a tinted tier ground. */
+  --color-score-weak: #a9abb5; /* total_rating < 40 */
+  --color-score-weak-bg: #23252f;
+  --color-score-fair: #e0a24a; /* 40 <= total_rating < 75 */
+  --color-score-fair-bg: #332612;
+  --color-score-strong: #5cc08d; /* total_rating >= 75 */
+  --color-score-strong-bg: #16301f;
+
+  /* Type -- Inter for display and body (hierarchy from size and space, not
+     weight); JetBrains Mono for figures, identifiers, tables and the score
+     pill. next/font prepends the real families to these stacks on <body>. */
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace;
 
   /* Product-grade type scale (Tailwind v4 reads --text-* from @theme).
-     Four sizes only: 13 / 16 / 20 / 28. */
+     13 / 16 / 22 / 30. */
   --text-meta: 0.8125rem; /* 13px -- labels, meta, chips, score pill */
   --text-body: 1rem; /* 16px -- paragraph copy, list rows, values */
-  --text-heading: 1.25rem; /* 20px -- <h2> section headings */
-  --text-display: 1.75rem; /* 28px -- <h1> page titles */
-  --leading-body: 1.5;
-  --leading-heading: 1.25;
+  --text-heading: 1.375rem; /* 22px -- <h2> section headings */
+  --text-display: 1.875rem; /* 30px -- <h1> page titles */
+  --leading-body: 1.55;
+  --leading-heading: 1.2;
 
   --radius-card: 0.75rem;
   --radius-control: 0.5rem;
+  --radius-chip: 0.25rem;
 
   /* Spacing scale (all multiples of 4). */
   --space-xs: 4px;
@@ -91,34 +131,61 @@
 :root[data-theme="light"] {
   color-scheme: light;
 
-  --color-surface-base: #f4f4f7;
-  --color-surface-raised: #ffffff;
-  --color-surface-overlay: #ececf1;
-  --color-surface-border: #d9d9e0;
+  --color-surface-base: #f7f7fa;
+  --color-surface-raised: #fdfdff;
+  --color-surface-overlay: #eceef4;
+  --color-surface-border: #dcdce4;
 
   --shadow-overlay: 0 6px 20px -4px rgba(20, 20, 30, 0.18);
 
-  --color-text-primary: #1b1b22;
-  --color-text-secondary: #4a4a57;
-  --color-text-muted: #6c6c7a;
+  --color-text-primary: #1b1c26;
+  --color-text-secondary: #45464f;
+  --color-text-muted: #5c5e6b;
 
-  --color-accent: #6d5cd6;
-  --color-accent-strong: #5a49c0;
-  --color-accent-on: #ffffff;
+  --color-accent: #5d5294;
+  /* Light: the hover tone (#796cbf) only clears ~4.2:1 on the page ground,
+     so small prose links (.sp-link) take the base primary-l instead --
+     they stay distinct by their underline. */
+  --color-accent-strong: #5d5294;
+  --color-accent-text: #5d5294;
+  --color-accent-soft: #e7e5fe;
+  --color-accent-edge: #c9c2ef;
+  --color-accent-on: #fdfdff;
 
-  --color-status-pending: #b7791f;
-  --color-status-playing: #0e7490;
-  --color-status-completed: #047857;
-  --color-status-abandoned: #64748b;
+  --color-secondary: #262a60;
+  --color-secondary-mid: #5d5294;
 
-  --color-danger: #c62828;
-  --color-success: #047857;
-  --color-focus-ring: #8a5a00;
+  --color-status-pending: #8a5a09;
+  --color-status-pending-bg: #fdf3e0;
+  --color-status-pending-border: #e3cfa6;
+  --color-status-playing: #22557f;
+  --color-status-playing-bg: #e6eef5;
+  --color-status-playing-border: #b9cfe3;
+  --color-status-completed: #1f7a4d;
+  --color-status-completed-bg: #e2f1ea;
+  --color-status-completed-border: #a9d4bf;
+  --color-status-abandoned: #5c5e6b;
+  --color-status-abandoned-bg: #eceef4;
+  --color-status-abandoned-border: #dcdce4;
+
+  --color-danger: #b3262c;
+  --color-danger-bg: #fbeaea;
+  --color-danger-border: #e3b6b8;
+  --color-success: #1f7a4d;
+  --color-success-bg: #e2f1ea;
+  --color-success-border: #a9d4bf;
+  --color-info: #22557f;
+  --color-info-bg: #e6eef5;
+  --color-info-border: #b9cfe3;
+  --color-focus-ring: #5d5294;
 
   --color-rating: #b0730f;
-  --color-score-weak: #6c6c7a;
-  --color-score-fair: #b7791f;
-  --color-score-strong: #047857;
+  --color-score-weak: #5c5e6b;
+  --color-score-weak-bg: #eceef4;
+  --color-score-fair: #8a5a09;
+  --color-score-fair-bg: #fdf3e0;
+  --color-score-strong: #1f7a4d;
+  --color-score-strong-bg: #e2f1ea;
 }
 
 * {
@@ -134,12 +201,7 @@ body {
 body {
   background-color: var(--color-surface-base);
   color: var(--color-text-primary);
-  font-family:
-    system-ui,
-    -apple-system,
-    "Segoe UI",
-    Roboto,
-    sans-serif;
+  font-family: var(--font-sans);
   font-size: var(--text-body);
   line-height: var(--leading-body);
   min-height: 100vh;
@@ -263,17 +325,20 @@ textarea {
   font: inherit;
 }
 
+/* Primary action -- Nocturne outlines primary buttons (1px accent border
+   on a transparent ground, accent-as-text), never a solid fill. Presence
+   is reserved for the hero and section dividers. */
 .sp-btn-primary {
   min-height: 2.75rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-xs);
-  background: var(--color-accent);
-  color: var(--color-accent-on);
+  background: transparent;
+  color: var(--color-accent-text);
   font-weight: 600;
   font-size: var(--text-body);
-  border: 0;
+  border: 1px solid var(--color-accent);
   border-radius: var(--radius-control);
   padding: 0 var(--space-lg);
   text-decoration: none;
@@ -281,7 +346,11 @@ textarea {
 }
 
 .sp-btn-primary:hover {
-  background: var(--color-accent-strong);
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+
+.sp-btn-primary:active {
+  background: color-mix(in srgb, var(--color-accent) 22%, transparent);
 }
 
 .sp-btn-secondary {
@@ -290,7 +359,7 @@ textarea {
   align-items: center;
   justify-content: center;
   gap: var(--space-xs);
-  background: var(--color-surface-overlay);
+  background: transparent;
   color: var(--color-text-secondary);
   font-weight: 600;
   font-size: var(--text-meta);
@@ -299,6 +368,10 @@ textarea {
   padding: 0 var(--space-ctl);
   text-decoration: none;
   cursor: pointer;
+}
+
+.sp-btn-secondary:hover {
+  background: color-mix(in srgb, var(--color-text-primary) 7%, transparent);
 }
 
 .sp-btn-danger {
@@ -320,6 +393,48 @@ textarea {
   border: 1px solid var(--color-surface-border);
   border-radius: var(--radius-card);
   padding: var(--space-lg);
+}
+
+/* Home hero -- the one full-bleed "presence" moment at page scale
+   (Nocturne direction): a desaturated deep-indigo radial ground that
+   fades into the page. Light theme drops the gradient for a flat raised
+   surface (the dark ramp reads muddy on a light ground). */
+.sp-hero {
+  background: radial-gradient(120% 150% at 6% 0%, var(--color-secondary) 0%, var(--color-surface-base) 62%);
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-card);
+  padding: var(--space-3xl) var(--space-2xl) var(--space-2xl);
+  margin-bottom: var(--space-2xl);
+}
+
+:root[data-theme="light"] .sp-hero {
+  background: var(--color-surface-raised);
+}
+
+.sp-hero .sp-h1 {
+  margin-top: var(--space-md);
+}
+
+.sp-hero .sp-lead {
+  max-width: 52ch;
+  font-size: var(--text-body);
+}
+
+/* Academic-demo badge -- a standing truth about the deployment, carried
+   in JetBrains Mono with the amber accent and a leading diamond so it is
+   recognisable without relying on colour. */
+.sp-demo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+  line-height: 1.4;
+  padding: var(--space-xs) var(--space-ctl);
+  border-radius: var(--radius-control);
+  background: var(--color-status-pending-bg);
+  border: 1px solid var(--color-status-pending-border);
+  color: var(--color-status-pending);
 }
 
 .sp-field {
@@ -414,8 +529,9 @@ textarea {
 }
 
 .sp-card-meta {
+  font-family: var(--font-mono);
   font-size: var(--text-meta);
-  color: var(--color-text-secondary);
+  color: var(--color-text-muted);
   margin: 0;
 }
 
@@ -455,16 +571,20 @@ textarea {
   margin: 2px 0 0;
 }
 
+/* Score pill -- Nocturne treats the IGDB critic score as data: JetBrains
+   Mono numerals in a soft 8px "slot", the tier carried by a tinted ground
+   + a same-tone border and text (never the accent). */
 .sp-score-pill {
   position: absolute;
   top: var(--space-sm);
   right: var(--space-sm);
+  font-family: var(--font-mono);
   background: var(--color-surface-overlay);
   border: 1px solid currentColor;
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   padding: 2px var(--space-sm);
   font-size: var(--text-meta);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .sp-score-pill--inline {
@@ -473,21 +593,27 @@ textarea {
 
 .sp-score-strong {
   color: var(--color-score-strong);
+  background: var(--color-score-strong-bg);
 }
 .sp-score-fair {
   color: var(--color-score-fair);
+  background: var(--color-score-fair-bg);
 }
 .sp-score-weak {
   color: var(--color-score-weak);
+  background: var(--color-score-weak-bg);
 }
 
+/* Status pill -- icon (from StatusPill.tsx) + text + a tinted tier ground,
+   4px "cell" radius. The state is never carried by colour alone. */
 .sp-status-pill {
   display: inline-flex;
   align-items: center;
+  gap: var(--space-xs);
   background: var(--color-surface-overlay);
   border: 1px solid currentColor;
-  border-radius: 999px;
-  padding: 2px var(--space-sm);
+  border-radius: var(--radius-chip);
+  padding: 3px var(--space-sm);
   font-size: var(--text-meta);
   font-weight: 600;
 }
@@ -500,29 +626,38 @@ textarea {
 
 .sp-status-pending {
   color: var(--color-status-pending);
+  background: var(--color-status-pending-bg);
+  border-color: var(--color-status-pending-border);
 }
 .sp-status-playing {
   color: var(--color-status-playing);
+  background: var(--color-status-playing-bg);
+  border-color: var(--color-status-playing-border);
 }
 .sp-status-completed {
   color: var(--color-status-completed);
+  background: var(--color-status-completed-bg);
+  border-color: var(--color-status-completed-border);
 }
 .sp-status-abandoned {
   color: var(--color-status-abandoned);
+  background: var(--color-status-abandoned-bg);
+  border-color: var(--color-status-abandoned-border);
 }
 
+/* Active filter chip -- Nocturne 4px "cell" radius, accent-tinted. */
 .sp-chip {
   display: inline-flex;
   align-items: center;
   flex-wrap: wrap;
   gap: var(--space-xs);
-  background: var(--color-surface-overlay);
-  border: 1px solid var(--color-surface-border);
-  border-radius: 999px;
+  background: var(--color-accent-soft);
+  border: 1px solid var(--color-accent-edge);
+  border-radius: var(--radius-chip);
   padding: 4px 10px;
   font-size: var(--text-meta);
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: var(--color-accent-text);
   text-decoration: none;
   max-width: 100%;
   overflow-wrap: anywhere;

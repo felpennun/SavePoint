@@ -56,19 +56,21 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     <main className="sp-page">
       {signedIn ? (
         <>
-          <h1 className="sp-h1">
-            {alias ? dict.home.signedIn.greeting.replace("{alias}", alias) : dict.home.signedIn.continueHeading}
-          </h1>
-          {alias ? (
-            <p className="sp-meta">{dict.account.switcher.current.replace("{alias}", alias)}</p>
-          ) : null}
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-ctl)", alignItems: "center", margin: "var(--space-lg) 0" }}>
-            <Link href={`/${locale}/recommendations`} className="sp-btn-primary">
-              {dict.home.signedIn.recommendationsCta}
-            </Link>
-            <Link href={`/${locale}/collection`} className="sp-link">
-              {dict.nav.collection}
-            </Link>
+          <div className="sp-hero">
+            <h1 className="sp-h1">
+              {alias ? dict.home.signedIn.greeting.replace("{alias}", alias) : dict.home.signedIn.continueHeading}
+            </h1>
+            {alias ? (
+              <p className="sp-meta">{dict.account.switcher.current.replace("{alias}", alias)}</p>
+            ) : null}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-ctl)", alignItems: "center", marginTop: "var(--space-lg)" }}>
+              <Link href={`/${locale}/recommendations`} className="sp-btn-primary">
+                {dict.home.signedIn.recommendationsCta}
+              </Link>
+              <Link href={`/${locale}/collection`} className="sp-link">
+                {dict.nav.collection}
+              </Link>
+            </div>
           </div>
 
           <h2 className="sp-h2">{dict.home.signedIn.continueHeading}</h2>
@@ -102,22 +104,24 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </>
       ) : (
         <>
-          <div style={{ color: "var(--color-text-primary)", marginBottom: "var(--space-sm)" }}>
-            <BrandLockup />
+          <div className="sp-hero">
+            <div style={{ color: "var(--color-text-primary)" }}>
+              <BrandLockup />
+            </div>
+            <h1 className="sp-h1">SavePoint</h1>
+            <p className="sp-lead">{dict.home.valueProposition}</p>
+            {/* No log-in entry here on purpose: sign-in lives in the navbar
+                (person icon) and on its own /login page. The home hero leads
+                with browsing the catalogue and creating an account. */}
+            <nav style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-ctl)", alignItems: "center", marginTop: "var(--space-lg)" }}>
+              <Link href={`/${locale}/catalogue`} className="sp-btn-primary">
+                {dict.home.loggedOut.secondaryCta}
+              </Link>
+              <Link href={`/${locale}/register`} className="sp-link">
+                {dict.home.loggedOut.registerCta}
+              </Link>
+            </nav>
           </div>
-          <h1 className="sp-h1">SavePoint</h1>
-          <p className="sp-lead">{dict.home.valueProposition}</p>
-          {/* No log-in entry here on purpose: sign-in lives in the navbar
-              (person icon) and on its own /login page. The home hero leads
-              with browsing the catalogue and creating an account. */}
-          <nav style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-ctl)", alignItems: "center", margin: "var(--space-lg) 0" }}>
-            <Link href={`/${locale}/catalogue`} className="sp-btn-primary">
-              {dict.home.loggedOut.secondaryCta}
-            </Link>
-            <Link href={`/${locale}/register`} className="sp-link">
-              {dict.home.loggedOut.registerCta}
-            </Link>
-          </nav>
 
           <section aria-label={dict.home.sampleHeading}>
             <h2 className="sp-h2">{dict.home.sampleHeading}</h2>
