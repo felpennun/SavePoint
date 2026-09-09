@@ -377,4 +377,4 @@ totales. Ver `.planning/phases/04-collaborative-and-hybrid-comparison/`.
 | 260909-ws8 | Implementar hybrid-mmr-v1 y adoptar rating_final compartido en web y offline | 2026-09-10 | 2c12838 | [260909-ws8-implementar-hybrid-mmr-v1-en-web-y-offli](./quick/260909-ws8-implementar-hybrid-mmr-v1-en-web-y-offli/) |
 | 260910-0u7 | Verificar la importación de facetas IGDB y dejar checkpoint para la interfaz | 2026-09-10 | a3f3a14 | [260910-0u7-verificar-importacion-de-facetas-igdb-y-](./quick/260910-0u7-verificar-importacion-de-facetas-igdb-y-/) |
 
-Last activity: 2026-09-10 - Verified IGDB facets, hybrid MMR web shelf, and prepared interface handoff
+Last activity: 2026-09-10 - Verified hybrid MMR shelf runtime, rebuilt web, and prepared interface handoff

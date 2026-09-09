@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "timestamp": "2026-09-10T00:36:04+02:00",
+  "timestamp": "2026-09-10T00:48:44+02:00",
   "phase": "04",
   "phase_name": "collaborative-and-hybrid-comparison",
   "phase_dir": ".planning/phases/04-collaborative-and-hybrid-comparison",
@@ -27,5 +27,5 @@
   ],
   "uncommitted_files": [],
   "next_action": "Continuar la interfaz web; no iniciar aún la evaluación offline ni depurar las facetas IGDB.",
-  "context_notes": "La base de datos de facetas ha pasado la verificación estructural. Los workers de Felipe terminaron la revisión actual y la otra LLM continuará con la interfaz."
+  "context_notes": "La base de datos de facetas ha pasado la verificación estructural. La API devuelve hybrid-mmr-v1 con 20 resultados y el frontend fue reconstruido porque servía un build anterior. Los workers de Felipe terminaron la revisión actual y la otra LLM continuará con la interfaz."
 }
