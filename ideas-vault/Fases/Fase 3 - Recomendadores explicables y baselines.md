@@ -70,7 +70,10 @@ Fase 2. La nueva población usa `rating_count >= 1` con ponderación escalonada 
 volumen, y las cohortes 10/100/240/50 ya están verificadas; todavía no se ha ejecutado ningún
 algoritmo. Las franquicias de IGDB se tratan como la señal de saga y se incluyen cuando
 existen, sin excluirlas por su cobertura global del 6,07 %; las obras sin saga simplemente
-no reciben esa dimensión dispersa.
+no reciben esa dimensión dispersa. Los controles finales de validación y archivo también
+han pasado: no hay fechas ausentes/futuras ni candidatos inelegibles, la rejilla 24 cumple
+15/3/6, solo usa rating de usuario y mantiene recencia en seis configuraciones. Los
+resultados están archivados; todavía no se han ejecutado algoritmos.
 
 La auditoría previa a algoritmos confirma 400 usuarios activos, 200 históricos preservados,
 0 solapamiento y split 240/80/80. El manifiesto reproducible tiene hash

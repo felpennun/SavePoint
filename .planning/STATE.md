@@ -198,6 +198,8 @@ TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<ver
 
 | 2026-09-09 | Inclusión de franquicia IGDB como saga | `franchise` se incluye como dimensión de `fs-v4` aunque su cobertura sea 6,07 %; se omite solo por obra cuando falta; auditoría y pruebas actualizadas; sin ejecutar algoritmos |
 
+| 2026-09-09 | Validación y archivo previos a algoritmos | PASS: corpus/candidatos, población 400/200, split 240/80/80, rejilla 24, rating de usuario y recencia validados; resultados archivados; sin ejecutar algoritmos |
+
 ## Deferred Items
 
 | Category | Item | Status | Deferred At | Milestone |

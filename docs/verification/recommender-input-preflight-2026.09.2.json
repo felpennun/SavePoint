@@ -1,0 +1,108 @@
+{
+  "algorithm_execution": "not_run",
+  "audit": "recommender-input-preflight",
+  "corpus": {
+    "algorithm_candidate_count": 30623,
+    "candidate_invalid_date_count": 0,
+    "candidate_invalid_rating_rule_count": 0,
+    "governed_count": 190479,
+    "governed_invalid_date_count": 0
+  },
+  "corpus_version": "2026.09.2",
+  "failures": [],
+  "passed": true,
+  "population": {
+    "active_count": 400,
+    "active_historical_overlap_count": 0,
+    "historical_phase2_count": 200,
+    "split_counts": {
+      "test": 80,
+      "train": 240,
+      "validation": 80
+    }
+  },
+  "protocol": {
+    "all_configurations_use_user_rating": true,
+    "feature_set_version": "fs-v4",
+    "grid_count": 24,
+    "grid_mode_counts": {
+      "multiplicative": 3,
+      "two_stage": 6,
+      "weighted_sum": 15
+    },
+    "no_configuration_uses_combined_total_rating": true,
+    "protocol_version": 2,
+    "recency_configuration_count": 6
+  },
+  "signal_coverage": {
+    "algorithm_candidate_count": 30623,
+    "corpus_version": "2026.09.2",
+    "developer_coverage": 0.5303366775340064,
+    "developer_present": 101018,
+    "developer_threshold": 0.5,
+    "feature_coverage": {
+      "developers": {
+        "coverage": 0.5303366775340064,
+        "missing": 89461,
+        "present": 101018
+      },
+      "franchises": {
+        "coverage": 0.06066285522288546,
+        "missing": 178924,
+        "present": 11555
+      },
+      "genres": {
+        "coverage": 1.0,
+        "missing": 0,
+        "present": 190479
+      },
+      "platforms": {
+        "coverage": 1.0,
+        "missing": 0,
+        "present": 190479
+      }
+    },
+    "feature_set_version": "fs-v4",
+    "franchise_coverage": 0.06066285522288546,
+    "franchise_present": 11555,
+    "franchise_threshold": 0.0,
+    "governed_count": 190479,
+    "include_developer": true,
+    "include_franchise": true,
+    "null_handling": {
+      "categorical_features": "missing facet omitted from sparse vector",
+      "external_user_rating_snapshot": "genre-median fallback when absent",
+      "popscore_complete": "missing primitive excludes composed PopScore",
+      "rating_volume_snapshot": "missing signal excluded and active weights renormalized",
+      "release_recency": "missing, future, or unrated release returns null"
+    },
+    "popscore_available": true,
+    "popscore_primitives_available": true,
+    "rating_available": true,
+    "rating_volume_available": true,
+    "release_recency_available": true,
+    "scalar_signal_coverage": {
+      "external_user_rating_snapshot": {
+        "coverage": 0.14193690643063014,
+        "missing": 163443,
+        "present": 27036
+      },
+      "popscore_complete": {
+        "coverage": 0.05212648113440327,
+        "missing": 180550,
+        "present": 9929
+      },
+      "rating_volume_snapshot": {
+        "coverage": 0.16076837866641466,
+        "missing": 159856,
+        "present": 30623
+      },
+      "release_recency": {
+        "coverage": 0.14193690643063014,
+        "missing": 163443,
+        "present": 27036
+      }
+    }
+  },
+  "validation_date": "2026-09-09"
+}
