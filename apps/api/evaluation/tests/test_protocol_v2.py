@@ -1,4 +1,4 @@
-"""Additional guards for the additive Phase 3 protocol v2 contract."""
+"""Additional guards for the additive Phase 3 protocol v3 contract."""
 
 from __future__ import annotations
 
@@ -14,11 +14,11 @@ def test_checked_in_protocol_is_v2_and_hash_is_reproducible() -> None:
     first = protocol.load()
     second = protocol.load()
 
-    assert first.protocol_version == 2
+    assert first.protocol_version == 7
     assert first.frozen_hash() == second.frozen_hash()
 
 
-def test_v2_cutoff_is_validated_without_changing_v1_loader() -> None:
+def test_v3_cutoff_is_validated_without_changing_v1_loader() -> None:
     raw = copy.deepcopy(protocol.load().raw)
     raw["eligibility_cutoff_date"] = "2026-09-08"
 
@@ -41,8 +41,8 @@ def test_service_version_guard_rejects_v1() -> None:
     raw["protocol_version"] = 1
     parsed = protocol.from_mapping(raw)
 
-    with pytest.raises(ProtocolError, match="expected protocol_version 2"):
-        protocol.require_version(parsed, 2)
+    with pytest.raises(ProtocolError, match="expected protocol_version 6"):
+        protocol.require_version(parsed, 6)
 
 
 def test_incomplete_artifact_is_rejected_closed() -> None:

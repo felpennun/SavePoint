@@ -183,3 +183,44 @@ afinidad usa F0,5: la precision del candidato pesa mas que la cobertura del
 perfil. Esto reduce la ventaja de obras que enumeran muchos generos o
 plataformas. El cambio se aplica al vector versionado, al ranker compartido,
 los workers y el runner offline.
+
+## 9. Decision final fs-v9
+
+Tras reevaluar el efecto del bonus de saga/franquicia y desarrollador, se fija
+como contrato definitivo `fs-v9` / `facet-similarity-v5`:
+
+- F0,5 se mantiene en el nucleo genero/plataforma, con pesos 0,50 y 0,25.
+- La precision del candidato conserva mas influencia que la cobertura del
+  perfil. Esto limita la ventaja artificial de obras que declaran muchos
+  generos o plataformas.
+- Saga/franquicia aporta como maximo 0,02 cuando existe coincidencia con el
+  perfil ponderado del usuario.
+- Desarrollador aporta como maximo 0,015 bajo la misma condicion.
+- El bonus opcional combinado queda limitado a 0,035. No se premia la mera
+  presencia de una saga o desarrollador y una faceta ausente no se penaliza.
+
+La reduccion busca que estas relaciones mejoren la personalizacion sin hacer
+que una saga o una desarrolladora dominen el rating IGDB, la similitud de
+contenido o PopScore. La misma formula, version y pesos se usan en el ranker
+web, los diez workers y la evaluacion offline. La cache fs-v9 contiene 190.479
+vectores y los diez workers de Felipe publicaron correctamente la revision 14.
+La comparacion reproducible de Silksong y Terraria queda archivada en
+[`recommendation-fs-v9-comparison-felipe-2026-09-09.md`](recommendation-fs-v9-comparison-felipe-2026-09-09.md).
+
+## 10. Refuerzo moderado de PopScore
+
+Se decide aumentar moderadamente la influencia de PopScore sin cambiar su
+normalizacion ni sus cuatro señales IGDB. La configuracion queda asi:
+
+- Weighted-Pop y Negative-Pop: contenido 0,55, rating-confidence 0,25 y
+  PopScore 0,20.
+- Multiplicative-Pop: `swing = 0,20`, con factor entre 0,80 y 1,20.
+- Two-Stage-Pop: desempate con rating-confidence 0,80 y PopScore 0,20.
+- Recency: contenido 0,20, rating-confidence 0,20, PopScore 0,20 y recencia
+  0,40.
+
+El objetivo es que la popularidad tenga un efecto apreciable y comparable al
+rating sin dominar la similitud ni la recencia. Se mantiene `popscore_missing_floor
+= 0,0`, de modo que una obra sin PopScore sigue recibiendo una penalizacion
+explicita. El cambio incrementa la version del protocolo a 7 y se reevaluara
+con el mismo snapshot de corpus.

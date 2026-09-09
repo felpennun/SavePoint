@@ -322,3 +322,15 @@ revision 14. Backend: 194 pruebas; TypeScript correcto. Se archivo la
 comparacion fs-v8 entre Silksong y Terraria; no se ejecuto la evaluacion de los
 400 usuarios. Ver `.planning/quick/260909-rnf-raise-saga-and-developer-optional-bonuse/`
 y `docs/verification/recommendation-fs-v8-comparison-felipe-2026-09-09.md`.
+
+## Tarea rapida completada — 2026-09-09
+
+Se completo `fs-v9` / `facet-similarity-v5`: F0,5 queda congelado, saga usa
+bonus maximo 0,02 y desarrollador 0,015. Ademas, PopScore se reforzo de forma
+moderada: 0,20 en las variantes lineales y desempates, `swing = 0,20` en la
+variante multiplicativa y 0,20 en Recency. El protocolo offline se versiono a
+7 y web/offline comparten los pesos. Los diez workers de Felipe publicaron la
+revision 14; la cache mantiene 190.479 vectores. Backend: 194 pruebas; web:
+TypeScript correcto. Reevaluacion archivada en
+`docs/verification/recommendation-fs-v9-comparison-felipe-2026-09-09.md`. No se
+ejecuto la evaluacion offline de los 400 usuarios.

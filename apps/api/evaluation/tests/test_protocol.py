@@ -64,7 +64,7 @@ def test_checked_in_protocol_loads_with_frozen_keys() -> None:
     assert frozen.relevance == {"completed": True, "rating_half_steps_gte": 7}
     assert frozen.split["strategy"] == "leave_one_out_per_user"
     assert frozen.candidate_set == (
-        "eligible_governed_corpus_user_rating_present_and_total_rating_count_gte_10_"
+        "eligible_governed_corpus_user_rating_present_and_total_rating_count_gte_5_"
         "minus_user_library_plus_heldout"
     )
     assert frozen.exclusions == "any_library_entry"
@@ -72,26 +72,29 @@ def test_checked_in_protocol_loads_with_frozen_keys() -> None:
     assert frozen.limitation.strip()
     # Plan 02-13 freezes the governed corpus and its evidence fingerprint.
     assert frozen.corpus_version == "2026.09.2"
-    assert frozen.snapshot_sha256 == "53341af5c60af02b5fd8a8d83eac0dc7eff218627c0df93c22fecb210ecac79d"
+    assert frozen.snapshot_sha256 == "c42f46a42d091e11cd894c3f942b8979b77f611ac7a4b048d8d152bebe8ce3cc"
     assert frozen.raw["popscore_snapshot_sha256"] == "16de92f28fa5b3dd1b387110628561eb6330b271ed2b1e76a69a7e0f03083097"
-    assert frozen.protocol_version == 2
+    assert frozen.protocol_version == 7
     assert frozen.user_split == {"train": 240, "validation": 80, "test": 80, "seed": 20260908}
     assert frozen.raw["synthetic_population"]["phase_3_population"] == 400
     assert frozen.raw["synthetic_population"]["rating_count_min"] == 1
 
 
-def test_checked_in_grid_is_24_configs_within_budget() -> None:
+def test_checked_in_grid_is_28_configs_within_budget() -> None:
     frozen = protocol.load()
     grid = frozen.grid
 
-    assert len(grid) == 24
+    assert len(grid) == 28
     assert len(grid) <= protocol.MAX_GRID
     modes = [entry["combine_mode"] for entry in grid]
-    assert modes.count("weighted_sum") == 15
+    assert modes.count("weighted_sum") == 16
     assert modes.count("multiplicative") == 3
     assert modes.count("two_stage") == 6
+    assert modes.count("multiplicative_popscore") == 1
+    assert modes.count("two_stage_popscore") == 1
+    assert modes.count("negative_weighted_sum_popscore") == 1
     assert sum("recency_score" in entry["signals"] for entry in grid) == 6
-    assert all("user_rating" in entry["signals"] for entry in grid[:15])
+    assert all("rating_confidence" in entry["signals"] for entry in grid)
     assert all("total_rating" not in entry["signals"] for entry in grid)
 
 

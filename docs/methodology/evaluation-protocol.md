@@ -148,14 +148,22 @@ Está congelada en **28 configuraciones** (tope duro: 28; `protocol.load()` lanz
 - La rejilla se puntúa **solo sobre `validation`**, con la métrica titular `ndcg@10`. Se
   bloquea la configuración ganadora.
 
-La versión vigente de la similitud de contenido es `fs-v6`, común a web,
-workers y evaluación offline. Género y plataforma forman el núcleo de
-similitud; sus pesos `0,50` y `0,25` se normalizan entre las facetas
-disponibles. Saga/franquicia y desarrollador actúan como confirmaciones
-positivas con pesos relativos `0,15` y `0,10`: solo aportan cuando coinciden
-con valores presentes en el perfil ponderado del usuario. La mera presencia
-de una saga o un desarrollador no concede puntos, y la ausencia no se imputa
-ni penaliza.
+La versión vigente de la similitud de contenido es `fs-v9` con regla
+`facet-similarity-v5`, común a web, workers y evaluación offline. Género y
+plataforma forman el núcleo de similitud; sus pesos `0,50` y `0,25` se
+normalizan entre las facetas disponibles y se combinan con una media F0,5
+(`beta = 0,5`), que prioriza la precisión del candidato frente a la cobertura
+del perfil. Saga/franquicia y desarrollador actúan como confirmaciones
+positivas con pesos máximos `0,02` y `0,015`, respectivamente: solo aportan
+cuando coinciden con valores presentes en el perfil ponderado del usuario.
+El bonus opcional combinado no puede superar `0,035`; la mera presencia de
+una saga o un desarrollador no concede puntos, y la ausencia no se imputa ni
+penaliza.
+
+Las variantes que incorporan PopScore usan el contrato de pesos publicado en
+el protocolo 7: 0,20 para PopScore en las sumas y desempates, `swing = 0,20`
+en la variante multiplicativa y 0,20 en Recency. La ausencia de PopScore se
+imputa a 0,0, por lo que no se transforma en una señal neutra.
 - El **conjunto de test se corre una sola vez** (`tuning.test_runs = 1`). Su consumo se
   registra en un marcador de run; `protocol.load()` se niega a volver a correr el test de un
   protocolo ya consumido salvo que se suba `protocol_version` (o se pase la bandera explícita

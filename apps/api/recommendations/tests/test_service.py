@@ -71,7 +71,7 @@ def v2_protocol():
 def test_manifest_excludes_seen_future_and_unrated_works(service_user, service_genres) -> None:  # noqa: ANN001
     owned = make_work("owned", service_genres["rpg"], rating=80.0, total_rating_count=10)
     counted = make_work("counted", service_genres["rpg"], rating=80.0, total_rating_count=10)
-    low_volume = make_work("low-volume", service_genres["shooter"], rating=80.0, total_rating_count=9)
+    low_volume = make_work("low-volume", service_genres["shooter"], rating=80.0, total_rating_count=4)
     unrated = make_work("unrated", service_genres["rpg"], total_rating_count=10)
     future = make_work(
         "future",
@@ -128,7 +128,7 @@ def test_algorithms_share_the_same_manifest_and_payload_stays_score_ordered(
         for algorithm_id in ALGORITHM_REGISTRY
     ]
 
-    assert {payload["protocol_version"] for payload in payloads} == {2}
+    assert {payload["protocol_version"] for payload in payloads} == {7}
     assert len({payload["candidate_manifest_sha256"] for payload in payloads}) == 1
     assert all(
         all(left["score"] >= right["score"] for left, right in zip(payload["results"], payload["results"][1:]))
@@ -171,7 +171,7 @@ def test_service_rejects_v1_artifact(service_user) -> None:  # noqa: ANN001
     raw = copy.deepcopy(protocol.load().raw)
     raw["protocol_version"] = 1
 
-    with pytest.raises(ProtocolError, match="expected protocol_version 2"):
+    with pytest.raises(ProtocolError, match="expected protocol_version 7"):
         service.recommend_for_user(
             service_user,
             "content-cbf-weighted-v1",

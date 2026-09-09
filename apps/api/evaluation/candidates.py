@@ -51,7 +51,7 @@ def build_common(
 ) -> CandidateManifest:
     """Build the common non-future candidate universe for product requests."""
 
-    require_version(protocol, 2)
+    require_version(protocol, 7)
     cutoff = eligibility_cutoff_date or protocol.eligibility_cutoff_date or date.today()
     governed = governed_works(
         corpus_version,
@@ -85,7 +85,7 @@ def build(user, protocol, corpus_version: str) -> tuple[frozenset, object, str] 
     immutable candidate set and manifest rather than letting rankers rebuild it.
     """
 
-    require_version(protocol, 2)
+    require_version(protocol, 7)
     split = leave_one_out(
         user,
         seed=protocol.loo_seed,

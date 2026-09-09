@@ -1,4 +1,4 @@
-"""Tests for the fs-v8 facet-aware content similarity contract."""
+"""Tests for the fs-v9 facet-aware content similarity contract."""
 
 from __future__ import annotations
 
@@ -74,7 +74,7 @@ def test_optional_match_is_not_diluted_by_unrelated_profile_values() -> None:
     result = facet_similarity(profile, candidate)
 
     assert result["facet_scores"]["developer"] == pytest.approx(1.0)
-    assert result["optional_bonus"] == pytest.approx(0.15)
+    assert result["optional_bonus"] == pytest.approx(0.015)
 
 
 def test_optional_bonus_uses_the_new_saga_and_developer_maxima() -> None:
@@ -94,7 +94,7 @@ def test_optional_bonus_uses_the_new_saga_and_developer_maxima() -> None:
 
     result = facet_similarity(profile, candidate)
 
-    assert result["optional_bonus"] == pytest.approx(0.35)
+    assert result["optional_bonus"] == pytest.approx(0.035)
 
 
 def test_core_precision_favors_narrower_candidate_metadata() -> None:

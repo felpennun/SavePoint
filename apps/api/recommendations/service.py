@@ -22,7 +22,7 @@ from recommendations.content.rank import rank_content_v1
 from recommendations.content.variants import ALGORITHM_REGISTRY
 
 
-PROTOCOL_VERSION = 6
+PROTOCOL_VERSION = 7
 MIN_LIMIT = 1
 MAX_LIMIT = 50
 

@@ -107,7 +107,7 @@ def combine(
     if spec.combine_mode == "multiplicative":
         return cosine_similarity * rating_confidence
     if spec.combine_mode == "multiplicative_popscore":
-        swing = max(0.0, min(1.0, float(spec.params.get("popscore_swing", 0.15))))
+        swing = max(0.0, min(1.0, float(spec.params.get("popscore_swing", 0.20))))
         popscore_factor = 1.0 - swing + (2.0 * swing * (effective_popscore or 0.0))
         return cosine_similarity * rating_confidence * popscore_factor
     if spec.combine_mode == "two_stage":
@@ -118,8 +118,8 @@ def combine(
     if spec.combine_mode == "two_stage_popscore":
         bands = max(1, int(spec.params.get("bands", 5)))
         band = min(bands - 1, int(cosine_similarity * bands))
-        w_rating = max(0.0, float(spec.params.get("w_rating", 0.85)))
-        w_popscore = max(0.0, float(spec.params.get("w_popscore", 0.15)))
+        w_rating = max(0.0, float(spec.params.get("w_rating", 0.80)))
+        w_popscore = max(0.0, float(spec.params.get("w_popscore", 0.20)))
         total = w_rating + w_popscore
         tie_break = (
             (w_rating * rating_confidence + w_popscore * (effective_popscore or 0.0)) / total
@@ -136,9 +136,9 @@ def combine(
         return max(0.0, positive - penalty)
     if spec.combine_mode == "negative_weighted_sum_popscore":
         positive = (
-            float(spec.params.get("w_content", 0.60)) * cosine_similarity
+            float(spec.params.get("w_content", 0.55)) * cosine_similarity
             + float(spec.params.get("w_rating", 0.25)) * rating_confidence
-            + float(spec.params.get("w_popscore", 0.15)) * (effective_popscore or 0.0)
+            + float(spec.params.get("w_popscore", 0.20)) * (effective_popscore or 0.0)
         )
         penalty = float(spec.params.get("negative_penalty", 0.0)) * negative_similarity
         return max(0.0, positive - penalty)

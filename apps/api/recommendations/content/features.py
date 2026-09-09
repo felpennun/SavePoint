@@ -5,8 +5,8 @@ A feature vector is a sparse ``{feature_key: weight}`` dict over a governed
 
 * ``genre:<slug>``  -- weight 0.50; guaranteed for every governed work.
 * ``platform:<slug>`` -- weight 0.25; allowlist platforms only.
-* ``franchise:<slug>`` -- weight 0.20; IGDB saga signal when present.
-* ``developer:<slug>`` -- weight 0.15; emitted when the governed
+* ``franchise:<slug>`` -- weight 0.02; IGDB saga signal when present.
+* ``developer:<slug>`` -- weight 0.015; emitted when the governed
   view contains the facet. Franchise is the IGDB saga signal and has no
   minimum coverage gate: missing saga data is omitted per work. Developer
   coverage retains its 50 % gate (D-11).
@@ -33,10 +33,11 @@ from catalogue.models import CorpusPopularitySnapshot, CorpusRatingSnapshot, Gam
 from catalogue.popularity import IGDB_ENGAGEMENT_TYPES
 
 # Bump when the vector-building or similarity rules change (part of the DTO,
-# REC-09). fs-v8 raises the optional confirmation weights and keeps cached
+# REC-09). fs-v9 freezes F0.5 and calibrates small optional confirmation
+# weights while keeping cached
 # vectors aligned with the shared facet contract. Cached rows from earlier
 # contracts must not be reused.
-FEATURE_SET_VERSION = "fs-v8"
+FEATURE_SET_VERSION = "fs-v9"
 
 # Shared scalar-signal contract. The product workers and offline runner both
 # call the same ranker, so this version is included in the published
@@ -46,15 +47,15 @@ RATING_QUALITY_POWER = 2.0
 RATING_VOLUME_BOOST = 0.20
 RATING_VOLUME_FLOOR = 1.0 - RATING_VOLUME_BOOST
 
-# These weights express the semantic hierarchy of the content signal. fs-v8
+# These weights express the semantic hierarchy of the content signal. fs-v9
 # uses genre/platform as the core and saga/developer as bounded confirmation
 # bonuses. They remain part of the versioned contract, not request-time tuning
 # parameters.
 FACET_WEIGHTS: dict[str, float] = {
     "genre": 0.50,
     "platform": 0.25,
-    "franchise": 0.20,
-    "developer": 0.15,
+    "franchise": 0.02,
+    "developer": 0.015,
 }
 
 # Saga/franchise is semantically meaningful even when sparse; absent facets are

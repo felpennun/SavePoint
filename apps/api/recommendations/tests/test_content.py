@@ -108,7 +108,7 @@ def test_recency_variant_adds_recency_to_the_other_candidate_signals() -> None:
     )
 
     rating_confidence = 0.7 * (0.8 + 0.2 * 0.6)
-    assert score == pytest.approx(0.8 * 0.30 + rating_confidence * 0.20 + 0.5 * 0.10 + 1.0 * 0.40)
+    assert score == pytest.approx(0.8 * 0.20 + rating_confidence * 0.20 + 0.5 * 0.20 + 1.0 * 0.40)
     assert spec.params["w_recency"] == 0.40
 
 
@@ -303,7 +303,7 @@ def test_versioned_dto_and_item_evidence(user_a, genres) -> None:  # noqa: ANN00
         "limitation",
         "results",
     }
-    assert result["feature_set_version"] == "fs-v8"
+    assert result["feature_set_version"] == "fs-v9"
     assert result["corpus_version"] == _CORPUS
     assert len(result["snapshot_sha256"]) == 64
     assert len(result["input_snapshot_sha256"]) == 64

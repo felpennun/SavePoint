@@ -14,7 +14,7 @@ from recommendations.content.features import FACET_WEIGHTS
 
 FeatureVector = dict[str, float]
 
-SIMILARITY_RULE_VERSION = "facet-similarity-v4"
+SIMILARITY_RULE_VERSION = "facet-similarity-v5"
 
 # Values below one give candidate precision more influence than profile
 # coverage. This limits the advantage of broad works that list many genres or
@@ -108,7 +108,7 @@ def facet_similarity(profile: FeatureVector, candidate: FeatureVector) -> dict:
         # compared with the strongest value in that family, so four unrelated
         # seed studios cannot dilute a genuine match into an invisible bonus.
         # Relative profile weight still matters when several optional values
-        # overlap, while the configured 0.20/0.15 weights remain the maximum.
+        # overlap, while the configured 0.02/0.015 weights remain the maximum.
         affinity, overlap = _facet_affinity(
             profile, candidate, facet, exact_match_scale=True
         )
@@ -121,7 +121,7 @@ def facet_similarity(profile: FeatureVector, candidate: FeatureVector) -> dict:
                 matched_parts[key] = FACET_WEIGHTS[facet] * value / profile_total
 
     # Optional facets are positive confirmation only. Their combined maximum
-    # is 0.35, enough to be visible without becoming a standalone recommender.
+    # is 0.035, a visible tie-break without becoming a standalone recommender.
     score = min(1.0, core + optional_numerator)
     return {
         "score": score,

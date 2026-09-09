@@ -42,20 +42,27 @@ la calidad. `display_rating` y las valoraciones SavePoint no entran en este
 cálculo. El perfil de rating por género solo se usa como fallback cuando la obra
 no tiene rating IGDB observado, y queda marcado en `rating_term_is_fallback`.
 
-La similitud de contenido usa `fs-v8` y la regla `facet-similarity-v4`. Género y
+La similitud de contenido usa `fs-v9` y la regla `facet-similarity-v5`. Género y
 plataforma forman el núcleo con pesos 0,50 y 0,25. Su afinidad combina cobertura
 ponderada del perfil con precisión de la obra mediante una media F0,5: la
 precisión tiene más influencia que la cobertura, por lo que una obra que declara
 muchos géneros o plataformas necesita que una proporción mayor de ellos coincida.
-Saga/franquicia y desarrollador usan pesos máximos 0,20 y 0,15, y actúan como
+Saga/franquicia y desarrollador usan pesos máximos 0,02 y 0,015, y actúan como
 bonus positivos solo cuando coinciden con valores presentes en el perfil
-ponderado del usuario. El bonus opcional máximo es 0,35; tener una saga o
+ ponderado del usuario. El bonus opcional máximo es 0,035; tener una saga o
 desarrollador cualquiera no aporta puntos y una faceta ausente no se imputa ni
 penaliza.
 
 PopScore usa `igdb-engagement-weighted-v2`: visitas 0,40; jugando 0,25;
 jugado 0,25; quiere jugar 0,10. Solo existe si están disponibles las cuatro
 primitivas normalizadas de IGDB.
+
+En las variantes que incluyen PopScore, su influencia publicada es 0,20. En
+Weighted-Pop y Negative-Pop comparte la suma con contenido 0,55 y
+rating-confidence 0,25; en Multiplicative-Pop usa `swing = 0,20`; en
+Two-Stage-Pop forma el desempate con pesos 0,80 para rating-confidence y 0,20
+para PopScore. Recency mantiene 0,40 para recencia y asigna 0,20 a cada una de
+contenido, rating-confidence y PopScore. La ausencia se imputa a 0,0.
 
 La elegibilidad de recomendación es más estricta que la pertenencia al
 catálogo: una obra debe estar en el corpus gobernado, tener fecha no futura,
