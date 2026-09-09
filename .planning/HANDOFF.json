@@ -11,7 +11,7 @@
   "completed_tasks": [
     {"id": 1, "name": "Rankers colaborativo e híbrido compartidos", "status": "done", "commit": "2c12838"},
     {"id": 2, "name": "Workers y estanterías web independientes", "status": "done", "commit": "2c12838"},
-    {"id": 3, "name": "Verificación de facetas IGDB y estantería hybrid-mmr", "status": "done", "commit": "pendiente"}
+    {"id": 3, "name": "Verificación de facetas IGDB y estantería hybrid-mmr", "status": "done", "commit": "a3f3a14"}
   ],
   "remaining_tasks": [
     {"id": 4, "name": "Continuar la interfaz web", "status": "next"},
