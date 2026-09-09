@@ -23,10 +23,11 @@ consumed by ``combine.py`` (Plan 02-11) -- never ``GameWork.total_rating``.
 from __future__ import annotations
 
 import math
+from datetime import date
 
 from django.db.models import Count
 
-from catalogue.corpus import ALLOWLIST_SLUGS, governed_works
+from catalogue.corpus import ALLOWLIST_SLUGS, evaluation_candidate_works, governed_works
 from catalogue.models import CorpusPopularitySnapshot, CorpusRatingSnapshot, GameWork, Genre
 from catalogue.popularity import IGDB_ENGAGEMENT_TYPES
 
@@ -116,16 +117,68 @@ def coverage_report(corpus_version: str | None = None) -> dict:
 
     works = governed_works(corpus_version)
     total = works.count()
+    candidate_count = evaluation_candidate_works(corpus_version).count()
+    genre_present = works.filter(genres__isnull=False).distinct().count()
+    platform_present = works.filter(
+        releases__platform__slug__in=ALLOWLIST_SLUGS
+    ).distinct().count()
     franchise_present = works.filter(franchises__isnull=False).distinct().count()
     developer_present = works.filter(developers__isnull=False).distinct().count()
 
     franchise_coverage = franchise_present / total if total else 0.0
     developer_coverage = developer_present / total if total else 0.0
 
+    snapshot_filter = CorpusRatingSnapshot.objects.filter(
+        work_id__in=works.values("id"),
+    )
+    if corpus_version is not None:
+        snapshot_filter = snapshot_filter.filter(corpus_version=corpus_version)
+    snapshot_rating_present = snapshot_filter.filter(rating__isnull=False).values("work_id").distinct().count()
+    snapshot_volume_present = snapshot_filter.filter(
+        total_rating_count__isnull=False
+    ).values("work_id").distinct().count()
+    popscore_present = (
+        CorpusPopularitySnapshot.objects.filter(
+            corpus_version=corpus_version,
+            work_id__in=works.values("id"),
+            popularity_type_name__in=IGDB_ENGAGEMENT_TYPES,
+            normalised_value__isnull=False,
+        )
+        .values("work_id")
+        .annotate(type_count=Count("popularity_type_name", distinct=True))
+        .filter(type_count=len(IGDB_ENGAGEMENT_TYPES))
+        .count()
+    )
+    dated_and_rated = works.filter(
+        first_release_date__isnull=False,
+        first_release_date__lte=date.today(),
+        id__in=snapshot_filter.filter(rating__isnull=False).values("work_id"),
+    ).distinct().count()
+
+    def field_coverage(present: int) -> dict[str, int | float]:
+        return {
+            "present": present,
+            "missing": max(total - present, 0),
+            "coverage": present / total if total else 0.0,
+        }
+
     return {
         "corpus_version": corpus_version,
         "feature_set_version": FEATURE_SET_VERSION,
         "governed_count": total,
+        "algorithm_candidate_count": candidate_count,
+        "feature_coverage": {
+            "genres": field_coverage(genre_present),
+            "platforms": field_coverage(platform_present),
+            "franchises": field_coverage(franchise_present),
+            "developers": field_coverage(developer_present),
+        },
+        "scalar_signal_coverage": {
+            "external_user_rating_snapshot": field_coverage(snapshot_rating_present),
+            "rating_volume_snapshot": field_coverage(snapshot_volume_present),
+            "release_recency": field_coverage(dated_and_rated),
+            "popscore_complete": field_coverage(popscore_present),
+        },
         "franchise_present": franchise_present,
         "developer_present": developer_present,
         "franchise_coverage": franchise_coverage,
@@ -141,18 +194,17 @@ def coverage_report(corpus_version: str | None = None) -> dict:
         "popscore_primitives_available": CorpusPopularitySnapshot.objects.filter(
             corpus_version=corpus_version
         ).exists(),
-        "rating_available": True,
-        "rating_volume_available": True,
-        "release_recency_available": True,
-        "popscore_available": CorpusPopularitySnapshot.objects.filter(
-            corpus_version=corpus_version,
-            popularity_type_name__in=IGDB_ENGAGEMENT_TYPES,
-            normalised_value__isnull=False,
-        )
-        .values("work_id")
-        .annotate(type_count=Count("popularity_type_name", distinct=True))
-        .filter(type_count=len(IGDB_ENGAGEMENT_TYPES))
-        .exists(),
+        "rating_available": snapshot_rating_present > 0,
+        "rating_volume_available": snapshot_volume_present > 0,
+        "release_recency_available": dated_and_rated > 0,
+        "popscore_available": popscore_present > 0,
+        "null_handling": {
+            "categorical_features": "missing facet omitted from sparse vector",
+            "external_user_rating_snapshot": "genre-median fallback when absent",
+            "rating_volume_snapshot": "missing signal excluded and active weights renormalized",
+            "release_recency": "missing, future, or unrated release returns null",
+            "popscore_complete": "missing primitive excludes composed PopScore",
+        },
     }
 
 

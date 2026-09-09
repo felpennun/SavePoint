@@ -13,7 +13,7 @@ from accounts.models import DemoAccountIdentity, demo_identity_anchor_id
 from catalogue.models import CorpusRatingSnapshot, CorpusVersion, GameWork
 from evaluation import protocol as protocol_module
 from evaluation.candidates import build
-from evaluation.runner import SnapshotCoverageError, run, validate_snapshot_coverage
+from evaluation.runner import SnapshotCoverageError, run, validate_active_population, validate_snapshot_coverage
 from library.models import LibraryEntry
 
 User = get_user_model()
@@ -27,6 +27,7 @@ def frozen_protocol():
     mapping["snapshot_sha256"] = None
     mapping["popscore_snapshot_sha256"] = None
     mapping["user_split"] = {"train": 0, "validation": 0, "test": 1, "seed": 20260908}
+    mapping["synthetic_population"]["phase_3_population"] = 1
     return protocol_module.from_mapping(mapping)
 
 
@@ -83,6 +84,12 @@ def test_build_returns_one_shared_candidate_set(runner_fixture, frozen_protocol)
     assert works[2].id not in candidate_ids
     assert works[3].id not in candidate_ids
     assert candidate_sha256
+
+
+def test_runner_population_contract_matches_active_split(runner_fixture, frozen_protocol):
+    user, _works, _identity = runner_fixture
+    report = validate_active_population([user], frozen_protocol, CORPUS_VERSION)
+    assert report == {"active_user_count": 1, "expected_user_count": 1, "split_total": 1}
 
 
 def test_build_skips_user_without_eligible_positive(runner_fixture, frozen_protocol):

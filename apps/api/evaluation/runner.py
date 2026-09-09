@@ -35,6 +35,29 @@ class SnapshotCoverageError(ValueError):
     """Raised when a run cannot be tied to the active immutable snapshot."""
 
 
+def validate_active_population(users: list[Any], protocol: Protocol, corpus_version: str) -> dict[str, int]:
+    """Fail closed when the active Phase 3 population or split is incomplete."""
+
+    expected_population = protocol.raw.get("synthetic_population", {}).get("phase_3_population")
+    split_total = sum(int(protocol.user_split[key]) for key in ("train", "validation", "test"))
+    # Fixture protocols may deliberately use a different corpus and population;
+    # the frozen production contract is checked only against its own corpus.
+    if protocol.corpus_version == corpus_version:
+        if expected_population is not None and len(users) != int(expected_population):
+            raise ValueError(
+                f"active synthetic population expects {expected_population} users; got {len(users)}"
+            )
+        if split_total != len(users):
+            raise ValueError(
+                f"user_split totals {split_total} users but active population has {len(users)}"
+            )
+    return {
+        "active_user_count": len(users),
+        "expected_user_count": int(expected_population or len(users)),
+        "split_total": split_total,
+    }
+
+
 def _hash_payload(payload: Any) -> str:
     return hashlib.sha256(
         json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str).encode("utf-8")

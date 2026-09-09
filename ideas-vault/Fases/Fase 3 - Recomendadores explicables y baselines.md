@@ -70,6 +70,15 @@ Fase 2. La nueva población usa `rating_count >= 1` con ponderación escalonada 
 volumen, y las cohortes 10/100/240/50 ya están verificadas; todavía no se ha ejecutado ningún
 algoritmo.
 
+La auditoría previa a algoritmos confirma 400 usuarios activos, 200 históricos preservados,
+0 solapamiento y split 240/80/80. El manifiesto reproducible tiene hash
+`be3e43c451724c9c3add784394955397292d20438dc18f17c60b1984e1f4dd38`. La cobertura de señales
+es: géneros/plataformas 100 %, desarrolladores 53,03 %, franquicias 6,07 %, rating IGDB
+14,19 %, volumen 16,08 % y PopScore completo 9.929 obras. Todavía no se ha ejecutado ningún
+algoritmo.
+
+Evidencia detallada: [[../../docs/verification/recommendation-input-audit-2026-09-09.md|auditoría de entradas de recomendación]].
+
 ## Enlaces
 
 - [[Metricas de ranking]] · [[Diversidad y novedad]] · [[Cohortes de usuario]]

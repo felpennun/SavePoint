@@ -194,6 +194,8 @@ TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<ver
 | 2026-09-09 | Actualización de rejillas y contrato de señales de la Fase 3 | Rejilla de 24 configuraciones; `recency-v1` combina las señales base y recencia; snapshot, hashes, protocolo y documentación actualizados; sin ejecutar algoritmos |
 | 2026-09-09 | Corrección y regeneración de población sintética de Fase 3 | Los 400 usuarios nuevos sustituyen a los 200 heredados como población activa; split 240/80/80, cohortes 10/100/240/50 y sesgo escalonado por `rating_count >= 1` verificados en BD; sin ejecutar algoritmos |
 
+| 2026-09-09 | Manifiesto, aislamiento y auditoría de señales de Fase 3 | Manifiesto hash-pinned de 400 usuarios; 200 históricos preservados sin solapamiento; split 240/80/80 verificado; cobertura y política de nulos de todas las señales documentadas; sin ejecutar algoritmos |
+
 ## Deferred Items
 
 | Category | Item | Status | Deferred At | Milestone |

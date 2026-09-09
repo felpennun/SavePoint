@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import random
+import hashlib
+import json
 from collections import Counter
 from dataclasses import dataclass
 from datetime import date
@@ -24,6 +26,14 @@ from library.models import BacklogStatus, CopyFormat, LibraryEntry, OwnedCopy
 SYNTHETIC_EVAL_USER_MARKER = "synthetic-eval-user"
 SYNTHETIC_PHASE2_MARKER = "synthetic-eval-user-phase2"
 SYNTHETIC_LOCK_KEY = 7250209
+RATING_COUNT_WEIGHT_BUCKETS = (
+    (5, 1.0),
+    (20, 2.0),
+    (100, 4.0),
+    (500, 8.0),
+    (2000, 16.0),
+    (None, 32.0),
+)
 LEGACY_PHASE2_ARCHETYPES = frozenset(
     {
         "monogenero-severo",
@@ -135,17 +145,10 @@ def _rating_count_weight(rating_count: int | None) -> float:
     """
 
     count = max(int(rating_count or 0), 1)
-    if count < 5:
-        return 1.0
-    if count < 20:
-        return 2.0
-    if count < 100:
-        return 4.0
-    if count < 500:
-        return 8.0
-    if count < 2000:
-        return 16.0
-    return 32.0
+    for maximum, weight in RATING_COUNT_WEIGHT_BUCKETS:
+        if maximum is None or count < maximum:
+            return weight
+    raise AssertionError("rating-count weight buckets must have an open final bucket")
 
 
 def _weighted_sample_without_replacement(
@@ -312,6 +315,7 @@ def apply_population(population: SyntheticPopulation) -> dict[str, object]:
     created = 0
     updated = 0
     anchor_ids: list[str] = []
+    user_ids: dict[str, str] = {}
     user_model = get_user_model()
     with transaction.atomic():
         with connection.cursor() as cursor:
@@ -388,7 +392,70 @@ def apply_population(population: SyntheticPopulation) -> dict[str, object]:
                 ]
             )
             anchor_ids.append(str(anchor_id))
-    return {"created": created, "updated": updated, "anchor_ids": anchor_ids}
+            user_ids[synthetic_user.seed_key] = str(identity.user_id)
+    return {
+        "created": created,
+        "updated": updated,
+        "anchor_ids": anchor_ids,
+        "user_ids": user_ids,
+    }
+
+
+def _cohort_for(user: SyntheticUser) -> str:
+    size = len(user.entries)
+    if user.no_history:
+        return "no_history"
+    if size <= 4:
+        return "sparse_history_1_to_4"
+    if size <= 10:
+        return "normal_history_5_to_10"
+    return "intensive_history_over_10"
+
+
+def render_population_manifest(
+    population: SyntheticPopulation,
+    *,
+    account_ids: dict[str, str] | None = None,
+) -> str:
+    """Render the machine-readable, hash-pinned synthetic population manifest."""
+
+    payload = {
+        "schema_version": "phase3-synthetic-population-v1",
+        "seed": population.seed,
+        "corpus_version": population.corpus_version,
+        "active_marker": SYNTHETIC_EVAL_USER_MARKER,
+        "population_count": len(population.users),
+        "rating_count_min": 1,
+        "rating_count_weight_buckets": [
+            {"max_exclusive": maximum, "weight": weight}
+            for maximum, weight in RATING_COUNT_WEIGHT_BUCKETS
+        ],
+        "split": {"train": 240, "validation": 80, "test": 80, "seed": 20260908},
+        "users": [
+            {
+                "seed_key": user.seed_key,
+                "account_id": (account_ids or {}).get(user.seed_key),
+                "archetype": user.archetype,
+                "cohort": _cohort_for(user),
+                "library_size": len(user.entries),
+                "entries": [
+                    {
+                        "work_id": str(entry.work_id),
+                        "current_status": entry.current_status,
+                        "rating_half_steps": entry.rating_half_steps,
+                        "release_id": str(entry.release_id) if entry.release_id else None,
+                        "edition_id": str(entry.edition_id) if entry.edition_id else None,
+                        "owned_copy": entry.owned_copy,
+                    }
+                    for entry in user.entries
+                ],
+            }
+            for user in population.users
+        ],
+    }
+    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+    payload["manifest_sha256"] = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+    return json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=True) + "\n"
 
 
 def render_validation_report(population: SyntheticPopulation) -> str:
