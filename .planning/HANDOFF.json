@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-09-09T14:21:14+02:00",
+  "phase": "03",
+  "phase_name": "explainable-content-recommenders-and-baseline-comparison",
+  "phase_dir": ".planning/phases/03-explainable-content-recommenders-and-baseline-comparison",
+  "plan": 4,
+  "task": 2,
+  "total_tasks": 2,
+  "status": "paused",
+  "completed_tasks": [
+    {"id": 1, "name": "Arquitectura común, workers y caché de recomendaciones", "status": "done", "commit": "b4f024b"},
+    {"id": 2, "name": "Contrato de candidatos N=10 y límite de 20 resultados publicados", "status": "done", "commit": "b4f024b"}
+  ],
+  "remaining_tasks": [
+    {"id": 3, "name": "Ejecutar y verificar la comparación offline tras autorización explícita", "status": "not_started"},
+    {"id": 4, "name": "Completar las evidencias y comprobaciones E2E de los planes 03-03 y 03-04", "status": "not_started"}
+  ],
+  "blockers": [],
+  "async_jobs": [],
+  "human_actions_pending": [
+    {"action": "Autorizar la ejecución de la comparación offline", "context": "El autor indicó que no se iniciara todavía la corrida experimental.", "blocking": true}
+  ],
+  "decisions": [
+    {"decision": "Todos los algoritmos usan rating IGDB no nulo y total_rating_count >= 10.", "rationale": "Evitar recomendar obras con calidad o volumen insuficientes.", "phase": "03"},
+    {"decision": "Las estanterías publicadas se fijan a 20 resultados.", "rationale": "Separar la profundidad de producto de los valores K de evaluación.", "phase": "03"}
+  ],
+  "uncommitted_files": [],
+  "next_action": "Esperar autorización y ejecutar una corrida offline controlada sin recalcular snapshots personales.",
+  "context_notes": "La arquitectura y datos están preparados; la evaluación experimental sigue pendiente por decisión del autor."
+}
