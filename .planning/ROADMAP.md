@@ -233,7 +233,12 @@ Plans:
   3. Multi-seed results expose uncertainty, cohort trade-offs, diversity/novelty effects, timing, and sensitivity without tuning on the test set.
   4. Each algorithm's theory, formulation, parameters, limitations, implementation evidence, agent contribution, and author interpretation are thesis-ready.
 
-**Plans**: TBD
+**Plans**: 3 plans in 2 waves
+
+**Plan files**:
+- [x] 04-01-PLAN.md — Rankers colaborativo e híbrido compartidos, con pruebas y fallbacks.
+- [x] 04-02-PLAN.md — Workers independientes y estanterías web para ambos algoritmos.
+- [x] 04-03-PLAN.md — Evaluación offline paralela por proceso, tiempos y fallo explícito.
 
 ### Phase 5: Complete Collection Workflows and Portability
 

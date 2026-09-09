@@ -10,7 +10,16 @@ import pytest
 from django.http import QueryDict
 from rest_framework.test import APIClient
 
-from catalogue.models import GameAlias, GameRelease, GameWork, Genre, Platform, SourceRecord
+from catalogue.models import (
+    CorpusPopularityScore,
+    CorpusVersion,
+    GameAlias,
+    GameRelease,
+    GameWork,
+    Genre,
+    Platform,
+    SourceRecord,
+)
 from catalogue.normalization import normalize_title
 from catalogue.search import (
     SORT_ORDERS,
@@ -101,7 +110,7 @@ def test_whitespace_only_query_returns_unfiltered_catalogue() -> None:
 
 
 @pytest.mark.django_db
-def test_catalogue_without_query_defaults_to_relevance() -> None:
+def test_catalogue_without_query_defaults_to_popscore() -> None:
     _make_work("Unrated Game")
     rated = _make_work("Highly Rated Game")
     rated.total_rating = 96.0
@@ -109,7 +118,7 @@ def test_catalogue_without_query_defaults_to_relevance() -> None:
 
     result = search_games()
 
-    assert result["sort"] == "relevance"
+    assert result["sort"] == "popscore_desc"
     assert [work.original_title for work in result["results"]] == [
         "Highly Rated Game",
         "Unrated Game",
@@ -117,7 +126,7 @@ def test_catalogue_without_query_defaults_to_relevance() -> None:
 
 
 @pytest.mark.django_db
-def test_default_relevance_keeps_works_with_fewer_than_one_thousand_ratings() -> None:
+def test_default_popscore_keeps_works_with_fewer_than_one_thousand_ratings() -> None:
     included = _make_work("Included Default Result")
     included.total_rating = 90.0
     included.save(update_fields=["total_rating"])
@@ -128,10 +137,10 @@ def test_default_relevance_keeps_works_with_fewer_than_one_thousand_ratings() ->
 
     result = search_games()
 
-    assert result["sort"] == "relevance"
+    assert result["sort"] == "popscore_desc"
     assert [work.original_title for work in result["results"]] == [
-        "Included Default Result",
         "Excluded Small Sample",
+        "Included Default Result",
     ]
 
 
@@ -153,7 +162,7 @@ def test_relevance_uses_stepped_rating_count_tiers() -> None:
         work.total_rating_count = rating_count
         work.save(update_fields=["total_rating", "total_rating_count"])
 
-    result = search_games()
+    result = search_games(cq=CatalogueQuery(sort="relevance"))
 
     assert [work.original_title for work in result["results"]] == [title for title, _, _ in expected]
 
@@ -172,13 +181,42 @@ def test_relevance_uses_rating_tier_before_score_for_search() -> None:
     too_small.total_rating_count = 999
     too_small.save(update_fields=["total_rating", "total_rating_count"])
 
-    result = search_games("Elden Ring")
+    result = search_games(cq=CatalogueQuery(q="Elden Ring", sort="relevance"))
 
     assert result["sort"] == "relevance"
     assert [work.original_title for work in result["results"]] == [
         "Elden Ring High",
         "Elden Ring Low",
         "Elden Ring Small",
+    ]
+
+
+@pytest.mark.django_db
+def test_default_catalogue_order_uses_active_popscore() -> None:
+    low = _make_work("Low PopScore")
+    high = _make_work("High PopScore")
+    CorpusVersion.objects.create(
+        version="catalogue-v1",
+        ruleset_sha256="1" * 64,
+        is_active=True,
+    )
+    calculated_at = "2026-09-09T00:00:00Z"
+    for work, score in ((low, 0.15), (high, 0.85)):
+        CorpusPopularityScore.objects.create(
+            work=work,
+            corpus_version="catalogue-v1",
+            score=score,
+            formula_version="igdb-engagement-weighted-v2",
+            calculated_at=calculated_at,
+            source_snapshot_sha256="2" * 64,
+        )
+
+    result = search_games()
+
+    assert result["sort"] == "popscore_desc"
+    assert [work.original_title for work in result["results"][:2]] == [
+        "High PopScore",
+        "Low PopScore",
     ]
 
 
@@ -430,8 +468,8 @@ def test_response_includes_facets_with_counts_and_year_range() -> None:
     facets = body["facets"]
 
     platform_counts = {p["slug"]: p["count"] for p in facets["platforms"]}
-    assert platform_counts["pc"] == 2
     assert platform_counts["playstation-5"] == 1
+    assert "pc" not in platform_counts
     genre_counts = {g["slug"]: g["count"] for g in facets["genres"]}
     assert genre_counts["role-playing-rpg"] == 2
     assert genre_counts["shooter"] == 1
@@ -607,6 +645,26 @@ def test_non_governed_work_hidden_from_list_search_and_facets() -> None:
 
     genre_counts = {g["slug"]: g["count"] for g in listing["facets"]["genres"]}
     assert genre_counts["role-playing-rpg"] == 1
+
+
+@pytest.mark.django_db
+def test_facets_exclude_non_allowlisted_platforms_on_governed_works() -> None:
+    rpg = _genre("Role-playing (RPG)", 12)
+    work = _work("Multi-platform Game", year=2015, platforms=("PC",), genres=(rpg,))
+    allowed, _ = Platform.objects.get_or_create(
+        slug="pc-microsoft-windows",
+        defaults={"name": "PC (Microsoft Windows)"},
+    )
+    GameRelease.objects.create(
+        work=work,
+        platform=allowed,
+        release_name="Multi-platform Game (Windows)",
+        release_date=date(2015, 1, 1),
+    )
+
+    platform_slugs = {item["slug"] for item in search_games()["facets"]["platforms"]}
+    assert "pc-microsoft-windows" in platform_slugs
+    assert "pc" not in platform_slugs
 
 
 @pytest.mark.django_db

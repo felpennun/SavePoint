@@ -3,9 +3,9 @@
   "governed_count": 190479,
   "rating_coverage_pct": 14.1937,
   "rating_present": 27036,
-  "recommendation_candidate_count": 30623,
-  "snapshots_inserted": 27036,
+  "recommendation_candidate_count": 13618,
+  "snapshots_inserted": 0,
   "source": "igdb",
-  "total_rating_coverage_pct": 16.1131,
-  "total_rating_present": 30692
+  "total_rating_count_present": 23311,
+  "total_rating_coverage_pct": 12.2381
 }

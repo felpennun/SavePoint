@@ -59,7 +59,11 @@ PLATFORM_ALLOWLIST: tuple[tuple[int, str, str], ...] = (
 )
 
 ALLOWLIST_SLUGS = frozenset(slug for _igdb_id, slug, _display_name in PLATFORM_ALLOWLIST)
-MIN_RECOMMENDATION_TOTAL_RATING_COUNT = 10
+MIN_RECOMMENDATION_TOTAL_RATING_COUNT = 5
+RECOMMENDATION_ELIGIBILITY_RULE = (
+    "rating IS NOT NULL AND total_rating_count >= "
+    f"{MIN_RECOMMENDATION_TOTAL_RATING_COUNT}"
+)
 
 def is_valid_name(name: str | None) -> bool:
     """Return whether a title has at least two alphanumeric characters."""
@@ -95,7 +99,7 @@ def evaluation_candidate_works(
     """Return catalogue works eligible for recommendation algorithms.
 
     The full governed catalogue remains searchable. A recommendation candidate
-    needs a non-null IGDB user rating and at least ten total IGDB ratings.
+    needs a non-null IGDB user rating and at least five total IGDB ratings.
     """
 
     return governed_works(

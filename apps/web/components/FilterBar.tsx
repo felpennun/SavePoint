@@ -2,7 +2,6 @@ import { getDictionary } from "@/i18n";
 import { FacetMenu } from "@/components/FacetMenu";
 import {
   MIN_RATING_OPTIONS,
-  SORT_KEYS,
   type CatalogueFilters,
   type FilterOption,
 } from "@/lib/catalogue-filters";
@@ -40,15 +39,6 @@ export function FilterBar({
 }) {
   const dict = getDictionary(locale);
   const f = dict.catalogue.filters;
-  const s = dict.catalogue.sort;
-  const sortLabels: Record<(typeof SORT_KEYS)[number], string> = {
-    relevance: s.relevance,
-    title_asc: s.titleAsc,
-    title_desc: s.titleDesc,
-    release_newest: s.releaseNewest,
-    release_oldest: s.releaseOldest,
-    rating_desc: s.ratingDesc,
-  };
   const platformsUnavailable = optionsUnavailable || platformOptions.length === 0;
   const genresUnavailable = optionsUnavailable || genreOptions.length === 0;
   const currentYear = new Date().getUTCFullYear();
@@ -104,17 +94,6 @@ export function FilterBar({
             {MIN_RATING_OPTIONS.map((v) => (
               <option key={v} value={v}>
                 {v}+
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="sp-field">
-          <label htmlFor="sort">{s.label}</label>
-          <select id="sort" name="sort" defaultValue={filters.sort}>
-            {SORT_KEYS.map((k) => (
-              <option key={k} value={k}>
-                {sortLabels[k]}
               </option>
             ))}
           </select>

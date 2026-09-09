@@ -25,10 +25,10 @@ from dataclasses import dataclass
 from datetime import date
 
 from django.contrib.postgres.search import TrigramSimilarity
-from django.db.models import Case, Count, F, IntegerField, Max, Min, QuerySet, Value, When
+from django.db.models import Case, Count, F, IntegerField, Max, Min, OuterRef, QuerySet, Subquery, Value, When
 
-from catalogue.corpus import governed_works
-from catalogue.models import GameAlias, GameWork, Genre, Platform
+from catalogue.corpus import ALLOWLIST_SLUGS, governed_works
+from catalogue.models import CorpusPopularityScore, CorpusVersion, GameAlias, GameWork, Genre, Platform
 from catalogue.normalization import normalize_title
 
 TRIGRAM_SIMILARITY_THRESHOLD = 0.3
@@ -75,9 +75,9 @@ SORT_ORDERS: dict[str, tuple] = {
 }
 # ``relevance`` is the default discovery mode with or without a text query.
 # It means a stepped rating-count order followed by the IGDB score.
-SORT_KEYS: tuple[str, ...] = ("relevance", *SORT_ORDERS.keys())
-DEFAULT_SORT_NO_QUERY = "relevance"
-DEFAULT_SORT_WITH_QUERY = "relevance"
+SORT_KEYS: tuple[str, ...] = ("popscore_desc", "relevance", *SORT_ORDERS.keys())
+DEFAULT_SORT_NO_QUERY = "popscore_desc"
+DEFAULT_SORT_WITH_QUERY = "popscore_desc"
 
 
 class FilterValidationError(ValueError):
@@ -295,7 +295,9 @@ def _facets(scoped: QuerySet[GameWork]) -> dict:
     """
     platforms = [
         {"slug": row["slug"], "name": row["name"], "count": row["count"]}
-        for row in Platform.objects.filter(releases__work__in=scoped)
+        for row in Platform.objects.filter(
+            slug__in=ALLOWLIST_SLUGS, releases__work__in=scoped
+        )
         .annotate(count=Count("releases__work", distinct=True))
         .order_by("name")
         .values("slug", "name", "count")
@@ -340,6 +342,27 @@ def _relevance_order(qs: QuerySet[GameWork]) -> QuerySet[GameWork]:
     )
 
 
+def _popscore_order(qs: QuerySet[GameWork]) -> QuerySet[GameWork]:
+    """Order by the materialised PopScore from the active corpus version."""
+
+    active_version = (
+        CorpusVersion.objects.filter(is_active=True)
+        .order_by("-created_at")
+        .values("version")[:1]
+    )
+    score = (
+        CorpusPopularityScore.objects.filter(
+            work_id=OuterRef("pk"),
+            corpus_version=Subquery(active_version),
+        )
+        .values("score")[:1]
+    )
+    return qs.annotate(popscore=Subquery(score)).order_by(
+        F("popscore").desc(nulls_last=True),
+        "canonical_slug",
+    )
+
+
 def search_games(
     query: str | None = None,
     page: int = 1,
@@ -380,7 +403,11 @@ def search_games(
 
     filtered = _apply_filters(scoped, cq)
 
-    if cq.sort == "relevance":
+    if cq.sort == "popscore_desc":
+        ordered_qs = _popscore_order(filtered)
+        total = ordered_qs.count()
+        page_works = list(_prefetched(ordered_qs)[start : start + page_size])
+    elif cq.sort == "relevance":
         ordered_qs = _relevance_order(filtered)
         total = ordered_qs.count()
         page_works = list(_prefetched(ordered_qs)[start : start + page_size])

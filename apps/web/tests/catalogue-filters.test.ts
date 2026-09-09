@@ -1,13 +1,14 @@
 import { describe, expect, it } from "vitest";
 
-import { buildQuery, parseFilters } from "@/lib/catalogue-filters";
+import { buildQuery, parseFilters, SORT_KEYS } from "@/lib/catalogue-filters";
 
-describe("catalogue default relevance", () => {
-  it("selects relevance without requiring a text query", () => {
-    expect(parseFilters({}, 2026).sort).toBe("relevance");
+describe("catalogue default PopScore", () => {
+  it("selects PopScore without requiring a text query", () => {
+    expect(parseFilters({}, 2026).sort).toBe("popscore_desc");
+    expect(SORT_KEYS).toEqual(["popscore_desc"]);
   });
 
-  it("keeps the default relevance mode stable in shareable URLs", () => {
+  it("keeps the default PopScore mode stable in shareable URLs", () => {
     expect(buildQuery(parseFilters({}, 2026))).toBe("");
     expect(buildQuery(parseFilters({ q: "Elden Ring" }, 2026))).toBe("?q=Elden+Ring");
   });

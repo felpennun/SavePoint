@@ -11,7 +11,7 @@ function SkeletonShelf() {
       <p role="status" aria-live="polite" className="visually-hidden">
         Loading…
       </p>
-      <ul className="sp-shelf-track" aria-hidden="true" style={{ listStyle: "none", margin: 0, padding: 0 }}>
+      <ul className="sp-shelf-track" aria-hidden="true">
         {Array.from({ length: 4 }, (_, index) => (
           <li key={index} className="sp-skeleton" />
         ))}
@@ -45,7 +45,7 @@ export function OwnedGamesDlcShelf({
         return (
           <div key={group.base_game.slug}>
             <h3 className="sp-h2">{labels.baseGameLabel.replace("{game}", group.base_game.title)}</h3>
-            <ul className="sp-shelf-track" style={{ listStyle: "none", margin: 0, padding: 0 }}>
+            <ul className="sp-shelf-track">
               {group.dlc.map((item) => (
                 <GameCard
                   key={`${group.base_game.slug}-${item.work_id}`}

@@ -1,12 +1,11 @@
-"""Deterministic product-recency signal, separate from recommendation novelty."""
+"""Deterministic calendar-year novelty signal for recent releases."""
 
 from __future__ import annotations
 
-import math
 from datetime import date
 
 
-DEFAULT_HALF_LIFE_DAYS = 365
+DEFAULT_YEAR_DECAY = 0.35
 
 
 def recency_score(
@@ -14,21 +13,25 @@ def recency_score(
     *,
     eligibility_cutoff_date: date,
     has_external_rating: bool,
-    half_life_days: int = DEFAULT_HALF_LIFE_DAYS,
+    year_decay: float = DEFAULT_YEAR_DECAY,
 ) -> float | None:
-    """Return a bounded release-recency score or ``None`` when unavailable.
+    """Return a bounded calendar-year score or ``None`` when unavailable.
 
     Only already-released games with an observed external rating are eligible
     for the product novelty signal. A missing date is not interpreted as an
-    old release, and a future release is never eligible.
+    old release, and a future release is never eligible. Every release in the
+    cutoff year scores ``1.0``; each previous calendar year is multiplied by
+    ``year_decay``. This makes the current year and the previous year explicit
+    novelty buckets rather than allowing a long-tailed day-level half-life to
+    keep very old works competitive.
     """
 
     if (
         release_date is None
         or release_date > eligibility_cutoff_date
         or not has_external_rating
-        or half_life_days <= 0
+        or not 0.0 < year_decay <= 1.0
     ):
         return None
-    age_days = max(0, (eligibility_cutoff_date - release_date).days)
-    return math.exp(-math.log(2) * age_days / half_life_days)
+    year_gap = max(0, eligibility_cutoff_date.year - release_date.year)
+    return year_decay**year_gap

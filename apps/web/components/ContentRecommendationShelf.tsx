@@ -45,7 +45,7 @@ export function ContentRecommendationShelf({
         </div>
       ) : null}
       {items.length > 0 ? (
-        <ol className="sp-shelf-track" style={{ listStyle: "none", margin: 0, padding: 0 }}>
+        <ol className="sp-shelf-track">
           {items.map((item) => (
             <GameCard
               key={item.work_id}
@@ -58,11 +58,7 @@ export function ContentRecommendationShelf({
                 cover: item.cover,
               }}
               locale={locale}
-              score={
-                item.signals?.external_rating == null
-                  ? null
-                  : item.signals.external_rating * 100
-              }
+              score={item.display_rating}
               evidence={item.reason ? formatReason(item.reason, locale) : undefined}
               coverVariant="shelf"
             />

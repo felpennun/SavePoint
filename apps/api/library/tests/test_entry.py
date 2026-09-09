@@ -9,7 +9,9 @@ from django.contrib.auth import get_user_model
 from django.db import connections
 from rest_framework.test import APIClient
 
+from accounts.models import DemoAccountAnchor
 from catalogue.models import AssetAttribution, GameRelease, GameWork, Platform
+from catalogue.ratings import display_rating
 from library.models import LibraryEntry, StatusTransition
 
 User = get_user_model()
@@ -73,6 +75,20 @@ def test_my_library_lists_a_rating_without_a_status_after_reload(work, user_a) -
     assert items[0]["work_slug"] == "tracer-game"
     assert items[0]["status"] is None
     assert items[0]["rating_half_steps"] == 10
+
+
+@pytest.mark.django_db
+def test_my_library_includes_the_blended_display_rating_separately(work, user_a) -> None:  # noqa: ANN001
+    work.rating = 80.0
+    work.rating_count = 3
+    work.save(update_fields=["rating", "rating_count"])
+    DemoAccountAnchor.objects.create(user=user_a)
+    LibraryEntry.objects.create(user=user_a, work=work, rating_half_steps=10)
+
+    item = _client_for(user_a).get("/api/library/entries/").json()["items"][0]
+
+    assert item["display_rating"] == display_rating(work) == 85.0
+    assert item["rating_half_steps"] == 10
 
 
 @pytest.mark.django_db

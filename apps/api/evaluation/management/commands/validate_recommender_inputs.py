@@ -95,26 +95,28 @@ class Command(BaseCommand):
             "multiplicative_popscore",
             "two_stage_popscore",
             "negative_weighted_sum_popscore",
+            "mmr",
         )}
         recency_count = sum("recency_score" in entry.get("signals", []) for entry in grid)
         all_rating_confidence = all("rating_confidence" in entry.get("signals", []) for entry in grid)
-        if len(grid) != 28 or modes != {
+        if len(grid) != 31 or modes != {
             "weighted_sum": 16,
             "multiplicative": 3,
             "two_stage": 6,
             "multiplicative_popscore": 1,
             "two_stage_popscore": 1,
             "negative_weighted_sum_popscore": 1,
+            "mmr": 3,
         }:
-            failures.append("tuning grid does not match the frozen 28-configuration contract")
+            failures.append("tuning grid does not match the frozen 31-configuration contract")
         if recency_count != 6:
             failures.append("recency signal is not limited to the six recency configurations")
         if not all_rating_confidence:
             failures.append("rating signals violate the rating-confidence contract")
 
         signals = coverage_report(corpus_version)
-        if signals["feature_set_version"] != "fs-v6" or not signals["include_franchise"]:
-            failures.append("saga/franchise signal is not active in fs-v6")
+        if signals["feature_set_version"] != "fs-v9" or not signals["include_franchise"]:
+            failures.append("saga/franchise signal is not active in fs-v9")
 
         evidence = {
             "audit": "recommender-input-preflight",

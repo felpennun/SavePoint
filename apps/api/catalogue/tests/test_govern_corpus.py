@@ -102,22 +102,32 @@ def test_govern_corpus_applies_every_d03_clause_and_keeps_unrated() -> None:
     assert len(evidence["sampled_manifest"]) == 1
 
 
-def test_recommendation_candidates_use_total_volume_or_user_rating() -> None:
-    total_volume = make_work(20)
-    total_volume.total_rating_count = 1
-    total_volume.save(update_fields=["total_rating_count"])
-    user_rating = make_work(21)
-    user_rating.rating = 72.0
-    user_rating.save(update_fields=["rating"])
-    excluded = make_work(22)
+def test_recommendation_candidates_require_rating_and_minimum_total_volume() -> None:
+    threshold_candidate = make_work(20)
+    threshold_candidate.rating = 72.0
+    threshold_candidate.total_rating_count = 5
+    threshold_candidate.save(update_fields=["rating", "total_rating_count"])
+    higher_volume_candidate = make_work(21)
+    higher_volume_candidate.rating = 80.0
+    higher_volume_candidate.total_rating_count = 10
+    higher_volume_candidate.save(update_fields=["rating", "total_rating_count"])
+    missing_rating = make_work(22)
+    missing_rating.total_rating_count = 100
+    missing_rating.save(update_fields=["total_rating_count"])
+    below_threshold = make_work(23)
+    below_threshold.rating = 90.0
+    below_threshold.total_rating_count = 4
+    below_threshold.save(update_fields=["rating", "total_rating_count"])
 
     run_governance()
 
     assert set(evaluation_candidate_works("2026.09.1").values_list("id", flat=True)) == {
-        total_volume.id,
-        user_rating.id,
+        threshold_candidate.id,
+        higher_volume_candidate.id,
     }
-    assert excluded.id not in evaluation_candidate_works("2026.09.1").values_list("id", flat=True)
+    candidates = evaluation_candidate_works("2026.09.1").values_list("id", flat=True)
+    assert missing_rating.id not in candidates
+    assert below_threshold.id not in candidates
 
 
 def test_govern_corpus_is_idempotent_and_emits_all_evidence_sections() -> None:

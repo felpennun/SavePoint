@@ -32,7 +32,7 @@ describe("catalogue multi-select filters", () => {
   });
 
   it("counts each selected facet value", () => {
-    expect(countActiveFilters({ genre: ["rpg", "strategy"], platform: ["switch"], sort: "relevance" })).toBe(3);
+    expect(countActiveFilters({ genre: ["rpg", "strategy"], platform: ["switch"], sort: "popscore_desc" })).toBe(3);
   });
 
   it("removes only the requested facet value and preserves other params", () => {

@@ -546,7 +546,10 @@ textarea {
 
 .sp-recommendation-shelves {
   display: grid;
-  gap: var(--space-2xl);
+  /* Seven explanatory shelves fit comfortably without making the page feel
+     like separate screens. The row height below reserves room for the
+     two-line evidence shown by content-based recommendations. */
+  gap: var(--space-xl);
 }
 
 .sp-shelf {
@@ -555,22 +558,33 @@ textarea {
   gap: var(--space-md);
 }
 
-.sp-recommendation-shelves .sp-h2 {
-  margin-top: 0;
+.sp-recommendation-shelves .sp-shelf > .sp-h2,
+.sp-recommendation-shelves .sp-shelf > .sp-muted {
+  /* Shelf layout owns all vertical rhythm through its grid gap. Leaving the
+     document-level heading/paragraph margins here made each shelf appear to
+     use a different separation. */
+  margin: 0;
 }
 
 .sp-shelf-track {
-  display: flex;
-  gap: var(--space-md);
+  list-style: none;
+  margin: 0;
+  padding: 0 0 var(--space-sm);
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 120px;
+  grid-auto-rows: 18.25rem;
+  justify-content: flex-start;
+  column-gap: var(--space-md);
+  row-gap: 0;
   overflow-x: auto;
-  min-height: 15.5rem;
-  padding-bottom: var(--space-sm);
+  min-height: 18.75rem;
   scroll-snap-type: x proximity;
 }
 
 .sp-shelf-track > li {
-  flex: 0 0 120px;
-  height: 15rem;
+  width: 120px;
+  height: 18.25rem;
 }
 
 .sp-shelf-track .sp-card {

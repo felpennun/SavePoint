@@ -15,6 +15,8 @@ from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
+from catalogue.models import GameWork
+from catalogue.ratings import display_rating, savepoint_rating_stats
 from evaluation.protocol import ProtocolError
 from recommendations.models import (
     RecommendationJobStatus,
@@ -22,6 +24,7 @@ from recommendations.models import (
 )
 from recommendations.service import RecommendationServiceError, recommend_for_user
 from recommendations.content.variants import ALGORITHM_REGISTRY
+from recommendations.published import CONTENT_ALGORITHM_IDS
 from recommendations.genre_heuristic import rank_genre_taste_v1
 from recommendations.published import SECTION_ALGORITHM_IDS, configuration_fingerprint
 
@@ -33,6 +36,7 @@ _DTO_KEYS = (
     "input_snapshot_sha256",
     "insufficient_history",
     "limitation",
+    "primary_genre",
     "results",
 )
 _ITEM_KEYS = (
@@ -42,11 +46,79 @@ _ITEM_KEYS = (
     "score",
     "catalogue_rating",
     "catalogue_rating_count",
+    "display_rating",
     "year",
     "platform_summary",
     "cover",
     "matched_genres",
 )
+
+
+def _with_current_display_ratings(payload: dict | None) -> dict | None:
+    """Hydrate persisted recommendation items with the shared product score.
+
+    Older snapshots may not contain ``display_rating`` because the value was
+    added after they were generated. Hydrating at the response boundary keeps
+    stale-but-valid snapshots numerically consistent with the game detail
+    endpoint without rerunning any recommendation algorithm.
+    """
+    if not isinstance(payload, dict):
+        return payload
+
+    item_refs: list[dict] = []
+    content = payload.get("content")
+    if isinstance(content, dict):
+        for section in content.values():
+            if isinstance(section, dict) and isinstance(section.get("results"), list):
+                item_refs.extend(item for item in section["results"] if isinstance(item, dict))
+    genre = payload.get("genre")
+    if isinstance(genre, dict) and isinstance(genre.get("results"), list):
+        item_refs.extend(item for item in genre["results"] if isinstance(item, dict))
+    enriched_items = _add_display_ratings(item_refs)
+    enriched_by_identity = {id(item): enriched for item, enriched in zip(item_refs, enriched_items)}
+
+    def enrich(item: dict) -> dict:
+        return enriched_by_identity.get(id(item), item)
+
+    enriched_content = {
+        key: (
+            {**section, "results": [enrich(item) for item in section["results"]]}
+            if isinstance(section, dict) and isinstance(section.get("results"), list)
+            else section
+        )
+        for key, section in content.items()
+    } if isinstance(content, dict) else content
+    enriched_genre = (
+        {**genre, "results": [enrich(item) for item in genre["results"]]}
+        if isinstance(genre, dict) and isinstance(genre.get("results"), list)
+        else genre
+    )
+    return {**payload, "content": enriched_content, "genre": enriched_genre}
+
+
+def _add_display_ratings(items: list[dict]) -> list[dict]:
+    """Add the product-only blended score without changing algorithm output."""
+    work_ids = [item.get("work_id") for item in items if item.get("work_id")]
+    works = {
+        str(work.id): work
+        for work in GameWork.objects.in_bulk(work_ids).values()
+    }
+    stats = savepoint_rating_stats(works.keys())
+    enriched = []
+    for item in items:
+        work = works.get(str(item.get("work_id")))
+        if work is None:
+            enriched.append(item)
+            continue
+        enriched.append(
+            {
+                **item,
+                "display_rating": display_rating(
+                    work, savepoint_stats=stats.get(work.id, (None, 0))
+                ),
+            }
+        )
+    return enriched
 
 
 class RecommendationsView(APIView):
@@ -77,11 +149,12 @@ class RecommendationsView(APIView):
             limit = None
 
         payload = rank_genre_taste_v1(request.user, limit=limit)
+        presentation_results = _add_display_ratings(payload["results"])
         return Response(
             {
                 **{key: payload[key] for key in _DTO_KEYS},
                 "results": [
-                    {key: item[key] for key in _ITEM_KEYS} for item in payload["results"]
+                    {key: item[key] for key in _ITEM_KEYS} for item in presentation_results
                 ],
             }
         )
@@ -123,6 +196,7 @@ class ContentRecsView(APIView):
         "platform_summary",
         "cover",
         "reason",
+        "display_rating",
     )
 
     def get(self, request: Request) -> Response:
@@ -141,7 +215,7 @@ class ContentRecsView(APIView):
         algorithm_id = request.query_params.get(
             "algorithm_id", "content-cbf-weighted-v1"
         )
-        if algorithm_id not in ALGORITHM_REGISTRY:
+        if algorithm_id not in CONTENT_ALGORITHM_IDS:
             return Response({"detail": "unknown algorithm_id"}, status=400)
 
         try:
@@ -154,12 +228,13 @@ class ContentRecsView(APIView):
             return Response(
                 {"detail": "recommendations are temporarily unavailable"}, status=503
             )
+        presentation_results = _add_display_ratings(payload["results"])
         return Response(
             {
                 **{key: payload[key] for key in self._DTO_KEYS if key != "results"},
                 "results": [
                     {key: item[key] for key in self._ITEM_KEYS}
-                    for item in payload["results"]
+                    for item in presentation_results
                 ],
             }
         )
@@ -184,6 +259,10 @@ class RecommendationSnapshotView(APIView):
         )
         complete_job_set = len(jobs) == len(SECTION_ALGORITHM_IDS)
         job_statuses = {job.status for job in jobs}
+        has_live_refresh = bool(
+            job_statuses
+            & {RecommendationJobStatus.QUEUED, RecommendationJobStatus.RUNNING}
+        )
         current_snapshot = (
             snapshot is not None
             and snapshot.collection_revision == state.collection_revision
@@ -199,8 +278,8 @@ class RecommendationSnapshotView(APIView):
             # mutation will create the next revision and enqueue it via the
             # signal. Existing users therefore see the onboarding state until
             # they update their catalogue.
-            status = "building" if jobs else "needs_refresh"
-        elif not complete_job_set:
+            status = "building" if has_live_refresh else "needs_refresh"
+        elif not complete_job_set or not has_live_refresh:
             status = "needs_refresh"
         else:
             status = "stale"
@@ -217,7 +296,7 @@ class RecommendationSnapshotView(APIView):
                     )
                 ),
                 "error": "refresh_failed" if RecommendationJobStatus.FAILED in job_statuses else None,
-                "sections": snapshot.payload if snapshot else None,
+                "sections": _with_current_display_ratings(snapshot.payload) if snapshot else None,
             }
         )
         response["Cache-Control"] = "private, no-store"

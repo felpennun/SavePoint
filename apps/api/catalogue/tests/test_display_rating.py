@@ -170,3 +170,14 @@ def test_detail_endpoint_exposes_display_rating_and_breakdown() -> None:
     body = APIClient().get("/api/catalogue/games/wired-detail/").json()
     assert body["display_rating"] == display_rating(work)
     assert body["rating_breakdown"] == {"igdb_count": 50, "savepoint_count": 1}
+
+
+def test_catalogue_card_and_detail_expose_the_same_blended_rating() -> None:
+    work = _work("same-rating-everywhere", rating=80.0, rating_count=3)
+    _rate(_demo_user("d-same-rating"), work, 10)
+
+    card = APIClient().get("/api/catalogue/games/").json()["results"][0]
+    detail = APIClient().get("/api/catalogue/games/same-rating-everywhere/").json()
+
+    assert card["display_rating"] == detail["display_rating"] == display_rating(work)
+    assert card["display_rating"] != card["total_rating"]

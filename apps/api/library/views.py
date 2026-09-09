@@ -17,6 +17,7 @@ from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from catalogue.models import GameWork
+from catalogue.ratings import display_rating, savepoint_rating_stats
 from catalogue.serializers import _cover, _platform_summary
 from library import services
 from library.models import BacklogStatus, LibraryEntry, OwnedCopy, StatusTransition
@@ -52,6 +53,8 @@ class MyLibraryView(APIView):
             .distinct()
             .order_by("work__original_title", "id")
         )
+        entries = list(entries)
+        display_stats = savepoint_rating_stats(entry.work_id for entry in entries)
         items = []
         summary = {choice.value: 0 for choice in BacklogStatus}
         for entry in entries:
@@ -64,6 +67,12 @@ class MyLibraryView(APIView):
                     "work_title": entry.work.title_en or entry.work.original_title,
                     "status": entry.current_status,
                     "rating_half_steps": entry.rating_half_steps,
+                    # Product-facing blended score; deliberately separate
+                    # from the owner's personal StarRating below the card.
+                    "display_rating": display_rating(
+                        entry.work,
+                        savepoint_stats=display_stats.get(entry.work_id, (None, 0)),
+                    ),
                     "owned_copy_count": entry.owned_copy_count,
                     # Enough for the Collection page's client-side sorts
                     # (recently_updated / release_year) to actually work; the

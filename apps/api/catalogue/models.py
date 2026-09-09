@@ -50,6 +50,88 @@ class Franchise(models.Model):
         return self.name
 
 
+class Theme(models.Model):
+    """An IGDB ``themes`` facet (setting/tone: Fantasy, Horror, Open world...).
+
+    Identity is the stable upstream IGDB theme id, never the internal UUID, so
+    the facet can be re-pointed at a different provider later without
+    renumbering. Persisted from the catalogue import as an additive M2M only;
+    it is deliberately NOT folded into the content checksum or the governed
+    corpus, and no recommender consumes it until an explicit later version
+    with its own feature cache and evaluation.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    igdb_id = models.PositiveIntegerField(unique=True)
+    name = models.CharField(max_length=120)
+    slug = models.SlugField(max_length=120, unique=True)
+
+    class Meta:
+        ordering = ("name",)
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class PlayerPerspective(models.Model):
+    """An IGDB ``player_perspectives`` facet (First person, Bird view...).
+
+    Same additive, non-governed contract as :class:`Theme`.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    igdb_id = models.PositiveIntegerField(unique=True)
+    name = models.CharField(max_length=120)
+    slug = models.SlugField(max_length=120, unique=True)
+
+    class Meta:
+        ordering = ("name",)
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class GameMode(models.Model):
+    """An IGDB ``game_modes`` facet (Single player, Co-operative, MMO...).
+
+    Same additive, non-governed contract as :class:`Theme`.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    igdb_id = models.PositiveIntegerField(unique=True)
+    name = models.CharField(max_length=120)
+    slug = models.SlugField(max_length=120, unique=True)
+
+    class Meta:
+        ordering = ("name",)
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class Keyword(models.Model):
+    """An IGDB ``keywords`` free-form community tag.
+
+    Unlike the closed vocabularies above, IGDB keywords are an unbounded,
+    ungoverned set (tens of thousands, with synonyms and noise). This model
+    stores them verbatim from the import; any normalisation, synonym
+    collapsing, denylisting or frequency filtering is a separate, versioned
+    curation step and does not belong here. Same additive, non-governed,
+    not-yet-in-any-recommender contract as :class:`Theme`.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    igdb_id = models.PositiveIntegerField(unique=True)
+    name = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=200, unique=True)
+
+    class Meta:
+        ordering = ("name",)
+
+    def __str__(self) -> str:
+        return self.name
+
+
 class Developer(models.Model):
     """An IGDB company explicitly marked as a developer for a work."""
 
@@ -94,6 +176,16 @@ class GameWork(models.Model):
     genres = models.ManyToManyField(Genre, blank=True, related_name="works")
     franchises = models.ManyToManyField(Franchise, blank=True, related_name="works")
     developers = models.ManyToManyField(Developer, blank=True, related_name="works")
+    # Additive IGDB classification facets (import-only, not governed, not yet
+    # consumed by any recommender -- see the model docstrings). Kept off the
+    # content checksum so attaching them never perturbs the frozen catalogue
+    # evidence.
+    themes = models.ManyToManyField(Theme, blank=True, related_name="works")
+    player_perspectives = models.ManyToManyField(
+        PlayerPerspective, blank=True, related_name="works"
+    )
+    game_modes = models.ManyToManyField(GameMode, blank=True, related_name="works")
+    keywords = models.ManyToManyField(Keyword, blank=True, related_name="works")
 
     class Meta:
         ordering = ("original_title", "id")

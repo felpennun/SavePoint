@@ -91,6 +91,7 @@ def test_empty_history_returns_explicit_insufficient_result(user_a) -> None:  # 
 
     assert result["insufficient_history"] is True
     assert result["results"] == []
+    assert result["primary_genre"] is None
     assert result["algorithm_id"] == ALGORITHM_ID == "genre-taste-v1"
     # NEVER a silent fall-back to the public popularity baseline (D-09).
     assert "popularity" not in result["limitation"].lower()
@@ -108,6 +109,12 @@ def test_dto_always_declares_identity_hash_and_bounded_limitation(user_a, genres
     assert isinstance(result["input_snapshot_sha256"], str)
     assert len(result["input_snapshot_sha256"]) == 64
     assert result["insufficient_history"] is False
+    assert result["primary_genre"] == {
+        "slug": "role-playing-rpg",
+        "name": "Role-playing (RPG)",
+        "entry_count": 1,
+        "weight": 4.0,
+    }
     # The limitation string explicitly bounds this away from Phase 6's model
     # comparison so the frontend cannot confuse it with REC-03 research work.
     lowered = result["limitation"].lower()
@@ -170,19 +177,34 @@ def test_outside_governed_corpus_is_excluded_from_candidates(user_a, genres) -> 
 
 
 @pytest.mark.django_db
-def test_stronger_genre_overlap_ranks_higher(user_a, genres) -> None:  # noqa: ANN001
-    # User activity: heavy RPG, light shooter.
+def test_only_the_most_frequent_library_genre_is_recommended(user_a, genres) -> None:  # noqa: ANN001
     _own(user_a, _work("owned-rpg-1", genres["rpg"]), status="completed", rating=10)
     _own(user_a, _work("owned-rpg-2", genres["rpg"]), status="completed", rating=10)
     _own(user_a, _work("owned-shooter", genres["shooter"]), status="pending", rating=None)
 
-    both = _work("unseen-rpg-shooter", genres["rpg"], genres["shooter"])  # noqa: F841
-    only_shooter = _work("unseen-shooter-only", genres["shooter"])  # noqa: F841
+    both = _work("unseen-rpg-shooter", genres["rpg"], genres["shooter"])
+    only_shooter = _work("unseen-shooter-only", genres["shooter"])
 
     result = rank_genre_taste_v1(user_a, limit=10)
     slugs = _slugs(result)
 
-    assert slugs.index("unseen-rpg-shooter") < slugs.index("unseen-shooter-only")
+    assert result["primary_genre"]["slug"] == "role-playing-rpg"
+    assert slugs == [both.canonical_slug]
+    assert only_shooter.canonical_slug not in slugs
+
+
+@pytest.mark.django_db
+def test_primary_genre_uses_library_frequency_not_rating_weight(user_a, genres) -> None:  # noqa: ANN001
+    _own(user_a, _work("owned-rpg-1", genres["rpg"]), status="pending", rating=None)
+    _own(user_a, _work("owned-rpg-2", genres["rpg"]), status="pending", rating=None)
+    _own(user_a, _work("owned-shooter", genres["shooter"]), status="completed", rating=10)
+    _work("unseen-rpg", genres["rpg"])
+    _work("unseen-shooter", genres["shooter"])
+
+    result = rank_genre_taste_v1(user_a, limit=20)
+
+    assert result["primary_genre"]["slug"] == "role-playing-rpg"
+    assert _slugs(result) == ["unseen-rpg"]
 
 
 @pytest.mark.django_db
@@ -200,6 +222,26 @@ def test_catalogue_rating_orders_matching_candidates_before_numeric_titles(user_
     assert [item["slug"] for item in result["results"]] == ["100 Tokyo Cats", "100 Animals"]
     assert result["results"][0]["catalogue_rating"] == 95.0
     assert result["results"][1]["catalogue_rating"] == 25.0
+
+
+@pytest.mark.django_db
+def test_taste_score_orders_candidates_before_catalogue_rating(user_a, genres) -> None:  # noqa: ANN001
+    _own(user_a, _work("owned-rpg-1", genres["rpg"]), status="completed", rating=10)
+    _own(user_a, _work("owned-rpg-2", genres["rpg"]), status="completed", rating=10)
+    _own(user_a, _work("owned-shooter", genres["shooter"]), status="pending", rating=None)
+    lower_rating = _work("lower-rating-rpg", genres["rpg"])
+    lower_rating.total_rating = 60.0
+    lower_rating.save(update_fields=["total_rating"])
+    higher_taste = _work("higher-taste-rpg-shooter", genres["rpg"], genres["shooter"])
+    higher_taste.total_rating = 40.0
+    higher_taste.save(update_fields=["total_rating"])
+
+    result = rank_genre_taste_v1(user_a, limit=10)
+
+    assert [item["slug"] for item in result["results"]] == [
+        "higher-taste-rpg-shooter",
+        "lower-rating-rpg",
+    ]
 
 
 @pytest.mark.django_db
@@ -235,12 +277,13 @@ def test_ties_break_by_canonical_slug_ascending(user_a, genres) -> None:  # noqa
 
 @pytest.mark.django_db
 def test_tie_break_holds_at_the_limit_boundary(user_a, genres) -> None:  # noqa: ANN001
-    """L-03: with rating-driven weights (multiples of 0.1, not exactly
+    """L-03: with rating-driven weights (nonlinear rating intensity, not
+    exactly
     representable) two equally-scored works can carry different float sums.
     The exact Python re-score must still cut on canonical_slug at limit=1, so
     the DB's float ordering can never decide which side of the boundary a
     tied work lands on."""
-    # A rating of 7 half-steps -> 0.7 rating contribution + 3 (completed) per
+    # A rating of 7 half-steps -> 0.49 rating contribution + 3 (completed) per
     # matched genre; both candidate works share the same two taste genres, so
     # their rational scores are identical.
     _own(user_a, _work("owned-a", genres["rpg"]), status="completed", rating=7)
@@ -384,6 +427,7 @@ _DTO_KEYS = {
     "input_snapshot_sha256",
     "insufficient_history",
     "limitation",
+    "primary_genre",
     "results",
 }
 _ITEM_KEYS = {
@@ -393,6 +437,7 @@ _ITEM_KEYS = {
     "score",
     "catalogue_rating",
     "catalogue_rating_count",
+    "display_rating",
     "year",
     "platform_summary",
     "cover",

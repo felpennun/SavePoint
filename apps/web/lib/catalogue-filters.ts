@@ -12,16 +12,11 @@
  */
 
 export const SORT_KEYS = [
-  "relevance",
-  "title_asc",
-  "title_desc",
-  "release_newest",
-  "release_oldest",
-  "rating_desc",
+  "popscore_desc",
 ] as const;
 export type SortKey = (typeof SORT_KEYS)[number];
 
-export const DEFAULT_SORT: SortKey = "relevance";
+export const DEFAULT_SORT: SortKey = "popscore_desc";
 
 export function resolveSort(raw: string | undefined): SortKey {
   if (raw && (SORT_KEYS as readonly string[]).includes(raw)) return raw as SortKey;

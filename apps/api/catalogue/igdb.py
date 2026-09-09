@@ -33,14 +33,19 @@ GAMES_COUNT_URL = "https://api.igdb.com/v4/games/count"
 POPULARITY_PRIMITIVES_URL = "https://api.igdb.com/v4/popularity_primitives"
 POPULARITY_TYPES_URL = "https://api.igdb.com/v4/popularity_types"
 
-# Apicalypse field list -- dot expansion keeps genres/platforms/cover to a
-# single request per page (ADR-006 anti-pattern: no N+1 per-game lookups).
+# Apicalypse field list -- dot expansion keeps genres/platforms/cover and the
+# additive classification facets (themes, keywords, player_perspectives,
+# game_modes) to a single request per page (ADR-006 anti-pattern: no N+1
+# per-game lookups). IGDB has no monthly quota, so the wider row costs
+# nothing extra beyond payload size.
 GAME_FIELDS = (
     "id,name,slug,url,first_release_date,total_rating,total_rating_count,"
     "rating,rating_count,summary,genres.id,genres.name,platforms.id,platforms.name,"
     "alternative_names.name,franchises.id,franchises.name,collections.name,"
     "involved_companies.company.id,involved_companies.company.name,"
-    "involved_companies.developer,cover.image_id"
+    "involved_companies.developer,cover.image_id,"
+    "themes.id,themes.name,keywords.id,keywords.name,"
+    "player_perspectives.id,player_perspectives.name,game_modes.id,game_modes.name"
 )
 
 DEFAULT_TIMEOUT = (10, 45)          # (connect, read) seconds

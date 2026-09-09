@@ -14,7 +14,7 @@ class VariantSpec:
     algorithm_id: str
     feature_set_version: str
     combine_mode: str
-    params: dict[str, float | int]
+    params: dict[str, float | int | str]
     version: str
 
 
@@ -107,6 +107,26 @@ ALGORITHM_REGISTRY: dict[str, VariantSpec] = {
             "w_recency": 0.40,
             "year_decay": 0.35,
             "popscore_missing_floor": 0.0,
+        },
+        version="v1",
+    ),
+    "content-cbf-mmr-v1": VariantSpec(
+        algorithm_id="content-cbf-mmr-v1",
+        feature_set_version=FEATURE_SET_VERSION,
+        combine_mode="mmr",
+        params={
+            "base_algorithm_id": "content-cbf-weighted-v1",
+            "lambda": 0.80,
+        },
+        version="v1",
+    ),
+    "content-cbf-mmr-pop-v1": VariantSpec(
+        algorithm_id="content-cbf-mmr-pop-v1",
+        feature_set_version=FEATURE_SET_VERSION,
+        combine_mode="mmr",
+        params={
+            "base_algorithm_id": "content-cbf-weighted-pop-v1",
+            "lambda": 0.80,
         },
         version="v1",
     ),

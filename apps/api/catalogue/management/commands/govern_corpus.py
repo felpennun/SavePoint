@@ -15,6 +15,7 @@ from django.db.models import Count
 
 from catalogue.corpus import (
     ALLOWLIST_SLUGS,
+    RECOMMENDATION_ELIGIBILITY_RULE,
     PLATFORM_ALLOWLIST,
     evaluation_candidate_works,
     governed_works,
@@ -24,7 +25,7 @@ from catalogue.models import AssetAttribution, CorpusVersion, GameWork, Platform
 
 
 GOVERN_CORPUS_LOCK_KEY = 902_020_201
-RULESET_ID = "D-01-platform-slug+D-03-name-release-dlc-genre-released+REC-rating-eligible-v2"
+RULESET_ID = "D-01-platform-slug+D-03-name-release-dlc-genre-released+REC-rating-eligible-v3"
 
 
 def _ruleset_sha256(as_of_date: date) -> str:
@@ -33,7 +34,7 @@ def _ruleset_sha256(as_of_date: date) -> str:
         "as_of_date": as_of_date.isoformat(),
         "platform_allowlist": PLATFORM_ALLOWLIST,
         "allowlist_slugs": sorted(ALLOWLIST_SLUGS),
-        "recommendation_eligibility": "total_rating_count >= 1 OR rating IS NOT NULL",
+        "recommendation_eligibility": RECOMMENDATION_ELIGIBILITY_RULE,
     }
     return hashlib.sha256(
         json.dumps(payload, ensure_ascii=False, sort_keys=True).encode("utf-8")
@@ -315,7 +316,7 @@ class Command(BaseCommand):
             "ruleset_sha256": ruleset_sha256,
             "as_of_date": as_of_date.isoformat(),
             "checksum": checksum,
-            "recommendation_eligibility": "total_rating_count >= 1 OR rating IS NOT NULL",
+            "recommendation_eligibility": RECOMMENDATION_ELIGIBILITY_RULE,
             "data_dictionary": data_dictionary,
             "quality_report": quality,
             "sampled_manifest": self._sampled_manifest(version, quality["governed_count"]),

@@ -200,8 +200,8 @@
       "xbox-360": 2393,
       "xbox-one": 8669
     },
-    "recommendation_candidate_count": 30623,
-    "recommendation_candidate_coverage_pct": 16.0768,
+    "recommendation_candidate_count": 13618,
+    "recommendation_candidate_coverage_pct": 7.1493,
     "release_year_histogram": {
       "1952": 1,
       "1970": 2,
@@ -293,8 +293,8 @@
       }
     ]
   },
-  "recommendation_eligibility": "total_rating_count >= 1 OR rating IS NOT NULL",
-  "ruleset_sha256": "286a0fa509eb6693ca58de9b5b43379ecd03c8a7ca6d0e4bce6d31b0ec6fa10d",
+  "recommendation_eligibility": "rating IS NOT NULL AND total_rating_count >= 5",
+  "ruleset_sha256": "28ff0ac107bddb2d36faf38732c1040a2052853d33514dbee146389bd0079144",
   "sampled_manifest": [
     {
       "canonical_slug": "thief-ii-the-metal-age",

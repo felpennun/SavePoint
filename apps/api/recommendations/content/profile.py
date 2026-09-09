@@ -7,7 +7,9 @@ vectors of the works in the user's library:
               / Sum( _entry_weight(status, rating) )
 
 ``_entry_weight`` is reused verbatim from ``recommendations._weights`` (the
-same signal the genre heuristic and the popularity baseline speak). One
+same signal the genre heuristic speaks). One
+personal rating contributes its normalised value at power 2, so high seed
+ratings have more influence than merely positive ones. One
 resolved read of the library; cached ``WorkFeatureVector`` rows are preferred
 with a fallback to computing the vector on the fly. A user with no
 genre-bearing history profiles to ``{}``.

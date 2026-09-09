@@ -11,8 +11,9 @@ count" language import one definition instead of copying the table.
 
 from __future__ import annotations
 
-# Mirrors ``library/popularity.py``'s status weighting so the personal
-# heuristic, the public baseline, and the content profile all agree.
+# Mirrors the activity weighting used by the personalised genre heuristic and
+# the content profile. The public popularity baseline intentionally keeps its
+# own non-personal aggregate formula and does not consume private ratings.
 # ``abandoned`` contributes nothing: a bounced-off title is not evidence of
 # taste.
 _STATUS_WEIGHTS: dict[str, float] = {
@@ -22,12 +23,23 @@ _STATUS_WEIGHTS: dict[str, float] = {
     "abandoned": 0.0,
 }
 
-# A rating adds ``rating_half_steps / 10`` (0.1 .. 1.0), identical to the
-# popularity baseline's rating contribution.
+# Personal ratings are deliberately nonlinear: a high rating is stronger
+# evidence of positive taste than a merely positive rating. Half-steps are
+# normalised to [0, 1] and squared before being added to the status weight.
 _RATING_DIVISOR = 10
+RATING_INTENSITY_POWER = 2.0
+
+
+def _rating_intensity(rating_half_steps: int | None) -> float:
+    """Return the nonlinear positive-intensity contribution of a rating."""
+
+    if rating_half_steps is None:
+        return 0.0
+    normalised = max(0.0, min(1.0, rating_half_steps / _RATING_DIVISOR))
+    return normalised**RATING_INTENSITY_POWER
 
 
 def _entry_weight(status: str | None, rating_half_steps: int | None) -> float:
     """Activity weight of one ``LibraryEntry`` from its status and rating."""
 
-    return _STATUS_WEIGHTS.get(status or "", 0.0) + (rating_half_steps or 0) / _RATING_DIVISOR
+    return _STATUS_WEIGHTS.get(status or "", 0.0) + _rating_intensity(rating_half_steps)

@@ -2,10 +2,10 @@
 partition (EVAL-01, EVAL-02; D-17, D-18, D-21).
 
 The candidate set built here is identical for every algorithm given the same
-user and seed (EVAL-01): eligible governed works (at least one rating or a
-valid external rating) minus the user's *remaining* library, plus the single
-eligible held-out item (D-18, RESEARCH Pitfall 6). Its ``sha256`` is returned
-so a run can freeze the per-user candidate manifest.
+user and seed (EVAL-01): eligible governed works (non-null IGDB user rating
+and at least five total IGDB ratings) minus the user's *remaining* library,
+plus the single eligible held-out item (D-18, RESEARCH Pitfall 6). Its
+``sha256`` is returned so a run can freeze the per-user candidate manifest.
 
 Leakage note (EVAL-02): the genre rating profile (D-13) is a *corpus* statistic
 derived from the immutable ``CorpusRatingSnapshot`` of the active

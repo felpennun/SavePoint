@@ -30,7 +30,7 @@ export function RecommendationShelf({
         {heading}
       </h2>
       {description ? <p id={`${sectionId}-description`} className="sp-muted">{description}</p> : null}
-      <ul className="sp-shelf-track" style={{ listStyle: "none", margin: 0, padding: 0 }}>
+      <ul className="sp-shelf-track">
         {shelf.items.map((item) => (
           <GameCard
             key={item.work_id}
@@ -44,7 +44,7 @@ export function RecommendationShelf({
             }}
             locale={locale}
             coverVariant="shelf"
-            score={item.catalogue_rating}
+            score={item.display_rating}
           />
         ))}
       </ul>

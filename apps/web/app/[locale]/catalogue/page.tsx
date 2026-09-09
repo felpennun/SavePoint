@@ -159,7 +159,7 @@ export default async function CataloguePage({
             <>
               <ul className="sp-grid" style={{ marginTop: "var(--space-md)" }}>
                 {result.results.map((game) => (
-                  <GameCard key={game.id} game={game} locale={locale} score={game.total_rating ?? null} />
+                  <GameCard key={game.id} game={game} locale={locale} score={game.display_rating ?? null} />
                 ))}
               </ul>
               <nav aria-label={locale === "es" ? "Paginación" : "Pagination"} style={{ display: "flex", gap: "var(--space-md)", alignItems: "center", justifyContent: "center", marginTop: "var(--space-xl)" }}>

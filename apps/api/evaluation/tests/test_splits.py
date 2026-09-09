@@ -65,7 +65,7 @@ def governed_corpus(db):
             in_corpus=True,
             corpus_version=CORPUS_VERSION,
             rating=101.0,
-            total_rating_count=9,
+            total_rating_count=4,
         )
     )
     # an ungoverned work, to prove it never leaks into the candidate set

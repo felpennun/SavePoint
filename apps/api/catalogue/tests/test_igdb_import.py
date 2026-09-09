@@ -25,12 +25,16 @@ from catalogue.models import (
     Developer,
     Franchise,
     GameAlias,
+    GameMode,
     GameRelease,
     GameWork,
     Genre,
     IgdbImportRun,
+    Keyword,
     Platform,
+    PlayerPerspective,
     SourceRecord,
+    Theme,
 )
 from catalogue.normalization import normalize_title
 
@@ -137,9 +141,21 @@ def _game(
     title_en: str | None = None,
     franchises: tuple[tuple[int, str], ...] = (),
     developers: tuple[tuple[int, str], ...] = (),
+    themes: tuple[tuple[int, str], ...] = (),
+    player_perspectives: tuple[tuple[int, str], ...] = (),
+    game_modes: tuple[tuple[int, str], ...] = (),
+    keywords: tuple[tuple[int, str], ...] = (),
 ) -> dict:
     row: dict = {"id": igdb_id, "name": name, "slug": slug or name.lower().replace(" ", "-")}
     row["url"] = f"https://www.igdb.com/games/{row['slug']}"
+    for field, pairs in (
+        ("themes", themes),
+        ("player_perspectives", player_perspectives),
+        ("game_modes", game_modes),
+        ("keywords", keywords),
+    ):
+        if pairs:
+            row[field] = [{"id": item_id, "name": item_name} for item_id, item_name in pairs]
     if genres:
         row["genres"] = [{"id": gid, "name": gname} for gid, gname in genres]
     if platforms:
@@ -325,6 +341,115 @@ def test_igdb_import_keeps_distinct_developers_with_the_same_provider_name() -> 
         (91, "Papyrus Design Group"),
         (92, "Papyrus Design Group"),
     ]
+
+
+# ---------------------------------------------------------------------------
+# Additive classification facets: themes / perspectives / modes / keywords
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("model", [Theme, PlayerPerspective, GameMode, Keyword])
+def test_classification_facet_is_unique_by_stable_igdb_identity(model) -> None:
+    model.objects.create(igdb_id=42, name="First", slug="first")
+    with pytest.raises(IntegrityError):
+        with transaction.atomic():
+            model.objects.create(igdb_id=42, name="Renamed", slug="renamed")
+    with transaction.atomic():
+        model.objects.create(igdb_id=43, name="Second", slug="second")
+    assert model.objects.count() == 2
+
+
+@pytest.mark.django_db
+def test_igdb_import_attaches_classification_facets() -> None:
+    _run_import(
+        FakeIgdbClient(
+            [[
+                _game(
+                    950,
+                    "Facet Quest",
+                    themes=((1, "Action"), (17, "Fantasy")),
+                    player_perspectives=((1, "First person"),),
+                    game_modes=((1, "Single player"), (2, "Multiplayer")),
+                    keywords=((100, "roguelike"), (101, "pixel-art")),
+                )
+            ]],
+            eligible=1,
+        )
+    )
+
+    work = GameWork.objects.get(canonical_slug="facet-quest")
+    assert set(work.themes.values_list("igdb_id", flat=True)) == {1, 17}
+    assert set(work.player_perspectives.values_list("igdb_id", flat=True)) == {1}
+    assert set(work.game_modes.values_list("igdb_id", flat=True)) == {1, 2}
+    assert set(work.keywords.values_list("name", flat=True)) == {"roguelike", "pixel-art"}
+    # Distinct stable identities are stored once and reachable back to the work.
+    assert list(Theme.objects.get(igdb_id=17).works.values_list("canonical_slug", flat=True)) == [
+        "facet-quest"
+    ]
+
+
+@pytest.mark.django_db
+def test_classification_facets_are_kept_off_the_content_checksum() -> None:
+    """Attaching the additive facets must not move the frozen catalogue
+    content checksum: a rerun of the same work with the facets stripped from
+    the upstream row converges to the identical checksum."""
+    with_facets = FakeIgdbClient(
+        [[
+            _game(
+                951,
+                "Checksum Quest",
+                genres=((12, "RPG"),),
+                themes=((17, "Fantasy"),),
+                keywords=((100, "roguelike"),),
+            )
+        ]],
+        eligible=1,
+    )
+    _run_import(with_facets)
+    run = IgdbImportRun.objects.get(source="igdb", query_identity="game_type=0")
+    checksum_with_facets = run.checksum
+
+    _run_import(FakeIgdbClient([[_game(951, "Checksum Quest", genres=((12, "RPG"),))]], eligible=1))
+    run.refresh_from_db()
+    assert run.checksum == checksum_with_facets
+
+
+@pytest.mark.django_db
+def test_reimport_preserves_facets_igdb_stops_returning() -> None:
+    _run_import(
+        FakeIgdbClient(
+            [[_game(952, "Sticky Quest", keywords=((100, "roguelike"), (101, "deckbuilder")))]],
+            eligible=1,
+        )
+    )
+    # A later pass where IGDB no longer lists the keywords must not clear them.
+    _run_import(FakeIgdbClient([[_game(952, "Sticky Quest")]], eligible=1))
+
+    work = GameWork.objects.get(canonical_slug="sticky-quest")
+    assert set(work.keywords.values_list("name", flat=True)) == {"roguelike", "deckbuilder"}
+
+
+@pytest.mark.django_db
+def test_facet_evidence_reports_coverage(tmp_path) -> None:
+    import json
+
+    out = tmp_path / "ev.json"
+    _run_import(
+        FakeIgdbClient(
+            [[
+                _game(953, "Alpha Facet", themes=((17, "Fantasy"),), keywords=((100, "roguelike"),)),
+                _game(954, "Beta Facet", game_modes=((1, "Single player"),)),
+            ]],
+            eligible=2,
+        ),
+        evidence_json=str(out),
+    )
+    facets = json.loads(out.read_text(encoding="utf-8"))["classification_facets"]
+    assert facets["themes"]["distinct_values"] == 1
+    assert facets["themes"]["works_with_any"] == 1
+    assert facets["keywords"]["works_with_any"] == 1
+    assert facets["game_modes"]["works_with_any"] == 1
 
 
 class FakeIgdbClient:

@@ -51,12 +51,16 @@ from catalogue.models import (
     Developer,
     Franchise,
     GameAlias,
+    GameMode,
     GameRelease,
     GameWork,
     Genre,
     IgdbImportRun,
+    Keyword,
     Platform,
+    PlayerPerspective,
     SourceRecord,
+    Theme,
 )
 from catalogue.normalization import normalize_title
 
@@ -200,6 +204,28 @@ class Command(BaseCommand):
             if isinstance(p, dict) and p.get("name"):
                 platforms.append((str(p["name"]).strip()))
 
+        # Additive classification facets: parsed here but deliberately kept
+        # out of _record_digest so attaching them never moves the frozen
+        # content checksum. ``name`` is clamped to each model's column width.
+        def _id_name_pairs(raw: Any, limit: int) -> list[tuple[int, str]]:
+            pairs: set[tuple[int, str]] = set()
+            for item in raw or []:
+                if not isinstance(item, dict):
+                    continue
+                try:
+                    item_id = int(item["id"])
+                except (KeyError, TypeError, ValueError):
+                    continue
+                item_name = str(item.get("name") or "").strip()[:limit]
+                if item_name:
+                    pairs.add((item_id, item_name))
+            return sorted(pairs)
+
+        themes = _id_name_pairs(row.get("themes"), 120)
+        player_perspectives = _id_name_pairs(row.get("player_perspectives"), 120)
+        game_modes = _id_name_pairs(row.get("game_modes"), 120)
+        keywords = _id_name_pairs(row.get("keywords"), 200)
+
         cover_id = None
         cover = row.get("cover")
         if isinstance(cover, dict):
@@ -226,6 +252,10 @@ class Command(BaseCommand):
             ),
             "genres": genres,
             "platforms": sorted(set(platforms)),
+            "themes": themes,
+            "player_perspectives": player_perspectives,
+            "game_modes": game_modes,
+            "keywords": keywords,
             "cover_url": cover_url,
         }
 
@@ -249,6 +279,11 @@ class Command(BaseCommand):
             "genres": sorted(gid for gid, _ in norm["genres"]),
             "platforms": norm["platforms"],
             "cover": norm["cover_url"],
+            # themes / player_perspectives / game_modes / keywords are
+            # intentionally absent: they are additive, non-governed enrichment
+            # and folding them in would move every record digest (and the
+            # catalogue content checksum pinned in the freeze evidence) on the
+            # first pass that attaches them.
         }
         blob = json.dumps(payload, sort_keys=True, ensure_ascii=False).encode("utf-8")
         return hashlib.sha256(blob).hexdigest()
@@ -342,6 +377,21 @@ class Command(BaseCommand):
         )
         return developer
 
+    def _classification_facet_for(self, model: Any, igdb_id: int, name: str) -> Any:
+        """Reconcile a Theme/PlayerPerspective/GameMode/Keyword row on its
+        stable IGDB id, minimising write churn on a 330k-work rescan: create
+        when missing, and only UPDATE when the display name or slug actually
+        changed."""
+        obj = model.objects.filter(igdb_id=igdb_id).first()
+        slug = self._facet_slug(name, igdb_id, model)
+        if obj is None:
+            return model.objects.create(igdb_id=igdb_id, name=name, slug=slug)
+        if obj.name != name or obj.slug != slug:
+            obj.name = name
+            obj.slug = slug
+            obj.save(update_fields=["name", "slug"])
+        return obj
+
     def _upsert(self, norm: dict, now: datetime) -> str:
         existing = (
             SourceRecord.objects.select_related("work")
@@ -410,6 +460,23 @@ class Command(BaseCommand):
             work.developers.add(
                 *[self._developer_for(developer_id, name) for developer_id, name in norm["developers"]]
             )
+        # Additive classification facets. ``.add()`` is idempotent and only
+        # ever inserts join rows -- it never clears an existing membership, so
+        # a facet IGDB later stops returning for a work is preserved, matching
+        # the importer's "reimports enrich, never erase" contract.
+        for facet_key, facet_model, manager_name in (
+            ("themes", Theme, "themes"),
+            ("player_perspectives", PlayerPerspective, "player_perspectives"),
+            ("game_modes", GameMode, "game_modes"),
+            ("keywords", Keyword, "keywords"),
+        ):
+            if norm[facet_key]:
+                getattr(work, manager_name).add(
+                    *[
+                        self._classification_facet_for(facet_model, facet_id, facet_name)
+                        for facet_id, facet_name in norm[facet_key]
+                    ]
+                )
 
         # IGDB is the owner of the English alias set. The legacy Wikidata
         # importer also uses locale=en/es but its Spanish aliases are kept;
@@ -522,6 +589,48 @@ class Command(BaseCommand):
             for p in Platform.objects.annotate(n=Count("releases")).order_by("-n", "name")[:20]
         ]
 
+        # Additive classification facet coverage: how many distinct values
+        # exist and how many IGDB works carry at least one. Evidence only --
+        # these facets are outside the governed corpus and the checksum.
+        classification_facets = {
+            "themes": {
+                "distinct_values": Theme.objects.count(),
+                "works_with_any": igdb_works.filter(themes__isnull=False).distinct().count(),
+                "top_values": [
+                    {"igdb_id": t.igdb_id, "name": t.name, "work_count": t.n}
+                    for t in Theme.objects.annotate(n=Count("works")).order_by("-n", "name")[:25]
+                ],
+            },
+            "player_perspectives": {
+                "distinct_values": PlayerPerspective.objects.count(),
+                "works_with_any": igdb_works.filter(player_perspectives__isnull=False)
+                .distinct()
+                .count(),
+                "top_values": [
+                    {"igdb_id": p.igdb_id, "name": p.name, "work_count": p.n}
+                    for p in PlayerPerspective.objects.annotate(n=Count("works")).order_by(
+                        "-n", "name"
+                    )
+                ],
+            },
+            "game_modes": {
+                "distinct_values": GameMode.objects.count(),
+                "works_with_any": igdb_works.filter(game_modes__isnull=False).distinct().count(),
+                "top_values": [
+                    {"igdb_id": m.igdb_id, "name": m.name, "work_count": m.n}
+                    for m in GameMode.objects.annotate(n=Count("works")).order_by("-n", "name")
+                ],
+            },
+            "keywords": {
+                "distinct_values": Keyword.objects.count(),
+                "works_with_any": igdb_works.filter(keywords__isnull=False).distinct().count(),
+                "top_values": [
+                    {"igdb_id": k.igdb_id, "name": k.name, "work_count": k.n}
+                    for k in Keyword.objects.annotate(n=Count("works")).order_by("-n", "name")[:50]
+                ],
+            },
+        }
+
         ids = sorted(int(s) for s in SourceRecord.objects.filter(source="igdb").values_list("source_id", flat=True))
         step = max(1, len(ids) // 300)
         sample_ids = ids[::step][:300]
@@ -560,6 +669,7 @@ class Command(BaseCommand):
             "malformed_skipped_this_pass": skipped,
             "genres": genres,
             "platform_top20": platforms,
+            "classification_facets": classification_facets,
             "release_year_histogram": {str(y): n for y, n in sorted(year_hist.items())},
             "covers_present": run.covers_present,
             "covers_fallback": run.covers_fallback,

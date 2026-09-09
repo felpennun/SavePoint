@@ -1,31 +1,31 @@
 {
   "version": "1.0",
-  "timestamp": "2026-09-09T14:21:14+02:00",
-  "phase": "03",
-  "phase_name": "explainable-content-recommenders-and-baseline-comparison",
-  "phase_dir": ".planning/phases/03-explainable-content-recommenders-and-baseline-comparison",
-  "plan": 4,
-  "task": 2,
-  "total_tasks": 2,
+  "timestamp": "2026-09-10T00:36:04+02:00",
+  "phase": "04",
+  "phase_name": "collaborative-and-hybrid-comparison",
+  "phase_dir": ".planning/phases/04-collaborative-and-hybrid-comparison",
+  "plan": 3,
+  "task": 3,
+  "total_tasks": 3,
   "status": "paused",
   "completed_tasks": [
-    {"id": 1, "name": "Arquitectura común, workers y caché de recomendaciones", "status": "done", "commit": "b4f024b"},
-    {"id": 2, "name": "Contrato de candidatos N=10 y límite de 20 resultados publicados", "status": "done", "commit": "b4f024b"}
+    {"id": 1, "name": "Rankers colaborativo e híbrido compartidos", "status": "done", "commit": "2c12838"},
+    {"id": 2, "name": "Workers y estanterías web independientes", "status": "done", "commit": "2c12838"},
+    {"id": 3, "name": "Verificación de facetas IGDB y estantería hybrid-mmr", "status": "done", "commit": "pendiente"}
   ],
   "remaining_tasks": [
-    {"id": 3, "name": "Ejecutar y verificar la comparación offline tras autorización explícita", "status": "not_started"},
-    {"id": 4, "name": "Completar las evidencias y comprobaciones E2E de los planes 03-03 y 03-04", "status": "not_started"}
+    {"id": 4, "name": "Continuar la interfaz web", "status": "next"},
+    {"id": 5, "name": "Analizar y depurar las facetas IGDB en una etapa versionada", "status": "deferred"},
+    {"id": 6, "name": "Ejecutar la evaluación offline de los 400 usuarios", "status": "not_started"}
   ],
   "blockers": [],
   "async_jobs": [],
-  "human_actions_pending": [
-    {"action": "Autorizar la ejecución de la comparación offline", "context": "El autor indicó que no se iniciara todavía la corrida experimental.", "blocking": true}
-  ],
+  "human_actions_pending": [],
   "decisions": [
-    {"decision": "Todos los algoritmos usan rating IGDB no nulo y total_rating_count >= 10.", "rationale": "Evitar recomendar obras con calidad o volumen insuficientes.", "phase": "03"},
-    {"decision": "Las estanterías publicadas se fijan a 20 resultados.", "rationale": "Separar la profundidad de producto de los valores K de evaluación.", "phase": "03"}
+    {"decision": "Las facetas IGDB se importan y conservan, pero no se depuran ni consumen algorítmicamente todavía.", "rationale": "Separar la integridad de la importación de la futura decisión metodológica sobre calidad y uso en recomendadores.", "phase": "04"},
+    {"decision": "hybrid-mmr-v1 dispone de una estantería y un worker independientes.", "rationale": "Mantener paridad entre el algoritmo offline y la experiencia web.", "phase": "04"}
   ],
   "uncommitted_files": [],
-  "next_action": "Esperar autorización y ejecutar una corrida offline controlada sin recalcular snapshots personales.",
-  "context_notes": "La arquitectura y datos están preparados; la evaluación experimental sigue pendiente por decisión del autor."
+  "next_action": "Continuar la interfaz web; no iniciar aún la evaluación offline ni depurar las facetas IGDB.",
+  "context_notes": "La base de datos de facetas ha pasado la verificación estructural. Los workers de Felipe terminaron la revisión actual y la otra LLM continuará con la interfaz."
 }

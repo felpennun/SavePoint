@@ -12,7 +12,7 @@ function SkeletonShelf({ count }: { count: number }) {
       <p role="status" aria-live="polite" className="visually-hidden">
         Loading…
       </p>
-      <ul className="sp-shelf-track" aria-hidden="true" style={{ listStyle: "none", margin: 0, padding: 0 }}>
+      <ul className="sp-shelf-track" aria-hidden="true">
         {Array.from({ length: count }, (_, index) => (
           <li key={index} className="sp-skeleton" />
         ))}
@@ -41,7 +41,7 @@ export function NewReleasesShelf({
         {labels.heading}
       </h2>
       <p className="sp-muted">{labels.explainer}</p>
-      <ul className="sp-shelf-track" style={{ listStyle: "none", margin: 0, padding: 0 }}>
+      <ul className="sp-shelf-track">
         {items.slice(0, 20).map((item) => (
           <GameCard
             key={item.id}

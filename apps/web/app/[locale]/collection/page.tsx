@@ -177,6 +177,7 @@ export default async function CollectionPage({
                 key={item.work_id}
                 game={toCardData(item)}
                 locale={locale}
+                score={item.display_rating}
                 status={STATUSES.includes(item.status as BacklogStatus) ? (item.status as BacklogStatus) : undefined}
                 ratingHalfSteps={item.rating_half_steps}
                 ownedCopyCount={item.owned_copy_count}
