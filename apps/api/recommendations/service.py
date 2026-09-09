@@ -183,6 +183,7 @@ def recommend_for_user(
         "feature_set_version": payload["feature_set_version"],
         "corpus_version": payload["corpus_version"],
         "snapshot_sha256": payload["snapshot_sha256"],
+        "popscore_snapshot_sha256": payload["popscore_snapshot_sha256"],
         "candidate_manifest_sha256": manifest.candidate_manifest_sha256,
         "candidate_count": len(manifest.candidate_ids),
         "explorable_count": len(manifest.explorable_ids),

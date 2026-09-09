@@ -138,7 +138,7 @@ def test_negative_variant_penalises_only_the_guarded_negative_genre(user, genres
 
 
 @pytest.mark.django_db
-def test_recency_variant_orders_only_by_released_rated_age(user, genres) -> None:  # noqa: ANN001
+def test_recency_variant_adds_released_rated_age_to_the_other_signals(user, genres) -> None:  # noqa: ANN001
     for index in range(3):
         entry(user, work(f"history-{index}", genres["rpg"]), "completed", 10)
     recent = work("recent", genres["rpg"])
@@ -162,6 +162,7 @@ def test_recency_variant_orders_only_by_released_rated_age(user, genres) -> None
     )
     by_slug = {item["slug"]: item for item in payload["results"]}
 
-    assert by_slug["recent"]["score"] == pytest.approx(1.0)
-    assert by_slug["older"]["score"] == pytest.approx(0.5)
+    assert by_slug["recent"]["score"] > by_slug["older"]["score"]
+    assert by_slug["recent"]["signals"]["recency_score"] == pytest.approx(1.0)
+    assert by_slug["older"]["signals"]["recency_score"] == pytest.approx(0.5)
     assert by_slug["unrated"]["signals"]["recency_score"] is None

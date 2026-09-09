@@ -191,6 +191,7 @@ TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<ver
 |---|---|---|
 | 2026-09-07 | Incorporación de la documentación de la Fase 2 en la memoria LaTeX | Protocolo, ratings, corpus gobernado, algoritmos y decisiones previas al laboratorio documentados; compilación pendiente de entorno TeX |
 | 2026-09-07 | Revisión académica y corrección de la memoria LaTeX | Tablas adaptables, prosa y referencias revisadas; compilación pendiente de entorno TeX |
+| 2026-09-09 | Actualización de rejillas y contrato de señales de la Fase 3 | Rejilla de 24 configuraciones; `recency-v1` combina las señales base y recencia; snapshot, hashes, protocolo y documentación actualizados; sin ejecutar algoritmos |
 
 ## Deferred Items
 

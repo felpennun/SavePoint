@@ -65,9 +65,10 @@ def _snapshot_sha256(corpus_version: str | None, work_ids: set[object]) -> str:
     if corpus_version is not None:
         snapshots = snapshots.filter(corpus_version=corpus_version)
     rows = [
-        (str(work_id), version, source, rating, count, retrieved_at.isoformat())
-        for work_id, version, source, rating, count, retrieved_at in snapshots.values_list(
-            "work_id", "corpus_version", "source", "rating", "rating_count", "retrieved_at"
+        (str(work_id), version, source, rating, count, total_count, retrieved_at.isoformat())
+        for work_id, version, source, rating, count, total_count, retrieved_at in snapshots.values_list(
+            "work_id", "corpus_version", "source", "rating", "rating_count",
+            "total_rating_count", "retrieved_at"
         )
     ]
     rows.sort()
@@ -111,7 +112,7 @@ def _load_candidate_vectors(
 
 def _candidate_signals(
     work: GameWork,
-    snapshot_stats: dict[object, tuple[float, int]],
+    snapshot_stats: dict[object, tuple[float | None, int, int | None]],
     volume_ceiling: int,
     popscore_by_work: dict[object, float],
     recency_by_work: dict[object, float],
@@ -119,11 +120,11 @@ def _candidate_signals(
     """Return only scalar signals backed by the frozen local snapshot."""
 
     has_snapshot = work.id in snapshot_stats
-    rating, rating_count = snapshot_stats.get(work.id, (None, 0))
+    rating, _rating_count, total_rating_count = snapshot_stats.get(work.id, (None, 0, None))
     return {
         "external_rating": normalise_rating(rating),
         "rating_volume": (
-            normalise_rating_volume(rating_count, volume_ceiling) if has_snapshot else None
+            normalise_rating_volume(total_rating_count, volume_ceiling) if has_snapshot else None
         ),
         "release_date": work.first_release_date.isoformat() if work.first_release_date else None,
         "recency_score": recency_by_work.get(work.id),
@@ -133,7 +134,7 @@ def _candidate_signals(
 
 def _recency_by_work(
     works: list[GameWork],
-    snapshot_stats: dict[object, tuple[float | None, int]],
+    snapshot_stats: dict[object, tuple[float | None, int, int | None]],
     eligibility_cutoff_date: date,
     half_life_days: int,
 ) -> dict[object, float]:
@@ -144,7 +145,7 @@ def _recency_by_work(
             score := recency_score(
                 work.first_release_date,
                 eligibility_cutoff_date=eligibility_cutoff_date,
-                has_external_rating=snapshot_stats.get(work.id, (None, 0))[0] is not None,
+                has_external_rating=snapshot_stats.get(work.id, (None, 0, None))[0] is not None,
                 half_life_days=half_life_days,
             )
         ) is not None
@@ -219,13 +220,16 @@ def _cold_start_results(
     spec: VariantSpec,
     corpus_version: str | None,
     profile: dict[str, float],
-    snapshot_stats: dict[object, tuple[float, int]],
+    snapshot_stats: dict[object, tuple[float | None, int, int | None]],
     genre_profile: dict[str, float],
     popscore_by_work: dict[object, float],
     recency_by_work: dict[object, float],
 ) -> list[dict]:
     vectors = _load_candidate_vectors(works, spec, corpus_version)
-    volume_ceiling = max((count for _rating, count in snapshot_stats.values()), default=0)
+    volume_ceiling = max(
+        (total_count or 0 for _rating, _count, total_count in snapshot_stats.values()),
+        default=0,
+    )
     scored: list[tuple[float, str, dict]] = []
     for work in works:
         vector = vectors[work.id]
@@ -244,6 +248,10 @@ def _cold_start_results(
             None,
             spec,
             recency_score=recency_by_work.get(work.id),
+            rating_volume=_candidate_signals(
+                work, snapshot_stats, volume_ceiling, popscore_by_work, recency_by_work
+            )["rating_volume"],
+            popscore=popscore_by_work.get(work.id),
         )
         item = _base_item(
             work,
@@ -312,15 +320,26 @@ def rank_content_v1(
         )
         if corpus_version is not None:
             snapshot_rows = snapshot_rows.filter(corpus_version=corpus_version)
-        per_work_snapshots: dict[object, list[tuple[float, int]]] = {}
-        for work_id, rating, rating_count in snapshot_rows.values_list("work_id", "rating", "rating_count"):
-            per_work_snapshots.setdefault(work_id, []).append((rating, rating_count))
+        per_work_snapshots: dict[object, list[tuple[float | None, int, int | None]]] = {}
+        for work_id, rating, rating_count, total_rating_count in snapshot_rows.values_list(
+            "work_id", "rating", "rating_count", "total_rating_count"
+        ):
+            per_work_snapshots.setdefault(work_id, []).append(
+                (rating, rating_count, total_rating_count)
+            )
         snapshot_stats = {
             work_id: (
-                math.fsum(rating * count for rating, count in rows) / sum(count for _rating, count in rows)
-                if sum(count for _rating, count in rows)
-                else math.fsum(rating for rating, _count in rows) / len(rows),
-                sum(count for _rating, count in rows),
+                (
+                    math.fsum(rating * count for rating, count, _total_count in rows if rating is not None)
+                    / sum(count for rating, count, _total_count in rows if rating is not None)
+                    if sum(_count for rating, _count, _total_count in rows if rating is not None)
+                    else None
+                ),
+                sum(count for _rating, count, _total_count in rows),
+                max(
+                    (total_count for _rating, _count, total_count in rows if total_count is not None),
+                    default=None,
+                ),
             )
             for work_id, rows in per_work_snapshots.items()
         }
@@ -364,7 +383,10 @@ def rank_content_v1(
         corpus_version,
         prepared_vectors=(prepared or {}).get("vectors"),
     )
-    volume_ceiling = max((count for _rating, count in snapshot_stats.values()), default=0)
+    volume_ceiling = max(
+        (total_count or 0 for _rating, _count, total_count in snapshot_stats.values()),
+        default=0,
+    )
     popscore_by_work = normalised_popscore_by_work(corpus_version, [work.id for work in candidates])
     recency_by_work = _recency_by_work(
         candidates,
@@ -389,6 +411,10 @@ def rank_content_v1(
             spec,
             negative_similarity=negative_similarity,
             recency_score=recency_by_work.get(work.id),
+            rating_volume=_candidate_signals(
+                work, snapshot_stats, volume_ceiling, popscore_by_work, recency_by_work
+            )["rating_volume"],
+            popscore=popscore_by_work.get(work.id),
         )
         evidence = explain(
             vector,

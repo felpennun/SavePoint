@@ -60,29 +60,29 @@ class Command(BaseCommand):
         with transaction.atomic():
             with connection.cursor() as cursor:
                 cursor.execute("SELECT pg_advisory_xact_lock(%s)", [SNAPSHOT_LOCK_KEY])
-            works = list(
-                evaluation_candidate_works(version)
-                .filter(rating__isnull=False)
-                .order_by("pk")
-            )
+            works = list(evaluation_candidate_works(version).order_by("pk"))
             inserted = 0
             for work in works:
-                _snapshot, created = CorpusRatingSnapshot.objects.get_or_create(
+                snapshot, created = CorpusRatingSnapshot.objects.get_or_create(
                     work=work,
                     corpus_version=version,
                     source="igdb",
                     defaults={
                         "rating": work.rating,
                         "rating_count": work.rating_count or 0,
+                        "total_rating_count": work.total_rating_count,
                         "retrieved_at": self._retrieved_at(work),
                     },
                 )
                 inserted += int(created)
+                if not created and snapshot.total_rating_count != work.total_rating_count:
+                    snapshot.total_rating_count = work.total_rating_count
+                    snapshot.save(update_fields=["total_rating_count"])
 
             governed = governed_works(version)
             candidates = evaluation_candidate_works(version)
             total_count = governed.count()
-            total_rating_count = governed.filter(total_rating__isnull=False).count()
+            total_rating_count = governed.filter(total_rating_count__gte=1).count()
             rating_count = governed.filter(rating__isnull=False).count()
             payload = {
                 "corpus_version": version,
@@ -90,7 +90,7 @@ class Command(BaseCommand):
                 "snapshots_inserted": inserted,
                 "governed_count": total_count,
                 "recommendation_candidate_count": candidates.count(),
-                "total_rating_present": total_rating_count,
+                "total_rating_count_present": total_rating_count,
                 "rating_present": rating_count,
                 "total_rating_coverage_pct": round(total_rating_count * 100 / total_count, 4)
                 if total_count

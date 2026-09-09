@@ -57,6 +57,8 @@ def _own(user, work, *, status="completed", rating=None):  # noqa: ANN001
 
 
 def _snapshot(work: GameWork, *, rating: float, rating_count: int = 100) -> None:
+    work.rating = rating
+    work.save(update_fields=["rating"])
     CorpusRatingSnapshot.objects.create(
         work=work,
         corpus_version=_CORPUS,
@@ -81,8 +83,24 @@ def test_algorithm_registry_has_the_named_positive_and_negative_variants() -> No
         "multiplicative",
         "two_stage",
         "negative_weighted_sum",
-        "recency_only",
+        "weighted_sum",
     ]
+
+
+def test_recency_variant_adds_recency_to_the_other_candidate_signals() -> None:
+    spec = ALGORITHM_REGISTRY["recency-v1"]
+    score = combine(
+        0.8,
+        0.7,
+        None,
+        spec,
+        rating_volume=0.6,
+        popscore=0.5,
+        recency_score=1.0,
+    )
+
+    assert score == pytest.approx(0.8 * 0.45 + 0.7 * 0.20 + 0.6 * 0.10 + 0.5 * 0.10 + 1.0 * 0.15)
+    assert spec.params["w_recency"] == 0.15
 
 
 @pytest.mark.django_db
@@ -337,6 +355,7 @@ def test_content_view_validates_algorithm_and_clamps_limit(user_a, genres) -> No
         "feature_set_version",
         "corpus_version",
         "snapshot_sha256",
+        "popscore_snapshot_sha256",
         "candidate_manifest_sha256",
         "candidate_count",
         "explorable_count",

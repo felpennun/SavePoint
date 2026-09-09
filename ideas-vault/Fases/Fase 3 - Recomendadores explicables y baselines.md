@@ -12,8 +12,8 @@ recalculables de forma independiente.
 
 ## Estado actual
 
-La discusión de la fase está **completada y lista para planificación** (2026-09-08). Todavía
-no es una fase planificada ni ejecutada.
+La discusión de la fase está **completada y lista para planificación** (2026-09-08). La fase
+está planificada, pero la comparación todavía no se ha ejecutado.
 
 ## Decisiones incorporadas en la discusión
 
@@ -27,6 +27,12 @@ no es una fase planificada ni ejecutada.
   recomendaciones.
 - Usar rating, géneros, saga, desarrollador, plataforma, número de valoraciones, novedad y
   tendencia/popularidad como métricas del recomendador.
+- Usar únicamente `rating` como nota de usuarios IGDB. `total_rating` (la combinación con
+  crítica) queda excluido para no contar dos veces la calidad; `total_rating_count` se conserva
+  como volumen y regla de elegibilidad.
+- La rejilla queda en 24 configuraciones: 15 sumas ponderadas, 3 multiplicativas y 6 de dos
+  etapas. `recency-v1` combina contenido, rating de usuarios, volumen y PopScore, y añade
+  `recency_score` con peso propio.
 - Basar la recomendación en la colección del usuario, incluyendo juegos en progreso; usar
   juegos con al menos una valoración o con rating válido aunque no tengan contador de votos.
   Los juegos sin rating pueden seguir explorándose en el catálogo, pero no los devolverá el
@@ -54,6 +60,14 @@ La planificación se ha preparado el 2026-09-08 en cuatro planes y tres ondas:
 Artefactos de preparación: [[../../.planning/phases/03-explainable-content-recommenders-and-baseline-comparison/03-RESEARCH|investigación]], [[../../.planning/phases/03-explainable-content-recommenders-and-baseline-comparison/03-VALIDATION|contrato Nyquist]], [[../../.planning/phases/03-explainable-content-recommenders-and-baseline-comparison/03-PATTERNS|mapa de patrones]] y [[../../.planning/phases/03-explainable-content-recommenders-and-baseline-comparison/03-UI-SPEC|contrato visual aprobado]].
 
 La planificación mantiene la decisión del proyecto de actualizar este vault con cada nueva decisión o información relevante. No se ha añadido una matriz API porque la fase usa snapshots gobernados y no integra una API externa nueva.
+
+## Estado de datos — 2026-09-09
+
+El corpus algorítmico activo es `2026.09.2`; sus hashes de ratings y PopScore están fijados en
+[`docs/methodology/protocol.json`](../../docs/methodology/protocol.json). La base contiene 200
+usuarios sintéticos actualmente. La discusión fija generar al menos 400 adicionales —600 en
+total— para la comparación principal, con cohortes de tamaño de biblioteca, historial escaso y
+sin historial; por tanto, todavía falta ampliar esa población antes de la evaluación.
 
 ## Enlaces
 

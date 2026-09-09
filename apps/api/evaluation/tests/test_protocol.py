@@ -64,32 +64,36 @@ def test_checked_in_protocol_loads_with_frozen_keys() -> None:
     assert frozen.relevance == {"completed": True, "rating_half_steps_gte": 7}
     assert frozen.split["strategy"] == "leave_one_out_per_user"
     assert frozen.candidate_set == (
-        "eligible_governed_corpus_rating_count_gte_1_or_valid_rating_"
+        "eligible_governed_corpus_total_rating_count_gte_1_or_valid_user_rating_"
         "minus_user_library_plus_heldout"
     )
     assert frozen.exclusions == "any_library_entry"
     assert frozen.simulation is True
     assert frozen.limitation.strip()
     # Plan 02-13 freezes the governed corpus and its evidence fingerprint.
-    assert frozen.corpus_version == "2026.09.1"
-    assert frozen.snapshot_sha256 == "648df3ded83dfab9e6f479a0d80291d3690e783e7b25f424b8e1e4260d839f01"
+    assert frozen.corpus_version == "2026.09.2"
+    assert frozen.snapshot_sha256 == "53341af5c60af02b5fd8a8d83eac0dc7eff218627c0df93c22fecb210ecac79d"
+    assert frozen.raw["popscore_snapshot_sha256"] == "a1a6078bc3dd9cb139f177224b32cb6c6292e34f5309f90490b681c1726a0864"
     assert frozen.protocol_version == 2
     assert frozen.candidate_set == (
-        "eligible_governed_corpus_rating_count_gte_1_or_valid_rating_"
+        "eligible_governed_corpus_total_rating_count_gte_1_or_valid_user_rating_"
         "minus_user_library_plus_heldout"
     )
 
 
-def test_checked_in_grid_is_18_configs_within_budget() -> None:
+def test_checked_in_grid_is_24_configs_within_budget() -> None:
     frozen = protocol.load()
     grid = frozen.grid
 
-    assert len(grid) == 18
+    assert len(grid) == 24
     assert len(grid) <= protocol.MAX_GRID
     modes = [entry["combine_mode"] for entry in grid]
-    assert modes.count("weighted_sum") == 9
+    assert modes.count("weighted_sum") == 15
     assert modes.count("multiplicative") == 3
     assert modes.count("two_stage") == 6
+    assert sum("recency_score" in entry["signals"] for entry in grid) == 6
+    assert all("user_rating" in entry["signals"] for entry in grid[:15])
+    assert all("total_rating" not in entry["signals"] for entry in grid)
 
 
 def test_evaluation_protocol_doc_documents_threats_to_validity() -> None:

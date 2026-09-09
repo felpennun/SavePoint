@@ -86,15 +86,22 @@ las cohortes y tests estadísticos son de la **Fase 3** y no forman parte de est
 
 ## Rejilla de tuning y aislamiento del test (D-21)
 
-- Los ~200 usuarios sintéticos se parten en tres subconjuntos **disjuntos** por una semilla
-  fija (`user_split.seed`): `train` ≈ 120, `validation` ≈ 40, `test` ≈ 40.
+- La población prevista es de 200 usuarios heredados de la Fase 2 más al menos 400 nuevos
+  usuarios sintéticos. Se parte en tres subconjuntos **disjuntos** por una semilla fija
+  (`user_split.seed`): `train` = 360, `validation` = 120, `test` = 120.
 - La **rejilla de tuning** se declara entera en `protocol.json` **antes** de correr nada.
-  Está congelada en **18 configuraciones** (tope duro: 24; `protocol.load()` lanza
-  `ProtocolError` si `len(grid) > 24`):
-  - `weighted_sum`: `(w1, w2) ∈ {(0.7, 0.3), (0.5, 0.5), (0.3, 0.7)}` × 3 conjuntos de
-    features = 9.
-  - `multiplicative`: × 3 conjuntos de features = 3.
-  - `two_stage`: bandas ∈ {3, 5} × 3 conjuntos de features = 6.
+Está congelada en **24 configuraciones** (tope duro: 24; `protocol.load()` lanza
+`ProtocolError` si `len(grid) > 24`):
+- `weighted_sum`: 5 perfiles de señales × 3 conjuntos de features = 15. Los
+  perfiles incorporan de forma progresiva similitud de contenido, rating de
+  usuarios IGDB, `total_rating_count` como volumen y PopScore; los dos últimos
+  añaden `recency_score` con peso explícito.
+- `multiplicative`: × 3 conjuntos de features = 3.
+- `two_stage`: bandas ∈ {3, 5} × 3 conjuntos de features = 6.
+- Los conjuntos de features son `genres_platform`,
+  `genres_platform_developer` y `genres_platform_developer_franchise`; la
+  franquicia queda identificada como ablación exploratoria por su cobertura
+  baja.
 - La rejilla se puntúa **solo sobre `validation`**, con la métrica titular `ndcg@10`. Se
   bloquea la configuración ganadora.
 - El **conjunto de test se corre una sola vez** (`tuning.test_runs = 1`). Su consumo se
@@ -106,12 +113,13 @@ las cohortes y tests estadísticos son de la **Fase 3** y no forman parte de est
   que es leakage-safe entre splits. Cualquier estadístico que *sí* se derivara de usuarios
   tendría que calcularse solo sobre `train` (EVAL-02).
 
-## `corpus_version` y `snapshot_sha256`
+## `corpus_version` y hashes de snapshots
 
-En este freeze quedan como `null` en `protocol.json`. Los resuelve el Plan `02-13` contra el
-`CorpusVersion` activo y contra el hash del dump del snapshot en el momento de la primera
-ejecución citada. El runner del Plan `02-13` toma `--corpus-version` de forma explícita y
-aborta si la cobertura del snapshot sobre la vista gobernada no es del 100 %.
+El protocolo apunta al corpus `2026.09.2`. `snapshot_sha256` identifica el
+snapshot de ratings de usuarios y `popscore_snapshot_sha256` identifica las
+primitivas normalizadas y el compuesto PopScore. El runner toma la versión y
+ambos hashes de forma explícita y aborta si hay deriva respecto a los datos
+locales congelados.
 
 ## Amenazas a la validez
 
@@ -162,7 +170,8 @@ aborta si la cobertura del snapshot sobre la vista gobernada no es del 100 %.
 ## Regla de elegibilidad del evaluador
 
 Desde `protocol_version: 2`, el universo que puntuan los algoritmos se limita
-a las obras gobernadas con `rating_count >= 1` o con un `rating` externo valido
+a las obras gobernadas con `total_rating_count >= 1` o con un `rating` de
+usuarios IGDB externo válido
 en el intervalo `[0, 100]`, aunque su recuento sea cero o nulo. Las obras sin
 ninguna de esas señales siguen disponibles para busqueda y coleccion, pero no
 se devuelven como recomendaciones ni participan en las metricas. El item

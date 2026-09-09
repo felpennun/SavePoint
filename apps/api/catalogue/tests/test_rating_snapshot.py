@@ -21,6 +21,7 @@ def make_rating_work(source_id: int, *, rating: float | None, total_rating: floa
         rating=rating,
         rating_count=10 if rating is not None else None,
         total_rating=total_rating,
+        total_rating_count=10 if total_rating is not None else None,
     )
     SourceRecord.objects.create(
         work=work,
@@ -73,7 +74,7 @@ def test_snapshot_is_insert_only_and_reports_both_rating_coverages() -> None:
     assert '"snapshots_inserted": 1' in first
     assert '"snapshots_inserted": 0' in second
     assert '"rating_present": 1' in second
-    assert '"total_rating_present": 1' in second
+    assert '"total_rating_count_present": 1' in second
 
 
 def test_snapshot_rejects_inactive_version_without_force() -> None:

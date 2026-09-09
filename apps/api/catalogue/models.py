@@ -258,7 +258,12 @@ class SourceRecord(models.Model):
 
 
 class CorpusRatingSnapshot(models.Model):
-    """Immutable external rating observation attached to a corpus version."""
+    """Immutable external rating observation attached to a corpus version.
+
+    ``rating_count`` is the count attached to the displayed user rating,
+    whereas ``total_rating_count`` is IGDB's broader count used as the frozen
+    volume signal.  They are intentionally stored separately.
+    """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     work = models.ForeignKey(
@@ -268,6 +273,7 @@ class CorpusRatingSnapshot(models.Model):
     source = models.CharField(max_length=16)
     rating = models.FloatField(null=True, blank=True)
     rating_count = models.PositiveIntegerField(default=0)
+    total_rating_count = models.PositiveIntegerField(null=True, blank=True)
     retrieved_at = models.DateTimeField()
 
     class Meta:

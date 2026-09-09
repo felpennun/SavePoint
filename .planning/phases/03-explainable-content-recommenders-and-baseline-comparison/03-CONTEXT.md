@@ -31,8 +31,9 @@
   y sus artefactos permanecen inmutables.
 - `recency_score` se calcula con decaimiento exponencial desde la fecha de
   lanzamiento, semivida de 365 días, y solo para obras ya publicadas con
-  valoración externa observada. Solo `recency-v1` usa esta puntuación: no se
-  mezcla con contenido, rating ni PopScore en las demás variantes.
+  valoración externa observada. Solo `recency-v1` usa esta puntuación como
+  señal adicional: combina contenido, rating de usuarios, volumen total y
+  PopScore, y añade `recency_score` con peso propio.
 
 ### Decisión de frontera de catálogo y recomendación — 2026-09-09
 
@@ -48,9 +49,10 @@
   umbral anterior de 1.000 valoraciones. La colección puede seguir contener
   obras fuera de este subconjunto y usarlas como semillas.
 - `rating` y `rating_count` son respectivamente la media y el número de
-  valoraciones de usuarios de IGDB. `total_rating` y `total_rating_count`
-  combinan usuarios de IGDB y crítica externa. El score congela la familia
-  `rating`; el filtro de elegibilidad acepta volumen total o rating de usuario.
+  valoraciones de usuarios de IGDB. `total_rating` es el score combinado con
+  crítica externa y queda fuera de los algoritmos para evitar doble conteo.
+  `total_rating_count` se conserva como volumen/criterio de elegibilidad, no
+  como una segunda nota. El score de calidad congela la familia `rating`.
 - La nueva versión debe registrar por separado el tamaño y hash del catálogo
   visible y del subconjunto algorítmico. Antes de crearla se aplican las
   migraciones de franquicia, desarrolladora y PopScore; después se reimportan y
@@ -236,9 +238,10 @@
 ## Phase Boundary
 
 Completar el **arnés de evaluación como evidencia de tesis** sobre los cinco
-algoritmos que ya define la Fase 2 (`random-v1`, `popularity-v1`,
+algoritmos base de la Fase 2 (`random-v1`, `popularity-v1`,
 `content-cbf-weighted-v1`, `content-cbf-multiplicative-v1`,
-`content-cbf-twostage-v1`), corriéndolos bajo el protocolo congelado y dejándolo
+`content-cbf-twostage-v1`) y las dos variantes adicionales (`content-cbf-neg-v1`
+y `recency-v1`), corriéndolos bajo el protocolo congelado y dejándolo
 todo **recalculable desde artefactos inmutables sin re-ejecutar ningún modelo**.
 
 En concreto la Fase 3 entrega:
@@ -414,7 +417,7 @@ producto o pulido de páginas de usuario final.
      de la Fase 2 si no ha cambiado).
 
   El `protocol.json` v1, su hash y el artefacto de la comparación 02-13 **no se
-  tocan**; la Fase 3 corre los cinco algoritmos bajo v2 con **su propio marcador
+  tocan**; la Fase 3 corre los cinco algoritmos base y las dos variantes adicionales bajo v2 con **su propio marcador
   de test consumido** (mecanismo `--force-new-protocol` / `record_test_run`, que
   es exactamente para esto). — **Reversibility:** one-way — `protocol_version: 2`
   y su `user_split` pasan a ser el contrato de evidencia de las comparaciones
@@ -520,7 +523,7 @@ métricas beyond-accuracy, `robustness`) es trabajo interno de la Fase 3.
 
 3. **Lo que NO cambia del freeze v1 → v2:** la regla de relevancia (D-17 Fase 2),
    la estrategia de split **leave-one-out** (D-18 Fase 2), K ∈ {5,10,20}, la
-   métrica titular `nDCG@10`, la rejilla de tuning de 18 configuraciones (tope
+   métrica titular `nDCG@10`, la rejilla de tuning de 24 configuraciones (tope
    24) y el aislamiento del test (una sola ejecución por versión, marcador de
    consumo). v2 solo **re-dimensiona `user_split`**, **amplía `metrics`**,
    **añade `robustness`** y **redefine la banda cold-start a 1-4**.

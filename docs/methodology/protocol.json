@@ -1,7 +1,7 @@
 {
   "protocol_version": 2,
-  "frozen_on": "2026-09-07",
-  "ratified_by": "Felipe — 02-08 Task 1 checkpoint:decision, option ratify-as-proposed, 2026-09-07",
+  "frozen_on": "2026-09-09",
+  "ratified_by": "Felipe — actualización de rejilla y señales, 2026-09-09",
   "simulation": true,
   "limitation": "Frozen offline evaluation protocol scored over seeded synthetic users. Every number produced under this protocol is simulation evidence about parameterised archetypes, not evidence about real SavePoint users (EVAL-10).",
   "relevance": {
@@ -15,7 +15,7 @@
     "seed": 20260907,
     "heldout_returned_to_candidates": true
   },
-  "candidate_set": "eligible_governed_corpus_rating_count_gte_1_or_valid_rating_minus_user_library_plus_heldout",
+  "candidate_set": "eligible_governed_corpus_total_rating_count_gte_1_or_valid_user_rating_minus_user_library_plus_heldout",
   "exclusions": "any_library_entry",
   "metrics": ["precision@k", "recall@k", "ndcg@k", "map@k"],
   "tuning": {
@@ -23,32 +23,50 @@
     "select_split": "validation",
     "test_runs": 1,
     "grid": [
-      {"combine_mode": "weighted_sum", "feature_set": "genres_rating", "params": {"w1": 0.7, "w2": 0.3}},
-      {"combine_mode": "weighted_sum", "feature_set": "genres_rating", "params": {"w1": 0.5, "w2": 0.5}},
-      {"combine_mode": "weighted_sum", "feature_set": "genres_rating", "params": {"w1": 0.3, "w2": 0.7}},
-      {"combine_mode": "weighted_sum", "feature_set": "genres_rating_platform", "params": {"w1": 0.7, "w2": 0.3}},
-      {"combine_mode": "weighted_sum", "feature_set": "genres_rating_platform", "params": {"w1": 0.5, "w2": 0.5}},
-      {"combine_mode": "weighted_sum", "feature_set": "genres_rating_platform", "params": {"w1": 0.3, "w2": 0.7}},
-      {"combine_mode": "weighted_sum", "feature_set": "genres_rating_platform_franchise_dev", "params": {"w1": 0.7, "w2": 0.3}},
-      {"combine_mode": "weighted_sum", "feature_set": "genres_rating_platform_franchise_dev", "params": {"w1": 0.5, "w2": 0.5}},
-      {"combine_mode": "weighted_sum", "feature_set": "genres_rating_platform_franchise_dev", "params": {"w1": 0.3, "w2": 0.7}},
-      {"combine_mode": "multiplicative", "feature_set": "genres_rating", "params": {}},
-      {"combine_mode": "multiplicative", "feature_set": "genres_rating_platform", "params": {}},
-      {"combine_mode": "multiplicative", "feature_set": "genres_rating_platform_franchise_dev", "params": {}},
-      {"combine_mode": "two_stage", "feature_set": "genres_rating", "params": {"bands": 3}},
-      {"combine_mode": "two_stage", "feature_set": "genres_rating", "params": {"bands": 5}},
-      {"combine_mode": "two_stage", "feature_set": "genres_rating_platform", "params": {"bands": 3}},
-      {"combine_mode": "two_stage", "feature_set": "genres_rating_platform", "params": {"bands": 5}},
-      {"combine_mode": "two_stage", "feature_set": "genres_rating_platform_franchise_dev", "params": {"bands": 3}},
-      {"combine_mode": "two_stage", "feature_set": "genres_rating_platform_franchise_dev", "params": {"bands": 5}}
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform", "signals": ["content_similarity", "user_rating"], "params": {"w_content": 0.70, "w_rating": 0.30}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform", "signals": ["content_similarity", "user_rating", "total_rating_count"], "params": {"w_content": 0.60, "w_rating": 0.25, "w_volume": 0.15}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform", "signals": ["content_similarity", "user_rating", "total_rating_count", "popscore"], "params": {"w_content": 0.50, "w_rating": 0.25, "w_volume": 0.10, "w_popscore": 0.15}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform", "signals": ["content_similarity", "user_rating", "total_rating_count", "popscore", "recency_score"], "params": {"w_content": 0.45, "w_rating": 0.20, "w_volume": 0.10, "w_popscore": 0.10, "w_recency": 0.15}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform", "signals": ["content_similarity", "user_rating", "total_rating_count", "popscore", "recency_score"], "params": {"w_content": 0.40, "w_rating": 0.20, "w_volume": 0.10, "w_popscore": 0.10, "w_recency": 0.20}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer", "signals": ["content_similarity", "user_rating"], "params": {"w_content": 0.70, "w_rating": 0.30}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer", "signals": ["content_similarity", "user_rating", "total_rating_count"], "params": {"w_content": 0.60, "w_rating": 0.25, "w_volume": 0.15}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer", "signals": ["content_similarity", "user_rating", "total_rating_count", "popscore"], "params": {"w_content": 0.50, "w_rating": 0.25, "w_volume": 0.10, "w_popscore": 0.15}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer", "signals": ["content_similarity", "user_rating", "total_rating_count", "popscore", "recency_score"], "params": {"w_content": 0.45, "w_rating": 0.20, "w_volume": 0.10, "w_popscore": 0.10, "w_recency": 0.15}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer", "signals": ["content_similarity", "user_rating", "total_rating_count", "popscore", "recency_score"], "params": {"w_content": 0.40, "w_rating": 0.20, "w_volume": 0.10, "w_popscore": 0.10, "w_recency": 0.20}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer_franchise", "signals": ["content_similarity", "user_rating"], "params": {"w_content": 0.70, "w_rating": 0.30}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer_franchise", "signals": ["content_similarity", "user_rating", "total_rating_count"], "params": {"w_content": 0.60, "w_rating": 0.25, "w_volume": 0.15}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer_franchise", "signals": ["content_similarity", "user_rating", "total_rating_count", "popscore"], "params": {"w_content": 0.50, "w_rating": 0.25, "w_volume": 0.10, "w_popscore": 0.15}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer_franchise", "signals": ["content_similarity", "user_rating", "total_rating_count", "popscore", "recency_score"], "params": {"w_content": 0.45, "w_rating": 0.20, "w_volume": 0.10, "w_popscore": 0.10, "w_recency": 0.15}},
+      {"combine_mode": "weighted_sum", "feature_set": "genres_platform_developer_franchise", "signals": ["content_similarity", "user_rating", "total_rating_count", "popscore", "recency_score"], "params": {"w_content": 0.40, "w_rating": 0.20, "w_volume": 0.10, "w_popscore": 0.10, "w_recency": 0.20}},
+      {"combine_mode": "multiplicative", "feature_set": "genres_platform", "signals": ["content_similarity", "user_rating"], "params": {}},
+      {"combine_mode": "multiplicative", "feature_set": "genres_platform_developer", "signals": ["content_similarity", "user_rating"], "params": {}},
+      {"combine_mode": "multiplicative", "feature_set": "genres_platform_developer_franchise", "signals": ["content_similarity", "user_rating"], "params": {}},
+      {"combine_mode": "two_stage", "feature_set": "genres_platform", "signals": ["content_similarity", "user_rating"], "params": {"bands": 3}},
+      {"combine_mode": "two_stage", "feature_set": "genres_platform", "signals": ["content_similarity", "user_rating"], "params": {"bands": 5}},
+      {"combine_mode": "two_stage", "feature_set": "genres_platform_developer", "signals": ["content_similarity", "user_rating"], "params": {"bands": 3}},
+      {"combine_mode": "two_stage", "feature_set": "genres_platform_developer", "signals": ["content_similarity", "user_rating"], "params": {"bands": 5}},
+      {"combine_mode": "two_stage", "feature_set": "genres_platform_developer_franchise", "signals": ["content_similarity", "user_rating"], "params": {"bands": 3}},
+      {"combine_mode": "two_stage", "feature_set": "genres_platform_developer_franchise", "signals": ["content_similarity", "user_rating"], "params": {"bands": 5}}
     ]
   },
   "user_split": {
-    "train": 120,
-    "validation": 40,
-    "test": 40,
+    "train": 360,
+    "validation": 120,
+    "test": 120,
     "seed": 20260908
   },
-  "corpus_version": "2026.09.1",
-  "snapshot_sha256": "648df3ded83dfab9e6f479a0d80291d3690e783e7b25f424b8e1e4260d839f01"
+  "synthetic_population": {
+    "phase_2_existing": 200,
+    "phase_3_additional_minimum": 400,
+    "phase_3_target_total_minimum": 600,
+    "cohorts": {
+      "no_history": 10,
+      "sparse_history_1_to_4": 100,
+      "intensive_over_10": 50,
+      "normal_5_to_10": 240
+    }
+  },
+  "corpus_version": "2026.09.2",
+  "snapshot_sha256": "53341af5c60af02b5fd8a8d83eac0dc7eff218627c0df93c22fecb210ecac79d",
+  "popscore_snapshot_sha256": "a1a6078bc3dd9cb139f177224b32cb6c6292e34f5309f90490b681c1726a0864"
 }

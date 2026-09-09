@@ -4,8 +4,8 @@
 (D-17), K and the headline metric (D-19), the leave-one-out split (D-18), the
 candidate set and exclusions, the frozen metric list (D-22), the tuning grid
 (D-21, capped at 24 configs), the disjoint train/validation/test user split, and
-placeholders for ``corpus_version`` / ``snapshot_sha256`` that Plan 02-13 fills
-in against the active ``CorpusVersion``.
+the corpus and the rating/PopScore snapshot hashes used by the active
+``CorpusVersion``.
 
 The loader is fail-closed, mirroring
 ``accounts.management.commands.bootstrap_demo_accounts.parse_seed_contract``:
@@ -297,6 +297,9 @@ def _build(raw: Any) -> Protocol:
         raise ProtocolError("protocol.corpus_version must be a string or null (resolved in 02-13).")
     if snapshot_sha256 is not None and not isinstance(snapshot_sha256, str):
         raise ProtocolError("protocol.snapshot_sha256 must be a string or null (resolved in 02-13).")
+    popscore_snapshot_sha256 = raw.get("popscore_snapshot_sha256")
+    if popscore_snapshot_sha256 is not None and not isinstance(popscore_snapshot_sha256, str):
+        raise ProtocolError("protocol.popscore_snapshot_sha256 must be a string or null.")
 
     cutoff = raw.get("eligibility_cutoff_date")
     if cutoff is not None:

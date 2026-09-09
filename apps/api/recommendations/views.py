@@ -97,6 +97,7 @@ class ContentRecsView(APIView):
         "feature_set_version",
         "corpus_version",
         "snapshot_sha256",
+        "popscore_snapshot_sha256",
         "candidate_manifest_sha256",
         "candidate_count",
         "explorable_count",

@@ -165,7 +165,7 @@ def normalise_rating(value: float | None) -> float | None:
 
 
 def normalise_rating_volume(value: int | None, ceiling: int | None) -> float | None:
-    """Normalise ``log1p(rating_count)`` against one frozen candidate view.
+    """Normalise ``log1p(total_rating_count)`` against one frozen view.
 
     The caller supplies the maximum count observed in that view, which makes
     the value reproducible and prevents an outlier from leaking a live global

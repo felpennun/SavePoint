@@ -25,6 +25,7 @@ def frozen_protocol():
     mapping = copy.deepcopy(protocol_module.load().raw)
     mapping["corpus_version"] = CORPUS_VERSION
     mapping["snapshot_sha256"] = None
+    mapping["popscore_snapshot_sha256"] = None
     mapping["user_split"] = {"train": 0, "validation": 0, "test": 1, "seed": 20260908}
     return protocol_module.from_mapping(mapping)
 
@@ -184,6 +185,7 @@ def test_artifact_contains_frozen_fields_and_metrics(runner_fixture, frozen_prot
         "protocol_sha256",
         "corpus_version",
         "snapshot_sha256",
+        "popscore_snapshot_sha256",
         "feature_set_version",
         "seeds",
         "split_manifest_sha256",
