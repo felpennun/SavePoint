@@ -64,12 +64,7 @@ export interface Dictionary {
     };
     sort: {
       label: string;
-      relevance: string;
-      titleAsc: string;
-      titleDesc: string;
-      releaseNewest: string;
-      releaseOldest: string;
-      ratingDesc: string;
+      popscoreDesc: string;
     };
   };
   card: {
@@ -141,7 +136,16 @@ export interface Dictionary {
       multiplicative: { heading: string; description: string };
       twoStage: { heading: string; description: string };
       negative: { heading: string; description: string };
+      weightedPop: { heading: string; description: string };
+      multiplicativePop: { heading: string; description: string };
+      twoStagePop: { heading: string; description: string };
+      negativePop: { heading: string; description: string };
       recency: { heading: string; description: string };
+      mmr: { heading: string; description: string };
+      mmrPop: { heading: string; description: string };
+      collaborative: { heading: string; description: string };
+      hybrid: { heading: string; description: string };
+      hybridMmr: { heading: string; description: string };
     };
     genreDescription: string;
     refreshPreparing: string;

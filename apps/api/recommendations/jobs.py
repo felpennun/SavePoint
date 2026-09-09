@@ -5,14 +5,16 @@ from __future__ import annotations
 import hashlib
 import json
 from datetime import timedelta
-from typing import Any
+from typing import Any, Callable
 
 from django.db import transaction
+from django.db.models import F, Q
 from django.utils import timezone
 
 from evaluation import protocol as evaluation_protocol
 from library.models import LibraryEntry, OwnedCopy
 from recommendations.content.features import FEATURE_SET_VERSION
+from recommendations.cancellation import RecommendationComputationCancelled
 from recommendations.genre_heuristic import rank_genre_taste_v1
 from recommendations.models import (
     RecommendationJobStatus,
@@ -56,13 +58,23 @@ def collection_fingerprint(user_id: int, revision: int) -> str:
 
 
 def enqueue_latest_refresh(user_id: int) -> list[RecommendationRefreshJob]:
-    """Create or re-open one durable job for every published section."""
+    """Supersede old work and enqueue exactly one job per latest section."""
 
     state = RecommendationState.objects.filter(user_id=user_id).first()
     if state is None or state.collection_revision == 0:
         return []
     now = timezone.now()
     fingerprint = configuration_fingerprint()
+    RecommendationRefreshJob.objects.filter(user_id=user_id).filter(
+        Q(requested_revision__lt=state.collection_revision)
+        | ~Q(configuration_fingerprint=fingerprint)
+    ).filter(
+        status__in=(RecommendationJobStatus.QUEUED, RecommendationJobStatus.RUNNING)
+    ).update(
+        status=RecommendationJobStatus.OBSOLETE,
+        locked_at=None,
+        updated_at=now,
+    )
     jobs = []
     for algorithm_id in SECTION_ALGORITHM_IDS:
         job, created = RecommendationRefreshJob.objects.get_or_create(
@@ -96,7 +108,11 @@ def enqueue_latest_refresh(user_id: int) -> list[RecommendationRefreshJob]:
 
 
 def build_recommendation_section(
-    user: Any, corpus_version: str | None, algorithm_id: str
+    user: Any,
+    corpus_version: str | None,
+    algorithm_id: str,
+    *,
+    should_continue: Callable[[], bool] | None = None,
 ) -> dict[str, Any]:
     """Compute exactly one product section under the shared algorithm catalog."""
 
@@ -108,9 +124,12 @@ def build_recommendation_section(
             protocol=frozen,
             corpus_version=corpus_version,
             limit=PUBLISHED_RESULT_LIMIT,
+            should_continue=should_continue,
         )
     if algorithm_id == GENRE_ALGORITHM_ID:
-        return rank_genre_taste_v1(user, limit=PUBLISHED_RESULT_LIMIT)
+        return rank_genre_taste_v1(
+            user, limit=PUBLISHED_RESULT_LIMIT, should_continue=should_continue
+        )
     raise ValueError("unknown published recommendation section")
 
 
@@ -128,6 +147,10 @@ def _claim_next_job(algorithm_id: str | None = None) -> str | None:
         queued_jobs = (
             RecommendationRefreshJob.objects.select_for_update(skip_locked=True)
             .filter(status=RecommendationJobStatus.QUEUED, available_at__lte=now)
+            .filter(
+                user__recommendation_state__collection_revision=F("requested_revision"),
+                configuration_fingerprint=configuration_fingerprint(),
+            )
         )
         if algorithm_id is not None:
             queued_jobs = queued_jobs.filter(algorithm_id=algorithm_id)
@@ -139,6 +162,18 @@ def _claim_next_job(algorithm_id: str | None = None) -> str | None:
         job.locked_at = now
         job.save(update_fields=["status", "attempts", "locked_at", "updated_at"])
         return str(job.id)
+
+
+def _job_is_current(job: RecommendationRefreshJob) -> bool:
+    """Return whether the exact claimed job remains the latest user revision."""
+
+    return RecommendationRefreshJob.objects.filter(
+        id=job.id,
+        status=RecommendationJobStatus.RUNNING,
+        requested_revision=job.requested_revision,
+        configuration_fingerprint=job.configuration_fingerprint,
+        user__recommendation_state__collection_revision=job.requested_revision,
+    ).exists()
 
 
 def _publish_if_complete(
@@ -206,10 +241,22 @@ def process_one_job(algorithm_id: str | None = None) -> bool:
         return False
     job = RecommendationRefreshJob.objects.select_related("user").get(id=job_id)
     try:
+        if not _job_is_current(job):
+            RecommendationRefreshJob.objects.filter(id=job.id).update(
+                status=RecommendationJobStatus.OBSOLETE,
+                locked_at=None,
+                updated_at=timezone.now(),
+            )
+            return True
         state = RecommendationState.objects.get(user_id=job.user_id)
         input_fingerprint = collection_fingerprint(job.user_id, job.requested_revision)
         corpus_version = active_corpus_version()
-        payload = build_recommendation_section(job.user, corpus_version, job.algorithm_id)
+        payload = build_recommendation_section(
+            job.user,
+            corpus_version,
+            job.algorithm_id,
+            should_continue=lambda: _job_is_current(job),
+        )
         with transaction.atomic():
             state = RecommendationState.objects.select_for_update().get(user_id=job.user_id)
             current_fingerprint = collection_fingerprint(job.user_id, state.collection_revision)
@@ -244,6 +291,14 @@ def process_one_job(algorithm_id: str | None = None) -> bool:
                 config_fingerprint=job.configuration_fingerprint,
                 corpus_version=corpus_version,
             )
+        return True
+    except RecommendationComputationCancelled:
+        RecommendationRefreshJob.objects.filter(id=job_id).update(
+            status=RecommendationJobStatus.OBSOLETE,
+            locked_at=None,
+            last_error="",
+            updated_at=timezone.now(),
+        )
         return True
     except Exception as exc:  # noqa: BLE001 - persist failure and keep old snapshot
         RecommendationRefreshJob.objects.filter(id=job_id).update(

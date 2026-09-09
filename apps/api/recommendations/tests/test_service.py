@@ -128,7 +128,7 @@ def test_algorithms_share_the_same_manifest_and_payload_stays_score_ordered(
         for algorithm_id in ALGORITHM_REGISTRY
     ]
 
-    assert {payload["protocol_version"] for payload in payloads} == {7}
+    assert {payload["protocol_version"] for payload in payloads} == {10}
     assert len({payload["candidate_manifest_sha256"] for payload in payloads}) == 1
     assert all(
         all(left["score"] >= right["score"] for left, right in zip(payload["results"], payload["results"][1:]))
@@ -171,10 +171,76 @@ def test_service_rejects_v1_artifact(service_user) -> None:  # noqa: ANN001
     raw = copy.deepcopy(protocol.load().raw)
     raw["protocol_version"] = 1
 
-    with pytest.raises(ProtocolError, match="expected protocol_version 7"):
+    with pytest.raises(ProtocolError, match="expected protocol_version 10"):
         service.recommend_for_user(
             service_user,
             "content-cbf-weighted-v1",
             protocol=protocol.from_mapping(raw),
             corpus_version=CORPUS,
         )
+
+
+@pytest.mark.django_db
+def test_service_routes_hybrid_mmr_and_preserves_parameters(
+    service_user, service_genres, monkeypatch
+) -> None:  # noqa: ANN001
+    for index in range(3):
+        seed = make_work(
+            f"hybrid-mmr-seed-{index}",
+            service_genres["rpg"],
+            rating=80.0,
+            total_rating_count=10,
+        )
+        LibraryEntry.objects.create(
+            user=service_user,
+            work=seed,
+            current_status="completed",
+            rating_half_steps=8,
+        )
+    candidate = make_work(
+        "hybrid-mmr-candidate",
+        service_genres["rpg"],
+        rating=80.0,
+        total_rating_count=10,
+    )
+    add_snapshot(candidate)
+    called = {}
+
+    def fake_ranker(*args, **kwargs):  # noqa: ANN002, ANN003
+        called.update(kwargs)
+        return {
+            "algorithm_id": "hybrid-mmr-v1",
+            "generated_at": "2026-09-09T00:00:00+00:00",
+            "input_snapshot_sha256": "a" * 64,
+            "feature_set_version": "fs-v9",
+            "corpus_version": CORPUS,
+            "snapshot_sha256": "b" * 64,
+            "popscore_snapshot_sha256": "c" * 64,
+            "insufficient_history": False,
+            "limitation": "test",
+            "parameters": {"lambda": 0.80, "pool_rule": "max(100, 5*K)"},
+            "results": [{
+                "work_id": str(candidate.id),
+                "slug": candidate.canonical_slug,
+                "title": candidate.original_title,
+                "score": 0.8,
+                "contributions": [],
+                "rating_term": 0.8,
+                "rating_term_is_fallback": False,
+                "reason_signals": [],
+                "negative_similarity": 0.0,
+                "signals": {},
+            }],
+        }
+
+    monkeypatch.setattr(service, "rank_hybrid_mmr_v1", fake_ranker)
+    payload = service.recommend_for_user(
+        service_user,
+        "hybrid-mmr-v1",
+        corpus_version=CORPUS,
+        eligibility_cutoff_date=date(2026, 9, 8),
+    )
+
+    assert called["candidate_ids"]
+    assert payload["algorithm_id"] == "hybrid-mmr-v1"
+    assert payload["parameters"]["lambda"] == 0.80

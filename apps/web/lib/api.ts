@@ -309,12 +309,23 @@ export interface ContentRecommendationItem {
   display_rating: number | null;
   signals: {
     external_rating: number | null;
+    rating_bayesian_normalized?: number | null;
     rating_quality: number | null;
     rating_confidence: number | null;
+    rating_final?: number | null;
     rating_volume: number | null;
     popscore: number | null;
     popscore_imputed: boolean;
     recency_score: number | null;
+    hybrid_content_score?: number;
+    hybrid_collaborative_score?: number;
+    hybrid_content_weight?: number;
+    hybrid_collaborative_weight?: number;
+    hybrid_collaborative_fallback?: boolean;
+    hybrid_relevance_score?: number;
+    mmr_relevance?: number;
+    mmr_redundancy?: number;
+    mmr_score?: number;
   };
   reason: ContentRecommendationReason | null;
   year: number | null;
@@ -332,7 +343,7 @@ export interface ContentRecommendationReason {
 }
 
 export interface ContentRecommendationsResult {
-  protocol_version: 6;
+  protocol_version: 10;
   algorithm_id: string;
   generated_at: string;
   input_snapshot_sha256: string;
@@ -345,6 +356,7 @@ export interface ContentRecommendationsResult {
   eligibility_cutoff_date: string;
   insufficient_history: boolean;
   limitation: string;
+  parameters?: Record<string, number | string>;
   results: ContentRecommendationItem[];
 }
 

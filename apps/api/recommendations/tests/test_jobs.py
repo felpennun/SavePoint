@@ -179,6 +179,26 @@ def test_worker_claims_only_its_named_section(transactional_db, monkeypatch) -> 
     assert RecommendationRefreshJob.objects.filter(user=user, status=RecommendationJobStatus.QUEUED).count() == len(SECTION_ALGORITHM_IDS) - 1
 
 
+def test_hybrid_mmr_worker_claims_only_its_named_section(transactional_db, monkeypatch) -> None:  # noqa: ANN001
+    user = _user()
+    _entry(user, _work())
+    processed = []
+    monkeypatch.setattr(
+        jobs,
+        "build_recommendation_section",
+        lambda user, corpus_version, algorithm_id, **kwargs: processed.append(algorithm_id) or {"results": []},
+    )
+
+    assert jobs.process_one_job("hybrid-mmr-v1") is True
+    assert processed == ["hybrid-mmr-v1"]
+    assert RecommendationRefreshJob.objects.get(
+        user=user, algorithm_id="hybrid-mmr-v1"
+    ).status == RecommendationJobStatus.SUCCEEDED
+    assert RecommendationRefreshJob.objects.filter(
+        user=user, status=RecommendationJobStatus.QUEUED
+    ).count() == len(SECTION_ALGORITHM_IDS) - 1
+
+
 def test_new_collection_revision_obsoletes_every_prior_section(transactional_db) -> None:  # noqa: ANN001
     user = _user()
     entry = _entry(user, _work())

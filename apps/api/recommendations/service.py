@@ -18,11 +18,14 @@ from catalogue.serializers import _cover, _platform_summary, _release_year
 from evaluation.candidates import CandidateManifest, build_common
 from evaluation import protocol as evaluation_protocol
 from library.models import LibraryEntry
+from recommendations.collaborative import rank_collaborative_user_knn_v1
 from recommendations.content.rank import rank_content_v1
 from recommendations.content.variants import ALGORITHM_REGISTRY
+from recommendations.hybrid import rank_hybrid_mmr_v1, rank_hybrid_weighted_cf_v1
+from recommendations.published import CONTENT_ALGORITHM_IDS
 
 
-PROTOCOL_VERSION = 7
+PROTOCOL_VERSION = 10
 MIN_LIMIT = 1
 MAX_LIMIT = 50
 
@@ -130,7 +133,7 @@ def recommend_for_user(
 ) -> dict:
     """Rank one user's governed candidates and return the stable v2 DTO."""
 
-    if algorithm_id not in ALGORITHM_REGISTRY:
+    if algorithm_id not in CONTENT_ALGORITHM_IDS:
         raise RecommendationServiceError("unknown algorithm_id")
     frozen = protocol or evaluation_protocol.load()
     evaluation_protocol.require_version(frozen, PROTOCOL_VERSION)
@@ -148,15 +151,42 @@ def recommend_for_user(
         from recommendations.cancellation import RecommendationComputationCancelled
 
         raise RecommendationComputationCancelled
-    payload = rank_content_v1(
-        user,
-        algorithm_id,
-        limit=_limit(limit),
-        corpus_version=manifest.corpus_version,
-        candidate_ids=manifest.candidate_ids,
-        min_rating_count=None,
-        should_continue=should_continue,
-    )
+    if algorithm_id in ALGORITHM_REGISTRY:
+        payload = rank_content_v1(
+            user,
+            algorithm_id,
+            limit=_limit(limit),
+            corpus_version=manifest.corpus_version,
+            candidate_ids=manifest.candidate_ids,
+            min_rating_count=None,
+            should_continue=should_continue,
+        )
+    elif algorithm_id == "cf-user-knn-v1":
+        payload = rank_collaborative_user_knn_v1(
+            user,
+            candidate_ids=manifest.candidate_ids,
+            limit=_limit(limit) or 20,
+            corpus_version=manifest.corpus_version,
+            should_continue=should_continue,
+        )
+    elif algorithm_id == "hybrid-weighted-cf-v1":
+        payload = rank_hybrid_weighted_cf_v1(
+            user,
+            candidate_ids=manifest.candidate_ids,
+            limit=_limit(limit) or 20,
+            corpus_version=manifest.corpus_version,
+            should_continue=should_continue,
+        )
+    elif algorithm_id == "hybrid-mmr-v1":
+        payload = rank_hybrid_mmr_v1(
+            user,
+            candidate_ids=manifest.candidate_ids,
+            limit=_limit(limit) or 20,
+            corpus_version=manifest.corpus_version,
+            should_continue=should_continue,
+        )
+    else:
+        raise RecommendationServiceError("unknown algorithm_id")
     result_ids = {item["work_id"] for item in payload["results"]}
     manifest_ids = {str(work_id) for work_id in manifest.candidate_ids}
     if not result_ids <= manifest_ids:
@@ -217,5 +247,6 @@ def recommend_for_user(
         "eligibility_cutoff_date": manifest.eligibility_cutoff_date.isoformat(),
         "insufficient_history": payload["insufficient_history"],
         "limitation": payload["limitation"],
+        "parameters": payload.get("parameters", {}),
         "results": results,
     }

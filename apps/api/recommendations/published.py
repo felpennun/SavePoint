@@ -19,17 +19,34 @@ from catalogue.corpus import (
 from recommendations.content.features import (
     FACET_WEIGHTS,
     FEATURE_SET_VERSION,
+    RATING_BAYESIAN_PRIOR_COUNT,
+    RATING_CONFIDENCE_PRIOR_COUNT,
     RATING_QUALITY_POWER,
     RATING_SIGNAL_VERSION,
-    RATING_VOLUME_BOOST,
-    RATING_VOLUME_FLOOR,
 )
+from recommendations.collaborative import ALGORITHM_ID as COLLABORATIVE_ALGORITHM_ID
 from recommendations.content.variants import ALGORITHM_REGISTRY
 from recommendations.content.similarity import SIMILARITY_RULE_VERSION
+from recommendations.hybrid import (
+    ALGORITHM_ID as HYBRID_ALGORITHM_ID,
+    MMR_ALGORITHM_ID as HYBRID_MMR_ALGORITHM_ID,
+    MMR_LAMBDA,
+    MMR_MIN_POOL,
+    MMR_POOL_MULTIPLIER,
+    PUBLISHED_LIMIT as HYBRID_MMR_LIMIT,
+    COLLABORATIVE_WEIGHT,
+    CONTENT_WEIGHT,
+)
 
 
 GENRE_ALGORITHM_ID = "genre-taste-v1"
-CONTENT_ALGORITHM_IDS = tuple(ALGORITHM_REGISTRY)
+BASE_CONTENT_ALGORITHM_IDS = tuple(ALGORITHM_REGISTRY)
+PHASE4_ALGORITHM_IDS = (
+    COLLABORATIVE_ALGORITHM_ID,
+    HYBRID_ALGORITHM_ID,
+    HYBRID_MMR_ALGORITHM_ID,
+)
+CONTENT_ALGORITHM_IDS = (*BASE_CONTENT_ALGORITHM_IDS, *PHASE4_ALGORITHM_IDS)
 SECTION_ALGORITHM_IDS = (*CONTENT_ALGORITHM_IDS, GENRE_ALGORITHM_ID)
 PUBLISHED_RESULT_LIMIT = 20
 
@@ -53,9 +70,13 @@ def configuration_fingerprint() -> str:
         "rating_confidence": {
             "version": RATING_SIGNAL_VERSION,
             "quality_power": RATING_QUALITY_POWER,
-            "volume_boost": RATING_VOLUME_BOOST,
-            "volume_floor": RATING_VOLUME_FLOOR,
-            "volume_source": "total_rating_count",
+            "prior_source": "total_rating_count_weighted_frozen_corpus_mean",
+            "prior_count": RATING_BAYESIAN_PRIOR_COUNT,
+            "confidence_prior_count": RATING_CONFIDENCE_PRIOR_COUNT,
+            "observation_count_source": "total_rating_count",
+            "quality_formula": "rating_bayesian_normalized ** 2",
+            "confidence_formula": "n / (n + m)",
+            "final_formula": "rating_quality * rating_confidence",
         },
         "content_algorithms": {
             algorithm_id: {
@@ -64,6 +85,29 @@ def configuration_fingerprint() -> str:
                 "version": spec.version,
             }
             for algorithm_id, spec in ALGORITHM_REGISTRY.items()
+        },
+        "phase4_algorithms": {
+            COLLABORATIVE_ALGORITHM_ID: {
+                "version": "cf-user-knn-v1",
+                "neighbor_k": 20,
+                "min_common_rated_works": 2,
+                "reference_population": "training_users_offline_all_other_users_web",
+            },
+            HYBRID_ALGORITHM_ID: {
+                "version": "hybrid-weighted-cf-v1",
+                "content_weight": CONTENT_WEIGHT,
+                "collaborative_weight": COLLABORATIVE_WEIGHT,
+            },
+            HYBRID_MMR_ALGORITHM_ID: {
+                "version": HYBRID_MMR_ALGORITHM_ID,
+                "base_algorithm_id": HYBRID_ALGORITHM_ID,
+                "content_weight": CONTENT_WEIGHT,
+                "collaborative_weight": COLLABORATIVE_WEIGHT,
+                "lambda": MMR_LAMBDA,
+                "pool_rule": f"max({MMR_MIN_POOL}, {MMR_POOL_MULTIPLIER}*K)",
+                "feature_set_version": FEATURE_SET_VERSION,
+                "presentation_limit": HYBRID_MMR_LIMIT,
+            },
         },
         "genre_algorithm_id": GENRE_ALGORITHM_ID,
         "genre_order": "taste_score_desc_catalogue_rating_desc_slug_asc",

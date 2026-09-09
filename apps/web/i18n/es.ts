@@ -83,12 +83,7 @@ export const es: Dictionary = {
     },
     sort: {
       label: "Ordenar por",
-      relevance: "Relevancia",
-      titleAsc: "Título A–Z",
-      titleDesc: "Título Z–A",
-      releaseNewest: "Fecha de lanzamiento (más reciente)",
-      releaseOldest: "Fecha de lanzamiento (más antiguo)",
-      ratingDesc: "Valoración IGDB (mayor a menor)",
+      popscoreDesc: "PopScore (mayor a menor)",
     },
   },
   card: {
@@ -164,9 +159,45 @@ export const es: Dictionary = {
         heading: "Afinidad con tus preferencias en cuenta",
         description: "Refuerza lo que valoras y reduce géneros que has valorado negativamente varias veces.",
       },
+      weightedPop: {
+        heading: "Afinidad por contenido y popularidad",
+        description: "Combina contenido, rating-confidence y PopScore; la falta de PopScore usa el mínimo.",
+      },
+      multiplicativePop: {
+        heading: "Afinidad equilibrada con popularidad",
+        description: "Multiplica afinidad y calidad, y ajusta la popularidad entre una penalización y un refuerzo del 15 %.",
+      },
+      twoStagePop: {
+        heading: "Afinidad en dos etapas con popularidad",
+        description: "La similitud decide la banda; dentro de ella ordenan rating-confidence y PopScore.",
+      },
+      negativePop: {
+        heading: "Afinidad con preferencias y popularidad",
+        description: "Refuerza tus preferencias y la actividad del catálogo, manteniendo la penalización de similitud negativa.",
+      },
       recency: {
         heading: "Novedades afines a ti",
         description: "Usa las mismas señales personalizadas y añade la novedad de la fecha de lanzamiento.",
+      },
+      mmr: {
+        heading: "Afinidad diversa por contenido",
+        description: "Parte de Weighted y reduce la repetición entre juegos demasiado parecidos.",
+      },
+      mmrPop: {
+        heading: "Afinidad diversa con popularidad",
+        description: "Parte de Weighted-Pop y equilibra relevancia, PopScore y variedad.",
+      },
+      collaborative: {
+        heading: "Coincidencia con usuarios similares",
+        description: "Aprende de usuarios con valoraciones parecidas y prioriza juegos que ellos han valorado positivamente.",
+      },
+      hybrid: {
+        heading: "Afinidad híbrida",
+        description: "Combina la afinidad de contenido Weighted con las valoraciones de usuarios similares.",
+      },
+      hybridMmr: {
+        heading: "Afinidad híbrida diversa",
+        description: "Combina contenido y colaboración con MMR para reducir repeticiones entre juegos muy parecidos.",
       },
     },
     genreDescription: "Heurística basada en los géneros de tu actividad y en la valoración del catálogo.",

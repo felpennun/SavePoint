@@ -80,12 +80,7 @@ export const en: Dictionary = {
     },
     sort: {
       label: "Sort by",
-      relevance: "Relevance",
-      titleAsc: "Title A–Z",
-      titleDesc: "Title Z–A",
-      releaseNewest: "Release date (newest)",
-      releaseOldest: "Release date (oldest)",
-      ratingDesc: "IGDB rating (high to low)",
+      popscoreDesc: "PopScore (high to low)",
     },
   },
   card: {
@@ -161,9 +156,45 @@ export const en: Dictionary = {
         heading: "Content match with your preferences in mind",
         description: "Boosts what you rate positively and reduces genres you have rated negatively several times.",
       },
+      weightedPop: {
+        heading: "Content and popularity match",
+        description: "Combines content, rating-confidence, and PopScore; missing PopScore uses the minimum.",
+      },
+      multiplicativePop: {
+        heading: "Balanced match with popularity",
+        description: "Multiplies affinity and quality, adjusting popularity between a 15% penalty and a 15% boost.",
+      },
+      twoStagePop: {
+        heading: "Two-stage match with popularity",
+        description: "Similarity chooses the band; rating-confidence and PopScore order works within it.",
+      },
+      negativePop: {
+        heading: "Match with preferences and popularity",
+        description: "Boosts your preferences and catalogue activity while retaining the negative-similarity penalty.",
+      },
       recency: {
         heading: "Recent matches for you",
         description: "Uses the same personalised signals and adds release-date recency.",
+      },
+      mmr: {
+        heading: "Diverse content matches",
+        description: "Starts from Weighted and reduces repetition between very similar games.",
+      },
+      mmrPop: {
+        heading: "Diverse matches with popularity",
+        description: "Starts from Weighted-Pop and balances relevance, PopScore, and variety.",
+      },
+      collaborative: {
+        heading: "Matches from similar users",
+        description: "Learns from users with similar ratings and prioritizes works they rated positively.",
+      },
+      hybrid: {
+        heading: "Hybrid affinity",
+        description: "Combines Weighted content affinity with ratings from similar users.",
+      },
+      hybridMmr: {
+        heading: "Diverse hybrid affinity",
+        description: "Combines content and collaborative affinity with MMR to reduce repetition between very similar games.",
       },
     },
     genreDescription: "A heuristic based on the genres in your activity and the catalogue rating.",

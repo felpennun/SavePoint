@@ -155,6 +155,51 @@ services:
       service: recommendation-worker-weighted
     command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id genre-taste-v1
 
+  recommendation-worker-weighted-pop:
+    extends:
+      service: recommendation-worker-weighted
+    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id content-cbf-weighted-pop-v1
+
+  recommendation-worker-multiplicative-pop:
+    extends:
+      service: recommendation-worker-weighted
+    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id content-cbf-multiplicative-pop-v1
+
+  recommendation-worker-twostage-pop:
+    extends:
+      service: recommendation-worker-weighted
+    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id content-cbf-twostage-pop-v1
+
+  recommendation-worker-negative-pop:
+    extends:
+      service: recommendation-worker-weighted
+    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id content-cbf-neg-pop-v1
+
+  recommendation-worker-mmr:
+    extends:
+      service: recommendation-worker-weighted
+    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id content-cbf-mmr-v1
+
+  recommendation-worker-mmr-pop:
+    extends:
+      service: recommendation-worker-weighted
+    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id content-cbf-mmr-pop-v1
+
+  recommendation-worker-collaborative:
+    extends:
+      service: recommendation-worker-weighted
+    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id cf-user-knn-v1
+
+  recommendation-worker-hybrid:
+    extends:
+      service: recommendation-worker-weighted
+    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id hybrid-weighted-cf-v1
+
+  recommendation-worker-hybrid-mmr:
+    extends:
+      service: recommendation-worker-weighted
+    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id hybrid-mmr-v1
+
   web:
     build:
       context: ..

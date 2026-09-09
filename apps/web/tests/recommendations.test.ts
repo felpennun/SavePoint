@@ -2,10 +2,15 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   getPersonalRecommendations,
-  groupRecommendationsByGenre,
+  primaryGenreRecommendationShelf,
   type PersonalRecommendationItem,
   type PersonalRecommendationsResult,
 } from "@/lib/api";
+import { CONTENT_RECOMMENDATION_SECTIONS } from "@/lib/recommendation-sections";
+
+it("publishes a dedicated localized hybrid MMR shelf", () => {
+  expect(CONTENT_RECOMMENDATION_SECTIONS).toContainEqual(["hybrid-mmr-v1", "hybridMmr"]);
+});
 
 function makeItem(
   slug: string,
@@ -19,6 +24,7 @@ function makeItem(
     score,
     catalogue_rating: 80,
     catalogue_rating_count: 1200,
+    display_rating: 80,
     year: null,
     platform_summary: "",
     cover: { url: null, is_placeholder: true, alt: `Title ${slug}` },
@@ -40,17 +46,18 @@ function makeResult(
   };
 }
 
-describe("groupRecommendationsByGenre (REC-10, D-UI-4)", () => {
+describe("primaryGenreRecommendationShelf (REC-10)", () => {
   it("returns no shelves for the insufficient-history shape", () => {
-    expect(groupRecommendationsByGenre(makeResult({ insufficient_history: true }))).toEqual([]);
+    expect(primaryGenreRecommendationShelf(makeResult({ insufficient_history: true }))).toBeNull();
   });
 
   it("returns no shelves when there are no ranked results", () => {
-    expect(groupRecommendationsByGenre(makeResult({ results: [] }))).toEqual([]);
+    expect(primaryGenreRecommendationShelf(makeResult({ results: [] }))).toBeNull();
   });
 
-  it("groups flat results into genre shelves ordered by the user's taste weight", () => {
+  it("returns only the shelf for the primary library genre", () => {
     const result = makeResult({
+      primary_genre: { slug: "rpg", name: "RPG", entry_count: 6, weight: 8 },
       results: [
         makeItem("a", 10, [
           ["rpg", "RPG", 8],
@@ -61,16 +68,15 @@ describe("groupRecommendationsByGenre (REC-10, D-UI-4)", () => {
       ],
     });
 
-    const shelves = groupRecommendationsByGenre(result);
+    const shelf = primaryGenreRecommendationShelf(result);
 
-    expect(shelves.map((s) => s.genreSlug)).toEqual(["rpg", "action", "puzzle"]);
-    expect(shelves[0].genre).toBe("RPG");
-    expect(shelves[0].tasteWeight).toBe(8);
-    // score order from the DTO is preserved inside each shelf
-    expect(shelves[1].items.map((i) => i.slug)).toEqual(["a", "b"]);
+    expect(shelf?.genreSlug).toBe("rpg");
+    expect(shelf?.genre).toBe("RPG");
+    expect(shelf?.tasteWeight).toBe(8);
+    expect(shelf?.items.map((i) => i.slug)).toEqual(["a"]);
   });
 
-  it("places an item that matches several genres on each of those shelves", () => {
+  it("uses the score-weight rule only as a fallback for legacy snapshots", () => {
     const result = makeResult({
       results: [
         makeItem("a", 10, [
@@ -81,48 +87,30 @@ describe("groupRecommendationsByGenre (REC-10, D-UI-4)", () => {
       ],
     });
 
-    const shelves = groupRecommendationsByGenre(result);
-    const rpg = shelves.find((s) => s.genreSlug === "rpg");
-    const action = shelves.find((s) => s.genreSlug === "action");
+    const shelf = primaryGenreRecommendationShelf(result);
 
-    expect(rpg?.items.some((i) => i.slug === "a")).toBe(true);
-    expect(action?.items.some((i) => i.slug === "a")).toBe(true);
+    expect(shelf?.genreSlug).toBe("rpg");
+    expect(shelf?.items.map((i) => i.slug)).toEqual(["a"]);
   });
 
-  it("caps the number of shelves (default 4)", () => {
+  it("caps the sole shelf at twenty items", () => {
     const result = makeResult({
-      results: [
-        makeItem("a", 10, [["g1", "G1", 10]]),
-        makeItem("b", 9, [["g2", "G2", 9]]),
-        makeItem("c", 8, [["g3", "G3", 8]]),
-        makeItem("d", 7, [["g4", "G4", 7]]),
-        makeItem("e", 6, [["g5", "G5", 6]]),
-      ],
+      primary_genre: { slug: "rpg", name: "RPG", entry_count: 30, weight: 10 },
+      results: Array.from({ length: 25 }, (_, i) => makeItem(`w${i}`, 100 - i, [["rpg", "RPG", 10]])),
     });
 
-    expect(groupRecommendationsByGenre(result)).toHaveLength(4);
+    expect(primaryGenreRecommendationShelf(result)?.items).toHaveLength(20);
   });
 
-  it("caps the number of items per shelf", () => {
+  it("accepts an explicit product-safe item cap", () => {
     const result = makeResult({
       results: Array.from({ length: 15 }, (_, i) =>
         makeItem(`w${i}`, 100 - i, [["rpg", "RPG", 5]]),
       ),
     });
 
-    const [shelf] = groupRecommendationsByGenre(result, { maxItemsPerShelf: 12 });
-    expect(shelf.items).toHaveLength(12);
-  });
-
-  it("breaks ties between equal-weight genres by slug ascending for determinism", () => {
-    const result = makeResult({
-      results: [
-        makeItem("a", 5, [["zeta", "Zeta", 5]]),
-        makeItem("b", 4, [["alpha", "Alpha", 5]]),
-      ],
-    });
-
-    expect(groupRecommendationsByGenre(result).map((s) => s.genreSlug)).toEqual(["alpha", "zeta"]);
+    const shelf = primaryGenreRecommendationShelf(result, { maxItems: 12 });
+    expect(shelf?.items).toHaveLength(12);
   });
 });
 

@@ -8,18 +8,11 @@ import { OwnedGamesDlcShelf } from "@/components/OwnedGamesDlcShelf";
 import { RecommendationShelf } from "@/components/RecommendationShelf";
 import { getDictionary } from "@/i18n";
 import {
-  groupRecommendationsByGenre,
+  primaryGenreRecommendationShelf,
   type OwnedDlcResult,
   type RecommendationSnapshotResult,
 } from "@/lib/api";
-
-const CONTENT_SECTIONS = [
-  ["content-cbf-weighted-v1", "weighted"],
-  ["content-cbf-multiplicative-v1", "multiplicative"],
-  ["content-cbf-twostage-v1", "twoStage"],
-  ["content-cbf-neg-v1", "negative"],
-  ["recency-v1", "recency"],
-] as const;
+import { CONTENT_RECOMMENDATION_SECTIONS } from "@/lib/recommendation-sections";
 
 const SNAPSHOT_CACHE_PREFIX = "savepoint:recommendation-snapshot:";
 
@@ -130,13 +123,13 @@ export function RecommendationsClient({ locale }: { locale: string }) {
 
   const genreData = snapshot?.sections?.genre ?? null;
   const contentData = snapshot?.sections?.content ?? {};
-  const genreShelves = genreData && !genreData.insufficient_history
-    ? groupRecommendationsByGenre(genreData)
-    : [];
+  const genreShelf = genreData && !genreData.insufficient_history
+    ? primaryGenreRecommendationShelf(genreData)
+    : null;
   const hasContentRecommendations = Object.values(contentData).some(
     (result) => result.results.length > 0,
   );
-  const hasRecommendations = hasContentRecommendations || genreShelves.length > 0 || dlc.groups.length > 0;
+  const hasRecommendations = hasContentRecommendations || genreShelf !== null || dlc.groups.length > 0;
   const isRefreshing = snapshot?.status === "building" || snapshot?.status === "stale";
   const needsCollectionChange = snapshot?.status === "needs_refresh";
 
@@ -160,7 +153,7 @@ export function RecommendationsClient({ locale }: { locale: string }) {
         </div>
       ) : hasRecommendations ? (
         <div className="sp-recommendation-shelves">
-          {CONTENT_SECTIONS.map(([algorithmId, copyKey]) => {
+          {CONTENT_RECOMMENDATION_SECTIONS.map(([algorithmId, copyKey]) => {
             const section = contentData[algorithmId];
             if (!section) return null;
             const copy = r.contentSections[copyKey];
@@ -175,14 +168,13 @@ export function RecommendationsClient({ locale }: { locale: string }) {
               />
             );
           })}
-          {genreShelves.map((shelf) => (
+          {genreShelf ? (
             <RecommendationShelf
-              key={shelf.genreSlug}
-              shelf={shelf}
+              shelf={genreShelf}
               locale={locale}
               description={r.genreDescription}
             />
-          ))}
+          ) : null}
           <OwnedGamesDlcShelf
             groups={dlc.groups}
             locale={locale}
