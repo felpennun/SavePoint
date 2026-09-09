@@ -5,7 +5,7 @@ status: approved
 shadcn_initialized: false
 preset: none
 created: "2026-09-08"
-reviewed_at: "2026-09-08"
+reviewed_at: "2026-09-09"
 ---
 
 # Fase 03 — Contrato de diseño UI
@@ -13,6 +13,11 @@ reviewed_at: "2026-09-08"
 > Contrato visual y de interacción para la Fase 3. Extiende el sistema de diseño de primera
 > parte ya implementado; no abre un rediseño ni un panel de investigación. Generado por
 > `gsd-ui-researcher` y validado por `gsd-ui-checker` el 2026-09-08.
+
+> **Enmienda del autor — 2026-09-09.** La página pasa a mostrar una sección independiente
+> para cada variante de recomendación de producto, con una explicación breve y las señales
+> consideradas. Las configuraciones de investigación, los baselines no personalizados y las
+> métricas siguen fuera de esta superficie.
 
 La superficie de producto en alcance es `/{locale}/recommendations`. Debe mostrar datos reales
 del backend y conservar exactamente el orden descendente de puntuación publicado por cada
@@ -38,15 +43,17 @@ encabezado de la página establece el contexto y el primer resultado real debe a
    de tema y el comportamiento mobile existentes sin alterar orden de foco, etiquetas ni
    breakpoints.
 2. El contenido normal de la página es únicamente un `<h1>` breve y secciones de recomendaciones.
-   Cada sección contiene un `<h2>` visible y una lista de tarjetas; no lleva introducción,
-   metodología, leyenda de algoritmo, explicación larga ni bloque de investigación.
-3. La primera sección presenta el resultado versionado del recomendador de contenido publicado
-   por la Fase 3. El frontend conserva el orden recibido: no reordena por título, rating externo,
-   fecha, género ni popularidad, y no agrupa el resultado de forma que altere su ranking.
-4. Los estantes heredados por género y de contenido para juegos poseídos pueden coexistir porque
-   proceden de datos reales. Nunca sustituyen silenciosamente a la sección principal si esta
-   falla. Cada sección algorítmica conserva su propio orden de puntuación; el estante relacional
-   de DLC conserva el orden determinista del endpoint y no se presenta como un ranking por score.
+   Cada sección algorítmica contiene un `<h2>` visible, una explicación de una o dos frases y
+   una lista de tarjetas. La explicación identifica el enfoque y las señales usadas sin exponer
+   hashes, metodología experimental, pesos internos sin calibrar ni un bloque de investigación.
+3. La página muestra, en este orden, las cinco variantes publicables de contenido: suma ponderada,
+   combinación multiplicativa, dos etapas, variante con señal negativa y variante de recencia.
+   Después muestra la heurística por género y, al final, el estante relacional de DLC. Una sección
+   sin resultados se omite por completo.
+4. Cada sección conserva el orden recibido de su endpoint: no reordena por título, rating externo,
+   fecha, género ni popularidad, y no agrupa el resultado de forma que altere su ranking. Nunca
+   sustituye silenciosamente a otra sección si falla. El estante relacional de DLC conserva el
+   orden determinista del endpoint y no se presenta como un ranking por score.
 5. No se renderizan fixtures, placeholders de juegos, tarjetas de relleno ni resultados simulados
    en el estado poblado. Un placeholder de **carátula ausente** sí es válido porque representa un
    dato real incompleto y conserva la geometría.
@@ -54,8 +61,10 @@ encabezado de la página establece el contexto y el primer resultado real debe a
    reales del resultado. La razón ocupa como máximo dos líneas visuales; no se recuperan
    `<details>` de metodología, tablas de contribuciones ni la frase «según tus géneros y
    valoraciones».
-7. No se añaden gráficas, tablas de métricas, filtros de runs, selectores de algoritmo, botones de
-   exportación, estados de job ni comparaciones estadísticas. Todo ello pertenece a la Fase 7.
+7. No se añaden gráficas, tablas de métricas, filtros de runs, un selector de algoritmo, botones de
+   exportación, estados de job ni comparaciones estadísticas. Las cinco variantes se muestran como
+   secciones fijas y explicadas; no se convierte la página en un panel de laboratorio. Todo lo
+   experimental pertenece a los artefactos de evaluación y a la Fase 7.
 
 ---
 
@@ -146,13 +155,24 @@ El ring global de foco sigue siendo `2px solid --color-focus-ring` con offset de
 ## Copywriting Contract
 
 Toda cadena nueva o modificada se incorpora con paridad estricta en `es.ts`, `en.ts` y
-`dictionary.ts`. La página no muestra prosa introductoria en el estado poblado.
+`dictionary.ts`. Las explicaciones de sección son copy de producto breve, no documentación
+experimental.
 
 | Elemento | Español | Inglés |
 |----------|---------|--------|
 | Título de página | `Recomendaciones` | `Recommendations` |
-| Sección principal | `Recomendado para ti` | `Recommended for you` |
+| Sección suma ponderada | `Afinidad por contenido` | `Content match` |
+| Explicación suma ponderada | `Combina similitud de contenido, tus valoraciones y señales de calidad y popularidad.` | `Combines content similarity, your ratings, and quality and popularity signals.` |
+| Sección multiplicativa | `Afinidad equilibrada` | `Balanced content match` |
+| Explicación multiplicativa | `Combina las señales para que ninguna compense por completo una afinidad muy baja en otra.` | `Combines signals so that a very low match in one dimension cannot be fully offset by another.` |
+| Sección dos etapas | `Afinidad en dos etapas` | `Two-stage content match` |
+| Explicación dos etapas | `Primero encuentra obras afines por contenido y después las ordena con las señales escalares.` | `First finds content-similar works, then orders them with scalar signals.` |
+| Sección negativa | `Afinidad con tus preferencias en cuenta` | `Content match with your preferences in mind` |
+| Explicación negativa | `Refuerza lo que valoras y reduce candidatos de géneros que has valorado negativamente varias veces.` | `Boosts what you rate positively and reduces genres you have rated negatively several times.` |
+| Sección de recencia | `Novedades afines a ti` | `Recent matches for you` |
+| Explicación de recencia | `Usa las mismas señales personalizadas y añade la novedad de la fecha de lanzamiento.` | `Uses the same personalised signals and adds release-date recency.` |
 | Sección por género | `Porque juegas mucho a {genre}` | `Because you play a lot of {genre}` |
+| Explicación por género | `Una heurística basada en los géneros de tu actividad y en la valoración del catálogo.` | `A heuristic based on the genres in your activity and the catalogue rating.` |
 | Sección de juegos poseídos | `Para tus juegos` | `For games you own` |
 | Grupo DLC | `DLC de {game}` | `DLC for {game}` |
 | Razón breve de tarjeta | `Coincide contigo en {reasons}.` | `Matches your taste in {reasons}.` |
@@ -166,8 +186,7 @@ Toda cadena nueva o modificada se incorpora con paridad estricta en `es.ts`, `en
 Copy prohibida en esta fase, aunque queden claves históricas en el diccionario:
 
 - `Recomendaciones según tus géneros y valoraciones` / `Recommended by your genres and ratings`.
-- Introducciones que expliquen cómo se genera el ranking.
-- `Cómo se generan` / `How these are generated`.
+- Explicaciones largas sobre cómo se genera el ranking.
 - Párrafos con `algorithm_id`, limitaciones, hashes, versiones o metodología.
 - La introducción del estante DLC; el título visible basta.
 
@@ -184,14 +203,19 @@ atribuyen una señal ausente ni usan texto generativo.
 1. `AppShell` heredado.
 2. `<main class="sp-page">` con `<h1 class="sp-h1">Recomendaciones</h1>`.
 3. Contenedor `.sp-recommendation-shelves`.
-4. Sección principal «Recomendado para ti», siempre primero cuando existe resultado.
-5. Estantes reales adicionales por género, en el orden determinista devuelto por su contrato.
-6. Sección «Para tus juegos», solo cuando existe al menos un grupo real con contenido.
+4. Sección «Afinidad por contenido» (`content-cbf-weighted-v1`).
+5. Sección «Afinidad equilibrada» (`content-cbf-multiplicative-v1`).
+6. Sección «Afinidad en dos etapas» (`content-cbf-twostage-v1`).
+7. Sección «Afinidad con tus preferencias en cuenta» (`content-cbf-neg-v1`).
+8. Sección «Novedades afines a ti» (`recency-v1`).
+9. Estantes reales por género (`genre-taste-v1`), en el orden determinista devuelto por su contrato.
+10. Sección «Para tus juegos», solo cuando existe al menos un grupo real con contenido.
 
 Cada sección algorítmica usa `<section aria-labelledby>` y una `<ol>` porque el orden comunica
-ranking. El frontend itera el array recibido sin `sort()`. La clave estable es `work_id`; un empate
-ya llega resuelto por el backend. La sección relacional de DLC usa `<ul>` y no muestra posición ni
-score inventados.
+ranking. La explicación se asocia al título mediante `aria-describedby` y no contiene información
+distinta de la copy aprobada. El frontend itera el array recibido sin `sort()`. La clave estable es
+`work_id`; un empate ya llega resuelto por el backend. La sección relacional de DLC usa `<ul>` y no
+muestra posición ni score inventados.
 
 ### Geometría uniforme
 
@@ -241,11 +265,11 @@ score inventados.
 | Componente | Contrato de Fase 3 |
 |------------|--------------------|
 | `AppShell` | Se reutiliza sin cambios funcionales; navegación, i18n, tema, focus trap y orden de foco quedan congelados. |
-| `ContentRecommendationShelf` | Renderiza la lista principal como `<ol>` y conserva el array del endpoint sin reordenar. Pasa a `GameCard` la razón real y reserva geometría uniforme. |
-| `RecommendationShelf` | Solo renderiza resultados reales de `genre-taste-v1`; conserva orden por score dentro de cada estante y no muestra párrafo explicativo. |
+| `ContentRecommendationShelf` | Renderiza una variante de contenido como `<section>` con `<h2>`, explicación breve y `<ol>`; conserva el array del endpoint sin reordenar, identifica el `algorithm_id` en el mapeo interno y pasa a `GameCard` la razón real. |
+| `RecommendationShelf` | Renderiza resultados reales de `genre-taste-v1` con su explicación breve localizada; conserva el orden por score dentro de cada estante y no muestra metodología experimental. |
 | `OwnedGamesDlcShelf` | Omite `intro`; oculta grupos vacíos y usa `<ul>` porque es una relación determinista, no una puntuación algorítmica. |
 | `GameCard` | Mantiene enlace único, portada 3:4, título completo accesible y placeholder lawful. En variante `shelf`, fija 120×288px y añade razón breve en slot de dos líneas cuando exista. |
-| Estado de carga de ruta | Skeleton geometry-matched: título de página, tres cabeceras de sección y cuatro tarjetas 120×288px por track; skeletons `aria-hidden`, un único `role="status" aria-live="polite"`. |
+| Estado de carga de ruta | Skeleton geometry-matched: título de página, cabeceras de las secciones configuradas y cuatro tarjetas 120×288px por track; skeletons `aria-hidden`, un único `role="status" aria-live="polite"`. |
 
 No se introduce un componente de dashboard, tabla de métricas, chart, selector de run ni paquete
 de UI de terceros.
@@ -257,7 +281,7 @@ de UI de terceros.
 | Estado | Contrato |
 |--------|----------|
 | Loading | Se muestra el skeleton de ruta con la misma geometría final. Solo el mensaje localizado «Cargando…» / «Loading…» se anuncia una vez. |
-| Populated | Secciones reales, títulos visibles, listas semánticas y orden del backend intacto. No aparece prosa adicional entre título y lista. |
+| Populated | Secciones reales, título, explicación breve, listas semánticas y orden del backend intacto. La explicación no muestra pesos, hashes ni métricas de evaluación. |
 | Empty parcial | Una sección opcional sin resultados se omite por completo, incluido su `<h2>`; no deja un hueco extra ni una lista vacía. |
 | Empty total | Si ninguna sección tiene resultados reales, se muestra el empty state y CTA del Copywriting Contract; nunca tarjetas de relleno. |
 | Error parcial | La sección afectada conserva su `<h2>` y muestra el error breve con «Cargar recomendaciones»; las demás secciones reales permanecen visibles. No se sustituye por otro ranking. |
@@ -317,7 +341,8 @@ contrato aprobado de la Fase 2.
    ausentes; ningún fallo parcial permite que otra sección parezca ser el ranking principal.
 7. Pase axe-core en dark y light, navegación completa por teclado, foco visible y comprobación de
    reflow a 400% / 320px. Los skeletons no producen anuncios repetidos.
-8. Test de alcance: no se renderizan gráficas, tablas de métricas, selectores de algoritmo/run ni
+8. Test de alcance: se renderizan las cinco secciones de contenido con su `algorithm_id` y copy
+   aprobada; no se renderizan gráficas, tablas de métricas, selectores de algoritmo/run ni
    controles de exportación en `/{locale}/recommendations`.
 
 ---

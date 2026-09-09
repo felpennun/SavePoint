@@ -97,6 +97,17 @@ una obra sin saga simplemente omite esa dimensión. La reconstrucción se comple
 190.479 obras gobernadas: 186.211 vectores creados, 4.268 actualizados y 0 ausentes. La evidencia
 está en [[../../apps/api/feature-vector-cache-2026.09.2.json|la evidencia de caché]].
 
+## Contrato visual enmendado — 2026-09-09
+
+La página de recomendaciones mostrará una sección independiente para cada variante publicable de
+contenido: suma ponderada, combinación multiplicativa, dos etapas, señal negativa y recencia. A
+continuación aparecerán la heurística por género y el estante relacional de DLC. Cada sección
+algorítmica tendrá una explicación localizada de una o dos frases y conservará el orden real del
+backend. La rejilla de investigación, los baselines académicos y las métricas no se mostrarán al
+usuario final.
+
+Fuente canónica: [[../../.planning/phases/03-explainable-content-recommenders-and-baseline-comparison/03-UI-SPEC|contrato visual de Fase 3]].
+
 Evidencia detallada: [[../../docs/verification/recommendation-input-audit-2026-09-09.md|auditoría de entradas de recomendación]].
 
 ## Enlaces

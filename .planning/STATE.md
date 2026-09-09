@@ -204,6 +204,8 @@ TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<ver
 
 | 2026-09-09 | Reconstrucción de caché fs-v4 | 190.479/190.479 vectores materializados; 186.211 creados, 4.268 actualizados, 0 ausentes; evidencia archivada; sin ejecutar algoritmos |
 
+| 2026-09-09 | Enmienda del contrato visual de recomendaciones | Página definida con cinco variantes de contenido, heurística por género y DLC; cada variante tendrá explicación breve y señales visibles; sin ejecutar algoritmos |
+
 ## Deferred Items
 
 | Category | Item | Status | Deferred At | Milestone |
