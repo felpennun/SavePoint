@@ -32,6 +32,7 @@ from evaluation.metrics import (
 )
 from evaluation.protocol import Protocol
 from evaluation.splits import user_split
+from evaluation.statistics import StatisticsConfig, compare_paired_algorithms
 from recommendations.content.features import (
     FEATURE_SET_VERSION,
     coverage_report,
@@ -39,6 +40,8 @@ from recommendations.content.features import (
     genre_rating_profile,
 )
 from recommendations.content.rank import rank_content_v1
+from recommendations.collaborative import rank_collaborative_user_knn_v1
+from recommendations.hybrid import rank_hybrid_mmr_v1, rank_hybrid_weighted_cf_v1
 from recommendations.published import CONTENT_ALGORITHM_IDS
 from recommendations.baselines import rank_random_v1
 from library.popularity import rank_popularity_v1
@@ -190,14 +193,59 @@ def _content_algorithm(*, user, candidate_ids, corpus_version, algorithm_id, **_
     return {"candidate_ids": list(candidate_ids), **payload}
 
 
+def _collaborative_algorithm(*, user, candidate_ids, corpus_version, **kwargs):
+    payload = rank_collaborative_user_knn_v1(
+        user,
+        candidate_ids=candidate_ids,
+        limit=max(K_VALUES),
+        corpus_version=corpus_version,
+        reference_user_ids=kwargs.get("prepared", {}).get("training_user_ids", ()),
+        prepared=kwargs.get("prepared"),
+    )
+    return {"candidate_ids": list(candidate_ids), **payload}
+
+
+def _hybrid_algorithm(*, user, candidate_ids, corpus_version, **kwargs):
+    payload = rank_hybrid_weighted_cf_v1(
+        user,
+        candidate_ids=candidate_ids,
+        limit=max(K_VALUES),
+        corpus_version=corpus_version,
+        reference_user_ids=kwargs.get("prepared", {}).get("training_user_ids", ()),
+        prepared=kwargs.get("prepared"),
+        genre_profile=kwargs.get("genre_profile"),
+    )
+    return {"candidate_ids": list(candidate_ids), **payload}
+
+
+def _hybrid_mmr_algorithm(*, user, candidate_ids, corpus_version, **kwargs):
+    payload = rank_hybrid_mmr_v1(
+        user,
+        candidate_ids=candidate_ids,
+        limit=max(K_VALUES),
+        corpus_version=corpus_version,
+        reference_user_ids=kwargs.get("prepared", {}).get("training_user_ids", ()),
+        prepared=kwargs.get("prepared"),
+        genre_profile=kwargs.get("genre_profile"),
+    )
+    return {"candidate_ids": list(candidate_ids), **payload}
+
+
 def default_algorithms() -> dict[str, Callable[..., Any]]:
-    """Return the fixed five-algorithm comparison set."""
+    """Return the fixed baseline and published content-variant comparison set."""
 
     algorithms: dict[str, Callable[..., Any]] = {
         "random-v1": _random_algorithm,
         "popularity-v1": _popularity_algorithm,
     }
-    algorithms.update({algorithm_id: _content_algorithm for algorithm_id in CONTENT_ALGORITHM_IDS})
+    algorithms.update({
+        algorithm_id: _content_algorithm
+        for algorithm_id in CONTENT_ALGORITHM_IDS
+        if algorithm_id not in {"cf-user-knn-v1", "hybrid-weighted-cf-v1"}
+    })
+    algorithms["cf-user-knn-v1"] = _collaborative_algorithm
+    algorithms["hybrid-weighted-cf-v1"] = _hybrid_algorithm
+    algorithms["hybrid-mmr-v1"] = _hybrid_mmr_algorithm
     return algorithms
 
 
@@ -234,6 +282,48 @@ def _mean_applicable(values: list[float | None]) -> tuple[float | None, int]:
     if not observed:
         return None, 0
     return math.fsum(observed) / len(observed), len(observed)
+
+
+def _headline_statistical_comparison(
+    protocol: Protocol, algorithm_artifacts: Mapping[str, Any]
+) -> dict[str, Any]:
+    """Compare the frozen headline metric without using it for tuning."""
+
+    try:
+        metric_name, k_value = protocol.headline.rsplit("@", 1)
+        k_key = str(int(k_value))
+    except (AttributeError, ValueError):
+        return {
+            "valid": False,
+            "estimable": False,
+            "method": "statistics-v1",
+            "warnings": [f"invalid headline metric: {protocol.headline!r}"],
+        }
+
+    observations = {
+        algorithm_id: {
+            row["user_id"]: float(row["metrics"][k_key][metric_name])
+            for row in artifact["per_user"]
+        }
+        for algorithm_id, artifact in algorithm_artifacts.items()
+    }
+    if len(observations) < 2:
+        config = StatisticsConfig(seed=protocol.loo_seed)
+        return {
+            "valid": False,
+            "estimable": False,
+            "statistics_version": "statistics-v1",
+            "family": protocol.headline,
+            "configuration": config.as_dict(),
+            "algorithm_order": sorted(observations),
+            "user_count": 0,
+            "warnings": ["at least two algorithms are required for comparison"],
+        }
+    return compare_paired_algorithms(
+        observations,
+        config=StatisticsConfig(seed=protocol.loo_seed),
+        family=protocol.headline,
+    )
 
 
 def _training_item_probabilities(user_ids: set[object]) -> dict[str, float]:
@@ -340,6 +430,7 @@ def run(
         "snapshot_stats": evaluation_snapshot_stats,
         "snapshot_sha256": actual_snapshot_hash,
         "popscore_snapshot_sha256": actual_popscore_hash,
+        "training_user_ids": tuple(partition.train),
     }
     vector_by_id = {
         str(work_id): vector for work_id, vector in evaluation_prepared["vectors"].items()
@@ -491,6 +582,9 @@ def run(
         },
         "split_manifest_sha256": split_manifest_hash,
         "algorithms": algorithm_artifacts,
+        "statistical_comparisons": {
+            protocol.headline: _headline_statistical_comparison(protocol, algorithm_artifacts),
+        },
         "simulation": True,
         "limitation": protocol.limitation,
     }

@@ -128,8 +128,8 @@ las cohortes y tests estadísticos son de la **Fase 3** y no forman parte de est
   usa pesos escalonados `1/2/4/8/16/32` para los tramos `1–4`, `5–19`, `20–99`,
   `100–499`, `500–1999` y `>=2000`, respectivamente.
 - La **rejilla de tuning** se declara entera en `protocol.json` **antes** de correr nada.
-Está congelada en **28 configuraciones** (tope duro: 28; `protocol.load()` lanza
-`ProtocolError` si `len(grid) > 28`):
+Está congelada en **30 configuraciones** (tope duro: 30; `protocol.load()` lanza
+`ProtocolError` si `len(grid) > 30`):
 - `weighted_sum`: 5 perfiles de señales × 3 conjuntos de features = 15, más una
   variante publicada con PopScore = 16. Los
   perfiles incorporan de forma progresiva similitud de contenido, rating de
@@ -161,7 +161,7 @@ una saga o un desarrollador no concede puntos, y la ausencia no se imputa ni
 penaliza.
 
 Las variantes que incorporan PopScore usan el contrato de pesos publicado en
-el protocolo 7: 0,20 para PopScore en las sumas y desempates, `swing = 0,20`
+el protocolo 8: 0,20 para PopScore en las sumas y desempates, `swing = 0,20`
 en la variante multiplicativa y 0,20 en Recency. La ausencia de PopScore se
 imputa a 0,0, por lo que no se transforma en una señal neutra.
 - El **conjunto de test se corre una sola vez** (`tuning.test_runs = 1`). Su consumo se
@@ -215,6 +215,33 @@ locales congelados.
   (`apps/api/evaluation/tests/test_protocol.py`), que fijan la forma del contrato y sus
   invariantes de freeze antes de que corra ninguna variante.
 
+## Actualizacion v8: rating bayesiano
+
+La señal compartida pasa a `rating-confidence-v5-final`. Para cada
+candidata con rating IGDB observado se calcula primero
+`rating_bayes = (n * rating_igdb + 25 * media_corpus) / (n + 25)`, donde
+`n = total_rating_count` y `media_corpus` es la media IGDB ponderada por ese
+recuento en el snapshot congelado. La señal final es `(rating_bayes / 100)^2`.
+
+El cambio contrae las notas de pocas valoraciones hacia la media del corpus y
+conserva casi intactas las notas con evidencia abundante. El recuento no vuelve
+a sumarse ni a multiplicarse: ya participa una sola vez en el ajuste. Este
+cambio invalida resultados anteriores de la señal de rating y eleva el
+protocolo a v8, sin cambiar split, K, metricas ni conjunto de candidatas.
+
+## Variantes MMR
+
+El protocolo incluye dos variantes nuevas de reordenacion diversificada. Ambas
+puntuan primero el mismo pool que su algoritmo base y aplican MMR sobre las 100
+mejores candidatas, o sobre cinco veces K si ese numero es mayor. La primera
+usa `content-cbf-weighted-v1`; la segunda usa `content-cbf-weighted-pop-v1`.
+
+Con `lambda = 0,80`, el primer resultado es el de mayor relevancia base y cada
+siguiente maximiza `0,80 * relevancia - 0,20 * similitud_maxima_con_seleccionados`.
+La similitud de redundancia es el coseno de los vectores fs-v9. MMR cambia el
+orden de seleccion, no la puntuacion base ni los pesos de Weighted o
+Weighted-Pop.
+
 ## Evidencia y fuentes
 
 - Contrato: [`protocol.json`](./protocol.json).
@@ -229,11 +256,44 @@ locales congelados.
 
 ## Regla de elegibilidad del evaluador
 
-Desde `protocol_version: 2`, el universo que puntuan los algoritmos se limita
-a las obras gobernadas con `total_rating_count >= 1` o con un `rating` de
-usuarios IGDB externo válido
-en el intervalo `[0, 100]`, aunque su recuento sea cero o nulo. Las obras sin
-ninguna de esas señales siguen disponibles para busqueda y coleccion, pero no
-se devuelven como recomendaciones ni participan en las metricas. El item
-retirado del leave-one-out tambien debe cumplir esta regla; de lo contrario,
-el usuario no participa en ese split.
+En el protocolo vigente (v9), el universo que puntúan los algoritmos se limita
+a las obras gobernadas, con fecha no futura, `rating IS NOT NULL` y
+`total_rating_count >= 5`. Las obras fuera de esta intersección siguen
+disponibles para búsqueda y colección, pero no se devuelven como
+recomendaciones ni participan en las métricas. El ítem retirado del
+leave-one-out también debe cumplir esta regla; de lo contrario, el usuario no
+participa en ese split.
+
+## Ejecución paralela de la Fase 4
+
+La suite incluye los baselines, las once variantes de contenido y los dos
+algoritmos nuevos de Fase 4: `cf-user-knn-v1` y `hybrid-weighted-cf-v1`. El
+comando `run_evaluation_parallel` ejecuta un proceso independiente por
+algoritmo sobre el mismo protocolo y manifiestos. El artefacto registra el
+tiempo de cada proceso, el tiempo total de pared y los fallos sin publicar
+resultados parciales como si fueran una comparación completa.
+
+## Regla vigente desde la Fase 4
+
+La elegibilidad actual exige simultáneamente obra gobernada, fecha no futura,
+`rating IS NOT NULL` y `total_rating_count >= 5`. Las obras que no cumplen la
+intersección siguen en el catálogo, pero quedan fuera de todos los algoritmos
+y de sus métricas.
+
+## Protocolo v10: rating final y MMR híbrido
+
+El protocolo v10 congela la señal global en tres componentes reproducibles:
+`rating_quality = rating_bayesian_normalized ^ 2`, `rating_confidence = n /
+(n + m)` y `rating_final = rating_quality * rating_confidence`, con `n =
+total_rating_count` y `m = 25`. El rating bayesiano usa la media del corpus
+ponderada por `total_rating_count` como prior. Esta señal se utiliza una sola
+vez en cada variante que consume calidad IGDB; no se aplica a ratings
+personales ni a la similitud colaborativa.
+
+La rejilla pasa a 31 configuraciones al incorporar la entrada MMR híbrida.
+`hybrid-mmr-v1` combina `0,60` de Weighted y `0,40` de User-kNN, usa fallback
+Weighted sin vecindad suficiente y aplica MMR sobre `max(100, 5 * K)` con
+`lambda = 0,80`, coseno de `fs-v9` y 20 resultados publicados. El runner
+offline y el worker web comparten esta implementación y el mismo conjunto de
+candidatas, exclusiones, snapshots y split. La evaluación de los 400 usuarios
+queda pendiente y no se infieren resultados hasta ejecutarla.

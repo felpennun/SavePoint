@@ -7,9 +7,10 @@ from statistics import median
 
 from catalogue.models import CorpusRatingSnapshot, GameWork
 from recommendations.content.features import (
-    bayesian_rating,
     compose_rating_confidence,
     genre_rating_profile,
+    rating_bayesian_normalized,
+    rating_final,
     rating_quality_signal,
 )
 from recommendations.content.variants import VariantSpec
@@ -63,9 +64,10 @@ def rating_term(
             return 0.0, True
         return rating_quality_signal(float(median(genre_values))) or 0.0, True
 
-    return rating_quality_signal(
-        bayesian_rating(own_rating, _total_rating_count, rating_prior)
-    ) or 0.0, False
+    normalized = rating_bayesian_normalized(
+        own_rating, _total_rating_count, rating_prior
+    )
+    return rating_final(normalized, _total_rating_count) or 0.0, False
 
 
 def combine(

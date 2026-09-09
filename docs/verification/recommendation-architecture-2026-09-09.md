@@ -107,9 +107,9 @@ la valoración IGDB solo desempata y los empates finales usan el slug canónico.
 
 ## Publicación y consistencia
 
-Un cambio en la colección encola catorce trabajos, uno por sección publicada.
+Un cambio en la colección encola quince trabajos, uno por sección publicada.
 Cada worker reclama únicamente su `algorithm_id`. Sus resultados permanecen
-privados hasta que los catorce han terminado correctamente; entonces se crea y
+privados hasta que los quince han terminado correctamente; entonces se crea y
 activa un único `RecommendationSnapshot`. Si cambia la colección o la huella
 de configuración durante el cálculo, el resultado se marca obsoleto y no
 puede sustituir al snapshot anterior.
@@ -127,19 +127,20 @@ bucles costosos, abandonan el cálculo desfasado y cada worker dedicado reclama
 el trabajo de su mismo algoritmo para la revisión más reciente. Ningún trabajo
 obsoleto puede publicarse.
 
-La rejilla de 30 configuraciones de `docs/methodology/protocol.json` conserva
+La rejilla de 31 configuraciones de `docs/methodology/protocol.json` conserva
 su función de espacio de exploración y validación metodológica. No es un
 conjunto adicional de estanterías ni de workers: el conjunto realmente
-ejecutado para comparar y publicar es el catálogo versionado de trece
+ejecutado para comparar y publicar es el catálogo versionado de catorce
 variantes publicables: conserva los baselines anteriores, añade las cuatro
-variantes PopScore descritas arriba y las dos variantes MMR.
+variantes PopScore descritas arriba, las dos variantes MMR de contenido y
+`hybrid-mmr-v1`.
 
 ## Variantes PopScore publicables — actualización 2026-09-09
 
 La arquitectura actual conserva los cuatro baselines de contenido y añade cuatro
 variantes paralelas que incorporan PopScore: suma ponderada, combinación
 multiplicativa, dos etapas y suma con señal negativa. Cada variante usa el mismo
-`rank_content_v1`, la misma señal `rating_confidence` y sus pesos versionados en
+`rank_content_v1`, la misma señal `rating_final` y sus pesos versionados en
 `ALGORITHM_REGISTRY`; por tanto, la comparación offline y la web ejecutan exactamente
 la misma fórmula. `recency-v1` también aplica esta política de PopScore y mantiene
 `recency_score` como señal adicional.
@@ -151,9 +152,9 @@ auditable la imputación. En la variante multiplicativa el rango es 0,85–1,15;
 las variantes aditivas el cero es una contribución/penalización real, y en dos
 etapas solo afecta al desempate dentro de la banda de similitud.
 
-El producto publica una estantería por cada una de las trece variantes personales,
+El producto publica una estantería por cada una de las catorce variantes personales,
 además de la estantería de género y la de DLC. Hay un worker dedicado por variante:
-los ocho nuevos se añaden a los seis servicios existentes y todos comparten la
+los nuevos servicios se añaden al catálogo existente y todos comparten la
 revisión de colección y la publicación atómica del snapshot.
 
 ## Verificación
@@ -176,8 +177,8 @@ posiciones reducen redundancia sin modificar las puntuaciones base.
 
 ## Fase 4: colaborativo e híbrido — actualización 2026-09-09
 
-La arquitectura añade exactamente dos algoritmos personales, sin modificar las
-once variantes de contenido existentes:
+La arquitectura añade tres algoritmos personales, sin modificar las once
+variantes de contenido existentes:
 
 - `cf-user-knn-v1` centra las valoraciones explícitas de `LibraryEntry` por la
   media de cada usuario y calcula coseno sobre al menos dos obras valoradas en
@@ -187,21 +188,24 @@ once variantes de contenido existentes:
 - `hybrid-weighted-cf-v1` combina `0,60 * content-cbf-weighted-v1` y
   `0,40 * cf-user-knn-v1`. Cuando no existe señal colaborativa, conserva el
   resultado de Weighted como fallback explícito.
+- `hybrid-mmr-v1` reutiliza esa relevancia híbrida y aplica MMR sobre el pool
+  `max(100, 5 * K)`, con `lambda = 0,80`, coseno de `fs-v9` y publicación de 20
+  resultados.
 
 En la web, la referencia colaborativa excluye al usuario actual y cada
 algoritmo tiene su propio worker y estantería. En offline, la referencia es
 exclusivamente el split `train`, para impedir fuga desde validación o test.
 Ambos caminos reciben el mismo manifiesto de candidatas, exclusiones, corpus y
-semillas. La configuración se identifica con protocolo v9.
+semillas. La configuración se identifica con protocolo v10.
 
 La evaluación offline se ejecuta con `run_evaluation_parallel`: crea un proceso
 aislado por algoritmo, recoge estado, error y duración individual, y conserva
 el tiempo total de pared y la suma de tiempos de workers. Si falla uno, el
 artefacto queda marcado como fallido y no se registra el marcador de test.
 
-## Frontera metodológica de la Fase 4 y propuesta futura — 2026-09-09
+## Frontera metodológica de la Fase 4 — 2026-09-09
 
-La comparación actual de la Fase 4 implementa únicamente `cf-user-knn-v1` y
+La comparación inicial de la Fase 4 implementaba únicamente `cf-user-knn-v1` y
 `hybrid-weighted-cf-v1`. Esta decisión no altera las variantes de contenido ya
 aceptadas, incluidas `content-cbf-mmr-v1` y `content-cbf-mmr-pop-v1`. La fase
 mantiene así un conjunto acotado de comparadores que puede auditarse con el
@@ -222,10 +226,10 @@ alcance y de validez de esta fase, no una afirmación de inferioridad
 algorítmica. No genera artefactos ejecutables ni resultados comparables para
 ninguno de esos modelos en esta fase.
 
-### `hybrid-mmr-v1`: propuesta no implementada
+### `hybrid-mmr-v1`: propuesta posteriormente autorizada
 
-Como línea de trabajo futura se propone `hybrid-mmr-v1`, con estado
-**Propuesta — no implementada**. Primero calcula la relevancia de
+Como línea de trabajo posterior se definió `hybrid-mmr-v1`, que fue autorizada
+y se implementó en la actualización del 2026-09-10. Primero calcula la relevancia de
 `hybrid-weighted-cf-v1` con la composición exacta
 `0,60 * content-cbf-weighted-v1 + 0,40 * cf-user-knn-v1`; cuando falta señal
 colaborativa, conserva el fallback Weighted ya definido. Después aplica la
@@ -238,21 +242,22 @@ propuesta es de 20 resultados.
 Esta propuesta se distingue de `content-cbf-mmr-v1`, que reordena la relevancia
 Weighted de contenido, y de `content-cbf-mmr-pop-v1`, que reordena
 Weighted-Pop; también se distingue de `hybrid-weighted-cf-v1`, que combina las
-señales pero no aplica la etapa MMR. `hybrid-mmr-v1` no tiene worker,
-estantería, registro, snapshot ni resultado de evaluación. Cualquier trabajo
-futuro deberá conservar el corpus, las exclusiones, las semillas y el contrato
-de evaluación vigentes, y documentar por separado cualquier cambio antes de
-convertir esta propuesta en una variante ejecutable.
+señales pero no aplica la etapa MMR. La implementación actual tiene worker,
+estantería, registro y entrada en el runner offline, aunque todavía no tiene
+resultados de evaluación de los 400 usuarios. Cualquier trabajo futuro deberá
+conservar el corpus, las exclusiones, las semillas y el contrato de evaluación
+vigentes, y documentar por separado cualquier cambio.
 
-## Actualizacion v8: rating bayesiano
+## Actualización v10: rating bayesiano y confianza explícita
 
-`rating_confidence` usa `rating-confidence-v4-bayesian` tanto en web como en
-evaluacion offline. Se calcula `rating_bayes = (n * rating_igdb + 25 *
-media_corpus) / (n + 25)` y despues `(rating_bayes / 100)^2`. `n` es
-`total_rating_count`; `media_corpus` es la media IGDB ponderada por ese
-recuento en el snapshot congelado. Una candidata de poca evidencia se contrae
-hacia la media; una de evidencia amplia conserva su nota. No se aplica ya un
-multiplicador de volumen separado.
+La señal global usa `rating-confidence-v5-final` tanto en web como en
+evaluación offline. Se calcula `rating_bayes = (n * rating_igdb + 25 *
+media_corpus) / (n + 25)`, `rating_quality = (rating_bayes / 100)^2`,
+`rating_confidence = n / (n + 25)` y `rating_final = rating_quality *
+rating_confidence`. `n` es `total_rating_count`; `media_corpus` es la media IGDB
+ponderada por ese recuento en el snapshot congelado. Una candidata de poca
+evidencia se contrae hacia la media y además recibe menor confianza. No se
+aplica ya un multiplicador de volumen separado.
 - `docker compose -f infra/compose.yaml config --quiet`: configuración de los
   catorce workers válida.
 
@@ -263,3 +268,45 @@ y la heurística de género. La actualización de Felipe en la revisión 14
 terminó con los 14 trabajos en `succeeded`; el snapshot activo contiene 13
 secciones personales y cada una entrega 20 resultados. La regresión backend
 completa pasó con 482 tests y TypeScript pasó con `tsc --noEmit`.
+
+## Estado actualizado de la Fase 4 — 2026-09-10
+
+La orden explícita del autor amplía la implementación de la Fase 4 con
+`hybrid-mmr-v1`. La variante está implementada en el ranker compartido de web
+y offline, tiene worker dedicado, estantería localizada y entrada propia en
+la suite de evaluación. No se ha ejecutado todavía la evaluación de los 400
+usuarios; esta sección documenta implementación y contrato, no resultados
+experimentales.
+
+`hybrid-mmr-v1` reutiliza la relevancia de `hybrid-weighted-cf-v1`:
+`0,60 * content-cbf-weighted-v1 + 0,40 * cf-user-knn-v1`. Si no hay vecindad
+colaborativa suficiente, conserva el fallback Weighted. Sobre esa relevancia
+ordena un pool de `max(100, 5 * K)` candidatas con MMR, `lambda = 0,80` y
+similitud coseno de `fs-v9`; la publicación entrega 20 resultados. Se
+distingue de `content-cbf-mmr-v1` y `content-cbf-mmr-pop-v1` porque su
+relevancia de partida incorpora colaboración explícita.
+
+### Señal global de rating v5
+
+Desde el protocolo v10, todos los rankers content-based y los híbridos que
+consumen calidad global usan una única señal observada:
+
+`rating_bayesian_normalized = ((n * rating_igdb + m * corpus_prior) / (n + m)) / 100`
+
+`rating_quality = rating_bayesian_normalized ^ 2`
+
+`rating_confidence = n / (n + m)`
+
+`rating_final = rating_quality * rating_confidence`
+
+`n` es `total_rating_count` y `m = 25` es una constante congelada. El rating
+bayesiano aporta calidad estabilizada hacia la media del corpus y la confianza
+aporta una penalización explícita cuando hay poca evidencia. `rating_volume`
+se conserva como evidencia explicativa, pero no vuelve a multiplicarse. La
+señal no sustituye el rating personal de las semillas ni las valoraciones
+explícitas que usa `cf-user-knn-v1`.
+
+El contrato v10 incorpora la fórmula, `m = 25`, `hybrid-mmr-v1`, sus pesos, el
+pool y MMR, y eleva la rejilla declarada a 31 configuraciones. Web y offline
+leen el mismo ranker y los mismos snapshots, por lo que el cambio de señal no
+puede producir dos arquitecturas distintas.

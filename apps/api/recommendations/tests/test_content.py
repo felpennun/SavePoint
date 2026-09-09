@@ -11,6 +11,7 @@ from rest_framework.test import APIClient
 from catalogue.models import CorpusRatingSnapshot, GameWork, Genre
 from library.models import LibraryEntry
 from recommendations.content.combine import combine, rating_term
+from recommendations.content.features import bayesian_rating, rating_quality_signal
 from recommendations.content.rank import rank_content_v1
 from recommendations.content.variants import ALGORITHM_REGISTRY, VariantSpec
 
@@ -56,7 +57,13 @@ def _own(user, work, *, status="completed", rating=None):  # noqa: ANN001
     )
 
 
-def _snapshot(work: GameWork, *, rating: float, rating_count: int = 100) -> None:
+def _snapshot(
+    work: GameWork,
+    *,
+    rating: float,
+    rating_count: int = 100,
+    total_rating_count: int | None = 100,
+) -> None:
     work.rating = rating
     work.save(update_fields=["rating"])
     CorpusRatingSnapshot.objects.create(
@@ -65,6 +72,7 @@ def _snapshot(work: GameWork, *, rating: float, rating_count: int = 100) -> None
         source="igdb",
         rating=rating,
         rating_count=rating_count,
+        total_rating_count=total_rating_count,
         retrieved_at=django_timezone.now(),
     )
 
@@ -80,6 +88,8 @@ def test_algorithm_registry_has_the_named_positive_and_negative_variants() -> No
         "content-cbf-twostage-pop-v1",
         "content-cbf-neg-pop-v1",
         "recency-v1",
+        "content-cbf-mmr-v1",
+        "content-cbf-mmr-pop-v1",
     }
     assert all(isinstance(spec, VariantSpec) for spec in ALGORITHM_REGISTRY.values())
     assert [spec.combine_mode for spec in ALGORITHM_REGISTRY.values()] == [
@@ -92,6 +102,8 @@ def test_algorithm_registry_has_the_named_positive_and_negative_variants() -> No
         "two_stage_popscore",
         "negative_weighted_sum_popscore",
         "weighted_sum",
+        "mmr",
+        "mmr",
     ]
 
 
@@ -107,9 +119,20 @@ def test_recency_variant_adds_recency_to_the_other_candidate_signals() -> None:
         recency_score=1.0,
     )
 
-    rating_confidence = 0.7 * (0.8 + 0.2 * 0.6)
+    rating_confidence = 0.7
     assert score == pytest.approx(0.8 * 0.20 + rating_confidence * 0.20 + 0.5 * 0.20 + 1.0 * 0.40)
     assert spec.params["w_recency"] == 0.40
+
+
+def test_bayesian_rating_shrinks_sparse_scores_towards_the_frozen_prior() -> None:
+    prior = 70.0
+    sparse = bayesian_rating(95.0, 5, prior)
+    established = bayesian_rating(95.0, 500, prior)
+
+    assert sparse == pytest.approx((5 * 95.0 + 25 * prior) / 30)
+    assert established == pytest.approx((500 * 95.0 + 25 * prior) / 525)
+    assert prior < sparse < established < 95.0
+    assert rating_quality_signal(sparse) < rating_quality_signal(established)
 
 
 @pytest.mark.django_db
@@ -123,14 +146,14 @@ def test_rating_term_uses_observed_corpus_snapshot_without_genre_dilution(genres
         work, _CORPUS, {"role-playing-rpg": 60.0}
     )
 
-    assert term == pytest.approx(0.81)
+    assert term == pytest.approx(0.648)
     assert is_fallback is False
 
     # The mutable product field must not influence a frozen recommendation.
     work.total_rating = 100.0
     work.save(update_fields=["total_rating"])
     assert rating_term(work, _CORPUS, {"role-playing-rpg": 60.0}) == (
-        pytest.approx(0.81),
+        pytest.approx(0.648),
         False,
     )
 
@@ -158,6 +181,8 @@ def test_combination_modes_have_distinct_ordering_semantics() -> None:
 
     orders = {}
     for algorithm_id, spec in ALGORITHM_REGISTRY.items():
+        if spec.combine_mode == "mmr":
+            continue
         scored = [
             (combine(cos, term, None, spec), slug)
             for slug, (cos, term) in candidates.items()

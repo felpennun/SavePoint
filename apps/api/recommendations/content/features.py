@@ -42,7 +42,7 @@ FEATURE_SET_VERSION = "fs-v9"
 # Shared scalar-signal contract. The product workers and offline runner both
 # call the same ranker, so this version is included in the published
 # configuration fingerprint whenever the transformation changes.
-RATING_SIGNAL_VERSION = "rating-confidence-v4-bayesian"
+RATING_SIGNAL_VERSION = "rating-confidence-v5-final"
 RATING_QUALITY_POWER = 2.0
 # Equivalent pseudo-observations used to shrink a sparse candidate rating
 # towards the frozen corpus mean.  It is deliberately a fixed contract value,

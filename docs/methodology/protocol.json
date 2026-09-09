@@ -1,5 +1,5 @@
 {
-  "protocol_version": 7,
+  "protocol_version": 10,
   "frozen_on": "2026-09-09",
   "ratified_by": "Felipe — intensidad de valoración personal, PopScore reforzado, recencia por año natural y umbral de candidatos >= 5, 2026-09-09",
   "simulation": true,
@@ -9,13 +9,16 @@
     "rating_half_steps_gte": 7
   },
   "rating_signal": {
-    "version": "rating-confidence-v3",
+    "version": "rating-confidence-v5-final",
     "quality_power": 2.0,
-    "volume_source": "total_rating_count",
-    "volume_normalisation": "log1p_over_frozen_view_max",
-    "volume_floor": 0.8,
-    "volume_boost": 0.2,
-    "composition": "rating_quality * (volume_floor + volume_boost * rating_volume)"
+    "prior_source": "total_rating_count_weighted_frozen_corpus_mean",
+    "prior_count": 25.0,
+    "observation_count_source": "total_rating_count",
+    "quality_formula": "rating_quality = rating_bayesian_normalized ^ 2",
+    "confidence_formula": "rating_confidence = n / (n + m)",
+    "final_formula": "rating_final = rating_quality * rating_confidence",
+    "m": 25,
+    "composition": "rating_bayesian_normalized = (((n * rating_igdb) + (25 * corpus_prior)) / (n + 25) / 100)"
   },
   "content_similarity": {
     "feature_set_version": "fs-v9",
@@ -80,8 +83,33 @@
       {"combine_mode": "weighted_sum", "feature_set": "genres_platform", "signals": ["content_similarity", "rating_confidence", "popscore"], "params": {"w_content": 0.55, "w_rating": 0.25, "w_popscore": 0.20, "popscore_missing_floor": 0.0}},
       {"combine_mode": "multiplicative_popscore", "feature_set": "genres_platform", "signals": ["content_similarity", "rating_confidence", "popscore"], "params": {"popscore_missing_floor": 0.0, "popscore_swing": 0.20}},
       {"combine_mode": "two_stage_popscore", "feature_set": "genres_platform", "signals": ["content_similarity", "rating_confidence", "popscore"], "params": {"bands": 5, "w_rating": 0.80, "w_popscore": 0.20, "popscore_missing_floor": 0.0}},
-      {"combine_mode": "negative_weighted_sum_popscore", "feature_set": "genres_platform", "signals": ["content_similarity", "rating_confidence", "popscore"], "params": {"w_content": 0.55, "w_rating": 0.25, "w_popscore": 0.20, "negative_penalty": 1.0, "popscore_missing_floor": 0.0}}
-    ]
+      {"combine_mode": "negative_weighted_sum_popscore", "feature_set": "genres_platform", "signals": ["content_similarity", "rating_confidence", "popscore"], "params": {"w_content": 0.55, "w_rating": 0.25, "w_popscore": 0.20, "negative_penalty": 1.0, "popscore_missing_floor": 0.0}},
+      {"combine_mode": "mmr", "feature_set": "genres_platform", "signals": ["weighted_relevance", "rating_confidence", "pairwise_content_similarity"], "params": {"base_algorithm_id": "content-cbf-weighted-v1", "lambda": 0.80}},
+      {"combine_mode": "mmr", "feature_set": "genres_platform", "signals": ["weighted_pop_relevance", "rating_confidence", "pairwise_content_similarity"], "params": {"base_algorithm_id": "content-cbf-weighted-pop-v1", "lambda": 0.80}}
+      ,{"combine_mode": "mmr", "feature_set": "genres_platform", "signals": ["hybrid_relevance", "rating_confidence", "pairwise_content_similarity"], "params": {"base_algorithm_id": "hybrid-weighted-cf-v1", "content_weight": 0.60, "collaborative_weight": 0.40, "lambda": 0.80, "pool_rule": "max(100, 5*K)", "feature_set_version": "fs-v9"}}
+    ],
+    "evaluation_algorithms": [
+      "random-v1",
+      "popularity-v1",
+      "content-cbf-weighted-v1",
+      "content-cbf-multiplicative-v1",
+      "content-cbf-twostage-v1",
+      "content-cbf-neg-v1",
+      "content-cbf-weighted-pop-v1",
+      "content-cbf-multiplicative-pop-v1",
+      "content-cbf-twostage-pop-v1",
+      "content-cbf-neg-pop-v1",
+      "recency-v1",
+      "content-cbf-mmr-v1",
+      "content-cbf-mmr-pop-v1",
+      "cf-user-knn-v1",
+      "hybrid-weighted-cf-v1"
+      ,"hybrid-mmr-v1"
+    ],
+    "parallel_execution": {
+      "process_per_algorithm": true,
+      "timing": "wall_clock_seconds_per_algorithm_and_suite"
+    }
   },
   "user_split": {
     "train": 240,

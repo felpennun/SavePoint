@@ -3,7 +3,7 @@
 ``docs/methodology/protocol.json`` is the evidence contract: it fixes relevance
 (D-17), K and the headline metric (D-19), the leave-one-out split (D-18), the
 candidate set and exclusions, the frozen metric list (D-22), the tuning grid
-(D-21, capped at 24 configs), the disjoint train/validation/test user split, and
+(D-21, capped at 31 configs), the disjoint train/validation/test user split, and
 the corpus and the rating/PopScore snapshot hashes used by the active
 ``CorpusVersion``.
 
@@ -12,7 +12,7 @@ The loader is fail-closed, mirroring
 every structural problem raises :class:`ProtocolError` before any caller can run
 a single variant. Two freeze invariants are enforced here:
 
-* ``len(grid) > 24`` -> :class:`ProtocolError` (D-21 tuning budget).
+* ``len(grid) > 31`` -> :class:`ProtocolError` (D-21 tuning budget).
 * a test-split run marker that already records *this* protocol's hash ->
   :class:`ProtocolError`, unless the caller passes ``allow_consumed_test=True``
   (which is only legitimate when ``protocol_version`` has been bumped).
@@ -29,11 +29,12 @@ from typing import Any
 
 from django.conf import settings
 
-MAX_GRID = 24
+MAX_GRID = 31
 
 REQUIRED_KEYS = frozenset(
     {
         "protocol_version",
+        "rating_signal",
         "relevance",
         "k_values",
         "headline",
@@ -48,7 +49,17 @@ REQUIRED_KEYS = frozenset(
     }
 )
 
-COMBINE_MODES = frozenset({"weighted_sum", "multiplicative", "two_stage"})
+COMBINE_MODES = frozenset(
+    {
+        "weighted_sum",
+        "multiplicative",
+        "two_stage",
+        "multiplicative_popscore",
+        "two_stage_popscore",
+        "negative_weighted_sum_popscore",
+        "mmr",
+    }
+)
 
 
 class ProtocolError(RuntimeError):
@@ -64,6 +75,7 @@ class Protocol:
     """A validated, typed view over ``protocol.json``."""
 
     protocol_version: int
+    rating_signal: dict[str, Any]
     relevance: dict[str, Any]
     k_values: tuple[int, ...]
     headline: str
@@ -81,7 +93,7 @@ class Protocol:
 
     @property
     def eligibility_cutoff_date(self) -> date | None:
-        """Return the optional frozen eligibility date from protocol v2.
+        """Return the optional frozen eligibility date from protocol v6.
 
         The signed Phase 2 contract predates this field, so the property is
         optional for backwards compatibility. Product requests use the
@@ -224,6 +236,24 @@ def _build(raw: Any) -> Protocol:
 
     protocol_version = _int(raw["protocol_version"], "protocol_version", minimum=1)
 
+    rating_signal = raw["rating_signal"]
+    if not isinstance(rating_signal, dict):
+        raise ProtocolError("protocol.rating_signal must be an object.")
+    signal_keys = {
+        "version",
+        "quality_power",
+        "prior_source",
+        "prior_count",
+        "observation_count_source",
+        "quality_formula",
+        "confidence_formula",
+        "final_formula",
+    }
+    if not signal_keys <= set(rating_signal):
+        raise ProtocolError("protocol.rating_signal is missing required keys.")
+    if rating_signal["prior_count"] != 25.0:
+        raise ProtocolError("protocol.rating_signal.prior_count must be 25.0.")
+
     relevance = raw["relevance"]
     if not isinstance(relevance, dict) or "completed" not in relevance or "rating_half_steps_gte" not in relevance:
         raise ProtocolError("protocol.relevance must set 'completed' and 'rating_half_steps_gte' (D-17).")
@@ -281,6 +311,13 @@ def _build(raw: Any) -> Protocol:
             raise ProtocolError(f"protocol.tuning.grid[{index}].feature_set must be a non-empty string.")
         if not isinstance(entry.get("params"), dict):
             raise ProtocolError(f"protocol.tuning.grid[{index}].params must be an object.")
+    evaluation_algorithms = tuning.get("evaluation_algorithms")
+    if evaluation_algorithms is not None and (
+        not isinstance(evaluation_algorithms, list)
+        or not evaluation_algorithms
+        or not all(isinstance(value, str) and value.strip() for value in evaluation_algorithms)
+    ):
+        raise ProtocolError("protocol.tuning.evaluation_algorithms must be a non-empty list of strings.")
 
     user_split = raw["user_split"]
     if not isinstance(user_split, dict):
@@ -321,6 +358,7 @@ def _build(raw: Any) -> Protocol:
 
     return Protocol(
         protocol_version=protocol_version,
+        rating_signal=dict(rating_signal),
         relevance=dict(relevance),
         k_values=k_tuple,
         headline=headline,

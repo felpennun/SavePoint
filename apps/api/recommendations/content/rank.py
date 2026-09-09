@@ -19,6 +19,7 @@ from recommendations.cancellation import RecommendationComputationCancelled
 from recommendations.content.diversity import mmr_rerank
 from recommendations.content.explain import explain
 from recommendations.content.features import (
+    bayesian_rating,
     FEATURE_SET_VERSION,
     corpus_rating_prior,
     coverage_report,
@@ -149,6 +150,7 @@ def _candidate_signals(
 
     has_snapshot = work.id in snapshot_stats
     rating, _rating_count, total_rating_count = snapshot_stats.get(work.id, (None, 0, None))
+    bayesian_adjusted = bayesian_rating(rating, total_rating_count, rating_prior)
     bayesian_normalized = rating_bayesian_normalized(
         rating, total_rating_count, rating_prior
     )
@@ -158,7 +160,7 @@ def _candidate_signals(
     )
     return {
         "external_rating": normalise_rating(rating),
-        "bayesian_rating": bayesian_normalized,
+        "bayesian_rating": bayesian_adjusted,
         "rating_bayesian_normalized": bayesian_normalized,
         "rating_quality": quality,
         "rating_confidence": confidence,

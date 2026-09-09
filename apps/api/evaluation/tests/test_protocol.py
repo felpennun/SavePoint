@@ -22,6 +22,16 @@ EXPECTED_METRICS = ("precision@k", "recall@k", "ndcg@k", "map@k")
 def _base_mapping(grid_size: int = 2) -> dict:
     return {
         "protocol_version": 1,
+        "rating_signal": {
+            "version": "test",
+            "quality_power": 2.0,
+            "prior_source": "test",
+            "prior_count": 25.0,
+            "observation_count_source": "total_rating_count",
+            "quality_formula": "rating_bayesian_normalized ** 2",
+            "confidence_formula": "n / (n + m)",
+            "final_formula": "rating_quality * rating_confidence",
+        },
         "simulation": True,
         "limitation": "Simulation evidence only (EVAL-10).",
         "relevance": {"completed": True, "rating_half_steps_gte": 7},
@@ -74,17 +84,17 @@ def test_checked_in_protocol_loads_with_frozen_keys() -> None:
     assert frozen.corpus_version == "2026.09.2"
     assert frozen.snapshot_sha256 == "c42f46a42d091e11cd894c3f942b8979b77f611ac7a4b048d8d152bebe8ce3cc"
     assert frozen.raw["popscore_snapshot_sha256"] == "16de92f28fa5b3dd1b387110628561eb6330b271ed2b1e76a69a7e0f03083097"
-    assert frozen.protocol_version == 7
+    assert frozen.protocol_version == 10
     assert frozen.user_split == {"train": 240, "validation": 80, "test": 80, "seed": 20260908}
     assert frozen.raw["synthetic_population"]["phase_3_population"] == 400
     assert frozen.raw["synthetic_population"]["rating_count_min"] == 1
 
 
-def test_checked_in_grid_is_28_configs_within_budget() -> None:
+def test_checked_in_grid_is_31_configs_within_budget() -> None:
     frozen = protocol.load()
     grid = frozen.grid
 
-    assert len(grid) == 28
+    assert len(grid) == 31
     assert len(grid) <= protocol.MAX_GRID
     modes = [entry["combine_mode"] for entry in grid]
     assert modes.count("weighted_sum") == 16
@@ -93,6 +103,8 @@ def test_checked_in_grid_is_28_configs_within_budget() -> None:
     assert modes.count("multiplicative_popscore") == 1
     assert modes.count("two_stage_popscore") == 1
     assert modes.count("negative_weighted_sum_popscore") == 1
+    assert modes.count("mmr") == 3
+    assert sum(entry["params"].get("base_algorithm_id") == "hybrid-weighted-cf-v1" for entry in grid) == 1
     assert sum("recency_score" in entry["signals"] for entry in grid) == 6
     assert all("rating_confidence" in entry["signals"] for entry in grid)
     assert all("total_rating" not in entry["signals"] for entry in grid)

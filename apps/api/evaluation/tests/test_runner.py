@@ -215,6 +215,7 @@ def test_artifact_contains_frozen_fields_and_metrics(runner_fixture, frozen_prot
         "seeds",
         "split_manifest_sha256",
         "algorithms",
+        "statistical_comparisons",
         "protocol_version",
         "split",
         "simulation",
@@ -223,3 +224,6 @@ def test_artifact_contains_frozen_fields_and_metrics(runner_fixture, frozen_prot
     metrics = artifact["algorithms"]["only"]["aggregates"]
     assert set(metrics) == {"5", "10", "20"}
     assert set(metrics["10"]) == {"precision", "recall", "ndcg", "map"}
+    headline = artifact["statistical_comparisons"][frozen_protocol.headline]
+    assert headline["family"] == frozen_protocol.headline
+    assert headline["configuration"]["seed"] == frozen_protocol.loo_seed
