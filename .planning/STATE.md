@@ -252,3 +252,10 @@ La autenticación de GitHub CLI funciona desde el contexto elevado necesario par
 el scope `project` está concedido. No se han publicado credenciales ni logs sensibles.
 
 Siguiente acción: ejecutar `/gsd-execute-phase 3`, empezando por la Ola 1 (`03-01`).
+## Tarea rápida completada — 2026-09-09
+
+Se adoptó el diseño de caché personal stale-while-revalidate en
+`.planning/quick/260909-asynchronous-recommendation-cache/`: snapshots y cola durable en
+PostgreSQL, worker independiente, endpoint no bloqueante y cinco secciones de recomendaciones
+con explicación localizada. Redis queda pospuesto hasta disponer de una medición de latencia o
+concurrencia que justifique añadirlo. No se ejecutaron algoritmos experimentales.

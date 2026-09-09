@@ -337,6 +337,41 @@ export type ContentRecommendationsResponse =
   | { kind: "unauthorized" }
   | { kind: "error" };
 
+export type RecommendationSnapshotStatus = "empty" | "building" | "stale" | "ready";
+
+export interface RecommendationSnapshotResult {
+  status: RecommendationSnapshotStatus;
+  current_revision: number;
+  published_revision: number | null;
+  generated_at: string | null;
+  job_status: string | null;
+  error: string | null;
+  sections: {
+    content: Record<string, ContentRecommendationsResult>;
+    genre: PersonalRecommendationsResult;
+  } | null;
+}
+
+export type RecommendationSnapshotResponse =
+  | { kind: "ok"; data: RecommendationSnapshotResult }
+  | { kind: "unauthorized" }
+  | { kind: "error" };
+
+/** Read the last published personal bundle without waiting for a refresh job. */
+export async function getRecommendationSnapshot(
+  cookieHeader: string,
+): Promise<RecommendationSnapshotResponse> {
+  const url = new URL("/api/recommendations/snapshot/", API_BASE);
+  try {
+    const response = await fetch(url, { cache: "no-store", headers: { Cookie: cookieHeader } });
+    if (response.status === 401 || response.status === 403) return { kind: "unauthorized" };
+    if (!response.ok) return { kind: "error" };
+    return { kind: "ok", data: (await response.json()) as RecommendationSnapshotResult };
+  } catch {
+    return { kind: "error" };
+  }
+}
+
 export async function getContentRecommendations(
   cookieHeader: string,
   limit = 20,

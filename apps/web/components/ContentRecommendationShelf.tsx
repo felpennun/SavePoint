@@ -8,6 +8,8 @@ export function ContentRecommendationShelf({
   items,
   locale,
   heading,
+  description,
+  sectionId = "content-recommendations-heading",
   error,
   retryHref,
   retryLabel,
@@ -15,16 +17,23 @@ export function ContentRecommendationShelf({
   items: ContentRecommendationItem[];
   locale: string;
   heading: string;
+  description?: string;
+  sectionId?: string;
   error?: string;
   retryHref?: string;
   retryLabel?: string;
 }) {
   if (items.length === 0 && !error) return null;
   return (
-    <section className="sp-shelf" aria-labelledby="content-recommendations-heading">
-      <h2 id="content-recommendations-heading" className="sp-h2">
+    <section
+      className="sp-shelf"
+      aria-labelledby={sectionId}
+      aria-describedby={description ? `${sectionId}-description` : undefined}
+    >
+      <h2 id={sectionId} className="sp-h2">
         {heading}
       </h2>
+      {description ? <p id={`${sectionId}-description`} className="sp-muted">{description}</p> : null}
       {error ? (
         <div className="sp-section-error" role="alert">
           <p className="sp-card-evidence">{error}</p>

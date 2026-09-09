@@ -147,6 +147,31 @@ export const es: Dictionary = {
     error: "No se pudieron cargar tus recomendaciones. Inténtalo de nuevo.",
     retry: "Cargar recomendaciones",
     contentHeading: "Recomendado para ti",
+    contentSections: {
+      weighted: {
+        heading: "Afinidad por contenido",
+        description: "Combina similitud de contenido, tus valoraciones y señales de calidad y popularidad.",
+      },
+      multiplicative: {
+        heading: "Afinidad equilibrada",
+        description: "Combina las señales para que ninguna compense por completo una afinidad muy baja en otra.",
+      },
+      twoStage: {
+        heading: "Afinidad en dos etapas",
+        description: "Primero encuentra obras afines por contenido y después las ordena con señales escalares.",
+      },
+      negative: {
+        heading: "Afinidad con tus preferencias en cuenta",
+        description: "Refuerza lo que valoras y reduce géneros que has valorado negativamente varias veces.",
+      },
+      recency: {
+        heading: "Novedades afines a ti",
+        description: "Usa las mismas señales personalizadas y añade la novedad de la fecha de lanzamiento.",
+      },
+    },
+    genreDescription: "Heurística basada en los géneros de tu actividad y en la valoración del catálogo.",
+    refreshPreparing: "Estamos preparando tus recomendaciones.",
+    refreshUpdating: "Estamos actualizando tus recomendaciones; mientras tanto ves la versión anterior.",
     dlc: {
       heading: "Para tus juegos",
       intro: "Contenido descargable de juegos que ya tienes en tu colección.",

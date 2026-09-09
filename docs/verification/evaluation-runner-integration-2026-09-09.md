@@ -64,3 +64,26 @@ La evidencia completa está en
 Fuentes canónicas: [`recommendation-input-audit-2026-09-09.md`](recommendation-input-audit-2026-09-09.md),
 [`protocol.json`](../methodology/protocol.json) y el código de
 [`features.py`](../../apps/api/recommendations/content/features.py).
+
+## Caché personal y refresco asíncrono
+
+La página de recomendaciones no calcula los algoritmos dentro de la petición HTTP. Los
+cambios en `LibraryEntry` y `OwnedCopy` incrementan una revisión de colección y encolan un
+trabajo idempotente en PostgreSQL. El worker calcula el bundle completo de secciones y lo
+publica en una transacción; si la colección cambia durante el cálculo, el resultado se marca
+obsoleto y nunca sustituye a un snapshot más reciente.
+
+`GET /api/recommendations/snapshot/` devuelve siempre el último bundle completo publicado.
+Mientras se procesa una revisión nueva, la web conserva el snapshot anterior y muestra un
+aviso accesible de actualización. En el primer uso, cuando aún no existe snapshot, muestra el
+estado de preparación. Esta política stale-while-revalidate evita bloquear la pestaña y evita
+que una respuesta parcial mezcle versiones de algoritmos.
+
+La primera implementación usa PostgreSQL como cola durable y almacén de snapshots; no se
+instala Redis todavía. Redis queda como optimización posterior condicionada a una medición de
+latencia, concurrencia o presión de lecturas que demuestre su necesidad. Si se incorpora,
+seguirá siendo efímero: el snapshot publicado y el estado de revisión continuarán teniendo a
+PostgreSQL como fuente de verdad.
+
+Fuente de implementación: `apps/api/recommendations/jobs.py`,
+`apps/api/recommendations/models.py` y `apps/web/components/RecommendationRefreshNotice.tsx`.

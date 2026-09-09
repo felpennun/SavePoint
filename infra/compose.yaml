@@ -114,6 +114,21 @@ services:
       - ../docs:/workspace/docs:ro
       - ../e2e:/workspace/e2e:ro
 
+  recommendation-worker:
+    # PostgreSQL is both the durable queue and the recommendation snapshot
+    # store for the local deployment. Redis remains an optional optimisation,
+    # not a source of truth.
+    extends:
+      service: api
+    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2
+    ports: []
+    healthcheck:
+      disable: true
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
   web:
     build:
       context: ..

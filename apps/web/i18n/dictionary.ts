@@ -136,6 +136,16 @@ export interface Dictionary {
       intro: string;
       baseGameLabel: string;
     };
+    contentSections: {
+      weighted: { heading: string; description: string };
+      multiplicative: { heading: string; description: string };
+      twoStage: { heading: string; description: string };
+      negative: { heading: string; description: string };
+      recency: { heading: string; description: string };
+    };
+    genreDescription: string;
+    refreshPreparing: string;
+    refreshUpdating: string;
   };
   collection: {
     heading: string;

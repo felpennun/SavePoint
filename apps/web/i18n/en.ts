@@ -144,6 +144,31 @@ export const en: Dictionary = {
     error: "We couldn't load your recommendations. Try again.",
     retry: "Reload recommendations",
     contentHeading: "Recommended for you",
+    contentSections: {
+      weighted: {
+        heading: "Content match",
+        description: "Combines content similarity, your ratings, and quality and popularity signals.",
+      },
+      multiplicative: {
+        heading: "Balanced content match",
+        description: "Combines signals so that a very low match in one dimension cannot be fully offset by another.",
+      },
+      twoStage: {
+        heading: "Two-stage content match",
+        description: "First finds content-similar works, then orders them with scalar signals.",
+      },
+      negative: {
+        heading: "Content match with your preferences in mind",
+        description: "Boosts what you rate positively and reduces genres you have rated negatively several times.",
+      },
+      recency: {
+        heading: "Recent matches for you",
+        description: "Uses the same personalised signals and adds release-date recency.",
+      },
+    },
+    genreDescription: "A heuristic based on the genres in your activity and the catalogue rating.",
+    refreshPreparing: "We are preparing your recommendations.",
+    refreshUpdating: "We are updating your recommendations; you are seeing the previous version for now.",
     dlc: {
       heading: "For games you own",
       intro: "Downloadable content for games already in your collection.",

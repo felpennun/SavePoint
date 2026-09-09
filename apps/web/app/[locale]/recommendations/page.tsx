@@ -5,13 +5,21 @@ import { redirect } from "next/navigation";
 import { RecommendationShelf } from "@/components/RecommendationShelf";
 import { ContentRecommendationShelf } from "@/components/ContentRecommendationShelf";
 import { OwnedGamesDlcShelf } from "@/components/OwnedGamesDlcShelf";
+import { RecommendationRefreshNotice } from "@/components/RecommendationRefreshNotice";
 import { getDictionary } from "@/i18n";
 import {
-  getContentRecommendations,
   getOwnedDlc,
-  getPersonalRecommendations,
+  getRecommendationSnapshot,
   groupRecommendationsByGenre,
 } from "@/lib/api";
+
+const CONTENT_SECTIONS = [
+  ["content-cbf-weighted-v1", "weighted"],
+  ["content-cbf-multiplicative-v1", "multiplicative"],
+  ["content-cbf-twostage-v1", "twoStage"],
+  ["content-cbf-neg-v1", "negative"],
+  ["recency-v1", "recency"],
+] as const;
 
 /**
  * Recommendations (01.1-UI-SPEC Screen Contract 4, REC-10, NEW).
@@ -48,25 +56,32 @@ export default async function RecommendationsPage({
     .map((c) => `${c.name}=${c.value}`)
     .join("; ");
 
-  const [genreResponse, contentResponse, ownedDlcResponse] = await Promise.all([
-    getPersonalRecommendations(cookieHeader),
-    getContentRecommendations(cookieHeader),
+  const [snapshotResponse, ownedDlcResponse] = await Promise.all([
+    getRecommendationSnapshot(cookieHeader),
     getOwnedDlc(cookieHeader).catch(() => ({ groups: [] })),
   ]);
-  if (genreResponse.kind === "unauthorized" || contentResponse.kind === "unauthorized") {
+  if (snapshotResponse.kind === "unauthorized") {
     redirect(loginRedirect);
   }
 
-  const genreData = genreResponse.kind === "ok" ? genreResponse.data : null;
-  const contentData = contentResponse.kind === "ok" ? contentResponse.data : null;
+  const snapshotData = snapshotResponse.kind === "ok" ? snapshotResponse.data : null;
+  const genreData = snapshotData?.sections?.genre ?? null;
+  const contentData = snapshotData?.sections?.content ?? {};
   const genreShelves = genreData && !genreData.insufficient_history ? groupRecommendationsByGenre(genreData) : [];
-  const contentItems = contentData ? contentData.results : [];
-  const hasRecommendations = contentItems.length > 0 || genreShelves.length > 0 || ownedDlcResponse.groups.length > 0;
+  const hasContentRecommendations = Object.values(contentData).some((result) => result.results.length > 0);
+  const hasRecommendations = hasContentRecommendations || genreShelves.length > 0 || ownedDlcResponse.groups.length > 0;
+  const isRefreshing = snapshotData?.status === "building" || snapshotData?.status === "stale";
+  const hasLoadError = snapshotResponse.kind === "error";
 
   return (
     <main className="sp-page">
       <h1 className="sp-h1">{r.nav}</h1>
-      {!hasRecommendations && (genreResponse.kind === "error" || contentResponse.kind === "error") ? (
+      {isRefreshing ? (
+        <RecommendationRefreshNotice
+          message={snapshotData?.status === "building" ? r.refreshPreparing : r.refreshUpdating}
+        />
+      ) : null}
+      {!hasRecommendations && hasLoadError ? (
         <div className="sp-empty" role="alert">
           <p className="sp-lead" style={{ marginInline: "auto" }}>
             {r.error}
@@ -77,16 +92,28 @@ export default async function RecommendationsPage({
         </div>
       ) : hasRecommendations ? (
         <div className="sp-recommendation-shelves">
-          <ContentRecommendationShelf
-            items={contentItems}
-            locale={locale}
-            heading={r.contentHeading}
-            error={contentResponse.kind === "error" ? r.error : undefined}
-            retryHref={`/${locale}/recommendations`}
-            retryLabel={r.retry}
-          />
+          {CONTENT_SECTIONS.map(([algorithmId, copyKey]) => {
+            const section = contentData[algorithmId];
+            if (!section) return null;
+            const copy = r.contentSections[copyKey];
+            return (
+              <ContentRecommendationShelf
+                key={algorithmId}
+                items={section.results}
+                locale={locale}
+                heading={copy.heading}
+                description={copy.description}
+                sectionId={`${algorithmId}-heading`}
+              />
+            );
+          })}
           {genreShelves.map((shelf) => (
-            <RecommendationShelf key={shelf.genreSlug} shelf={shelf} locale={locale} />
+            <RecommendationShelf
+              key={shelf.genreSlug}
+              shelf={shelf}
+              locale={locale}
+              description={r.genreDescription}
+            />
           ))}
           <OwnedGamesDlcShelf
             groups={ownedDlcResponse.groups}
@@ -97,7 +124,9 @@ export default async function RecommendationsPage({
         </div>
       ) : (
         <div className="sp-empty">
-          <p className="sp-h2" style={{ margin: 0 }}>{r.emptyHeading}</p>
+          <p className="sp-h2" style={{ margin: 0 }}>
+            {snapshotData?.status === "building" ? r.refreshPreparing : r.emptyHeading}
+          </p>
           <p className="sp-lead" style={{ marginInline: "auto" }}>{r.emptyBody}</p>
           <Link href={`/${locale}/catalogue`} className="sp-btn-primary">{r.emptyCta}</Link>
         </div>

@@ -110,6 +110,23 @@ Fuente canónica: [[../../.planning/phases/03-explainable-content-recommenders-a
 
 Evidencia detallada: [[../../docs/verification/recommendation-input-audit-2026-09-09.md|auditoría de entradas de recomendación]].
 
+## Caché personal y decisión sobre Redis — 2026-09-09
+
+La web adopta un flujo stale-while-revalidate por usuario. Cada cambio de colección crea una
+nueva revisión y un trabajo coalescido en PostgreSQL; el worker calcula las cinco variantes de
+contenido y la heurística de género fuera de la petición. El bundle se publica de forma
+atómica, por lo que el usuario conserva la versión anterior hasta que el nuevo cálculo está
+completo. Si no hay snapshot previo, la interfaz muestra preparación y actualiza el estado
+mediante refrescos breves del servidor.
+
+Decisión: no instalar Redis en esta fase. PostgreSQL ya es la fuente de verdad y puede alojar
+la cola durable, la revisión de colección y los snapshots; añadir Redis ahora duplicaría estado
+operativo sin evidencia de necesidad. Se reconsiderará tras medir latencia y concurrencia en
+la demo. Si se incorpora, será una aceleración efímera para lecturas o señalización, nunca el
+único almacén del resultado publicado.
+
+Fuente canónica: [[../../docs/verification/evaluation-runner-integration-2026-09-09|integración del runner y caché personal]].
+
 ## Enlaces
 
 - [[Metricas de ranking]] · [[Diversidad y novedad]] · [[Cohortes de usuario]]

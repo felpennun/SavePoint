@@ -16,6 +16,11 @@ from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from evaluation.protocol import ProtocolError
+from recommendations.jobs import enqueue_latest_refresh
+from recommendations.models import (
+    RecommendationJobStatus,
+    RecommendationState,
+)
 from recommendations.service import RecommendationServiceError, recommend_for_user
 from recommendations.content.variants import ALGORITHM_REGISTRY
 from recommendations.genre_heuristic import rank_genre_taste_v1
@@ -158,3 +163,51 @@ class ContentRecsView(APIView):
                 ],
             }
         )
+
+
+class RecommendationSnapshotView(APIView):
+    """Return the latest complete personal bundle without waiting for refresh."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request) -> Response:
+        state, _ = RecommendationState.objects.get_or_create(user=request.user)
+        snapshot = state.active_snapshot
+        job = (
+            state.user.recommendation_refresh_jobs.filter(
+                requested_revision=state.collection_revision,
+            )
+            .order_by("-created_at")
+            .first()
+        )
+        if job is not None and job.status in {
+            RecommendationJobStatus.FAILED,
+            RecommendationJobStatus.OBSOLETE,
+        }:
+            job = enqueue_latest_refresh(request.user.id)
+        if state.collection_revision == 0 and snapshot is None:
+            status = "empty"
+        elif snapshot is None:
+            status = "building" if job is not None else "empty"
+            if job is None:
+                job = enqueue_latest_refresh(request.user.id)
+        elif snapshot.collection_revision == state.collection_revision:
+            status = "ready"
+        else:
+            status = "stale"
+            if job is None:
+                job = enqueue_latest_refresh(request.user.id)
+
+        response = Response(
+            {
+                "status": status,
+                "current_revision": state.collection_revision,
+                "published_revision": snapshot.collection_revision if snapshot else None,
+                "generated_at": snapshot.generated_at.isoformat() if snapshot else None,
+                "job_status": job.status if job else None,
+                "error": "refresh_failed" if job and job.status == RecommendationJobStatus.FAILED else None,
+                "sections": snapshot.payload if snapshot else None,
+            }
+        )
+        response["Cache-Control"] = "private, no-store"
+        return response

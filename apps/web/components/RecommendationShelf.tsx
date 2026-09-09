@@ -11,17 +11,25 @@ import type { PersonalRecommendationShelf } from "@/lib/api";
 export function RecommendationShelf({
   shelf,
   locale,
+  description,
 }: {
   shelf: PersonalRecommendationShelf;
   locale: string;
+  description?: string;
 }) {
   const heading = getDictionary(locale).recommendations.shelfHeading.replace("{genre}", shelf.genre);
+  const sectionId = `recommendation-${shelf.genreSlug}`;
 
   return (
-    <section className="sp-shelf" aria-labelledby={`recommendation-${shelf.genreSlug}`}>
-      <h2 id={`recommendation-${shelf.genreSlug}`} className="sp-h2">
+    <section
+      className="sp-shelf"
+      aria-labelledby={sectionId}
+      aria-describedby={description ? `${sectionId}-description` : undefined}
+    >
+      <h2 id={sectionId} className="sp-h2">
         {heading}
       </h2>
+      {description ? <p id={`${sectionId}-description`} className="sp-muted">{description}</p> : null}
       <ul className="sp-shelf-track" style={{ listStyle: "none", margin: 0, padding: 0 }}>
         {shelf.items.map((item) => (
           <GameCard
