@@ -10,7 +10,7 @@ from typing import Any
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connection, transaction
 
-from catalogue.corpus import governed_works
+from catalogue.corpus import evaluation_candidate_works, governed_works
 from catalogue.models import CorpusRatingSnapshot, CorpusVersion, SourceRecord
 
 
@@ -60,7 +60,11 @@ class Command(BaseCommand):
         with transaction.atomic():
             with connection.cursor() as cursor:
                 cursor.execute("SELECT pg_advisory_xact_lock(%s)", [SNAPSHOT_LOCK_KEY])
-            works = list(governed_works(version).filter(rating__isnull=False).order_by("pk"))
+            works = list(
+                evaluation_candidate_works(version)
+                .filter(rating__isnull=False)
+                .order_by("pk")
+            )
             inserted = 0
             for work in works:
                 _snapshot, created = CorpusRatingSnapshot.objects.get_or_create(
@@ -76,6 +80,7 @@ class Command(BaseCommand):
                 inserted += int(created)
 
             governed = governed_works(version)
+            candidates = evaluation_candidate_works(version)
             total_count = governed.count()
             total_rating_count = governed.filter(total_rating__isnull=False).count()
             rating_count = governed.filter(rating__isnull=False).count()
@@ -84,6 +89,7 @@ class Command(BaseCommand):
                 "source": "igdb",
                 "snapshots_inserted": inserted,
                 "governed_count": total_count,
+                "recommendation_candidate_count": candidates.count(),
                 "total_rating_present": total_rating_count,
                 "rating_present": rating_count,
                 "total_rating_coverage_pct": round(total_rating_count * 100 / total_count, 4)

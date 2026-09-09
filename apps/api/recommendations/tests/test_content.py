@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import timezone
+from datetime import date, timezone
 
 import pytest
 from django.utils import timezone as django_timezone
@@ -44,6 +44,7 @@ def _work(slug: str, *genre_objs: Genre) -> GameWork:
         total_rating_count=1000,
         in_corpus=True,
         corpus_version=_CORPUS,
+        first_release_date=date(2020, 1, 1),
     )
     work.genres.set(genre_objs)
     return work
@@ -228,11 +229,11 @@ def test_cold_start_returns_fallback_and_keeps_seen_work_out(user_a, genres) -> 
 
 
 @pytest.mark.django_db
-def test_rank_excludes_candidates_with_fewer_than_one_thousand_ratings(user_a, genres) -> None:  # noqa: ANN001
-    excluded = _work("low-confidence-candidate", genres["rpg"])
-    excluded.total_rating_count = 999
-    excluded.save(update_fields=["total_rating_count"])
-    _snapshot(excluded, rating=99.0, rating_count=999)
+def test_rank_includes_user_rated_candidates_below_the_old_volume_threshold(user_a, genres) -> None:  # noqa: ANN001
+    user_rated = _work("low-volume-user-rated-candidate", genres["rpg"])
+    user_rated.total_rating_count = None
+    user_rated.save(update_fields=["total_rating_count"])
+    _snapshot(user_rated, rating=99.0, rating_count=1)
 
     included = _work("high-confidence-candidate", genres["rpg"])
     included.total_rating_count = 1000
@@ -245,7 +246,7 @@ def test_rank_excludes_candidates_with_fewer_than_one_thousand_ratings(user_a, g
 
     slugs = {item["slug"] for item in result["results"]}
     assert "high-confidence-candidate" in slugs
-    assert "low-confidence-candidate" not in slugs
+    assert "low-volume-user-rated-candidate" in slugs
 
 
 @pytest.mark.django_db

@@ -6,7 +6,7 @@ from datetime import date
 import pytest
 from django.core.management import call_command
 
-from catalogue.corpus import ALLOWLIST_SLUGS
+from catalogue.corpus import ALLOWLIST_SLUGS, evaluation_candidate_works
 from catalogue.models import GameRelease, GameWork, Genre, Platform, SourceRecord
 
 
@@ -59,7 +59,13 @@ def make_work(
 
 def run_governance(version: str = "2026.09.1") -> dict:
     output = io.StringIO()
-    call_command("govern_corpus", version=version, evidence_json="-", stdout=output)
+    call_command(
+        "govern_corpus",
+        version=version,
+        as_of_date="2026-09-09",
+        evidence_json="-",
+        stdout=output,
+    )
     return json.loads(output.getvalue())
 
 
@@ -92,7 +98,26 @@ def test_govern_corpus_applies_every_d03_clause_and_keeps_unrated() -> None:
         "future_release_date": 0,
     }
     assert evidence["quality_report"]["governed_count"] == 1
+    assert evidence["quality_report"]["recommendation_candidate_count"] == 0
     assert len(evidence["sampled_manifest"]) == 1
+
+
+def test_recommendation_candidates_use_total_volume_or_user_rating() -> None:
+    total_volume = make_work(20)
+    total_volume.total_rating_count = 1
+    total_volume.save(update_fields=["total_rating_count"])
+    user_rating = make_work(21)
+    user_rating.rating = 72.0
+    user_rating.save(update_fields=["rating"])
+    excluded = make_work(22)
+
+    run_governance()
+
+    assert set(evaluation_candidate_works("2026.09.1").values_list("id", flat=True)) == {
+        total_volume.id,
+        user_rating.id,
+    }
+    assert excluded.id not in evaluation_candidate_works("2026.09.1").values_list("id", flat=True)
 
 
 def test_govern_corpus_is_idempotent_and_emits_all_evidence_sections() -> None:

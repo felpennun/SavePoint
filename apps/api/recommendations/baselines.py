@@ -24,7 +24,7 @@ from datetime import datetime, timezone
 
 from django.contrib.auth.models import AbstractBaseUser
 
-from catalogue.corpus import governed_works
+from catalogue.corpus import evaluation_candidate_works
 from library.models import LibraryEntry
 
 ALGORITHM_ID = "random-v1"
@@ -67,7 +67,7 @@ def rank_random_v1(
         for row in LibraryEntry.objects.filter(user=user).values("work_id")
     }
 
-    candidate_query = governed_works(corpus_version)
+    candidate_query = evaluation_candidate_works(corpus_version)
     if candidate_ids is not None:
         candidate_query = candidate_query.filter(id__in=set(candidate_ids))
     else:

@@ -15,7 +15,7 @@ from django.contrib.auth import get_user_model
 from django.db import connection, transaction
 
 from accounts.models import DemoAccountIdentity, demo_identity_anchor_id
-from catalogue.corpus import governed_works
+from catalogue.corpus import evaluation_candidate_works
 from evaluation.archetypes import Archetype, DEFAULT_ARCHETYPES, validate_archetypes
 from evaluation.protocol import load as load_protocol
 from library.models import BacklogStatus, LibraryEntry
@@ -64,7 +64,7 @@ class SyntheticGenerationError(ValueError):
 
 
 def _work_candidates(corpus_version: str | None) -> list[_WorkCandidate]:
-    works = governed_works(corpus_version).prefetch_related("genres").order_by("id")
+    works = evaluation_candidate_works(corpus_version).prefetch_related("genres").order_by("id")
     return [
         _WorkCandidate(
             work_id=work.id,

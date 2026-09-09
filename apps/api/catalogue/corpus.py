@@ -60,12 +60,6 @@ PLATFORM_ALLOWLIST: tuple[tuple[int, str, str], ...] = (
 
 ALLOWLIST_SLUGS = frozenset(slug for _igdb_id, slug, _display_name in PLATFORM_ALLOWLIST)
 
-# The project catalogue is a reproducible snapshot, not a list of announced
-# releases. Keep future-dated imports out of the application until they have
-# actually been released and can be verified in a later corpus snapshot.
-MAX_CATALOGUE_RELEASE_DATE = date(2026, 12, 31)
-
-
 def is_valid_name(name: str | None) -> bool:
     """Return whether a title has at least two alphanumeric characters."""
 
@@ -78,16 +72,15 @@ def governed_works(
     *,
     eligibility_cutoff_date: date | None = None,
 ) -> QuerySet[GameWork]:
-    """Return the canonical governed view, optionally pinned to one version."""
+    """Return the released, dated catalogue view, optionally pinned to one version.
 
-    cutoff = eligibility_cutoff_date or MAX_CATALOGUE_RELEASE_DATE
-    queryset = GameWork.objects.filter(
-        is_dlc=False,
-        in_corpus=True,
-    ).filter(
-        Q(first_release_date__isnull=True)
-        | Q(first_release_date__lte=cutoff)
-    )
+    ``in_corpus`` is catalogue membership, not recommendation eligibility. The
+    governance command freezes it using its explicit ``--as-of-date``.
+    """
+
+    queryset = GameWork.objects.filter(is_dlc=False, in_corpus=True)
+    if eligibility_cutoff_date is not None:
+        queryset = queryset.filter(first_release_date__lte=eligibility_cutoff_date)
     if corpus_version is not None:
         queryset = queryset.filter(corpus_version=corpus_version)
     return queryset
@@ -98,16 +91,14 @@ def evaluation_candidate_works(
     *,
     eligibility_cutoff_date: date | None = None,
 ) -> QuerySet[GameWork]:
-    """Return governed works with an observable rating signal.
+    """Return catalogue works eligible for recommendation algorithms.
 
-    The evaluation harness keeps the full governed catalogue searchable, but
-    it must not score unrated works as recommendation candidates. A work is
-    eligible when it has at least one user rating, or when its external rating
-    is a valid IGDB value even if the provider did not expose a rating count.
+    The full governed catalogue remains searchable. A candidate needs either
+    one observation in IGDB's combined rating or a non-null IGDB user rating.
     """
 
     return governed_works(
         corpus_version, eligibility_cutoff_date=eligibility_cutoff_date
     ).filter(
-        Q(rating_count__gte=1) | Q(rating__gte=0, rating__lte=100)
+        Q(total_rating_count__gte=1) | Q(rating__isnull=False)
     )

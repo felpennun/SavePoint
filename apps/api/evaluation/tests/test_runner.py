@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import copy
 import uuid
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 import pytest
 from django.contrib.auth import get_user_model
@@ -35,10 +35,12 @@ def runner_fixture(db):
         GameWork.objects.create(
             canonical_slug=f"runner-work-{index}",
             original_title=f"Runner Work {index}",
-            rating=80.0 if index == 0 else (101.0 if index == 3 else None),
+            rating=80.0 if index == 0 else None,
             rating_count=None if index == 0 else (1 if index == 1 else None),
+            total_rating_count=1 if index == 1 else None,
             in_corpus=True,
             corpus_version=CORPUS_VERSION,
+            first_release_date=date(2020, 1, 1),
         )
         for index in range(4)
     ]

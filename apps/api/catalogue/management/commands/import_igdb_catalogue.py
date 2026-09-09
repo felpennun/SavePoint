@@ -354,30 +354,25 @@ class Command(BaseCommand):
 
         if existing is not None:
             work = existing.work
-            work.canonical_slug = norm["canonical_slug"]
-            work.original_title = norm["name"]
-            work.title_en = norm["title_en"]
-            work.is_dlc = False
-            work.first_release_date = norm["release_date"]
-            work.total_rating = norm["total_rating"]
-            work.rating = norm["rating"]
-            work.rating_count = norm["rating_count"]
-            work.total_rating_count = norm["total_rating_count"]
-            work.summary = norm["summary"]
-            work.save(
-                update_fields=[
-                    "canonical_slug",
-                    "original_title",
-                    "title_en",
-                    "is_dlc",
-                    "first_release_date",
-                    "total_rating",
-                    "rating",
-                    "rating_count",
-                    "total_rating_count",
-                    "summary",
-                ]
-            )
+            update_fields: list[str] = []
+            if not work.title_en and norm["title_en"]:
+                work.title_en = norm["title_en"]
+                update_fields.append("title_en")
+            for field, normalized_field in (
+                ("first_release_date", "release_date"),
+                ("total_rating", "total_rating"),
+                ("rating", "rating"),
+                ("rating_count", "rating_count"),
+                ("total_rating_count", "total_rating_count"),
+            ):
+                if getattr(work, field) is None and norm[normalized_field] is not None:
+                    setattr(work, field, norm[normalized_field])
+                    update_fields.append(field)
+            if not work.summary and norm["summary"]:
+                work.summary = norm["summary"]
+                update_fields.append("summary")
+            if update_fields:
+                work.save(update_fields=update_fields)
             outcome = "updated"
         else:
             work = GameWork.objects.create(
@@ -405,13 +400,16 @@ class Command(BaseCommand):
             },
         )
 
-        work.genres.set([self._genre_for(gid, gname) for gid, gname in norm["genres"]])
-        work.franchises.set(
-            [self._franchise_for(franchise_id, name) for franchise_id, name in norm["franchises"]]
-        )
-        work.developers.set(
-            [self._developer_for(developer_id, name) for developer_id, name in norm["developers"]]
-        )
+        if norm["genres"]:
+            work.genres.add(*[self._genre_for(gid, gname) for gid, gname in norm["genres"]])
+        if norm["franchises"]:
+            work.franchises.add(
+                *[self._franchise_for(franchise_id, name) for franchise_id, name in norm["franchises"]]
+            )
+        if norm["developers"]:
+            work.developers.add(
+                *[self._developer_for(developer_id, name) for developer_id, name in norm["developers"]]
+            )
 
         # IGDB is the owner of the English alias set. The legacy Wikidata
         # importer also uses locale=en/es but its Spanish aliases are kept;
@@ -436,22 +434,28 @@ class Command(BaseCommand):
             GameAlias.objects.filter(
                 work=work, locale="en", normalized_value=normalized
             ).update(value=value)
-        work.aliases.filter(locale="en").exclude(
-            normalized_value__in=desired_aliases
-        ).delete()
-
         written_release_names: list[str] = []
         if norm["platforms"]:
             for pname in norm["platforms"]:
                 platform = self._platform_for(pname)
                 release_name = f"{norm['name']} ({pname})"
                 written_release_names.append(release_name)
-                GameRelease.objects.update_or_create(
+                release, created = GameRelease.objects.get_or_create(
                     work=work,
                     release_name=release_name,
                     defaults={"platform": platform, "release_date": norm["release_date"]},
                 )
-        else:
+                if not created:
+                    release_updates: list[str] = []
+                    if release.platform_id is None:
+                        release.platform = platform
+                        release_updates.append("platform")
+                    if release.release_date is None and norm["release_date"] is not None:
+                        release.release_date = norm["release_date"]
+                        release_updates.append("release_date")
+                    if release_updates:
+                        release.save(update_fields=release_updates)
+        elif existing is None:
             written_release_names.append(norm["name"])
             GameRelease.objects.update_or_create(
                 work=work,
@@ -459,31 +463,28 @@ class Command(BaseCommand):
                 defaults={"platform": None, "release_date": norm["release_date"]},
             )
 
-        # A prior import may have written releases under a now-stale name
-        # (title or platform label changed upstream). Drop those so the
-        # catalogue converges instead of accumulating duplicates -- but never
-        # one a user already owns or that carries editions (both PROTECT), so
-        # a title change can't raise ProtectedError and wedge the batch
-        # (repo-review 2026-09-06 L-04).
-        (
-            work.releases.exclude(release_name__in=written_release_names)
-            .filter(owned_copies__isnull=True, editions__isnull=True)
-            .delete()
-        )
-
-        AssetAttribution.objects.update_or_create(
-            work=work,
-            source_url=IGDB_TERMS_URL,
-            defaults={
-                "local_path": "",
-                "creator": "IGDB",
-                "licence": IGDB_LICENCE,
-                "licence_url": IGDB_TERMS_URL,
-                "file_url": norm["cover_url"],
-                "reviewed_at": now,
-                "display_allowed": bool(norm["cover_url"]),
-            },
-        )
+        # Keep prior releases even if an upstream title or platform label
+        # changes. Reimports enrich the existing catalogue; they never erase
+        # previously observed source or user data.
+        if norm["cover_url"] or existing is None:
+            asset, created = AssetAttribution.objects.get_or_create(
+                work=work,
+                source_url=IGDB_TERMS_URL,
+                defaults={
+                    "local_path": "",
+                    "creator": "IGDB",
+                    "licence": IGDB_LICENCE,
+                    "licence_url": IGDB_TERMS_URL,
+                    "file_url": norm["cover_url"],
+                    "reviewed_at": now,
+                    "display_allowed": bool(norm["cover_url"]),
+                },
+            )
+            if not created and not asset.file_url and norm["cover_url"]:
+                asset.file_url = norm["cover_url"]
+                asset.reviewed_at = now
+                asset.display_allowed = True
+                asset.save(update_fields=["file_url", "reviewed_at", "display_allowed"])
         return outcome
 
     # -- aggregate evidence -------------------------------------------------

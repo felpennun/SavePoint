@@ -34,6 +34,30 @@
   valoración externa observada. Solo `recency-v1` usa esta puntuación: no se
   mezcla con contenido, rating ni PopScore en las demás variantes.
 
+### Decisión de frontera de catálogo y recomendación — 2026-09-09
+
+- Una única tabla de obras conserva el catálogo y sus metadatos; no se duplican
+  juegos para los recomendadores. La membresía `in_corpus` representa el
+  **catálogo visible**, no la salida algorítmica.
+- Una nueva versión gobernada admite en catálogo solamente obras no DLC, con
+  nombre, género y plataforma permitida, cuya `first_release_date` sea conocida
+  y no posterior a su `as_of_date` explícito. Las obras futuras o sin fecha no
+  se borran de la base, pero quedan fuera del catálogo de esa versión.
+- El **universo de salida de todos los algoritmos** es un subconjunto del
+  catálogo: `total_rating_count >= 1 OR rating IS NOT NULL`. Se elimina el
+  umbral anterior de 1.000 valoraciones. La colección puede seguir contener
+  obras fuera de este subconjunto y usarlas como semillas.
+- `rating` y `rating_count` son respectivamente la media y el número de
+  valoraciones de usuarios de IGDB. `total_rating` y `total_rating_count`
+  combinan usuarios de IGDB y crítica externa. El score congela la familia
+  `rating`; el filtro de elegibilidad acepta volumen total o rating de usuario.
+- La nueva versión debe registrar por separado el tamaño y hash del catálogo
+  visible y del subconjunto algorítmico. Antes de crearla se aplican las
+  migraciones de franquicia, desarrolladora y PopScore; después se reimportan y
+  congelan esas señales. La ejecución quedó completada el 2026-09-09 para la
+  versión `2026.09.2`; la evidencia está en
+  `docs/verification/igdb-import-audit-2026-09-09.md`.
+
 ### Corpus gobernado y cobertura de valoraciones
 
 - La Fase 3 comienza actualizando y versionando el corpus gobernado **antes de
@@ -127,10 +151,9 @@
     reglas generales de fecha y edición (en torno a 200.000). Pueden buscarse,
     abrirse, guardarse en una colección y utilizarse como juegos semilla para
     encontrar contenido parecido.
-  - **Universo de salida del recomendador:** solo obras con al menos una
-    valoración contabilizada (`rating_count >= 1`) **o** con un rating externo
-    válido aunque su fuente no proporcione un recuento utilizable. Una obra sin
-    ninguna señal de rating puede influir mediante sus metadatos si está en la
+  - **Universo de salida del recomendador:** solo obras con
+    `total_rating_count >= 1` **o** `rating IS NOT NULL`. Una obra sin ninguna
+    señal de rating puede influir mediante sus metadatos si está en la
     colección del usuario, pero nunca se devuelve como recomendación.
 - Esta reducción se aplica a los candidatos que puntúan los algoritmos, no al
   catálogo completo. Debe reducir coste de cómputo ahora que se incorporan más

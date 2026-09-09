@@ -8,7 +8,7 @@ import pytest
 from django.core.management import call_command
 from django.utils import timezone
 
-from catalogue.models import CorpusPopularitySnapshot, CorpusVersion, GameWork, SourceRecord
+from catalogue.models import CorpusPopularityScore, CorpusPopularitySnapshot, CorpusVersion, GameWork, SourceRecord
 from catalogue.popularity import normalised_popscore_by_work
 
 
@@ -107,6 +107,31 @@ def test_popularity_snapshot_is_primitive_level_governed_and_immutable() -> None
         stdout=StringIO(),
     )
     assert CorpusPopularitySnapshot.objects.count() == 8
+
+
+@pytest.mark.django_db
+def test_materialize_popscore_persists_the_composed_signal() -> None:
+    version = "materialized-popscore-test"
+    CorpusVersion.objects.create(version=version, ruleset_sha256="a" * 64, is_active=True)
+    work = GameWork.objects.create(canonical_slug="materialized", original_title="Materialized")
+    for type_id, name, value in zip(
+        range(1, 5), ("Visits", "Want to Play", "Playing", "Played"), (0.1, 0.2, 0.3, 0.4)
+    ):
+        CorpusPopularitySnapshot.objects.create(
+            work=work,
+            corpus_version=version,
+            popularity_type_id=type_id,
+            popularity_type_name=name,
+            value=value,
+            normalised_value=value,
+            retrieved_at=timezone.now(),
+            payload_sha256=f"{type_id}" * 64,
+        )
+
+    call_command("materialize_popscore", corpus_version=version, stdout=StringIO())
+    score = CorpusPopularityScore.objects.get(work=work, corpus_version=version)
+    assert score.score == pytest.approx(0.25)
+    assert score.formula_version == "igdb-engagement-mean-v1"
 
 
 @pytest.mark.django_db

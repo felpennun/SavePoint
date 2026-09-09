@@ -40,7 +40,7 @@ class Franchise(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     igdb_id = models.PositiveIntegerField(unique=True)
-    name = models.CharField(max_length=200, unique=True)
+    name = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=True)
 
     class Meta:
@@ -55,7 +55,7 @@ class Developer(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     igdb_id = models.PositiveIntegerField(unique=True)
-    name = models.CharField(max_length=200, unique=True)
+    name = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=True)
 
     class Meta:
@@ -313,6 +313,34 @@ class CorpusPopularitySnapshot(models.Model):
             models.Index(
                 fields=("corpus_version", "popularity_type_id"),
                 name="catalogue_pop_ver_type_idx",
+            )
+        ]
+
+
+class CorpusPopularityScore(models.Model):
+    """Materialised unweighted PopScore for one work and corpus version."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    work = models.ForeignKey(
+        GameWork, on_delete=models.CASCADE, related_name="popularity_scores"
+    )
+    corpus_version = models.CharField(max_length=32)
+    score = models.FloatField()
+    formula_version = models.CharField(max_length=64)
+    calculated_at = models.DateTimeField()
+    source_snapshot_sha256 = models.CharField(max_length=64)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=("work", "corpus_version"),
+                name="catalogue_unique_popularity_score",
+            )
+        ]
+        indexes = [
+            models.Index(
+                fields=("corpus_version", "score"),
+                name="catalogue_pop_score_idx",
             )
         ]
 

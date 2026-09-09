@@ -1,0 +1,11 @@
+{
+  "corpus_version": "2026.09.2",
+  "governed_count": 190479,
+  "rating_coverage_pct": 14.1937,
+  "rating_present": 27036,
+  "recommendation_candidate_count": 30623,
+  "snapshots_inserted": 27036,
+  "source": "igdb",
+  "total_rating_coverage_pct": 16.1131,
+  "total_rating_present": 30692
+}

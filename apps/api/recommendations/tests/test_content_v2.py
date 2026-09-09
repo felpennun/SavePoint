@@ -40,6 +40,7 @@ def work(slug: str, *genres: Genre) -> GameWork:
         in_corpus=True,
         corpus_version=CORPUS,
         total_rating_count=1,
+        first_release_date=date(2020, 1, 1),
     )
     item.genres.set(genres)
     return item

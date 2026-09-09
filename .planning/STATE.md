@@ -121,6 +121,13 @@ Progreso global: 2/8 fases (25%).
 
 ## Accumulated Context
 
+### Estado actualizado — 2026-09-09
+
+La importación IGDB y la sincronización DLC/expansiones terminaron con política
+aditiva. El corpus activo `2026.09.2` contiene `190479` obras visibles y `30623`
+candidatas derivadas; ratings y PopScore están congelados y el PopScore compuesto
+está materializado para `9929` obras. No se han ejecutado rankings ni evaluaciones.
+
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.

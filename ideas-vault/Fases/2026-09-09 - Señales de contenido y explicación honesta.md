@@ -48,10 +48,32 @@ No se ha consultado IGDB, ni se ha reimportado o gobernado un corpus nuevo, ni
 se han ejecutado experimentos. La decisión siguiente es revisar esta base y,
 solo después, publicar un nuevo corpus y capturar sus instantáneas.
 
+## Frontera de catálogo y candidatos — 2026-09-09
+
+El autor separa dos vistas sin duplicar obras. El catálogo de una versión nueva
+incluye únicamente juegos con fecha conocida ya publicada al corte fijado; los
+futuros y sin fecha continúan almacenados, pero no se muestran. El universo de
+salida de los algoritmos es el subconjunto
+`total_rating_count >= 1 OR rating IS NOT NULL`, sin el umbral histórico de
+1.000 valoraciones. La biblioteca del usuario puede conservar cualquier juego
+del catálogo y usarlo como semilla.
+
+`rating` y `rating_count` proceden de usuarios de IGDB; `total_rating` y
+`total_rating_count` agregan usuarios y crítica externa. La reimportación
+aditiva, el corpus `2026.09.2` y sus snapshots ya están completados; no se ha
+calculado ningún ranking.
+
+La auditoría confirmó que no hay títulos ni slugs vacíos. Las obras futuras,
+sin fecha y los DLC permanecen almacenados, pero fuera de la vista gobernada.
+Las ausencias parciales de señales opcionales son cobertura real de IGDB y no
+se rellenan artificialmente. El PopScore compuesto se materializó en
+`CorpusPopularityScore` para las obras con las cuatro primitivas observadas.
+
 ## Evidencia canónica
 
 - [[../../.planning/phases/03-explainable-content-recommenders-and-baseline-comparison/03-02-PLAN|Plan 03-02]]
 - [[../../.planning/phases/03-explainable-content-recommenders-and-baseline-comparison/03-02-SUMMARY|Resumen 03-02]]
+- [[../../docs/verification/igdb-import-audit-2026-09-09|Auditoría de importación IGDB y señales]]
 - `apps/api/recommendations/content/profile.py`
 - `apps/api/recommendations/content/rank.py`
 - `apps/api/recommendations/tests/test_content_v2.py`

@@ -62,8 +62,6 @@ class Command(BaseCommand):
             parent_by_igdb = {int(row.source_id): row.work for row in parents}
             for child_id, row in child_rows.items():
                 normalized = importer._normalize(row)
-                if normalized["release_date"] is not None and normalized["release_date"].year > 2026:
-                    continue
                 importer._upsert(normalized, now)
                 child = SourceRecord.objects.get(source="igdb", source_id=str(child_id)).work
                 if not child.is_dlc:

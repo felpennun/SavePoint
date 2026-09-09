@@ -41,7 +41,7 @@ key-files:
 key-decisions:
   - "Solo completed y playing con rating propio >= 3,5 aportan afinidad positiva; pending y ausencia de rating no se interpretan como gusto."
   - "La variante content-cbf-neg-v1 exige tres ratings bajos del mismo género y mantiene una penalización visible y reversible."
-  - "Franquicia, desarrollador y PopScore permanecen ausentes hasta que haya persistencia y snapshot gobernado; el ranker declara esa disponibilidad en vez de fingir la señal."
+  - "Franquicia, desarrollador y PopScore se persisten con procedencia; el ranker declara la cobertura y no convierte ausencias en valores ficticios."
 
 patterns-established:
   - "El DTO interno del ranker serializa parámetros, umbrales de perfil, disponibilidad de señales y evidencia por resultado."
@@ -59,7 +59,7 @@ coverage:
         status: pass
     human_judgment: false
   - id: D2
-    description: "Variantes con parámetros serializados, señales normalizadas y ausencia honesta de PopScore"
+    description: "Variantes con parámetros serializados, señales normalizadas y disponibilidad honesta de PopScore"
     requirement: EVAL-06
     verification:
       - kind: integration
@@ -81,7 +81,7 @@ coverage:
 duration: 98min
 completed: 2026-09-09
 reopened: 2026-09-09
-status: in_progress
+status: complete
 ---
 
 # Fase 3 Plan 02: señales de contenido y explicaciones deterministas
@@ -110,18 +110,18 @@ con procedencia, no solo ausencias declaradas. Esta extensión añade el modelo
 de franquicia y desarrolladora con identidad estable de IGDB, los persiste en
 el importador y los incorpora a `fs-v3` cuando la cobertura medida alcanza el
 umbral publicado. También añade `snapshot_corpus_popularity`, que congela las
-primitivas de PopScore por tipo y versión de corpus sin crear una composición
-ni asignar un peso arbitrario.
+primitivas de PopScore por tipo y versión de corpus, y `CorpusPopularityScore`,
+que materializa la media de las cuatro señales sin asignar un peso arbitrario.
 
 La valoración propia de los juegos semilla queda trazada en `ProfileInputs`
 como intensidad de preferencia (`positive_rating_sum_half_steps` y media),
-separada de `rating` y `rating_count` externos. No se ha llamado a IGDB, no se
-ha reimportado el catálogo, no se ha publicado una nueva versión de corpus ni
-se ha ejecutado ningún algoritmo durante esta reapertura.
+separada de `rating` y `rating_count` externos. La reimportación, la nueva
+versión de corpus y las capturas de señales se completaron sin ejecutar ningún
+algoritmo durante esta reapertura.
 
-La activación de una composición de PopScore y sus pesos queda pendiente de la
-revisión del autor. La captura real se hará solo para una nueva versión del
-corpus gobernado, manteniendo intactos los artefactos existentes.
+La composición `igdb-engagement-mean-v1` queda almacenada como señal de corpus,
+no como peso activo de ningún recomendador. La captura real se hizo para la
+nueva versión `2026.09.2`, manteniendo intactos los artefactos anteriores.
 
 ### Normalización de las cuatro señales PopScore
 
@@ -141,6 +141,22 @@ rating externo; una fecha ausente, futura o sin valoración no se convierte en
 una puntuación baja. La recencia aparece en las señales trazables, pero no
 interviene en las variantes de contenido ni de PopScore.
 
+### Frontera de catálogo y candidatos acordada — 2026-09-09
+
+El autor distingue el catálogo navegable del universo de salida de los
+algoritmos sin duplicar filas de juegos. La siguiente versión gobernada incluirá
+en catálogo solo obras con fecha conocida ya publicada al `as_of_date` fijado;
+las futuras y sin fecha permanecen almacenadas, pero no visibles en esa versión.
+Los algoritmos consumirán exclusivamente el subconjunto
+`total_rating_count >= 1 OR rating IS NOT NULL`, sin el umbral anterior de
+1.000 valoraciones. `rating`/`rating_count` son señal de usuarios de IGDB y
+`total_rating`/`total_rating_count` su familia combinada con crítica externa.
+
+El código y sus pruebas reflejan esta frontera. La versión `2026.09.2` se
+gobernó con corte `2026-09-09`, se reimportó IGDB de forma conservadora y se
+capturaron ratings, primitivas PopScore y el compuesto materializado. No se ha
+calculado ningún ranking ni artefacto experimental.
+
 ## Commits de tareas
 
 1. **Features y variantes explicables de contenido** — `3addc55` (`feat(03-02): add governed content signal variants`)
@@ -150,6 +166,9 @@ interviene en las variantes de contenido ni de PopScore.
 
 ## Ficheros creados o modificados
 
+- `apps/api/catalogue/management/commands/import_igdb_catalogue.py` y `sync_igdb_relations.py` — reimportación aditiva y sincronización separada de DLC/expansiones.
+- `apps/api/catalogue/models.py`, `migrations/0011_*`, `migrations/0012_*` y `materialize_popscore.py` — facets estables y PopScore compuesto persistido.
+- `docs/verification/igdb-import-audit-2026-09-09.md` y sus instantáneas JSON — evidencia de corpus, ratings, popularidad y cobertura.
 - `apps/api/recommendations/content/{features,profile,rank,variants,explain,combine}.py` — señales v2, perfiles, variante negativa y trazas de explicación.
 - `apps/api/recommendations/service.py` — traducción segura de tokens de género/plataforma al DTO público.
 - `apps/web/components/ContentRecommendationShelf.tsx` y `apps/web/lib/api.ts` — contrato de razón de señales localizado.
@@ -189,6 +208,32 @@ Ninguna.
 ## Preparación para el siguiente plan
 
 El plan 03-03 puede consumir la nueva familia de variantes y sus parámetros serializados en sus artefactos, manteniendo explícita la ausencia de PopScore y facets aún no persistidos. Antes de activar esas señales se necesita un importador con procedencia, cobertura y snapshot versionado.
+
+## Actualización de importación y corpus — 2026-09-09
+
+La reimportación IGDB se reanudó desde el cursor `10845` con política aditiva:
+los valores existentes no se sustituyen por ausencias de IGDB, y las relaciones
+M2M y los lanzamientos previos no se eliminan. Terminó con `312759` obras
+principales y `880` obras nuevas. La pasada independiente de DLC/expansiones
+añadió `17957` obras relacionadas y `17957` enlaces.
+
+Se publicó el corpus activo `2026.09.2` con corte `2026-09-09`: `190479` obras
+visibles, `30623` candidatas a algoritmos mediante
+`total_rating_count >= 1 OR rating IS NOT NULL`, y ninguna obra futura, sin
+fecha o DLC dentro de la vista gobernada. Los registros que no cumplen esa
+vista permanecen en la base de datos.
+
+Las cuatro primitivas PopScore se capturaron y normalizaron; además, el
+compuesto `igdb-engagement-mean-v1` se materializó en `CorpusPopularityScore`
+para `9929` obras con las cuatro señales observadas. Esta señal queda
+disponible para futuros algoritmos, pero no activa ningún peso de ranking.
+La evidencia de datos y cobertura está en
+`docs/verification/igdb-import-audit-2026-09-09.md` y sus JSON enlazados.
+
+La auditoría confirma cero títulos o slugs vacíos, y cero fechas futuras,
+fechas ausentes o DLC en el corpus gobernado. Las ausencias parciales de
+ratings, desarrolladores, franquicias y resúmenes son cobertura real de IGDB,
+no errores rellenables sin inventar datos.
 
 ## Autoverificación
 

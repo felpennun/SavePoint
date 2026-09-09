@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 from collections import Counter
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -15,8 +15,8 @@ from django.db.models import Count
 
 from catalogue.corpus import (
     ALLOWLIST_SLUGS,
-    MAX_CATALOGUE_RELEASE_DATE,
     PLATFORM_ALLOWLIST,
+    evaluation_candidate_works,
     governed_works,
     is_valid_name,
 )
@@ -24,14 +24,16 @@ from catalogue.models import AssetAttribution, CorpusVersion, GameWork, Platform
 
 
 GOVERN_CORPUS_LOCK_KEY = 902_020_201
-RULESET_ID = "D-01-platform-slug+D-03-name-release-dlc-genre-date-max-2026"
+RULESET_ID = "D-01-platform-slug+D-03-name-release-dlc-genre-released+REC-rating-eligible-v2"
 
 
-def _ruleset_sha256() -> str:
+def _ruleset_sha256(as_of_date: date) -> str:
     payload = {
         "ruleset": RULESET_ID,
+        "as_of_date": as_of_date.isoformat(),
         "platform_allowlist": PLATFORM_ALLOWLIST,
         "allowlist_slugs": sorted(ALLOWLIST_SLUGS),
+        "recommendation_eligibility": "total_rating_count >= 1 OR rating IS NOT NULL",
     }
     return hashlib.sha256(
         json.dumps(payload, ensure_ascii=False, sort_keys=True).encode("utf-8")
@@ -78,6 +80,11 @@ class Command(BaseCommand):
         if base_version_action is not None:
             parser._handle_conflict_resolve(None, [("--version", base_version_action)])
         parser.add_argument("--version", default=None)
+        parser.add_argument(
+            "--as-of-date",
+            default=None,
+            help="ISO date used to exclude future and undated works; defaults to today's UTC date.",
+        )
         parser.add_argument("--evidence-json", default="-")
 
     def _default_version(self, ruleset_sha256: str) -> str:
@@ -97,7 +104,7 @@ class Command(BaseCommand):
                 continue
         return f"{prefix}.{sequence + 1}"
 
-    def _govern(self, version: str, ruleset_sha256: str) -> dict[str, Any]:
+    def _govern(self, version: str, ruleset_sha256: str, as_of_date: date) -> dict[str, Any]:
         source_works = list(
             GameWork.objects.filter(source_records__source="igdb")
             .distinct()
@@ -129,7 +136,7 @@ class Command(BaseCommand):
                 "missing_first_release_date": work.first_release_date is None,
                 "future_release_date": (
                     work.first_release_date is not None
-                    and work.first_release_date > MAX_CATALOGUE_RELEASE_DATE
+                    and work.first_release_date > as_of_date
                 ),
             }
             for reason, applies in failed.items():
@@ -156,6 +163,7 @@ class Command(BaseCommand):
             "source_works": source_works,
             "valid_ids": valid_ids,
             "exclusion_reasons": exclusion_reasons,
+            "recommendation_count": evaluation_candidate_works(version).count(),
         }
 
     def _quality_report(
@@ -163,12 +171,20 @@ class Command(BaseCommand):
         governed: Any,
         source_works: list[GameWork],
         exclusion_reasons: Counter,
+        recommendation_count: int,
     ) -> dict[str, Any]:
         total = governed.count()
         field_specs = {
             "total_rating": ("igdb", "FloatField", "Valor combinado vivo de IGDB."),
+            "total_rating_count": (
+                "igdb",
+                "PositiveIntegerField",
+                "Número de valoraciones de usuarios y crítica externa de IGDB.",
+            ),
             "rating": ("igdb", "FloatField", "Rating medio de usuarios de IGDB."),
             "rating_count": ("igdb", "PositiveIntegerField", "Número de ratings de usuarios de IGDB."),
+            "franchises": ("igdb", "ManyToMany", "Franquicias estables de IGDB."),
+            "developers": ("igdb", "ManyToMany", "Desarrolladoras marcadas por IGDB."),
             "summary": ("igdb", "TextField", "Sinopsis textual de IGDB."),
             "cover": ("igdb", "URLField", "Portada hotlink o placeholder de primera parte."),
         }
@@ -215,6 +231,8 @@ class Command(BaseCommand):
         ]
         return {
             "governed_count": total,
+            "recommendation_candidate_count": recommendation_count,
+            "recommendation_candidate_coverage_pct": _pct(recommendation_count, total),
             "coverage": coverage,
             "genre_distribution": dict(sorted(genres.items())),
             "platform_distribution": dict(sorted(platforms.items())),
@@ -263,11 +281,20 @@ class Command(BaseCommand):
             for record in sampled
         ]
 
-    def _evidence(self, version: str, state: dict[str, Any], ruleset_sha256: str) -> dict[str, Any]:
+    def _evidence(
+        self,
+        version: str,
+        state: dict[str, Any],
+        ruleset_sha256: str,
+        as_of_date: date,
+    ) -> dict[str, Any]:
         governed = governed_works(version)
         checksum = _checksum_for_governed()
         quality = self._quality_report(
-            governed, state["source_works"], state["exclusion_reasons"]
+            governed,
+            state["source_works"],
+            state["exclusion_reasons"],
+            state["recommendation_count"],
         )
         data_dictionary = {
             "name": {"type": "CharField", "source": "igdb", "nullable": False},
@@ -277,6 +304,7 @@ class Command(BaseCommand):
             "total_rating": {"type": "FloatField", "source": "igdb", "nullable": True},
             "rating": {"type": "FloatField", "source": "igdb", "nullable": True},
             "rating_count": {"type": "PositiveIntegerField", "source": "igdb", "nullable": False},
+            "total_rating_count": {"type": "PositiveIntegerField", "source": "igdb", "nullable": True},
             "in_corpus": {"type": "BooleanField", "source": "derived", "nullable": False},
             "corpus_version": {"type": "CharField", "source": "derived", "nullable": False},
             "genres": {"type": "ManyToMany", "source": "igdb", "nullable": True},
@@ -285,7 +313,9 @@ class Command(BaseCommand):
         return {
             "corpus_version": version,
             "ruleset_sha256": ruleset_sha256,
+            "as_of_date": as_of_date.isoformat(),
             "checksum": checksum,
+            "recommendation_eligibility": "total_rating_count >= 1 OR rating IS NOT NULL",
             "data_dictionary": data_dictionary,
             "quality_report": quality,
             "sampled_manifest": self._sampled_manifest(version, quality["governed_count"]),
@@ -302,11 +332,19 @@ class Command(BaseCommand):
         self.stderr.write(f"evidence written: {target}")
 
     def handle(self, *args: Any, **options: Any) -> None:
-        ruleset_sha256 = _ruleset_sha256()
+        try:
+            as_of_date = (
+                date.fromisoformat(options["as_of_date"])
+                if options["as_of_date"]
+                else datetime.now(timezone.utc).date()
+            )
+        except ValueError as exc:
+            raise CommandError("--as-of-date must use YYYY-MM-DD") from exc
+        ruleset_sha256 = _ruleset_sha256(as_of_date)
         with transaction.atomic():
             version = options["version"] or self._default_version(ruleset_sha256)
-            state = self._govern(version, ruleset_sha256)
-            evidence = self._evidence(version, state, ruleset_sha256)
+            state = self._govern(version, ruleset_sha256, as_of_date)
+            evidence = self._evidence(version, state, ruleset_sha256, as_of_date)
         self._emit_evidence(options["evidence_json"], evidence)
         if options["evidence_json"] != "-":
             self.stdout.write(

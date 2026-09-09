@@ -1,0 +1,82 @@
+{
+  "captured_at": "2026-09-09T02:48:21.398901+00:00",
+  "composition": {
+    "formula": "mean of the four normalised primitive values",
+    "id": "igdb-engagement-mean-v1",
+    "missing_policy": "no composition when any required primitive is absent",
+    "normalisation": "log1p then average-rank percentile within each frozen primitive type",
+    "required_types": [
+      "Visits",
+      "Want to Play",
+      "Playing",
+      "Played"
+    ]
+  },
+  "corpus_version": "2026.09.2",
+  "engagement_types": {
+    "Played": 4,
+    "Playing": 3,
+    "Visits": 1,
+    "Want to Play": 2
+  },
+  "governed_igdb_work_count": 190479,
+  "limitation": "The normalised composition is stored for traceability only. No recommender weight is active until a versioned algorithm variant is approved.",
+  "normalised_observations_by_type": {
+    "Played": 61477,
+    "Playing": 19426,
+    "Visits": 46419,
+    "Want to Play": 60713
+  },
+  "primitive_types": {
+    "1": {
+      "external_source": "121",
+      "name": "Visits"
+    },
+    "2": {
+      "external_source": "121",
+      "name": "Want to Play"
+    },
+    "3": {
+      "external_source": "121",
+      "name": "Playing"
+    },
+    "4": {
+      "external_source": "121",
+      "name": "Played"
+    },
+    "5": {
+      "external_source": "1",
+      "name": "24hr Peak Players"
+    },
+    "6": {
+      "external_source": "1",
+      "name": "Postitive Reviews"
+    },
+    "7": {
+      "external_source": "1",
+      "name": "Negative Reviews"
+    },
+    "8": {
+      "external_source": "1",
+      "name": "Total Reviews"
+    },
+    "9": {
+      "external_source": "1",
+      "name": "Global Top Sellers"
+    },
+    "10": {
+      "external_source": "1",
+      "name": "Most Wishlisted Upcoming"
+    },
+    "34": {
+      "external_source": "14",
+      "name": "24hr Hours Watched"
+    }
+  },
+  "primitives_outside_governed_corpus": 143146,
+  "relevant_primitives_seen": 491156,
+  "snapshot_sha256": "46d82c43356ea945f6fea07f01b3d0de5e8b2b4a71db1a78bd92f501065f6a9f",
+  "snapshots_already_immutable": 0,
+  "snapshots_inserted": 491156,
+  "source": "igdb_popularity_primitives"
+}

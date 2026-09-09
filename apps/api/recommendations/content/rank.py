@@ -10,7 +10,7 @@ from typing import Any
 
 from django.contrib.auth.models import AbstractBaseUser
 
-from catalogue.corpus import governed_works
+from catalogue.corpus import evaluation_candidate_works
 from catalogue.models import CorpusRatingSnapshot, GameWork
 from catalogue.popularity import normalised_popscore_by_work, popscore_snapshot_sha256
 from library.models import LibraryEntry
@@ -35,8 +35,6 @@ _MIN_LIMIT = 1
 _MAX_LIMIT = 50
 _DEFAULT_LIMIT = 20
 _COLD_START_ENTRIES = 3
-_MIN_RATING_COUNT = 1000
-
 _LIMITATION = (
     "Deterministic content-based ranking over the frozen corpus and external "
     "rating snapshot. It is offline simulation evidence, not evidence about "
@@ -268,7 +266,7 @@ def rank_content_v1(
     candidate_ids: set[object] | tuple[object, ...] | None = None,
     generated_at: datetime | None = None,
     eligibility_cutoff_date: date | None = None,
-    min_rating_count: int | None = _MIN_RATING_COUNT,
+    min_rating_count: int | None = None,
     genre_profile: dict[str, float] | None = None,
     prepared: dict[str, Any] | None = None,
 ) -> dict:
@@ -278,31 +276,21 @@ def rank_content_v1(
     limit = _clamp_limit(limit)
     generated_at = generated_at or datetime.now(timezone.utc)
     eligibility_cutoff_date = eligibility_cutoff_date or generated_at.date()
-    effective_min_rating_count = (
-        None if spec.combine_mode == "recency_only" else min_rating_count
-    )
-
     seen_ids = set(LibraryEntry.objects.filter(user=user).values_list("work_id", flat=True))
     requested_ids = set(candidate_ids) if candidate_ids is not None else None
     if prepared is not None:
         candidates = [
             work
             for work in prepared["works"]
-            if (requested_ids is None or work.id in requested_ids)
-            and (
-                effective_min_rating_count is None
-                or (work.total_rating_count or 0) >= effective_min_rating_count
-            )
+            if requested_ids is None or work.id in requested_ids
         ]
         snapshot_sha256 = prepared.get("snapshot_sha256", "")
     else:
-        candidate_query = governed_works(corpus_version)
+        candidate_query = evaluation_candidate_works(corpus_version)
         if requested_ids is not None:
             candidate_query = candidate_query.filter(id__in=requested_ids)
         else:
             candidate_query = candidate_query.exclude(id__in=seen_ids)
-        if effective_min_rating_count is not None:
-            candidate_query = candidate_query.filter(total_rating_count__gte=effective_min_rating_count)
         candidates = list(
             candidate_query.filter(genres__isnull=False)
             .prefetch_related("genres", "releases__platform", "franchises", "developers")

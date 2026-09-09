@@ -7,7 +7,7 @@ import json
 import math
 from collections.abc import Iterable
 
-from catalogue.models import CorpusPopularitySnapshot
+from catalogue.models import CorpusPopularityScore, CorpusPopularitySnapshot
 
 
 IGDB_ENGAGEMENT_TYPES = ("Visits", "Want to Play", "Playing", "Played")
@@ -32,11 +32,19 @@ def normalised_popscore_by_work(
         normalised_value__isnull=False,
     ).values_list("work_id", "popularity_type_name", "normalised_value"):
         values.setdefault(work_id, {})[name] = normalised_value
-    return {
+    calculated = {
         work_id: math.fsum(parts[name] for name in IGDB_ENGAGEMENT_TYPES) / len(IGDB_ENGAGEMENT_TYPES)
         for work_id, parts in values.items()
         if all(name in parts for name in IGDB_ENGAGEMENT_TYPES)
     }
+    if calculated:
+        persisted = dict(
+            CorpusPopularityScore.objects.filter(
+                corpus_version=corpus_version, work_id__in=calculated
+            ).values_list("work_id", "score")
+        )
+        return {work_id: persisted.get(work_id, score) for work_id, score in calculated.items()}
+    return calculated
 
 
 def popscore_snapshot_sha256(corpus_version: str | None) -> str | None:

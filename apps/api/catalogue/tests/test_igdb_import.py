@@ -19,6 +19,7 @@ from django.core.management import CommandError, call_command
 from django.db import DatabaseError, IntegrityError, transaction
 
 from catalogue.igdb import IgdbClient, IgdbClientError, redact
+from catalogue.management.commands.import_igdb_catalogue import IGDB_TERMS_URL
 from catalogue.models import (
     AssetAttribution,
     Developer,
@@ -221,11 +222,11 @@ def test_igdb_import_maps_user_ratings_summary_and_reconciles_english_aliases() 
     _run_import(FakeIgdbClient(changed, eligible=1))
 
     work.refresh_from_db()
-    assert work.rating == 88.0
-    assert work.summary == "A changed summary."
-    assert not work.aliases.filter(normalized_value="stale alias").exists()
+    assert work.rating == 87.5
+    assert work.summary == "A short summary."
+    assert work.aliases.filter(normalized_value="stale alias").exists()
     assert work.aliases.filter(normalized_value="alias legado", locale="es").exists()
-    assert work.aliases.filter(locale="en").count() == 2
+    assert work.aliases.filter(locale="en").count() == 4
 
 
 @pytest.mark.django_db
@@ -235,6 +236,46 @@ def test_igdb_import_keeps_omitted_rating_fields_null() -> None:
     assert work.rating is None
     assert work.rating_count is None
     assert work.total_rating_count is None
+
+
+@pytest.mark.django_db
+def test_reimport_preserves_observed_fields_when_igdb_omits_them() -> None:
+    _run_import(
+        FakeIgdbClient(
+            [[
+                _game(
+                    914,
+                    "Complete Signal Quest",
+                    genres=((31, "Adventure"),),
+                    platforms=((6, "PC"),),
+                    franchises=((78, "Signal Saga"),),
+                    developers=((89, "Signal Studio"),),
+                    cover="signal-cover",
+                    first_release_date=1_600_000_000,
+                    rating=85.0,
+                    rating_count=10,
+                    total_rating_count=12,
+                    summary="Observed summary.",
+                    alternative_names=("Signal Alias",),
+                )
+            ]],
+            eligible=1,
+        )
+    )
+
+    _run_import(FakeIgdbClient([[_game(914, "Complete Signal Quest")]], eligible=1))
+
+    work = GameWork.objects.get(canonical_slug="complete-signal-quest")
+    assert work.first_release_date is not None
+    assert work.rating == 85.0
+    assert work.rating_count == 10
+    assert work.total_rating_count == 12
+    assert work.summary == "Observed summary."
+    assert list(work.genres.values_list("name", flat=True)) == ["Adventure"]
+    assert list(work.franchises.values_list("name", flat=True)) == ["Signal Saga"]
+    assert list(work.developers.values_list("name", flat=True)) == ["Signal Studio"]
+    assert work.releases.count() == 1
+    assert work.assets.get(source_url=IGDB_TERMS_URL).file_url.endswith("signal-cover.jpg")
 
 
 @pytest.mark.django_db
@@ -258,6 +299,32 @@ def test_igdb_import_persists_stable_franchises_and_developers() -> None:
     assert list(work.developers.values_list("igdb_id", "slug")) == [(88, "signal-studio")]
     assert Franchise.objects.count() == 1
     assert Developer.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_igdb_import_keeps_distinct_developers_with_the_same_provider_name() -> None:
+    _run_import(
+        FakeIgdbClient(
+            [[
+                _game(
+                    912,
+                    "First Signal Quest",
+                    developers=((91, "Papyrus Design Group"),),
+                ),
+                _game(
+                    913,
+                    "Second Signal Quest",
+                    developers=((92, "Papyrus Design Group"),),
+                ),
+            ]],
+            eligible=2,
+        )
+    )
+
+    assert list(Developer.objects.values_list("igdb_id", "name")) == [
+        (91, "Papyrus Design Group"),
+        (92, "Papyrus Design Group"),
+    ]
 
 
 class FakeIgdbClient:
@@ -430,17 +497,17 @@ def test_chunked_reimport_after_complete_does_not_skip_the_committed_range() -> 
     assert run.pass_cursor == 20
     assert run.last_committed_igdb_id == 40  # monotonic guard unmoved
 
-    # Simulate a page-2 row needing to be re-processed (an upstream change):
-    # corrupt one of its works locally. A correct resume re-fetches page 2
-    # and the upsert on id 30 restores it; the buggy resume jumps past id 40
-    # and leaves the corruption in place.
-    GameWork.objects.filter(canonical_slug="gamma").update(original_title="STALE-DO-NOT-KEEP")
+    # Simulate a page-2 row needing an additive repair. A correct resume
+    # re-fetches page 2 and fills the missing date; the buggy resume jumps past
+    # id 40 and leaves it blank. Existing observed values are intentionally
+    # never overwritten by a reimport.
+    GameWork.objects.filter(canonical_slug="gamma").update(first_release_date=None)
 
     _run_import(FakeIgdbClient(_two_full_pages(), eligible=4))
     run.refresh_from_db()
     assert run.status == IgdbImportRun.Status.COMPLETE
     assert run.pass_cursor == 40
-    assert GameWork.objects.get(canonical_slug="gamma").original_title == "Gamma", (
+    assert GameWork.objects.get(canonical_slug="gamma").first_release_date is not None, (
         "resume jumped past the committed range and skipped page 2"
     )
     assert SourceRecord.objects.filter(source="igdb").count() == 4
