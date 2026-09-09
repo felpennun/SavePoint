@@ -57,8 +57,8 @@ def governed_corpus(db):
     )
     works.append(
         GameWork.objects.create(
-            canonical_slug="loo-work-invalid-rating",
-            original_title="LOO Work Invalid Rating",
+            canonical_slug="loo-work-non-null-rating",
+            original_title="LOO Work Non-null Rating",
             is_dlc=False,
             in_corpus=True,
             corpus_version=CORPUS_VERSION,
@@ -145,13 +145,14 @@ def test_candidate_set_excludes_remaining_library_but_includes_heldout(
     # the user's other library works are excluded
     assert result.candidate_ids.isdisjoint(remaining_owned)
     assert result.remaining_library_ids == frozenset(remaining_owned)
-    # unowned eligible governed works are candidates; unrated, invalid and
-    # ungoverned works never are
+    # unowned eligible governed works are candidates; unrated and ungoverned
+    # works never are. A non-null IGDB rating satisfies the frozen rule even
+    # when this fixture deliberately uses an out-of-range value.
     unowned_governed = {w.id for w in governed_corpus[5:12]}
     assert unowned_governed <= result.candidate_ids
     assert governed_corpus[-1].id not in result.candidate_ids
     assert governed_corpus[12].id not in result.candidate_ids
-    assert governed_corpus[13].id not in result.candidate_ids
+    assert governed_corpus[13].id in result.candidate_ids
 
 
 def test_completed_unrated_work_is_not_an_evaluation_positive(

@@ -200,6 +200,8 @@ TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<ver
 
 | 2026-09-09 | Validación y archivo previos a algoritmos | PASS: corpus/candidatos, población 400/200, split 240/80/80, rejilla 24, rating de usuario y recencia validados; resultados archivados; sin ejecutar algoritmos |
 
+| 2026-09-09 | Integración del runner y métricas pendientes | Runner con métricas beyond-accuracy, hash de PopScore, valores por usuario y evidencias del corpus integrados; 120 tests pasados; caché fs-v4 documentada; sin ejecutar algoritmos |
+
 ## Deferred Items
 
 | Category | Item | Status | Deferred At | Milestone |

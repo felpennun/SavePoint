@@ -82,6 +82,20 @@ es: géneros/plataformas 100 %, desarrolladores 53,03 %, franquicias 6,07 %, rat
 14,19 %, volumen 16,08 % y PopScore completo 9.929 obras. Todavía no se ha ejecutado ningún
 algoritmo.
 
+## Integración del runner — 2026-09-09
+
+El runner ya incorpora cobertura de catálogo y predicción, concentración HHI, diversidad
+intra-lista y novedad. La novedad se calcula con probabilidades de interacciones de los usuarios
+de entrenamiento, sin leer el conjunto de test para construir la señal. La suite dirigida pasó
+120/120 tests y las evidencias del corpus, ratings, popularidad y PopScore quedaron archivadas.
+No se ha lanzado ninguna evaluación experimental.
+
+`fs-v4` es el namespace versionado de los vectores dispersos de contenido. Incluye la faceta
+`franchise` de IGDB como señal de saga, además de géneros, plataformas y desarrolladores cuando
+corresponde. El cambio de `fs-v3` a `fs-v4` impide reutilizar vectores creados con reglas antiguas;
+una obra sin saga simplemente omite esa dimensión. La reconstrucción completa de la caché se
+mantiene como paso operativo independiente antes de ejecutar la comparación.
+
 Evidencia detallada: [[../../docs/verification/recommendation-input-audit-2026-09-09.md|auditoría de entradas de recomendación]].
 
 ## Enlaces

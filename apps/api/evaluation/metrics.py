@@ -22,6 +22,14 @@ import math
 from collections.abc import Iterable, Sequence
 
 
+def _top_k_lists(ranked_lists: Iterable[Sequence[object]], k: int) -> list[list[object]]:
+    """Materialise bounded recommendation lists without treating ``k <= 0`` as data."""
+
+    if k <= 0:
+        return []
+    return [list(ranked[:k]) for ranked in ranked_lists]
+
+
 def _as_set(relevant: Iterable[object]) -> set[object]:
     return relevant if isinstance(relevant, (set, frozenset)) else set(relevant)
 
@@ -105,3 +113,90 @@ def map_at_k(
     return math.fsum(
         average_precision_at_k(ranked, rel, k) for ranked, rel in pairs
     ) / len(pairs)
+
+
+def catalogue_coverage_at_k(
+    ranked_lists: Iterable[Sequence[object]], candidate_universe: Iterable[object], k: int
+) -> float | None:
+    """Fraction of the eligible candidate universe exposed in any top-``k`` list."""
+
+    universe = set(candidate_universe)
+    if not universe:
+        return None
+    exposed = {item for ranked in _top_k_lists(ranked_lists, k) for item in ranked}
+    return len(exposed & universe) / len(universe)
+
+
+def prediction_coverage_at_k(
+    ranked_lists: Iterable[Sequence[object]], candidate_lists: Iterable[Sequence[object]], k: int
+) -> float | None:
+    """Fraction of candidate slots for which a ranker emitted a valid top-``k`` item.
+
+    This detects a ranker that cannot score part of a shared candidate manifest;
+    it is intentionally separate from catalogue coverage, which measures variety.
+    """
+
+    pairs = list(zip(ranked_lists, candidate_lists, strict=True))
+    denominator = math.fsum(min(k, len(candidates)) for _ranked, candidates in pairs if k > 0)
+    if denominator <= 0:
+        return None
+    numerator = math.fsum(min(k, len(ranked)) for ranked, _candidates in pairs if k > 0)
+    return numerator / denominator
+
+
+def concentration_hhi_at_k(ranked_lists: Iterable[Sequence[object]], k: int) -> float | None:
+    """Herfindahl-Hirschman concentration of item exposure across top-``k`` lists."""
+
+    exposures: dict[object, int] = {}
+    total = 0
+    for ranked in _top_k_lists(ranked_lists, k):
+        for item in ranked:
+            exposures[item] = exposures.get(item, 0) + 1
+            total += 1
+    if total == 0:
+        return None
+    return math.fsum((count / total) ** 2 for count in exposures.values())
+
+
+def intra_list_diversity(
+    ranked_ids: Sequence[object], vectors: dict[object, dict[str, float]]
+) -> float | None:
+    """Mean pairwise cosine distance, or ``None`` when it is not estimable."""
+
+    if len(ranked_ids) < 2:
+        return None
+    selected = [vectors.get(item) for item in ranked_ids]
+    if any(vector is None for vector in selected):
+        return None
+
+    distances: list[float] = []
+    for index, left in enumerate(selected[:-1]):
+        assert left is not None
+        left_norm = math.sqrt(math.fsum(value * value for value in left.values()))
+        for right in selected[index + 1 :]:
+            assert right is not None
+            right_norm = math.sqrt(math.fsum(value * value for value in right.values()))
+            if left_norm == 0 or right_norm == 0:
+                return None
+            shared = left.keys() & right.keys()
+            similarity = math.fsum(left[key] * right[key] for key in shared) / (left_norm * right_norm)
+            distances.append(max(0.0, min(1.0, 1.0 - similarity)))
+    return math.fsum(distances) / len(distances) if distances else None
+
+
+def novelty_at_k(
+    ranked_ids: Sequence[object], item_probabilities: dict[object, float], k: int
+) -> float | None:
+    """Mean self-information ``-log2(p_i)`` over a top-``k`` list.
+
+    A zero or missing training probability is not silently converted to an
+    infinite novelty score: it is reported as not estimable instead.
+    """
+
+    items = list(ranked_ids[:k]) if k > 0 else []
+    if not items:
+        return None
+    probabilities = [item_probabilities.get(item) for item in items]
+    if any(value is None or value <= 0.0 or value > 1.0 for value in probabilities):
+        return None
+    return math.fsum(-math.log2(value) for value in probabilities if value is not None) / len(items)

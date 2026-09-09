@@ -1,0 +1,15 @@
+{
+  "composition": "unweighted arithmetic mean of the four normalised primitives",
+  "corpus_version": "2026.09.2",
+  "formula_version": "igdb-engagement-mean-v1",
+  "missing_policy": "no score row when any required primitive is absent",
+  "normalisation": "log1p then average-rank percentile per primitive",
+  "required_signals": [
+    "Visits",
+    "Want to Play",
+    "Playing",
+    "Played"
+  ],
+  "scores_materialised": 9929,
+  "source_snapshot_sha256": "a1a6078bc3dd9cb139f177224b32cb6c6292e34f5309f90490b681c1726a0864"
+}

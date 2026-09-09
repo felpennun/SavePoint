@@ -17,15 +17,32 @@ from django.contrib.auth import get_user_model
 from accounts.models import DemoAccountIdentity
 from catalogue.corpus import evaluation_candidate_works, governed_works
 from catalogue.models import CorpusRatingSnapshot, CorpusVersion
+from catalogue.popularity import popscore_snapshot_sha256
 from evaluation.candidates import build
-from evaluation.metrics import map_at_k, ndcg_at_k, precision_at_k, recall_at_k
+from evaluation.metrics import (
+    catalogue_coverage_at_k,
+    concentration_hhi_at_k,
+    intra_list_diversity,
+    map_at_k,
+    ndcg_at_k,
+    novelty_at_k,
+    precision_at_k,
+    prediction_coverage_at_k,
+    recall_at_k,
+)
 from evaluation.protocol import Protocol
 from evaluation.splits import user_split
-from recommendations.content.features import FEATURE_SET_VERSION, feature_vector, genre_rating_profile
+from recommendations.content.features import (
+    FEATURE_SET_VERSION,
+    coverage_report,
+    feature_vector,
+    genre_rating_profile,
+)
 from recommendations.content.rank import rank_content_v1
 from recommendations.content.variants import ALGORITHM_REGISTRY
 from recommendations.baselines import rank_random_v1
 from library.popularity import rank_popularity_v1
+from library.models import LibraryEntry
 
 K_VALUES = (5, 10, 20)
 SYNTHETIC_MARKER = "synthetic-eval-user"
@@ -67,12 +84,15 @@ def _hash_payload(payload: Any) -> str:
 def snapshot_sha256(corpus_version: str) -> str:
     """Hash every governed snapshot row in one corpus version."""
 
-    work_ids = governed_works(corpus_version).values_list("id", flat=True)
+    work_ids = evaluation_candidate_works(corpus_version).values_list("id", flat=True)
     rows = [
-        (str(work_id), version, source, rating, count, retrieved_at.isoformat())
-        for work_id, version, source, rating, count, retrieved_at in CorpusRatingSnapshot.objects.filter(
+        (str(work_id), version, source, rating, count, total_count, retrieved_at.isoformat())
+        for work_id, version, source, rating, count, total_count, retrieved_at in CorpusRatingSnapshot.objects.filter(
             work_id__in=work_ids, corpus_version=corpus_version
-        ).values_list("work_id", "corpus_version", "source", "rating", "rating_count", "retrieved_at")
+        ).values_list(
+            "work_id", "corpus_version", "source", "rating", "rating_count",
+            "total_rating_count", "retrieved_at"
+        )
     ]
     rows.sort()
     return _hash_payload(rows)
@@ -207,6 +227,28 @@ def _average(rows: list[dict[str, float]]) -> dict[str, float]:
     }
 
 
+def _mean_applicable(values: list[float | None]) -> tuple[float | None, int]:
+    """Return a mean only for observed values, retaining the denominator."""
+
+    observed = [value for value in values if value is not None]
+    if not observed:
+        return None, 0
+    return math.fsum(observed) / len(observed), len(observed)
+
+
+def _training_item_probabilities(user_ids: set[object]) -> dict[str, float]:
+    """Freeze novelty frequencies from training users only, never the test split."""
+
+    if not user_ids:
+        return {}
+    counts: dict[str, int] = {}
+    for work_id in LibraryEntry.objects.filter(user_id__in=user_ids).values_list("work_id", flat=True):
+        key = str(work_id)
+        counts[key] = counts.get(key, 0) + 1
+    total = sum(counts.values())
+    return {work_id: count / total for work_id, count in counts.items()} if total else {}
+
+
 def run(
     protocol: Protocol,
     corpus_version: str,
@@ -222,6 +264,10 @@ def run(
     actual_snapshot_hash = snapshot_sha256(corpus_version)
     if protocol.snapshot_sha256 and protocol.snapshot_sha256 != actual_snapshot_hash:
         raise SnapshotCoverageError("snapshot checksum differs from frozen protocol")
+    actual_popscore_hash = popscore_snapshot_sha256(corpus_version)
+    expected_popscore_hash = protocol.raw.get("popscore_snapshot_sha256")
+    if expected_popscore_hash and expected_popscore_hash != actual_popscore_hash:
+        raise SnapshotCoverageError("PopScore checksum differs from frozen protocol")
 
     user_model = get_user_model()
     users = list(
@@ -229,8 +275,10 @@ def run(
             demo_identity__marker=SYNTHETIC_MARKER,
         ).order_by("id")
     )
+    population_report = validate_active_population(users, protocol, corpus_version)
     partition = user_split([user.pk for user in users], protocol)
     user_ids = set(getattr(partition, split))
+    training_probabilities = _training_item_probabilities(set(partition.train))
     selected_users = [user for user in users if user.pk in user_ids]
     candidates_by_user: list[tuple[Any, list[Any], Any, str]] = []
     skipped_user_count = 0
@@ -247,36 +295,59 @@ def run(
     algorithm_map = dict(algorithms or default_algorithms())
     algorithm_artifacts: dict[str, Any] = {}
     evaluation_genre_profile = genre_rating_profile(corpus_version)
+    signal_availability = coverage_report(corpus_version)
     evaluation_works = list(
         evaluation_candidate_works(corpus_version)
         .filter(genres__isnull=False)
-        .prefetch_related("genres", "releases__platform")
+        .prefetch_related("genres", "releases__platform", "franchises", "developers")
     )
     snapshot_rows = CorpusRatingSnapshot.objects.filter(
         work_id__in=[work.id for work in evaluation_works], rating__isnull=False,
         corpus_version=corpus_version,
     )
-    per_work_snapshots: dict[object, list[tuple[float, int]]] = {}
-    for work_id, rating, rating_count in snapshot_rows.values_list("work_id", "rating", "rating_count"):
-        per_work_snapshots.setdefault(work_id, []).append((rating, rating_count))
+    per_work_snapshots: dict[object, list[tuple[float, int, int | None]]] = {}
+    for work_id, rating, rating_count, total_rating_count in snapshot_rows.values_list(
+        "work_id", "rating", "rating_count", "total_rating_count"
+    ):
+        per_work_snapshots.setdefault(work_id, []).append(
+            (rating, rating_count, total_rating_count)
+        )
     evaluation_snapshot_stats = {
         work_id: (
-            math.fsum(rating * count for rating, count in rows) / sum(count for _rating, count in rows)
-            if sum(count for _rating, count in rows)
-            else math.fsum(rating for rating, _count in rows) / len(rows),
-            sum(count for _rating, count in rows),
+            math.fsum(rating * count for rating, count, _total_count in rows) / sum(count for _rating, count, _total_count in rows)
+            if sum(count for _rating, count, _total_count in rows)
+            else math.fsum(rating for rating, _count, _total_count in rows) / len(rows),
+            sum(count for _rating, count, _total_count in rows),
+            max(
+                (total_count for _rating, _count, total_count in rows if total_count is not None),
+                default=None,
+            ),
         )
         for work_id, rows in per_work_snapshots.items()
     }
     evaluation_prepared = {
         "works": evaluation_works,
         "vectors": {
-            work.id: feature_vector(work, feature_set_version=FEATURE_SET_VERSION)
+            work.id: feature_vector(
+                work,
+                include_franchise=signal_availability["include_franchise"],
+                include_developer=signal_availability["include_developer"],
+                feature_set_version=FEATURE_SET_VERSION,
+            )
             for work in evaluation_works
         },
         "genre_profile": evaluation_genre_profile,
         "snapshot_stats": evaluation_snapshot_stats,
         "snapshot_sha256": actual_snapshot_hash,
+        "popscore_snapshot_sha256": actual_popscore_hash,
+    }
+    vector_by_id = {
+        str(work_id): vector for work_id, vector in evaluation_prepared["vectors"].items()
+    }
+    candidate_universe = {
+        str(candidate_id)
+        for _user, candidate_ids, _heldout_id, _candidate_hash in candidates_by_user
+        for candidate_id in candidate_ids
     }
     all_manifest_rows = [
         (str(user.pk), str(heldout_id), candidate_hash)
@@ -287,6 +358,9 @@ def run(
     for algorithm_id, algorithm in algorithm_map.items():
         per_user: list[dict[str, Any]] = []
         metric_rows: dict[str, list[dict[str, float]]] = {str(k): [] for k in K_VALUES}
+        ranked_lists: dict[str, list[list[str]]] = {str(k): [] for k in K_VALUES}
+        candidate_lists: dict[str, list[list[str]]] = {str(k): [] for k in K_VALUES}
+        beyond_rows: dict[str, list[dict[str, float | None]]] = {str(k): [] for k in K_VALUES}
         for user, candidate_ids, heldout_id, candidate_hash in candidates_by_user:
             result = algorithm(
                 user=user,
@@ -318,6 +392,7 @@ def run(
                     else None
                 ),
                 "metrics": {},
+                "beyond_accuracy": {},
             }
             for k in K_VALUES:
                 metrics = {
@@ -328,13 +403,70 @@ def run(
                 }
                 row["metrics"][str(k)] = metrics
                 metric_rows[str(k)].append(metrics)
+                top_k = ranked_ids[:k]
+                beyond = {
+                    "intra_list_diversity": intra_list_diversity(top_k, vector_by_id),
+                    "novelty": novelty_at_k(top_k, training_probabilities, k),
+                    "recommended_count": len(top_k),
+                }
+                row["beyond_accuracy"][str(k)] = beyond
+                ranked_lists[str(k)].append(top_k)
+                candidate_lists[str(k)].append(sorted(candidate_strings))
+                beyond_rows[str(k)].append(beyond)
             per_user.append(row)
 
         aggregates = {k: _average(rows) for k, rows in metric_rows.items()}
+        beyond_aggregates: dict[str, dict[str, Any]] = {}
+        for k in K_VALUES:
+            key = str(k)
+            exposed = {item for ranked in ranked_lists[key] for item in ranked}
+            catalogue_coverage = catalogue_coverage_at_k(
+                ranked_lists[key], candidate_universe, k
+            )
+            prediction_coverage = prediction_coverage_at_k(
+                ranked_lists[key], candidate_lists[key], k
+            )
+            concentration = concentration_hhi_at_k(ranked_lists[key], k)
+            ild, ild_count = _mean_applicable(
+                [row["intra_list_diversity"] for row in beyond_rows[key]]
+            )
+            novelty, novelty_count = _mean_applicable(
+                [row["novelty"] for row in beyond_rows[key]]
+            )
+            candidate_slots = sum(min(k, len(candidates)) for candidates in candidate_lists[key])
+            prediction_slots = sum(len(ranked) for ranked in ranked_lists[key])
+            beyond_aggregates[key] = {
+                "catalogue_coverage": {
+                    "value": catalogue_coverage,
+                    "numerator": len(exposed & candidate_universe),
+                    "denominator": len(candidate_universe),
+                },
+                "prediction_coverage": {
+                    "value": prediction_coverage,
+                    "numerator": prediction_slots,
+                    "denominator": candidate_slots,
+                },
+                "concentration_hhi": {
+                    "value": concentration,
+                    "denominator": prediction_slots,
+                },
+                "intra_list_diversity": {
+                    "value": ild,
+                    "applicable_user_count": ild_count,
+                    "user_count": len(beyond_rows[key]),
+                },
+                "novelty": {
+                    "value": novelty,
+                    "applicable_user_count": novelty_count,
+                    "user_count": len(beyond_rows[key]),
+                    "source": "training_interactions",
+                },
+            }
         algorithm_artifacts[algorithm_id] = {
             "algorithm_id": algorithm_id,
             "per_user": per_user,
             "aggregates": aggregates,
+            "beyond_accuracy": beyond_aggregates,
         }
 
     return {
@@ -343,6 +475,7 @@ def run(
         "code_commit": _code_commit(),
         "corpus_version": corpus_version,
         "snapshot_sha256": actual_snapshot_hash,
+        "popscore_snapshot_sha256": actual_popscore_hash,
         "feature_set_version": FEATURE_SET_VERSION,
         "seeds": {
             "leave_one_out": protocol.loo_seed,
@@ -350,6 +483,7 @@ def run(
         },
         "split": split,
         "evaluation_population": {
+            **population_report,
             "requested_user_count": len(selected_users),
             "evaluated_user_count": len(candidates_by_user),
             "skipped_user_count": skipped_user_count,
