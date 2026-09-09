@@ -142,7 +142,7 @@ export const es: Dictionary = {
     cardEvidence: "Comparte tus géneros: {genres}",
     contentCardEvidence: "Coincide contigo en {reasons}.",
     emptyHeading: "Aún no hay suficiente actividad",
-    emptyBody: "Valora o completa algunos juegos y aquí aparecerán sugerencias por género.",
+    emptyBody: "Añade juegos a tu colección y, si quieres, valóralos o marca su estado para empezar a recibir recomendaciones.",
     emptyCta: "Explorar el catálogo",
     error: "No se pudieron cargar tus recomendaciones. Inténtalo de nuevo.",
     retry: "Cargar recomendaciones",
@@ -172,6 +172,7 @@ export const es: Dictionary = {
     genreDescription: "Heurística basada en los géneros de tu actividad y en la valoración del catálogo.",
     refreshPreparing: "Estamos preparando tus recomendaciones.",
     refreshUpdating: "Estamos actualizando tus recomendaciones; mientras tanto ves la versión anterior.",
+    refreshNeedsCollectionChange: "Modifica tu colección para actualizar tus recomendaciones.",
     dlc: {
       heading: "Para tus juegos",
       intro: "Contenido descargable de juegos que ya tienes en tu colección.",

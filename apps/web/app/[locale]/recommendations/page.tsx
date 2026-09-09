@@ -71,6 +71,7 @@ export default async function RecommendationsPage({
   const hasContentRecommendations = Object.values(contentData).some((result) => result.results.length > 0);
   const hasRecommendations = hasContentRecommendations || genreShelves.length > 0 || ownedDlcResponse.groups.length > 0;
   const isRefreshing = snapshotData?.status === "building" || snapshotData?.status === "stale";
+  const needsCollectionChange = snapshotData?.status === "needs_refresh";
   const hasLoadError = snapshotResponse.kind === "error";
 
   return (
@@ -80,6 +81,11 @@ export default async function RecommendationsPage({
         <RecommendationRefreshNotice
           message={snapshotData?.status === "building" ? r.refreshPreparing : r.refreshUpdating}
         />
+      ) : null}
+      {needsCollectionChange ? (
+        <p className="sp-muted" role="status" aria-live="polite">
+          {r.refreshNeedsCollectionChange}
+        </p>
       ) : null}
       {!hasRecommendations && hasLoadError ? (
         <div className="sp-empty" role="alert">
@@ -125,7 +131,11 @@ export default async function RecommendationsPage({
       ) : (
         <div className="sp-empty">
           <p className="sp-h2" style={{ margin: 0 }}>
-            {snapshotData?.status === "building" ? r.refreshPreparing : r.emptyHeading}
+            {snapshotData?.status === "building"
+              ? r.refreshPreparing
+              : snapshotData?.status === "needs_refresh"
+                ? r.refreshNeedsCollectionChange
+                : r.emptyHeading}
           </p>
           <p className="sp-lead" style={{ marginInline: "auto" }}>{r.emptyBody}</p>
           <Link href={`/${locale}/catalogue`} className="sp-btn-primary">{r.emptyCta}</Link>

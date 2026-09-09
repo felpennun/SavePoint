@@ -146,6 +146,7 @@ export interface Dictionary {
     genreDescription: string;
     refreshPreparing: string;
     refreshUpdating: string;
+    refreshNeedsCollectionChange: string;
   };
   collection: {
     heading: string;

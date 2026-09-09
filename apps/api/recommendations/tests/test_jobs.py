@@ -89,6 +89,20 @@ def test_snapshot_endpoint_keeps_previous_bundle_while_refreshing(transactional_
     assert data["sections"] == snapshot.payload
 
 
+def test_existing_collection_without_job_is_not_requeued_by_page_open(transactional_db) -> None:  # noqa: ANN001
+    user = _user()
+    _entry(user, _work())
+    RecommendationRefreshJob.objects.filter(user=user).delete()
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    response = client.get("/api/recommendations/snapshot/")
+
+    assert response.status_code == 200
+    assert response.json()["status"] == "needs_refresh"
+    assert not RecommendationRefreshJob.objects.filter(user=user).exists()
+
+
 def test_worker_publishes_bundle_only_for_current_revision(transactional_db, monkeypatch) -> None:  # noqa: ANN001
     user = _user()
     _entry(user, _work())

@@ -139,7 +139,7 @@ export const en: Dictionary = {
     cardEvidence: "Shares your genres: {genres}",
     contentCardEvidence: "Matches your taste in {reasons}.",
     emptyHeading: "Not enough activity yet",
-    emptyBody: "Rate or complete a few games and genre suggestions will appear here.",
+    emptyBody: "Add games to your collection and, if you like, rate them or set their status to start receiving recommendations.",
     emptyCta: "Browse the catalogue",
     error: "We couldn't load your recommendations. Try again.",
     retry: "Reload recommendations",
@@ -169,6 +169,7 @@ export const en: Dictionary = {
     genreDescription: "A heuristic based on the genres in your activity and the catalogue rating.",
     refreshPreparing: "We are preparing your recommendations.",
     refreshUpdating: "We are updating your recommendations; you are seeing the previous version for now.",
+    refreshNeedsCollectionChange: "Update your collection to refresh your recommendations.",
     dlc: {
       heading: "For games you own",
       intro: "Downloadable content for games already in your collection.",

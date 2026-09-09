@@ -188,15 +188,18 @@ class RecommendationSnapshotView(APIView):
         if state.collection_revision == 0 and snapshot is None:
             status = "empty"
         elif snapshot is None:
-            status = "building" if job is not None else "empty"
-            if job is None:
-                job = enqueue_latest_refresh(request.user.id)
+            # A collection may predate the asynchronous worker. Do not create
+            # work merely because the user opened the page; a new library
+            # mutation will create the next revision and enqueue it via the
+            # signal. Existing users therefore see the onboarding state until
+            # they update their catalogue.
+            status = "building" if job is not None else "needs_refresh"
         elif snapshot.collection_revision == state.collection_revision:
             status = "ready"
+        elif job is None:
+            status = "needs_refresh"
         else:
             status = "stale"
-            if job is None:
-                job = enqueue_latest_refresh(request.user.id)
 
         response = Response(
             {

@@ -337,7 +337,7 @@ export type ContentRecommendationsResponse =
   | { kind: "unauthorized" }
   | { kind: "error" };
 
-export type RecommendationSnapshotStatus = "empty" | "building" | "stale" | "ready";
+export type RecommendationSnapshotStatus = "empty" | "building" | "stale" | "ready" | "needs_refresh";
 
 export interface RecommendationSnapshotResult {
   status: RecommendationSnapshotStatus;
