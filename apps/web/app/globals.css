@@ -617,7 +617,7 @@ input[type="radio"] {
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(172px, 1fr));
   gap: var(--space-md);
 }
 
@@ -649,7 +649,7 @@ input[type="radio"] {
 
 .sp-cover {
   position: relative;
-  aspect-ratio: 2 / 3;
+  aspect-ratio: 3 / 4;
   border-radius: var(--radius-card);
   overflow: hidden;
   background: var(--color-surface-overlay);
@@ -754,7 +754,7 @@ input[type="radio"] {
 }
 
 .sp-collection-grid > li {
-  height: 27rem;
+  height: 23rem;
   min-width: 0;
 }
 
@@ -974,29 +974,29 @@ a.sp-chip--active:hover {
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: 164px;
-  grid-auto-rows: 21.5rem;
+  grid-auto-rows: 20rem;
   justify-content: flex-start;
   column-gap: var(--space-md);
   row-gap: 0;
   overflow-x: auto;
-  min-height: 22rem;
+  min-height: 20.5rem;
   scroll-snap-type: x proximity;
 }
 
 .sp-shelf-track > li {
   width: 164px;
-  height: 21.5rem;
+  height: 20rem;
 }
 
 /* Shelves that carry no evidence line (new releases, owned DLC) don't
    need the two-line reserve -- keep them tight to cover + title. */
 .sp-shelf-track--dense {
-  grid-auto-rows: 19rem;
-  min-height: 19.5rem;
+  grid-auto-rows: 17.5rem;
+  min-height: 18rem;
 }
 
 .sp-shelf-track--dense > li {
-  height: 19rem;
+  height: 17.5rem;
 }
 
 .sp-shelf-track .sp-card {
@@ -1005,7 +1005,7 @@ a.sp-chip--active:hover {
 
 .sp-shelf-track .sp-cover {
   width: 100%;
-  aspect-ratio: 2 / 3;
+  aspect-ratio: 3 / 4;
 }
 
 .sp-shelf-track .sp-card-title {
@@ -1754,7 +1754,7 @@ a.sp-chip--active:hover {
   }
 
   .sp-collection-grid > li {
-    height: 25rem;
+    height: 22rem;
   }
 
   .sp-copy-remove {
