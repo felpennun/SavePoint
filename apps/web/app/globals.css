@@ -864,9 +864,28 @@ input[type="radio"] {
 }
 
 .sp-card-stars {
-  color: var(--color-rating);
+  display: inline-flex;
   font-size: var(--text-micro);
   letter-spacing: 1px;
+  line-height: 1;
+}
+
+.sp-card-star {
+  color: var(--color-text-muted);
+}
+
+.sp-card-star.is-filled {
+  color: var(--color-rating);
+}
+
+/* Real half-filled glyph: the left half paints in the rating colour, the
+   right half in the muted track colour, clipped to the star shape. */
+.sp-card-star.is-half {
+  background: linear-gradient(90deg, var(--color-rating) 0 50%, var(--color-text-muted) 50% 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
 }
 
 .sp-collection-grid > li {
@@ -1441,9 +1460,11 @@ a.sp-chip--active:hover {
 }
 
 .sp-star-glyph.is-half {
-  background: linear-gradient(90deg, var(--color-rating) 50%, var(--color-text-muted) 50%);
+  background: linear-gradient(90deg, var(--color-rating) 0 50%, var(--color-text-muted) 50% 100%);
   background-clip: text;
+  -webkit-background-clip: text;
   color: transparent;
+  -webkit-text-fill-color: transparent;
 }
 
 .sp-star-half-button {
@@ -1467,9 +1488,10 @@ a.sp-chip--active:hover {
   right: 0;
 }
 
-.sp-star-half-button:hover,
+/* No :hover box -- hovering only previews the fill (see displayRating in
+   LibraryControls). Keyboard focus still needs a visible ring. */
 .sp-star-half-button:focus-visible {
-  outline: 2px solid var(--color-rating);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: -2px;
 }
 

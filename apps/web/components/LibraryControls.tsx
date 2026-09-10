@@ -121,7 +121,12 @@ export function LibraryControls({
   const [feedback, setFeedback] = useState<string | null>(null);
   const [status, setStatus] = useState<Status | "">("");
   const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
   const [copies, setCopies] = useState<OwnedCopyItem[]>([]);
+
+  /** While the pointer or keyboard focus is over the stars, preview that
+   * value; otherwise show the saved rating. Both are in half-steps (1..10). */
+  const displayRating = hoverRating || rating;
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -201,13 +206,22 @@ export function LibraryControls({
       <div className="sp-library-section">
         <div className="sp-section-heading-row">
           <h3>{copy.ratingLabel}</h3>
-          <span className="sp-rating-value">{rating > 0 ? `${(rating / 2).toFixed(1)} / 5` : copy.ratingUnrated}</span>
+          <span className="sp-rating-value">
+            {displayRating > 0 ? `${(displayRating / 2).toFixed(1)} / 5` : copy.ratingUnrated}
+          </span>
         </div>
-        <div className="sp-interactive-stars" role="group" aria-label={copy.ratingLabel}>
+        <div
+          className="sp-interactive-stars"
+          role="group"
+          aria-label={copy.ratingLabel}
+          onMouseLeave={() => setHoverRating(0)}
+        >
           {Array.from({ length: 5 }, (_, index) => (
             <span className="sp-star-unit" key={index}>
               <span
-                className={`sp-star-glyph${rating >= (index + 1) * 2 ? " is-filled" : ""}${rating === index * 2 + 1 ? " is-half" : ""}`}
+                className={`sp-star-glyph${displayRating >= (index + 1) * 2 ? " is-filled" : ""}${
+                  displayRating === index * 2 + 1 ? " is-half" : ""
+                }`}
                 aria-hidden="true"
               >
                 ★
@@ -224,6 +238,9 @@ export function LibraryControls({
                     aria-label={label}
                     aria-pressed={rating === halfStep}
                     onClick={() => setRating(rating === halfStep ? 0 : halfStep)}
+                    onMouseEnter={() => setHoverRating(halfStep)}
+                    onFocus={() => setHoverRating(halfStep)}
+                    onBlur={() => setHoverRating(0)}
                     disabled={saving}
                   />
                 );

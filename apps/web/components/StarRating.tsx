@@ -18,10 +18,6 @@ export function StarRating({
   className?: string;
 }) {
   const clamped = Math.max(0, Math.min(10, Math.round(value)));
-  const full = Math.floor(clamped / 2);
-  const half = clamped % 2 === 1;
-  const empty = 5 - full - (half ? 1 : 0);
-  const stars = "★".repeat(full) + (half ? "½" : "") + "☆".repeat(empty);
   const label = ariaLabelTemplate.replace("{n}", (clamped / 2).toString());
 
   return (
@@ -30,7 +26,19 @@ export function StarRating({
       role="img"
       aria-label={label}
     >
-      {stars}
+      {Array.from({ length: 5 }, (_, index) => {
+        const filled = clamped >= (index + 1) * 2;
+        const half = clamped === index * 2 + 1;
+        return (
+          <span
+            key={index}
+            className={`sp-card-star${filled ? " is-filled" : ""}${half ? " is-half" : ""}`}
+            aria-hidden="true"
+          >
+            ★
+          </span>
+        );
+      })}
     </span>
   );
 }
