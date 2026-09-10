@@ -801,6 +801,47 @@ input[type="radio"] {
   border-color: var(--color-accent-edge);
 }
 
+/* Bare tile -- Nocturne home artboard 2b: the cover poster with the title
+   and year beneath it, no card panel behind. Used on the logged-out home
+   sample and the "Novedades" shelf. */
+.sp-tile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  height: 100%;
+  text-decoration: none;
+  color: inherit;
+}
+
+.sp-tile > .sp-cover {
+  border: 1px solid var(--color-surface-border);
+  flex: none;
+}
+
+.sp-tile:hover > .sp-cover {
+  border-color: var(--color-accent-edge);
+}
+
+.sp-tile-title {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sp-tile-meta {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  color: var(--color-text-muted);
+}
+
 .sp-cover {
   position: relative;
   aspect-ratio: 3 / 4;
@@ -1200,8 +1241,13 @@ a.sp-chip--active:hover {
   height: 18.5rem;
 }
 
-.sp-shelf-track .sp-card {
+.sp-shelf-track .sp-card,
+.sp-shelf-track .sp-tile {
   scroll-snap-align: start;
+}
+
+.sp-shelf-track .sp-tile-title {
+  min-height: 2.6em;
 }
 
 .sp-shelf-track .sp-cover {

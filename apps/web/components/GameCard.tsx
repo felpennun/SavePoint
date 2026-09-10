@@ -28,6 +28,7 @@ export function GameCard({
   ownedCopyCount,
   coverVariant = "grid",
   evidence,
+  bare = false,
 }: {
   game: GameCardData;
   locale: string;
@@ -39,6 +40,11 @@ export function GameCard({
   /** Plain-language reason this card is here (e.g. the genre-overlap
    * evidence on the recommendations shelf). Rendered under the meta line. */
   evidence?: string;
+  /** Nocturne home artboard (2b): drop the whole card panel -- render just
+   * the cover poster with the title and year underneath it, no surface,
+   * no score pill, no foot. Used for the logged-out home sample and the
+   * "Novedades" shelf, where the browse journey leads with the artwork. */
+  bare?: boolean;
 }) {
   const dict = getDictionary(locale);
   const { width, height } = coverVariant === "shelf" ? { width: 164, height: 246 } : { width: 200, height: 300 };
@@ -47,26 +53,38 @@ export function GameCard({
   const showCopies = ownedCopyCount != null && ownedCopyCount > 0;
   const hasFoot = status != null || showStars || showCopies;
 
+  const cover = game.cover.is_placeholder ? (
+    <div className="sp-cover-placeholder" data-testid="cover-placeholder">
+      <span>{game.title}</span>
+      <span className="visually-hidden">{dict.common.coverMissing}</span>
+    </div>
+  ) : (
+    <CoverImage
+      src={game.cover.url}
+      alt={game.cover.alt}
+      title={game.title}
+      missingLabel={dict.common.coverMissing}
+      width={width}
+      height={height}
+    />
+  );
+
+  if (bare) {
+    return (
+      <li>
+        <Link href={`/${locale}/games/${game.slug}`} className="sp-tile">
+          <div className="sp-cover">{cover}</div>
+          <p className="sp-tile-title">{game.title}</p>
+          {game.year != null ? <p className="sp-tile-meta">{game.year}</p> : null}
+        </Link>
+      </li>
+    );
+  }
+
   return (
     <li>
       <Link href={`/${locale}/games/${game.slug}`} className="sp-card">
-        <div className="sp-cover">
-          {game.cover.is_placeholder ? (
-            <div className="sp-cover-placeholder" data-testid="cover-placeholder">
-              <span>{game.title}</span>
-              <span className="visually-hidden">{dict.common.coverMissing}</span>
-            </div>
-          ) : (
-            <CoverImage
-              src={game.cover.url}
-              alt={game.cover.alt}
-              title={game.title}
-              missingLabel={dict.common.coverMissing}
-              width={width}
-              height={height}
-            />
-          )}
-        </div>
+        <div className="sp-cover">{cover}</div>
         <div className="sp-card-body">
           <div className="sp-card-head">
             <p className="sp-card-title">{game.title}</p>

@@ -43,13 +43,7 @@ export function NewReleasesShelf({
       <p className="sp-muted">{labels.explainer}</p>
       <ul className="sp-shelf-track sp-shelf-track--dense">
         {items.slice(0, 20).map((item) => (
-          <GameCard
-            key={item.id}
-            game={item}
-            locale={locale}
-            coverVariant="shelf"
-            score={item.display_rating ?? item.total_rating ?? null}
-          />
+          <GameCard key={item.id} game={item} locale={locale} coverVariant="shelf" bare />
         ))}
       </ul>
     </section>

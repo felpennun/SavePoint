@@ -135,7 +135,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             ) : (
               <ul className="sp-grid">
                 {sample.map((game) => (
-                  <GameCard key={game.id} game={game} locale={locale} score={game.display_rating ?? null} />
+                  <GameCard key={game.id} game={game} locale={locale} score={game.display_rating ?? null} bare />
                 ))}
               </ul>
             )}
