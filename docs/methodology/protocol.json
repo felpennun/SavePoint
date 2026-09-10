@@ -1,7 +1,7 @@
 {
-  "protocol_version": 10,
-  "frozen_on": "2026-09-09",
-  "ratified_by": "Felipe — intensidad de valoración personal, PopScore reforzado, recencia por año natural y umbral de candidatos >= 5, 2026-09-09",
+  "protocol_version": 12,
+  "frozen_on": "2026-09-10",
+  "ratified_by": "Felipe — etiquetas curadas como señal principal con IDF por rareza y peso 0,75, 2026-09-10",
   "simulation": true,
   "limitation": "Frozen offline evaluation protocol scored over seeded synthetic users. Every number produced under this protocol is simulation evidence about parameterised archetypes, not evidence about real SavePoint users (EVAL-10).",
   "relevance": {
@@ -21,9 +21,9 @@
     "composition": "rating_bayesian_normalized = (((n * rating_igdb) + (25 * corpus_prior)) / (n + 25) / 100)"
   },
   "content_similarity": {
-    "feature_set_version": "fs-v9",
+    "feature_set_version": "fs-v12-curated-tags-idf",
     "core_facets": {
-      "genre": 0.5,
+      "tag": 0.75,
       "platform": 0.25
     },
     "optional_confirmation_facets": {
@@ -39,7 +39,13 @@
     "missing_metadata": "neutral",
     "optional_match_rule": "positive_only_when_value_overlaps_weighted_user_profile",
     "optional_match_calibration": "overlap is scaled against the strongest profile value in each optional facet",
-    "similarity_rule_version": "facet-similarity-v5"
+    "similarity_rule_version": "facet-similarity-v7",
+    "tag_idf": {
+      "formula_version": "smoothed-idf-l2-v1",
+      "smoothing": 1.0,
+      "formula": "ln((N + smoothing) / (df_tag + smoothing)) + 1",
+      "normalisation": "per_work_l2_to_tag_family_weight"
+    }
   },
   "k_values": [5, 10, 20],
   "headline": "ndcg@10",

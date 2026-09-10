@@ -37,7 +37,7 @@ export function GameCard({
   ratingHalfSteps?: number | null;
   ownedCopyCount?: number;
   coverVariant?: "grid" | "shelf";
-  /** Plain-language reason this card is here (e.g. the genre-overlap
+  /** Plain-language reason this card is here (e.g. the tag-overlap
    * evidence on the recommendations shelf). Rendered under the meta line. */
   evidence?: string;
   /** Nocturne home artboard (2b): drop the whole card panel -- render just

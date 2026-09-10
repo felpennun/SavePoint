@@ -16,6 +16,8 @@ experimentos reproducibles, usuarios sinteticos y resultados explicables.
 - [[Recomendador basado en contenido]]
 - [[Recomendador colaborativo]]
 - [[Recomendador hibrido]]
+- [[ADR-009 - Algoritmos y workers de recomendacion]]
+- [[2026-09-10 - Sincronizacion nocturna y corpus dinamico]]
 
 ## Propiedades transversales
 
@@ -34,10 +36,13 @@ experimentos reproducibles, usuarios sinteticos y resultados explicables.
 - [[Conjunto de candidatos compartido]]
 - [[Cohortes de usuario]]
 - [[Artefacto de evaluacion reproducible]]
+- [[2026-09-10 - Checkpoint evaluacion offline 400 usuarios]]
 
 ## Relacionado
 
 - [[ADR-007 - Heuristico de gusto por generos]]
 - [[ADR-008 - Ratings externos gobernados y RAWG]]
+- [[ADR-009 - Algoritmos y workers de recomendacion]]
+- Especificación canónica: [`docs/methodology/recommendation-algorithms.md`](../../docs/methodology/recommendation-algorithms.md)
 - [[Fase 3 - Recomendadores explicables y baselines]]
 - [[Fase 4 - Colaborativo e hibrido]]

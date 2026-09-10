@@ -20,7 +20,7 @@ export function FilterBar({
   basePath,
   activeCount,
   platformOptions,
-  genreOptions,
+  tagOptions,
   currentQuery,
   yearMin = 1958,
   yearMax,
@@ -31,7 +31,7 @@ export function FilterBar({
   basePath: string;
   activeCount: number;
   platformOptions: FilterOption[];
-  genreOptions: FilterOption[];
+  tagOptions: FilterOption[];
   currentQuery: string;
   yearMin?: number;
   yearMax?: number;
@@ -40,7 +40,7 @@ export function FilterBar({
   const dict = getDictionary(locale);
   const f = dict.catalogue.filters;
   const platformsUnavailable = optionsUnavailable || platformOptions.length === 0;
-  const genresUnavailable = optionsUnavailable || genreOptions.length === 0;
+  const tagsUnavailable = optionsUnavailable || tagOptions.length === 0;
   const currentYear = new Date().getUTCFullYear();
   const yearCeiling = yearMax ?? currentYear + 2;
 
@@ -78,13 +78,13 @@ export function FilterBar({
         />
 
         <FacetMenu
-          name="genre"
-          label={f.genre}
-          options={genreOptions}
-          selected={filters.genre}
+          name="tag"
+          label={f.tag}
+          options={tagOptions}
+          selected={filters.tag}
           locale={locale}
           currentQuery={currentQuery}
-          unavailable={genresUnavailable}
+          unavailable={tagsUnavailable}
         />
 
         <div className="sp-field">
@@ -120,7 +120,7 @@ export function FilterBar({
           ) : null}
         </div>
 
-        {platformsUnavailable || genresUnavailable ? (
+        {platformsUnavailable || tagsUnavailable ? (
           <p className="sp-muted" style={{ gridColumn: "1 / -1", margin: 0 }}>
             {f.unavailable}
           </p>

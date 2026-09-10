@@ -28,7 +28,7 @@ from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models import Case, Count, F, IntegerField, Max, Min, OuterRef, QuerySet, Subquery, Value, When
 
 from catalogue.corpus import ALLOWLIST_SLUGS, governed_works
-from catalogue.models import CorpusPopularityScore, CorpusVersion, GameAlias, GameWork, Genre, Platform
+from catalogue.models import CorpusPopularityScore, CorpusVersion, CuratedLabel, GameAlias, GameWork, Platform
 from catalogue.normalization import normalize_title
 
 TRIGRAM_SIMILARITY_THRESHOLD = 0.3
@@ -94,7 +94,7 @@ class FilterValidationError(ValueError):
 @dataclass
 class CatalogueQuery:
     q: str | None = None
-    genres: tuple[str, ...] = ()
+    tags: tuple[str, ...] = ()
     platforms: tuple[str, ...] = ()
     year_from: int | None = None
     year_to: int | None = None
@@ -188,12 +188,12 @@ def parse_catalogue_query(params: Mapping[str, str]) -> CatalogueQuery:
                 f"min_rating must be between {int(RATING_MIN)} and {int(RATING_MAX)}",
             )
 
-    genres = _multi_values(params, "genre")
+    tags = _multi_values(params, "tag")
     platforms = _multi_values(params, "platform")
 
     return CatalogueQuery(
         q=q,
-        genres=genres,
+        tags=tags,
         platforms=platforms,
         year_from=year_from,
         year_to=year_to,
@@ -220,13 +220,13 @@ def _apply_filters(qs: QuerySet[GameWork], cq: CatalogueQuery) -> QuerySet[GameW
         if valid_platforms:
             qs = qs.filter(releases__platform__slug__in=valid_platforms)
             joined = True
-    if cq.genres:
-        valid_genres = set(
-            Genre.objects.filter(slug__in=cq.genres).values_list("slug", flat=True)
+    if cq.tags:
+        valid_tags = set(
+            CuratedLabel.objects.filter(slug__in=cq.tags).values_list("slug", flat=True)
         )
-        for slug in cq.genres:
-            if slug in valid_genres:
-                qs = qs.filter(genres__slug=slug)
+        for slug in cq.tags:
+            if slug in valid_tags:
+                qs = qs.filter(curated_labels__slug=slug)
                 joined = True
     if cq.year_from is not None:
         qs = qs.filter(first_release_date__gte=date(cq.year_from, 1, 1))
@@ -240,7 +240,7 @@ def _apply_filters(qs: QuerySet[GameWork], cq: CatalogueQuery) -> QuerySet[GameW
 
 
 def _prefetched(qs: QuerySet[GameWork]) -> QuerySet[GameWork]:
-    return qs.prefetch_related("releases__platform", "assets", "genres")
+    return qs.prefetch_related("releases__platform", "assets", "curated_labels")
 
 
 def _ordered_matching_work_ids(normalized_query: str) -> list[str]:
@@ -302,9 +302,9 @@ def _facets(scoped: QuerySet[GameWork]) -> dict:
         .order_by("name")
         .values("slug", "name", "count")
     ]
-    genres = [
+    tags = [
         {"slug": row["slug"], "name": row["name"], "count": row["count"]}
-        for row in Genre.objects.filter(works__in=scoped)
+        for row in CuratedLabel.objects.filter(works__in=scoped)
         .annotate(count=Count("works", distinct=True))
         .order_by("name")
         .values("slug", "name", "count")
@@ -312,7 +312,7 @@ def _facets(scoped: QuerySet[GameWork]) -> dict:
     span = scoped.aggregate(min=Min("first_release_date"), max=Max("first_release_date"))
     return {
         "platforms": platforms,
-        "genres": genres,
+        "tags": tags,
         "year_range": {
             "min": span["min"].year if span["min"] else None,
             "max": span["max"].year if span["max"] else None,

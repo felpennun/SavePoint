@@ -50,7 +50,7 @@ export const es: Dictionary = {
     filters: {
       heading: "Filtros",
       platform: "Plataforma",
-      genre: "Género",
+      tag: "Etiquetas",
       yearFrom: "Año desde",
       yearTo: "Año hasta",
       minRating: "Valoración IGDB mínima",
@@ -77,7 +77,7 @@ export const es: Dictionary = {
       searchInList: "Filtrar esta lista",
     },
     chip: {
-      genre: "Género: {value}",
+      tag: "Etiqueta: {value}",
       platform: "Plataforma: {value}",
     },
   },
@@ -116,7 +116,7 @@ export const es: Dictionary = {
     dlc: "DLC",
     expansion: "Expansión",
     igdbRating: "Valoración IGDB",
-    genres: "Géneros",
+    tags: "Etiquetas",
     platforms: "Plataformas",
     releaseDate: "Fecha de lanzamiento",
     addToCollection: "Añadir a la colección",
@@ -126,16 +126,16 @@ export const es: Dictionary = {
   },
   recommendations: {
     nav: "Recomendaciones",
-    heading: "Recomendaciones según tus géneros y valoraciones",
+    heading: "Recomendaciones según tus etiquetas y valoraciones",
     intro:
-      "Generado a partir de los géneros de los juegos que has valorado y completado, priorizando los mejor valorados del catálogo. No es el ranking de popularidad de la demo.",
+      "Generado a partir de las etiquetas de los juegos que has valorado y completado, priorizando los mejor valorados del catálogo. No es el ranking de popularidad de la demo.",
     excludedNote: "No se muestran los juegos que ya están en tu colección.",
     methodHeading: "Cómo se generan",
     methodAlgorithm:
-      "Algoritmo: {id} — una heurística determinista de géneros que ordena por valoración del catálogo, no el ranking de popularidad de la demo ni un modelo entrenado.",
-    shelfHeading: "Porque juegas mucho a {genre}",
+      "Algoritmo: {id} — una heurística determinista de etiquetas que ordena por valoración del catálogo, no el ranking de popularidad de la demo ni un modelo entrenado.",
+    shelfHeading: "Porque juegas mucho a {tag}",
     shelfEvidence:
-      "Estos juegos comparten el género {genre} con títulos que has valorado o a los que has puesto un estado.",
+      "Estos juegos comparten la etiqueta {tag} con títulos que has valorado o a los que has puesto un estado.",
     emptyHeading: "Aún no hay suficiente actividad",
     emptyBody: "Añade juegos a tu colección y, si quieres, valóralos o marca su estado para empezar a recibir recomendaciones.",
     emptyCta: "Explorar el catálogo",
@@ -157,7 +157,7 @@ export const es: Dictionary = {
       },
       negative: {
         heading: "Afinidad con tus preferencias en cuenta",
-        description: "Refuerza lo que valoras y reduce géneros que has valorado negativamente varias veces.",
+        description: "Refuerza lo que valoras y reduce etiquetas que has valorado negativamente varias veces.",
       },
       weightedPop: {
         heading: "Afinidad por contenido y popularidad",
@@ -200,7 +200,7 @@ export const es: Dictionary = {
         description: "Combina contenido y colaboración con MMR para reducir repeticiones entre juegos muy parecidos.",
       },
     },
-    genreDescription: "Heurística basada en los géneros de tu actividad y en la valoración del catálogo.",
+    tagDescription: "Heurística basada en las etiquetas de tu actividad y en la valoración del catálogo.",
     refreshPreparing: "Estamos preparando tus recomendaciones.",
     refreshUpdating: "Estamos actualizando tus recomendaciones; mientras tanto ves la versión anterior.",
     refreshNeedsCollectionChange: "Modifica tu colección para actualizar tus recomendaciones.",

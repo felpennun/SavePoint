@@ -34,8 +34,8 @@ def _release_year(work: GameWork) -> int | None:
     return min(d.year for d in dated) if dated else None
 
 
-def _genres(work: GameWork) -> list[dict]:
-    return [{"slug": g.slug, "name": g.name} for g in work.genres.all()]
+def _tags(work: GameWork) -> list[dict]:
+    return [{"slug": tag.slug, "name": tag.name} for tag in work.curated_labels.all()]
 
 
 def _platform_summary(work: GameWork) -> str:
@@ -80,7 +80,7 @@ class GameCardSerializer(serializers.Serializer):
     total_rating = serializers.FloatField(allow_null=True)
     total_rating_count = serializers.IntegerField(allow_null=True)
     display_rating = serializers.SerializerMethodField()
-    genres = serializers.SerializerMethodField()
+    tags = serializers.SerializerMethodField()
 
     def get_title(self, work: GameWork) -> str:
         return _display_title(work)
@@ -97,8 +97,8 @@ class GameCardSerializer(serializers.Serializer):
     def get_cover(self, work: GameWork) -> dict:
         return _cover(work)
 
-    def get_genres(self, work: GameWork) -> list[dict]:
-        return _genres(work)
+    def get_tags(self, work: GameWork) -> list[dict]:
+        return _tags(work)
 
 
 class ReleaseSerializer(serializers.Serializer):
@@ -175,7 +175,7 @@ class GameDetailSerializer(serializers.Serializer):
     # Aggregate-only counts for the detail-page rating breakdown line
     # (never per-user rows -- threat T-02-05-02).
     rating_breakdown = serializers.SerializerMethodField()
-    genres = serializers.SerializerMethodField()
+    tags = serializers.SerializerMethodField()
     cover = serializers.SerializerMethodField()
     releases = serializers.SerializerMethodField()
     related_content = serializers.SerializerMethodField()
@@ -198,8 +198,8 @@ class GameDetailSerializer(serializers.Serializer):
     def get_rating_breakdown(self, work: GameWork) -> dict[str, int]:
         return rating_breakdown(work)
 
-    def get_genres(self, work: GameWork) -> list[dict]:
-        return _genres(work)
+    def get_tags(self, work: GameWork) -> list[dict]:
+        return _tags(work)
 
     def get_cover(self, work: GameWork) -> dict:
         return _cover(work)

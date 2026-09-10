@@ -13,7 +13,12 @@ from catalogue.models import GameWork
 from recommendations.collaborative import ALGORITHM_ID as COLLABORATIVE_ALGORITHM_ID
 from recommendations.collaborative import rank_collaborative_user_knn_v1
 from recommendations.content.diversity import mmr_rerank
-from recommendations.content.features import FEATURE_SET_VERSION, coverage_report, feature_vector
+from recommendations.content.features import (
+    FEATURE_SET_VERSION,
+    coverage_report,
+    feature_vector,
+    tag_idf_profile,
+)
 from recommendations.content.rank import rank_content_v1
 
 
@@ -45,7 +50,7 @@ def _hybrid_relevance(
     corpus_version: str | None,
     reference_user_ids: Iterable[object] | None,
     prepared: dict[str, Any] | None,
-    genre_profile: dict[str, float] | None,
+    tag_profile: dict[str, float] | None,
     should_continue: Callable[[], bool] | None,
 ) -> tuple[dict[str, Any], dict[str, Any], list[tuple[float, str, dict[str, Any]]]]:
     """Calculate one hybrid relevance pool for both published variants."""
@@ -58,7 +63,7 @@ def _hybrid_relevance(
         corpus_version=corpus_version,
         candidate_ids=set(candidate_ids),
         min_rating_count=None,
-        genre_profile=genre_profile,
+        tag_profile=tag_profile,
         prepared=prepared,
         should_continue=should_continue,
     )
@@ -120,7 +125,7 @@ def _vectors_for_items(
     corpus_version: str | None,
     prepared: dict[str, Any] | None,
 ) -> dict[str, dict[str, float]]:
-    """Load the exact fs-v9 vectors used by the shared content ranker."""
+    """Load the exact fs-v12 vectors used by the shared content ranker."""
 
     item_list = list(items)
     requested = {str(item["work_id"]) for item in item_list}
@@ -140,14 +145,16 @@ def _vectors_for_items(
         works = list(
             evaluation_candidate_works(corpus_version)
             .filter(id__in=requested)
-            .prefetch_related("genres", "releases__platform", "franchises", "developers")
+            .prefetch_related("curated_labels", "releases__platform", "franchises", "developers")
         )
     availability = coverage_report(corpus_version)
+    tag_idf = (prepared or {}).get("tag_idf") or tag_idf_profile(corpus_version)
     return {
         str(work.id): feature_vector(
             work,
             include_franchise=availability["include_franchise"],
             include_developer=availability["include_developer"],
+            tag_idf=tag_idf,
             feature_set_version=FEATURE_SET_VERSION,
         )
         for work in works
@@ -196,7 +203,7 @@ def rank_hybrid_weighted_cf_v1(
     corpus_version: str | None = None,
     reference_user_ids: Iterable[object] | None = None,
     prepared: dict[str, Any] | None = None,
-    genre_profile: dict[str, float] | None = None,
+    tag_profile: dict[str, float] | None = None,
     should_continue: Callable[[], bool] | None = None,
 ) -> dict[str, Any]:
     """Combine the existing Weighted ranker with user-kNN evidence."""
@@ -209,7 +216,7 @@ def rank_hybrid_weighted_cf_v1(
         corpus_version=corpus_version,
         reference_user_ids=reference_user_ids,
         prepared=prepared,
-        genre_profile=genre_profile,
+        tag_profile=tag_profile,
         should_continue=should_continue,
     )
     bounded_limit = max(1, min(50, int(limit)))
@@ -241,10 +248,10 @@ def rank_hybrid_mmr_v1(
     corpus_version: str | None = None,
     reference_user_ids: Iterable[object] | None = None,
     prepared: dict[str, Any] | None = None,
-    genre_profile: dict[str, float] | None = None,
+    tag_profile: dict[str, float] | None = None,
     should_continue: Callable[[], bool] | None = None,
 ) -> dict[str, Any]:
-    """Apply fs-v9 MMR to the shared hybrid relevance pool."""
+    """Apply fs-v12 MMR to the shared hybrid relevance pool."""
 
     candidate_ids = tuple(candidate_ids)
     bounded_limit = max(1, min(50, int(limit)))
@@ -256,7 +263,7 @@ def rank_hybrid_mmr_v1(
         corpus_version=corpus_version,
         reference_user_ids=reference_user_ids,
         prepared=prepared,
-        genre_profile=genre_profile,
+        tag_profile=tag_profile,
         should_continue=should_continue,
     )
     pool = ranked[:pool_limit]
@@ -292,7 +299,7 @@ def rank_hybrid_mmr_v1(
         parameters=parameters,
         limitation=(
             "Hybrid Weighted plus explicit-rating user-kNN relevance is re-ranked "
-            "with deterministic MMR over an fs-v9 candidate pool; sparse "
+            "with deterministic MMR over an fs-v12 candidate pool; sparse "
             "collaborative history falls back to Weighted relevance."
         ),
     )

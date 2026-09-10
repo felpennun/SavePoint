@@ -47,7 +47,7 @@ export const en: Dictionary = {
     filters: {
       heading: "Filters",
       platform: "Platform",
-      genre: "Genre",
+      tag: "Tags",
       yearFrom: "Year from",
       yearTo: "Year to",
       minRating: "Minimum IGDB rating",
@@ -74,7 +74,7 @@ export const en: Dictionary = {
       searchInList: "Filter this list",
     },
     chip: {
-      genre: "Genre: {value}",
+      tag: "Tag: {value}",
       platform: "Platform: {value}",
     },
   },
@@ -113,7 +113,7 @@ export const en: Dictionary = {
     dlc: "DLC",
     expansion: "Expansion",
     igdbRating: "IGDB rating",
-    genres: "Genres",
+    tags: "Tags",
     platforms: "Platforms",
     releaseDate: "Release date",
     addToCollection: "Add to collection",
@@ -123,16 +123,16 @@ export const en: Dictionary = {
   },
   recommendations: {
     nav: "Recommendations",
-    heading: "Recommended by your genres and ratings",
+    heading: "Recommended by your tags and ratings",
     intro:
-      "Built from the genres of the games you've rated and completed, prioritising the catalogue's highest-rated games. Not the demo popularity ranking.",
+      "Built from the tags of the games you've rated and completed, prioritising the catalogue's highest-rated games. Not the demo popularity ranking.",
     excludedNote: "Games already in your collection are not shown.",
     methodHeading: "How these are generated",
     methodAlgorithm:
-      "Algorithm: {id} — a deterministic genre heuristic ordered by catalogue rating, not the demo popularity ranking and not a trained model.",
-    shelfHeading: "Because you play a lot of {genre}",
+      "Algorithm: {id} — a deterministic tag heuristic ordered by catalogue rating, not the demo popularity ranking and not a trained model.",
+    shelfHeading: "Because you play a lot of {tag}",
     shelfEvidence:
-      "These games share the {genre} genre with titles you've rated or set a status on.",
+      "These games share the {tag} tag with titles you've rated or set a status on.",
     emptyHeading: "Not enough activity yet",
     emptyBody: "Add games to your collection and, if you like, rate them or set their status to start receiving recommendations.",
     emptyCta: "Browse the catalogue",
@@ -154,7 +154,7 @@ export const en: Dictionary = {
       },
       negative: {
         heading: "Content match with your preferences in mind",
-        description: "Boosts what you rate positively and reduces genres you have rated negatively several times.",
+        description: "Boosts what you rate positively and reduces tags you have rated negatively several times.",
       },
       weightedPop: {
         heading: "Content and popularity match",
@@ -197,7 +197,7 @@ export const en: Dictionary = {
         description: "Combines content and collaborative affinity with MMR to reduce repetition between very similar games.",
       },
     },
-    genreDescription: "A heuristic based on the genres in your activity and the catalogue rating.",
+    tagDescription: "A heuristic based on the tags in your activity and the catalogue rating.",
     refreshPreparing: "We are preparing your recommendations.",
     refreshUpdating: "We are updating your recommendations; you are seeing the previous version for now.",
     refreshNeedsCollectionChange: "Update your collection to refresh your recommendations.",

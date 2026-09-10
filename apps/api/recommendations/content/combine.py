@@ -8,7 +8,7 @@ from statistics import median
 from catalogue.models import CorpusRatingSnapshot, GameWork
 from recommendations.content.features import (
     compose_rating_confidence,
-    genre_rating_profile,
+    tag_rating_profile,
     rating_bayesian_normalized,
     rating_final,
     rating_quality_signal,
@@ -41,7 +41,7 @@ def _candidate_snapshot_rating(
 def rating_term(
     work: GameWork,
     corpus_version: str | None,
-    genre_profile: dict[str, float] | None = None,
+    tag_profile: dict[str, float] | None = None,
     snapshot_stats: dict[object, tuple[float | None, int, int | None]] | None = None,
     rating_prior: float | None = None,
 ) -> tuple[float, bool]:
@@ -52,17 +52,17 @@ def rating_term(
     candidate without an observed rating, and that result is flagged.
     """
 
-    profile = genre_profile if genre_profile is not None else genre_rating_profile(corpus_version)
-    genre_values = [profile[genre.slug] for genre in work.genres.all() if genre.slug in profile]
+    profile = tag_profile if tag_profile is not None else tag_rating_profile(corpus_version)
+    tag_values = [profile[tag.slug] for tag in work.curated_labels.all() if tag.slug in profile]
     if snapshot_stats is None:
         own_rating, _rating_count, _total_rating_count = _candidate_snapshot_rating(work, corpus_version)
     else:
         own_rating, _rating_count, _total_rating_count = snapshot_stats.get(work.id, (None, 0, None))
 
     if own_rating is None:
-        if not genre_values:
+        if not tag_values:
             return 0.0, True
-        return rating_quality_signal(float(median(genre_values))) or 0.0, True
+        return rating_quality_signal(float(median(tag_values))) or 0.0, True
 
     normalized = rating_bayesian_normalized(
         own_rating, _total_rating_count, rating_prior

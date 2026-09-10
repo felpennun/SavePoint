@@ -1,0 +1,60 @@
+{
+  "audit": "offline-evaluation-preflight",
+  "validated_at": "2026-09-10",
+  "algorithm_execution": "not_run",
+  "technical_gate": "passed",
+  "scientific_freeze": "pending",
+  "corpus_version": "2026.09.2",
+  "corpus": {
+    "governed_count": 190479,
+    "algorithm_candidate_count": 13621,
+    "invalid_date_count": 0,
+    "candidate_invalid_rating_rule_count": 0
+  },
+  "protocol": {
+    "version": 12,
+    "sha256": "02af71222ffcc964ac940e7ebbe3c51c87fc70cf869f55248e4dce836f894a61",
+    "feature_set_version": "fs-v12-curated-tags-idf",
+    "population_seed": 20260909,
+    "split_seed": 20260908,
+    "split": {
+      "train": 240,
+      "validation": 80,
+      "test": 80
+    },
+    "test_marker_exists_before_run": false
+  },
+  "snapshots": {
+    "ratings_sha256": "c42f46a42d091e11cd894c3f942b8979b77f611ac7a4b048d8d152bebe8ce3cc",
+    "popscore_sha256": "16de92f28fa5b3dd1b387110628561eb6330b271ed2b1e76a69a7e0f03083097"
+  },
+  "population": {
+    "active_count": 400,
+    "historical_phase2_count": 0,
+    "active_historical_overlap_count": 0,
+    "evaluable_positive_users": 390,
+    "evaluable_positive_users_by_split": {
+      "train": 232,
+      "validation": 79,
+      "test": 79
+    },
+    "test_assigned_users": 80,
+    "test_expected_skipped_users": 1,
+    "split_disjoint": true,
+    "split_covers_active_population": true
+  },
+  "evaluation_suite": {
+    "algorithm_count": 16,
+    "tuning_grid_count": 31,
+    "pytest_evaluation_result": "95 passed"
+  },
+  "source_state": {
+    "head_at_checkpoint": "8766b9da16a7e3bfdc7d462761f8fabe1af51800",
+    "working_tree": "dirty; relevant protocol/evaluation/recommendation changes require a reproducibility freeze before final test"
+  },
+  "commands": {
+    "population_audit": "docker compose -f infra/compose.yaml exec -T api python manage.py audit_synthetic_population --corpus-version 2026.09.2",
+    "input_preflight": "docker compose -f infra/compose.yaml exec -T api python manage.py validate_recommender_inputs --corpus-version 2026.09.2 --validation-date 2026-09-10 --evidence-json /workspace/apps/api/evaluation-input-preflight-2026-09-10.json",
+    "evaluation": "docker compose -f infra/compose.yaml exec -T api python manage.py run_evaluation_parallel --corpus-version 2026.09.2 --split test --max-workers 4 --evidence-json /workspace/apps/api/evaluation-400-test-2026-09-10.artifact.json"
+  }
+}

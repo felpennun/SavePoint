@@ -4,7 +4,7 @@ import type { PersonalRecommendationShelf } from "@/lib/api";
 
 /**
  * RecommendationShelf renders one horizontally scrollable GameCard list per
- * recommendation genre. The page intentionally keeps only these lists in
+ * recommendation tag. The page intentionally keeps only these lists in
  * the successful state; explanatory copy belongs in the thesis, not in the
  * demo surface.
  */
@@ -12,15 +12,15 @@ export function RecommendationShelf({
   shelf,
   locale,
   description,
-  algorithmId = "genre-taste-v1",
+  algorithmId = "tag-taste-v1",
 }: {
   shelf: PersonalRecommendationShelf;
   locale: string;
   description?: string;
   algorithmId?: string;
 }) {
-  const heading = getDictionary(locale).recommendations.shelfHeading.replace("{genre}", shelf.genre);
-  const sectionId = `recommendation-${shelf.genreSlug}`;
+  const heading = getDictionary(locale).recommendations.shelfHeading.replace("{tag}", shelf.tag);
+  const sectionId = `recommendation-${shelf.tagSlug}`;
 
   return (
     <section

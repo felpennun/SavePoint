@@ -35,20 +35,20 @@ def explain(
         for key in profile.keys() & candidate_vector.keys()
     }
     positive_parts = [(key, value) for key, value in parts.items() if value > 0]
-    genre_parts = {
-        key.removeprefix("genre:"): value
+    tag_parts = {
+        key.removeprefix("tag:"): value
         for key, value in positive_parts
-        if key.startswith("genre:")
+        if key.startswith("tag:")
     }
     denominator = math.fsum(value for value in parts.values() if value > 0)
     if denominator <= 0:
         contributions = []
     else:
         contributions = [
-            {"genre": genre, "contribution_pct": round(value / denominator, 3)}
-            for genre, value in genre_parts.items()
+            {"tag": tag, "contribution_pct": round(value / denominator, 3)}
+            for tag, value in tag_parts.items()
         ]
-        contributions.sort(key=lambda item: (-item["contribution_pct"], item["genre"]))
+        contributions.sort(key=lambda item: (-item["contribution_pct"], item["tag"]))
 
     # These are presentation-neutral tokens, not generated prose.  They only
     # name an overlap actually present in the two vectors, so a caller can

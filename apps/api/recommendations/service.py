@@ -13,7 +13,7 @@ from typing import Callable
 
 from django.contrib.auth.models import AbstractBaseUser
 
-from catalogue.models import CorpusVersion, Developer, Franchise, GameWork, Genre
+from catalogue.models import CorpusVersion, CuratedLabel, Developer, Franchise, GameWork
 from catalogue.serializers import _cover, _platform_summary, _release_year
 from evaluation.candidates import CandidateManifest, build_common
 from evaluation import protocol as evaluation_protocol
@@ -25,7 +25,7 @@ from recommendations.hybrid import rank_hybrid_mmr_v1, rank_hybrid_weighted_cf_v
 from recommendations.published import CONTENT_ALGORITHM_IDS
 
 
-PROTOCOL_VERSION = 10
+PROTOCOL_VERSION = 12
 MIN_LIMIT = 1
 MAX_LIMIT = 50
 
@@ -84,7 +84,7 @@ def build_candidate_manifest(
 def _reason(
     item: dict,
     *,
-    genre_names: dict[str, str],
+    tag_names: dict[str, str],
     platform_names: dict[str, str],
     franchise_names: dict[str, str],
     developer_names: dict[str, str],
@@ -96,8 +96,8 @@ def _reason(
         kind = signal.get("kind")
         slug = signal.get("value")
         names = (
-            genre_names
-            if kind == "genre"
+            tag_names
+            if kind == "tag"
             else platform_names
             if kind == "platform"
             else franchise_names
@@ -201,10 +201,10 @@ def recommend_for_user(
     works = {
         str(work.id): work
         for work in GameWork.objects.filter(id__in=result_ids).prefetch_related(
-            "genres", "assets", "releases__platform", "franchises", "developers"
+            "curated_labels", "assets", "releases__platform", "franchises", "developers"
         )
     }
-    genre_names = dict(Genre.objects.values_list("slug", "name"))
+    tag_names = dict(CuratedLabel.objects.values_list("slug", "name"))
     franchise_names = dict(Franchise.objects.values_list("slug", "name"))
     developer_names = dict(Developer.objects.values_list("slug", "name"))
     results = []
@@ -220,7 +220,7 @@ def recommend_for_user(
                 "cover": _cover(work),
                 "reason": _reason(
                     item,
-                    genre_names=genre_names,
+                    tag_names=tag_names,
                     franchise_names=franchise_names,
                     developer_names=developer_names,
                     platform_names={

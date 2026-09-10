@@ -49,7 +49,7 @@ def _work_map(
     query = evaluation_candidate_works(corpus_version).filter(id__in=requested)
     return {
         str(work.id): work
-        for work in query.prefetch_related("genres", "releases__platform", "franchises", "developers")
+        for work in query.prefetch_related("curated_labels", "releases__platform", "franchises", "developers")
     }
 
 

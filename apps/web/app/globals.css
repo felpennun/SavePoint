@@ -1372,7 +1372,7 @@ a.sp-chip--active:hover {
    column (artboards 2j sources, 2f provenance). */
 .sp-spec-table {
   margin: var(--space-lg) 0;
-  border: 1px solid var(--color-surface-border);
+  border: 2px solid var(--color-surface-border);
   border-radius: var(--radius-control);
   overflow: hidden;
   font-size: var(--text-meta);

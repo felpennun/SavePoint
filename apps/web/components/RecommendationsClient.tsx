@@ -8,7 +8,7 @@ import { OwnedGamesDlcShelf } from "@/components/OwnedGamesDlcShelf";
 import { RecommendationShelf } from "@/components/RecommendationShelf";
 import { getDictionary } from "@/i18n";
 import {
-  primaryGenreRecommendationShelf,
+  primaryTagRecommendationShelf,
   type OwnedDlcResult,
   type RecommendationSnapshotResult,
 } from "@/lib/api";
@@ -121,15 +121,15 @@ export function RecommendationsClient({ locale }: { locale: string }) {
     };
   }, []);
 
-  const genreData = snapshot?.sections?.genre ?? null;
+  const tagData = snapshot?.sections?.tags ?? null;
   const contentData = snapshot?.sections?.content ?? {};
-  const genreShelf = genreData && !genreData.insufficient_history
-    ? primaryGenreRecommendationShelf(genreData)
+  const tagShelf = tagData && !tagData.insufficient_history
+    ? primaryTagRecommendationShelf(tagData)
     : null;
   const hasContentRecommendations = Object.values(contentData).some(
     (result) => result.results.length > 0,
   );
-  const hasRecommendations = hasContentRecommendations || genreShelf !== null || dlc.groups.length > 0;
+  const hasRecommendations = hasContentRecommendations || tagShelf !== null || dlc.groups.length > 0;
   const isRefreshing = snapshot?.status === "building" || snapshot?.status === "stale";
   const needsCollectionChange = snapshot?.status === "needs_refresh";
 
@@ -179,11 +179,11 @@ export function RecommendationsClient({ locale }: { locale: string }) {
               />
             );
           })}
-          {genreShelf ? (
+          {tagShelf ? (
             <RecommendationShelf
-              shelf={genreShelf}
+              shelf={tagShelf}
               locale={locale}
-              description={r.genreDescription}
+              description={r.tagDescription}
             />
           ) : null}
           <OwnedGamesDlcShelf

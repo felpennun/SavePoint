@@ -22,7 +22,11 @@ from recommendations.models import (
     RecommendationJobStatus,
     RecommendationState,
 )
-from recommendations.service import RecommendationServiceError, recommend_for_user
+from recommendations.service import (
+    RecommendationServiceError,
+    active_corpus_version,
+    recommend_for_user,
+)
 from recommendations.content.variants import ALGORITHM_REGISTRY
 from recommendations.published import CONTENT_ALGORITHM_IDS
 from recommendations.genre_heuristic import rank_genre_taste_v1
@@ -36,7 +40,7 @@ _DTO_KEYS = (
     "input_snapshot_sha256",
     "insufficient_history",
     "limitation",
-    "primary_genre",
+    "primary_tag",
     "results",
 )
 _ITEM_KEYS = (
@@ -50,7 +54,7 @@ _ITEM_KEYS = (
     "year",
     "platform_summary",
     "cover",
-    "matched_genres",
+    "matched_tags",
 )
 
 
@@ -71,9 +75,9 @@ def _with_current_display_ratings(payload: dict | None) -> dict | None:
         for section in content.values():
             if isinstance(section, dict) and isinstance(section.get("results"), list):
                 item_refs.extend(item for item in section["results"] if isinstance(item, dict))
-    genre = payload.get("genre")
-    if isinstance(genre, dict) and isinstance(genre.get("results"), list):
-        item_refs.extend(item for item in genre["results"] if isinstance(item, dict))
+    tags = payload.get("tags")
+    if isinstance(tags, dict) and isinstance(tags.get("results"), list):
+        item_refs.extend(item for item in tags["results"] if isinstance(item, dict))
     enriched_items = _add_display_ratings(item_refs)
     enriched_by_identity = {id(item): enriched for item, enriched in zip(item_refs, enriched_items)}
 
@@ -88,12 +92,12 @@ def _with_current_display_ratings(payload: dict | None) -> dict | None:
         )
         for key, section in content.items()
     } if isinstance(content, dict) else content
-    enriched_genre = (
-        {**genre, "results": [enrich(item) for item in genre["results"]]}
-        if isinstance(genre, dict) and isinstance(genre.get("results"), list)
-        else genre
+    enriched_tags = (
+        {**tags, "results": [enrich(item) for item in tags["results"]]}
+        if isinstance(tags, dict) and isinstance(tags.get("results"), list)
+        else tags
     )
-    return {**payload, "content": enriched_content, "genre": enriched_genre}
+    return {**payload, "content": enriched_content, "tags": enriched_tags}
 
 
 def _add_display_ratings(items: list[dict]) -> list[dict]:
@@ -148,7 +152,11 @@ class RecommendationsView(APIView):
         else:
             limit = None
 
-        payload = rank_genre_taste_v1(request.user, limit=limit)
+        payload = rank_genre_taste_v1(
+            request.user,
+            corpus_version=active_corpus_version(),
+            limit=limit,
+        )
         presentation_results = _add_display_ratings(payload["results"])
         return Response(
             {

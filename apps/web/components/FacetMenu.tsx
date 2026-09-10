@@ -1,7 +1,7 @@
 import { formatCount, getDictionary } from "@/i18n";
 import { type FilterOption, removeHref } from "@/lib/catalogue-filters";
 
-type FacetName = "genre" | "platform";
+type FacetName = "tag" | "platform";
 
 function withoutFacet(currentQuery: string, name: FacetName): string {
   const params = new URLSearchParams(currentQuery.startsWith("?") ? currentQuery.slice(1) : currentQuery);

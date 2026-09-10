@@ -32,10 +32,10 @@ from datetime import datetime, timezone
 from typing import Callable
 
 from django.contrib.auth.models import AbstractBaseUser
-from django.db.models import Case, F, FloatField, Sum, Value, When
+from django.db.models import F, FloatField, Value
 
 from catalogue.corpus import evaluation_candidate_works
-from catalogue.models import GameWork, Genre
+from catalogue.models import CuratedLabel, GameWork
 from catalogue.serializers import _cover, _platform_summary, _release_year
 from library.models import LibraryEntry
 from recommendations._weights import (  # noqa: F401  (re-exported for callers)
@@ -44,6 +44,7 @@ from recommendations._weights import (  # noqa: F401  (re-exported for callers)
     _STATUS_WEIGHTS,
 )
 from recommendations.cancellation import RecommendationComputationCancelled
+from recommendations.content.features import tag_idf_profile
 
 # ``_STATUS_WEIGHTS`` / ``_RATING_DIVISOR`` / ``_entry_weight`` moved to the
 # shared ``recommendations._weights`` module (Plan 02-10) so the content
@@ -53,7 +54,7 @@ from recommendations.cancellation import RecommendationComputationCancelled
 # shared with the content profile.
 __all__ = ["ALGORITHM_ID", "rank_genre_taste_v1"]
 
-ALGORITHM_ID = "genre-taste-v1"
+ALGORITHM_ID = "tag-taste-v1"
 
 # Documented request bound (threat T-01.1-11): the caller-supplied ``limit``
 # is clamped into ``[_MIN_LIMIT, _MAX_LIMIT]`` and the ranking SQL carries a
@@ -100,7 +101,7 @@ def _clamp_limit(limit: int | None) -> int:
 
 def _fingerprint(
     taste: dict,
-    primary_genre_slug: str | None,
+    primary_tag_slug: str | None,
     ranked: list[tuple[str, float, float | None, int | None]],
 ) -> str:
     """Hash the exact taste vector and ordered result metadata.
@@ -110,8 +111,8 @@ def _fingerprint(
     """
     payload = {
         "algorithm_id": ALGORITHM_ID,
-        "taste": sorted((str(genre_id), round(weight, 6)) for genre_id, weight in taste.items()),
-        "primary_genre_slug": primary_genre_slug,
+        "taste": sorted((str(tag_id), round(weight, 6)) for tag_id, weight in taste.items()),
+        "primary_tag_slug": primary_tag_slug,
         "ranked": [
             (
                 slug,
@@ -132,7 +133,7 @@ def _insufficient_history(generated_at: datetime, taste: dict) -> dict:
         "input_snapshot_sha256": _fingerprint(taste, None, []),
         "insufficient_history": True,
         "limitation": _INSUFFICIENT_HISTORY_LIMITATION,
-        "primary_genre": None,
+        "primary_tag": None,
         "results": [],
     }
 
@@ -141,6 +142,7 @@ def rank_genre_taste_v1(
     user: AbstractBaseUser,
     limit: int | None = _DEFAULT_LIMIT,
     *,
+    corpus_version: str | None = None,
     generated_at: datetime | None = None,
     should_continue: Callable[[], bool] | None = None,
 ) -> dict:
@@ -171,40 +173,43 @@ def rank_genre_taste_v1(
             entry["current_status"], entry["rating_half_steps"]
         )
 
-    # 2. Fold each seen work's genres into the taste vector, bounded by the
+    # 2. Fold each seen work's curated tags into the taste vector, bounded by the
     #    user's (small) library size.
-    through = GameWork.genres.through
+    through = GameWork.curated_labels.through
+    tag_idf = tag_idf_profile(corpus_version)
+    tag_slug_by_id = dict(CuratedLabel.objects.values_list("id", "slug"))
     taste_weights: dict[object, float] = {}
-    genre_entry_counts: dict[object, int] = {}
+    tag_entry_counts: dict[object, int] = {}
     if seen_ids:
-        for work_id, genre_id in through.objects.filter(gamework_id__in=seen_ids).values_list(
-            "gamework_id", "genre_id"
-        ):
+        for work_id, tag_id in through.objects.filter(work_id__in=seen_ids).values_list(
+            "work_id", "label_id"
+        ).distinct():
             weight = activity_by_work.get(work_id, 0.0)
             if weight:
-                taste_weights[genre_id] = taste_weights.get(genre_id, 0.0) + weight
-                genre_entry_counts[genre_id] = genre_entry_counts.get(genre_id, 0) + 1
+                idf = tag_idf.get(tag_slug_by_id.get(tag_id, ""), 1.0)
+                taste_weights[tag_id] = taste_weights.get(tag_id, 0.0) + weight * idf
+                tag_entry_counts[tag_id] = tag_entry_counts.get(tag_id, 0) + 1
 
     if not taste_weights or sum(taste_weights.values()) <= 0:
         return _insufficient_history(generated_at, taste_weights)
 
-    genre_metadata = {
-        genre.id: (genre.slug, genre.name)
-        for genre in Genre.objects.filter(id__in=taste_weights).only("id", "slug", "name")
+    tag_metadata = {
+        tag.id: (tag.slug, tag.name)
+        for tag in CuratedLabel.objects.filter(id__in=taste_weights).only("id", "slug", "name")
     }
-    primary_genre_id = min(
+    primary_tag_id = min(
         taste_weights,
-        key=lambda genre_id: (-genre_entry_counts[genre_id], genre_metadata[genre_id][0]),
+        key=lambda tag_id: (-tag_entry_counts[tag_id], tag_metadata[tag_id][0]),
     )
-    primary_genre_slug, primary_genre_name = genre_metadata[primary_genre_id]
-    primary_genre = {
-        "slug": primary_genre_slug,
-        "name": primary_genre_name,
-        "entry_count": genre_entry_counts[primary_genre_id],
-        "weight": round(taste_weights[primary_genre_id], 3),
+    primary_tag_slug, primary_tag_name = tag_metadata[primary_tag_id]
+    primary_tag = {
+        "slug": primary_tag_slug,
+        "name": primary_tag_name,
+        "entry_count": tag_entry_counts[primary_tag_id],
+        "weight": round(taste_weights[primary_tag_id], 3),
     }
 
-    # 3. Rank unseen governed candidates in the most frequent library genre.
+    # 3. Rank unseen governed candidates in the most frequent library tag.
     # and have a sufficiently reliable catalogue rating sample. This heuristic
     # shares the product candidate boundary: no future, DLC, ungoverned, or
     # rating-ineligible work may bypass the content recommendation corpus.
@@ -222,32 +227,33 @@ def rank_genre_taste_v1(
     #    whatever order the float sums happened to land in (repo-review
     #    2026-09-06 L-03).
     candidate_pool = limit * _CANDIDATE_OVERFETCH
-    score_case = Case(
-        *[When(genre_id=genre_id, then=Value(float(weight))) for genre_id, weight in taste_weights.items()],
-        default=Value(0.0),
-        output_field=FloatField(),
-    )
     governed_candidates = evaluation_candidate_works(
+        corpus_version,
         eligibility_cutoff_date=generated_at.date()
     )
     ranked_rows = (
-        through.objects.filter(genre_id=primary_genre_id)
-        .filter(gamework_id__in=governed_candidates.values("id"))
-        .filter(gamework__total_rating_count__gte=_MIN_CATALOGUE_RATING_COUNT)
-        .exclude(gamework_id__in=list(seen_ids))
-        .values("gamework_id")
-        .annotate(taste_score=Sum(score_case))
+        through.objects.filter(label_id=primary_tag_id)
+        .filter(work_id__in=governed_candidates.values("id"))
+        .filter(work__total_rating_count__gte=_MIN_CATALOGUE_RATING_COUNT)
+        .exclude(work_id__in=list(seen_ids))
+        .values("work_id")
+        .annotate(
+            taste_score=Value(
+                float(taste_weights[primary_tag_id]), output_field=FloatField()
+            )
+        )
+        .distinct()
         .order_by(
-            F("gamework__total_rating").desc(nulls_last=True),
+            F("work__total_rating").desc(nulls_last=True),
             "-taste_score",
-            "gamework__canonical_slug",
+            "work__canonical_slug",
         )[:candidate_pool]
     )
-    ordered_work_ids = [row["gamework_id"] for row in ranked_rows]
+    ordered_work_ids = [row["work_id"] for row in ranked_rows]
 
     works = (
         governed_candidates.filter(id__in=ordered_work_ids)
-        .prefetch_related("genres", "assets", "releases__platform")
+        .prefetch_related("curated_labels", "assets", "releases__platform")
         .in_bulk()
     )
 
@@ -261,19 +267,20 @@ def rank_genre_taste_v1(
         work = works.get(work_id)
         if work is None:
             continue
-        matched = [
-            {
-                "slug": genre.slug,
-                "name": genre.name,
-                "weight": round(taste_weights[genre.id], 3),
+        matched_by_id = {
+            tag.id: {
+                "slug": tag.slug,
+                "name": tag.name,
+                "weight": round(taste_weights[tag.id], 3),
             }
-            for genre in work.genres.all()
-            if genre.id in taste_weights
-        ]
+            for tag in work.curated_labels.all()
+            if tag.id in taste_weights
+        }
+        matched = list(matched_by_id.values())
         if not matched:
             continue
         matched.sort(key=lambda item: (-item["weight"], item["slug"]))
-        score = sum(taste_weights[genre.id] for genre in work.genres.all() if genre.id in taste_weights)
+        score = sum(taste_weights[tag_id] for tag_id in matched_by_id)
         scored.append((score, work.total_rating, work.canonical_slug, work, matched))
 
     # Authoritative order: exact taste score desc, catalogue rating desc
@@ -300,7 +307,7 @@ def rank_genre_taste_v1(
             "year": _release_year(work),
             "platform_summary": _platform_summary(work),
             "cover": _cover(work),
-            "matched_genres": matched,
+            "matched_tags": matched,
         }
         for score, rating, _slug, work, matched in scored
     ]
@@ -310,7 +317,7 @@ def rank_genre_taste_v1(
         "generated_at": generated_at.isoformat(),
         "input_snapshot_sha256": _fingerprint(
             taste_weights,
-            primary_genre_slug,
+            primary_tag_slug,
             [
                 (
                     item["slug"],
@@ -323,6 +330,6 @@ def rank_genre_taste_v1(
         ),
         "insufficient_history": False,
         "limitation": _LIMITATION,
-        "primary_genre": primary_genre,
+        "primary_tag": primary_tag,
         "results": results,
     }

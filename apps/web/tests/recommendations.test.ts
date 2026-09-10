@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   getPersonalRecommendations,
-  primaryGenreRecommendationShelf,
+  primaryTagRecommendationShelf,
   type PersonalRecommendationItem,
   type PersonalRecommendationsResult,
 } from "@/lib/api";
@@ -15,7 +15,7 @@ it("publishes a dedicated localized hybrid MMR shelf", () => {
 function makeItem(
   slug: string,
   score: number,
-  genres: Array<[slug: string, name: string, weight: number]>,
+  tags: Array<[slug: string, name: string, weight: number]>,
 ): PersonalRecommendationItem {
   return {
     work_id: `id-${slug}`,
@@ -28,7 +28,7 @@ function makeItem(
     year: null,
     platform_summary: "",
     cover: { url: null, is_placeholder: true, alt: `Title ${slug}` },
-    matched_genres: genres.map(([gslug, name, weight]) => ({ slug: gslug, name, weight })),
+    matched_tags: tags.map(([slug, name, weight]) => ({ slug, name, weight })),
   };
 }
 
@@ -36,7 +36,7 @@ function makeResult(
   overrides: Partial<PersonalRecommendationsResult> = {},
 ): PersonalRecommendationsResult {
   return {
-    algorithm_id: "genre-taste-v1",
+    algorithm_id: "tag-taste-v1",
     generated_at: "2026-09-06T00:00:00+00:00",
     input_snapshot_sha256: "deadbeef",
     insufficient_history: false,
@@ -46,18 +46,18 @@ function makeResult(
   };
 }
 
-describe("primaryGenreRecommendationShelf (REC-10)", () => {
+describe("primaryTagRecommendationShelf (REC-10)", () => {
   it("returns no shelves for the insufficient-history shape", () => {
-    expect(primaryGenreRecommendationShelf(makeResult({ insufficient_history: true }))).toBeNull();
+    expect(primaryTagRecommendationShelf(makeResult({ insufficient_history: true }))).toBeNull();
   });
 
   it("returns no shelves when there are no ranked results", () => {
-    expect(primaryGenreRecommendationShelf(makeResult({ results: [] }))).toBeNull();
+    expect(primaryTagRecommendationShelf(makeResult({ results: [] }))).toBeNull();
   });
 
   it("returns only the shelf for the primary library genre", () => {
     const result = makeResult({
-      primary_genre: { slug: "rpg", name: "RPG", entry_count: 6, weight: 8 },
+      primary_tag: { slug: "rpg", name: "RPG", entry_count: 6, weight: 8 },
       results: [
         makeItem("a", 10, [
           ["rpg", "RPG", 8],
@@ -68,10 +68,10 @@ describe("primaryGenreRecommendationShelf (REC-10)", () => {
       ],
     });
 
-    const shelf = primaryGenreRecommendationShelf(result);
+    const shelf = primaryTagRecommendationShelf(result);
 
-    expect(shelf?.genreSlug).toBe("rpg");
-    expect(shelf?.genre).toBe("RPG");
+    expect(shelf?.tagSlug).toBe("rpg");
+    expect(shelf?.tag).toBe("RPG");
     expect(shelf?.tasteWeight).toBe(8);
     expect(shelf?.items.map((i) => i.slug)).toEqual(["a"]);
   });
@@ -87,19 +87,19 @@ describe("primaryGenreRecommendationShelf (REC-10)", () => {
       ],
     });
 
-    const shelf = primaryGenreRecommendationShelf(result);
+    const shelf = primaryTagRecommendationShelf(result);
 
-    expect(shelf?.genreSlug).toBe("rpg");
+    expect(shelf?.tagSlug).toBe("rpg");
     expect(shelf?.items.map((i) => i.slug)).toEqual(["a"]);
   });
 
   it("caps the sole shelf at twenty items", () => {
     const result = makeResult({
-      primary_genre: { slug: "rpg", name: "RPG", entry_count: 30, weight: 10 },
+      primary_tag: { slug: "rpg", name: "RPG", entry_count: 30, weight: 10 },
       results: Array.from({ length: 25 }, (_, i) => makeItem(`w${i}`, 100 - i, [["rpg", "RPG", 10]])),
     });
 
-    expect(primaryGenreRecommendationShelf(result)?.items).toHaveLength(20);
+    expect(primaryTagRecommendationShelf(result)?.items).toHaveLength(20);
   });
 
   it("accepts an explicit product-safe item cap", () => {
@@ -109,7 +109,7 @@ describe("primaryGenreRecommendationShelf (REC-10)", () => {
       ),
     });
 
-    const shelf = primaryGenreRecommendationShelf(result, { maxItems: 12 });
+    const shelf = primaryTagRecommendationShelf(result, { maxItems: 12 });
     expect(shelf?.items).toHaveLength(12);
   });
 });

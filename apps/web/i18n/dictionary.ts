@@ -39,7 +39,7 @@ export interface Dictionary {
     filters: {
       heading: string;
       platform: string;
-      genre: string;
+      tag: string;
       yearFrom: string;
       yearTo: string;
       minRating: string;
@@ -58,7 +58,7 @@ export interface Dictionary {
       searchInList: string;
     };
     chip: {
-      genre: string;
+      tag: string;
       platform: string;
     };
   };
@@ -91,7 +91,7 @@ export interface Dictionary {
     ratingBreakdownExternalOnly: string;
     ratingBreakdownLocalOnly: string;
     igdbRating: string;
-    genres: string;
+    tags: string;
     platforms: string;
     releaseDate: string;
     summary: string;
@@ -119,7 +119,7 @@ export interface Dictionary {
      * confused with popularity (REC-02) or the Phase 6 recommender. */
     methodAlgorithm: string;
     shelfHeading: string;
-    /** "{genre}" -> the taste genre; per-shelf plain-language explainer. */
+    /** "{tag}" -> the taste tag; per-shelf plain-language explainer. */
     shelfEvidence: string;
     emptyHeading: string;
     emptyBody: string;
@@ -147,7 +147,7 @@ export interface Dictionary {
       hybrid: { heading: string; description: string };
       hybridMmr: { heading: string; description: string };
     };
-    genreDescription: string;
+    tagDescription: string;
     refreshPreparing: string;
     refreshUpdating: string;
     refreshNeedsCollectionChange: string;

@@ -25,7 +25,12 @@ from django.contrib.auth.models import AbstractBaseUser
 from catalogue.models import GameWork
 from library.models import LibraryEntry
 from recommendations._weights import _entry_weight
-from recommendations.content.features import FEATURE_SET_VERSION, coverage_report, feature_vector
+from recommendations.content.features import (
+    FEATURE_SET_VERSION,
+    coverage_report,
+    feature_vector,
+    tag_idf_profile,
+)
 from recommendations.models import WorkFeatureVector
 
 
@@ -47,7 +52,7 @@ class ProfileInputs:
     negative: dict[str, float]
     positive_entry_count: int
     positive_rating_sum_half_steps: int
-    negative_genres: tuple[str, ...]
+    negative_tags: tuple[str, ...]
 
     def as_dict(self) -> dict:
         return {
@@ -60,8 +65,8 @@ class ProfileInputs:
                 else None
             ),
             "own_rating_role": "seed_preference_intensity",
-            "negative_genre_minimum": _NEGATIVE_GENRE_MINIMUM,
-            "negative_genres": list(self.negative_genres),
+            "negative_tag_minimum": _NEGATIVE_GENRE_MINIMUM,
+            "negative_tags": list(self.negative_tags),
         }
 
 
@@ -73,45 +78,51 @@ def _l2_normalize(vector: dict[str, float]) -> dict[str, float]:
 
 
 def _load_vectors(
-    work_ids: list[object], corpus_version: str | None
+    work_ids: list[object],
+    corpus_version: str | None,
+    tag_idf: dict[str, float] | None = None,
 ) -> dict[object, dict[str, float]]:
     """Feature vector per work id -- cached rows first, computed fallback."""
 
     availability = coverage_report(corpus_version)
-    # A cache row does not carry the coverage decision that produced it. Once
-    # a newly imported facet clears its threshold, recompute instead of
-    # silently reusing a vector produced while that facet was unavailable.
+    # The vector cache is rebuilt as an offline, versioned materialisation. It
+    # is therefore safe to use it for optional facets too; missing rows alone
+    # fall back to a bounded prefetch instead of loading the whole catalogue.
     vectors: dict[object, dict[str, float]] = {}
-    if not (availability["include_franchise"] or availability["include_developer"]):
-        vectors = {
-            row["work_id"]: row["vector_json"]
-            for row in WorkFeatureVector.objects.filter(
-                work_id__in=work_ids, feature_set_version=FEATURE_SET_VERSION
-            ).values("work_id", "vector_json")
-        }
+    vectors = {
+        row["work_id"]: row["vector_json"]
+        for row in WorkFeatureVector.objects.filter(
+            work_id__in=work_ids, feature_set_version=FEATURE_SET_VERSION
+        ).values("work_id", "vector_json")
+    }
     missing = [work_id for work_id in work_ids if work_id not in vectors]
     if missing:
         for work in GameWork.objects.filter(id__in=missing).prefetch_related(
-            "genres", "releases__platform", "franchises", "developers"
+            "curated_labels", "releases__platform", "franchises", "developers"
         ):
             vectors[work.id] = feature_vector(
                 work,
                 include_franchise=availability["include_franchise"],
                 include_developer=availability["include_developer"],
+                tag_idf=tag_idf,
             )
     return vectors
 
 
 def build_profile(
-    user: AbstractBaseUser, corpus_version: str | None = None  # noqa: ARG001
+    user: AbstractBaseUser,
+    corpus_version: str | None = None,
+    tag_idf: dict[str, float] | None = None,
 ) -> dict[str, float]:
     """Return the positive component of :func:`build_profile_inputs`."""
 
-    return build_profile_inputs(user, corpus_version).positive
+    return build_profile_inputs(user, corpus_version, tag_idf).positive
 
 
 def build_profile_inputs(
-    user: AbstractBaseUser, corpus_version: str | None = None  # noqa: ARG001
+    user: AbstractBaseUser,
+    corpus_version: str | None = None,
+    tag_idf: dict[str, float] | None = None,
 ) -> ProfileInputs:
     """Build separated positive and safeguarded negative taste evidence.
 
@@ -128,13 +139,16 @@ def build_profile_inputs(
     if not entries:
         return ProfileInputs({}, {}, 0, 0, ())
 
-    vectors = _load_vectors([entry["work_id"] for entry in entries], corpus_version)
+    resolved_tag_idf = tag_idf if tag_idf is not None else tag_idf_profile(corpus_version)
+    vectors = _load_vectors(
+        [entry["work_id"] for entry in entries], corpus_version, resolved_tag_idf
+    )
 
     accumulator: dict[str, float] = {}
     total_weight = 0.0
     positive_entry_count = 0
     positive_rating_sum_half_steps = 0
-    negative_genre_counts: dict[str, int] = {}
+    negative_tag_counts: dict[str, int] = {}
     for entry in entries:
         status = entry["current_status"]
         rating = entry["rating_half_steps"]
@@ -146,8 +160,8 @@ def build_profile_inputs(
 
         if rating < _POSITIVE_RATING_MINIMUM:
             for key in normalized:
-                if key.startswith("genre:"):
-                    negative_genre_counts[key] = negative_genre_counts.get(key, 0) + 1
+                if key.startswith("tag:"):
+                    negative_tag_counts[key] = negative_tag_counts.get(key, 0) + 1
             continue
 
         weight = _entry_weight(entry["current_status"], entry["rating_half_steps"])
@@ -164,16 +178,16 @@ def build_profile_inputs(
         if total_weight > 0 and accumulator
         else {}
     )
-    negative_genres = tuple(
+    negative_tags = tuple(
         sorted(
-            key for key, count in negative_genre_counts.items() if count >= _NEGATIVE_GENRE_MINIMUM
+            key for key, count in negative_tag_counts.items() if count >= _NEGATIVE_GENRE_MINIMUM
         )
     )
-    negative = _l2_normalize({key: float(negative_genre_counts[key]) for key in negative_genres})
+    negative = _l2_normalize({key: float(negative_tag_counts[key]) for key in negative_tags})
     return ProfileInputs(
         positive,
         negative,
         positive_entry_count,
         positive_rating_sum_half_steps,
-        negative_genres,
+        negative_tags,
     )

@@ -86,7 +86,7 @@ class SyntheticPopulation:
 @dataclass(frozen=True)
 class _WorkCandidate:
     work_id: UUID
-    genres: frozenset[str]
+    tags: frozenset[str]
     first_release_date: date | None
     rating_count: int
     release_id: UUID | None
@@ -107,7 +107,7 @@ def _work_candidates(
         queryset = queryset.filter(rating_count__gte=minimum_rating_count)
     works = (
         queryset
-        .prefetch_related("genres", "releases__editions")
+        .prefetch_related("curated_labels", "releases__editions")
         .order_by("id")
     )
     candidates: list[_WorkCandidate] = []
@@ -118,7 +118,7 @@ def _work_candidates(
         candidates.append(
             _WorkCandidate(
                 work_id=work.id,
-                genres=frozenset(genre.slug for genre in work.genres.all()),
+                tags=frozenset(tag.slug for tag in work.curated_labels.all()),
                 first_release_date=work.first_release_date,
                 rating_count=work.rating_count or 0,
                 release_id=release.id if release is not None else None,
@@ -171,12 +171,12 @@ def _pool_for(
     preferred: set[str],
     works: list[_WorkCandidate],
 ) -> list[_WorkCandidate]:
-    matching = [work for work in works if work.genres.intersection(preferred)]
+    matching = [work for work in works if work.tags.intersection(preferred)]
     if len(matching) < archetype.library_size_range[1]:
         matching = works
     if archetype.saga_concentration and preferred:
         saga_genre = sorted(preferred)[0]
-        saga = [work for work in matching if saga_genre in work.genres]
+        saga = [work for work in matching if saga_genre in work.tags]
         if len(saga) >= archetype.library_size_range[0]:
             matching = saga + [work for work in matching if work not in saga]
     if archetype.release_bias == "recent":
@@ -225,13 +225,13 @@ def generate(
         raise SyntheticGenerationError(
             "the governed corpus contains no works with rating_count >= 1"
         )
-    available_genres = sorted({genre for work in works for genre in work.genres})
+    available_tags = sorted({tag for work in works for tag in work.tags})
     users: list[SyntheticUser] = []
     for archetype in selected:
         archetype_rng = random.Random(f"{seed}:{archetype.name}")
-        min_genres, max_genres = archetype.genre_pref_range
-        genre_count = min(archetype_rng.randint(min_genres, max_genres), len(available_genres))
-        preferred = set(archetype_rng.sample(available_genres, genre_count)) if genre_count else set()
+        min_tags, max_tags = archetype.genre_pref_range
+        tag_count = min(archetype_rng.randint(min_tags, max_tags), len(available_tags))
+        preferred = set(archetype_rng.sample(available_tags, tag_count)) if tag_count else set()
         pool = _pool_for(archetype, preferred, works)
         for ordinal in range(1, archetype.n_users + 1):
             user_rng = random.Random(f"{seed}:{archetype.name}:{ordinal}")

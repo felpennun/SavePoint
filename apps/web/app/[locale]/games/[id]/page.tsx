@@ -49,7 +49,7 @@ export default async function GameDetailPage({
   const platforms = Array.from(
     new Set(game.releases.map((release) => release.platform).filter((platform): platform is string => Boolean(platform))),
   );
-  const genres = game.genres ?? [];
+  const tags = game.tags ?? [];
   const releaseDate = game.releases
     .map((release) => release.release_date)
     .filter((date): date is string => Boolean(date))
@@ -128,17 +128,17 @@ export default async function GameDetailPage({
 
             <Synopsis text={game.summary} labels={dict.detail.synopsis} />
 
-            {genres.length > 0 ? (
+            {tags.length > 0 ? (
               <>
-                <h2 className="sp-h2">{dict.detail.genres}</h2>
+                <h2 className="sp-h2">{dict.detail.tags}</h2>
                 <div className="sp-chip-row">
-                  {genres.map((genre) => (
+                  {tags.map((tag) => (
                     <Link
-                      key={genre.slug}
-                      href={`/${locale}/catalogue?genre=${encodeURIComponent(genre.slug)}`}
+                      key={tag.slug}
+                      href={`/${locale}/catalogue?tag=${encodeURIComponent(tag.slug)}`}
                       className="sp-chip"
                     >
-                      {genre.name}
+                      {tag.name}
                     </Link>
                   ))}
                 </div>

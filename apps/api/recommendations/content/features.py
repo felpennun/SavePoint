@@ -3,7 +3,7 @@
 A feature vector is a sparse ``{feature_key: weight}`` dict over a governed
 ``GameWork``. Facets have a deliberately descending semantic importance:
 
-* ``genre:<slug>``  -- weight 0.50; guaranteed for every governed work.
+* ``tag:<slug>``  -- weight 0.75; emitted from the curated unified tag set.
 * ``platform:<slug>`` -- weight 0.25; allowlist platforms only.
 * ``franchise:<slug>`` -- weight 0.02; IGDB saga signal when present.
 * ``developer:<slug>`` -- weight 0.015; emitted when the governed
@@ -11,9 +11,11 @@ A feature vector is a sparse ``{feature_key: weight}`` dict over a governed
   minimum coverage gate: missing saga data is omitted per work. Developer
   coverage retains its 50 % gate (D-11).
 
-Within each facet the configured facet weight is divided by ``sqrt(k)`` for
-``k`` keys in that facet, so a work with many values in one family does not
-dominate the cosine numerator.
+Within the tag facet, smoothed inverse document frequency (IDF) gives rare
+curated tags more weight than generic ones. The resulting tag values are
+L2-normalised to the family weight, so the complete tag block remains 0.75
+regardless of the number or rarity of a work's tags. Other facets continue to
+divide their configured family weight by ``sqrt(k)`` for ``k`` observed keys.
 
 The **rating term is NOT a vector dimension** (threat T-02-10-01). The
 corpus-level genre rating statistic lives in :func:`genre_rating_profile`,
@@ -24,20 +26,24 @@ consumed by ``combine.py`` (Plan 02-11) -- never ``GameWork.total_rating``.
 from __future__ import annotations
 
 import math
+import os
+from contextlib import contextmanager
 from datetime import date
+from functools import lru_cache
+from typing import Iterator
 
-from django.db.models import Count
+from django.db.models import Count, Exists, OuterRef
 
 from catalogue.corpus import ALLOWLIST_SLUGS, evaluation_candidate_works, governed_works
-from catalogue.models import CorpusPopularitySnapshot, CorpusRatingSnapshot, GameWork, Genre
+from catalogue.models import CorpusPopularitySnapshot, CorpusRatingSnapshot, CuratedLabel, GameWork
 from catalogue.popularity import IGDB_ENGAGEMENT_TYPES
 
 # Bump when the vector-building or similarity rules change (part of the DTO,
-# REC-09). fs-v9 freezes F0.5 and calibrates small optional confirmation
+# REC-09). fs-v12 freezes curated-tag IDF, F0.5 and the optional confirmation
 # weights while keeping cached
 # vectors aligned with the shared facet contract. Cached rows from earlier
 # contracts must not be reused.
-FEATURE_SET_VERSION = "fs-v9"
+FEATURE_SET_VERSION = "fs-v12-curated-tags-idf"
 
 # Shared scalar-signal contract. The product workers and offline runner both
 # call the same ranker, so this version is included in the published
@@ -50,16 +56,23 @@ RATING_QUALITY_POWER = 2.0
 RATING_BAYESIAN_PRIOR_COUNT = 25.0
 RATING_CONFIDENCE_PRIOR_COUNT = RATING_BAYESIAN_PRIOR_COUNT
 
-# These weights express the semantic hierarchy of the content signal. fs-v9
-# uses genre/platform as the core and saga/developer as bounded confirmation
+# These weights express the semantic hierarchy of the content signal. The
+# current contract uses curated-tags/platform as the core and saga/developer
+# as bounded confirmation
 # bonuses. They remain part of the versioned contract, not request-time tuning
 # parameters.
 FACET_WEIGHTS: dict[str, float] = {
-    "genre": 0.50,
+    "tag": 0.75,
     "platform": 0.25,
     "franchise": 0.02,
     "developer": 0.015,
 }
+
+# IDF is frozen per governed corpus version and is part of the feature-set
+# contract. Additive smoothing keeps every observed tag finite, including a
+# tag that appears in exactly one work.
+TAG_IDF_FORMULA_VERSION = "smoothed-idf-l2-v1"
+TAG_IDF_SMOOTHING = 1.0
 
 # Saga/franchise is semantically meaningful even when sparse; absent facets are
 # omitted from each work vector instead of excluding the whole signal family.
@@ -68,6 +81,15 @@ FRANCHISE_COVERAGE_THRESHOLD = 0.0
 # differently from the explicitly requested saga signal.
 DEVELOPER_COVERAGE_THRESHOLD = 0.5
 
+@contextmanager
+def _feature_stats_lock() -> Iterator[None]:
+    """Keep the statistics hook cheap; immutable values are process-cached."""
+
+    # The previous advisory lock serialized all workers behind one expensive
+    # report. The EXISTS-based queries below are independent and the long-lived
+    # workers cache their corpus-version result, so no database lock is needed.
+    yield
+
 
 def _facet_weight(facet: str, count: int) -> float:
     """Return the configured family weight split across its observed values."""
@@ -75,8 +97,54 @@ def _facet_weight(facet: str, count: int) -> float:
     return FACET_WEIGHTS[facet] / math.sqrt(count) if count else 0.0
 
 
-def _genre_slugs(work: GameWork) -> list[str]:
-    return sorted({genre.slug for genre in work.genres.all()})
+def _tag_slugs(work: GameWork) -> list[str]:
+    return sorted({tag.slug for tag in work.curated_labels.all()})
+
+
+def _compute_tag_idf_profile(corpus_version: str | None = None) -> dict[str, float]:
+    """Return smoothed inverse-document-frequency values for curated tags.
+
+    ``N`` is the number of governed works in the selected corpus version and
+    ``df`` is the number of those works carrying each tag. The profile is a
+    corpus statistic, never user-specific, so web and offline ranking can use
+    the same frozen values.
+    """
+
+    with _feature_stats_lock():
+        works = governed_works(corpus_version)
+        document_count = works.count()
+        if not document_count:
+            return {}
+
+        through = GameWork.curated_labels.through
+        frequencies = (
+            through.objects.filter(work_id__in=works.values("id"))
+            .values("label_id")
+            .annotate(document_frequency=Count("work_id", distinct=True))
+        )
+        slug_by_id = dict(CuratedLabel.objects.values_list("id", "slug"))
+        return {
+            slug_by_id[row["label_id"]]: math.log(
+                (document_count + TAG_IDF_SMOOTHING)
+                / (row["document_frequency"] + TAG_IDF_SMOOTHING)
+            )
+            + 1.0
+            for row in frequencies
+            if row["label_id"] in slug_by_id
+        }
+
+
+@lru_cache(maxsize=8)
+def _cached_tag_idf_profile(corpus_version: str | None) -> dict[str, float]:
+    return _compute_tag_idf_profile(corpus_version)
+
+
+def tag_idf_profile(corpus_version: str | None = None) -> dict[str, float]:
+    """Return IDF values, cached only by long-lived worker processes."""
+
+    if os.environ.get("SAVEPOINT_RECOMMENDATION_STATS_CACHE") == "1":
+        return dict(_cached_tag_idf_profile(corpus_version))
+    return _compute_tag_idf_profile(corpus_version)
 
 
 def _platform_slugs(work: GameWork) -> list[str]:
@@ -102,6 +170,7 @@ def feature_vector(
     *,
     include_franchise: bool = False,
     include_developer: bool = False,
+    tag_idf: dict[str, float] | None = None,
     feature_set_version: str = FEATURE_SET_VERSION,  # noqa: ARG001  (reserved for future schemes)
 ) -> dict[str, float]:
     """Return the sparse content feature vector for ``work``.
@@ -112,10 +181,23 @@ def feature_vector(
 
     vector: dict[str, float] = {}
 
-    genre_slugs = _genre_slugs(work)
-    genre_weight = _facet_weight("genre", len(genre_slugs))
-    for slug in genre_slugs:
-        vector[f"genre:{slug}"] = genre_weight
+    tag_slugs = _tag_slugs(work)
+    if tag_slugs:
+        if tag_idf:
+            idf_values = {
+                slug: max(float(tag_idf.get(slug, 1.0)), 0.0)
+                for slug in tag_slugs
+            }
+            idf_norm = math.sqrt(math.fsum(value * value for value in idf_values.values()))
+            tag_values = {
+                slug: FACET_WEIGHTS["tag"] * value / idf_norm
+                for slug, value in idf_values.items()
+            } if idf_norm else {}
+        else:
+            tag_weight = _facet_weight("tag", len(tag_slugs))
+            tag_values = {slug: tag_weight for slug in tag_slugs}
+        for slug, value in tag_values.items():
+            vector[f"tag:{slug}"] = value
 
     platform_slugs = _platform_slugs(work)
     platform_weight = _facet_weight("platform", len(platform_slugs))
@@ -137,7 +219,7 @@ def feature_vector(
     return vector
 
 
-def coverage_report(corpus_version: str | None = None) -> dict:
+def _compute_coverage_report(corpus_version: str | None = None) -> dict:
     """Measure facet coverage and decide which signal families are emitted.
 
     IGDB ``franchise`` is the saga signal and is included whenever at least one
@@ -145,45 +227,60 @@ def coverage_report(corpus_version: str | None = None) -> dict:
     Developer keeps the documented 50 % coverage gate.
     """
 
-    works = governed_works(corpus_version)
-    total = works.count()
-    candidate_count = evaluation_candidate_works(corpus_version).count()
-    genre_present = works.filter(genres__isnull=False).distinct().count()
-    platform_present = works.filter(
-        releases__platform__slug__in=ALLOWLIST_SLUGS
-    ).distinct().count()
-    franchise_present = works.filter(franchises__isnull=False).distinct().count()
-    developer_present = works.filter(developers__isnull=False).distinct().count()
+    with _feature_stats_lock():
+        works = governed_works(corpus_version)
+        total = works.count()
+        candidate_count = evaluation_candidate_works(corpus_version).count()
 
-    franchise_coverage = franchise_present / total if total else 0.0
-    developer_coverage = developer_present / total if total else 0.0
+        # These used to be JOIN + DISTINCT counts over every GameWork column.
+        # EXISTS keeps the count on the indexed GameWork primary key and avoids
+        # materialising duplicate joined rows for multi-valued facets.
+        tag_present = works.filter(
+            Exists(GameWork.objects.filter(pk=OuterRef("pk"), curated_labels__isnull=False))
+        ).count()
+        platform_present = works.filter(
+            Exists(
+                GameWork.objects.filter(
+                    pk=OuterRef("pk"),
+                    releases__platform__slug__in=ALLOWLIST_SLUGS,
+                )
+            )
+        ).count()
+        franchise_present = works.filter(
+            Exists(GameWork.objects.filter(pk=OuterRef("pk"), franchises__isnull=False))
+        ).count()
+        developer_present = works.filter(
+            Exists(GameWork.objects.filter(pk=OuterRef("pk"), developers__isnull=False))
+        ).count()
 
-    snapshot_filter = CorpusRatingSnapshot.objects.filter(
-        work_id__in=works.values("id"),
-    )
-    if corpus_version is not None:
-        snapshot_filter = snapshot_filter.filter(corpus_version=corpus_version)
-    snapshot_rating_present = snapshot_filter.filter(rating__isnull=False).values("work_id").distinct().count()
-    snapshot_volume_present = snapshot_filter.filter(
-        total_rating_count__isnull=False
-    ).values("work_id").distinct().count()
-    popscore_present = (
-        CorpusPopularitySnapshot.objects.filter(
-            corpus_version=corpus_version,
-            work_id__in=works.values("id"),
-            popularity_type_name__in=IGDB_ENGAGEMENT_TYPES,
-            normalised_value__isnull=False,
+        snapshot_filter = CorpusRatingSnapshot.objects.filter(
+            work_id=OuterRef("pk"),
         )
-        .values("work_id")
-        .annotate(type_count=Count("popularity_type_name", distinct=True))
-        .filter(type_count=len(IGDB_ENGAGEMENT_TYPES))
-        .count()
-    )
-    dated_and_rated = works.filter(
-        first_release_date__isnull=False,
-        first_release_date__lte=date.today(),
-        id__in=snapshot_filter.filter(rating__isnull=False).values("work_id"),
-    ).distinct().count()
+        if corpus_version is not None:
+            snapshot_filter = snapshot_filter.filter(corpus_version=corpus_version)
+        snapshot_rating_exists = snapshot_filter.filter(rating__isnull=False)
+        snapshot_volume_exists = snapshot_filter.filter(total_rating_count__isnull=False)
+        snapshot_rating_present = works.filter(Exists(snapshot_rating_exists)).count()
+        snapshot_volume_present = works.filter(Exists(snapshot_volume_exists)).count()
+        popscore_present = (
+            CorpusPopularitySnapshot.objects.filter(
+                corpus_version=corpus_version,
+                work_id__in=works.values("id"),
+                popularity_type_name__in=IGDB_ENGAGEMENT_TYPES,
+                normalised_value__isnull=False,
+            )
+            .values("work_id")
+            .annotate(type_count=Count("popularity_type_name", distinct=True))
+            .filter(type_count=len(IGDB_ENGAGEMENT_TYPES))
+            .count()
+        )
+        dated_and_rated = works.filter(
+            first_release_date__isnull=False,
+            first_release_date__lte=date.today(),
+        ).filter(Exists(snapshot_rating_exists)).count()
+
+        franchise_coverage = franchise_present / total if total else 0.0
+        developer_coverage = developer_present / total if total else 0.0
 
     def field_coverage(present: int) -> dict[str, int | float]:
         return {
@@ -203,10 +300,16 @@ def coverage_report(corpus_version: str | None = None) -> dict:
             "prior_count": RATING_BAYESIAN_PRIOR_COUNT,
             "observation_count_source": "total_rating_count",
         },
+        "tag_idf": {
+            "formula_version": TAG_IDF_FORMULA_VERSION,
+            "smoothing": TAG_IDF_SMOOTHING,
+            "document_count": total,
+            "document_frequency_definition": "governed works carrying the curated tag",
+        },
         "governed_count": total,
         "algorithm_candidate_count": candidate_count,
         "feature_coverage": {
-            "genres": field_coverage(genre_present),
+            "tags": field_coverage(tag_present),
             "platforms": field_coverage(platform_present),
             "franchises": field_coverage(franchise_present),
             "developers": field_coverage(developer_present),
@@ -244,6 +347,19 @@ def coverage_report(corpus_version: str | None = None) -> dict:
             "popscore_complete": "missing primitive excludes composed PopScore",
         },
     }
+
+
+@lru_cache(maxsize=8)
+def _cached_coverage_report(corpus_version: str | None) -> dict:
+    return _compute_coverage_report(corpus_version)
+
+
+def coverage_report(corpus_version: str | None = None) -> dict:
+    """Return coverage, cached only by long-lived worker processes."""
+
+    if os.environ.get("SAVEPOINT_RECOMMENDATION_STATS_CACHE") == "1":
+        return dict(_cached_coverage_report(corpus_version))
+    return _compute_coverage_report(corpus_version)
 
 
 def normalise_rating(value: float | None) -> float | None:
@@ -352,8 +468,8 @@ def normalise_rating_volume(value: int | None, ceiling: int | None) -> float | N
     return math.log1p(value) / denominator
 
 
-def genre_rating_profile(corpus_version: str | None = None) -> dict[str, float]:
-    """Mean external rating per genre over governed works that carry a
+def tag_rating_profile(corpus_version: str | None = None) -> dict[str, float]:
+    """Mean external rating per curated tag over governed works that carry a
     ``CorpusRatingSnapshot`` rating for ``corpus_version``.
 
     A *corpus* statistic derived from the frozen snapshot, not user data, so
@@ -385,19 +501,24 @@ def genre_rating_profile(corpus_version: str | None = None) -> dict[str, float]:
         for work_id, ratings in per_work.items()
     }
 
-    through = GameWork.genres.through
-    genre_slug_by_id = dict(Genre.objects.values_list("id", "slug"))
+    through = GameWork.curated_labels.through
+    tag_slug_by_id = dict(CuratedLabel.objects.values_list("id", "slug"))
     buckets: dict[str, list[float]] = {}
-    for work_id, genre_id in through.objects.filter(
-        gamework_id__in=work_rating
-    ).values_list("gamework_id", "genre_id"):
-        slug = genre_slug_by_id.get(genre_id)
+    for work_id, tag_id in through.objects.filter(
+        work_id__in=work_rating
+    ).values_list("work_id", "label_id"):
+        slug = tag_slug_by_id.get(tag_id)
         if slug is not None:
             buckets.setdefault(slug, []).append(work_rating[work_id])
 
     return {
         slug: math.fsum(values) / len(values) for slug, values in buckets.items()
     }
+
+
+# Compatibility alias for historical experiment callers. New workers must use
+# the curated-tag name and the ``tag:`` vector namespace.
+genre_rating_profile = tag_rating_profile
 
 
 def corpus_rating_prior(

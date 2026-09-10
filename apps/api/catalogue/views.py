@@ -119,7 +119,7 @@ class GameDetailView(APIView):
                     "releases__editions",
                     "assets",
                     "source_records",
-                    "genres",
+                    "curated_labels",
                     "related_children__child_work__assets",
                     "related_children__child_work__releases__platform",
                 )
@@ -153,7 +153,7 @@ class NewReleasesView(APIView):
         works_by_id = {
             str(work.id): work
             for work in GameWork.objects.filter(pk__in=snapshot.work_ids).prefetch_related(
-                "assets", "releases__platform", "genres"
+                "assets", "releases__platform", "curated_labels"
             )
         }
         # Preserve the frozen order; drop any id that has since disappeared.

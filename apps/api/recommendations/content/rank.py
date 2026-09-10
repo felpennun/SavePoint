@@ -9,6 +9,7 @@ from datetime import date, datetime, timezone
 from typing import Any, Callable
 
 from django.contrib.auth.models import AbstractBaseUser
+from django.db.models import Exists, OuterRef
 
 from catalogue.corpus import evaluation_candidate_works
 from catalogue.models import CorpusRatingSnapshot, GameWork
@@ -24,13 +25,14 @@ from recommendations.content.features import (
     corpus_rating_prior,
     coverage_report,
     feature_vector,
-    genre_rating_profile,
+    tag_rating_profile,
     normalise_rating,
     normalise_rating_volume,
     rating_bayesian_normalized,
     rating_confidence,
     rating_final,
     rating_quality,
+    tag_idf_profile,
 )
 from recommendations.content.profile import ProfileInputs, build_profile_inputs
 from recommendations.content.recency import recency_score
@@ -105,6 +107,7 @@ def _load_candidate_vectors(
     spec: VariantSpec,
     corpus_version: str | None,
     prepared_vectors: dict[object, dict[str, float]] | None = None,
+    tag_idf: dict[str, float] | None = None,
     should_continue: Callable[[], bool] | None = None,
 ) -> dict[object, dict[str, float]]:
     if prepared_vectors is not None:
@@ -115,25 +118,29 @@ def _load_candidate_vectors(
         }
     availability = coverage_report(corpus_version)
     work_ids = [work.id for work in works]
-    cached: dict[object, dict[str, float]] = {}
-    if not (availability["include_franchise"] or availability["include_developer"]):
-        cached = {
-            row["work_id"]: row["vector_json"]
-            for row in WorkFeatureVector.objects.filter(
-                work_id__in=work_ids, feature_set_version=spec.feature_set_version
-            ).values("work_id", "vector_json")
-        }
+    cached: dict[object, dict[str, float]] = {
+        row["work_id"]: row["vector_json"]
+        for row in WorkFeatureVector.objects.filter(
+            work_id__in=work_ids, feature_set_version=spec.feature_set_version
+        ).values("work_id", "vector_json")
+    }
+    missing_work_map = {
+        work.id: work
+        for work in GameWork.objects.filter(id__in=[work_id for work_id in work_ids if work_id not in cached])
+        .prefetch_related("curated_labels", "releases__platform", "franchises", "developers")
+    }
     for index, work in enumerate(works):
         if index % _CANCELLATION_CHECK_INTERVAL == 0:
             _ensure_current(should_continue)
-        cached.setdefault(
-            work.id,
-            feature_vector(
-                work,
-                include_franchise=availability["include_franchise"],
-                include_developer=availability["include_developer"],
-                feature_set_version=FEATURE_SET_VERSION,
-            ),
+        if work.id in cached:
+            continue
+        source_work = missing_work_map.get(work.id, work)
+        cached[work.id] = feature_vector(
+            source_work,
+            include_franchise=availability["include_franchise"],
+            include_developer=availability["include_developer"],
+            tag_idf=tag_idf,
+            feature_set_version=FEATURE_SET_VERSION,
         )
     return cached
 
@@ -295,15 +302,20 @@ def _cold_start_results(
     corpus_version: str | None,
     profile: dict[str, float],
     snapshot_stats: dict[object, tuple[float | None, int, int | None]],
-    genre_profile: dict[str, float],
+    tag_profile: dict[str, float],
     popscore_by_work: dict[object, float],
     recency_by_work: dict[object, float],
     rating_prior: float | None,
+    tag_idf: dict[str, float],
     should_continue: Callable[[], bool] | None,
 ) -> list[dict]:
     base_spec = _base_spec(spec)
     vectors = _load_candidate_vectors(
-        works, base_spec, corpus_version, should_continue=should_continue
+        works,
+        base_spec,
+        corpus_version,
+        tag_idf=tag_idf,
+        should_continue=should_continue,
     )
     volume_ceiling = max(
         (total_count or 0 for _rating, _count, total_count in snapshot_stats.values()),
@@ -317,7 +329,7 @@ def _cold_start_results(
         rt, fallback = rating_term(
             work,
             corpus_version,
-            genre_profile,
+            tag_profile,
             snapshot_stats,
             rating_prior,
         )
@@ -376,7 +388,8 @@ def rank_content_v1(
     generated_at: datetime | None = None,
     eligibility_cutoff_date: date | None = None,
     min_rating_count: int | None = None,
-    genre_profile: dict[str, float] | None = None,
+    tag_profile: dict[str, float] | None = None,
+    tag_idf: dict[str, float] | None = None,
     prepared: dict[str, Any] | None = None,
     should_continue: Callable[[], bool] | None = None,
     _limit_cap: int | None = None,
@@ -405,19 +418,24 @@ def rank_content_v1(
         else:
             candidate_query = candidate_query.exclude(id__in=seen_ids)
         candidates = list(
-            candidate_query.filter(genres__isnull=False)
-            .prefetch_related("genres", "releases__platform", "franchises", "developers")
-            .distinct()
+            candidate_query.filter(
+                Exists(GameWork.objects.filter(pk=OuterRef("pk"), curated_labels__isnull=False))
+            )
         )
         snapshot_sha256 = _snapshot_sha256(corpus_version, {work.id for work in candidates} | seen_ids)
     _ensure_current(should_continue)
-    profile_inputs = build_profile_inputs(user, corpus_version)
+    resolved_tag_idf = (
+        tag_idf
+        if tag_idf is not None
+        else (prepared.get("tag_idf") if prepared is not None else None)
+    ) or tag_idf_profile(corpus_version)
+    profile_inputs = build_profile_inputs(user, corpus_version, resolved_tag_idf)
     profile = profile_inputs.positive
-    resolved_genre_profile = (
-        genre_profile
-        if genre_profile is not None
-        else (prepared.get("genre_profile") if prepared is not None else None)
-    ) or genre_rating_profile(corpus_version)
+    resolved_tag_profile = (
+        tag_profile
+        if tag_profile is not None
+        else (prepared.get("tag_profile") if prepared is not None else None)
+    ) or tag_rating_profile(corpus_version)
     if prepared is not None and "snapshot_stats" in prepared:
         snapshot_stats = prepared["snapshot_stats"]
     else:
@@ -474,10 +492,11 @@ def rank_content_v1(
             corpus_version,
             profile,
             snapshot_stats,
-            resolved_genre_profile,
+            resolved_tag_profile,
             popscore_by_work,
             recency_by_work,
             rating_prior,
+            resolved_tag_idf,
             should_continue,
         )
         return _dto(
@@ -497,6 +516,7 @@ def rank_content_v1(
         base_spec,
         corpus_version,
         prepared_vectors=(prepared or {}).get("vectors"),
+        tag_idf=resolved_tag_idf,
         should_continue=should_continue,
     )
     volume_ceiling = max(
@@ -521,7 +541,7 @@ def rank_content_v1(
         rt, fallback = rating_term(
             work,
             corpus_version,
-            resolved_genre_profile,
+            resolved_tag_profile,
             snapshot_stats,
             rating_prior,
         )

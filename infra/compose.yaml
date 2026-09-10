@@ -125,6 +125,10 @@ services:
       service: api
     network_mode: "service:api"
     command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id content-cbf-weighted-v1
+    environment:
+      # Corpus statistics are immutable per version; cache them in each
+      # long-lived worker so every algorithm does not repeat the same scans.
+      SAVEPOINT_RECOMMENDATION_STATS_CACHE: "1"
     ports: !reset []
     healthcheck:
       disable: true
@@ -153,10 +157,10 @@ services:
       service: recommendation-worker-weighted
     command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id recency-v1
 
-  recommendation-worker-genre:
+  recommendation-worker-tags:
     extends:
       service: recommendation-worker-weighted
-    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id genre-taste-v1
+    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id tag-taste-v1
 
   recommendation-worker-weighted-pop:
     extends:

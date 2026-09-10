@@ -5,7 +5,7 @@
  *
  * The `sort` and `min_rating` vocabularies are fixed client-side; the
  * catalogue API validates them again and returns a bounded 400 for anything
- * off-list (RESEARCH security V5). Platform/genre slugs are open-ended (the
+ * off-list (RESEARCH security V5). Platform/tag slugs are open-ended (the
  * real option lists come from the API `facets` payload at request time), so
  * `parseFilters` passes them through untouched and lets the server drop any
  * value it does not recognise.
@@ -32,7 +32,7 @@ export interface FilterOption {
   label: string;
 }
 
-export const FILTER_PARAM_KEYS = ["q", "platform", "genre", "year_from", "year_to", "min_rating", "sort"] as const;
+export const FILTER_PARAM_KEYS = ["q", "platform", "tag", "year_from", "year_to", "min_rating", "sort"] as const;
 
 /** Stable presentation order for the governed platform allowlist. Current
  * consoles come first, followed by previous generations and other platforms.
@@ -90,7 +90,7 @@ export function sortPlatformOptions(options: FilterOption[]): FilterOption[] {
 export interface CatalogueFilters {
   q?: string;
   platform: string[];
-  genre: string[];
+  tag: string[];
   year_from?: string;
   year_to?: string;
   min_rating?: string;
@@ -98,7 +98,7 @@ export interface CatalogueFilters {
 }
 
 /** Parse + validate raw searchParams into a safe filter object. Unknown
- * min_rating values are dropped; platform/genre slugs pass through (the API
+ * min_rating values are dropped; platform/tag slugs pass through (the API
  * validates them); years are clamped and swapped if from > to. */
 export function parseFilters(
   sp: Record<string, string | string[] | undefined>,
@@ -113,7 +113,7 @@ export function parseFilters(
 
   const q = firstValue(sp.q)?.trim() || undefined;
   const platform = normalizeFacet(sp.platform);
-  const genre = normalizeFacet(sp.genre);
+  const tag = normalizeFacet(sp.tag);
   const minRatingRaw = firstValue(sp.min_rating);
   const minRating = (MIN_RATING_OPTIONS as readonly string[]).includes(minRatingRaw ?? "") ? minRatingRaw : undefined;
 
@@ -130,7 +130,7 @@ export function parseFilters(
   return {
     q,
     platform,
-    genre,
+    tag,
     year_from: from != null ? String(from) : undefined,
     year_to: to != null ? String(to) : undefined,
     min_rating: minRating,
@@ -144,7 +144,7 @@ export function countActiveFilters(f: CatalogueFilters): number {
   let n = 0;
   if (f.q) n += 1;
   n += f.platform.length;
-  n += f.genre.length;
+  n += f.tag.length;
   if (f.year_from) n += 1;
   if (f.year_to) n += 1;
   if (f.min_rating) n += 1;
@@ -159,8 +159,8 @@ export function buildQuery(f: Partial<CatalogueFilters>, page?: number): string 
   if (f.platform) {
     for (const platform of f.platform) params.append("platform", platform);
   }
-  if (f.genre) {
-    for (const genre of f.genre) params.append("genre", genre);
+  if (f.tag) {
+    for (const tag of f.tag) params.append("tag", tag);
   }
   if (f.year_from) params.set("year_from", f.year_from);
   if (f.year_to) params.set("year_to", f.year_to);
@@ -173,7 +173,7 @@ export function buildQuery(f: Partial<CatalogueFilters>, page?: number): string 
 
 /** Remove one occurrence of a repeated query parameter while preserving all
  * other values and parameters. */
-export function removeHref(current: string, key: "genre" | "platform", value: string): string {
+export function removeHref(current: string, key: "tag" | "platform", value: string): string {
   const params = new URLSearchParams(current.startsWith("?") ? current.slice(1) : current);
   const next = new URLSearchParams();
   let removed = false;

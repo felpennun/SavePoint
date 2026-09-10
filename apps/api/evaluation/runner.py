@@ -37,7 +37,8 @@ from recommendations.content.features import (
     FEATURE_SET_VERSION,
     coverage_report,
     feature_vector,
-    genre_rating_profile,
+    tag_idf_profile,
+    tag_rating_profile,
 )
 from recommendations.content.rank import rank_content_v1
 from recommendations.collaborative import rank_collaborative_user_knn_v1
@@ -187,7 +188,7 @@ def _content_algorithm(*, user, candidate_ids, corpus_version, algorithm_id, **_
         corpus_version=corpus_version,
         candidate_ids=candidate_ids,
         min_rating_count=None,
-        genre_profile=_kwargs.get("genre_profile"),
+        tag_profile=_kwargs.get("tag_profile"),
         prepared=_kwargs.get("prepared"),
     )
     return {"candidate_ids": list(candidate_ids), **payload}
@@ -213,7 +214,7 @@ def _hybrid_algorithm(*, user, candidate_ids, corpus_version, **kwargs):
         corpus_version=corpus_version,
         reference_user_ids=kwargs.get("prepared", {}).get("training_user_ids", ()),
         prepared=kwargs.get("prepared"),
-        genre_profile=kwargs.get("genre_profile"),
+        tag_profile=kwargs.get("tag_profile"),
     )
     return {"candidate_ids": list(candidate_ids), **payload}
 
@@ -226,7 +227,7 @@ def _hybrid_mmr_algorithm(*, user, candidate_ids, corpus_version, **kwargs):
         corpus_version=corpus_version,
         reference_user_ids=kwargs.get("prepared", {}).get("training_user_ids", ()),
         prepared=kwargs.get("prepared"),
-        genre_profile=kwargs.get("genre_profile"),
+        tag_profile=kwargs.get("tag_profile"),
     )
     return {"candidate_ids": list(candidate_ids), **payload}
 
@@ -384,12 +385,13 @@ def run(
 
     algorithm_map = dict(algorithms or default_algorithms())
     algorithm_artifacts: dict[str, Any] = {}
-    evaluation_genre_profile = genre_rating_profile(corpus_version)
+    evaluation_tag_profile = tag_rating_profile(corpus_version)
+    evaluation_tag_idf = tag_idf_profile(corpus_version)
     signal_availability = coverage_report(corpus_version)
     evaluation_works = list(
         evaluation_candidate_works(corpus_version)
-        .filter(genres__isnull=False)
-        .prefetch_related("genres", "releases__platform", "franchises", "developers")
+        .filter(curated_labels__isnull=False)
+        .prefetch_related("curated_labels", "releases__platform", "franchises", "developers")
     )
     snapshot_rows = CorpusRatingSnapshot.objects.filter(
         work_id__in=[work.id for work in evaluation_works], rating__isnull=False,
@@ -422,11 +424,13 @@ def run(
                 work,
                 include_franchise=signal_availability["include_franchise"],
                 include_developer=signal_availability["include_developer"],
+                tag_idf=evaluation_tag_idf,
                 feature_set_version=FEATURE_SET_VERSION,
             )
             for work in evaluation_works
         },
-        "genre_profile": evaluation_genre_profile,
+        "tag_profile": evaluation_tag_profile,
+        "tag_idf": evaluation_tag_idf,
         "snapshot_stats": evaluation_snapshot_stats,
         "snapshot_sha256": actual_snapshot_hash,
         "popscore_snapshot_sha256": actual_popscore_hash,
@@ -460,7 +464,7 @@ def run(
                 heldout_work_id=heldout_id,
                 protocol=protocol,
                 corpus_version=corpus_version,
-                genre_profile=evaluation_genre_profile,
+                tag_profile=evaluation_tag_profile,
                 prepared=evaluation_prepared,
             )
             ranked_ids, declared_candidates = _ranked_ids(result)

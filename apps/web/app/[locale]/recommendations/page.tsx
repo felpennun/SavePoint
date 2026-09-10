@@ -8,7 +8,7 @@ import { RecommendationsClient } from "@/components/RecommendationsClient";
  *
  * The independent D-04 personalized page: it wires the D-09 backend
  * contract (`GET /api/recommendations/genre-taste/`, `IsAuthenticated`)
- * into horizontal shelves for the content recommender, genre taste, and
+ * into horizontal shelves for the content recommender, tag taste, and
  * owned downloadable content. Each shelf has a localized visible heading;
  * algorithm explanations remain in the thesis and are not mixed into this
  * product surface.

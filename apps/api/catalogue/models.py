@@ -132,6 +132,74 @@ class Keyword(models.Model):
         return self.name
 
 
+class Subgenre(models.Model):
+    """A curated, versioned subgenre derived from raw IGDB keywords.
+
+    ``Keyword`` remains the immutable-ish raw provider layer. This separate
+    entity is the only layer that a recommender may consume after an explicit
+    curation run has published its versioned mapping.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=200, unique=True)
+    curation_version = models.CharField(max_length=64)
+    source_keywords = models.ManyToManyField(
+        Keyword,
+        through="SubgenreKeyword",
+        related_name="subgenres",
+    )
+
+    class Meta:
+        ordering = ("name",)
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class SubgenreKeyword(models.Model):
+    """Traceable link from one raw IGDB keyword to one canonical subgenre."""
+
+    subgenre = models.ForeignKey(Subgenre, on_delete=models.CASCADE)
+    keyword = models.ForeignKey(Keyword, on_delete=models.PROTECT)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=("subgenre", "keyword"),
+                name="catalogue_unique_subgenre_keyword",
+            )
+        ]
+
+
+class CuratedLabel(models.Model):
+    """Versioned editorial label exposed by the catalogue taxonomy.
+
+    The label list intentionally spans genres, subgenres, themes, modes and
+    product features. ``kind`` preserves that semantic distinction for
+    recommenders while the UI may present one unified filter vocabulary.
+    """
+
+    class Kind(models.TextChoices):
+        GENRE = "genre", "Genre"
+        SUBGENRE = "subgenre", "Subgenre"
+        THEME = "theme", "Theme"
+        MODE = "mode", "Mode"
+        FEATURE = "feature", "Feature"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=120, unique=True)
+    slug = models.SlugField(max_length=120, unique=True)
+    kind = models.CharField(max_length=16, choices=Kind.choices)
+    curation_version = models.CharField(max_length=64)
+
+    class Meta:
+        ordering = ("name",)
+
+    def __str__(self) -> str:
+        return self.name
+
+
 class Developer(models.Model):
     """An IGDB company explicitly marked as a developer for a work."""
 
@@ -186,6 +254,13 @@ class GameWork(models.Model):
     )
     game_modes = models.ManyToManyField(GameMode, blank=True, related_name="works")
     keywords = models.ManyToManyField(Keyword, blank=True, related_name="works")
+    subgenres = models.ManyToManyField(Subgenre, blank=True, related_name="works")
+    curated_labels = models.ManyToManyField(
+        CuratedLabel,
+        through="GameWorkCuratedLabel",
+        blank=True,
+        related_name="works",
+    )
 
     class Meta:
         ordering = ("original_title", "id")
@@ -201,6 +276,37 @@ class GameWork(models.Model):
 
     def __str__(self) -> str:
         return self.original_title
+
+
+class GameWorkCuratedLabel(models.Model):
+    """Traceable evidence linking a work to one editorial label."""
+
+    class SourceKind(models.TextChoices):
+        GENRE = "genre", "Genre"
+        THEME = "theme", "Theme"
+        GAME_MODE = "game_mode", "Game mode"
+        PLAYER_PERSPECTIVE = "player_perspective", "Player perspective"
+        KEYWORD = "keyword", "Keyword"
+        SUBGENRE = "subgenre", "Subgenre"
+
+    work = models.ForeignKey(GameWork, on_delete=models.CASCADE)
+    label = models.ForeignKey(CuratedLabel, on_delete=models.CASCADE)
+    source_kind = models.CharField(max_length=24, choices=SourceKind.choices)
+    source_value = models.CharField(max_length=200)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=("work", "label", "source_kind", "source_value"),
+                name="catalogue_unique_curated_label_evidence",
+            )
+        ]
+        indexes = [
+            models.Index(
+                fields=("label", "work"),
+                name="cat_cur_label_work_idx",
+            )
+        ]
 
 
 class Platform(models.Model):
@@ -532,7 +638,6 @@ class AssetAttribution(models.Model):
 
     def __str__(self) -> str:
         return f"asset for {self.work} ({'allowed' if self.display_allowed else 'placeholder'})"
-
 
 
 class NewReleasesSnapshot(models.Model):

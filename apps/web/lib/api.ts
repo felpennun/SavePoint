@@ -22,7 +22,7 @@ export interface Cover {
   attribution?: CoverAttribution;
 }
 
-export interface GenreRef {
+export interface TagRef {
   slug: string;
   name: string;
 }
@@ -40,8 +40,8 @@ export interface GameCard {
   display_rating?: number | null;
   /** Number of IGDB user/critic ratings used by the relevance threshold. */
   total_rating_count?: number | null;
-  /** IGDB genres for this work (CAT-02). */
-  genres?: GenreRef[];
+  /** Curated unified tags for this work. */
+  tags?: TagRef[];
 }
 
 export interface FacetOption {
@@ -52,7 +52,7 @@ export interface FacetOption {
 
 export interface CatalogueFacets {
   platforms: FacetOption[];
-  genres: FacetOption[];
+  tags: FacetOption[];
   year_range: { min: number | null; max: number | null };
 }
 
@@ -60,7 +60,7 @@ export interface CatalogueListParams {
   q?: string;
   page?: number;
   platform?: string[];
-  genre?: string[];
+  tag?: string[];
   year_from?: string;
   year_to?: string;
   min_rating?: string;
@@ -130,8 +130,8 @@ export interface GameDetail {
   releases: Release[];
   related_content: RelatedContentItem[];
   provenance: Provenance | null;
-  /** Wired by Plan 03; absent -> the genres row is omitted. */
-  genres?: GenreRef[];
+  /** Curated unified tags; absent -> the tags row is omitted. */
+  tags?: TagRef[];
   /** IGDB total_rating (0-100). Wired by Plan 03; absent -> no ScorePill. */
   total_rating?: number | null;
 }
@@ -160,8 +160,8 @@ export async function fetchCatalogueList(params: CatalogueListParams = {}): Prom
   if (params.platform) {
     for (const platform of params.platform) url.searchParams.append("platform", platform);
   }
-  if (params.genre) {
-    for (const genre of params.genre) url.searchParams.append("genre", genre);
+  if (params.tag) {
+    for (const tag of params.tag) url.searchParams.append("tag", tag);
   }
   if (params.year_from) url.searchParams.set("year_from", params.year_from);
   if (params.year_to) url.searchParams.set("year_to", params.year_to);
@@ -271,10 +271,10 @@ export async function fetchMyLibrary(cookieHeader: string): Promise<MyLibraryRes
   return (await response.json()) as MyLibraryResult;
 }
 
-/** Per-item genre-overlap evidence from the genre-taste-v1 heuristic: a
- * genre the recommended work shares with the signed-in user's own rated /
- * status-tracked library, plus that genre's accumulated taste weight. */
-export interface RecommendationMatchedGenre {
+/** Per-item tag-overlap evidence from the tag-taste-v1 heuristic: a
+ * tag the recommended work shares with the signed-in user's own rated /
+ * status-tracked library, plus that tag's accumulated taste weight. */
+export interface RecommendationMatchedTag {
   slug: string;
   name: string;
   weight: number;
@@ -294,7 +294,7 @@ export interface PersonalRecommendationItem {
   year: number | null;
   platform_summary: string;
   cover: Cover;
-  matched_genres: RecommendationMatchedGenre[];
+  matched_tags: RecommendationMatchedTag[];
 }
 
 export interface ContentRecommendationItem {
@@ -302,7 +302,7 @@ export interface ContentRecommendationItem {
   slug: string;
   title: string;
   score: number;
-  contributions: { genre: string; contribution_pct: number }[];
+  contributions: { tag: string; contribution_pct: number }[];
   rating_term: number;
   rating_term_is_fallback: boolean;
   /** Product-facing blended rating, shared with catalogue and detail cards. */
@@ -336,7 +336,7 @@ export interface ContentRecommendationItem {
 export interface ContentRecommendationReason {
   kind: "signal_overlap";
     signals: {
-      kind: "genre" | "platform" | "franchise" | "developer";
+      kind: "tag" | "platform" | "franchise" | "developer";
       slug: string;
       name: string;
     }[];
@@ -376,7 +376,7 @@ export interface RecommendationSnapshotResult {
   error: string | null;
   sections: {
     content: Record<string, ContentRecommendationsResult>;
-    genre: PersonalRecommendationsResult;
+    tags: PersonalRecommendationsResult;
   } | null;
 }
 
@@ -434,7 +434,7 @@ export async function getOwnedDlc(cookieHeader: string): Promise<OwnedDlcResult>
   return (await response.json()) as OwnedDlcResult;
 }
 
-/** The allowlisted DTO of the authenticated genre-taste recommender
+/** The allowlisted DTO of the authenticated tag-taste recommender
  * (REC-10, Plan 01.1-05). `algorithm_id` + `limitation` are surfaced
  * verbatim on the page so this personal heuristic can never be confused
  * with the public popularity baseline (REC-02) or the Phase 6 research
@@ -447,7 +447,7 @@ export interface PersonalRecommendationsResult {
   input_snapshot_sha256: string;
   insufficient_history: boolean;
   limitation: string;
-  primary_genre?: {
+  primary_tag?: {
     slug: string;
     name: string;
     entry_count: number;
@@ -461,18 +461,18 @@ export type PersonalRecommendationsResponse =
   | { kind: "unauthorized" }
   | { kind: "error" };
 
-/** The single deterministic genre shelf shown in the product. */
+/** The single deterministic tag shelf shown in the product. */
 export interface PersonalRecommendationShelf {
   /** Display name of the taste genre this shelf is built around. */
-  genre: string;
-  genreSlug: string;
-  /** The user's accumulated taste weight for this genre (shelf ordering). */
+  tag: string;
+  tagSlug: string;
+  /** The user's accumulated taste weight for this tag (shelf ordering). */
   tasteWeight: number;
   items: PersonalRecommendationItem[];
 }
 
 /**
- * Personalized genre-taste recommendations (REC-10). Server-side only: a
+ * Personalized tag-taste recommendations (REC-10). Server-side only: a
  * Server Component's own `fetch()` does not carry the visitor's cookies,
  * so the session cookie read from the incoming request must be forwarded
  * explicitly (same pattern as `fetchMyLibrary`). The endpoint is
@@ -500,34 +500,34 @@ export async function getPersonalRecommendations(
   }
 }
 
-/** Return only the dominant-library-genre shelf, capped at 20 items. */
-export function primaryGenreRecommendationShelf(
+/** Return only the dominant-library-tag shelf, capped at 20 items. */
+export function primaryTagRecommendationShelf(
   result: PersonalRecommendationsResult,
   { maxItems = 20 }: { maxItems?: number } = {},
 ): PersonalRecommendationShelf | null {
   if (result.insufficient_history || result.results.length === 0) return null;
 
-  const genres = new Map<string, { name: string; weight: number }>();
+  const tags = new Map<string, { name: string; weight: number }>();
   for (const item of result.results) {
-    for (const genre of item.matched_genres) {
-      const existing = genres.get(genre.slug);
-      if (!existing || genre.weight > existing.weight) {
-        genres.set(genre.slug, { name: genre.name, weight: genre.weight });
+    for (const tag of item.matched_tags) {
+      const existing = tags.get(tag.slug);
+      if (!existing || tag.weight > existing.weight) {
+        tags.set(tag.slug, { name: tag.name, weight: tag.weight });
       }
     }
   }
 
-  const fallback = [...genres.entries()]
+  const fallback = [...tags.entries()]
     .sort(([slugA, a], [slugB, b]) => b.weight - a.weight || slugA.localeCompare(slugB))[0];
-  const primary = result.primary_genre ?? (fallback
+  const primary = result.primary_tag ?? (fallback
     ? { slug: fallback[0], name: fallback[1].name, weight: fallback[1].weight }
     : null);
   if (primary === null) return null;
   const items = result.results
-    .filter((item) => item.matched_genres.some((genre) => genre.slug === primary.slug))
+    .filter((item) => item.matched_tags.some((tag) => tag.slug === primary.slug))
     .slice(0, maxItems);
   return items.length > 0
-    ? { genre: primary.name, genreSlug: primary.slug, tasteWeight: primary.weight, items }
+    ? { tag: primary.name, tagSlug: primary.slug, tasteWeight: primary.weight, items }
     : null;
 }
 

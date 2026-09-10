@@ -20,6 +20,7 @@ from recommendations.content.features import (
     FEATURE_SET_VERSION,
     coverage_report,
     feature_vector,
+    tag_idf_profile,
 )
 from recommendations.models import WorkFeatureVector
 
@@ -50,11 +51,12 @@ class Command(BaseCommand):
         batch_size = options["batch_size"]
 
         report = coverage_report(corpus_version)
+        tag_idf = tag_idf_profile(corpus_version)
         include_franchise = report["include_franchise"]
         include_developer = report["include_developer"]
 
         queryset = governed_works(corpus_version).prefetch_related(
-            "genres", "releases__platform", "franchises", "developers"
+            "curated_labels", "releases__platform", "franchises", "developers"
         )
 
         created = 0
@@ -91,6 +93,7 @@ class Command(BaseCommand):
                         work,
                         include_franchise=include_franchise,
                         include_developer=include_developer,
+                        tag_idf=tag_idf,
                     ),
                     updated_at=timezone.now(),
                 )
@@ -107,6 +110,7 @@ class Command(BaseCommand):
             "vectors_updated": updated,
             "include_franchise": include_franchise,
             "include_developer": include_developer,
+            "tag_idf": tag_idf,
             "coverage_report": report,
         }
 

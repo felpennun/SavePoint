@@ -34,7 +34,7 @@ function toQueryString(params: RawParams): string {
  * Catalogue (01.1-UI-SPEC Screen Contract 2, CAT-02). Server component,
  * searchParams-driven, every control submits via GET so each filtered view
  * is a shareable/bookmarkable URL — no client-only filter state. The
- * platform/genre checkbox options and the year-input bounds come from the
+ * platform/tag checkbox options and the year-input bounds come from the
  * API `facets` payload; if that payload is unavailable the FilterBar
  * degrades to search-only. Pagination carries the full query string.
  */
@@ -63,7 +63,7 @@ export default async function CataloguePage({
       q: filters.q,
       page: currentPage,
       platform: filters.platform,
-      genre: filters.genre,
+      tag: filters.tag,
       year_from: filters.year_from,
       year_to: filters.year_to,
       min_rating: filters.min_rating,
@@ -75,19 +75,19 @@ export default async function CataloguePage({
 
   const platformOptions: FilterOption[] =
     sortPlatformOptions(result?.facets.platforms.map((p) => ({ value: p.slug, label: p.name })) ?? []);
-  const genreOptions: FilterOption[] =
-    result?.facets.genres.map((g) => ({ value: g.slug, label: g.name })) ?? [];
+  const tagOptions: FilterOption[] =
+    result?.facets.tags.map((tag) => ({ value: tag.slug, label: tag.name })) ?? [];
   const yearRange = result?.facets.year_range;
   const platformSlugs = new Set(platformOptions.map((option) => option.value));
-  const genreSlugs = new Set(genreOptions.map((option) => option.value));
+  const tagSlugs = new Set(tagOptions.map((option) => option.value));
   const visibleFilters = {
     ...filters,
     platform: filters.platform.filter((value) => platformSlugs.has(value)),
-    genre: filters.genre.filter((value) => genreSlugs.has(value)),
+    tag: filters.tag.filter((value) => tagSlugs.has(value)),
   };
   const activeCount = countActiveFilters(visibleFilters);
   const platformLabels = new Map(platformOptions.map((option) => [option.value, option.label]));
-  const genreLabels = new Map(genreOptions.map((option) => [option.value, option.label]));
+  const tagLabels = new Map(tagOptions.map((option) => [option.value, option.label]));
 
   return (
     <main className="sp-page">
@@ -97,13 +97,13 @@ export default async function CataloguePage({
         <section className="sp-results-column" aria-label={dict.catalogue.heading}>
           {activeCount > 0 ? (
             <div className="sp-chip-row" aria-label={dict.catalogue.filters.activeLabel.many(activeCount)}>
-              {visibleFilters.genre.map((value) => {
-                const label = dict.catalogue.chip.genre.replace("{value}", genreLabels.get(value) ?? value);
+              {visibleFilters.tag.map((value) => {
+                const label = dict.catalogue.chip.tag.replace("{value}", tagLabels.get(value) ?? value);
                 return (
                   <FilterChip
-                    key={`genre-${value}`}
+                    key={`tag-${value}`}
                     label={label}
-                    removeHref={`${basePath}${removeHref(currentQuery, "genre", value)}`}
+                    removeHref={`${basePath}${removeHref(currentQuery, "tag", value)}`}
                     removeAriaLabel={`${locale === "es" ? "Quitar filtro" : "Remove filter"} ${label}`}
                   />
                 );
@@ -202,7 +202,7 @@ export default async function CataloguePage({
             basePath={basePath}
             activeCount={activeCount}
             platformOptions={platformOptions}
-            genreOptions={genreOptions}
+            tagOptions={tagOptions}
             currentQuery={currentQuery}
             yearMin={yearRange?.min ?? 1958}
             yearMax={yearRange?.max ?? currentYear + 2}

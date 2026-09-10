@@ -23,6 +23,8 @@ from recommendations.content.features import (
     RATING_CONFIDENCE_PRIOR_COUNT,
     RATING_QUALITY_POWER,
     RATING_SIGNAL_VERSION,
+    TAG_IDF_FORMULA_VERSION,
+    TAG_IDF_SMOOTHING,
 )
 from recommendations.collaborative import ALGORITHM_ID as COLLABORATIVE_ALGORITHM_ID
 from recommendations.content.variants import ALGORITHM_REGISTRY
@@ -39,7 +41,9 @@ from recommendations.hybrid import (
 )
 
 
-GENRE_ALGORITHM_ID = "genre-taste-v1"
+TAG_ALGORITHM_ID = "tag-taste-v1"
+# Kept as a Python/API compatibility alias for the existing queue wiring.
+GENRE_ALGORITHM_ID = TAG_ALGORITHM_ID
 BASE_CONTENT_ALGORITHM_IDS = tuple(ALGORITHM_REGISTRY)
 PHASE4_ALGORITHM_IDS = (
     COLLABORATIVE_ALGORITHM_ID,
@@ -63,6 +67,12 @@ def configuration_fingerprint() -> str:
         "feature_set_version": FEATURE_SET_VERSION,
         "similarity_rule_version": SIMILARITY_RULE_VERSION,
         "facet_weights": FACET_WEIGHTS,
+        "tag_idf": {
+            "formula_version": TAG_IDF_FORMULA_VERSION,
+            "smoothing": TAG_IDF_SMOOTHING,
+            "formula": "ln((N + smoothing) / (df_tag + smoothing)) + 1",
+            "normalisation": "per_work_l2_to_tag_family_weight",
+        },
         "popscore": {
             "formula_version": POPSCORE_FORMULA_VERSION,
             "weights": POPSCORE_WEIGHTS,
@@ -109,8 +119,8 @@ def configuration_fingerprint() -> str:
                 "presentation_limit": HYBRID_MMR_LIMIT,
             },
         },
-        "genre_algorithm_id": GENRE_ALGORITHM_ID,
-        "genre_order": "taste_score_desc_catalogue_rating_desc_slug_asc",
+        "tag_algorithm_id": TAG_ALGORITHM_ID,
+        "tag_order": "taste_score_desc_catalogue_rating_desc_slug_asc",
     }
     return hashlib.sha256(
         json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")

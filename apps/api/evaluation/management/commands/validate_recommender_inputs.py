@@ -18,7 +18,7 @@ from catalogue.corpus import (
 from evaluation.protocol import load as load_protocol
 from evaluation.splits import user_split
 from evaluation.synthetic import SYNTHETIC_EVAL_USER_MARKER, SYNTHETIC_PHASE2_MARKER
-from recommendations.content.features import coverage_report
+from recommendations.content.features import FEATURE_SET_VERSION, coverage_report
 
 
 class Command(BaseCommand):
@@ -115,8 +115,8 @@ class Command(BaseCommand):
             failures.append("rating signals violate the rating-confidence contract")
 
         signals = coverage_report(corpus_version)
-        if signals["feature_set_version"] != "fs-v9" or not signals["include_franchise"]:
-            failures.append("saga/franchise signal is not active in fs-v9")
+        if signals["feature_set_version"] != FEATURE_SET_VERSION or not signals["include_franchise"]:
+            failures.append("saga/franchise signal is not active in the current feature set")
 
         evidence = {
             "audit": "recommender-input-preflight",

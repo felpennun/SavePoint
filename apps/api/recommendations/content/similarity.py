@@ -14,14 +14,14 @@ from recommendations.content.features import FACET_WEIGHTS
 
 FeatureVector = dict[str, float]
 
-SIMILARITY_RULE_VERSION = "facet-similarity-v5"
+SIMILARITY_RULE_VERSION = "facet-similarity-v7"
 
 # Values below one give candidate precision more influence than profile
 # coverage. This limits the advantage of broad works that list many genres or
 # platforms while retaining a reward for covering the user's weighted taste.
 CORE_PRECISION_BETA = 0.5
 
-_CORE_FACETS = ("genre", "platform")
+_CORE_FACETS = ("tag", "platform")
 _OPTIONAL_FACETS = ("franchise", "developer")
 
 

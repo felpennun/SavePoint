@@ -128,7 +128,10 @@ def build_recommendation_section(
         )
     if algorithm_id == GENRE_ALGORITHM_ID:
         return rank_genre_taste_v1(
-            user, limit=PUBLISHED_RESULT_LIMIT, should_continue=should_continue
+            user,
+            corpus_version=corpus_version,
+            limit=PUBLISHED_RESULT_LIMIT,
+            should_continue=should_continue,
         )
     raise ValueError("unknown published recommendation section")
 
@@ -209,13 +212,13 @@ def _publish_if_complete(
             for section in section_jobs
             if section.algorithm_id in CONTENT_ALGORITHM_IDS
         },
-        "genre": next(
+        "tags": next(
             section.result_payload
             for section in section_jobs
             if section.algorithm_id == GENRE_ALGORITHM_ID
         ),
     }
-    snapshot, _ = RecommendationSnapshot.objects.get_or_create(
+    snapshot, created = RecommendationSnapshot.objects.get_or_create(
         user_id=user_id,
         collection_revision=requested_revision,
         input_fingerprint=input_fingerprint,
@@ -227,6 +230,19 @@ def _publish_if_complete(
             "generated_at": timezone.now(),
         },
     )
+    if not created:
+        snapshot.corpus_version = corpus_version
+        snapshot.feature_set_version = FEATURE_SET_VERSION
+        snapshot.payload = payload
+        snapshot.generated_at = timezone.now()
+        snapshot.save(
+            update_fields=[
+                "corpus_version",
+                "feature_set_version",
+                "payload",
+                "generated_at",
+            ]
+        )
     state.active_snapshot = snapshot
     state.save(update_fields=["active_snapshot", "updated_at"])
 
