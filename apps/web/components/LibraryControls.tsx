@@ -28,7 +28,7 @@ const COPY = {
     save: "Guardar configuración",
     saving: "Guardando configuración…",
     success: "Configuración guardada",
-    removeCopy: "Eliminar esta copia",
+    removeCopy: "Eliminar",
     error: "No se pudo guardar la configuración. Inténtalo de nuevo.",
     loginRequired: "Inicia sesión para guardar estado, valoración o copias.",
     loading: "Cargando configuración…",
@@ -51,7 +51,7 @@ const COPY = {
     save: "Save configuration",
     saving: "Saving configuration…",
     success: "Configuration saved",
-    removeCopy: "Remove this copy",
+    removeCopy: "Remove",
     error: "We couldn't save the configuration. Try again.",
     loginRequired: "Log in to save status, rating, or copies.",
     loading: "Loading configuration…",
@@ -207,7 +207,9 @@ export function LibraryControls({
         <div className="sp-section-heading-row">
           <h3>{copy.ratingLabel}</h3>
           <span className="sp-rating-value">
-            {displayRating > 0 ? `${(displayRating / 2).toFixed(1)} / 5` : copy.ratingUnrated}
+            {displayRating > 0
+              ? `${(displayRating / 2).toFixed(1).replace(".", locale === "es" ? "," : ".")} / 5`
+              : copy.ratingUnrated}
           </span>
         </div>
         <div
@@ -261,6 +263,14 @@ export function LibraryControls({
             const selectedRelease = releases.find((release) => release.id === item.release_id);
             return (
               <div className="sp-copy-row" key={item.id ?? item.idempotency_key ?? index}>
+                <button
+                  type="button"
+                  className="sp-copy-remove"
+                  onClick={() => setCopies((previous) => previous.filter((_, itemIndex) => itemIndex !== index))}
+                  disabled={saving}
+                >
+                  {copy.removeCopy}
+                </button>
                 <div className="sp-field">
                   <label htmlFor={`copy-release-${index}`}>{copy.copyRelease}</label>
                   <select
@@ -306,15 +316,12 @@ export function LibraryControls({
                     </select>
                   </div>
                 ) : null}
-                <button type="button" className="sp-btn-secondary sp-copy-remove" onClick={() => setCopies((previous) => previous.filter((_, itemIndex) => itemIndex !== index))} disabled={saving}>
-                  {copy.removeCopy}
-                </button>
               </div>
             );
           })}
         </div>
         {releases.length > 0 ? (
-          <button type="button" className="sp-btn-secondary sp-copy-add" onClick={() => setCopies((previous) => [...previous, newCopy(releases)])} disabled={saving}>
+          <button type="button" className="sp-copy-add" onClick={() => setCopies((previous) => [...previous, newCopy(releases)])} disabled={saving}>
             {copy.copyAdd}
           </button>
         ) : null}

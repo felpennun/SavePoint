@@ -1501,25 +1501,57 @@ a.sp-chip--active:hover {
 }
 
 .sp-copy-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: var(--space-sm);
-  align-items: end;
-  padding: var(--space-md);
+  padding: var(--space-ctl);
   border: 1px solid var(--color-surface-border);
   border-radius: var(--radius-control);
   background: var(--color-surface-raised);
 }
 
+/* Nocturne artboard 2f: a quiet danger-coloured text link pinned to the
+   top-right of the copy card, not a full-width button. */
 .sp-copy-remove {
-  grid-column: 1 / -1;
-  width: 100%;
-  white-space: normal;
-  line-height: 1.25;
+  align-self: flex-end;
+  margin-bottom: calc(-1 * var(--space-xs));
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-danger);
+  font-size: var(--text-micro);
+  font-weight: 500;
+  cursor: pointer;
 }
 
+.sp-copy-remove:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+.sp-copy-remove:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* "Add another copy" is an accent text link under the list. */
 .sp-copy-add {
-  width: 100%;
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent-text);
+  font-size: var(--text-meta);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.sp-copy-add:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+.sp-copy-add:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .sp-library-save {
@@ -1993,16 +2025,8 @@ a.sp-chip--active:hover {
     order: -1;
   }
 
-  .sp-copy-row {
-    grid-template-columns: 1fr 1fr;
-  }
-
   .sp-collection-grid > li {
     height: 23rem;
-  }
-
-  .sp-copy-remove {
-    grid-column: 1 / -1;
   }
 
   .sp-filterbar > summary {
