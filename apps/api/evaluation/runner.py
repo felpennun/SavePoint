@@ -239,10 +239,15 @@ def default_algorithms() -> dict[str, Callable[..., Any]]:
         "random-v1": _random_algorithm,
         "popularity-v1": _popularity_algorithm,
     }
+    # These three need their own callables, not _content_algorithm, and are
+    # appended below in the exact order the frozen protocol declares them
+    # (protocol.tuning.evaluation_algorithms), which run_evaluation_parallel
+    # checks position by position.
+    non_content = {"cf-user-knn-v1", "hybrid-weighted-cf-v1", "hybrid-mmr-v1"}
     algorithms.update({
         algorithm_id: _content_algorithm
         for algorithm_id in CONTENT_ALGORITHM_IDS
-        if algorithm_id not in {"cf-user-knn-v1", "hybrid-weighted-cf-v1"}
+        if algorithm_id not in non_content
     })
     algorithms["cf-user-knn-v1"] = _collaborative_algorithm
     algorithms["hybrid-weighted-cf-v1"] = _hybrid_algorithm

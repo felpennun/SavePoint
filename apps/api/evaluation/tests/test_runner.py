@@ -108,6 +108,13 @@ def test_offline_runner_uses_the_product_content_algorithm_catalog() -> None:
     }
 
 
+def test_offline_runner_order_matches_the_frozen_protocol() -> None:
+    # run_evaluation_parallel compares these position by position, so a set
+    # match is not enough: the order must equal protocol.tuning.evaluation_algorithms.
+    declared = protocol_module.load().raw["tuning"]["evaluation_algorithms"]
+    assert list(default_algorithms()) == declared
+
+
 def test_build_skips_user_without_eligible_positive(runner_fixture, frozen_protocol):
     _user, works, _identity = runner_fixture
     user = User.objects.create_user(username="runner-unrated-only")
