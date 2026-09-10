@@ -48,7 +48,6 @@ export function RecommendationShelf({
               cover: item.cover,
             }}
             locale={locale}
-            coverVariant="shelf"
             score={item.display_rating}
           />
         ))}

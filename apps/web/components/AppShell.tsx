@@ -9,6 +9,7 @@ import { BrandLockup } from "@/components/BrandLockup";
 import { DemoAccountBanner } from "@/components/DemoAccountBanner";
 import { LoginIconButton } from "@/components/LoginIconButton";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import { ShelfWheelScroll } from "@/components/ShelfWheelScroll";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { getDictionary, type Dictionary } from "@/i18n";
 
@@ -219,6 +220,7 @@ export function AppShell({
       </header>
       {isAuthenticated ? <DemoAccountBanner text={dict.account.banner} /> : null}
       <div id="main-content">{children}</div>
+      <ShelfWheelScroll />
     </>
   );
 }

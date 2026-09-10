@@ -2,7 +2,6 @@ import Link from "next/link";
 
 import { GameCard } from "@/components/GameCard";
 import type { ContentRecommendationItem } from "@/lib/api";
-import { getDictionary } from "@/i18n";
 
 export function ContentRecommendationShelf({
   items,
@@ -66,23 +65,10 @@ export function ContentRecommendationShelf({
               }}
               locale={locale}
               score={item.display_rating}
-              evidence={item.reason ? formatReason(item.reason, locale) : undefined}
-              coverVariant="shelf"
             />
           ))}
         </ol>
       ) : null}
     </section>
   );
-}
-
-function formatReason(
-  reason: NonNullable<ContentRecommendationItem["reason"]>,
-  locale: string,
-): string | undefined {
-  const names = reason.signals.slice(0, 2).map((signal) => signal.name).filter(Boolean);
-  if (names.length === 0) return undefined;
-  const joined = names.join(locale === "en" ? " and " : " y ");
-  const template = getDictionary(locale).recommendations.contentCardEvidence;
-  return template.replace("{reasons}", joined);
 }

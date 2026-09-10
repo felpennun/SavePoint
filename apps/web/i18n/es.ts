@@ -129,8 +129,6 @@ export const es: Dictionary = {
     shelfHeading: "Porque juegas mucho a {genre}",
     shelfEvidence:
       "Estos juegos comparten el género {genre} con títulos que has valorado o a los que has puesto un estado.",
-    cardEvidence: "Comparte tus géneros: {genres}",
-    contentCardEvidence: "Coincide contigo en {reasons}.",
     emptyHeading: "Aún no hay suficiente actividad",
     emptyBody: "Añade juegos a tu colección y, si quieres, valóralos o marca su estado para empezar a recibir recomendaciones.",
     emptyCta: "Explorar el catálogo",

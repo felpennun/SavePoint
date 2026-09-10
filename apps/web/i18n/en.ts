@@ -126,8 +126,6 @@ export const en: Dictionary = {
     shelfHeading: "Because you play a lot of {genre}",
     shelfEvidence:
       "These games share the {genre} genre with titles you've rated or set a status on.",
-    cardEvidence: "Shares your genres: {genres}",
-    contentCardEvidence: "Matches your taste in {reasons}.",
     emptyHeading: "Not enough activity yet",
     emptyBody: "Add games to your collection and, if you like, rate them or set their status to start receiving recommendations.",
     emptyCta: "Browse the catalogue",

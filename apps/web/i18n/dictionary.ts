@@ -112,10 +112,6 @@ export interface Dictionary {
     shelfHeading: string;
     /** "{genre}" -> the taste genre; per-shelf plain-language explainer. */
     shelfEvidence: string;
-    /** "{genres}" -> the comma-joined overlap genres; per-card evidence. */
-    cardEvidence: string;
-    /** "{reasons}" -> the bounded signals returned by the v2 ranker. */
-    contentCardEvidence: string;
     emptyHeading: string;
     emptyBody: string;
     emptyCta: string;
