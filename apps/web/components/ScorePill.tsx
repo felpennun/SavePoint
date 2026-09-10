@@ -3,9 +3,9 @@
  * identity). IGDB `total_rating` (0-100) as a rounded integer that sits
  * INSIDE the Nocturne "save slot" shape: a JetBrains Mono numeral over the
  * shell, which is filled with a tinted tier ground and stroked in the tier
- * colour. Five tramos (identity artboard 1c):
- *   90-100 essential (primary) - 75-89 great (success) - 60-74 fair
- *   (neutral) - 40-59 poor (warning) - 0-39 bad (error).
+ * colour. Five tramos, purple -> blue -> green -> amber -> red:
+ *   90-100 essential (accent) - 75-89 great (info/blue) - 60-74 fair
+ *   (success/green) - 40-59 poor (warning/amber) - 0-39 bad (danger/red).
  * When there is NO rating the slot is still drawn -- dashed outline with an
  * em dash -- the sixth "SIN NOTA" variant from the designs. Never uses the
  * accent as a flood.

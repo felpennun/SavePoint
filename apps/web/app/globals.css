@@ -988,8 +988,9 @@ input[type="radio"] {
 /* Score pill -- Nocturne treats the IGDB critic score as data sitting
    INSIDE the "save slot": a JetBrains Mono numeral over the shell, which
    is filled with a tinted tier ground and stroked in the tier colour.
-   Five tramos, each tier sets --sp-score-fg / --sp-score-bg. It sits in
-   the card title row (never overlaid on the cover art). */
+   Five tramos (purple / blue / green / amber / red, best to worst), each
+   tier sets --sp-score-fg / --sp-score-bg. It sits in the card title row
+   (never overlaid on the cover art). */
 .sp-score-pill {
   display: inline-flex;
   align-items: center;
@@ -1051,17 +1052,18 @@ input[type="radio"] {
   font-size: var(--text-body);
 }
 
+/* Tier band, best to worst: purple -> blue -> green -> amber -> red. */
 .sp-score-essential {
   --sp-score-fg: var(--color-accent-text);
   --sp-score-bg: var(--color-accent-soft);
 }
 .sp-score-great {
-  --sp-score-fg: var(--color-success);
-  --sp-score-bg: var(--color-success-bg);
+  --sp-score-fg: var(--color-info);
+  --sp-score-bg: var(--color-info-bg);
 }
 .sp-score-fair {
-  --sp-score-fg: var(--color-text-primary);
-  --sp-score-bg: var(--color-surface-overlay);
+  --sp-score-fg: var(--color-success);
+  --sp-score-bg: var(--color-success-bg);
 }
 .sp-score-poor {
   --sp-score-fg: var(--color-status-pending);
