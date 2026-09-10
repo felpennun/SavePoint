@@ -531,6 +531,57 @@ input[type="radio"] {
   color: var(--color-status-pending);
 }
 
+/* System notices -- mono status chips with a leading glyph (artboard 2h
+   recommendation refresh row). */
+.sp-notice-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin: var(--space-sm) 0 var(--space-lg);
+}
+
+.sp-notice {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  line-height: 1.4;
+  padding: var(--space-xs) var(--space-ctl);
+  border-radius: var(--radius-control);
+}
+
+.sp-notice svg {
+  flex: none;
+}
+
+.sp-notice--info {
+  background: var(--color-info-bg);
+  border: 1px solid var(--color-info-border);
+  color: var(--color-info);
+}
+
+.sp-notice--warn {
+  background: var(--color-status-pending-bg);
+  border: 1px solid var(--color-status-pending-border);
+  color: var(--color-status-pending);
+}
+
+/* Recommendation shelf heading row: title + a mono algorithm-id tag on
+   the same baseline (artboard 2h). */
+.sp-shelf-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-ctl);
+}
+
+.sp-algo-id {
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+  color: var(--color-secondary-mid);
+}
+
 .sp-field {
   display: flex;
   flex-direction: column;
@@ -903,7 +954,9 @@ a.sp-chip--active:hover {
 }
 
 .sp-recommendation-shelves .sp-shelf > .sp-h2,
-.sp-recommendation-shelves .sp-shelf > .sp-muted {
+.sp-recommendation-shelves .sp-shelf > .sp-shelf-head,
+.sp-recommendation-shelves .sp-shelf > .sp-muted,
+.sp-recommendation-shelves .sp-shelf-head > .sp-h2 {
   /* Shelf layout owns all vertical rhythm through its grid gap. Leaving the
      document-level heading/paragraph margins here made each shelf appear to
      use a different separation. */

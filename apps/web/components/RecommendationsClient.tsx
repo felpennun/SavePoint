@@ -136,15 +136,25 @@ export function RecommendationsClient({ locale }: { locale: string }) {
   return (
     <main className="sp-page">
       <h1 className="sp-h1">{r.nav}</h1>
-      {isRefreshing ? (
-        <p className="sp-muted" role="status" aria-live="polite">
-          {snapshot?.status === "building" ? r.refreshPreparing : r.refreshUpdating}
-        </p>
-      ) : null}
-      {needsCollectionChange ? (
-        <p className="sp-muted" role="status" aria-live="polite">
-          {r.refreshNeedsCollectionChange}
-        </p>
+      {isRefreshing || needsCollectionChange ? (
+        <div className="sp-notice-row">
+          {isRefreshing ? (
+            <span className="sp-notice sp-notice--info" role="status" aria-live="polite">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <rect x="4" y="4" width="16" height="16" rx="2" />
+              </svg>
+              {snapshot?.status === "building" ? r.refreshPreparing : r.refreshUpdating}
+            </span>
+          ) : null}
+          {needsCollectionChange ? (
+            <span className="sp-notice sp-notice--warn" role="status" aria-live="polite">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 3l9 9-9 9-9-9 9-9Z" />
+              </svg>
+              {r.refreshNeedsCollectionChange}
+            </span>
+          ) : null}
+        </div>
       ) : null}
       {!hasRecommendations && loadFailed ? (
         <div className="sp-empty" role="alert">
@@ -165,6 +175,7 @@ export function RecommendationsClient({ locale }: { locale: string }) {
                 heading={copy.heading}
                 description={copy.description}
                 sectionId={`${algorithmId}-heading`}
+                algorithmId={algorithmId}
               />
             );
           })}

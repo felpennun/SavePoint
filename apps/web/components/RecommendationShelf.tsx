@@ -12,10 +12,12 @@ export function RecommendationShelf({
   shelf,
   locale,
   description,
+  algorithmId = "genre-taste-v1",
 }: {
   shelf: PersonalRecommendationShelf;
   locale: string;
   description?: string;
+  algorithmId?: string;
 }) {
   const heading = getDictionary(locale).recommendations.shelfHeading.replace("{genre}", shelf.genre);
   const sectionId = `recommendation-${shelf.genreSlug}`;
@@ -26,9 +28,12 @@ export function RecommendationShelf({
       aria-labelledby={sectionId}
       aria-describedby={description ? `${sectionId}-description` : undefined}
     >
-      <h2 id={sectionId} className="sp-h2">
-        {heading}
-      </h2>
+      <div className="sp-shelf-head">
+        <h2 id={sectionId} className="sp-h2">
+          {heading}
+        </h2>
+        <span className="sp-algo-id">{algorithmId}</span>
+      </div>
       {description ? <p id={`${sectionId}-description`} className="sp-muted">{description}</p> : null}
       <ul className="sp-shelf-track">
         {shelf.items.map((item) => (

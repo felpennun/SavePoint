@@ -10,6 +10,7 @@ export function ContentRecommendationShelf({
   heading,
   description,
   sectionId = "content-recommendations-heading",
+  algorithmId,
   error,
   retryHref,
   retryLabel,
@@ -19,6 +20,9 @@ export function ContentRecommendationShelf({
   heading: string;
   description?: string;
   sectionId?: string;
+  /** The backend algorithm id, shown as a mono tag beside the heading
+   * (Nocturne artboard 2h). */
+  algorithmId?: string;
   error?: string;
   retryHref?: string;
   retryLabel?: string;
@@ -30,9 +34,12 @@ export function ContentRecommendationShelf({
       aria-labelledby={sectionId}
       aria-describedby={description ? `${sectionId}-description` : undefined}
     >
-      <h2 id={sectionId} className="sp-h2">
-        {heading}
-      </h2>
+      <div className="sp-shelf-head">
+        <h2 id={sectionId} className="sp-h2">
+          {heading}
+        </h2>
+        {algorithmId ? <span className="sp-algo-id">{algorithmId}</span> : null}
+      </div>
       {description ? <p id={`${sectionId}-description`} className="sp-muted">{description}</p> : null}
       {error ? (
         <div className="sp-section-error" role="alert">
