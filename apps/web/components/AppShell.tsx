@@ -188,8 +188,11 @@ export function AppShell({
       <a href="#main-content" className="skip-link">
         {dict.nav.skipToContent}
       </a>
-      <header className="border-b" style={{ borderColor: "var(--color-card-border)", background: "var(--color-surface-raised)", position: "relative" }}>
-        <div className="flex items-center justify-between gap-2 md:gap-4 px-4 md:px-5 py-3">
+      <header className="border-b" style={{ borderColor: "var(--color-surface-border)", background: "var(--color-surface-overlay)", position: "relative" }}>
+        <div
+          className="flex items-center justify-between gap-2 md:gap-4 py-3 px-4 md:px-6"
+          style={{ maxWidth: "1180px", margin: "0 auto" }}
+        >
           <div className="flex min-w-0 items-center gap-4 md:gap-7">
             <Link href={`/${locale}`} aria-label={dict.nav.home} className="min-w-0 [&>svg]:max-w-full" style={{ color: "var(--color-text-primary)", display: "inline-flex", alignItems: "center" }}>
               <BrandLockup />

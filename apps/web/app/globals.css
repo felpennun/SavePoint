@@ -463,17 +463,24 @@ input[type="radio"] {
   font-weight: 600;
 }
 
-/* Account switcher trigger -- a rounded pill with a circular avatar chip
-   (artboard 2a). */
+/* Icon-only navbar buttons (theme toggle, account trigger): a square 44px
+   target, no visible label -- the state/action live on aria-* only. */
+.sp-icon-btn {
+  width: 2.75rem;
+  min-width: 2.75rem;
+  padding: 0;
+  gap: 0;
+}
+
+/* Account switcher trigger -- an icon-only circular button holding the
+   avatar chip. */
 .sp-account-trigger {
   border-radius: 999px;
-  padding-left: 4px;
-  gap: var(--space-sm);
 }
 
 .sp-account-avatar {
-  width: 1.625rem;
-  height: 1.625rem;
+  width: 1.75rem;
+  height: 1.75rem;
   padding: 5px;
   border-radius: 999px;
   background: var(--color-accent-edge);
@@ -724,7 +731,8 @@ input[type="radio"] {
   border: 1px solid var(--color-surface-border);
   border-radius: var(--radius-control);
   padding: 0 var(--space-sm);
-  background: var(--color-surface-overlay);
+  /* An inset field against the raised-overlay navbar. */
+  background: var(--color-surface-base);
 }
 
 .sp-navsearch > svg {

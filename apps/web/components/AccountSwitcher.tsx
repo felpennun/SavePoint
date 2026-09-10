@@ -104,7 +104,7 @@ export function AccountSwitcher({
       <button
         ref={triggerRef}
         type="button"
-        className="sp-btn-secondary sp-account-trigger"
+        className="sp-btn-secondary sp-icon-btn sp-account-trigger"
         aria-label={triggerText}
         aria-haspopup="menu"
         aria-expanded={open}
@@ -114,8 +114,6 @@ export function AccountSwitcher({
           <circle cx="12" cy="8" r="4" />
           <path d="M4 21v-1a7 7 0 0 1 14 0v1" />
         </svg>
-        <span className="hidden md:inline">{triggerText}</span>
-        <span aria-hidden="true">▾</span>
       </button>
       {open ? (
         <div

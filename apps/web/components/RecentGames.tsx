@@ -27,7 +27,7 @@ export function RecentGames({
   }, []);
 
   return (
-    <section aria-labelledby="recent-games-heading">
+    <section className="sp-shelf" aria-labelledby="recent-games-heading">
       <h2 id="recent-games-heading" className="sp-h2">
         {heading}
       </h2>

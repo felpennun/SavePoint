@@ -295,9 +295,6 @@ export const es: Dictionary = {
   },
   theme: {
     toggle: {
-      label: "Tema",
-      dark: "Oscuro",
-      light: "Claro",
       switchToDark: "Cambiar al tema oscuro",
       switchToLight: "Cambiar al tema claro",
     },

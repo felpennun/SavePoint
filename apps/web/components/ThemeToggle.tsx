@@ -9,15 +9,13 @@ import { useEffect, useState } from "react";
  * activate it flips `document.documentElement.dataset.theme` synchronously
  * and writes the sp-theme cookie (path=/, 1 year, SameSite=Lax, not
  * HttpOnly -- it is not a secret and the client must set it).
- * Icon-only below md, 44px target, correct aria-pressed / aria-label.
+ * Icon-only at every width; 44px target; the state and the action are on
+ * `aria-pressed` and `aria-label`.
  */
 export function ThemeToggle({
   labels,
 }: {
   labels: {
-    label: string;
-    dark: string;
-    light: string;
     switchToDark: string;
     switchToLight: string;
   };
@@ -39,19 +37,16 @@ export function ThemeToggle({
   }
 
   const isLight = theme === "light";
-  // Before mount, render a stable label matching the SSR attribute so
-  // hydration doesn't mismatch; `mounted` only refines the icon.
-  const stateWord = isLight ? labels.light : labels.dark;
 
   return (
     <button
       type="button"
-      className="sp-btn-secondary min-w-11 shrink-0"
+      className="sp-btn-secondary sp-icon-btn min-w-11 shrink-0"
       aria-pressed={isLight}
       aria-label={isLight ? labels.switchToDark : labels.switchToLight}
       onClick={toggle}
     >
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
         {mounted && isLight ? (
           <>
             <circle cx="12" cy="12" r="4" />
@@ -61,9 +56,6 @@ export function ThemeToggle({
           <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
         )}
       </svg>
-      <span className="hidden md:inline">
-        {labels.label}: {stateWord}
-      </span>
     </button>
   );
 }

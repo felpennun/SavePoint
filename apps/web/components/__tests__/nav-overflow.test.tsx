@@ -35,33 +35,28 @@ describe.each(["es", "en"])("responsive navbar accessibility (%s)", (locale) => 
     listHeading: dict.account.list.heading,
   };
 
-  it("preserves the theme name and pressed state when its text is hidden", async () => {
+  it("theme toggle is icon-only: name and state come from aria-* not text", async () => {
     await page.setContent(renderToStaticMarkup(<ThemeToggle labels={dict.theme.toggle} />));
     const button = page.getByRole("button", { name: dict.theme.toggle.switchToLight, exact: true });
     expect(await button.count()).toBe(1);
     expect(await button.getAttribute("aria-pressed")).toBe("false");
-    const label = button.locator("span");
-    expect(await label.getAttribute("class")).toBe("hidden md:inline");
-    const before = await button.locator("*").count();
-    // Hiding the visible text must not remove the accessible name. Geometry
-    // and compiled responsive CSS are verified in the phase browser pass.
-    await label.evaluate((element) => { element.style.display = "none"; });
-    expect(await button.count()).toBe(1);
-    expect(await button.locator("*").count()).toBe(before);
-    expect(await button.getAttribute("aria-pressed")).toBe("false");
+    // No visible label: the only child is the decorative icon.
+    expect((await button.textContent())?.trim()).toBe("");
+    expect(await button.locator("svg").count()).toBe(1);
+    expect(await button.locator("span").count()).toBe(0);
   });
 
-  it("keeps simulated account identification accessible in the generic fallback", async () => {
+  it("account trigger is icon-only but still identifies as a simulated-account menu", async () => {
     await page.setContent(renderToStaticMarkup(<AccountSwitcher locale={locale} labels={accountLabels} />));
     const button = page.getByRole("button", { name: dict.account.switcher.label, exact: true });
     expect(await button.count()).toBe(1);
     expect(await button.getAttribute("aria-label")).toMatch(/simulada|simulated/i);
     expect(await button.getAttribute("aria-haspopup")).toBe("menu");
     expect(await button.getAttribute("aria-expanded")).toBe("false");
-    const label = button.locator("span").first();
-    expect(await label.getAttribute("class")).toBe("hidden md:inline");
-    await label.evaluate((element) => { element.style.display = "none"; });
-    expect(await button.count()).toBe(1);
+    // No visible label or caret: just the avatar icon.
+    expect((await button.textContent())?.trim()).toBe("");
+    expect(await button.locator("svg").count()).toBe(1);
+    expect(await button.locator("span").count()).toBe(0);
   });
 
   it("keeps both controls in the header in the same DOM order at every width", async () => {
@@ -73,9 +68,11 @@ describe.each(["es", "en"])("responsive navbar accessibility (%s)", (locale) => 
     for (const width of [320, 375, 768, 1280]) {
       await page.setViewportSize({ width, height: 800 });
       expect(await header.innerHTML()).toBe(initialMarkup);
+      // Theme toggle and account trigger are icon-only (empty text); only
+      // the mobile-menu button carries a visible label. Order is stable.
       expect(await header.getByRole("button").allTextContents()).toEqual([
-        `${dict.theme.toggle.label}: ${dict.theme.toggle.dark}`,
-        `${dict.account.switcher.label}▾`,
+        "",
+        "",
         dict.nav.openMenu,
       ]);
       expect(await page.getByRole("dialog").count()).toBe(0);

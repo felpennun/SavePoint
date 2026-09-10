@@ -52,7 +52,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       {signedIn ? (
         <>
           {newReleasesShelf}
-          <div style={{ borderTop: "1px solid var(--color-surface-border)", marginTop: "var(--space-xl)", paddingTop: "var(--space-xl)" }}>
+          <div style={{ borderTop: "1px solid var(--color-surface-border)", marginTop: "var(--space-md)", paddingTop: "var(--space-md)" }}>
             <RecentGames
               locale={locale}
               heading={dict.home.signedIn.continueHeading}
@@ -101,7 +101,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             )}
           </section>
 
-          <div style={{ borderTop: "1px solid var(--color-surface-border)", marginTop: "var(--space-xl)", paddingTop: "var(--space-xl)" }}>
+          <div style={{ borderTop: "1px solid var(--color-surface-border)", marginTop: "var(--space-md)", paddingTop: "var(--space-md)" }}>
             {newReleasesShelf}
           </div>
         </>

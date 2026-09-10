@@ -222,9 +222,6 @@ export interface Dictionary {
   };
   theme: {
     toggle: {
-      label: string;
-      dark: string;
-      light: string;
       switchToDark: string;
       switchToLight: string;
     };

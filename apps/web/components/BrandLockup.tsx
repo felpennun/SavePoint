@@ -21,15 +21,15 @@ export function BrandLockup({ title = "SavePoint" }: { title?: string }) {
         gap: "0.5rem",
         color: "inherit",
         fontWeight: 600,
-        fontSize: "clamp(1.125rem, 1rem + 1.1vw, 1.375rem)",
+        fontSize: "clamp(1.25rem, 1.05rem + 1.3vw, 1.5rem)",
         lineHeight: 1,
         letterSpacing: "-0.02em",
         whiteSpace: "nowrap",
       }}
     >
       <svg
-        width="30"
-        height="30"
+        width="34"
+        height="34"
         viewBox="0 0 48 48"
         fill="none"
         aria-hidden="true"
