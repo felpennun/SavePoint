@@ -286,9 +286,8 @@ export const es: Dictionary = {
       explainer: "Juegos del corpus gobernado lanzados recientemente.",
     },
     signedIn: {
-      greeting: "Hola de nuevo, {alias}",
       continueHeading: "Retoma donde lo dejaste",
-      recommendationsCta: "Ver tus recomendaciones por género",
+      continueEmpty: "Aún no has visitado ningún juego.",
     },
     loggedOut: {
       secondaryCta: "Explorar el catálogo",

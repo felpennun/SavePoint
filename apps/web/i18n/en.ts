@@ -283,9 +283,8 @@ export const en: Dictionary = {
       explainer: "Recently released games from the governed corpus.",
     },
     signedIn: {
-      greeting: "Welcome back, {alias}",
       continueHeading: "Pick up where you left off",
-      recommendationsCta: "See your genre recommendations",
+      continueEmpty: "You haven't visited any games yet.",
     },
     loggedOut: {
       secondaryCta: "Browse the catalogue",

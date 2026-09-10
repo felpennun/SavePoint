@@ -6,6 +6,7 @@ import { CoverImage } from "@/components/CoverImage";
 import { LibraryControls } from "@/components/LibraryControls";
 import { OwnedGamesDlcShelf } from "@/components/OwnedGamesDlcShelf";
 import { RatingBreakdownLine } from "@/components/RatingBreakdownLine";
+import { RecordGameVisit } from "@/components/RecordGameVisit";
 import { ScorePill } from "@/components/ScorePill";
 import { Synopsis } from "@/components/Synopsis";
 import { getDictionary } from "@/i18n";
@@ -59,6 +60,20 @@ export default async function GameDetailPage({
 
   return (
     <main className="sp-page sp-game-page">
+      <RecordGameVisit
+        game={{
+          slug: game.slug,
+          title: game.title,
+          year: game.year ?? null,
+          platform_summary: platforms.slice(0, 3).join(", "),
+          display_rating: game.display_rating ?? null,
+          cover: {
+            url: game.cover.url ?? null,
+            is_placeholder: game.cover.is_placeholder,
+            alt: game.cover.alt,
+          },
+        }}
+      />
       <div className="sp-detail-grid">
         <div className="sp-detail-main">
           <div className="sp-cover-hero">

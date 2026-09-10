@@ -213,9 +213,8 @@ export interface Dictionary {
       explainer: string;
     };
     signedIn: {
-      greeting: string;
       continueHeading: string;
-      recommendationsCta: string;
+      continueEmpty: string;
     };
     loggedOut: {
       secondaryCta: string;
