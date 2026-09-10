@@ -104,6 +104,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       ) : (
         <>
           <div className="sp-hero">
+            <svg className="sp-hero-mark" width="34" height="34" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+              <path d="M6 12a6 6 0 0 1 6-6h20l10 10v20a6 6 0 0 1-6 6H12a6 6 0 0 1-6-6V12Z" stroke="var(--color-accent-strong)" strokeWidth="2.5" />
+              <path d="M24 15l8 9-8 9-8-9 8-9Z" fill="var(--color-accent-strong)" />
+            </svg>
             <h1 className="sp-h1">SavePoint</h1>
             <p className="sp-lead">{dict.home.valueProposition}</p>
             {/* No log-in entry here on purpose: sign-in lives in the navbar

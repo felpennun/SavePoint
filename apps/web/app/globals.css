@@ -547,8 +547,13 @@ input[type="radio"] {
   background: var(--color-surface-raised);
 }
 
+.sp-hero-mark {
+  display: block;
+  margin-bottom: var(--space-md);
+}
+
 .sp-hero .sp-h1 {
-  margin-top: var(--space-md);
+  margin-top: 0;
 }
 
 .sp-hero .sp-lead {
@@ -838,6 +843,19 @@ input[type="radio"] {
   margin-top: auto;
   padding-top: var(--space-sm);
   border-top: 1px solid var(--color-card-border);
+}
+
+/* Collection card foot: rating stars and the owned-copies count share
+   one line, "★★★★★ · 2 copias" (artboard 2g). */
+.sp-card-rating-copies {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.sp-card-dot {
+  color: var(--color-text-muted);
 }
 
 .sp-card-copies {

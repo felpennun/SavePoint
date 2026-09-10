@@ -81,13 +81,20 @@ export function GameCard({
           {hasFoot ? (
             <div className="sp-card-foot">
               {status ? <StatusPill status={status} label={dict.status.labels[status]} bare /> : null}
-              {showStars ? (
-                <StarRating value={ratingHalfSteps as number} ariaLabelTemplate={dict.card.rating.aria} />
-              ) : null}
-              {showCopies ? (
-                <span className="sp-card-copies">
-                  {formatCount(dict.collection.ownedCopyCount, ownedCopyCount as number)}
-                </span>
+              {showStars || showCopies ? (
+                <div className="sp-card-rating-copies">
+                  {showStars ? (
+                    <StarRating value={ratingHalfSteps as number} ariaLabelTemplate={dict.card.rating.aria} />
+                  ) : null}
+                  {showStars && showCopies ? (
+                    <span aria-hidden="true" className="sp-card-dot">·</span>
+                  ) : null}
+                  {showCopies ? (
+                    <span className="sp-card-copies">
+                      {formatCount(dict.collection.ownedCopyCount, ownedCopyCount as number)}
+                    </span>
+                  ) : null}
+                </div>
               ) : null}
             </div>
           ) : null}

@@ -17,7 +17,7 @@ export function LoginIconButton({ locale, label }: { locale: string; label: stri
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
-        strokeWidth="2"
+        strokeWidth="1.75"
         strokeLinecap="round"
         aria-hidden="true"
       >
