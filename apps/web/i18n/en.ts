@@ -280,7 +280,6 @@ export const en: Dictionary = {
     sampleHeading: "A catalogue sample",
     newReleases: {
       heading: "New releases",
-      explainer: "Recently released games from the governed corpus.",
     },
     signedIn: {
       continueHeading: "Pick up where you left off",

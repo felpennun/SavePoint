@@ -30,7 +30,7 @@ export function NewReleasesShelf({
   items: GameCardData[];
   locale: string;
   status?: ShelfStatus;
-  labels: { heading: string; explainer: string };
+  labels: { heading: string };
 }) {
   if (status === "loading") return <SkeletonShelf count={6} />;
   if (status === "error" || status === "empty" || items.length === 0) return null;
@@ -40,7 +40,6 @@ export function NewReleasesShelf({
       <h2 id="new-releases-heading" className="sp-h2">
         {labels.heading}
       </h2>
-      <p className="sp-muted">{labels.explainer}</p>
       <ul className="sp-shelf-track">
         {items.slice(0, 20).map((item) => (
           <GameCard

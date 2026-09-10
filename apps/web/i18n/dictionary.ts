@@ -210,7 +210,6 @@ export interface Dictionary {
     sampleHeading: string;
     newReleases: {
       heading: string;
-      explainer: string;
     };
     signedIn: {
       continueHeading: string;

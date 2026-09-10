@@ -290,7 +290,7 @@ input[type="radio"] {
 .sp-page {
   max-width: 1180px;
   margin: 0 auto;
-  padding: var(--space-xl) var(--space-lg) var(--space-3xl);
+  padding: var(--space-lg) var(--space-lg) var(--space-3xl);
 }
 
 .sp-game-page {
@@ -1218,13 +1218,14 @@ a.sp-chip--active:hover {
   gap: var(--space-md);
 }
 
-.sp-recommendation-shelves .sp-shelf > .sp-h2,
-.sp-recommendation-shelves .sp-shelf > .sp-shelf-head,
-.sp-recommendation-shelves .sp-shelf > .sp-muted,
-.sp-recommendation-shelves .sp-shelf-head > .sp-h2 {
+.sp-shelf > .sp-h2,
+.sp-shelf > .sp-shelf-head,
+.sp-shelf > .sp-muted,
+.sp-shelf-head > .sp-h2 {
   /* Shelf layout owns all vertical rhythm through its grid gap. Leaving the
      document-level heading/paragraph margins here made each shelf appear to
-     use a different separation. */
+     use a different separation, and pushed the first shelf far below the
+     navbar. */
   margin: 0;
 }
 

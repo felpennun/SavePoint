@@ -283,7 +283,6 @@ export const es: Dictionary = {
     sampleHeading: "Una muestra del catálogo",
     newReleases: {
       heading: "Novedades",
-      explainer: "Juegos del corpus gobernado lanzados recientemente.",
     },
     signedIn: {
       continueHeading: "Retoma donde lo dejaste",
