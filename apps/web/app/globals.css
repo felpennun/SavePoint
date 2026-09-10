@@ -263,6 +263,27 @@ input[type="radio"] {
   top: 0.5rem;
 }
 
+/* A hairline in the brand colour running across the full width of the
+   navbar, interrupted by the centred content column (which paints its own
+   ground on top of it). Only visible in the side gutters on viewports
+   wider than the 1180px column. */
+.sp-navbar::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--color-accent);
+  z-index: 0;
+}
+
+.sp-navbar-inner {
+  position: relative;
+  z-index: 1;
+  background: var(--color-surface-overlay);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .sp-skeleton {
     animation: none !important;

@@ -188,9 +188,9 @@ export function AppShell({
       <a href="#main-content" className="skip-link">
         {dict.nav.skipToContent}
       </a>
-      <header className="border-b" style={{ borderColor: "var(--color-surface-border)", background: "var(--color-surface-overlay)", position: "relative" }}>
+      <header className="sp-navbar border-b" style={{ borderColor: "var(--color-surface-border)", background: "var(--color-surface-overlay)", position: "relative" }}>
         <div
-          className="flex items-center justify-between gap-2 md:gap-4 py-3 px-4 md:px-6"
+          className="sp-navbar-inner flex items-center justify-between gap-2 md:gap-4 py-3 px-4 md:px-6"
           style={{ maxWidth: "1180px", margin: "0 auto" }}
         >
           <div className="flex min-w-0 items-center gap-4 md:gap-7">
