@@ -617,7 +617,7 @@ input[type="radio"] {
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(172px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(184px, 1fr));
   gap: var(--space-md);
 }
 
@@ -754,7 +754,7 @@ input[type="radio"] {
 }
 
 .sp-collection-grid > li {
-  height: 23rem;
+  height: 26rem;
   min-width: 0;
 }
 
@@ -1162,8 +1162,8 @@ a.sp-chip--active:hover {
 
 .sp-content-sidebar {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(240px, 292px);
-  gap: var(--space-2xl);
+  grid-template-columns: minmax(0, 1fr) minmax(216px, 260px);
+  gap: var(--space-xl);
   align-items: start;
 }
 
@@ -1754,7 +1754,7 @@ a.sp-chip--active:hover {
   }
 
   .sp-collection-grid > li {
-    height: 22rem;
+    height: 23rem;
   }
 
   .sp-copy-remove {
