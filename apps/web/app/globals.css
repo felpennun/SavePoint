@@ -1215,13 +1215,16 @@ a.sp-chip--active:hover {
   padding: 0;
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: 184px;
-  grid-auto-rows: 21.5rem;
+  /* Same card as the catalogue grid: 200px wide (the catalogue's rendered
+     column at desktop), height driven by the content so cover + 2-line
+     title + meta match exactly. */
+  grid-auto-columns: 198px;
+  grid-auto-rows: auto;
+  align-items: stretch;
   justify-content: flex-start;
   column-gap: var(--space-md);
   row-gap: 0;
   overflow-x: auto;
-  min-height: 22rem;
   scroll-snap-type: x proximity;
   /* The scrollbar is hidden: horizontal movement comes from the mouse
      wheel (ShelfWheelScroll) or from tabbing through the cards. A visible
@@ -1235,8 +1238,7 @@ a.sp-chip--active:hover {
 }
 
 .sp-shelf-track > li {
-  width: 184px;
-  height: 21.5rem;
+  width: 198px;
 }
 
 /* Bare-tile shelves (new releases) carry no card panel, just cover +
@@ -1249,9 +1251,6 @@ a.sp-chip--active:hover {
 
 .sp-shelf-track--dense > li {
   width: 176px;
-}
-
-.sp-shelf-track--dense > li {
   height: 18.5rem;
 }
 
