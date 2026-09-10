@@ -97,6 +97,7 @@ export default async function GameDetailPage({
                     ariaLabelTemplate={dict.card.score.aria}
                     withLabel
                     label={dict.card.score.label}
+                    tierLabels={dict.card.score.tiers}
                     className="sp-score-pill--inline"
                   />
                   <RatingBreakdownLine

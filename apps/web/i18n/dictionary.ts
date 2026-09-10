@@ -67,6 +67,15 @@ export interface Dictionary {
       label: string;
       aria: string;
       none: string;
+      /** Tier names shown beside the ScorePill on the detail page,
+       * coloured in the tier colour. */
+      tiers: {
+        essential: string;
+        great: string;
+        fair: string;
+        poor: string;
+        bad: string;
+      };
     };
     rating: {
       aria: string;

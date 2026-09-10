@@ -30,6 +30,7 @@ export function ScorePill({
   className,
   withLabel,
   label,
+  tierLabels,
   emptyLabel,
 }: {
   rating: number | null | undefined;
@@ -39,12 +40,17 @@ export function ScorePill({
   /** Show a localized textual label next to the slot (detail page). */
   withLabel?: boolean;
   label?: string;
+  /** Localized tier names (dict.card.score.tiers). When given with
+   * `withLabel`, the tier word ("Imprescindible", ...) is shown under the
+   * label in the tier colour. */
+  tierLabels?: Record<Tier, string>;
   /** Accessible name for the no-rating slot (dict.card.score.none). */
   emptyLabel?: string;
 }) {
   const hasRating = rating != null && !Number.isNaN(rating);
   const value = hasRating ? Math.round(rating as number) : null;
-  const tierClass = value != null ? `sp-score-${tierOf(value)}` : "sp-score-empty";
+  const tier = value != null ? tierOf(value) : null;
+  const tierClass = tier != null ? `sp-score-${tier}` : "sp-score-empty";
   const ariaLabel =
     value != null
       ? ariaLabelTemplate.replace("{n}", String(value))
@@ -64,7 +70,14 @@ export function ScorePill({
         </svg>
         <span className="sp-score-slot-value">{value != null ? value : "—"}</span>
       </span>
-      {withLabel && label ? <span className="sp-score-pill-label">{label}</span> : null}
+      {withLabel && label ? (
+        <span className="sp-score-pill-text">
+          <span className="sp-score-pill-label">{label}</span>
+          {tier != null && tierLabels ? (
+            <span className="sp-score-pill-tier">{tierLabels[tier]}</span>
+          ) : null}
+        </span>
+      ) : null}
     </span>
   );
 }

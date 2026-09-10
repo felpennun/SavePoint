@@ -83,6 +83,13 @@ export const en: Dictionary = {
       label: "Rating",
       aria: "Rating {n} out of 100",
       none: "No rating",
+      tiers: {
+        essential: "Essential",
+        great: "Very good",
+        fair: "Fair",
+        poor: "Weak",
+        bad: "Avoid",
+      },
     },
     rating: {
       aria: "Your rating: {n} of 5",

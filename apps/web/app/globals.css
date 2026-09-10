@@ -1035,10 +1035,27 @@ input[type="radio"] {
   transform: translate(-0.5px, 1.5px);
 }
 
+.sp-score-pill-text {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.2;
+}
+
 .sp-score-pill-label {
   font-size: var(--text-meta);
   font-weight: 600;
   color: var(--color-text-secondary);
+}
+
+/* Tier word ("Imprescindible" ...), in the tier colour set by the
+   .sp-score-<tier> class on the pill root. */
+.sp-score-pill-tier {
+  font-size: var(--text-micro);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sp-score-fg);
 }
 
 .sp-score-pill--inline .sp-score-slot,
