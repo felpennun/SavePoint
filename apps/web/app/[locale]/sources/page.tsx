@@ -42,38 +42,62 @@ export default async function SourcesPage({ params }: { params: Promise<{ locale
     return (
       <main className="sp-page">
         <h1 className="sp-h1">{copy.heading}</h1>
-        <p role="alert">{copy.unavailable}</p>
-        <a href={`/${locale}/sources`}>{copy.reload}</a>
+        <div className="sp-empty sp-empty--error" role="alert">
+          <p className="sp-h2" style={{ margin: 0 }}>
+            {copy.unavailable}
+          </p>
+          <a href={`/${locale}/sources`} className="sp-btn-primary">
+            {copy.reload}
+          </a>
+        </div>
       </main>
     );
   }
 
   return (
-    <main>
-      <h1>{copy.heading}</h1>
-      <dl>
-        <dt>{copy.dataset}</dt>
-        <dd>
-          {sources.source} —{" "}
-          <a href={sources.source_url} target="_self" rel="noopener">
-            {sources.source_url}
-          </a>
-        </dd>
-        <dt>{copy.license}</dt>
-        <dd>{sources.licence}</dd>
-        <dt>{copy.retrieved}</dt>
-        <dd>{new Date(sources.retrieved_at).toISOString().slice(0, 10)}</dd>
-        <dt>{copy.checksum}</dt>
-        <dd style={{ wordBreak: "break-all" }}>{sources.snapshot_sha256}</dd>
-        <dt>{copy.records}</dt>
-        <dd>{sources.record_count}</dd>
-        <dt>{copy.covers}</dt>
-        <dd>
-          {sources.approved_asset_count} / {sources.total_asset_candidate_count}
-        </dd>
+    <main className="sp-page">
+      <h1 className="sp-h1">{copy.heading}</h1>
+      <p className="sp-lead">{copy.offline}</p>
+
+      <dl className="sp-spec-table">
+        <div className="sp-spec-row">
+          <dt>{copy.dataset}</dt>
+          <dd>
+            {sources.source} —{" "}
+            <a href={sources.source_url} className="sp-link" target="_self" rel="noopener">
+              {sources.source_url}
+            </a>
+          </dd>
+        </div>
+        <div className="sp-spec-row">
+          <dt>{copy.license}</dt>
+          <dd>{sources.licence}</dd>
+        </div>
+        <div className="sp-spec-row">
+          <dt>{copy.retrieved}</dt>
+          <dd className="sp-mono">{new Date(sources.retrieved_at).toISOString().slice(0, 10)}</dd>
+        </div>
+        <div className="sp-spec-row">
+          <dt>{copy.checksum}</dt>
+          <dd className="sp-mono" style={{ wordBreak: "break-all" }}>
+            {sources.snapshot_sha256}
+          </dd>
+        </div>
+        <div className="sp-spec-row">
+          <dt>{copy.records}</dt>
+          <dd className="sp-mono">{sources.record_count}</dd>
+        </div>
+        <div className="sp-spec-row">
+          <dt>{copy.covers}</dt>
+          <dd className="sp-mono">
+            {sources.approved_asset_count} / {sources.total_asset_candidate_count}
+          </dd>
+        </div>
       </dl>
-      <p>{copy.coverPolicy}</p>
-      <p>{copy.offline}</p>
+
+      <p className="sp-muted" style={{ maxWidth: "76ch", lineHeight: 1.65 }}>
+        {copy.coverPolicy}
+      </p>
     </main>
   );
 }

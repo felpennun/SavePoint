@@ -122,9 +122,17 @@ export default async function CataloguePage({
             </div>
           ) : null}
           {failed || !result ? (
-        <div>
-          <p role="alert">{dict.errors.retryCatalogue}</p>
-          <Link href={basePath} className="sp-link">
+        <div className="sp-empty sp-empty--error">
+          <span className="sp-error-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" aria-hidden="true">
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+            error
+          </span>
+          <p className="sp-h2" role="alert" style={{ margin: 0 }}>
+            {dict.errors.retryCatalogue}
+          </p>
+          <Link href={basePath} className="sp-btn-primary">
             {dict.common.retry}
           </Link>
         </div>
@@ -146,6 +154,10 @@ export default async function CataloguePage({
                 </>
               ) : (
                 <>
+                  <svg className="sp-empty-mark" width="40" height="40" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                    <path d="M6 12a6 6 0 0 1 6-6h20l10 10v20a6 6 0 0 1-6 6H12a6 6 0 0 1-6-6V12Z" stroke="currentColor" strokeWidth="2.5" />
+                    <path d="M24 15l8 9-8 9-8-9 8-9Z" fill="currentColor" />
+                  </svg>
                   <p className="sp-h2" style={{ margin: 0 }}>
                     {dict.catalogue.emptyHeading}
                   </p>

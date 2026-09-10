@@ -41,18 +41,19 @@ export function TopNavigation({ items, locale }: { items: NavItem[]; locale: str
   const pathname = usePathname();
   return (
     <nav aria-label={locale === "es" ? "Principal" : "Main"} className="hidden md:block">
-      <ul className="flex items-center gap-6" style={{ listStyle: "none", margin: 0, padding: 0 }}>
+      <ul className="flex items-center" style={{ listStyle: "none", margin: 0, padding: 0, gap: "22px" }}>
         {items.map((item) => (
           <li key={item.href}>
             <Link
               href={item.href}
               aria-current={isCurrent(pathname, item.href) ? "page" : undefined}
               style={{
-                color: isCurrent(pathname, item.href) ? "var(--color-text-primary)" : "var(--color-text-secondary)",
+                fontSize: "14px",
+                color: isCurrent(pathname, item.href) ? "var(--color-text-primary)" : "var(--color-text-muted)",
                 textDecoration: "none",
                 fontWeight: isCurrent(pathname, item.href) ? 600 : 400,
                 borderBottom: isCurrent(pathname, item.href) ? "2px solid var(--color-accent)" : "2px solid transparent",
-                paddingBottom: "2px",
+                paddingBottom: "3px",
               }}
             >
               {item.label}
@@ -130,10 +131,14 @@ export function MobileMenu({ items, dict }: { items: NavItem[]; dict: Dictionary
           className="sp-surface"
           style={{ position: "absolute", left: "var(--space-md)", right: "var(--space-md)", zIndex: 40, marginTop: "var(--space-sm)" }}
         >
-          <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: "var(--space-sm)" }}>
+          <ul className="sp-mobile-nav">
             {items.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} onClick={() => setOpen(false)}>
+                <Link
+                  href={item.href}
+                  aria-current={isCurrent(pathname, item.href) ? "page" : undefined}
+                  onClick={() => setOpen(false)}
+                >
                   {item.label}
                 </Link>
               </li>
@@ -162,8 +167,8 @@ export function AppShell({
       <a href="#main-content" className="skip-link">
         {dict.nav.skipToContent}
       </a>
-      <header className="border-b" style={{ borderColor: "var(--color-surface-border)", background: "var(--color-surface-raised)", position: "relative" }}>
-        <div className="flex items-center justify-between gap-2 md:gap-4 px-3 md:px-4 py-3">
+      <header className="border-b" style={{ borderColor: "var(--color-card-border)", background: "var(--color-surface-raised)", position: "relative" }}>
+        <div className="flex items-center justify-between gap-2 md:gap-4 px-4 md:px-5 py-3">
           <Link href={`/${locale}`} aria-label={dict.nav.home} className="min-w-0 [&>svg]:max-w-full" style={{ color: "var(--color-text-primary)", display: "inline-flex", alignItems: "center" }}>
             <BrandLockup />
           </Link>

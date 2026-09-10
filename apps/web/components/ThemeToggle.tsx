@@ -51,7 +51,7 @@ export function ThemeToggle({
       aria-label={isLight ? labels.switchToDark : labels.switchToLight}
       onClick={toggle}
     >
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
         {mounted && isLight ? (
           <>
             <circle cx="12" cy="12" r="4" />

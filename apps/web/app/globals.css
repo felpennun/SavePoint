@@ -400,6 +400,88 @@ input[type="radio"] {
   cursor: pointer;
 }
 
+/* Language switch -- one mono-bordered `ES / EN` pill (artboard 2a). */
+.sp-lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-control);
+  padding: 0 var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+}
+
+.sp-lang-opt {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: 0 var(--space-xs);
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.sp-lang-opt:hover {
+  color: var(--color-text-secondary);
+}
+
+.sp-lang-opt[aria-current="page"] {
+  color: var(--color-text-primary);
+  font-weight: 700;
+}
+
+.sp-lang-sep {
+  color: var(--color-text-muted);
+}
+
+/* Mobile nav panel items -- padded rows, the current route accent-tinted. */
+.sp-mobile-nav {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sp-mobile-nav a {
+  display: block;
+  padding: var(--space-sm) var(--space-ctl);
+  border-radius: var(--radius-chip);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-size: var(--text-body);
+}
+
+.sp-mobile-nav a:hover {
+  background: color-mix(in srgb, var(--color-text-primary) 6%, transparent);
+}
+
+.sp-mobile-nav a[aria-current="page"] {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+  font-weight: 600;
+}
+
+/* Account switcher trigger -- a rounded pill with a circular avatar chip
+   (artboard 2a). */
+.sp-account-trigger {
+  border-radius: 999px;
+  padding-left: 4px;
+  gap: var(--space-sm);
+}
+
+.sp-account-avatar {
+  width: 1.625rem;
+  height: 1.625rem;
+  padding: 5px;
+  border-radius: 999px;
+  background: var(--color-accent-edge);
+  color: var(--color-accent-text);
+  flex: none;
+  box-sizing: border-box;
+}
+
 .sp-surface {
   background: var(--color-surface-raised);
   border: 1px solid var(--color-surface-border);
@@ -883,12 +965,94 @@ a.sp-chip--active:hover {
 }
 
 .sp-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
   background: var(--color-surface-raised);
   border: 1px solid var(--color-surface-border);
   border-radius: var(--radius-card);
   padding: var(--space-2xl) var(--space-lg);
   text-align: center;
   margin-top: var(--space-lg);
+}
+
+/* Faded save-slot mark above a "no results" message (artboard 2e). */
+.sp-empty-mark {
+  color: var(--color-text-muted);
+  opacity: 0.5;
+}
+
+/* Error variant: a red-edged card with a mono "error" tag (artboard 2e). */
+.sp-empty--error {
+  border-color: var(--color-danger);
+}
+
+.sp-error-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
+  border: 1px solid var(--color-danger-border);
+  border-radius: var(--radius-chip);
+  padding: 3px var(--space-sm);
+}
+
+.sp-empty .sp-btn-primary,
+.sp-empty .sp-link {
+  margin-top: var(--space-xs);
+}
+
+/* Inline mono value (spec tables, provenance, counts). */
+.sp-mono {
+  font-family: var(--font-mono);
+}
+
+/* Spec table -- label / value rows with a hairline grid and a raised label
+   column (artboards 2j sources, 2f provenance). */
+.sp-spec-table {
+  margin: var(--space-lg) 0;
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-control);
+  overflow: hidden;
+  font-size: var(--text-meta);
+}
+
+.sp-spec-row {
+  display: grid;
+  grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
+}
+
+.sp-spec-row + .sp-spec-row {
+  border-top: 1px solid var(--color-surface-border);
+}
+
+.sp-spec-row > dt {
+  margin: 0;
+  padding: var(--space-ctl) var(--space-md);
+  background: var(--color-surface-raised);
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.sp-spec-row > dd {
+  margin: 0;
+  padding: var(--space-ctl) var(--space-md);
+  color: var(--color-text-secondary);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 560px) {
+  .sp-spec-row {
+    grid-template-columns: 1fr;
+  }
+  .sp-spec-row > dd {
+    padding-top: 0;
+  }
 }
 
 /* Pagination -- prev / next as accent links, the current page in a mono

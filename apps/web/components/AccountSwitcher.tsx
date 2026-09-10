@@ -104,13 +104,13 @@ export function AccountSwitcher({
       <button
         ref={triggerRef}
         type="button"
-        className="sp-btn-secondary"
+        className="sp-btn-secondary sp-account-trigger"
         aria-label={triggerText}
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
       >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+        <svg className="sp-account-avatar" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
           <circle cx="12" cy="8" r="4" />
           <path d="M4 21v-1a7 7 0 0 1 14 0v1" />
         </svg>
