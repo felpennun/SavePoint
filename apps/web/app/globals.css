@@ -1721,6 +1721,10 @@ a.sp-chip--active:hover {
   grid-template-columns: 280px minmax(0, 1fr);
   gap: var(--space-2xl);
   min-width: 0;
+  /* Keep the cover its natural height -- without this the cover column
+     stretches to match the (much taller) content column and its drop
+     shadow reads as an empty panel hanging below the poster. */
+  align-items: start;
 }
 
 .sp-detail-content {
@@ -1736,6 +1740,13 @@ a.sp-chip--active:hover {
 .sp-cover-hero {
   width: 280px;
   max-width: 100%;
+  align-self: start;
+}
+
+/* The drop shadow hugs the poster itself (rounded corners and all), not
+   the wrapper -- otherwise any extra wrapper height shows as a shadowed
+   slab under the cover. */
+.sp-cover-hero > .sp-cover {
   box-shadow: 0 10px 30px -6px rgba(0, 0, 0, 0.45);
 }
 
