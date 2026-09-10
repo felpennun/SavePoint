@@ -44,6 +44,7 @@ from recommendations.content.rank import rank_content_v1
 from recommendations.collaborative import rank_collaborative_user_knn_v1
 from recommendations.hybrid import rank_hybrid_mmr_v1, rank_hybrid_weighted_cf_v1
 from recommendations.published import CONTENT_ALGORITHM_IDS
+from recommendations.models import WorkFeatureVector
 from recommendations.baselines import rank_random_v1
 from library.popularity import rank_popularity_v1
 from library.models import LibraryEntry
@@ -345,6 +346,41 @@ def _training_item_probabilities(user_ids: set[object]) -> dict[str, float]:
     return {work_id: count / total for work_id, count in counts.items()} if total else {}
 
 
+def _prepared_candidate_vectors(
+    works: Sequence[Any],
+    signal_availability: Mapping[str, Any],
+    tag_idf: Mapping[str, float],
+) -> dict[object, dict[str, float]]:
+    """Load candidate feature vectors, preferring the shared ``WorkFeatureVector`` cache.
+
+    This mirrors ``recommendations.content.rank._load_candidate_vectors``: the
+    cache rows are the output of ``feature_vector()`` for ``FEATURE_SET_VERSION``
+    (materialised by ``rebuild_feature_vectors``), so reading them here avoids
+    recomputing every candidate vector once per algorithm without changing any
+    scored value. Any work absent from the cache falls back to a direct compute
+    with the same arguments the cache builder uses.
+    """
+
+    work_ids = [work.id for work in works]
+    vectors: dict[object, dict[str, float]] = {
+        row["work_id"]: row["vector_json"]
+        for row in WorkFeatureVector.objects.filter(
+            work_id__in=work_ids, feature_set_version=FEATURE_SET_VERSION
+        ).values("work_id", "vector_json")
+    }
+    for work in works:
+        if work.id in vectors:
+            continue
+        vectors[work.id] = feature_vector(
+            work,
+            include_franchise=signal_availability["include_franchise"],
+            include_developer=signal_availability["include_developer"],
+            tag_idf=tag_idf,
+            feature_set_version=FEATURE_SET_VERSION,
+        )
+    return vectors
+
+
 def run(
     protocol: Protocol,
     corpus_version: str,
@@ -424,16 +460,9 @@ def run(
     }
     evaluation_prepared = {
         "works": evaluation_works,
-        "vectors": {
-            work.id: feature_vector(
-                work,
-                include_franchise=signal_availability["include_franchise"],
-                include_developer=signal_availability["include_developer"],
-                tag_idf=evaluation_tag_idf,
-                feature_set_version=FEATURE_SET_VERSION,
-            )
-            for work in evaluation_works
-        },
+        "vectors": _prepared_candidate_vectors(
+            evaluation_works, signal_availability, evaluation_tag_idf
+        ),
         "tag_profile": evaluation_tag_profile,
         "tag_idf": evaluation_tag_idf,
         "snapshot_stats": evaluation_snapshot_stats,
