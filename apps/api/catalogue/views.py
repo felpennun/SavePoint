@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from datetime import date, timedelta
 
-from django.db.models import F
+from django.db.models import F, OuterRef, Subquery
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -13,7 +13,14 @@ from rest_framework.throttling import ScopedRateThrottle, SimpleRateThrottle
 from rest_framework.views import APIView
 
 from catalogue.corpus import governed_works
-from catalogue.models import AssetAttribution, GameWork, RelatedContent, SourceRecord
+from catalogue.models import (
+    AssetAttribution,
+    CorpusPopularityScore,
+    CorpusVersion,
+    GameWork,
+    RelatedContent,
+    SourceRecord,
+)
 from catalogue.search import (
     DEFAULT_PAGE_SIZE,
     FilterValidationError,
@@ -45,6 +52,12 @@ DLC_RELATIONS = ("dlc", "expansion")
 # comparison on ``first_release_date`` (no calendar arithmetic per row).
 NEW_RELEASE_WINDOW_DAYS = 183
 NEW_RELEASE_LIMIT = 20
+
+# Within that window works are ranked by a blend of how recent the release
+# is (0 at the cutoff, 1 today) and the materialised IGDB PopScore
+# (already normalised to [0, 1]); a missing PopScore counts as 0.
+NEW_RELEASE_RECENCY_WEIGHT = 0.70
+NEW_RELEASE_POPSCORE_WEIGHT = 0.30
 
 
 class NewReleasesThrottle(SimpleRateThrottle):
@@ -141,24 +154,49 @@ class NewReleasesView(APIView):
     """GET /api/catalogue/new-releases/ -- the home "Novedades" shelf (D-24).
 
     Up to 20 governed works whose ``first_release_date`` falls in the last
-    ~6 months, newest first with ``canonical_slug`` as the deterministic
-    tie-break. An empty window is ``[]`` with 200 (the frontend hides the
-    whole shelf), never an error. DLC and works outside the governed corpus
-    are excluded by ``governed_works()``.
+    ~6 months, ranked by ``0.70 * recency + 0.30 * PopScore`` with
+    ``canonical_slug`` as the deterministic tie-break. An empty window is
+    ``[]`` with 200 (the frontend hides the whole shelf), never an error.
+    DLC and works outside the governed corpus are excluded by
+    ``governed_works()``.
     """
 
     throttle_classes = [NewReleasesThrottle]
 
     def get(self, request: Request) -> Response:
         cutoff = date.today() - timedelta(days=NEW_RELEASE_WINDOW_DAYS)
-        works = list(
+        active_version = (
+            CorpusVersion.objects.filter(is_active=True)
+            .order_by("-created_at")
+            .values("version")[:1]
+        )
+        popscore = (
+            CorpusPopularityScore.objects.filter(
+                work_id=OuterRef("pk"),
+                corpus_version=Subquery(active_version),
+            )
+            .values("score")[:1]
+        )
+        window = (
             governed_works()
             .filter(first_release_date__gte=cutoff)
-            .order_by(F("first_release_date").desc(nulls_last=True), "canonical_slug")
-            .prefetch_related("assets", "releases__platform", "genres")[
-                :NEW_RELEASE_LIMIT
-            ]
+            .annotate(popscore=Subquery(popscore))
+            .prefetch_related("assets", "releases__platform", "genres")
         )
+
+        def blended(work: GameWork) -> float:
+            days_in = (work.first_release_date - cutoff).days
+            recency = min(1.0, max(0.0, days_in / NEW_RELEASE_WINDOW_DAYS))
+            pop = float(work.popscore) if work.popscore is not None else 0.0
+            return (
+                NEW_RELEASE_RECENCY_WEIGHT * recency
+                + NEW_RELEASE_POPSCORE_WEIGHT * pop
+            )
+
+        works = sorted(
+            window,
+            key=lambda work: (-blended(work), work.canonical_slug),
+        )[:NEW_RELEASE_LIMIT]
         return Response(
             GameCardSerializer(
                 works, many=True, context=_card_context(works)

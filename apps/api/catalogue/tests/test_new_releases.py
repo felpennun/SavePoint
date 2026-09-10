@@ -4,9 +4,10 @@ shelf endpoint (Plan 02-05 Task 1, DATA-05 / QUAL-05 / D-24).
 The detail serializer must carry the IGDB ``summary`` and the IGDB *user*
 rating (``rating`` / ``rating_count``) plus provenance ``retrieved_at`` /
 ``source``. ``GET /api/catalogue/new-releases/`` returns up to 20 governed
-works released in the last ~6 months, ordered ``first_release_date`` desc with
-``canonical_slug`` as the tie-break; an empty window is ``[]`` with 200, never
-an error, and a work outside the governed corpus never appears.
+works released in the last ~6 months, ranked by ``0.70 * recency +
+0.30 * PopScore`` with ``canonical_slug`` as the tie-break; an empty window
+is ``[]`` with 200, never an error, and a work outside the governed corpus
+never appears.
 """
 
 from __future__ import annotations
@@ -16,7 +17,12 @@ from datetime import date, datetime, timedelta, timezone
 import pytest
 from rest_framework.test import APIClient
 
-from catalogue.models import GameWork, SourceRecord
+from catalogue.models import (
+    CorpusPopularityScore,
+    CorpusVersion,
+    GameWork,
+    SourceRecord,
+)
 
 pytestmark = pytest.mark.django_db
 
@@ -175,6 +181,34 @@ def test_new_releases_orders_by_release_date_desc_then_canonical_slug() -> None:
     slugs = [row["slug"] for row in body]
 
     assert slugs.index("a-newer") < slugs.index("b-newer") < slugs.index("z-older")
+
+
+def test_new_releases_blends_recency_with_popscore() -> None:
+    """A somewhat older but highly popular release outranks a fresher one
+    with no engagement signal: the ranking is 0.70 recency + 0.30 PopScore,
+    not recency alone."""
+    CorpusVersion.objects.create(
+        version="2026.09.1", ruleset_sha256="c" * 64, is_active=True
+    )
+    fresh = _governed_work(
+        "fresh-unknown", first_release_date=_TODAY - timedelta(days=30)
+    )
+    _igdb_source(fresh, "20")
+    popular = _governed_work(
+        "old-but-popular", first_release_date=_TODAY - timedelta(days=45)
+    )
+    _igdb_source(popular, "21")
+    CorpusPopularityScore.objects.create(
+        work=popular,
+        corpus_version="2026.09.1",
+        score=1.0,
+        formula_version="igdb-engagement-weighted-v2",
+        calculated_at=datetime(2026, 9, 1, tzinfo=timezone.utc),
+        source_snapshot_sha256="d" * 64,
+    )
+
+    slugs = [row["slug"] for row in APIClient().get("/api/catalogue/new-releases/").json()]
+    assert slugs.index("old-but-popular") < slugs.index("fresh-unknown")
 
 
 def test_new_releases_empty_window_returns_empty_list_with_200() -> None:
