@@ -617,13 +617,13 @@ input[type="radio"] {
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(156px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: var(--space-md);
 }
 
 @media (max-width: 720px) {
   .sp-grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
 }
 
@@ -754,7 +754,7 @@ input[type="radio"] {
 }
 
 .sp-collection-grid > li {
-  height: 25rem;
+  height: 27rem;
   min-width: 0;
 }
 
@@ -775,8 +775,8 @@ input[type="radio"] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2.375rem;
+  height: 2.375rem;
   flex: none;
 }
 
@@ -801,6 +801,10 @@ input[type="radio"] {
   font-size: var(--text-meta);
   line-height: 1;
   color: var(--sp-score-fg);
+  /* The save-slot path has its notch cut from the top-right, so its
+     visual centre sits a hair below the bounding-box centre -- nudge the
+     numeral down/left so it reads optically centred inside the shape. */
+  transform: translate(-0.5px, 1.5px);
 }
 
 .sp-score-pill-label {
@@ -1750,7 +1754,7 @@ a.sp-chip--active:hover {
   }
 
   .sp-collection-grid > li {
-    height: 24rem;
+    height: 25rem;
   }
 
   .sp-copy-remove {
