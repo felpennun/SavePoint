@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 
-import { BrandLockup } from "@/components/BrandLockup";
 import { GameCard } from "@/components/GameCard";
 import { NewReleasesShelf } from "@/components/NewReleasesShelf";
 import { getDictionary } from "@/i18n";
@@ -105,9 +104,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       ) : (
         <>
           <div className="sp-hero">
-            <div style={{ color: "var(--color-text-primary)" }}>
-              <BrandLockup />
-            </div>
             <h1 className="sp-h1">SavePoint</h1>
             <p className="sp-lead">{dict.home.valueProposition}</p>
             {/* No log-in entry here on purpose: sign-in lives in the navbar

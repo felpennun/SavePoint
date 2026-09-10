@@ -22,6 +22,9 @@
   --color-surface-raised: #232532;
   --color-surface-overlay: #292b31;
   --color-surface-border: #3a3d49;
+  /* The quiet hairline around a game card -- a step softer than the
+     general surface border so the cards recede into cover-led grids. */
+  --color-card-border: #292b31;
 
   --shadow-overlay: 0 6px 20px -4px rgba(0, 0, 0, 0.5);
   --color-skeleton-base: var(--color-surface-overlay);
@@ -99,6 +102,7 @@
 
   /* Product-grade type scale (Tailwind v4 reads --text-* from @theme).
      13 / 16 / 22 / 30. */
+  --text-micro: 0.75rem; /* 12px -- card meta, evidence, status / rating lines */
   --text-meta: 0.8125rem; /* 13px -- labels, meta, chips, score pill */
   --text-body: 1rem; /* 16px -- paragraph copy, list rows, values */
   --text-heading: 1.375rem; /* 22px -- <h2> section headings */
@@ -135,6 +139,7 @@
   --color-surface-raised: #fdfdff;
   --color-surface-overlay: #eceef4;
   --color-surface-border: #dcdce4;
+  --color-card-border: #dcdce4;
 
   --shadow-overlay: 0 6px 20px -4px rgba(20, 20, 30, 0.18);
 
@@ -482,19 +487,39 @@ textarea {
   }
 }
 
+/* Game card -- one surface on every page (catalogue, collection, home,
+   every recommendation shelf): a 2:3 cover flush at the top, clipped by
+   the card radius, then a padded body. Nocturne identity artboard 1k. */
 .sp-card {
   position: relative;
-  display: block;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-control);
+  overflow: hidden;
   text-decoration: none;
   color: inherit;
 }
 
+.sp-card:hover {
+  border-color: var(--color-accent-edge);
+}
+
 .sp-cover {
   position: relative;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 2 / 3;
   border-radius: var(--radius-card);
   overflow: hidden;
-  background: var(--color-surface-raised);
+  background: var(--color-surface-overlay);
+  flex: none;
+}
+
+/* Standalone cover (game detail hero) keeps its own rounding; inside a
+   card the card clips it, so drop the radius. */
+.sp-card > .sp-cover {
+  border-radius: 0;
 }
 
 .sp-cover img {
@@ -506,21 +531,41 @@ textarea {
 
 .sp-cover-placeholder {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: var(--space-xs);
   height: 100%;
   width: 100%;
   padding: var(--space-sm);
   text-align: center;
-  font-size: var(--text-meta);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
   color: var(--color-text-muted);
 }
 
+.sp-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-ctl);
+  flex: 1;
+  min-width: 0;
+}
+
+.sp-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
 .sp-card-title {
-  font-size: var(--text-body);
+  font-size: 0.9375rem; /* 15px */
   font-weight: 600;
+  line-height: 1.3;
   color: var(--color-text-primary);
-  margin: var(--space-sm) 0 2px;
+  margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
@@ -530,63 +575,59 @@ textarea {
 
 .sp-card-meta {
   font-family: var(--font-mono);
-  font-size: var(--text-meta);
+  font-size: var(--text-micro);
   color: var(--color-text-muted);
   margin: 0;
-}
-
-.sp-collection-grid > li {
-  height: 24rem;
-  min-width: 0;
-}
-
-.sp-collection-grid .sp-card {
-  display: flex;
-  height: 100%;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.sp-collection-grid .sp-card-title {
-  min-height: 2.8em;
-}
-
-.sp-collection-grid .sp-card-meta {
-  min-height: 1.35rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+.sp-card-evidence {
+  font-size: var(--text-micro);
+  line-height: 1.45;
+  color: var(--color-secondary-mid);
+  margin: 0;
+}
+
+/* Card foot -- divided block for the collection context: backlog status
+   line, personal rating, owned-copies count. Pinned to the card bottom so
+   ragged bodies still line up in a grid row. */
+.sp-card-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: auto;
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--color-card-border);
+}
+
+.sp-card-copies {
+  font-size: var(--text-micro);
+  color: var(--color-text-muted);
+}
+
 .sp-card-stars {
   color: var(--color-rating);
-  font-size: var(--text-meta);
-  margin-top: 2px;
+  font-size: var(--text-micro);
   letter-spacing: 1px;
 }
 
-.sp-card-evidence {
-  font-size: var(--text-meta);
-  color: var(--color-text-muted);
-  margin: 2px 0 0;
+.sp-collection-grid > li {
+  height: 25rem;
+  min-width: 0;
 }
 
 /* Score pill -- Nocturne treats the IGDB critic score as data sitting
    INSIDE the "save slot": a JetBrains Mono numeral over the shell, which
    is filled with a tinted tier ground and stroked in the tier colour.
-   Five tramos, each tier sets --sp-score-fg / --sp-score-bg. */
+   Five tramos, each tier sets --sp-score-fg / --sp-score-bg. It sits in
+   the card title row (never overlaid on the cover art). */
 .sp-score-pill {
-  position: absolute;
-  top: var(--space-sm);
-  right: var(--space-sm);
   display: inline-flex;
   align-items: center;
   gap: var(--space-sm);
-}
-
-.sp-score-pill--inline,
-.sp-score-pill--labelled {
-  position: static;
+  flex: none;
 }
 
 .sp-score-slot {
@@ -594,8 +635,8 @@ textarea {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.125rem;
-  height: 2.125rem;
+  width: 2.25rem;
+  height: 2.25rem;
   flex: none;
 }
 
@@ -701,6 +742,21 @@ textarea {
   border-color: var(--color-status-abandoned-border);
 }
 
+/* Bare status line (game card foot): glyph + label in the tier colour,
+   no pill chrome. Keeps `.sp-status-<state>` for the colour, drops the
+   ground/border/padding those classes also set. */
+.sp-status-line {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  background: none;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  font-size: var(--text-micro);
+  font-weight: 600;
+}
+
 /* Active filter chip -- Nocturne 4px "cell" radius, accent-tinted. */
 .sp-chip {
   display: inline-flex;
@@ -763,48 +819,47 @@ textarea {
   padding: 0 0 var(--space-sm);
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: 120px;
-  grid-auto-rows: 18.25rem;
+  grid-auto-columns: 164px;
+  grid-auto-rows: 21.5rem;
   justify-content: flex-start;
   column-gap: var(--space-md);
   row-gap: 0;
   overflow-x: auto;
-  min-height: 18.75rem;
+  min-height: 22rem;
   scroll-snap-type: x proximity;
 }
 
 .sp-shelf-track > li {
-  width: 120px;
-  height: 18.25rem;
+  width: 164px;
+  height: 21.5rem;
+}
+
+/* Shelves that carry no evidence line (new releases, owned DLC) don't
+   need the two-line reserve -- keep them tight to cover + title. */
+.sp-shelf-track--dense {
+  grid-auto-rows: 19rem;
+  min-height: 19.5rem;
+}
+
+.sp-shelf-track--dense > li {
+  height: 19rem;
 }
 
 .sp-shelf-track .sp-card {
-  display: flex;
-  height: 100%;
-  flex-direction: column;
   scroll-snap-align: start;
 }
 
 .sp-shelf-track .sp-cover {
-  width: 120px;
-  height: 160px;
-  aspect-ratio: 3 / 4;
-  flex: 0 0 160px;
+  width: 100%;
+  aspect-ratio: 2 / 3;
 }
 
 .sp-shelf-track .sp-card-title {
-  min-height: 2.8em;
-}
-
-.sp-shelf-track .sp-card-meta {
-  min-height: 1.35rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-height: 2.6em;
 }
 
 .sp-shelf-track .sp-card-evidence {
-  min-height: 2.8em;
+  min-height: 2.7em;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
@@ -1424,7 +1479,7 @@ textarea {
   }
 
   .sp-collection-grid > li {
-    height: 22rem;
+    height: 24rem;
   }
 
   .sp-copy-remove {

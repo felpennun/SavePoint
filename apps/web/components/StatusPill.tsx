@@ -58,15 +58,20 @@ export function StatusPill({
   status,
   label,
   onCover = false,
+  bare = false,
 }: {
   status: BacklogStatus;
   label: string;
   onCover?: boolean;
+  /** Drop the pill chrome: a plain glyph + label line in the status
+   * colour, for use inside the game card foot. */
+  bare?: boolean;
 }) {
+  const className = bare
+    ? `sp-status-line sp-status-${status}`
+    : `sp-status-pill sp-status-${status}${onCover ? " sp-status-pill--on-cover" : ""}`;
   return (
-    <span
-      className={`sp-status-pill sp-status-${status}${onCover ? " sp-status-pill--on-cover" : ""}`}
-    >
+    <span className={className}>
       <StatusGlyph status={status} />
       {label}
     </span>
