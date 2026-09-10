@@ -160,11 +160,44 @@ class Command(BaseCommand):
             "--max-workers", type=int, default=0,
             help="limit process concurrency; 0 means one process per algorithm",
         )
+        parser.add_argument(
+            "--serial-tail", type=int, default=0,
+            help=(
+                "run the last N algorithms of the suite one process at a time "
+                "(the memory-heavy MMR / collaborative / hybrid variants), while "
+                "the rest run at --max-workers; execution condition only"
+            ),
+        )
         parser.add_argument("--marker-path", default="", help="override the test marker path")
 
     @staticmethod
     def _marker_path(option: str) -> Path:
         return Path(option) if option else Path(settings.BASE_DIR) / ".evaluation-test-run.json"
+
+    @staticmethod
+    def _drain_pool(
+        payloads: list[dict[str, Any]],
+        workers: int,
+        worker_results: list[dict[str, Any]],
+    ) -> None:
+        """Run one batch of algorithm payloads and append their result manifests."""
+
+        if not payloads:
+            return
+        with ProcessPoolExecutor(max_workers=max(1, min(workers, len(payloads)))) as executor:
+            futures = [executor.submit(_run_algorithm_process, payload) for payload in payloads]
+            for future in as_completed(futures):
+                try:
+                    worker_results.append(future.result())
+                except Exception as exc:  # noqa: BLE001 - convert pool failure to an explicit manifest
+                    worker_results.append(
+                        {
+                            "algorithm_id": "unknown-process",
+                            "status": "failed",
+                            "error_type": type(exc).__name__,
+                            "error": str(exc)[:500],
+                        }
+                    )
 
     def _emit_evidence(self, target: str, artifact: dict[str, Any]) -> None:
         blob = json.dumps(artifact, indent=2, ensure_ascii=False, sort_keys=True) + "\n"
@@ -210,23 +243,19 @@ class Command(BaseCommand):
             }
             for algorithm_id in algorithm_ids
         ]
+        serial_tail = min(max(0, int(options.get("serial_tail") or 0)), len(payloads))
+        head_payloads = payloads[: len(payloads) - serial_tail]
+        tail_payloads = payloads[len(payloads) - serial_tail :]
+
         wall_started_at = datetime.now(timezone.utc)
         wall_started = time.perf_counter()
         worker_results: list[dict[str, Any]] = []
-        with ProcessPoolExecutor(max_workers=max_workers) as executor:
-            futures = [executor.submit(_run_algorithm_process, payload) for payload in payloads]
-            for future in as_completed(futures):
-                try:
-                    worker_results.append(future.result())
-                except Exception as exc:  # noqa: BLE001 - convert pool failure to an explicit manifest
-                    worker_results.append(
-                        {
-                            "algorithm_id": "unknown-process",
-                            "status": "failed",
-                            "error_type": type(exc).__name__,
-                            "error": str(exc)[:500],
-                        }
-                    )
+        # The heavy MMR / collaborative / hybrid variants at the tail of the
+        # suite each hold the full candidate universe; draining them one at a
+        # time keeps peak memory within a small Docker VM. Execution condition
+        # only -- it changes neither the scored values nor the merged artifact.
+        self._drain_pool(head_payloads, max_workers, worker_results)
+        self._drain_pool(tail_payloads, 1, worker_results)
         wall_finished_at = datetime.now(timezone.utc)
         try:
             artifact = _merge_worker_artifacts(
@@ -238,6 +267,9 @@ class Command(BaseCommand):
             )
         except ValueError as exc:
             raise CommandError(str(exc)) from exc
+        if isinstance(artifact.get("parallel_execution"), dict):
+            artifact["parallel_execution"]["max_workers"] = max_workers
+            artifact["parallel_execution"]["serial_tail"] = serial_tail
         self._emit_evidence(options.get("evidence_json", ""), artifact)
         if artifact["status"] != "succeeded":
             raise CommandError("one or more offline algorithm workers failed; no test marker was recorded")
