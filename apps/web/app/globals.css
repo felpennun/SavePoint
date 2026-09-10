@@ -612,6 +612,62 @@ input[type="radio"] {
   font-size: var(--text-body);
 }
 
+/* Filter panel header -- "Filtros" + a mono "N activos" count (artboard 2d). */
+.sp-filterbar-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.sp-filterbar-title {
+  font-size: var(--text-body);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.sp-filterbar-count {
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+  color: var(--color-secondary-mid);
+}
+
+/* Search field -- magnifier icon inside a single bordered box. */
+.sp-search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-control);
+  padding: 0 var(--space-ctl);
+  background: var(--color-surface-overlay);
+}
+
+.sp-search > svg {
+  flex: none;
+  color: var(--color-text-muted);
+}
+
+.sp-search input {
+  flex: 1;
+  min-width: 0;
+  min-height: 2.5rem;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  padding: var(--space-sm) 0;
+  font-size: var(--text-body);
+}
+
+.sp-search input:focus-visible {
+  outline: none;
+}
+
+.sp-search:focus-within {
+  border-color: var(--color-accent);
+}
+
 .sp-grid {
   list-style: none;
   margin: 0;
@@ -1675,14 +1731,41 @@ a.sp-chip--active:hover {
 }
 
 @media (min-width: 48rem) {
+  /* On desktop the filter facets read as inline, always-open bordered
+     lists (artboard 2d), not a popover -- the <details> still toggles for
+     no-JS mobile, but the list stays visible here regardless.
+     ::details-content is the modern hook; the older display override is
+     kept for engines that hide the slotted child instead. */
+  .sp-facet::details-content {
+    content-visibility: visible;
+    display: block;
+  }
+  .sp-facet:not([open]) > .sp-surface {
+    display: block;
+  }
   .sp-facet > .sp-surface {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 20rem;
-    max-width: min(20rem, calc(100vw - var(--space-2xl)));
-    z-index: 30;
-    box-shadow: var(--shadow-overlay);
+    margin-top: var(--space-xs);
+    padding: var(--space-ctl);
+  }
+  .sp-facet > summary {
+    cursor: default;
+  }
+  .sp-facet > summary .sp-facet-chevron {
+    display: none;
+  }
+  /* The 44px checkbox is a mobile touch target; on desktop the whole
+     label row carries the target and the tick is drawn small. */
+  .sp-facet-option {
+    gap: var(--space-sm);
+    padding: 0 var(--space-xs);
+  }
+  .sp-facet-option input {
+    flex: 0 0 1rem;
+    width: 1rem;
+    height: 1rem;
+  }
+  .sp-facet-options {
+    max-height: 11rem;
   }
 }
 

@@ -49,10 +49,22 @@ export function FilterBar({
       <summary>
         {f.mobileToggle.replace("{n}", String(activeCount))}
       </summary>
+      <div className="sp-filterbar-head">
+        <span className="sp-filterbar-title">{locale === "es" ? "Filtros" : "Filters"}</span>
+        {activeCount > 0 ? (
+          <span className="sp-filterbar-count">{f.activeLabel.many(activeCount)}</span>
+        ) : null}
+      </div>
       <form method="get" action={basePath} className="sp-filterbar-body">
         <div className="sp-field">
           <label htmlFor="q">{dict.catalogue.searchLabel}</label>
-          <input id="q" name="q" type="search" defaultValue={filters.q ?? ""} />
+          <div className="sp-search">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" />
+              <path d="M16.5 16.5 21 21" />
+            </svg>
+            <input id="q" name="q" type="search" defaultValue={filters.q ?? ""} />
+          </div>
         </div>
 
         <FacetMenu
