@@ -6,8 +6,9 @@
  * colour. Five tramos (identity artboard 1c):
  *   90-100 essential (primary) - 75-89 great (success) - 60-74 fair
  *   (neutral) - 40-59 poor (warning) - 0-39 bad (error).
- * `rating == null` renders nothing -- the caller shows `card.score.none`
- * visually-hidden if it needs to. Never uses the accent as a flood.
+ * When there is NO rating the slot is still drawn -- dashed outline with an
+ * em dash -- the sixth "SIN NOTA" variant from the designs. Never uses the
+ * accent as a flood.
  */
 
 /** The Nocturne isotype shell -- a memory-card notch -- on a 48 grid. */
@@ -29,6 +30,7 @@ export function ScorePill({
   className,
   withLabel,
   label,
+  emptyLabel,
 }: {
   rating: number | null | undefined;
   /** e.g. dict.card.score.aria = "Rating {n} out of 100" */
@@ -37,15 +39,20 @@ export function ScorePill({
   /** Show a localized textual label next to the slot (detail page). */
   withLabel?: boolean;
   label?: string;
+  /** Accessible name for the no-rating slot (dict.card.score.none). */
+  emptyLabel?: string;
 }) {
-  if (rating == null || Number.isNaN(rating)) return null;
-  const value = Math.round(rating);
-  const tier = tierOf(value);
-  const ariaLabel = ariaLabelTemplate.replace("{n}", String(value));
+  const hasRating = rating != null && !Number.isNaN(rating);
+  const value = hasRating ? Math.round(rating as number) : null;
+  const tierClass = value != null ? `sp-score-${tierOf(value)}` : "sp-score-empty";
+  const ariaLabel =
+    value != null
+      ? ariaLabelTemplate.replace("{n}", String(value))
+      : emptyLabel ?? ariaLabelTemplate.replace("{n}", "—");
 
   return (
     <span
-      className={`sp-score-pill sp-score-${tier}${withLabel ? " sp-score-pill--labelled" : ""}${
+      className={`sp-score-pill ${tierClass}${withLabel ? " sp-score-pill--labelled" : ""}${
         className ? ` ${className}` : ""
       }`}
       role="img"
@@ -55,7 +62,7 @@ export function ScorePill({
         <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false">
           <path d={SLOT_PATH} />
         </svg>
-        <span className="sp-score-slot-value">{value}</span>
+        <span className="sp-score-slot-value">{value != null ? value : "—"}</span>
       </span>
       {withLabel && label ? <span className="sp-score-pill-label">{label}</span> : null}
     </span>

@@ -70,7 +70,11 @@ export function GameCard({
         <div className="sp-card-body">
           <div className="sp-card-head">
             <p className="sp-card-title">{game.title}</p>
-            <ScorePill rating={score} ariaLabelTemplate={dict.card.score.aria} />
+            <ScorePill
+              rating={score}
+              ariaLabelTemplate={dict.card.score.aria}
+              emptyLabel={dict.card.score.none}
+            />
           </div>
           {metaParts.length > 0 ? <p className="sp-card-meta">{metaParts.join(" · ")}</p> : null}
           {evidence ? <p className="sp-card-evidence">{evidence}</p> : null}
