@@ -11,6 +11,7 @@ type CopyFormat = "physical" | "digital";
 
 const COPY = {
   es: {
+    configHeading: "Tu configuración",
     statusLegend: "Estado",
     statusLabels: { pending: "Pendiente", playing: "Jugando", completed: "Completado", abandoned: "Abandonado" },
     ratingLabel: "Tu valoración",
@@ -33,6 +34,7 @@ const COPY = {
     loading: "Cargando configuración…",
   },
   en: {
+    configHeading: "Your setup",
     statusLegend: "Status",
     statusLabels: { pending: "Pending", playing: "Playing", completed: "Completed", abandoned: "Abandoned" },
     ratingLabel: "Your rating",
@@ -182,7 +184,8 @@ export function LibraryControls({
   }
 
   return (
-    <section className="sp-library-controls" aria-label={copy.copiesHeading}>
+    <section className="sp-library-controls" aria-label={copy.configHeading}>
+      <h3 className="sp-library-title">{copy.configHeading}</h3>
       <fieldset className="sp-library-section">
         <legend>{copy.statusLegend}</legend>
         <div className="sp-status-options">

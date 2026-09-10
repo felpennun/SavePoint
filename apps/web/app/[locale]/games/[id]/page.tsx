@@ -197,9 +197,9 @@ export default async function GameDetailPage({
 
             {game.provenance ? (
             <section aria-label={dict.provenance.heading} className="sp-provenance">
-              <h2 className="sp-h2" style={{ fontSize: "var(--text-meta)", margin: "0 0 var(--space-xs)" }}>
+              <p className="sp-eyebrow" style={{ margin: "0 0 var(--space-sm)" }}>
                 {dict.provenance.heading}
-              </h2>
+              </p>
               <p style={{ margin: 0 }}>
                 {game.provenance.source} · {game.provenance.source_id} · {game.provenance.licence} · {" "}
                 {new Date(game.provenance.retrieved_at).toISOString().slice(0, 10)}
