@@ -7,6 +7,8 @@ import json
 import math
 import os
 import subprocess
+import sys
+import time
 from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import Any
@@ -484,7 +486,9 @@ def run(
     ]
     split_manifest_hash = _hash_payload(sorted(all_manifest_rows))
 
-    for algorithm_id, algorithm in algorithm_map.items():
+    algorithm_count = len(algorithm_map)
+    for algorithm_index, (algorithm_id, algorithm) in enumerate(algorithm_map.items(), start=1):
+        algorithm_started = time.perf_counter()
         per_user: list[dict[str, Any]] = []
         metric_rows: dict[str, list[dict[str, float]]] = {str(k): [] for k in K_VALUES}
         ranked_lists: dict[str, list[list[str]]] = {str(k): [] for k in K_VALUES}
@@ -591,12 +595,21 @@ def run(
                     "source": "training_interactions",
                 },
             }
+        algorithm_seconds = round(time.perf_counter() - algorithm_started, 6)
         algorithm_artifacts[algorithm_id] = {
             "algorithm_id": algorithm_id,
             "per_user": per_user,
             "aggregates": aggregates,
             "beyond_accuracy": beyond_aggregates,
+            "duration_seconds": algorithm_seconds,
         }
+        print(
+            f"[eval] {algorithm_index}/{algorithm_count} {algorithm_id} "
+            f"done in {algorithm_seconds:.1f}s "
+            f"({len(candidates_by_user)} users)",
+            file=sys.stderr,
+            flush=True,
+        )
 
     return {
         "protocol_version": protocol.protocol_version,
