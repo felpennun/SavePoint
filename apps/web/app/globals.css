@@ -228,6 +228,13 @@ textarea {
   min-height: 2.75rem;
 }
 
+/* Native checkboxes / radios take the accent tick (Nocturne: themed
+   interaction states, never browser defaults). */
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--color-accent);
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -757,38 +764,46 @@ textarea {
   font-weight: 600;
 }
 
-/* Active filter chip -- Nocturne 4px "cell" radius, accent-tinted. */
+/* Chip -- Nocturne 4px "cell" radius. Two variants: the base is a neutral
+   outline (genres, static tags); `--active` is the accent-tinted removable
+   filter chip (catalogue active filters). */
 .sp-chip {
   display: inline-flex;
   align-items: center;
   flex-wrap: wrap;
   gap: var(--space-xs);
-  background: var(--color-accent-soft);
-  border: 1px solid var(--color-accent-edge);
+  background: transparent;
+  border: 1px solid var(--color-surface-border);
   border-radius: var(--radius-chip);
   padding: 4px 10px;
   font-size: var(--text-meta);
   font-weight: 600;
-  color: var(--color-accent-text);
+  color: var(--color-text-secondary);
   text-decoration: none;
   max-width: 100%;
   overflow-wrap: anywhere;
 }
 
-.sp-chip .sp-chip-x {
-  color: var(--color-text-muted);
-  flex: 0 0 auto;
+a.sp-chip:hover {
+  border-color: var(--color-accent);
+  color: var(--color-text-primary);
 }
 
-.sp-copies-chip {
-  display: inline-block;
-  margin-top: var(--space-xs);
-  font-size: var(--text-meta);
-  color: var(--color-text-secondary);
-  background: var(--color-surface-overlay);
-  border: 1px solid var(--color-surface-border);
-  border-radius: 999px;
-  padding: 1px var(--space-sm);
+.sp-chip--active {
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent-edge);
+  color: var(--color-accent-text);
+}
+
+a.sp-chip--active:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent-text);
+}
+
+.sp-chip .sp-chip-x {
+  color: currentColor;
+  opacity: 0.7;
+  flex: 0 0 auto;
 }
 
 .sp-recommendation-shelves {
@@ -874,6 +889,35 @@ textarea {
   padding: var(--space-2xl) var(--space-lg);
   text-align: center;
   margin-top: var(--space-lg);
+}
+
+/* Pagination -- prev / next as accent links, the current page in a mono
+   accent-bordered chip (Nocturne artboards 2d, 2g). */
+.sp-pagination {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--space-xl);
+  font-size: var(--text-body);
+}
+
+.sp-pagination a {
+  color: var(--color-accent-strong);
+  text-decoration: none;
+}
+
+.sp-pagination a:hover {
+  text-decoration: underline;
+}
+
+.sp-pagination-current {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-accent-edge);
+  border-radius: var(--radius-control);
+  padding: 4px var(--space-ctl);
 }
 
 /* Algorithm + limitation disclosure on the recommendations page (D-09):
@@ -1081,18 +1125,25 @@ textarea {
   overflow-y: auto;
 }
 
+/* Collection status summary -- one small stat box per backlog state
+   (Nocturne artboard 2g): the status line on top, a big mono count below. */
 .sp-summary-dl {
   display: flex;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   flex-wrap: wrap;
   margin: var(--space-lg) 0 var(--space-sm);
-  font-size: var(--text-meta);
 }
 
 .sp-summary-dl > div {
   display: flex;
-  gap: var(--space-sm);
-  align-items: center;
+  flex-direction: column;
+  gap: var(--space-xs);
+  flex: 1 1 7rem;
+  min-width: 7rem;
+  padding: var(--space-ctl) var(--space-md);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-raised);
 }
 
 .sp-summary-dl dt {
@@ -1101,7 +1152,10 @@ textarea {
 
 .sp-summary-dl dd {
   margin: 0;
-  font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: var(--text-heading);
+  font-weight: 700;
+  line-height: 1;
   color: var(--color-text-primary);
 }
 

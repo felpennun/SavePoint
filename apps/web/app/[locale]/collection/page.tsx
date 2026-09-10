@@ -137,7 +137,7 @@ export default async function CollectionPage({
           {STATUSES.map((s) => (
             <div key={s}>
               <dt>
-                <StatusPill status={s} label={dict.status.labels[s]} />
+                <StatusPill status={s} label={dict.status.labels[s]} bare />
               </dt>
               <dd>{formatCount(dict.collection.statusSummaryCount, library.summary[s] ?? 0)}</dd>
             </div>
@@ -185,16 +185,13 @@ export default async function CollectionPage({
             ))}
           </ul>
           {pageCount > 1 ? (
-            <nav
-              aria-label={locale === "es" ? "Paginación" : "Pagination"}
-              style={{ display: "flex", gap: "var(--space-md)", alignItems: "center", justifyContent: "center", marginTop: "var(--space-xl)" }}
-            >
+            <nav className="sp-pagination" aria-label={locale === "es" ? "Paginación" : "Pagination"}>
               {currentPage > 1 ? (
                 <Link href={buildHref({ page: String(currentPage - 1) })}>
                   {locale === "es" ? "Anterior" : "Previous"}
                 </Link>
               ) : null}
-              <span aria-current="page" style={{ color: "var(--color-accent-strong)", fontWeight: 600 }}>
+              <span aria-current="page" className="sp-pagination-current">
                 {currentPage}
               </span>
               {currentPage < pageCount ? (

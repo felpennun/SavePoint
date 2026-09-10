@@ -162,13 +162,13 @@ export default async function CataloguePage({
                   <GameCard key={game.id} game={game} locale={locale} score={game.display_rating ?? null} />
                 ))}
               </ul>
-              <nav aria-label={locale === "es" ? "Paginación" : "Pagination"} style={{ display: "flex", gap: "var(--space-md)", alignItems: "center", justifyContent: "center", marginTop: "var(--space-xl)" }}>
+              <nav className="sp-pagination" aria-label={locale === "es" ? "Paginación" : "Pagination"}>
                 {currentPage > 1 ? (
                   <Link href={`${basePath}${buildQuery(visibleFilters, currentPage - 1)}`}>
                     {locale === "es" ? "Anterior" : "Previous"}
                   </Link>
                 ) : null}
-                <span aria-current="page" style={{ color: "var(--color-accent-strong)", fontWeight: 600 }}>
+                <span aria-current="page" className="sp-pagination-current">
                   {currentPage}
                 </span>
                 {result.has_next ? (
