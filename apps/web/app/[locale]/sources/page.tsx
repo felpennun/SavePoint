@@ -37,6 +37,18 @@ export default async function SourcesPage({ params }: { params: Promise<{ locale
   const copy = COPY[locale];
 
   const sources = await fetchSources();
+  const num = (value: number) => new Intl.NumberFormat(locale).format(value);
+  let sourceHref = "";
+  if (sources) {
+    try {
+      sourceHref = new URL(sources.source_url).origin;
+    } catch {
+      sourceHref = sources.source_url;
+    }
+  }
+  const coverPct = sources && sources.total_asset_candidate_count > 0
+    ? Math.round((sources.approved_asset_count / sources.total_asset_candidate_count) * 100)
+    : null;
 
   if (!sources) {
     return (
@@ -63,9 +75,9 @@ export default async function SourcesPage({ params }: { params: Promise<{ locale
         <div className="sp-spec-row">
           <dt>{copy.dataset}</dt>
           <dd>
-            {sources.source} —{" "}
-            <a href={sources.source_url} className="sp-link" target="_self" rel="noopener">
-              {sources.source_url}
+            {sources.source.toUpperCase()} —{" "}
+            <a href={sourceHref} className="sp-link" target="_blank" rel="noopener noreferrer">
+              {sourceHref.replace(/^https?:\/\//, "")}
             </a>
           </dd>
         </div>
@@ -85,12 +97,13 @@ export default async function SourcesPage({ params }: { params: Promise<{ locale
         </div>
         <div className="sp-spec-row">
           <dt>{copy.records}</dt>
-          <dd className="sp-mono">{sources.record_count}</dd>
+          <dd className="sp-mono">{num(sources.record_count)}</dd>
         </div>
         <div className="sp-spec-row">
           <dt>{copy.covers}</dt>
           <dd className="sp-mono">
-            {sources.approved_asset_count} / {sources.total_asset_candidate_count}
+            {num(sources.approved_asset_count)} / {num(sources.total_asset_candidate_count)}
+            {coverPct != null ? ` (${coverPct}%)` : ""}
           </dd>
         </div>
       </dl>
