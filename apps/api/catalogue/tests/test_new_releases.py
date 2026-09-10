@@ -7,7 +7,8 @@ rating (``rating`` / ``rating_count``) plus provenance ``retrieved_at`` /
 works released in the last ~6 months, ranked by ``0.70 * recency +
 0.30 * PopScore`` with ``canonical_slug`` as the tie-break; an empty window
 is ``[]`` with 200, never an error, and a work outside the governed corpus
-never appears.
+never appears. The ranking is a materialised snapshot -- the request path
+serves it verbatim and only ``materialize_new_releases`` recomputes it.
 """
 
 from __future__ import annotations
@@ -15,12 +16,14 @@ from __future__ import annotations
 from datetime import date, datetime, timedelta, timezone
 
 import pytest
+from django.core.management import call_command
 from rest_framework.test import APIClient
 
 from catalogue.models import (
     CorpusPopularityScore,
     CorpusVersion,
     GameWork,
+    NewReleasesSnapshot,
     SourceRecord,
 )
 
@@ -209,6 +212,45 @@ def test_new_releases_blends_recency_with_popscore() -> None:
 
     slugs = [row["slug"] for row in APIClient().get("/api/catalogue/new-releases/").json()]
     assert slugs.index("old-but-popular") < slugs.index("fresh-unknown")
+
+
+def test_new_releases_is_served_from_a_snapshot_not_recomputed_per_request() -> None:
+    """A game added after the first request does not appear until the
+    snapshot is rematerialised -- the request path never recomputes."""
+    first = _governed_work(
+        "first-in-window", first_release_date=_TODAY - timedelta(days=40)
+    )
+    _igdb_source(first, "30")
+
+    body = APIClient().get("/api/catalogue/new-releases/").json()
+    assert [row["slug"] for row in body] == ["first-in-window"]
+    assert NewReleasesSnapshot.objects.count() == 1
+
+    fresher = _governed_work(
+        "added-later", first_release_date=_TODAY - timedelta(days=1)
+    )
+    _igdb_source(fresher, "31")
+
+    body_again = APIClient().get("/api/catalogue/new-releases/").json()
+    assert [row["slug"] for row in body_again] == ["first-in-window"]
+
+
+def test_materialize_new_releases_command_refreshes_the_snapshot() -> None:
+    first = _governed_work(
+        "was-only-entry", first_release_date=_TODAY - timedelta(days=40)
+    )
+    _igdb_source(first, "32")
+    APIClient().get("/api/catalogue/new-releases/")  # bootstrap the snapshot
+
+    fresher = _governed_work(
+        "now-newer", first_release_date=_TODAY - timedelta(days=1)
+    )
+    _igdb_source(fresher, "33")
+
+    call_command("materialize_new_releases")
+
+    slugs = [row["slug"] for row in APIClient().get("/api/catalogue/new-releases/").json()]
+    assert slugs == ["now-newer", "was-only-entry"]
 
 
 def test_new_releases_empty_window_returns_empty_list_with_200() -> None:

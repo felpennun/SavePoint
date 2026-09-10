@@ -81,18 +81,21 @@ services:
       - "8000:8000"
     # Fixed offline startup cycle (OPS-02/OPS-03): migrate, import the frozen
     # local catalogue snapshot, bootstrap/rotate the plural demo accounts from
-    # DEMO_ACCOUNTS, then load the deterministic seed interactions -- all four
-    # commands are idempotent and advisory-lock-guarded (01-06/01.1-04/01-16),
-    # so re-running this same chain on every `up` (including concurrent
-    # `docker compose up` invocations) never duplicates rows or leaves
-    # partial state. Nothing here downloads data or calls an external
-    # provider -- every input is already a local file under data/.
+    # DEMO_ACCOUNTS, load the deterministic seed interactions, then
+    # materialise the home "Novedades" shelf (D-24: a frozen snapshot the
+    # request path never recomputes) -- every command is idempotent and
+    # advisory-lock-guarded (01-06/01.1-04/01-16/02-24), so re-running this
+    # same chain on every `up` (including concurrent `docker compose up`
+    # invocations) never duplicates rows or leaves partial state. Nothing
+    # here downloads data or calls an external provider -- every input is
+    # already a local file under data/.
     command: >
       sh -c "python manage.py migrate --noinput &&
       python manage.py import_catalogue &&
       python manage.py load_localized_summaries &&
       python manage.py bootstrap_demo_accounts &&
       python manage.py seed_demo &&
+      python manage.py materialize_new_releases &&
       python manage.py runserver 0.0.0.0:8000"
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/', timeout=2)"]

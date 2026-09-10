@@ -533,3 +533,25 @@ class AssetAttribution(models.Model):
     def __str__(self) -> str:
         return f"asset for {self.work} ({'allowed' if self.display_allowed else 'placeholder'})"
 
+
+
+class NewReleasesSnapshot(models.Model):
+    """The materialised home "Novedades" shelf (D-24).
+
+    The shelf ranking (``0.70 * recency + 0.30 * PopScore`` over the last
+    ~183 days) is recomputed only when the IGDB catalogue is re-imported --
+    never per request. Until then the release window and the PopScore
+    inputs do not move, so every page load serves this frozen ordered list.
+    Exactly one row (``pk = 1``); ``work_ids`` is the ordered list of
+    ``GameWork`` primary keys, already capped at the shelf limit.
+    """
+
+    SINGLETON_PK = 1
+
+    id = models.PositiveSmallIntegerField(primary_key=True, default=SINGLETON_PK)
+    work_ids = models.JSONField(default=list)
+    formula = models.CharField(max_length=64, default="recency-0.70-popscore-0.30-v1")
+    computed_at = models.DateTimeField()
+
+    def __str__(self) -> str:
+        return f"NewReleasesSnapshot({len(self.work_ids)} works @ {self.computed_at:%Y-%m-%d %H:%M})"

@@ -62,6 +62,7 @@ from catalogue.models import (
     SourceRecord,
     Theme,
 )
+from catalogue.new_releases import materialize_new_releases
 from catalogue.normalization import normalize_title
 
 # Transaction-scoped advisory lock key -- distinct from the Wikidata importer's
@@ -864,12 +865,18 @@ class Command(BaseCommand):
         run.status = IgdbImportRun.Status.COMPLETE
         run.save()
 
+        # The home "Novedades" shelf is a materialised snapshot -- it only
+        # moves when the catalogue is (re-)imported (D-24), so refresh it
+        # here rather than recomputing the blend on every home page load.
+        snapshot = materialize_new_releases()
+
         self.stderr.write(
             self.style.SUCCESS(
                 f"IGDB import complete: {total_works} primary works "
                 f"(+{created_total} new / ~{updated_total} refreshed / {skipped_total} skipped this pass), "
                 f"covers {covers_present} present / {run.covers_fallback} fallback, "
-                f"checksum {run.checksum[:12]}..., eligible_live={eligible}"
+                f"checksum {run.checksum[:12]}..., eligible_live={eligible}, "
+                f"novedades_snapshot={len(snapshot.work_ids)} works"
             )
         )
 
