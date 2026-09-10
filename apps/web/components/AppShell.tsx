@@ -65,6 +65,26 @@ export function TopNavigation({ items, locale }: { items: NavItem[]; locale: str
   );
 }
 
+/** Name search in the header. A plain GET form that lands on the
+ * catalogue with `?q=` -- shareable, works without JavaScript. Hidden
+ * below md, where the catalogue's own FilterBar search takes over. */
+export function NavSearch({ locale, label }: { locale: string; label: string }) {
+  return (
+    <form
+      role="search"
+      method="get"
+      action={`/${locale}/catalogue`}
+      className="sp-navsearch hidden md:flex"
+    >
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="7" />
+        <path d="M16.5 16.5 21 21" />
+      </svg>
+      <input type="search" name="q" aria-label={label} placeholder={label} />
+    </form>
+  );
+}
+
 export function MobileMenu({ items, dict }: { items: NavItem[]; dict: Dictionary }) {
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -169,11 +189,14 @@ export function AppShell({
       </a>
       <header className="border-b" style={{ borderColor: "var(--color-card-border)", background: "var(--color-surface-raised)", position: "relative" }}>
         <div className="flex items-center justify-between gap-2 md:gap-4 px-4 md:px-5 py-3">
-          <Link href={`/${locale}`} aria-label={dict.nav.home} className="min-w-0 [&>svg]:max-w-full" style={{ color: "var(--color-text-primary)", display: "inline-flex", alignItems: "center" }}>
-            <BrandLockup />
-          </Link>
-          <div className="flex shrink-0 items-center gap-2 md:gap-4">
+          <div className="flex min-w-0 items-center gap-4 md:gap-7">
+            <Link href={`/${locale}`} aria-label={dict.nav.home} className="min-w-0 [&>svg]:max-w-full" style={{ color: "var(--color-text-primary)", display: "inline-flex", alignItems: "center" }}>
+              <BrandLockup />
+            </Link>
             <TopNavigation items={items} locale={locale} />
+          </div>
+          <div className="flex shrink-0 items-center gap-2 md:gap-4">
+            <NavSearch locale={locale} label={dict.nav.search} />
             <LanguageToggle locale={locale} />
             <ThemeToggle labels={dict.theme.toggle} />
             {isAuthenticated ? (

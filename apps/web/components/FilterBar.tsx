@@ -72,7 +72,6 @@ export function FilterBar({
           label={f.platform}
           options={platformOptions}
           selected={filters.platform}
-          semanticsText={dict.catalogue.facet.platformSemantics}
           locale={locale}
           currentQuery={currentQuery}
           unavailable={platformsUnavailable}
@@ -83,7 +82,6 @@ export function FilterBar({
           label={f.genre}
           options={genreOptions}
           selected={filters.genre}
-          semanticsText={dict.catalogue.facet.genreSemantics}
           locale={locale}
           currentQuery={currentQuery}
           unavailable={genresUnavailable}
@@ -108,13 +106,6 @@ export function FilterBar({
                 {v}+
               </option>
             ))}
-          </select>
-        </div>
-
-        <div className="sp-field">
-          <label htmlFor="sort">{dict.catalogue.sort.label}</label>
-          <select id="sort" name="sort" defaultValue={filters.sort}>
-            <option value="popscore_desc">{dict.catalogue.sort.popscoreDesc}</option>
           </select>
         </div>
 

@@ -20,7 +20,6 @@ export function FacetMenu({
   label,
   options,
   selected,
-  semanticsText,
   locale,
   currentQuery,
   unavailable = false,
@@ -29,7 +28,6 @@ export function FacetMenu({
   label: string;
   options: FilterOption[];
   selected: string[];
-  semanticsText: string;
   locale: string;
   currentQuery: string;
   unavailable?: boolean;
@@ -60,7 +58,6 @@ export function FacetMenu({
             </p>
           ) : (
             <>
-              <p className="sp-muted sp-facet-semantics">{semanticsText}</p>
               <ul className="sp-facet-options">
                 {options.map((option) => (
                   <li key={option.value}>

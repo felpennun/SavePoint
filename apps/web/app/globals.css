@@ -715,6 +715,57 @@ input[type="radio"] {
   border-color: var(--color-accent);
 }
 
+/* Header name search -- a compact bordered box in the navbar utility
+   cluster. Desktop only; below md the catalogue's own FilterBar search
+   takes over. */
+.sp-navsearch {
+  align-items: center;
+  gap: var(--space-sm);
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-control);
+  padding: 0 var(--space-sm);
+  background: var(--color-surface-overlay);
+}
+
+.sp-navsearch > svg {
+  flex: none;
+  color: var(--color-text-muted);
+}
+
+.sp-navsearch input {
+  width: 9rem;
+  min-width: 0;
+  height: 2rem;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  padding: 0;
+  font-size: var(--text-meta);
+  transition: width 0.12s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-navsearch input {
+    transition: none;
+  }
+}
+
+.sp-navsearch input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.sp-navsearch input:focus-visible {
+  outline: none;
+}
+
+.sp-navsearch:focus-within {
+  border-color: var(--color-accent);
+}
+
+.sp-navsearch:focus-within input {
+  width: 12rem;
+}
+
 .sp-grid {
   list-style: none;
   margin: 0;
@@ -1866,11 +1917,6 @@ a.sp-chip--active:hover {
   max-width: 100%;
   max-height: 20rem;
   overflow: auto;
-}
-
-.sp-facet-semantics {
-  margin: 0 0 var(--space-sm);
-  overflow-wrap: anywhere;
 }
 
 .sp-facet-options {

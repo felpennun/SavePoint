@@ -20,6 +20,7 @@ export const en: Dictionary = {
     skipToContent: "Skip to content",
     openMenu: "Open menu",
     closeMenu: "Close menu",
+    search: "Search by name",
   },
   catalogue: {
     heading: "Catalogue",
@@ -64,8 +65,6 @@ export const en: Dictionary = {
       emptyBody: "Clear a filter or widen your search.",
     },
     facet: {
-      genreSemantics: "Shows games that have all selected genres.",
-      platformSemantics: "Shows games available on any selected platform.",
       selectedCount: {
         zero: "Any",
         one: "1 selected",
@@ -77,10 +76,6 @@ export const en: Dictionary = {
     chip: {
       genre: "Genre: {value}",
       platform: "Platform: {value}",
-    },
-    sort: {
-      label: "Sort by",
-      popscoreDesc: "PopScore (high to low)",
     },
   },
   card: {

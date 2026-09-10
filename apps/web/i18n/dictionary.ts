@@ -24,6 +24,7 @@ export interface Dictionary {
     skipToContent: string;
     openMenu: string;
     closeMenu: string;
+    search: string;
   };
   catalogue: {
     heading: string;
@@ -52,8 +53,6 @@ export interface Dictionary {
       emptyBody: string;
     };
     facet: {
-      genreSemantics: string;
-      platformSemantics: string;
       selectedCount: CountCopy;
       clear: string;
       searchInList: string;
@@ -61,10 +60,6 @@ export interface Dictionary {
     chip: {
       genre: string;
       platform: string;
-    };
-    sort: {
-      label: string;
-      popscoreDesc: string;
     };
   };
   card: {
