@@ -482,6 +482,48 @@ input[type="radio"] {
   box-sizing: border-box;
 }
 
+/* Public profile header (artboard 2j): a larger initials avatar, the
+   alias as the page title and a mono path line under it. */
+.sp-profile-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.sp-profile-avatar {
+  width: 3.5rem;
+  height: 3.5rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-heading);
+  font-weight: 600;
+}
+
+.sp-activity-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sp-activity-list > li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-ctl) 0;
+  border-top: 1px solid var(--color-card-border);
+  font-size: var(--text-body);
+}
+
+.sp-activity-list > li .sp-link {
+  font-weight: 600;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .sp-surface {
   background: var(--color-surface-raised);
   border: 1px solid var(--color-surface-border);
@@ -1525,6 +1567,7 @@ a.sp-chip--active:hover {
 .sp-cover-hero {
   width: 280px;
   max-width: 100%;
+  box-shadow: 0 10px 30px -6px rgba(0, 0, 0, 0.45);
 }
 
 @media (max-width: 820px) {

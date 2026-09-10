@@ -111,6 +111,13 @@ export function FilterBar({
           </select>
         </div>
 
+        <div className="sp-field">
+          <label htmlFor="sort">{dict.catalogue.sort.label}</label>
+          <select id="sort" name="sort" defaultValue={filters.sort}>
+            <option value="popscore_desc">{dict.catalogue.sort.popscoreDesc}</option>
+          </select>
+        </div>
+
         <div className="sp-filterbar-actions">
           <button type="submit" className="sp-btn-primary">
             {f.apply}

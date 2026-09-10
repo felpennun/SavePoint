@@ -207,6 +207,11 @@ export default async function CollectionPage({
 
         <aside className="sp-filter-column" aria-label={dict.collection.filterByStatus}>
           <form method="get" action={basePath} className="sp-surface sp-controls-row">
+            <div className="sp-filterbar-head">
+              <span className="sp-filterbar-title">
+                {locale === "es" ? "Filtrar y ordenar" : "Filter and sort"}
+              </span>
+            </div>
             <div className="sp-field">
               <label htmlFor="status">{dict.collection.filterByStatus}</label>
               <select id="status" name="status" defaultValue={activeStatus === "all" ? "" : activeStatus}>
