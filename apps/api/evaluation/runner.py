@@ -15,10 +15,11 @@ from typing import Any
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.db.models import Exists, OuterRef
 
 from accounts.models import DemoAccountIdentity
 from catalogue.corpus import evaluation_candidate_works, governed_works
-from catalogue.models import CorpusRatingSnapshot, CorpusVersion
+from catalogue.models import CorpusRatingSnapshot, CorpusVersion, GameWork
 from catalogue.popularity import popscore_snapshot_sha256
 from evaluation.candidates import build
 from evaluation.metrics import (
@@ -431,9 +432,16 @@ def run(
     evaluation_tag_profile = tag_rating_profile(corpus_version)
     evaluation_tag_idf = tag_idf_profile(corpus_version)
     signal_availability = coverage_report(corpus_version)
+    # Exists(), not .filter(curated_labels__isnull=False): the latter JOINs the
+    # curated_labels M2M and duplicates a work once per label (bug fixed
+    # 2026-09-11 -- a work with N labels was scored and ranked N times,
+    # inflating precision/recall/nDCG/MAP past their [0,1] bounds whenever it
+    # ranked highly). recommendations/content/rank.py's own product-facing
+    # candidate query already uses this Exists() pattern for the same reason;
+    # this mirrors it so the offline `prepared["works"]` path matches it.
     evaluation_works = list(
         evaluation_candidate_works(corpus_version)
-        .filter(curated_labels__isnull=False)
+        .filter(Exists(GameWork.objects.filter(pk=OuterRef("pk"), curated_labels__isnull=False)))
         .prefetch_related("curated_labels", "releases__platform", "franchises", "developers")
     )
     snapshot_rows = CorpusRatingSnapshot.objects.filter(
@@ -513,6 +521,10 @@ def run(
             candidate_strings = {str(value) for value in candidate_ids}
             assert set(ranked_ids) <= candidate_strings, (
                 f"algorithm {algorithm_id} returned an id outside its candidate set"
+            )
+            assert len(ranked_ids) == len(set(ranked_ids)), (
+                f"algorithm {algorithm_id} returned a ranked list with duplicate ids "
+                f"for user {user.pk} (metrics like nDCG/recall assume one entry per id)"
             )
             relevant = {str(heldout_id)}
             row: dict[str, Any] = {

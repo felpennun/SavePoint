@@ -10,7 +10,8 @@ import pytest
 from django.contrib.auth import get_user_model
 
 from accounts.models import DemoAccountIdentity, demo_identity_anchor_id
-from catalogue.models import CorpusRatingSnapshot, CorpusVersion, GameWork
+from catalogue.corpus import evaluation_candidate_works
+from catalogue.models import CorpusRatingSnapshot, CorpusVersion, CuratedLabel, GameWork
 from evaluation import protocol as protocol_module
 from evaluation.candidates import build
 from evaluation.runner import (
@@ -92,6 +93,39 @@ def test_build_returns_one_shared_candidate_set(runner_fixture, frozen_protocol)
     assert works[2].id not in candidate_ids
     assert works[3].id not in candidate_ids
     assert candidate_sha256
+
+
+@pytest.mark.django_db
+def test_evaluation_candidate_works_is_not_duplicated_by_multi_label_works(runner_fixture) -> None:
+    # Regression (2026-09-11): .filter(curated_labels__isnull=False) JOINs the
+    # M2M and returns one row per label, so a work with N curated labels used
+    # to be scored and ranked N times by run() -- inflating precision/recall/
+    # nDCG/MAP past their [0,1] bounds whenever it ranked highly. The fix
+    # (evaluation/runner.py) reads that same list via Exists(), matching the
+    # product-facing query in recommendations/content/rank.py.
+    _user, works, _identity = runner_fixture
+    work = works[0]
+    for index, kind in enumerate((CuratedLabel.Kind.GENRE, CuratedLabel.Kind.THEME, CuratedLabel.Kind.MODE)):
+        label = CuratedLabel.objects.create(
+            name=f"Runner Label {index}", slug=f"runner-label-{index}", kind=kind,
+            curation_version="test",
+        )
+        work.curated_labels.add(label)
+
+    naive_row_count = (
+        evaluation_candidate_works(CORPUS_VERSION).filter(curated_labels__isnull=False).count()
+    )
+    assert naive_row_count > 1, "fixture must exercise the multi-label duplication path"
+
+    from django.db.models import Exists, OuterRef
+
+    deduped_ids = list(
+        evaluation_candidate_works(CORPUS_VERSION)
+        .filter(Exists(GameWork.objects.filter(pk=OuterRef("pk"), curated_labels__isnull=False)))
+        .values_list("id", flat=True)
+    )
+    assert deduped_ids.count(work.id) == 1
+    assert len(deduped_ids) == len(set(deduped_ids))
 
 
 def test_runner_population_contract_matches_active_split(runner_fixture, frozen_protocol):
