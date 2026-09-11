@@ -194,9 +194,42 @@ los usuarios de este split.
 
 Recall@10 se lee directamente como "de cuántos de los 79 usuarios se recuperó el ítem
 retenido en el top-10": `hybrid-weighted-cf-v1` lo consigue para 20 usuarios (25,3 %),
-`content-cbf-weighted-v1` para 19 (24,1 %). Los dos baselines (`random-v1`,
-`popularity-v1`) no aciertan ni un solo usuario en ningún K — la comparación frente a ellos
-es la más limpia de este cálculo (§5).
+`content-cbf-weighted-v1` para 19 (24,1 %). `random-v1` no acierta ni un solo usuario en
+ningún K; `popularity-v1` acierta 1 vez, solo al ampliar a K=20 (§4.3) — la comparación
+frente a ambos sigue siendo la más limpia de este cálculo (§5).
+
+### 4.3 Aciertos en bruto por K (recuento de usuarios, no porcentaje)
+
+Con un único positivo por usuario, `Recall@K × 79` es exactamente el número de usuarios
+(de los 79 evaluables) para los que el algoritmo recuperó el ítem retenido dentro de las
+primeras K posiciones de 13.618 candidatas.
+
+| Algoritmo | Aciertos @5 | Aciertos @10 | Aciertos @20 |
+|---|---:|---:|---:|
+| `hybrid-weighted-cf-v1` | 16/79 | 20/79 | 21/79 |
+| `content-cbf-weighted-v1` | 15/79 | 19/79 | 22/79 |
+| `content-cbf-weighted-pop-v1` | 13/79 | 17/79 | 19/79 |
+| `hybrid-mmr-v1` | 11/79 | 16/79 | 24/79 |
+| `content-cbf-mmr-v1` | 11/79 | 15/79 | 21/79 |
+| `content-cbf-twostage-v1` | 9/79 | 14/79 | 17/79 |
+| `content-cbf-mmr-pop-v1` | 11/79 | 13/79 | 16/79 |
+| `content-cbf-twostage-pop-v1` | 9/79 | 12/79 | 17/79 |
+| `content-cbf-neg-v1` | 8/79 | 11/79 | 14/79 |
+| `content-cbf-neg-pop-v1` | 7/79 | 10/79 | 12/79 |
+| `cf-user-knn-v1` | 3/79 | 9/79 | 12/79 |
+| `content-cbf-multiplicative-v1` | 2/79 | 9/79 | 12/79 |
+| `content-cbf-multiplicative-pop-v1` | 2/79 | 8/79 | 11/79 |
+| `recency-v1` | 1/79 | 1/79 | 1/79 |
+| `popularity-v1` | 0/79 | 0/79 | 1/79 |
+| `random-v1` | 0/79 | 0/79 | 0/79 |
+
+Dos lecturas que no se ven en los porcentajes: `hybrid-mmr-v1` termina con el mayor
+recuento en K=20 (24/79, 30 %) aunque no lidera en K=5 ni K=10 — la reordenación por
+diversidad de MMR a veces empuja el acierto un poco más abajo en la lista a cambio de una
+lista más variada (coherente con la diversidad intra-lista más alta del §6). `recency-v1`
+no mejora en absoluto al ampliar K (1/1/1): su único acierto ya cae dentro del top-5 y no
+hay ningún otro usuario donde "lo más reciente" resulte ser también el ítem correcto, ni
+ampliando la ventana a 20.
 
 ## 5. Intervalos y pruebas pareadas de nDCG@10 (métrica titular)
 
@@ -438,6 +471,61 @@ Bajo el protocolo `2026.09.2`/v14 y este split de test de un solo uso:
   de evaluación distinto y complementario, no una repetición comparativa de este. Ver
   [[2026-09-11 - Siguiente estudio, 20 usuarios reales y evaluacion de calidad]] y
   `.planning/ROADMAP.md`.
+
+### 11.1 ¿Es este un buen resultado? Magnitud absoluta frente a significación
+
+La significación estadística (§5) no dice por sí sola si un recuento de aciertos de
+~20-30 % (§4.3) es "bueno". Tres explicaciones posibles compiten para ese número modesto
+en términos absolutos: (a) los algoritmos son débiles, (b) el diseño del estudio
+(positivos/usuarios/colecciones con un componente aleatorio) limita el techo alcanzable,
+o (c) la propia tarea (LOO de un único ítem sobre 13.618 candidatas) es intrínsecamente
+difícil incluso para un recomendador excelente. La evidencia de este cálculo apunta
+mayoritariamente a (c), con una contribución real pero secundaria de (b) — no a (a):
+
+- **Frente al azar, la mejora es enorme.** La probabilidad de que `random-v1` acierte un
+  ítem concreto en el top-20 de 13.618 candidatas es 20/13.618 ≈ 0,147 % por usuario;
+  sobre 79 usuarios, el valor esperado es ≈ 0,12 aciertos — exactamente lo observado
+  (0/79, §4.3). El mejor algoritmo en K=20 (`hybrid-mmr-v1`, 24/79 ≈ 30,4 %) es
+  **≈ 207 veces** esa tasa de azar. Esta magnitud de mejora, no el porcentaje absoluto, es
+  la que hay que citar como evidencia de que el sistema funciona — y es exactamente lo que
+  reportan la Friedman y las 14 comparaciones significativas del §5.
+- **La tarea en sí es dura, incluso para un recomendador perfecto.** LOO de un único
+  positivo (D-17/D-18, §8) no pregunta "¿sugeriste algo que le gustaría?" sino "¿acertaste
+  el ítem exacto que históricamente añadió, entre 13.618 alternativas?". Un usuario con
+  gustos coherentes (p. ej. "RPG de mundo abierto") puede tener decenas de candidatas
+  igual de plausibles en el corpus; acertar la que él concretamente eligió es
+  probabilístico incluso con un modelo de gusto ideal. Herlocker et al. (2004) señalan
+  esto explícitamente: el acierto puntual (*hit rate*) penaliza a cualquier sistema que
+  recomiende bien pero distinto del histórico exacto — motivo por el que el protocolo
+  también reporta el §6 (cobertura/diversidad/novedad), que no depende de acertar un ítem
+  concreto.
+- **La composición parcialmente aleatoria de la biblioteca sintética sí pone un techo, y
+  es la variable donde el autor tiene más razón para sospechar.** Más allá de los 5
+  positivos garantizados por usuario, el resto de la biblioteca (hasta 10-20 ítems) se
+  genera con un componente aleatorio (`evaluation/synthetic.py`, diseño del autor,
+  2026-09-10/11) — no necesariamente coherente temáticamente. El perfil de contenido de
+  un usuario (`build_profile_inputs`) se construye promediando *todos* sus positivos
+  restantes tras el LOO: si varios de ellos son ruido temático sin relación con el ítem
+  retenido, el perfil resultante es una mezcla diluida, no un vector de gusto limpio —
+  reduciendo la probabilidad de que el ítem retenido puntúe entre los primeros 20 aunque
+  el algoritmo de similitud funcione correctamente. Esto **no se puede aislar del todo con
+  los datos de esta ejecución** (no se midió el hit-rate condicionado a "cuántos de los
+  positivos restantes del usuario comparten tag con el retenido"), así que queda como una
+  hipótesis razonada, no un hallazgo cuantificado.
+- **El siguiente estudio (§11, 20 usuarios reales) es la prueba directa de la hipótesis
+  anterior.** Una biblioteca real no tiene el componente artificialmente aleatorio de la
+  sintética — si el hit-rate sube notablemente con datos reales bajo el mismo protocolo de
+  LOO, confirma que (b) explicaba parte del techo observado aquí; si se mantiene en el
+  mismo rango, refuerza que (c) es la explicación dominante y que ~20-30 % de acierto en
+  top-20 sobre un catálogo de este tamaño es, sencillamente, lo esperable para esta familia
+  de algoritmos bajo este protocolo.
+
+**Conclusión razonada:** no hay evidencia en este cálculo de que los algoritmos estén
+"mal" — al contrario, la mejora sobre el azar es de dos órdenes de magnitud y
+estadísticamente significativa frente a los baselines. El porcentaje absoluto modesto es
+coherente con la dificultad intrínseca de la tarea LOO de un único positivo sobre un
+catálogo grande, con una contribución probable (no cuantificada aquí) del componente
+aleatorio de las bibliotecas sintéticas.
 
 ## 12. Bibliografía citada
 
