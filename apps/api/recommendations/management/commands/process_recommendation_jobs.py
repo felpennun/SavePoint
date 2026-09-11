@@ -7,7 +7,7 @@ import time
 from django.core.management.base import BaseCommand
 
 from recommendations.jobs import process_one_job
-from recommendations.published import SECTION_ALGORITHM_IDS
+from recommendations.published import SECTION_ALGORITHM_IDS, SIGNAL_ALGORITHM_ID
 
 
 class Command(BaseCommand):
@@ -19,8 +19,8 @@ class Command(BaseCommand):
         parser.add_argument("--max-jobs", type=int, default=0, help="Stop after N jobs; 0 means no limit.")
         parser.add_argument(
             "--algorithm-id",
-            choices=SECTION_ALGORITHM_IDS,
-            help="Process only this published recommendation section.",
+            choices=(*SECTION_ALGORITHM_IDS, SIGNAL_ALGORITHM_ID),
+            help="Process only this published recommendation section, or the signals job.",
         )
 
     def handle(self, *args, **options) -> None:  # noqa: ANN002, ANN003

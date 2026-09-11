@@ -9,7 +9,7 @@ the same immutable manifest.
 from __future__ import annotations
 
 from datetime import date
-from typing import Callable
+from typing import Any, Callable
 
 from django.contrib.auth.models import AbstractBaseUser
 
@@ -129,9 +129,19 @@ def recommend_for_user(
     protocol: evaluation_protocol.Protocol | None = None,
     corpus_version: str | None = None,
     eligibility_cutoff_date: date | None = None,
+    prepared: dict[str, Any] | None = None,
     should_continue: Callable[[], bool] | None = None,
 ) -> dict:
-    """Rank one user's governed candidates and return the stable v2 DTO."""
+    """Rank one user's governed candidates and return the stable v2 DTO.
+
+    ``prepared`` (added 2026-09-11) is a shared-signal bundle a caller with one
+    already built may pass in -- see ``recommendations/content/signal_cache.py``
+    for how the live job queue populates it from ``RecommendationSignalCache``.
+    It is only ever forwarded to the content/hybrid rankers that know how to
+    use it (``rank_content_v1``, and the two hybrid rankers that embed a
+    ``rank_content_v1`` sub-call); ``cf-user-knn-v1`` and ``tag-taste-v1``
+    never receive it.
+    """
 
     if algorithm_id not in CONTENT_ALGORITHM_IDS:
         raise RecommendationServiceError("unknown algorithm_id")
@@ -159,6 +169,7 @@ def recommend_for_user(
             corpus_version=manifest.corpus_version,
             candidate_ids=manifest.candidate_ids,
             min_rating_count=None,
+            prepared=prepared,
             should_continue=should_continue,
         )
     elif algorithm_id == "cf-user-knn-v1":
@@ -175,6 +186,7 @@ def recommend_for_user(
             candidate_ids=manifest.candidate_ids,
             limit=_limit(limit) or 20,
             corpus_version=manifest.corpus_version,
+            prepared=prepared,
             should_continue=should_continue,
         )
     elif algorithm_id == "hybrid-mmr-v1":
@@ -183,6 +195,7 @@ def recommend_for_user(
             candidate_ids=manifest.candidate_ids,
             limit=_limit(limit) or 20,
             corpus_version=manifest.corpus_version,
+            prepared=prepared,
             should_continue=should_continue,
         )
     else:

@@ -91,6 +91,43 @@ class RecommendationState(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
+class RecommendationSignalCache(models.Model):
+    """One user's shared content signals, computed once by the signals job.
+
+    ``rating_term`` and ``facet_similarity`` (positive and negative) are the
+    same regardless of which of the 13 content/hybrid algorithm variants ends
+    up scoring a candidate with them (see ``recommendations/content/rank.py``
+    and ``recommendations/content/signal_cache.py``). Each of those variants
+    normally runs in its own dedicated worker container
+    (``infra/compose.yaml``), so a same-process cache like the offline
+    evaluation runner uses cannot be shared between them -- this table is the
+    cross-process equivalent: the ``content-signals-v1`` job computes the
+    O(candidates) loop exactly once per (user, collection revision,
+    configuration) and every dependent worker reads this row instead of
+    repeating it.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="recommendation_signal_caches"
+    )
+    requested_revision = models.PositiveBigIntegerField()
+    configuration_fingerprint = models.CharField(max_length=64)
+    corpus_version = models.CharField(max_length=64, null=True, blank=True)
+    profile_inputs_json = models.JSONField()
+    rating_term_json = models.JSONField()
+    similarity_json = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=("user", "requested_revision", "configuration_fingerprint"),
+                name="recommendations_unique_signal_cache",
+            )
+        ]
+
+
 class RecommendationJobStatus(models.TextChoices):
     QUEUED = "queued", "Queued"
     RUNNING = "running", "Running"

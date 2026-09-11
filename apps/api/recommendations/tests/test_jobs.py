@@ -15,7 +15,11 @@ from recommendations.models import (
     RecommendationSnapshot,
     RecommendationState,
 )
-from recommendations.published import SECTION_ALGORITHM_IDS, configuration_fingerprint
+from recommendations.published import (
+    SECTION_ALGORITHM_IDS,
+    SIGNAL_ALGORITHM_ID,
+    configuration_fingerprint,
+)
 
 
 def _user():
@@ -45,8 +49,14 @@ def test_collection_change_enqueues_every_published_section(transactional_db) ->
     jobs = RecommendationRefreshJob.objects.filter(user=user)
 
     assert state.collection_revision == 1
-    assert jobs.count() == len(SECTION_ALGORITHM_IDS)
-    assert set(jobs.values_list("algorithm_id", flat=True)) == set(SECTION_ALGORITHM_IDS)
+    # content-signals-v1 (2026-09-11) is enqueued alongside every published
+    # section: it is not itself a section (SIGNAL_ALGORITHM_ID is not in
+    # SECTION_ALGORITHM_IDS), but every content/hybrid job waits on it.
+    assert jobs.count() == len(SECTION_ALGORITHM_IDS) + 1
+    assert set(jobs.values_list("algorithm_id", flat=True)) == {
+        *SECTION_ALGORITHM_IDS,
+        SIGNAL_ALGORITHM_ID,
+    }
     assert set(jobs.values_list("requested_revision", flat=True)) == {1}
     assert set(jobs.values_list("status", flat=True)) == {RecommendationJobStatus.QUEUED}
 
@@ -148,6 +158,10 @@ def test_workers_publish_bundle_only_after_every_section_succeeds(transactional_
         lambda user, corpus_version, algorithm_id, **kwargs: {"algorithm_id": algorithm_id, "results": []},
     )
 
+    # content/hybrid sections are only claimable once content-signals-v1 has
+    # succeeded for this (user, revision, configuration).
+    assert jobs.process_one_job(SIGNAL_ALGORITHM_ID) is True
+
     for algorithm_id in SECTION_ALGORITHM_IDS[:-1]:
         assert jobs.process_one_job(algorithm_id) is True
     state = RecommendationState.objects.get(user=user)
@@ -173,6 +187,9 @@ def test_worker_claims_only_its_named_section(transactional_db, monkeypatch) -> 
         lambda user, corpus_version, algorithm_id, **kwargs: processed.append(algorithm_id) or {"results": []},
     )
 
+    assert jobs.process_one_job(SIGNAL_ALGORITHM_ID) is True
+    processed.clear()
+
     assert jobs.process_one_job("recency-v1") is True
     assert processed == ["recency-v1"]
     assert RecommendationRefreshJob.objects.get(user=user, algorithm_id="recency-v1").status == RecommendationJobStatus.SUCCEEDED
@@ -188,6 +205,9 @@ def test_hybrid_mmr_worker_claims_only_its_named_section(transactional_db, monke
         "build_recommendation_section",
         lambda user, corpus_version, algorithm_id, **kwargs: processed.append(algorithm_id) or {"results": []},
     )
+
+    assert jobs.process_one_job(SIGNAL_ALGORITHM_ID) is True
+    processed.clear()
 
     assert jobs.process_one_job("hybrid-mmr-v1") is True
     assert processed == ["hybrid-mmr-v1"]
@@ -217,7 +237,7 @@ def test_new_collection_revision_obsoletes_every_prior_section(transactional_db)
         requested_revision=state.collection_revision,
         configuration_fingerprint=configuration_fingerprint(),
     )
-    assert latest_jobs.count() == len(SECTION_ALGORITHM_IDS)
+    assert latest_jobs.count() == len(SECTION_ALGORITHM_IDS) + 1
     assert set(latest_jobs.values_list("status", flat=True)) == {RecommendationJobStatus.QUEUED}
 
 
@@ -225,7 +245,9 @@ def test_running_worker_cancels_when_a_new_revision_arrives(transactional_db, mo
     user = _user()
     entry = _entry(user, _work())
 
-    def supersede_while_calculating(user, corpus_version, algorithm_id, *, should_continue):  # noqa: ANN001
+    def supersede_while_calculating(user, corpus_version, algorithm_id, *, should_continue, **kwargs):  # noqa: ANN001
+        if algorithm_id != "recency-v1":
+            return {"algorithm_id": algorithm_id, "results": []}
         entry.rating_half_steps = 10
         entry.save(update_fields=["rating_half_steps", "updated_at"])
         assert should_continue is not None
@@ -234,6 +256,7 @@ def test_running_worker_cancels_when_a_new_revision_arrives(transactional_db, mo
 
     monkeypatch.setattr(jobs, "build_recommendation_section", supersede_while_calculating)
 
+    assert jobs.process_one_job(SIGNAL_ALGORITHM_ID) is True
     assert jobs.process_one_job("recency-v1") is True
 
     state = RecommendationState.objects.get(user=user)
@@ -245,4 +268,38 @@ def test_running_worker_cancels_when_a_new_revision_arrives(transactional_db, mo
         user=user,
         requested_revision=2,
         status=RecommendationJobStatus.QUEUED,
-    ).count() == len(SECTION_ALGORITHM_IDS)
+    ).count() == len(SECTION_ALGORITHM_IDS) + 1
+
+
+def test_content_job_is_not_claimable_before_its_signals_job_succeeds(transactional_db, monkeypatch) -> None:  # noqa: ANN001
+    """A dependent worker polls and finds nothing rather than computing signals itself."""
+
+    user = _user()
+    _entry(user, _work())
+    monkeypatch.setattr(
+        jobs,
+        "build_recommendation_section",
+        lambda user, corpus_version, algorithm_id, **kwargs: {"algorithm_id": algorithm_id, "results": []},
+    )
+
+    # No signals row for this (user, revision, configuration) yet: the claim
+    # query withholds every dependent job -- a --loop worker just polls again.
+    assert jobs.process_one_job("content-cbf-weighted-v1") is False
+    assert jobs.process_one_job("hybrid-mmr-v1") is False
+    assert RecommendationRefreshJob.objects.get(
+        user=user, algorithm_id="content-cbf-weighted-v1"
+    ).status == RecommendationJobStatus.QUEUED
+
+    # cf-user-knn-v1 and tag-taste-v1 never call rank_content_v1, so they are
+    # not dependents and remain claimable even before the signals job runs.
+    assert jobs.process_one_job("cf-user-knn-v1") is True
+    assert jobs.process_one_job("tag-taste-v1") is True
+
+    assert jobs.process_one_job(SIGNAL_ALGORITHM_ID) is True
+
+    # Now that the signals job has succeeded, the same dependent job becomes
+    # claimable without any change to the queued row itself.
+    assert jobs.process_one_job("content-cbf-weighted-v1") is True
+    assert RecommendationRefreshJob.objects.get(
+        user=user, algorithm_id="content-cbf-weighted-v1"
+    ).status == RecommendationJobStatus.SUCCEEDED

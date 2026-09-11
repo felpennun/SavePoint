@@ -117,6 +117,29 @@ services:
       - ../docs:/workspace/docs:ro
       - ../e2e:/workspace/e2e:ro
 
+  recommendation-worker-signals:
+    # content-signals-v1 (2026-09-11): computes the shared rating_term/
+    # facet_similarity signals once per (user, revision, configuration) and
+    # persists them to RecommendationSignalCache, so the 13 dependent workers
+    # below (recommendations/published.py SIGNAL_DEPENDENT_ALGORITHM_IDS)
+    # read them instead of each repeating the same O(candidates) loop in its
+    # own container. _claim_next_job never lets a dependent job run before
+    # this one has succeeded for the same job -- no dependent worker computes
+    # this loop itself while this service is up.
+    extends:
+      service: api
+    network_mode: "service:api"
+    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id content-signals-v1
+    environment:
+      SAVEPOINT_RECOMMENDATION_STATS_CACHE: "1"
+    ports: !reset []
+    healthcheck:
+      disable: true
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
   recommendation-worker-weighted:
     # PostgreSQL is both the durable queue and the recommendation snapshot
     # store for the local deployment. Redis remains an optional optimisation,

@@ -54,6 +54,22 @@ CONTENT_ALGORITHM_IDS = (*BASE_CONTENT_ALGORITHM_IDS, *PHASE4_ALGORITHM_IDS)
 SECTION_ALGORITHM_IDS = (*CONTENT_ALGORITHM_IDS, GENRE_ALGORITHM_ID)
 PUBLISHED_RESULT_LIMIT = 20
 
+# The signals job (D-TBD, 2026-09-11) is not itself a published section -- it
+# has no product-facing result_payload and is deliberately excluded from
+# SECTION_ALGORITHM_IDS/_publish_if_complete -- it is an internal dependency
+# every worker in SIGNAL_DEPENDENT_ALGORITHM_IDS waits on before it may be
+# claimed (recommendations/jobs.py, _claim_next_job). Every base content
+# variant scores through rank_content_v1 directly; the two hybrids embed a
+# rank_content_v1("content-cbf-weighted-v1", ...) sub-call, so they share the
+# same dependency. cf-user-knn-v1 and tag-taste-v1 never call rank_content_v1
+# and are therefore not dependents.
+SIGNAL_ALGORITHM_ID = "content-signals-v1"
+SIGNAL_DEPENDENT_ALGORITHM_IDS = (
+    *BASE_CONTENT_ALGORITHM_IDS,
+    HYBRID_ALGORITHM_ID,
+    HYBRID_MMR_ALGORITHM_ID,
+)
+
 
 def configuration_fingerprint() -> str:
     """Identify every algorithm and signal rule used in a published snapshot."""

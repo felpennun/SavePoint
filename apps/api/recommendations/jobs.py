@@ -8,26 +8,30 @@ from datetime import timedelta
 from typing import Any, Callable
 
 from django.db import transaction
-from django.db.models import F, Q
+from django.db.models import Exists, F, OuterRef, Q
 from django.utils import timezone
 
 from evaluation import protocol as evaluation_protocol
 from library.models import LibraryEntry, OwnedCopy
+from recommendations.content import signal_cache
 from recommendations.content.features import FEATURE_SET_VERSION
 from recommendations.cancellation import RecommendationComputationCancelled
 from recommendations.genre_heuristic import rank_genre_taste_v1
 from recommendations.models import (
     RecommendationJobStatus,
     RecommendationRefreshJob,
+    RecommendationSignalCache,
     RecommendationSnapshot,
     RecommendationState,
 )
-from recommendations.service import active_corpus_version, recommend_for_user
+from recommendations.service import active_corpus_version, build_candidate_manifest, recommend_for_user
 from recommendations.published import (
     CONTENT_ALGORITHM_IDS,
     GENRE_ALGORITHM_ID,
     PUBLISHED_RESULT_LIMIT,
     SECTION_ALGORITHM_IDS,
+    SIGNAL_ALGORITHM_ID,
+    SIGNAL_DEPENDENT_ALGORITHM_IDS,
     configuration_fingerprint,
 )
 
@@ -76,7 +80,11 @@ def enqueue_latest_refresh(user_id: int) -> list[RecommendationRefreshJob]:
         updated_at=now,
     )
     jobs = []
-    for algorithm_id in SECTION_ALGORITHM_IDS:
+    # content-signals-v1 first: it is not itself a published section (see
+    # published.SIGNAL_ALGORITHM_ID), but every SIGNAL_DEPENDENT_ALGORITHM_IDS
+    # job waits for it to SUCCEED before _claim_next_job will surface it, so
+    # it must exist alongside the sections from the very first enqueue.
+    for algorithm_id in (SIGNAL_ALGORITHM_ID, *SECTION_ALGORITHM_IDS):
         job, created = RecommendationRefreshJob.objects.get_or_create(
             user_id=user_id,
             requested_revision=state.collection_revision,
@@ -112,18 +120,54 @@ def build_recommendation_section(
     corpus_version: str | None,
     algorithm_id: str,
     *,
+    requested_revision: int,
+    configuration_fingerprint: str,
     should_continue: Callable[[], bool] | None = None,
 ) -> dict[str, Any]:
     """Compute exactly one product section under the shared algorithm catalog."""
 
+    if algorithm_id == SIGNAL_ALGORITHM_ID:
+        frozen = evaluation_protocol.load(allow_consumed_test=True)
+        manifest = build_candidate_manifest(user, frozen, corpus_version=corpus_version)
+        bundle = signal_cache.build_corpus_bundle(
+            user, manifest.corpus_version, manifest.candidate_ids, should_continue=should_continue
+        )
+        signal_cache.build_and_store_signal_cache(
+            user=user,
+            requested_revision=requested_revision,
+            configuration_fingerprint=configuration_fingerprint,
+            corpus_version=manifest.corpus_version,
+            bundle=bundle,
+            should_continue=should_continue,
+        )
+        return {"algorithm_id": algorithm_id, "candidate_count": len(manifest.candidate_ids)}
     if algorithm_id in CONTENT_ALGORITHM_IDS:
         frozen = evaluation_protocol.load(allow_consumed_test=True)
+        prepared = None
+        if algorithm_id in SIGNAL_DEPENDENT_ALGORITHM_IDS:
+            row = RecommendationSignalCache.objects.filter(
+                user=user,
+                requested_revision=requested_revision,
+                configuration_fingerprint=configuration_fingerprint,
+            ).first()
+            if row is not None:
+                manifest = build_candidate_manifest(user, frozen, corpus_version=corpus_version)
+                bundle = signal_cache.build_corpus_bundle(
+                    user, manifest.corpus_version, manifest.candidate_ids, should_continue=should_continue
+                )
+                prepared = signal_cache.load_prepared(row, user=user, bundle=bundle)
+            # A dependent job is only ever claimed after _claim_next_job
+            # confirms a SUCCEEDED signals row exists (recommendations/jobs.py).
+            # A missing row here means that row was superseded/obsoleted
+            # between the claim and this read; recommend_for_user below still
+            # computes correctly without it, just without the cache benefit.
         return recommend_for_user(
             user,
             algorithm_id,
             protocol=frozen,
             corpus_version=corpus_version,
             limit=PUBLISHED_RESULT_LIMIT,
+            prepared=prepared,
             should_continue=should_continue,
         )
     if algorithm_id == GENRE_ALGORITHM_ID:
@@ -157,6 +201,22 @@ def _claim_next_job(algorithm_id: str | None = None) -> str | None:
         )
         if algorithm_id is not None:
             queued_jobs = queued_jobs.filter(algorithm_id=algorithm_id)
+        # content-signals-v1 dependents (published.SIGNAL_DEPENDENT_ALGORITHM_IDS)
+        # never get claimed ahead of their signals row: no lock, no blocking
+        # call -- a worker with nothing else claimable here just polls again
+        # on its normal --poll-seconds interval (see content/signal_cache.py).
+        signals_ready = Exists(
+            RecommendationRefreshJob.objects.filter(
+                user_id=OuterRef("user_id"),
+                requested_revision=OuterRef("requested_revision"),
+                configuration_fingerprint=OuterRef("configuration_fingerprint"),
+                algorithm_id=SIGNAL_ALGORITHM_ID,
+                status=RecommendationJobStatus.SUCCEEDED,
+            )
+        )
+        queued_jobs = queued_jobs.exclude(
+            Q(algorithm_id__in=SIGNAL_DEPENDENT_ALGORITHM_IDS) & ~signals_ready
+        )
         job = queued_jobs.order_by("available_at", "created_at").first()
         if job is None:
             return None
@@ -248,9 +308,13 @@ def _publish_if_complete(
 
 
 def process_one_job(algorithm_id: str | None = None) -> bool:
-    """Process one named section; stale results are never published."""
+    """Process one named section, or the signals job; stale results are never published."""
 
-    if algorithm_id is not None and algorithm_id not in SECTION_ALGORITHM_IDS:
+    if (
+        algorithm_id is not None
+        and algorithm_id not in SECTION_ALGORITHM_IDS
+        and algorithm_id != SIGNAL_ALGORITHM_ID
+    ):
         raise ValueError("unknown published recommendation section")
     job_id = _claim_next_job(algorithm_id)
     if job_id is None:
@@ -271,6 +335,8 @@ def process_one_job(algorithm_id: str | None = None) -> bool:
             job.user,
             corpus_version,
             job.algorithm_id,
+            requested_revision=job.requested_revision,
+            configuration_fingerprint=job.configuration_fingerprint,
             should_continue=lambda: _job_is_current(job),
         )
         with transaction.atomic():
