@@ -120,6 +120,23 @@ class Protocol:
     def relevance_rating_floor(self) -> int:
         return int(self.relevance["rating_half_steps_gte"])
 
+    @property
+    def heldout_min_external_rating(self) -> float | None:
+        """Optional floor (0-100 IGDB scale) the LOO held-out item must clear.
+
+        Added in protocol_version 14: pairs D-17's personal-taste relevance
+        rule with a catalogue-quality floor on the *held-out* item specifically,
+        so its rank in a leave-one-out evaluation is not driven purely by an
+        algorithm correctly ignoring/down-weighting a personally-loved but
+        externally under-rated title -- most of the 16 offline variants blend
+        content similarity with rating_confidence and/or PopScore (see
+        ``evaluation.splits.leave_one_out``). Absent (``None``) on protocol
+        contracts frozen before this field existed.
+        """
+
+        value = self.relevance.get("heldout_min_external_rating")
+        return float(value) if value is not None else None
+
     def frozen_hash(self) -> str:
         """SHA-256 over the canonical JSON of the whole contract.
 

@@ -24,6 +24,7 @@ from datetime import date
 from typing import NamedTuple
 
 from catalogue.corpus import evaluation_candidate_works
+from catalogue.models import GameWork
 from library.models import LibraryEntry
 
 
@@ -107,6 +108,25 @@ def leave_one_out(
     )
     if not positives:
         return None
+
+    # protocol_version 14 (D-TBD): the held-out item must also clear a
+    # catalogue-quality floor on its own external rating, not just the
+    # user's personal taste rule -- otherwise a personally-loved but
+    # externally under-rated title gets pulled down by rating_confidence/
+    # PopScore in most of the 16 variants regardless of how well the
+    # algorithm actually modelled the user's taste. Absent on older frozen
+    # protocols, so this is a no-op there.
+    heldout_min_rating = protocol.heldout_min_external_rating
+    if heldout_min_rating is not None:
+        positives = {
+            work_id
+            for work_id, rating in GameWork.objects.filter(
+                id__in=positives
+            ).values_list("id", "rating")
+            if rating is not None and rating >= heldout_min_rating
+        }
+        if not positives:
+            return None
 
     rng = random.Random(f"{seed}:{user.pk}")
     heldout = rng.choice(sorted(positives))

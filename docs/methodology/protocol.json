@@ -1,12 +1,13 @@
 {
-  "protocol_version": 13,
+  "protocol_version": 14,
   "frozen_on": "2026-09-11",
-  "ratified_by": "Felipe — regeneración de la población sintética de 400 usuarios (biblioteca 10-20, franja de PopScore 75% redondeada al alza, minimo 5 positivos elegibles garantizados por biblioteca) tras el hallazgo de prevalencia de insufficient_history del 74% en el split de test de protocol_version 12, 2026-09-11. Fórmulas, similitud, candidatas, exclusiones y pesos sin cambios respecto a v12 (02af71222ffcc964ac940e7ebbe3c51c87fc70cf869f55248e4dce836f894a61).",
+  "ratified_by": "Felipe — la selección leave-one-out (evaluation/splits.py) elegía el positivo retirado únicamente por el gusto personal del usuario (completed o rating_half_steps>=7), sin piso sobre su rating externo de IGDB; como la mayoría de las 16 variantes combinan similitud de contenido con rating_confidence y/o PopScore, un positivo retirado con rating externo bajo podía hundirse en el ranking pase lo que pase con la calidad del modelado de contenido, sesgando la comparación. Se añade relevance.heldout_min_external_rating=70 (mediana del rating IGDB sobre las 13.618 candidatas elegibles de 2026.09.2) como piso adicional solo para la selección del positivo retirado -- verificado antes de congelar: 0 usuarios de los 400 (232/80/80) pierden todos sus positivos elegibles a ese umbral. No se regenera la población ni cambia ninguna fórmula/peso respecto a v13 (2b76dbc55716012b574bde7889b1dae3f19640f376a4b9f9cf93c9c5923be51c).",
   "simulation": true,
   "limitation": "Frozen offline evaluation protocol scored over seeded synthetic users. Every number produced under this protocol is simulation evidence about parameterised archetypes, not evidence about real SavePoint users (EVAL-10).",
   "relevance": {
     "completed": true,
-    "rating_half_steps_gte": 7
+    "rating_half_steps_gte": 7,
+    "heldout_min_external_rating": 70
   },
   "rating_signal": {
     "version": "rating-confidence-v5-final",

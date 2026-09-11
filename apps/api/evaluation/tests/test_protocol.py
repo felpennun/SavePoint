@@ -71,7 +71,12 @@ def test_checked_in_protocol_loads_with_frozen_keys() -> None:
     assert frozen.k_values == (5, 10, 20)
     assert frozen.headline == "ndcg@10"
     assert frozen.metrics == EXPECTED_METRICS
-    assert frozen.relevance == {"completed": True, "rating_half_steps_gte": 7}
+    assert frozen.relevance == {
+        "completed": True,
+        "rating_half_steps_gte": 7,
+        "heldout_min_external_rating": 70,
+    }
+    assert frozen.heldout_min_external_rating == 70.0
     assert frozen.split["strategy"] == "leave_one_out_per_user"
     assert frozen.candidate_set == (
         "eligible_governed_corpus_user_rating_present_and_total_rating_count_gte_5_"
@@ -84,7 +89,7 @@ def test_checked_in_protocol_loads_with_frozen_keys() -> None:
     assert frozen.corpus_version == "2026.09.2"
     assert frozen.snapshot_sha256 == "c42f46a42d091e11cd894c3f942b8979b77f611ac7a4b048d8d152bebe8ce3cc"
     assert frozen.raw["popscore_snapshot_sha256"] == "16de92f28fa5b3dd1b387110628561eb6330b271ed2b1e76a69a7e0f03083097"
-    assert frozen.protocol_version == 13
+    assert frozen.protocol_version == 14
     assert frozen.user_split == {"train": 240, "validation": 80, "test": 80, "seed": 20260908}
     assert frozen.raw["synthetic_population"]["phase_3_population"] == 400
     assert frozen.raw["synthetic_population"]["rating_count_min"] == 1

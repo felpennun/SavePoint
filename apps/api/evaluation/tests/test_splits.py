@@ -171,6 +171,81 @@ def test_completed_unrated_work_is_not_an_evaluation_positive(
     ) is None
 
 
+# --------------------------------------------------------------------------- #
+# held-out external-rating floor (protocol_version 14)                        #
+# --------------------------------------------------------------------------- #
+def test_heldout_selection_skips_a_positive_below_the_external_rating_floor(
+    user, governed_corpus, frozen_protocol
+) -> None:
+    # governed_corpus[13] ("non-null-rating") has rating=101.0, only 4 total
+    # ratings -- fails the *candidate* eligibility rule (needs >=5), so it is
+    # never a valid heldout target regardless of the new floor. Use a
+    # dedicated low-rated-but-eligible work instead.
+    low_rated = GameWork.objects.create(
+        canonical_slug="loo-work-low-rated",
+        original_title="LOO Work Low Rated",
+        is_dlc=False,
+        in_corpus=True,
+        corpus_version=CORPUS_VERSION,
+        rating=40.0,
+        total_rating_count=10,
+    )
+    assert frozen_protocol.heldout_min_external_rating == 70.0
+    _own(user, low_rated, status="completed")
+
+    assert leave_one_out(
+        user, seed=frozen_protocol.loo_seed, protocol=frozen_protocol, corpus_version=CORPUS_VERSION
+    ) is None
+
+
+def test_heldout_selection_only_considers_positives_above_the_floor(
+    user, governed_corpus, frozen_protocol
+) -> None:
+    low_rated = GameWork.objects.create(
+        canonical_slug="loo-work-low-rated-2",
+        original_title="LOO Work Low Rated 2",
+        is_dlc=False,
+        in_corpus=True,
+        corpus_version=CORPUS_VERSION,
+        rating=40.0,
+        total_rating_count=10,
+    )
+    _own(user, low_rated, status="completed")
+    _own(user, governed_corpus[0], status="completed")  # rating=80.0, clears the floor
+
+    for _ in range(20):
+        result = leave_one_out(
+            user, seed=frozen_protocol.loo_seed, protocol=frozen_protocol, corpus_version=CORPUS_VERSION
+        )
+        assert result.heldout_work_id == governed_corpus[0].id
+
+
+def test_older_protocol_without_the_floor_field_is_unaffected(
+    user, governed_corpus, frozen_protocol
+) -> None:
+    raw = dict(frozen_protocol.raw)
+    raw["relevance"] = {"completed": True, "rating_half_steps_gte": 7}
+    legacy_protocol = protocol_module.from_mapping(raw)
+    assert legacy_protocol.heldout_min_external_rating is None
+
+    low_rated = GameWork.objects.create(
+        canonical_slug="loo-work-low-rated-legacy",
+        original_title="LOO Work Low Rated Legacy",
+        is_dlc=False,
+        in_corpus=True,
+        corpus_version=CORPUS_VERSION,
+        rating=40.0,
+        total_rating_count=10,
+    )
+    _own(user, low_rated, status="completed")
+
+    result = leave_one_out(
+        user, seed=legacy_protocol.loo_seed, protocol=legacy_protocol, corpus_version=CORPUS_VERSION
+    )
+    assert result is not None
+    assert result.heldout_work_id == low_rated.id
+
+
 def test_candidate_manifest_sha256_is_stable_across_runs(user, governed_corpus, frozen_protocol) -> None:
     for work in governed_corpus[:4]:
         _own(user, work, status="completed")
