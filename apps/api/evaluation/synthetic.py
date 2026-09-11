@@ -46,8 +46,21 @@ RATING_COUNT_WEIGHT_BUCKETS = (
 # leave-one-out always has enough relevant-positive, profile-eligible
 # entries left after retiring one (D-17 relevance + the content profile's
 # `_COLD_START_ENTRIES` activity requirement, recommendations/content/rank.py).
+#
+# Candidate protocol v15 (2026-09-11, not yet frozen): raised from 5 to 8 to
+# support a proposed leave-THREE-out study where all 3 retired items must
+# also share the user's single most-weighted content tag. 5 guaranteed
+# positives only left a margin of 1 above _COLD_START_ENTRIES=3 after
+# retiring one; retiring three from that pool left as few as 2 for 19% of
+# the current test split (measured directly, not assumed). 8 guaranteed
+# restores the same +2 margin retiring three that 5 already gave retiring
+# one. Still drawn from the same archetype-preferred-tag-biased pool
+# (`_pool_for`), so it is also expected to raise same-tag availability, not
+# just the raw count -- verify empirically before freezing, same as every
+# other population change this session.
 POPSCORE_TIER_FRACTION = 0.75
-GUARANTEED_ELIGIBLE_MINIMUM = 5
+GUARANTEED_ELIGIBLE_MINIMUM = 8
+GUARANTEED_SAME_TAG_MINIMUM = 3
 GUARANTEED_STATUS_CHOICES = (BacklogStatus.COMPLETED, BacklogStatus.PLAYING)
 GUARANTEED_RATING_HALF_STEPS = (7, 8, 9, 10)
 LEGACY_PHASE2_ARCHETYPES = frozenset(
@@ -295,12 +308,60 @@ def generate(
                         f"corpus has only {len(popscore_pool)} eligible candidates "
                         f"but {archetype.name} needs {popscore_count}"
                     )
-                popscore_chosen = _weighted_sample_without_replacement(
-                    popscore_pool, popscore_count, user_rng
+                guaranteed_target = min(GUARANTEED_ELIGIBLE_MINIMUM, popscore_count)
+                # Candidate protocol v15: force at least GUARANTEED_SAME_TAG_
+                # MINIMUM of the guaranteed positives to share one tag,
+                # instead of leaving tag concentration to chance. Without
+                # this, whichever tag ends up dominating a user's *weighted*
+                # content profile (recommendations/content/profile.py) was
+                # only reliably matched by >=3 of their own eligible
+                # positives for ~88% of users even after raising
+                # GUARANTEED_ELIGIBLE_MINIMUM alone (measured directly,
+                # 2026-09-11) -- a fixed-size random draw from the preferred-
+                # tag pool doesn't guarantee any *one* tag repeats enough
+                # times. The cluster tag is the best-supplied preferred tag in
+                # this user's own PopScore-tier pool, so it is deterministic
+                # given the seed and never starves a user of a tag with no
+                # supply.
+                cluster_tag = None
+                if preferred:
+                    tag_supply = Counter(
+                        tag for work in popscore_pool for tag in work.tags if tag in preferred
+                    )
+                    if tag_supply:
+                        cluster_tag = max(tag_supply.items(), key=lambda item: (item[1], item[0]))[0]
+                same_tag_pool = (
+                    [work for work in popscore_pool if cluster_tag in work.tags] if cluster_tag else []
                 )
+                same_tag_target = min(GUARANTEED_SAME_TAG_MINIMUM, guaranteed_target, len(same_tag_pool))
+                same_tag_chosen = (
+                    _weighted_sample_without_replacement(same_tag_pool, same_tag_target, user_rng)
+                    if same_tag_target
+                    else []
+                )
+                remaining_popscore_pool = [
+                    work for work in popscore_pool
+                    if work.work_id not in {chosen.work_id for chosen in same_tag_chosen}
+                ]
+                remaining_popscore_target = popscore_count - len(same_tag_chosen)
+                if remaining_popscore_target > len(remaining_popscore_pool):
+                    remaining_popscore_pool = [
+                        work for work in works
+                        if work.work_id in popscore_ids
+                        and work.work_id not in {chosen.work_id for chosen in same_tag_chosen}
+                    ]
+                if remaining_popscore_target > len(remaining_popscore_pool):
+                    raise SyntheticGenerationError(
+                        f"corpus has only {len(remaining_popscore_pool)} eligible candidates "
+                        f"but {archetype.name} needs {remaining_popscore_target} more after the "
+                        "same-tag guarantee"
+                    )
+                rest_chosen = _weighted_sample_without_replacement(
+                    remaining_popscore_pool, remaining_popscore_target, user_rng
+                )
+                popscore_chosen = same_tag_chosen + rest_chosen
                 guaranteed_ids = frozenset(
-                    work.work_id
-                    for work in popscore_chosen[: min(GUARANTEED_ELIGIBLE_MINIMUM, popscore_count)]
+                    work.work_id for work in popscore_chosen[:guaranteed_target]
                 )
                 free_chosen: list[_WorkCandidate] = []
                 if free_count:
