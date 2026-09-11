@@ -52,6 +52,18 @@
     "head_at_checkpoint": "8766b9da16a7e3bfdc7d462761f8fabe1af51800",
     "working_tree": "dirty; relevant protocol/evaluation/recommendation changes require a reproducibility freeze before final test"
   },
+  "correction_2026_09_11": {
+    "note": "evaluable_positive_users_by_split and test_expected_skipped_users above were computed at head_at_checkpoint (pre-freeze) under a looser candidate-eligibility rule (total_rating_count >= 1, superseded by b4f024b's total_rating_count >= 5 on 2026-09-09T14:19+02:00, before this checkpoint's own timestamp). The authoritative counts, reproduced by the final test run, are below. See docs/verification/evaluation-results-400-test-2026-09-10.md section 3.",
+    "evaluable_positive_users_by_split": {
+      "train": 227,
+      "validation": 78,
+      "test": 73
+    },
+    "test_assigned_users": 80,
+    "test_actual_skipped_users": 7,
+    "final_run_code_commit": "64efe32b5146862061c642410d0ff95bf9c2544e",
+    "final_artifact_sha256": "6cf05b9c53e595f5915c9b68538e44063e8e3bdd3b070520bbd88ed3f388be8b"
+  },
   "commands": {
     "population_audit": "docker compose -f infra/compose.yaml exec -T api python manage.py audit_synthetic_population --corpus-version 2026.09.2",
     "input_preflight": "docker compose -f infra/compose.yaml exec -T api python manage.py validate_recommender_inputs --corpus-version 2026.09.2 --validation-date 2026-09-10 --evidence-json /workspace/apps/api/evaluation-input-preflight-2026-09-10.json",

@@ -1,0 +1,258 @@
+{
+  "algorithms": {},
+  "errors": [
+    {
+      "algorithm_id": "cf-user-knn-v1",
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "content-cbf-mmr-pop-v1",
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "content-cbf-mmr-v1",
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "content-cbf-multiplicative-pop-v1",
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "content-cbf-multiplicative-v1",
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "content-cbf-neg-pop-v1",
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "content-cbf-neg-v1",
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "content-cbf-twostage-pop-v1",
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "content-cbf-twostage-v1",
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "content-cbf-weighted-pop-v1",
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "content-cbf-weighted-v1",
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "hybrid-mmr-v1",
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "hybrid-weighted-cf-v1",
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "popularity-v1",
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "random-v1",
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "recency-v1",
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "status": "failed"
+    }
+  ],
+  "parallel_execution": {
+    "process_per_algorithm": true,
+    "wall_duration_seconds": 1.568809,
+    "wall_finished_at": "2026-09-10T19:35:44.799808+00:00",
+    "wall_started_at": "2026-09-10T19:35:43.231024+00:00",
+    "worker_count": 16
+  },
+  "protocol_sha256": "02af71222ffcc964ac940e7ebbe3c51c87fc70cf869f55248e4dce836f894a61",
+  "protocol_version": 12,
+  "split": "leave_one_out_per_user",
+  "status": "failed",
+  "worker_timings": [
+    {
+      "algorithm_id": "cf-user-knn-v1",
+      "duration_seconds": 0.252074,
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "finished_at": "2026-09-10T19:35:44.748049+00:00",
+      "started_at": "2026-09-10T19:35:44.495977+00:00",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "content-cbf-mmr-pop-v1",
+      "duration_seconds": 0.253668,
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "finished_at": "2026-09-10T19:35:44.669653+00:00",
+      "started_at": "2026-09-10T19:35:44.415988+00:00",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "content-cbf-mmr-v1",
+      "duration_seconds": 0.369829,
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "finished_at": "2026-09-10T19:35:44.549051+00:00",
+      "started_at": "2026-09-10T19:35:44.179223+00:00",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "content-cbf-multiplicative-pop-v1",
+      "duration_seconds": 0.371366,
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "finished_at": "2026-09-10T19:35:44.172731+00:00",
+      "started_at": "2026-09-10T19:35:43.801368+00:00",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "content-cbf-multiplicative-v1",
+      "duration_seconds": 0.527524,
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "finished_at": "2026-09-10T19:35:43.785442+00:00",
+      "started_at": "2026-09-10T19:35:43.257909+00:00",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "content-cbf-neg-pop-v1",
+      "duration_seconds": 0.344596,
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "finished_at": "2026-09-10T19:35:44.492477+00:00",
+      "started_at": "2026-09-10T19:35:44.147881+00:00",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "content-cbf-neg-v1",
+      "duration_seconds": 0.352477,
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "finished_at": "2026-09-10T19:35:44.142817+00:00",
+      "started_at": "2026-09-10T19:35:43.790342+00:00",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "content-cbf-twostage-pop-v1",
+      "duration_seconds": 0.311618,
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "finished_at": "2026-09-10T19:35:44.412969+00:00",
+      "started_at": "2026-09-10T19:35:44.101352+00:00",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "content-cbf-twostage-v1",
+      "duration_seconds": 0.316921,
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "finished_at": "2026-09-10T19:35:44.097775+00:00",
+      "started_at": "2026-09-10T19:35:43.780856+00:00",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "content-cbf-weighted-pop-v1",
+      "duration_seconds": 0.360018,
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "finished_at": "2026-09-10T19:35:44.150715+00:00",
+      "started_at": "2026-09-10T19:35:43.790701+00:00",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "content-cbf-weighted-v1",
+      "duration_seconds": 0.519763,
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "finished_at": "2026-09-10T19:35:43.777547+00:00",
+      "started_at": "2026-09-10T19:35:43.257762+00:00",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "hybrid-mmr-v1",
+      "duration_seconds": 0.234504,
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "finished_at": "2026-09-10T19:35:44.790438+00:00",
+      "started_at": "2026-09-10T19:35:44.555932+00:00",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "hybrid-weighted-cf-v1",
+      "duration_seconds": 0.253352,
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "finished_at": "2026-09-10T19:35:44.766005+00:00",
+      "started_at": "2026-09-10T19:35:44.512653+00:00",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "popularity-v1",
+      "duration_seconds": 0.527663,
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "finished_at": "2026-09-10T19:35:43.785458+00:00",
+      "started_at": "2026-09-10T19:35:43.257780+00:00",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "random-v1",
+      "duration_seconds": 0.53498,
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "finished_at": "2026-09-10T19:35:43.795509+00:00",
+      "started_at": "2026-09-10T19:35:43.260521+00:00",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "recency-v1",
+      "duration_seconds": 0.348674,
+      "error": "missing CorpusRatingSnapshot for 3 governed live-rated works",
+      "error_type": "SnapshotCoverageError",
+      "finished_at": "2026-09-10T19:35:44.506323+00:00",
+      "started_at": "2026-09-10T19:35:44.157644+00:00",
+      "status": "failed"
+    }
+  ]
+}

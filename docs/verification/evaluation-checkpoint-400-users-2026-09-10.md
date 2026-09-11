@@ -1,8 +1,25 @@
 # Checkpoint de preparación: evaluación offline sobre usuarios sintéticos
 
 **Fecha del checkpoint:** 2026-09-10  
-**Estado:** gate técnico superado; congelación científica del estado fuente pendiente.  
-**Cálculo final iniciado:** no.
+**Estado:** gate técnico superado; congelación científica del estado fuente **completada** (commit `b1ec0f7`, más los commits de reproducibilidad `b956256`/`3fba4bb`/`64efe32` descritos en el resultado final).  
+**Cálculo final iniciado:** sí — completado con éxito el 2026-09-11. Resultado, tablas y análisis
+estadístico en [`evaluation-results-400-test-2026-09-10.md`](./evaluation-results-400-test-2026-09-10.md).
+
+> **Corrección posterior (2026-09-11).** Este checkpoint se calculó en `HEAD 8766b9d`,
+> **antes** de la congelación real (`b1ec0f7`), y sus conteos de usuarios evaluables
+> (`232/79/79`, tabla de cohortes y párrafo siguientes) se hicieron bajo una regla de
+> elegibilidad de candidatas más laxa (`total_rating_count >= 1`, vigente hasta las
+> 2026-09-09 14:19) que la que aplica el protocolo congelado
+> (`rating IS NOT NULL AND total_rating_count >= 5`, vigente desde `b4f024b`). Bajo la
+> regla realmente vigente, los conteos autoritativos —reproducidos en la ejecución
+> final— son **train 227 / validation 78 / test 73** (skip 13/2/7 en vez de 8/1/1). Los
+> 12 usuarios adicionales que ahora se omiten tienen biblioteca no vacía pero su único
+> positivo elegible tiene `total_rating_count` entre 1 y 4, por debajo del umbral `>=5`;
+> no es una regresión de datos, es la aplicación correcta de la regla de elegibilidad ya
+> vigente cuando se congeló el protocolo. El detalle completo está en
+> [`evaluation-results-400-test-2026-09-10.md`](./evaluation-results-400-test-2026-09-10.md) §3.
+> Los números de esta sección se dejan como estaban por trazabilidad del proceso; no se
+> deben citar como el conteo final.
 
 ## Decisión de alcance
 

@@ -1,0 +1,210 @@
+{
+  "algorithms": {},
+  "errors": [
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    }
+  ],
+  "parallel_execution": {
+    "process_per_algorithm": true,
+    "wall_duration_seconds": 93.542643,
+    "wall_finished_at": "2026-09-10T20:27:56.758441+00:00",
+    "wall_started_at": "2026-09-10T20:26:23.224682+00:00",
+    "worker_count": 16
+  },
+  "protocol_sha256": "02af71222ffcc964ac940e7ebbe3c51c87fc70cf869f55248e4dce836f894a61",
+  "protocol_version": 12,
+  "split": "leave_one_out_per_user",
+  "status": "failed",
+  "worker_timings": [
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    },
+    {
+      "algorithm_id": "unknown-process",
+      "error": "A process in the process pool was terminated abruptly while the future was running or pending.",
+      "error_type": "BrokenProcessPool",
+      "status": "failed"
+    }
+  ]
+}
