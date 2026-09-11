@@ -10,6 +10,7 @@ import subprocess
 import sys
 import time
 from collections.abc import Callable, Mapping, Sequence
+from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -39,6 +40,7 @@ from evaluation.statistics import StatisticsConfig, compare_paired_algorithms
 from recommendations.content.features import (
     FEATURE_SET_VERSION,
     coverage_report,
+    corpus_rating_prior,
     feature_vector,
     tag_idf_profile,
     tag_rating_profile,
@@ -479,6 +481,12 @@ def run(
         "snapshot_sha256": actual_snapshot_hash,
         "popscore_snapshot_sha256": actual_popscore_hash,
         "training_user_ids": tuple(partition.train),
+        # Shared across every algorithm_id, same corpus_version + date for the
+        # whole run: computing it once here (instead of per rank_content_v1
+        # call) avoids one CorpusRatingSnapshot aggregate query per algorithm
+        # per user. rank_content_v1 already prefers prepared["rating_prior"]
+        # when present.
+        "rating_prior": corpus_rating_prior(corpus_version, eligibility_cutoff_date=date.today()),
     }
     vector_by_id = {
         str(work_id): vector for work_id, vector in evaluation_prepared["vectors"].items()

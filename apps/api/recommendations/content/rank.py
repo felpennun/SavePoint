@@ -429,7 +429,21 @@ def rank_content_v1(
         if tag_idf is not None
         else (prepared.get("tag_idf") if prepared is not None else None)
     ) or tag_idf_profile(corpus_version)
-    profile_inputs = build_profile_inputs(user, corpus_version, resolved_tag_idf)
+    # Signal-sharing cache (2026-09-11): `profile_inputs`, `rating_term` and
+    # facet similarity depend only on (user, work, corpus_version, tag data) --
+    # never on which of the 16 algorithm_id variants is scoring them. A caller
+    # that reuses the same `prepared` dict across several algorithm_id calls
+    # for the same user (the offline evaluation runner, one process handling
+    # all 16 algorithms) can skip recomputing them per algorithm. The web path
+    # passes prepared=None (one algorithm per request/worker) and is
+    # unaffected -- every cache lookup below is a no-op then.
+    profile_cache = prepared.setdefault("_profile_cache", {}) if prepared is not None else None
+    if profile_cache is not None and user.pk in profile_cache:
+        profile_inputs = profile_cache[user.pk]
+    else:
+        profile_inputs = build_profile_inputs(user, corpus_version, resolved_tag_idf)
+        if profile_cache is not None:
+            profile_cache[user.pk] = profile_inputs
     profile = profile_inputs.positive
     resolved_tag_profile = (
         tag_profile
@@ -530,21 +544,34 @@ def rank_content_v1(
         eligibility_cutoff_date,
         float(spec.params.get("year_decay", 0.35)),
     )
+    rating_term_cache = prepared.setdefault("_rating_term_cache", {}) if prepared is not None else None
+    similarity_cache = prepared.setdefault("_similarity_cache", {}) if prepared is not None else None
     scored: list[tuple[float, str, dict]] = []
     for index, work in enumerate(candidates):
         if index % _CANCELLATION_CHECK_INTERVAL == 0:
             _ensure_current(should_continue)
         vector = vectors[work.id]
-        similarity_evidence = facet_similarity(profile, vector)
+        if similarity_cache is not None and (user.pk, work.id) in similarity_cache:
+            similarity_evidence, negative_similarity = similarity_cache[(user.pk, work.id)]
+        else:
+            similarity_evidence = facet_similarity(profile, vector)
+            negative_similarity = facet_similarity(profile_inputs.negative, vector)["score"]
+            if similarity_cache is not None:
+                similarity_cache[(user.pk, work.id)] = (similarity_evidence, negative_similarity)
         similarity = similarity_evidence["score"]
         parts = similarity_evidence["parts"]
-        rt, fallback = rating_term(
-            work,
-            corpus_version,
-            resolved_tag_profile,
-            snapshot_stats,
-            rating_prior,
-        )
+        if rating_term_cache is not None and work.id in rating_term_cache:
+            rt, fallback = rating_term_cache[work.id]
+        else:
+            rt, fallback = rating_term(
+                work,
+                corpus_version,
+                resolved_tag_profile,
+                snapshot_stats,
+                rating_prior,
+            )
+            if rating_term_cache is not None:
+                rating_term_cache[work.id] = (rt, fallback)
         signals = _scored_signals(
             base_spec,
             work,
@@ -555,7 +582,6 @@ def rank_content_v1(
             rt,
             rating_prior,
         )
-        negative_similarity = facet_similarity(profile_inputs.negative, vector)["score"]
         score = combine(
             similarity,
             rt,
