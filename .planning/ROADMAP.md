@@ -291,6 +291,21 @@ Plans:
 **Plans**: TBD
 **UI hint**: yes
 
+### Candidate phase (not yet numbered or scheduled): Real-User Study and Survey-Based Quality Evaluation
+
+Noted by the author 2026-09-11, after the synthetic-population offline study (protocol v14,
+400 users) closes: recruit 20 real users who build their own library in SavePoint, collect
+that library data, then run a **survey-based quality evaluation** (subjective satisfaction,
+not the ranking metrics used for the synthetic study) plus the same 16-algorithm offline
+harness over their real libraries. The corpus at that point will be newer than the
+`2026.09.2` snapshot frozen for the current study, but must itself be frozen to one
+consistent snapshot shared across all 20 collections for that round. This is explicitly a
+**quality** evaluation, not a comparative benchmark against the synthetic-population
+metrics — two separate thesis chapters with separate methodologies. Full rationale:
+`ideas-vault/Fases/2026-09-11 - Siguiente estudio, 20 usuarios reales y evaluacion de calidad.md`.
+Not planned (no requirement IDs, success criteria, or wave breakdown yet) — evaluate and
+schedule properly in a later phase-planning pass.
+
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |

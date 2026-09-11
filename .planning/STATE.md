@@ -215,6 +215,7 @@ TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<ver
 | Category | Item | Status | Deferred At | Milestone |
 |----------|------|--------|-------------|-----------|
 | Hardening | Production-strength controls beyond the Phase 1 demo boundary | Planned | Roadmap creation | v1 |
+| Evaluation | Real-user study (20 users, own libraries, survey-based quality evaluation) after the synthetic-population offline study closes; own frozen corpus snapshot, not comparative with the synthetic-population metrics. Not yet a numbered/scheduled phase. | Noted, not planned | 2026-09-11 (author decision) | v1 |
 
 ## Tarea rápida completada — 2026-09-09
 
