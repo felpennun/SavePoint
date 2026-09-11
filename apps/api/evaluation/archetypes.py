@@ -72,6 +72,20 @@ PHASE_2_ARCHETYPES: tuple[Archetype, ...] = (
 # Phase 3 replaces the 200-user Phase 2 evaluation population with this
 # deterministic 400-user population.  The cohorts are explicit so the
 # resulting manifest can be checked without inferring them from labels.
+#
+# Protocol v13 revision (2026-09-11): every non-`no_history` archetype now
+# shares one `library_size_range` (10-20) instead of the earlier
+# sparse/normal/intensive stratification (1-4 / 5-10 / 11-20). That
+# stratification let leave-one-out routinely drop a user below the content
+# ranker's `_COLD_START_ENTRIES` (3) threshold, collapsing most content
+# variants to their non-personalised fallback for the majority of the test
+# split (documented in evaluation-results-400-test-2026-09-10.md). The three
+# archetypes below keep their original names and taste parameters
+# (genre_pref_range, rating_generosity, status_mix, release_bias) for
+# account-identity continuity across regenerations -- only their size range
+# and `cold_start` flag changed; `generate()` now also draws a PopScore-tier
+# and a guaranteed-eligible tier within every non-empty library (see
+# synthetic.py `POPSCORE_TIER_FRACTION` / `GUARANTEED_ELIGIBLE_MINIMUM`).
 DEFAULT_ARCHETYPES: tuple[Archetype, ...] = (
     Archetype(
         name="sin-historial-monogenero", label="Sin historial monogénero", n_users=5,
@@ -85,41 +99,40 @@ DEFAULT_ARCHETYPES: tuple[Archetype, ...] = (
     ),
     Archetype(
         name="cold-start-monogenero", label="Cold-start monogénero", n_users=33,
-        genre_pref_range=(1, 2), library_size_range=(1, 4), rating_generosity="severe",
-        status_mix={"completed": 0.55, "pending": 0.35, "abandoned": 0.10}, cold_start=True,
+        genre_pref_range=(1, 2), library_size_range=(10, 20), rating_generosity="severe",
+        status_mix={"completed": 0.55, "pending": 0.35, "abandoned": 0.10},
     ),
     Archetype(
         name="cold-start-explorador", label="Cold-start explorador", n_users=33,
-        genre_pref_range=(3, 5), library_size_range=(1, 4), rating_generosity="medium",
+        genre_pref_range=(3, 5), library_size_range=(10, 20), rating_generosity="medium",
         status_mix={"completed": 0.35, "playing": 0.15, "pending": 0.40, "abandoned": 0.10},
-        cold_start=True, release_bias="recent",
+        release_bias="recent",
     ),
     Archetype(
         name="cold-start-generoso", label="Cold-start generoso", n_users=34,
-        genre_pref_range=(3, 6), library_size_range=(1, 4), rating_generosity="generous",
+        genre_pref_range=(3, 6), library_size_range=(10, 20), rating_generosity="generous",
         status_mix={"completed": 0.45, "playing": 0.15, "pending": 0.35, "abandoned": 0.05},
-        cold_start=True,
     ),
     Archetype(
         name="normal-monogenero", label="Usuario normal monogénero", n_users=80,
-        genre_pref_range=(1, 3), library_size_range=(5, 10), rating_generosity="severe",
+        genre_pref_range=(1, 3), library_size_range=(10, 20), rating_generosity="severe",
         status_mix={"completed": 0.55, "playing": 0.10, "pending": 0.25, "abandoned": 0.10},
     ),
     Archetype(
         name="normal-omnivoro", label="Usuario normal omnívoro", n_users=80,
-        genre_pref_range=(5, 8), library_size_range=(5, 10), rating_generosity="medium",
+        genre_pref_range=(5, 8), library_size_range=(10, 20), rating_generosity="medium",
         status_mix={"completed": 0.45, "playing": 0.15, "pending": 0.30, "abandoned": 0.10},
         saga_concentration=0.35,
     ),
     Archetype(
         name="normal-explorador", label="Usuario normal explorador", n_users=80,
-        genre_pref_range=(3, 5), library_size_range=(5, 10), rating_generosity="generous",
+        genre_pref_range=(3, 5), library_size_range=(10, 20), rating_generosity="generous",
         status_mix={"completed": 0.25, "playing": 0.25, "pending": 0.40, "abandoned": 0.10},
         release_bias="recent",
     ),
     Archetype(
         name="intensivo-veterano", label="Usuario intensivo veterano", n_users=50,
-        genre_pref_range=(5, 8), library_size_range=(11, 20), rating_generosity="generous",
+        genre_pref_range=(5, 8), library_size_range=(10, 20), rating_generosity="generous",
         status_mix={"completed": 0.55, "playing": 0.15, "pending": 0.20, "abandoned": 0.10},
     ),
 )

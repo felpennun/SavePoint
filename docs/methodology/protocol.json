@@ -1,7 +1,7 @@
 {
-  "protocol_version": 12,
-  "frozen_on": "2026-09-10",
-  "ratified_by": "Felipe — etiquetas curadas como señal principal con IDF por rareza y peso 0,75, 2026-09-10",
+  "protocol_version": 13,
+  "frozen_on": "2026-09-11",
+  "ratified_by": "Felipe — regeneración de la población sintética de 400 usuarios (biblioteca 10-20, franja de PopScore 75% redondeada al alza, minimo 5 positivos elegibles garantizados por biblioteca) tras el hallazgo de prevalencia de insufficient_history del 74% en el split de test de protocol_version 12, 2026-09-11. Fórmulas, similitud, candidatas, exclusiones y pesos sin cambios respecto a v12 (02af71222ffcc964ac940e7ebbe3c51c87fc70cf869f55248e4dce836f894a61).",
   "simulation": true,
   "limitation": "Frozen offline evaluation protocol scored over seeded synthetic users. Every number produced under this protocol is simulation evidence about parameterised archetypes, not evidence about real SavePoint users (EVAL-10).",
   "relevance": {
@@ -126,7 +126,9 @@
   "synthetic_population": {
     "phase_3_population": 400,
     "replaces_phase_2_population": true,
-    "seed": 20260909,
+    "schema_version": "phase3-synthetic-population-v2",
+    "revision_note": "protocol_version 13: uniform 10-20 library size, PopScore realism tier, guaranteed-eligible minimum -- replaces the sparse/normal/intensive size stratification of protocol_version 12 (see docs/verification/evaluation-results-400-test-2026-09-10.md and the 2026-09-11 vault note for why).",
+    "seed": 20260911,
     "rating_count_min": 1,
     "rating_count_weight_buckets": [
       {"max_exclusive": 5, "weight": 1},
@@ -136,11 +138,15 @@
       {"max_exclusive": 2000, "weight": 16},
       {"max_exclusive": null, "weight": 32}
     ],
+    "library_size_range": [10, 20],
+    "popscore_tier_fraction": 0.75,
+    "popscore_tier_rounding": "ceil",
+    "guaranteed_eligible_minimum": 5,
+    "guaranteed_rating_half_steps_choices": [7, 8, 9, 10],
+    "guaranteed_status_choices": ["completed", "playing"],
     "cohorts": {
       "no_history": 10,
-      "sparse_history_1_to_4": 100,
-      "intensive_over_10": 50,
-      "normal_5_to_10": 240
+      "active_history_10_to_20": 390
     }
   },
   "corpus_version": "2026.09.2",

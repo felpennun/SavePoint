@@ -5,6 +5,7 @@ from __future__ import annotations
 import random
 import hashlib
 import json
+import math
 from collections import Counter
 from dataclasses import dataclass
 from datetime import date
@@ -18,6 +19,7 @@ from django.db import connection, transaction
 
 from accounts.models import DemoAccountIdentity, demo_identity_anchor_id
 from catalogue.corpus import evaluation_candidate_works
+from catalogue.popularity import normalised_popscore_by_work
 from evaluation.archetypes import Archetype, DEFAULT_ARCHETYPES, validate_archetypes
 from evaluation.protocol import load as load_protocol
 from library.models import BacklogStatus, CopyFormat, LibraryEntry, OwnedCopy
@@ -34,6 +36,20 @@ RATING_COUNT_WEIGHT_BUCKETS = (
     (2000, 16.0),
     (None, 32.0),
 )
+# Protocol v13 (2026-09-11): each non-empty library draws a PopScore-tier
+# fraction (rounded up) from works with a complete IGDB PopScore composite
+# (recommendations/catalogue.popularity.normalised_popscore_by_work returns
+# only works with all four primitives), so most of a synthetic collection is
+# a recognisable, popular title rather than a long-tail one. Within that
+# tier, at least GUARANTEED_ELIGIBLE_MINIMUM entries are forced to
+# `completed`/`playing` with a rating in GUARANTEED_RATING_HALF_STEPS, so
+# leave-one-out always has enough relevant-positive, profile-eligible
+# entries left after retiring one (D-17 relevance + the content profile's
+# `_COLD_START_ENTRIES` activity requirement, recommendations/content/rank.py).
+POPSCORE_TIER_FRACTION = 0.75
+GUARANTEED_ELIGIBLE_MINIMUM = 5
+GUARANTEED_STATUS_CHOICES = (BacklogStatus.COMPLETED, BacklogStatus.PLAYING)
+GUARANTEED_RATING_HALF_STEPS = (7, 8, 9, 10)
 LEGACY_PHASE2_ARCHETYPES = frozenset(
     {
         "monogenero-severo",
@@ -56,6 +72,11 @@ class SyntheticEntry:
     release_id: UUID | None = None
     edition_id: UUID | None = None
     owned_copy: bool = False
+    # Evaluation-manifest evidence only (protocol v13): True for the forced
+    # completed/playing, rating>=3.5 entries drawn from the PopScore tier
+    # that guarantee a usable leave-one-out positive. Not persisted on
+    # LibraryEntry -- the product model has no such concept.
+    guaranteed: bool = False
 
 
 @dataclass(frozen=True)
@@ -225,6 +246,13 @@ def generate(
         raise SyntheticGenerationError(
             "the governed corpus contains no works with rating_count >= 1"
         )
+    # PopScore-complete subset of the already-eligible pool (protocol v13):
+    # normalised_popscore_by_work only returns works with all four IGDB
+    # engagement primitives, so this frozenset is exactly the "known/popular
+    # enough to have measurable engagement" pool the PopScore tier draws from.
+    popscore_ids = frozenset(
+        normalised_popscore_by_work(corpus_version, [work.work_id for work in works])
+    )
     available_tags = sorted({tag for work in works for tag in work.tags})
     users: list[SyntheticUser] = []
     for archetype in selected:
@@ -237,26 +265,79 @@ def generate(
             user_rng = random.Random(f"{seed}:{archetype.name}:{ordinal}")
             min_size, max_size = archetype.library_size_range
             requested_size = user_rng.randint(min_size, max_size)
-            if archetype.cold_start:
-                requested_size = user_rng.randint(1, 4)
             if requested_size > len(pool):
                 raise SyntheticGenerationError(
                     f"corpus has {len(pool)} candidates but {archetype.name} needs {requested_size}"
                 )
-            chosen = _weighted_sample_without_replacement(pool, requested_size, user_rng)
+            guaranteed_ids: frozenset[UUID] = frozenset()
+            if requested_size == 0:
+                chosen: list[_WorkCandidate] = []
+            else:
+                popscore_count = math.ceil(POPSCORE_TIER_FRACTION * requested_size)
+                free_count = requested_size - popscore_count
+                popscore_pool = [work for work in pool if work.work_id in popscore_ids]
+                if len(popscore_pool) < popscore_count:
+                    # Not enough PopScore-complete supply within this
+                    # archetype's tag-preferred pool -- widen to the whole
+                    # eligible corpus before giving up (mirrors _pool_for's
+                    # own tag-affinity fallback).
+                    popscore_pool = [work for work in works if work.work_id in popscore_ids]
+                if len(popscore_pool) < popscore_count:
+                    # This corpus has too little (or no) PopScore coverage to
+                    # fill the realism tier at all -- degrade to the general
+                    # eligible pool rather than fail generation. The
+                    # guaranteed-eligible entries below still come from this
+                    # tier, so the leave-one-out guarantee is unaffected;
+                    # only the "known/popular" realism preference is lost.
+                    popscore_pool = pool if len(pool) >= popscore_count else works
+                if len(popscore_pool) < popscore_count:
+                    raise SyntheticGenerationError(
+                        f"corpus has only {len(popscore_pool)} eligible candidates "
+                        f"but {archetype.name} needs {popscore_count}"
+                    )
+                popscore_chosen = _weighted_sample_without_replacement(
+                    popscore_pool, popscore_count, user_rng
+                )
+                guaranteed_ids = frozenset(
+                    work.work_id
+                    for work in popscore_chosen[: min(GUARANTEED_ELIGIBLE_MINIMUM, popscore_count)]
+                )
+                free_chosen: list[_WorkCandidate] = []
+                if free_count:
+                    excluded = {work.work_id for work in popscore_chosen}
+                    free_pool = [work for work in pool if work.work_id not in excluded]
+                    if len(free_pool) < free_count:
+                        free_pool = [work for work in works if work.work_id not in excluded]
+                    if len(free_pool) < free_count:
+                        raise SyntheticGenerationError(
+                            f"corpus has only {len(free_pool)} remaining candidates "
+                            f"but {archetype.name} needs {free_count} more"
+                        )
+                    free_chosen = _weighted_sample_without_replacement(
+                        free_pool, free_count, user_rng
+                    )
+                chosen = popscore_chosen + free_chosen
             states = list(archetype.status_mix)
             weights = list(archetype.status_mix.values())
-            entries = [
-                SyntheticEntry(
-                    work_id=work.work_id,
-                    current_status=user_rng.choices(states, weights=weights, k=1)[0],
-                    rating_half_steps=_rating(user_rng, archetype.rating_generosity),
-                    release_id=work.release_id,
-                    edition_id=work.edition_id,
-                    owned_copy=bool(work.release_id and user_rng.random() < 0.35),
+            entries = []
+            for work in chosen:
+                if work.work_id in guaranteed_ids:
+                    status = user_rng.choice(GUARANTEED_STATUS_CHOICES)
+                    rating = user_rng.choice(GUARANTEED_RATING_HALF_STEPS)
+                else:
+                    status = user_rng.choices(states, weights=weights, k=1)[0]
+                    rating = _rating(user_rng, archetype.rating_generosity)
+                entries.append(
+                    SyntheticEntry(
+                        work_id=work.work_id,
+                        current_status=status,
+                        rating_half_steps=rating,
+                        release_id=work.release_id,
+                        edition_id=work.edition_id,
+                        owned_copy=bool(work.release_id and user_rng.random() < 0.35),
+                        guaranteed=work.work_id in guaranteed_ids,
+                    )
                 )
-                for work in chosen
-            ]
             if entries:
                 _ensure_positive(entries)
                 if not any(entry.owned_copy for entry in entries):
@@ -269,6 +350,7 @@ def generate(
                                 release_id=entry.release_id,
                                 edition_id=entry.edition_id,
                                 owned_copy=True,
+                                guaranteed=entry.guaranteed,
                             )
                             break
             users.append(
@@ -402,14 +484,13 @@ def apply_population(population: SyntheticPopulation) -> dict[str, object]:
 
 
 def _cohort_for(user: SyntheticUser) -> str:
-    size = len(user.entries)
+    # Protocol v13: every non-empty library is drawn from the same 10-20
+    # range (archetypes.py), so the earlier sparse/normal/intensive
+    # stratification by size no longer applies -- there is just the
+    # no_history cold-start cohort and everyone else.
     if user.no_history:
         return "no_history"
-    if size <= 4:
-        return "sparse_history_1_to_4"
-    if size <= 10:
-        return "normal_history_5_to_10"
-    return "intensive_history_over_10"
+    return "active_history_10_to_20"
 
 
 def render_population_manifest(
@@ -430,6 +511,9 @@ def render_population_manifest(
             {"max_exclusive": maximum, "weight": weight}
             for maximum, weight in RATING_COUNT_WEIGHT_BUCKETS
         ],
+        "popscore_tier_fraction": POPSCORE_TIER_FRACTION,
+        "guaranteed_eligible_minimum": GUARANTEED_ELIGIBLE_MINIMUM,
+        "guaranteed_rating_half_steps_choices": list(GUARANTEED_RATING_HALF_STEPS),
         "split": {"train": 240, "validation": 80, "test": 80, "seed": 20260908},
         "users": [
             {
@@ -438,6 +522,7 @@ def render_population_manifest(
                 "archetype": user.archetype,
                 "cohort": _cohort_for(user),
                 "library_size": len(user.entries),
+                "guaranteed_count": sum(entry.guaranteed for entry in user.entries),
                 "entries": [
                     {
                         "work_id": str(entry.work_id),
@@ -446,6 +531,7 @@ def render_population_manifest(
                         "release_id": str(entry.release_id) if entry.release_id else None,
                         "edition_id": str(entry.edition_id) if entry.edition_id else None,
                         "owned_copy": entry.owned_copy,
+                        "guaranteed": entry.guaranteed,
                     }
                     for entry in user.entries
                 ],

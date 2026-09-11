@@ -14,7 +14,7 @@ def test_checked_in_protocol_is_v2_and_hash_is_reproducible() -> None:
     first = protocol.load()
     second = protocol.load()
 
-    assert first.protocol_version == 12
+    assert first.protocol_version == 13
     assert first.frozen_hash() == second.frozen_hash()
 
 

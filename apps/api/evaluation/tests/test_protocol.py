@@ -84,7 +84,7 @@ def test_checked_in_protocol_loads_with_frozen_keys() -> None:
     assert frozen.corpus_version == "2026.09.2"
     assert frozen.snapshot_sha256 == "c42f46a42d091e11cd894c3f942b8979b77f611ac7a4b048d8d152bebe8ce3cc"
     assert frozen.raw["popscore_snapshot_sha256"] == "16de92f28fa5b3dd1b387110628561eb6330b271ed2b1e76a69a7e0f03083097"
-    assert frozen.protocol_version == 12
+    assert frozen.protocol_version == 13
     assert frozen.user_split == {"train": 240, "validation": 80, "test": 80, "seed": 20260908}
     assert frozen.raw["synthetic_population"]["phase_3_population"] == 400
     assert frozen.raw["synthetic_population"]["rating_count_min"] == 1

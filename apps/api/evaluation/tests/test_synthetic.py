@@ -82,10 +82,38 @@ def test_default_phase3_population_has_the_frozen_cohorts(db) -> None:  # noqa: 
     population = generate(20260909, DEFAULT_ARCHETYPES, "test")
     sizes = [len(user.entries) for user in population.users]
     assert len(population.users) == 400
+    # Protocol v13: no size stratification below no_history -- every other
+    # archetype draws a 10-20 entry library (evaluation/archetypes.py).
     assert sum(size == 0 for size in sizes) == 10
-    assert sum(1 <= size <= 4 for size in sizes) == 100
-    assert sum(5 <= size <= 10 for size in sizes) == 240
-    assert sum(size > 10 for size in sizes) == 50
+    assert sum(10 <= size <= 20 for size in sizes) == 390
+
+
+@pytest.mark.django_db
+def test_default_phase3_population_guarantees_five_eligible_positives(db) -> None:  # noqa: ANN001
+    _works()
+    population = generate(20260909, DEFAULT_ARCHETYPES, "test")
+    for user in population.users:
+        if user.no_history:
+            continue
+        guaranteed = [entry for entry in user.entries if entry.guaranteed]
+        assert len(guaranteed) >= 5
+        assert all(entry.current_status in ("completed", "playing") for entry in guaranteed)
+        assert all(entry.rating_half_steps is not None and entry.rating_half_steps >= 7 for entry in guaranteed)
+
+
+@pytest.mark.django_db
+def test_guaranteed_flag_survives_the_owned_copy_backfill(db) -> None:  # noqa: ANN001
+    # Regression: the owned-copy-guarantee rebuild used to reconstruct a
+    # SyntheticEntry without forwarding `guaranteed`, silently dropping one
+    # of the five guaranteed positives whenever no entry rolled owned_copy
+    # by chance and the rebuild happened to land on a guaranteed entry.
+    _works()
+    for seed in range(20260911, 20260931):
+        population = generate(seed, DEFAULT_ARCHETYPES, "test")
+        for user in population.users:
+            if user.no_history:
+                continue
+            assert sum(entry.guaranteed for entry in user.entries) >= 5, user.seed_key
 
 
 @pytest.mark.django_db

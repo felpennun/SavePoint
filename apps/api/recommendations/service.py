@@ -25,7 +25,7 @@ from recommendations.hybrid import rank_hybrid_mmr_v1, rank_hybrid_weighted_cf_v
 from recommendations.published import CONTENT_ALGORITHM_IDS
 
 
-PROTOCOL_VERSION = 12
+PROTOCOL_VERSION = 13
 MIN_LIMIT = 1
 MAX_LIMIT = 50
 
