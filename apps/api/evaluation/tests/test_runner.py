@@ -16,7 +16,9 @@ from evaluation import protocol as protocol_module
 from evaluation.candidates import build
 from evaluation.runner import (
     SnapshotCoverageError,
+    build_evaluation_context,
     default_algorithms,
+    precompute_shared_content_signals,
     run,
     validate_active_population,
     validate_snapshot_coverage,
@@ -268,3 +270,123 @@ def test_artifact_contains_frozen_fields_and_metrics(runner_fixture, frozen_prot
     headline = artifact["statistical_comparisons"][frozen_protocol.headline]
     assert headline["family"] == frozen_protocol.headline
     assert headline["configuration"]["seed"] == frozen_protocol.loo_seed
+
+
+@pytest.mark.django_db
+def test_run_with_a_precomputed_context_matches_run_with_none(runner_fixture, frozen_protocol) -> None:
+    # 2026-09-11: run_evaluation_parallel builds one context in its parent
+    # process and forks workers that reuse it (see precompute_shared_content_
+    # signals below); this is the guard that the plumbing itself -- passing
+    # `context=` instead of letting run() build its own -- never changes a
+    # scored value.
+    def ranker(*, candidate_ids, **_kwargs):
+        return list(candidate_ids)
+
+    fresh = run(frozen_protocol, CORPUS_VERSION, {"only": ranker}, split="test")
+
+    context = build_evaluation_context(frozen_protocol, CORPUS_VERSION, split="test")
+    reused = run(frozen_protocol, CORPUS_VERSION, {"only": ranker}, split="test", context=context)
+
+    def strip_timing(artifact: dict) -> dict:
+        artifact = copy.deepcopy(artifact)
+        for algorithm in artifact["algorithms"].values():
+            algorithm.pop("duration_seconds", None)
+        return artifact
+
+    assert strip_timing(fresh) == strip_timing(reused)
+
+
+@pytest.mark.django_db
+def test_run_rejects_a_context_built_for_a_different_split(runner_fixture, frozen_protocol) -> None:
+    def ranker(*, candidate_ids, **_kwargs):
+        return list(candidate_ids)
+
+    context = build_evaluation_context(frozen_protocol, CORPUS_VERSION, split="test")
+    with pytest.raises(ValueError, match="context was built for split"):
+        run(frozen_protocol, CORPUS_VERSION, {"only": ranker}, split="train", context=context)
+
+
+@pytest.mark.django_db
+def test_precompute_shared_content_signals_matches_uncached_rank_content_v1() -> None:
+    # Standalone from the LOO/protocol machinery above -- this is purely
+    # about whether precompute_shared_content_signals populates the same
+    # cache keys rank_content_v1 reads, with the same values an uncached
+    # call would compute for itself.
+    from recommendations.content.features import (
+        corpus_rating_prior,
+        tag_idf_profile,
+        tag_rating_profile,
+    )
+    from recommendations.content.rank import _load_candidate_vectors, rank_content_v1
+    from recommendations.content.variants import ALGORITHM_REGISTRY
+
+    corpus_version = "runner-precompute-test"
+    CorpusVersion.objects.create(
+        version=corpus_version, ruleset_sha256="c" * 64, is_active=True, governed_count=4
+    )
+    label = CuratedLabel.objects.create(
+        name="Precompute RPG", slug="precompute-rpg", kind=CuratedLabel.Kind.GENRE,
+        curation_version="test",
+    )
+
+    def make_work(slug: str) -> GameWork:
+        work = GameWork.objects.create(
+            canonical_slug=slug,
+            original_title=slug,
+            in_corpus=True,
+            corpus_version=corpus_version,
+            rating=80.0,
+            total_rating_count=10,
+            first_release_date=date(2020, 1, 1),
+        )
+        work.curated_labels.add(label)
+        CorpusRatingSnapshot.objects.create(
+            work=work, corpus_version=corpus_version, source="igdb", rating=80.0,
+            rating_count=10, total_rating_count=10,
+            retrieved_at=datetime(2026, 9, 7, tzinfo=timezone.utc),
+        )
+        return work
+
+    candidate = make_work("precompute-candidate")
+    user = User.objects.create_user(username="precompute-user")
+    for index in range(3):
+        seed = make_work(f"precompute-seed-{index}")
+        LibraryEntry.objects.create(
+            user=user, work=seed, current_status="completed", rating_half_steps=10
+        )
+
+    works = [candidate]
+    tag_idf = tag_idf_profile(corpus_version)
+    tag_profile = tag_rating_profile(corpus_version)
+    vectors = _load_candidate_vectors(
+        works, ALGORITHM_REGISTRY["content-cbf-weighted-v1"], corpus_version, tag_idf=tag_idf
+    )
+    context = {
+        "corpus_version": corpus_version,
+        "candidates_by_user": [(user, [candidate.id], candidate.id, "hash")],
+        "evaluation_prepared": {
+            "works": works,
+            "vectors": vectors,
+            "tag_profile": tag_profile,
+            "tag_idf": tag_idf,
+            "snapshot_stats": {candidate.id: (80.0, 10, 10)},
+            "rating_prior": corpus_rating_prior(corpus_version, eligibility_cutoff_date=date.today()),
+        },
+    }
+
+    precompute_shared_content_signals(context)
+    prepared = context["evaluation_prepared"]
+    assert candidate.id in prepared["_rating_term_cache"]
+    assert (user.pk, candidate.id) in prepared["_similarity_cache"]
+    assert user.pk in prepared["_profile_cache"]
+
+    cached = rank_content_v1(
+        user, "content-cbf-weighted-v1", corpus_version=corpus_version,
+        candidate_ids={candidate.id}, prepared=prepared,
+    )
+    uncached = rank_content_v1(
+        user, "content-cbf-weighted-v1", corpus_version=corpus_version,
+        candidate_ids={candidate.id},
+    )
+    assert cached["insufficient_history"] is False
+    assert cached["results"] == uncached["results"]

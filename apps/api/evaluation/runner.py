@@ -386,14 +386,20 @@ def _prepared_candidate_vectors(
     return vectors
 
 
-def run(
+def build_evaluation_context(
     protocol: Protocol,
     corpus_version: str,
-    algorithms: Mapping[str, Callable[..., Any]] | None = None,
-    *,
     split: str = "test",
 ) -> dict[str, Any]:
-    """Run each algorithm against one immutable candidate set per user."""
+    """Build everything one evaluation run needs, independent of which algorithm scores it.
+
+    Split out of ``run()`` (2026-09-11) so a parallel caller can build this
+    once in the parent process and let every algorithm worker reuse it,
+    instead of every worker process rebuilding the same candidate sets and
+    corpus-wide signals from scratch. Pair with
+    ``precompute_shared_content_signals`` to also share the O(candidates x
+    users) content loop itself -- see ``run_evaluation_parallel``.
+    """
 
     if split not in {"train", "validation", "test"}:
         raise ValueError("split must be train, validation, or test")
@@ -429,8 +435,6 @@ def run(
     if not candidates_by_user:
         raise ValueError(f"no evaluable synthetic users in {split} split")
 
-    algorithm_map = dict(algorithms or default_algorithms())
-    algorithm_artifacts: dict[str, Any] = {}
     evaluation_tag_profile = tag_rating_profile(corpus_version)
     evaluation_tag_idf = tag_idf_profile(corpus_version)
     signal_availability = coverage_report(corpus_version)
@@ -502,6 +506,121 @@ def run(
     ]
     split_manifest_hash = _hash_payload(sorted(all_manifest_rows))
 
+    return {
+        "corpus_version": corpus_version,
+        "split": split,
+        "actual_snapshot_hash": actual_snapshot_hash,
+        "actual_popscore_hash": actual_popscore_hash,
+        "population_report": population_report,
+        "selected_users": selected_users,
+        "candidates_by_user": candidates_by_user,
+        "skipped_user_count": skipped_user_count,
+        "training_probabilities": training_probabilities,
+        "evaluation_prepared": evaluation_prepared,
+        "vector_by_id": vector_by_id,
+        "candidate_universe": candidate_universe,
+        "split_manifest_sha256": split_manifest_hash,
+    }
+
+
+def precompute_shared_content_signals(
+    context: dict[str, Any],
+    *,
+    should_continue: Callable[[], bool] | None = None,
+) -> None:
+    """Populate the per-(user,work) content signals every algorithm reuses.
+
+    Mutates ``context["evaluation_prepared"]`` in place, adding the same
+    ``_profile_cache`` / ``_rating_term_cache`` / ``_similarity_cache`` keys
+    ``rank_content_v1`` already knows how to read (2026-09-11,
+    ``recommendations/content/rank.py``) -- but pre-populated for *every*
+    user in this run's split up front, not lazily per call. ``rating_term``
+    never depends on the user, so it is computed once per work regardless of
+    how many users are in the split; ``facet_similarity`` (positive and
+    negative) is computed once per (user, work) -- the same total volume of
+    work ``run_evaluation`` already pays across its 16 sequential algorithm
+    calls, just done once instead of once per algorithm.
+
+    This only saves anything for a parallel caller if the worker *processes*
+    inherit this already-populated memory via ``fork`` copy-on-write rather
+    than each rebuilding it or having it re-pickled to them -- see the
+    module-level ``_SHARED_CONTEXT`` in ``run_evaluation_parallel``, built
+    and precomputed in the parent process before any worker is forked.
+    """
+
+    from recommendations.content.combine import rating_term
+    from recommendations.content.profile import ProfileInputs, build_profile_inputs
+    from recommendations.content.similarity import facet_similarity
+
+    prepared = context["evaluation_prepared"]
+    works = prepared["works"]
+    vectors = prepared["vectors"]
+    tag_profile = prepared["tag_profile"]
+    tag_idf = prepared["tag_idf"]
+    snapshot_stats = prepared["snapshot_stats"]
+    rating_prior = prepared["rating_prior"]
+    corpus_version = context["corpus_version"]
+
+    rating_term_cache: dict[Any, tuple[float, bool]] = {}
+    for index, work in enumerate(works):
+        if index % 512 == 0 and should_continue is not None and not should_continue():
+            return
+        rating_term_cache[work.id] = rating_term(
+            work, corpus_version, tag_profile, snapshot_stats, rating_prior
+        )
+
+    profile_cache: dict[Any, ProfileInputs] = {}
+    similarity_cache: dict[tuple[Any, Any], tuple[dict, float]] = {}
+    for user, _candidate_ids, _heldout_id, _candidate_hash in context["candidates_by_user"]:
+        if should_continue is not None and not should_continue():
+            return
+        profile_inputs = build_profile_inputs(user, corpus_version, tag_idf)
+        profile_cache[user.pk] = profile_inputs
+        for work in works:
+            vector = vectors.get(work.id)
+            if vector is None:
+                continue
+            similarity_evidence = facet_similarity(profile_inputs.positive, vector)
+            negative_similarity = facet_similarity(profile_inputs.negative, vector)["score"]
+            similarity_cache[(user.pk, work.id)] = (similarity_evidence, negative_similarity)
+
+    prepared["_rating_term_cache"] = rating_term_cache
+    prepared["_profile_cache"] = profile_cache
+    prepared["_similarity_cache"] = similarity_cache
+
+
+def run(
+    protocol: Protocol,
+    corpus_version: str,
+    algorithms: Mapping[str, Callable[..., Any]] | None = None,
+    *,
+    split: str = "test",
+    context: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Run each algorithm against one immutable candidate set per user.
+
+    ``context`` (2026-09-11) is the dict :func:`build_evaluation_context`
+    returns; passing one in skips rebuilding it, so a caller that already
+    built (and optionally signal-precomputed) it once can reuse it across
+    several ``run()`` calls -- each scoring a different, disjoint algorithm
+    subset -- without rebuilding the shared candidate sets or corpus-wide
+    signals every time. Omitting it (the default) preserves exactly the
+    previous behaviour of building everything fresh inside this call.
+    """
+
+    if context is not None and context["split"] != split:
+        raise ValueError(
+            f"context was built for split={context['split']!r}, but run() was called with split={split!r}"
+        )
+    ctx = context if context is not None else build_evaluation_context(protocol, corpus_version, split)
+    candidates_by_user = ctx["candidates_by_user"]
+    evaluation_prepared = ctx["evaluation_prepared"]
+    training_probabilities = ctx["training_probabilities"]
+    candidate_universe = ctx["candidate_universe"]
+    vector_by_id = ctx["vector_by_id"]
+
+    algorithm_map = dict(algorithms or default_algorithms())
+    algorithm_artifacts: dict[str, Any] = {}
     algorithm_count = len(algorithm_map)
     for algorithm_index, (algorithm_id, algorithm) in enumerate(algorithm_map.items(), start=1):
         algorithm_started = time.perf_counter()
@@ -518,7 +637,7 @@ def run(
                 heldout_work_id=heldout_id,
                 protocol=protocol,
                 corpus_version=corpus_version,
-                tag_profile=evaluation_tag_profile,
+                tag_profile=evaluation_prepared["tag_profile"],
                 prepared=evaluation_prepared,
             )
             ranked_ids, declared_candidates = _ranked_ids(result)
@@ -636,8 +755,8 @@ def run(
         "protocol_sha256": protocol.frozen_hash(),
         "code_commit": _code_commit(),
         "corpus_version": corpus_version,
-        "snapshot_sha256": actual_snapshot_hash,
-        "popscore_snapshot_sha256": actual_popscore_hash,
+        "snapshot_sha256": ctx["actual_snapshot_hash"],
+        "popscore_snapshot_sha256": ctx["actual_popscore_hash"],
         "feature_set_version": FEATURE_SET_VERSION,
         "seeds": {
             "leave_one_out": protocol.loo_seed,
@@ -645,13 +764,13 @@ def run(
         },
         "split": split,
         "evaluation_population": {
-            **population_report,
-            "requested_user_count": len(selected_users),
+            **ctx["population_report"],
+            "requested_user_count": len(ctx["selected_users"]),
             "evaluated_user_count": len(candidates_by_user),
-            "skipped_user_count": skipped_user_count,
+            "skipped_user_count": ctx["skipped_user_count"],
             "skipped_reason": "no eligible positive item for leave-one-out",
         },
-        "split_manifest_sha256": split_manifest_hash,
+        "split_manifest_sha256": ctx["split_manifest_sha256"],
         "algorithms": algorithm_artifacts,
         "statistical_comparisons": {
             protocol.headline: _headline_statistical_comparison(protocol, algorithm_artifacts),

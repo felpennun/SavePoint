@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import multiprocessing
 import time
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from datetime import datetime, timezone
@@ -13,7 +14,26 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
 from evaluation import protocol
-from evaluation.runner import SnapshotCoverageError, _headline_statistical_comparison, default_algorithms, run
+from evaluation.runner import (
+    SnapshotCoverageError,
+    _headline_statistical_comparison,
+    build_evaluation_context,
+    default_algorithms,
+    precompute_shared_content_signals,
+    run,
+)
+
+# Built once in the parent process (Command.handle, before any worker is
+# forked) and left as a module-level global rather than passed through the
+# per-task payload: ProcessPoolExecutor forks worker processes on this
+# platform (confirmed: multiprocessing.get_start_method() == "fork"), so
+# each forked worker already has a copy-on-write view of whatever this
+# holds at fork time -- no re-pickling of ~13.6k GameWork rows and their
+# precomputed signals per worker, and no separate cross-process cache
+# needed (contrast with the web queue's DB-backed RecommendationSignalCache,
+# which exists precisely because product workers are long-lived, separately
+# started containers that never share a fork point).
+_SHARED_CONTEXT: dict[str, Any] | None = None
 
 
 def _run_algorithm_process(payload: dict[str, Any]) -> dict[str, Any]:
@@ -35,6 +55,7 @@ def _run_algorithm_process(payload: dict[str, Any]) -> dict[str, Any]:
             payload["corpus_version"],
             algorithms={algorithm_id: algorithm},
             split=payload["split"],
+            context=_SHARED_CONTEXT,
         )
         result = {
             "algorithm_id": algorithm_id,
@@ -184,7 +205,14 @@ class Command(BaseCommand):
 
         if not payloads:
             return
-        with ProcessPoolExecutor(max_workers=max(1, min(workers, len(payloads)))) as executor:
+        # Explicit fork context (not just the platform default): forked
+        # workers inherit the parent's already-populated _SHARED_CONTEXT via
+        # copy-on-write, which is the entire point of building it before any
+        # worker starts (see the module docstring above _SHARED_CONTEXT).
+        fork_context = multiprocessing.get_context("fork")
+        with ProcessPoolExecutor(
+            max_workers=max(1, min(workers, len(payloads))), mp_context=fork_context
+        ) as executor:
             futures = [executor.submit(_run_algorithm_process, payload) for payload in payloads]
             for future in as_completed(futures):
                 try:
@@ -247,6 +275,30 @@ class Command(BaseCommand):
         head_payloads = payloads[: len(payloads) - serial_tail]
         tail_payloads = payloads[len(payloads) - serial_tail :]
 
+        # Build the shared candidate sets and corpus-wide signals, then
+        # precompute the per-(user,work) content signals (profile,
+        # rating_term, facet_similarity) every content/hybrid algorithm
+        # would otherwise recompute for itself -- once, here, in the parent
+        # process, before any worker is forked. See _SHARED_CONTEXT and
+        # evaluation.runner.precompute_shared_content_signals.
+        global _SHARED_CONTEXT
+        self.stderr.write(self.style.NOTICE("Building shared evaluation context..."))
+        context_started = time.perf_counter()
+        _SHARED_CONTEXT = build_evaluation_context(frozen, corpus_version, options["split"])
+        self.stderr.write(
+            f"Context built in {time.perf_counter() - context_started:.1f}s "
+            f"({len(_SHARED_CONTEXT['candidates_by_user'])} evaluable users, "
+            f"{len(_SHARED_CONTEXT['evaluation_prepared']['works'])} candidate works); "
+            "precomputing shared content signals..."
+        )
+        precompute_started = time.perf_counter()
+        precompute_shared_content_signals(_SHARED_CONTEXT)
+        self.stderr.write(
+            self.style.SUCCESS(
+                f"Shared content signals precomputed in {time.perf_counter() - precompute_started:.1f}s"
+            )
+        )
+
         wall_started_at = datetime.now(timezone.utc)
         wall_started = time.perf_counter()
         worker_results: list[dict[str, Any]] = []
@@ -254,6 +306,10 @@ class Command(BaseCommand):
         # suite each hold the full candidate universe; draining them one at a
         # time keeps peak memory within a small Docker VM. Execution condition
         # only -- it changes neither the scored values nor the merged artifact.
+        # Now that the O(candidates x users) content loop is already shared
+        # via _SHARED_CONTEXT, each worker's own remaining cost is much
+        # smaller, so a serial tail is no longer required for safety by
+        # default (--serial-tail 0); it remains available if ever needed.
         self._drain_pool(head_payloads, max_workers, worker_results)
         self._drain_pool(tail_payloads, 1, worker_results)
         wall_finished_at = datetime.now(timezone.utc)
