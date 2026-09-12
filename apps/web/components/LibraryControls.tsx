@@ -24,6 +24,14 @@ const COPY = {
     copyDigital: "Digital",
     copyRelease: "Plataforma",
     copyEdition: "Edición (opcional)",
+    copyPurchaseDate: "Fecha de compra (opcional)",
+    copyPrice: "Precio (opcional)",
+    copyCurrency: "Moneda",
+    copyStore: "Tienda (opcional)",
+    copyConservation: "Estado de conservación",
+    copyConservationNone: "—",
+    copyConservationLabels: { new: "Nuevo", good: "Bueno", fair: "Aceptable", poor: "Deficiente", damaged: "Dañado" },
+    copyStorageLocation: "Ubicación (opcional)",
     copyAdd: "Añadir otra copia",
     save: "Guardar configuración",
     saving: "Guardando configuración…",
@@ -47,6 +55,14 @@ const COPY = {
     copyDigital: "Digital",
     copyRelease: "Platform",
     copyEdition: "Edition (optional)",
+    copyPurchaseDate: "Purchase date (optional)",
+    copyPrice: "Price (optional)",
+    copyCurrency: "Currency",
+    copyStore: "Store (optional)",
+    copyConservation: "Conservation state",
+    copyConservationNone: "—",
+    copyConservationLabels: { new: "New", good: "Good", fair: "Fair", poor: "Poor", damaged: "Damaged" },
+    copyStorageLocation: "Storage location (optional)",
     copyAdd: "Add another copy",
     save: "Save configuration",
     saving: "Saving configuration…",
@@ -82,12 +98,21 @@ async function apiPost(path: string, body: unknown) {
   });
 }
 
+type ConservationState = "new" | "good" | "fair" | "poor" | "damaged";
+const CONSERVATION_STATES: ConservationState[] = ["new", "good", "fair", "poor", "damaged"];
+
 interface OwnedCopyItem {
   id?: string;
   release_id: string;
   edition_id: string | null;
   format: CopyFormat;
   idempotency_key?: string;
+  purchase_date: string | null;
+  price: string | null;
+  currency: string | null;
+  store: string | null;
+  conservation_state: ConservationState | null;
+  storage_location: string | null;
 }
 
 function newCopy(releases: Release[]): OwnedCopyItem {
@@ -100,6 +125,12 @@ function newCopy(releases: Release[]): OwnedCopyItem {
     edition_id: null,
     format: "physical",
     idempotency_key: idempotencyKey,
+    purchase_date: null,
+    price: null,
+    currency: null,
+    store: null,
+    conservation_state: null,
+    storage_location: null,
   };
 }
 
@@ -164,12 +195,20 @@ export function LibraryControls({
       const response = await apiPost(`/api/library/entries/${workId}/configuration/`, {
         status: status || null,
         rating_half_steps: rating || null,
-        copies: copies.map(({ id, release_id, edition_id, format, idempotency_key }) => ({
-          ...(id ? { id } : { idempotency_key }),
-          release_id,
-          edition_id,
-          format,
-        })),
+        copies: copies.map(
+          ({ id, release_id, edition_id, format, idempotency_key, purchase_date, price, currency, store, conservation_state, storage_location }) => ({
+            ...(id ? { id } : { idempotency_key }),
+            release_id,
+            edition_id,
+            format,
+            purchase_date,
+            price,
+            currency,
+            store,
+            conservation_state: format === "digital" ? null : conservation_state,
+            storage_location: format === "digital" ? null : storage_location,
+          }),
+        ),
       });
       if (!response.ok) {
         setFeedback(copy.error);
@@ -291,7 +330,15 @@ export function LibraryControls({
                   <select
                     id={`copy-format-${index}`}
                     value={item.format}
-                    onChange={(event) => updateCopy(index, { format: event.target.value as CopyFormat })}
+                    onChange={(event) => {
+                      const format = event.target.value as CopyFormat;
+                      updateCopy(
+                        index,
+                        format === "digital"
+                          ? { format, conservation_state: null, storage_location: null }
+                          : { format },
+                      );
+                    }}
                     disabled={saving}
                   >
                     <option value="physical">{copy.copyPhysical}</option>
@@ -315,6 +362,84 @@ export function LibraryControls({
                       ))}
                     </select>
                   </div>
+                ) : null}
+
+                <div className="sp-field">
+                  <label htmlFor={`copy-purchase-date-${index}`}>{copy.copyPurchaseDate}</label>
+                  <input
+                    id={`copy-purchase-date-${index}`}
+                    type="date"
+                    value={item.purchase_date ?? ""}
+                    onChange={(event) => updateCopy(index, { purchase_date: event.target.value || null })}
+                    disabled={saving}
+                  />
+                </div>
+                <div className="sp-field">
+                  <label htmlFor={`copy-price-${index}`}>{copy.copyPrice}</label>
+                  <input
+                    id={`copy-price-${index}`}
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    inputMode="decimal"
+                    value={item.price ?? ""}
+                    onChange={(event) => updateCopy(index, { price: event.target.value || null })}
+                    disabled={saving}
+                  />
+                </div>
+                <div className="sp-field">
+                  <label htmlFor={`copy-currency-${index}`}>{copy.copyCurrency}</label>
+                  <input
+                    id={`copy-currency-${index}`}
+                    type="text"
+                    maxLength={3}
+                    placeholder="EUR"
+                    value={item.currency ?? ""}
+                    onChange={(event) => updateCopy(index, { currency: event.target.value.toUpperCase() || null })}
+                    disabled={saving}
+                  />
+                </div>
+                <div className="sp-field">
+                  <label htmlFor={`copy-store-${index}`}>{copy.copyStore}</label>
+                  <input
+                    id={`copy-store-${index}`}
+                    type="text"
+                    value={item.store ?? ""}
+                    onChange={(event) => updateCopy(index, { store: event.target.value || null })}
+                    disabled={saving}
+                  />
+                </div>
+                {item.format === "physical" ? (
+                  <>
+                    <div className="sp-field">
+                      <label htmlFor={`copy-conservation-${index}`}>{copy.copyConservation}</label>
+                      <select
+                        id={`copy-conservation-${index}`}
+                        value={item.conservation_state ?? ""}
+                        onChange={(event) =>
+                          updateCopy(index, { conservation_state: (event.target.value || null) as ConservationState | null })
+                        }
+                        disabled={saving}
+                      >
+                        <option value="">{copy.copyConservationNone}</option>
+                        {CONSERVATION_STATES.map((state) => (
+                          <option key={state} value={state}>
+                            {copy.copyConservationLabels[state]}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="sp-field">
+                      <label htmlFor={`copy-storage-location-${index}`}>{copy.copyStorageLocation}</label>
+                      <input
+                        id={`copy-storage-location-${index}`}
+                        type="text"
+                        value={item.storage_location ?? ""}
+                        onChange={(event) => updateCopy(index, { storage_location: event.target.value || null })}
+                        disabled={saving}
+                      />
+                    </div>
+                  </>
                 ) : null}
               </div>
             );

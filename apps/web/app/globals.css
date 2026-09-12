@@ -552,6 +552,101 @@ input[type="radio"] {
   overflow-wrap: anywhere;
 }
 
+/* Phase 5: public-profile favorites/comments/lists aggregates reuse the
+   activity-list row rhythm above so the whole profile reads as one list of
+   sections, not four different visual languages. */
+.sp-favorites-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.sp-favorites-list > li {
+  padding: var(--space-xs) var(--space-md);
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-chip);
+  background: var(--color-surface-raised);
+}
+
+.sp-profile-comments-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sp-profile-comments-list > li {
+  padding: var(--space-ctl) 0;
+  border-top: 1px solid var(--color-card-border);
+}
+
+.sp-profile-comments-list > li p {
+  margin: var(--space-xs) 0 0;
+  color: var(--color-text-secondary);
+}
+
+.sp-profile-lists {
+  display: grid;
+  gap: var(--space-md);
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+}
+
+.sp-profile-list-card {
+  padding: var(--space-ctl);
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-raised);
+}
+
+.sp-profile-list-card ol {
+  margin: var(--space-sm) 0 0;
+  padding-left: var(--space-lg);
+}
+
+.sp-favorite-slots {
+  display: grid;
+  gap: var(--space-sm);
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+}
+
+.sp-game-comments {
+  margin-top: var(--space-2xl);
+  display: grid;
+  gap: var(--space-md);
+}
+
+.sp-custom-lists {
+  display: grid;
+  gap: var(--space-lg);
+  margin-top: var(--space-2xl);
+}
+
+.sp-list-items {
+  margin: var(--space-sm) 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.sp-list-items > li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-xs) 0;
+  border-top: 1px solid var(--color-card-border);
+}
+
+.sp-list-item-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex: none;
+}
+
 .sp-surface {
   background: var(--color-surface-raised);
   border: 1px solid var(--color-surface-border);

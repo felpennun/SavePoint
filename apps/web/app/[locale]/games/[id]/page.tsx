@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 
 import { CoverImage } from "@/components/CoverImage";
+import { GameComments } from "@/components/GameComments";
 import { LibraryControls } from "@/components/LibraryControls";
 import { OwnedGamesDlcShelf } from "@/components/OwnedGamesDlcShelf";
 import { RatingBreakdownLine } from "@/components/RatingBreakdownLine";
@@ -158,6 +159,8 @@ export default async function GameDetailPage({
                 <p className="sp-kv">{formattedReleaseDate}</p>
               </>
             ) : null}
+
+            <GameComments workId={game.id} locale={locale} isAuthenticated={isAuthenticated} />
           </div>
         </div>
 

@@ -1,9 +1,12 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 
+import { CoverImage } from "@/components/CoverImage";
+import { ProfileSettings } from "@/components/ProfileSettings";
 import { StatusPill, type BacklogStatus } from "@/components/StatusPill";
 import { getDictionary } from "@/i18n";
-import { fetchPublicProfile } from "@/lib/api";
+import { fetchAccountMe, fetchPublicProfile } from "@/lib/api";
 
 const STATUSES: BacklogStatus[] = ["pending", "playing", "completed", "abandoned"];
 
@@ -14,6 +17,10 @@ const COPY = {
     activity: "Actividad pública",
     summaryLabels: { pending: "pendientes", playing: "jugando", completed: "completados", abandoned: "abandonados" },
     note: "Solo se muestran los campos que expone el backend: alias, actividad y resumen. Sin datos privados ni valoraciones ajenas.",
+    favoritesHeading: "Favoritos",
+    commentsHeading: "Comentarios",
+    listsHeading: "Listas",
+    listEmpty: "Lista vacía",
   },
   en: {
     heading: (alias: string) => `${alias}'s profile`,
@@ -21,6 +28,10 @@ const COPY = {
     activity: "Public activity",
     summaryLabels: { pending: "pending", playing: "playing", completed: "completed", abandoned: "abandoned" },
     note: "Only the fields the backend exposes are shown: alias, activity and summary. No private data, no other users' ratings.",
+    favoritesHeading: "Favorites",
+    commentsHeading: "Comments",
+    listsHeading: "Lists",
+    listEmpty: "Empty list",
   },
 } as const;
 
@@ -52,16 +63,42 @@ export default async function PublicProfilePage({
     notFound();
   }
 
+  const cookieStore = await cookies();
+  const cookieHeader = cookieStore
+    .getAll()
+    .map((cookie) => `${cookie.name}=${cookie.value}`)
+    .join("; ");
+  const me = cookieStore.has("sessionid") ? await fetchAccountMe(cookieHeader) : null;
+  const isOwner = me?.username === profile.alias;
+
   const summaryChips = STATUSES.map((status) => [status, profile.summary[status] ?? 0] as const).filter(
     ([, count]) => count > 0,
   );
+  const favoriteSlots = profile.favorites.filter((slot) => slot !== null);
 
   return (
     <main className="sp-page">
+      {isOwner ? (
+        <div className="sp-surface" style={{ marginBottom: "var(--space-xl)" }}>
+          <ProfileSettings locale={locale} />
+        </div>
+      ) : null}
+
       <div className="sp-profile-head">
-        <span className="sp-account-avatar sp-profile-avatar" aria-hidden="true">
-          {initials(profile.alias)}
-        </span>
+        {profile.avatar_url ? (
+          <CoverImage
+            src={profile.avatar_url}
+            alt={copy.heading(profile.alias)}
+            title={profile.alias}
+            missingLabel=""
+            width={64}
+            height={64}
+          />
+        ) : (
+          <span className="sp-account-avatar sp-profile-avatar" aria-hidden="true">
+            {initials(profile.alias)}
+          </span>
+        )}
         <div>
           <h1 className="sp-h1" style={{ margin: 0 }}>
             {copy.heading(profile.alias)}
@@ -71,6 +108,25 @@ export default async function PublicProfilePage({
           </p>
         </div>
       </div>
+
+      {profile.bio ? <p className="sp-lead">{profile.bio}</p> : null}
+
+      {favoriteSlots.length > 0 ? (
+        <>
+          <p className="sp-eyebrow" style={{ margin: "var(--space-xl) 0 var(--space-sm)" }}>
+            {copy.favoritesHeading}
+          </p>
+          <ul className="sp-favorites-list">
+            {favoriteSlots.map((slot) => (
+              <li key={slot!.work_slug}>
+                <Link href={`/${locale}/games/${slot!.work_slug}`} className="sp-link">
+                  {slot!.work_title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : null}
 
       {summaryChips.length > 0 ? (
         <div className="sp-chip-row">
@@ -104,6 +160,52 @@ export default async function PublicProfilePage({
           })}
         </ul>
       )}
+
+      {profile.comments.length > 0 ? (
+        <>
+          <p className="sp-eyebrow" style={{ margin: "var(--space-xl) 0 var(--space-sm)" }}>
+            {copy.commentsHeading}
+          </p>
+          <ul className="sp-profile-comments-list">
+            {profile.comments.map((comment, index) => (
+              <li key={`${comment.work_slug}-${index}`}>
+                <Link href={`/${locale}/games/${comment.work_slug}`} className="sp-link">
+                  {comment.work_title}
+                </Link>
+                <p className="sp-meta">{comment.text}</p>
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : null}
+
+      {profile.lists.length > 0 ? (
+        <>
+          <p className="sp-eyebrow" style={{ margin: "var(--space-xl) 0 var(--space-sm)" }}>
+            {copy.listsHeading}
+          </p>
+          <div className="sp-profile-lists">
+            {profile.lists.map((list, listIndex) => (
+              <div className="sp-profile-list-card" key={`${list.name}-${listIndex}`}>
+                <h3 className="sp-library-title">{list.name}</h3>
+                {list.items.length === 0 ? (
+                  <p className="sp-meta">{copy.listEmpty}</p>
+                ) : (
+                  <ol>
+                    {list.items.map((item) => (
+                      <li key={item.work_slug}>
+                        <Link href={`/${locale}/games/${item.work_slug}`} className="sp-link">
+                          {item.work_title}
+                        </Link>
+                      </li>
+                    ))}
+                  </ol>
+                )}
+              </div>
+            ))}
+          </div>
+        </>
+      ) : null}
 
       <p className="sp-muted" style={{ maxWidth: "72ch", lineHeight: 1.6, marginTop: "var(--space-xl)" }}>
         {copy.note}

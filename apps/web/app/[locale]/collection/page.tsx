@@ -2,6 +2,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { CustomLists } from "@/components/CustomLists";
 import { GameCard } from "@/components/GameCard";
 import { PaginationArrow } from "@/components/PaginationArrow";
 import { FilterDropdown } from "@/components/FilterDropdown";
@@ -192,6 +193,12 @@ export default async function CollectionPage({
       </p>
 
       {libraryTotal > 0 ? (
+        <a href="/api/library/export/collection.csv" className="sp-link" download>
+          {locale === "es" ? "Exportar colección a CSV" : "Export collection to CSV"}
+        </a>
+      ) : null}
+
+      {libraryTotal > 0 ? (
         <dl className="sp-summary-dl" aria-label={locale === "es" ? "Resumen por estado" : "Status summary"}>
           {STATUS_SUMMARY_ORDER.map((s) => (
             <div key={s}>
@@ -267,6 +274,13 @@ export default async function CollectionPage({
         </>
       )}
       </section>
+
+      {libraryTotal > 0 ? (
+        <CustomLists
+          locale={locale}
+          collectionItems={library.items.map((item) => ({ work_id: item.work_id, work_title: item.work_title }))}
+        />
+      ) : null}
     </main>
   );
 }

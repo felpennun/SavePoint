@@ -194,10 +194,36 @@ export interface PublicProfileActivityItem {
   status: string;
 }
 
+/** One slot of the public five-slot favorites shelf; `null` for an empty
+ * slot (PROF-01/D-02, `build_public_profile`). */
+export type PublicFavoriteSlot = { work_slug: string; work_title: string } | null;
+
+export interface PublicProfileComment {
+  work_slug: string;
+  work_title: string;
+  text: string;
+}
+
+export interface PublicProfileListItem {
+  work_slug: string;
+  work_title: string;
+  position: number;
+}
+
+export interface PublicProfileList {
+  name: string;
+  items: PublicProfileListItem[];
+}
+
 export interface PublicProfile {
   alias: string;
+  bio: string;
+  avatar_url: string;
   activity: PublicProfileActivityItem[];
   summary: Record<string, number>;
+  favorites: PublicFavoriteSlot[];
+  comments: PublicProfileComment[];
+  lists: PublicProfileList[];
 }
 
 export async function fetchPublicProfile(alias: string): Promise<PublicProfile | null> {
@@ -549,6 +575,48 @@ export async function fetchAccountMe(cookieHeader: string): Promise<AccountMe | 
     return typeof body.username === "string" ? { username: body.username } : null;
   } catch {
     return null;
+  }
+}
+
+/** Owner-facing profile read DTO (PROF-01, `serialize_account_profile`) --
+ * never includes `username`; the alias is the login username and is
+ * rendered from `AccountMe`/route params, never from this response. */
+export interface MyProfile {
+  bio: string;
+  avatar_url: string;
+  collection_visibility: "public" | "private";
+  favorites_visibility: "public" | "private";
+}
+
+export async function fetchMyProfile(cookieHeader: string): Promise<MyProfile | null> {
+  const url = new URL("/api/accounts/me/profile/", API_BASE);
+  try {
+    const response = await fetch(url, { cache: "no-store", headers: { Cookie: cookieHeader } });
+    if (!response.ok) return null;
+    return (await response.json()) as MyProfile;
+  } catch {
+    return null;
+  }
+}
+
+/** Owner-facing favorites DTO (D-02, `serialize_favorite_slots`) -- always
+ * five positions; `work_id` is `null` for an empty slot. */
+export interface MyFavoriteSlot {
+  slot: number;
+  work_id: string | null;
+  work_slug: string | null;
+  work_title: string | null;
+}
+
+export async function fetchMyFavorites(cookieHeader: string): Promise<MyFavoriteSlot[]> {
+  const url = new URL("/api/accounts/me/favorites/", API_BASE);
+  try {
+    const response = await fetch(url, { cache: "no-store", headers: { Cookie: cookieHeader } });
+    if (!response.ok) return [];
+    const body = (await response.json()) as { slots?: unknown };
+    return Array.isArray(body.slots) ? (body.slots as MyFavoriteSlot[]) : [];
+  } catch {
+    return [];
   }
 }
 
