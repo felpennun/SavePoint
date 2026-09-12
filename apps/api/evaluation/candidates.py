@@ -88,6 +88,14 @@ def build(user, protocol, corpus_version: str) -> tuple[frozenset, frozenset, st
     frozen ``leave_one_out_per_user`` strategy, one or more under the
     candidate ``leave_fraction_out_dominant_tag_per_user`` strategy -- so a
     caller never needs to know which mechanism produced it.
+
+    Under ``leave_fraction_out_dominant_tag_per_user``, a user for whom that
+    mechanism specifically cannot be constructed (no content-tag signal at
+    all, or their dominant tag's own pool never clears the external-rating
+    floor) falls back to the plain single-item ``leave_one_out`` rather than
+    being excluded outright -- author decision, 2026-09-12: only a user with
+    zero eligible positives at all (excluded by both mechanisms alike) is
+    actually left out of the study. See the 2026-09-12 vault note.
     """
 
     require_version(protocol, 15)
@@ -101,13 +109,13 @@ def build(user, protocol, corpus_version: str) -> tuple[frozenset, frozenset, st
             corpus_version=corpus_version,
             eligibility_cutoff_date=cutoff,
         )
-        if fraction_split is None:
-            return None
-        return (
-            fraction_split.candidate_ids,
-            fraction_split.heldout_work_ids,
-            fraction_split.candidate_manifest_sha256,
-        )
+        if fraction_split is not None:
+            return (
+                fraction_split.candidate_ids,
+                fraction_split.heldout_work_ids,
+                fraction_split.candidate_manifest_sha256,
+            )
+        # Falls through to the plain leave_one_out fallback below.
     split = leave_one_out(
         user,
         seed=protocol.loo_seed,

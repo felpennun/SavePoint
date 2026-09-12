@@ -422,6 +422,33 @@ def test_leave_fraction_out_returns_none_without_any_positive(
     ) is None
 
 
+def test_build_falls_back_to_leave_one_out_when_the_dominant_tag_mechanism_cannot_apply(
+    dominant_tag_corpus, dominant_tag_user
+) -> None:
+    # A work with no curated_labels at all (and no release/platform data)
+    # has an empty feature vector, so build_profile_inputs skips it entirely
+    # -- leave_fraction_out_dominant_tag returns None (empty profile), but
+    # the work still clears the relevance rule and the external-rating
+    # floor, so plain leave_one_out can and should still use it. build()
+    # must fall back rather than excluding this user outright.
+    from evaluation.candidates import build
+
+    untagged = _tagged_work("dominant-tag-untagged-0")  # no labels passed
+    _positive(dominant_tag_user, untagged)
+
+    frozen = protocol_module.load()
+    assert frozen.split["strategy"] == "leave_fraction_out_dominant_tag_per_user"
+    assert leave_fraction_out_dominant_tag(
+        dominant_tag_user, seed=frozen.loo_seed, protocol=frozen, corpus_version=DOMINANT_TAG_CORPUS,
+        eligibility_cutoff_date=date(2026, 9, 12),
+    ) is None
+
+    built = build(dominant_tag_user, frozen, DOMINANT_TAG_CORPUS)
+    assert built is not None
+    _candidate_ids, heldout_ids, _candidate_hash = built
+    assert heldout_ids == frozenset({untagged.id})
+
+
 def test_leave_fraction_out_returns_none_below_the_external_rating_floor(
     dominant_tag_corpus, dominant_tag_user
 ) -> None:
