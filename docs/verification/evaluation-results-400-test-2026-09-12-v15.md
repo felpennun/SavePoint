@@ -170,6 +170,37 @@ continua (p. ej. `content-cbf-weighted-v1` recupera, en media, el 23,3 % de los 
 retenidos de cada usuario dentro del top-10) — más información por usuario que en v12/v14,
 donde solo había un ítem posible que acertar o no.
 
+### 4.3 Tabla de éxitos por algoritmo
+
+Con retención múltiple por usuario, "acierto" se reporta en dos niveles: cuántos de los
+**202 ítems retenidos en total** (suma de `len(heldout_work_ids)` sobre los 79 usuarios) se
+recuperaron en el top-K, y cuántos de los **79 usuarios** recibieron al menos uno de los
+suyos.
+
+| Algoritmo | Ítems@5 | Ítems@10 | Ítems@20 | Usuarios≥1@5 | Usuarios≥1@10 | Usuarios≥1@20 |
+|---|---:|---:|---:|---:|---:|---:|
+| `content-cbf-weighted-v1` | 32/202 | 48/202 | 57/202 | 29/79 | 39/79 | 46/79 |
+| `hybrid-weighted-cf-v1` | 33/202 | 48/202 | 57/202 | 29/79 | 38/79 | 45/79 |
+| `hybrid-mmr-v1` | 29/202 | 42/202 | 51/202 | 27/79 | 35/79 | 40/79 |
+| `content-cbf-weighted-pop-v1` | 28/202 | 38/202 | 51/202 | 26/79 | 34/79 | 43/79 |
+| `content-cbf-mmr-v1` | 24/202 | 36/202 | 48/202 | 23/79 | 32/79 | 39/79 |
+| `content-cbf-neg-v1` | 23/202 | 34/202 | 40/202 | 20/79 | 28/79 | 33/79 |
+| `content-cbf-twostage-v1` | 21/202 | 33/202 | 48/202 | 20/79 | 28/79 | 38/79 |
+| `content-cbf-mmr-pop-v1` | 23/202 | 31/202 | 41/202 | 23/79 | 28/79 | 35/79 |
+| `content-cbf-twostage-pop-v1` | 20/202 | 32/202 | 52/202 | 19/79 | 28/79 | 41/79 |
+| `content-cbf-neg-pop-v1` | 20/202 | 27/202 | 37/202 | 18/79 | 24/79 | 31/79 |
+| `content-cbf-multiplicative-v1` | 15/202 | 19/202 | 30/202 | 15/79 | 17/79 | 27/79 |
+| `content-cbf-multiplicative-pop-v1` | 15/202 | 19/202 | 30/202 | 15/79 | 17/79 | 27/79 |
+| `cf-user-knn-v1` | 4/202 | 7/202 | 13/202 | 4/79 | 7/79 | 12/79 |
+| `popularity-v1` | 1/202 | 2/202 | 2/202 | 1/79 | 2/79 | 2/79 |
+| `recency-v1` | 1/202 | 1/202 | 1/202 | 1/79 | 1/79 | 1/79 |
+| `random-v1` | 0/202 | 0/202 | 0/202 | 0/79 | 0/79 | 0/79 |
+
+Lectura: con `content-cbf-weighted-v1`, **49 % de los usuarios (39/79)** recibe al menos un
+juego de su tag favorito recuperado dentro del top-10 — frente al 9 % (7/79) con
+`cf-user-knn-v1` (colaborativo puro) y el 3 % o menos con los baselines. `random-v1` no
+acierta ni un solo ítem de los 202 en ningún K.
+
 ## 5. Intervalos y pruebas pareadas de nDCG@10 (métrica titular)
 
 Configuración: bootstrap BCa (2000 remuestreos, IC 95 %, semilla `20260907`), Wilcoxon
@@ -311,7 +342,35 @@ Bajo el protocolo `2026.09.2`/v15 y este split de test de un solo uso:
 - **Siguiente paso ya decidido por el autor**: estudio con 20 usuarios reales, evaluación
   de calidad por encuestas — capítulo complementario, no comparativo con este.
 
-## 11. Artefactos y reproducibilidad
+## 11. Comparativa entre las tres evaluaciones de la semana (v12, v14, v15)
+
+| | **v12** (2026-09-10) | **v14** (2026-09-11) | **v15** (2026-09-12) |
+|---|---|---|---|
+| Mecanismo LOO | 1 ítem fijo, sin piso de rating | 1 ítem fijo, piso de rating externo ≥70 | Fracción adaptativa (30%) del tag dominante, ≥1, con retroceso; respaldo a LOO simple |
+| Usuarios evaluables (test) | 73/80 | 79/80 | 79/80 |
+| Ítems retenidos por usuario | 1 | 1 | Media 2,56 (rango 1-5) |
+| % en `insufficient_history` | 74 % | 0 % | 0 % |
+| Friedman χ² (ómnibus) | 30,00 | 105,28 | **258,07** |
+| Friedman p | 0,0119 | 1,29 × 10⁻¹⁵ | **2,69 × 10⁻⁴⁶** |
+| Comparaciones significativas (Holm) | 0/120 | 14/120 | **54/120** |
+| Mejor algoritmo | `cf-user-knn-v1` (0,0155) — no significativo | `hybrid-weighted-cf-v1` (0,1526) | `content-cbf-weighted-v1` (0,1725) |
+| 2º mejor | — | `content-cbf-weighted-v1` (0,1452) | `hybrid-weighted-cf-v1` (0,1699) |
+| ¿Contenido bate a baselines? | No (nada significativo) | Sí (4 algoritmos) | Sí (más algoritmos, más margen) |
+| ¿Contenido bate a colaborativo puro? | No | No | **Sí — hallazgo nuevo** (8 de 10 variantes) |
+| ¿`weighted_sum` bate a `multiplicative`? | No aplica | Sí | Sí |
+| Tiempo de pared | 3 h 42 min (proceso único) | 1 h 11 min (precómputo+fork, 2+5) | 1 h 12 min (igual; +10x en construcción de contexto) |
+| Conclusión citable | Ninguna — hallazgo metodológico (arranque en frío) | Sí, moderada | Sí, la más sólida de las tres |
+
+Progresión limpia: v12 encontró y expuso un problema de diseño (arranque en frío por
+interacción entre la generación de población y el umbral de contenido), v14 lo corrigió y
+ya dio un resultado citable, v15 afinó aún más la prueba (más información por usuario vía
+retención múltiple) y sacó un hallazgo que las dos anteriores no tenían potencia
+estadística para establecer — contenido significativamente superior a colaborativo puro.
+Fuentes: [`evaluation-results-400-test-2026-09-10.md`](./evaluation-results-400-test-2026-09-10.md)
+(v12), [`evaluation-results-400-test-2026-09-11.md`](./evaluation-results-400-test-2026-09-11.md)
+(v14).
+
+## 12. Artefactos y reproducibilidad
 
 | Artefacto | Ruta | SHA-256 |
 |---|---|---|
