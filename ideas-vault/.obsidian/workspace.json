@@ -11,10 +11,14 @@
             "id": "8fc71c85047349ea",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Vista gráfica"
+              "type": "markdown",
+              "state": {
+                "file": "Fases/2026-09-09 - Rating bayesiano reproducible.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "2026-09-09 - Rating bayesiano reproducible"
             }
           }
         ]
@@ -51,7 +55,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "tag:#concepto",
+                "query": "baye",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -182,8 +186,13 @@
       "bases:Crear nueva base": false
     }
   },
-  "active": "2cfb59bdaafd7463",
+  "active": "8fc71c85047349ea",
   "lastOpenFiles": [
+    "Sin título.canvas",
+    "Fases/2026-09-09 - Señales de contenido y explicación honesta.md",
+    "Fases/2026-09-12 - Cierre Fase 4 colaborativa e hibrida.md",
+    "Conceptos/Control contra alucinaciones.md",
+    "Fases/2026-09-11 - Piso de rating externo en LOO y paralelizacion offline.md",
     "Conceptos/Corpus gobernado.md",
     "Sin título.base",
     "Conceptos/ADR (concepto).md",
