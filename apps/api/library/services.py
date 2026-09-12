@@ -7,14 +7,37 @@ import uuid
 from datetime import datetime, timezone
 
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError, transaction
+from django.db import IntegrityError, models, transaction
 
 from catalogue.models import Edition, GameRelease, GameWork
-from library.models import BacklogStatus, CopyFormat, LibraryEntry, OwnedCopy, StatusTransition
+from library.models import (
+    BacklogStatus,
+    ContentVisibility,
+    CopyFormat,
+    CustomList,
+    CustomListItem,
+    GameComment,
+    LibraryEntry,
+    OwnedCopy,
+    StatusTransition,
+)
 
 VALID_RATING_RANGE = range(1, 11)
 VALID_FORMATS = {choice.value for choice in CopyFormat}
 VALID_STATUSES = {choice.value for choice in BacklogStatus}
+VALID_VISIBILITIES = {choice.value for choice in ContentVisibility}
+
+
+class CommentAlreadyExists(Exception):
+    """Raised when the caller already has a comment for this work (D-04:
+    at most one comment per user/work) -- the view maps this to HTTP 409
+    without ever touching the database again."""
+
+
+class StaleListVersion(Exception):
+    """Raised when a reorder's ``expected_version`` no longer matches the
+    list's persisted version -- the view maps this to HTTP 409. Always
+    raised before any item is touched inside the reorder transaction."""
 
 
 def set_rating(*, user, work: GameWork, rating_half_steps: int | None) -> LibraryEntry:
@@ -206,3 +229,190 @@ def clear_library_configuration(*, user, work: GameWork) -> None:
     with transaction.atomic():
         OwnedCopy.objects.filter(user=user, work=work).delete()
         LibraryEntry.objects.filter(user=user, work=work).delete()
+
+
+# ---------------------------------------------------------------------------
+# Comments (D-04/D-05, LIB-03): one comment per user/work, author-owned.
+# ---------------------------------------------------------------------------
+
+
+def list_visible_comments(*, work: GameWork, viewer):  # noqa: ANN001
+    """Every ``public`` comment for this work, plus the viewer's own comment
+    regardless of its visibility (D-05) -- an anonymous viewer only ever
+    sees the public set."""
+    queryset = GameComment.objects.filter(work=work).select_related("user").order_by("created_at", "id")
+    if viewer is not None and getattr(viewer, "is_authenticated", False):
+        queryset = queryset.filter(models.Q(visibility=ContentVisibility.PUBLIC) | models.Q(user=viewer))
+    else:
+        queryset = queryset.filter(visibility=ContentVisibility.PUBLIC)
+    return queryset
+
+
+def create_comment(
+    *, user, work: GameWork, text: str | None = None, visibility: str | None = None
+) -> GameComment:
+    """Create the caller's single comment for this work.
+
+    Rejects (without any mutation) a work outside the caller's own
+    collection, a missing/blank text, an invalid visibility, and -- via
+    ``CommentAlreadyExists`` -- a second comment for the same user/work
+    (D-04: exactly one comment per user/work, never a silent duplicate)."""
+    if text is None or not text.strip():
+        raise ValidationError("text is required.")
+    resolved_visibility = visibility if visibility is not None else ContentVisibility.PUBLIC
+    if resolved_visibility not in VALID_VISIBILITIES:
+        raise ValidationError("visibility must be 'public' or 'private'.")
+    if not LibraryEntry.objects.filter(user=user, work=work).exists():
+        raise ValidationError("work is not in your collection.")
+    if GameComment.objects.filter(user=user, work=work).exists():
+        raise CommentAlreadyExists()
+
+    with transaction.atomic():
+        comment = GameComment.objects.create(
+            user=user, work=work, text=text, visibility=resolved_visibility
+        )
+    return comment
+
+
+def update_comment(
+    *, comment: GameComment, text: str | None = None, visibility: str | None = None
+) -> GameComment:
+    """Update the fields provided; fields left ``None`` are left untouched
+    (matches ``accounts.services.update_profile``'s partial-update
+    contract)."""
+    if text is not None and not text.strip():
+        raise ValidationError("text is required.")
+    if visibility is not None and visibility not in VALID_VISIBILITIES:
+        raise ValidationError("visibility must be 'public' or 'private'.")
+
+    update_fields: list[str] = []
+    if text is not None:
+        comment.text = text
+        update_fields.append("text")
+    if visibility is not None:
+        comment.visibility = visibility
+        update_fields.append("visibility")
+
+    if update_fields:
+        with transaction.atomic():
+            comment.save(update_fields=[*update_fields, "updated_at"])
+    return comment
+
+
+def delete_comment(*, user, comment_id: str) -> bool:
+    """Delete the caller's own comment. Owner-scoped by construction: the
+    filter includes ``user=user`` so a non-owner's delete affects zero rows
+    (indistinguishable from a nonexistent comment)."""
+    deleted, _ = GameComment.objects.filter(id=comment_id, user=user).delete()
+    return bool(deleted)
+
+
+# ---------------------------------------------------------------------------
+# Custom lists (D-06/D-07, LIB-04): manual, ordered collections of a user's
+# own owned games, with optimistic-concurrency reorder.
+# ---------------------------------------------------------------------------
+
+
+def create_list(*, user, name: str | None = None, visibility: str | None = None) -> CustomList:
+    if name is None or not name.strip():
+        raise ValidationError("name is required.")
+    resolved_visibility = visibility if visibility is not None else ContentVisibility.PUBLIC
+    if resolved_visibility not in VALID_VISIBILITIES:
+        raise ValidationError("visibility must be 'public' or 'private'.")
+
+    with transaction.atomic():
+        custom_list = CustomList.objects.create(user=user, name=name, visibility=resolved_visibility)
+    return custom_list
+
+
+def update_list(*, custom_list: CustomList, name: str | None = None, visibility: str | None = None) -> CustomList:
+    if name is not None and not name.strip():
+        raise ValidationError("name is required.")
+    if visibility is not None and visibility not in VALID_VISIBILITIES:
+        raise ValidationError("visibility must be 'public' or 'private'.")
+
+    update_fields: list[str] = []
+    if name is not None:
+        custom_list.name = name
+        update_fields.append("name")
+    if visibility is not None:
+        custom_list.visibility = visibility
+        update_fields.append("visibility")
+
+    if update_fields:
+        with transaction.atomic():
+            custom_list.save(update_fields=[*update_fields, "updated_at"])
+    return custom_list
+
+
+def add_list_item(*, user, custom_list: CustomList, work: GameWork) -> CustomListItem:
+    """Append one owned work to the end of the list.
+
+    Membership is re-checked against the caller's own ``LibraryEntry``
+    before any write (Pitfall 3, 05-RESEARCH.md) -- a work that left the
+    collection cannot be added to a new list, even if it once belonged
+    here. The parent list row is locked for the duration of the insert so
+    two concurrent adds can never compute the same "next" position."""
+    if not LibraryEntry.objects.filter(user=user, work=work).exists():
+        raise ValidationError("work is not in your collection.")
+
+    with transaction.atomic():
+        locked_list = CustomList.objects.select_for_update().get(id=custom_list.id, user=user)
+        if CustomListItem.objects.filter(list=locked_list, work=work).exists():
+            raise ValidationError("work is already in this list.")
+        max_position = (
+            CustomListItem.objects.filter(list=locked_list)
+            .order_by("-position")
+            .values_list("position", flat=True)
+            .first()
+        )
+        next_position = (max_position or 0) + 1
+        item = CustomListItem.objects.create(list=locked_list, work=work, position=next_position)
+    return item
+
+
+def reorder_list_items(*, user, list_id: str, expected_version: int, item_ids: list[str]) -> CustomList:
+    """Atomically reassign consecutive ``1..N`` positions from a caller-
+    submitted complete ordering of the list's current item ids.
+
+    ``select_for_update()`` serializes concurrent reorders of the same
+    list; a version mismatch raises ``StaleListVersion`` (mapped to HTTP
+    409) before any item row is touched, so a losing concurrent writer
+    never leaves duplicated or gapped positions. Positions are written in
+    two passes -- first to unique temporary values outside the final
+    ``1..N`` range, then to the final consecutive range -- so the
+    intermediate state never collides with ``UniqueConstraint(list,
+    position)`` (Pattern 4, 05-PATTERNS.md). Any exception raised while
+    inside the surrounding ``transaction.atomic()`` rolls the whole
+    operation back, leaving the previous order intact.
+    """
+    with transaction.atomic():
+        custom_list = CustomList.objects.select_for_update().filter(id=list_id, user=user).first()
+        if custom_list is None:
+            raise ValidationError("list not found.")
+        if custom_list.version != expected_version:
+            raise StaleListVersion()
+
+        items = list(CustomListItem.objects.filter(list=custom_list))
+        items_by_id = {str(item.id): item for item in items}
+        submitted_ids = [str(item_id) for item_id in item_ids]
+        if set(submitted_ids) != set(items_by_id) or len(submitted_ids) != len(items_by_id):
+            raise ValidationError("item_ids must exactly match the list's current items.")
+
+        # Phase 1: unique temporary positions, well outside 1..N.
+        temp_offset = len(submitted_ids) + 1000
+        for offset, item_id in enumerate(submitted_ids):
+            item = items_by_id[item_id]
+            item.position = temp_offset + offset
+            item.save(update_fields=["position"])
+
+        # Phase 2: final consecutive 1..N positions in submission order.
+        for index, item_id in enumerate(submitted_ids, start=1):
+            item = items_by_id[item_id]
+            item.position = index
+            item.save(update_fields=["position"])
+
+        custom_list.version += 1
+        custom_list.save(update_fields=["version", "updated_at"])
+
+    return custom_list

@@ -24,7 +24,8 @@ from accounts.models import (
     FavoriteSlot,
     ProfileVisibility,
 )
-from library.models import BacklogStatus, LibraryEntry
+from library.models import BacklogStatus, ContentVisibility, CustomList, GameComment, LibraryEntry
+from library.serializers import serialize_profile_comment, serialize_profile_list
 
 User = get_user_model()
 
@@ -56,9 +57,37 @@ def _serialize_public_favorites(user) -> list:  # noqa: ANN001
     ]
 
 
+def _serialize_public_comments(user, *, is_owner: bool) -> list:  # noqa: ANN001
+    """Public-profile comment aggregate (LIB-03/D-04/D-05): a comment's own
+    ``visibility`` gates it here -- never ``collection_visibility`` or
+    ``favorites_visibility``, which are independent toggles. The owner
+    viewing their own profile sees every comment regardless of visibility,
+    matching the owner-always-sees-own-data pattern used throughout this
+    module."""
+    queryset = GameComment.objects.filter(user=user).select_related("work").order_by("created_at", "id")
+    if not is_owner:
+        queryset = queryset.filter(visibility=ContentVisibility.PUBLIC)
+    return [serialize_profile_comment(comment) for comment in queryset]
+
+
+def _serialize_public_lists(user, *, is_owner: bool) -> list:  # noqa: ANN001
+    """Public-profile custom-list aggregate (LIB-04/D-06/D-07): each list's
+    own ``visibility`` gates it here, independent of
+    ``collection_visibility``/``favorites_visibility``. The owner sees
+    every list of their own regardless of visibility."""
+    queryset = (
+        CustomList.objects.filter(user=user).prefetch_related("items__work").order_by("created_at", "id")
+    )
+    if not is_owner:
+        queryset = queryset.filter(visibility=ContentVisibility.PUBLIC)
+    return [serialize_profile_list(custom_list) for custom_list in queryset]
+
+
 def build_public_profile(user, *, viewer=None) -> dict:  # noqa: ANN001
     """PRIV-01 allowlist, now also gating collection/favorites behind D-02's
-    independent ``collection_visibility``/``favorites_visibility`` policies.
+    independent ``collection_visibility``/``favorites_visibility`` policies,
+    plus comments/lists (LIB-03/LIB-04) whose own ``visibility`` field gates
+    them independently of those two toggles (D-05/D-07).
 
     ``viewer`` is the requesting ``request.user`` (may be anonymous). The
     owner visiting their own profile always sees their own full data
@@ -105,6 +134,8 @@ def build_public_profile(user, *, viewer=None) -> dict:  # noqa: ANN001
         "activity": activity,
         "summary": summary,
         "favorites": favorites,
+        "comments": _serialize_public_comments(user, is_owner=is_owner),
+        "lists": _serialize_public_lists(user, is_owner=is_owner),
     }
 
 
