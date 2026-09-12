@@ -336,7 +336,7 @@ export interface ContentRecommendationItem {
 export interface ContentRecommendationReason {
   kind: "signal_overlap";
     signals: {
-      kind: "tag" | "platform" | "franchise" | "developer";
+      kind: "tag" | "theme" | "mode" | "feature" | "platform" | "franchise" | "developer";
       slug: string;
       name: string;
     }[];

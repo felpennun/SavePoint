@@ -8,7 +8,7 @@ import pytest
 from django.utils import timezone as django_timezone
 from rest_framework.test import APIClient
 
-from catalogue.models import CorpusRatingSnapshot, GameWork, Genre
+from catalogue.models import CorpusRatingSnapshot, CuratedLabel, GameWork, GameWorkCuratedLabel
 from library.models import LibraryEntry
 from recommendations.content.combine import combine, rating_term
 from recommendations.content.features import bayesian_rating, rating_quality_signal
@@ -29,16 +29,18 @@ def user_a(db):  # noqa: ANN001
 
 @pytest.fixture
 def genres(db):  # noqa: ANN001
+    # "genres" for call-site continuity; these are CuratedLabel rows (the
+    # ranking pipeline reads work.curated_labels exclusively).
     return {
-        "rpg": Genre.objects.create(
-            igdb_id=12, name="Role-playing (RPG)", slug="role-playing-rpg"
+        "rpg": CuratedLabel.objects.create(
+            name="Role-playing (RPG)", slug="role-playing-rpg", kind=CuratedLabel.Kind.GENRE, curation_version="test"
         ),
-        "shooter": Genre.objects.create(igdb_id=5, name="Shooter", slug="shooter"),
-        "puzzle": Genre.objects.create(igdb_id=9, name="Puzzle", slug="puzzle"),
+        "shooter": CuratedLabel.objects.create(name="Shooter", slug="shooter", kind=CuratedLabel.Kind.GENRE, curation_version="test"),
+        "puzzle": CuratedLabel.objects.create(name="Puzzle", slug="puzzle", kind=CuratedLabel.Kind.GENRE, curation_version="test"),
     }
 
 
-def _work(slug: str, *genre_objs: Genre) -> GameWork:
+def _work(slug: str, *tags: CuratedLabel) -> GameWork:
     work = GameWork.objects.create(
         canonical_slug=slug,
         original_title=slug.replace("-", " ").title(),
@@ -47,7 +49,8 @@ def _work(slug: str, *genre_objs: Genre) -> GameWork:
         corpus_version=_CORPUS,
         first_release_date=date(2020, 1, 1),
     )
-    work.genres.set(genre_objs)
+    for tag in tags:
+        GameWorkCuratedLabel.objects.create(work=work, label=tag, source_kind="genre", source_value=tag.name)
     return work
 
 
@@ -234,10 +237,10 @@ def test_rank_is_deterministic_and_breaks_equal_scores_by_slug(user_a, genres) -
     assert first["results"] == second["results"]
 
 
-def test_explain_is_numeric_and_sorted_by_genre_contribution() -> None:
+def test_explain_is_numeric_and_sorted_by_tag_contribution() -> None:
     spec = ALGORITHM_REGISTRY["content-cbf-weighted-v1"]
-    candidate = {"genre:rpg": 0.5, "genre:shooter": 0.5, "platform:pc": 0.2}
-    profile = {"genre:rpg": 0.8, "genre:shooter": 0.2, "platform:pc": 0.1}
+    candidate = {"tag:rpg": 0.5, "tag:shooter": 0.5, "platform:pc": 0.2}
+    profile = {"tag:rpg": 0.8, "tag:shooter": 0.2, "platform:pc": 0.1}
 
     from recommendations.content.explain import explain
 
@@ -253,12 +256,12 @@ def test_explain_is_numeric_and_sorted_by_genre_contribution() -> None:
     }
     assert result["variant"] == spec.algorithm_id
     assert result["contributions"] == [
-        {"genre": "rpg", "contribution_pct": round(0.4 / 0.52, 3)},
-        {"genre": "shooter", "contribution_pct": round(0.1 / 0.52, 3)},
+        {"tag": "rpg", "contribution_pct": round(0.4 / 0.52, 3)},
+        {"tag": "shooter", "contribution_pct": round(0.1 / 0.52, 3)},
     ]
     assert result["reason_signals"] == [
-        {"kind": "genre", "value": "rpg", "contribution_pct": round(0.4 / 0.52, 3)},
-        {"kind": "genre", "value": "shooter", "contribution_pct": round(0.1 / 0.52, 3)},
+        {"kind": "tag", "value": "rpg", "contribution_pct": round(0.4 / 0.52, 3)},
+        {"kind": "tag", "value": "shooter", "contribution_pct": round(0.1 / 0.52, 3)},
     ]
     assert all("because" not in str(value).lower() for value in result.values())
 
@@ -328,7 +331,7 @@ def test_versioned_dto_and_item_evidence(user_a, genres) -> None:  # noqa: ANN00
         "limitation",
         "results",
     }
-    assert result["feature_set_version"] == "fs-v9"
+    assert result["feature_set_version"] == "fs-v13-family-weighted-tags"
     assert result["corpus_version"] == _CORPUS
     assert len(result["snapshot_sha256"]) == 64
     assert len(result["input_snapshot_sha256"]) == 64

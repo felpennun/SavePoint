@@ -1,21 +1,50 @@
 """Per-work content feature vectors and the corpus rating statistic (D-11/D-13).
 
 A feature vector is a sparse ``{feature_key: weight}`` dict over a governed
-``GameWork``. Facets have a deliberately descending semantic importance:
+``GameWork``. fs-v13 splits the former single curated-tag bucket into four
+independently-weighted families, each with its own smoothed IDF, plus the
+existing platform/franchise/developer facets:
 
-* ``tag:<slug>``  -- weight 0.75; emitted from the curated unified tag set.
-* ``platform:<slug>`` -- weight 0.25; allowlist platforms only.
+* ``tag:<slug>``  -- weight 0.60; genre + subgenre merged (the primary taste
+  axis: a subgenre like Souls-like is a genuine refinement of a genre like
+  RPG, not a competing signal, so the two share one IDF-weighted bucket).
+* ``theme:<slug>`` -- weight 0.20; mood/setting (Horror, Fantasy, Sci-fi...).
+* ``feature:<slug>`` -- weight 0.10; format/technical descriptors (Open
+  World, VR, Retro...).
+* ``mode:<slug>`` -- weight 0.05; social context (Singleplayer, Co-op...).
+* ``platform:<slug>`` -- weight 0.05; allowlist platforms only.
 * ``franchise:<slug>`` -- weight 0.02; IGDB saga signal when present.
 * ``developer:<slug>`` -- weight 0.015; emitted when the governed
   view contains the facet. Franchise is the IGDB saga signal and has no
   minimum coverage gate: missing saga data is omitted per work. Developer
   coverage retains its 50 % gate (D-11).
 
-Within the tag facet, smoothed inverse document frequency (IDF) gives rare
-curated tags more weight than generic ones. The resulting tag values are
-L2-normalised to the family weight, so the complete tag block remains 0.75
-regardless of the number or rarity of a work's tags. Other facets continue to
-divide their configured family weight by ``sqrt(k)`` for ``k`` observed keys.
+``tag`` and ``platform`` are the two CORE facets in ``similarity.py``'s
+``facet_similarity()``: their weighted affinities are averaged, renormalised
+over whichever of the two is present on both sides of a comparison. Theme,
+mode, feature, franchise, and developer are OPTIONAL/bonus facets: a match
+only ever adds to the score, and an absent value on either side contributes
+neither a bonus nor a penalty -- it is excluded from that comparison
+entirely, never folded into core's renormalised denominator. This is a
+deliberate correction (2026-09-12, author-caught): an earlier design that put
+all five families into one renormalised core pool let a work missing rarer
+metadata (say, no theme) look *relatively* stronger on genre alone than an
+equally-genre-matched work that also carries a theme -- rewarding sparse
+metadata instead of staying neutral to it. Keeping only near-universal-
+coverage facets (tag, platform) in the renormalised core avoids that bias:
+genre is measured the same way regardless of what else a work happens to
+have tagged.
+
+Within each family, smoothed inverse document frequency (IDF) gives rare
+curated values more weight than generic ones, scoped to that family's OWN
+population (see :func:`_compute_family_idf_profile`) -- not the whole
+governed corpus, or a sparsely-covered family like ``feature`` would look
+artificially rarer (and so more heavily weighted) than its true population
+warrants. The resulting per-family values are L2-normalised to that family's
+configured weight, so e.g. the complete tag block remains 0.60 regardless of
+the number or rarity of a work's genre/subgenre tags. Franchise and developer
+continue to divide their configured family weight by ``sqrt(k)`` for ``k``
+observed keys (no IDF -- see ``exact_match_scale`` in ``similarity.py``).
 
 The **rating term is NOT a vector dimension** (threat T-02-10-01). The
 corpus-level genre rating statistic lives in :func:`genre_rating_profile`,
@@ -30,20 +59,26 @@ import os
 from contextlib import contextmanager
 from datetime import date
 from functools import lru_cache
-from typing import Iterator
+from typing import Callable, Iterator
 
 from django.db.models import Count, Exists, OuterRef
 
 from catalogue.corpus import ALLOWLIST_SLUGS, evaluation_candidate_works, governed_works
-from catalogue.models import CorpusPopularitySnapshot, CorpusRatingSnapshot, CuratedLabel, GameWork
+from catalogue.models import (
+    CorpusPopularitySnapshot,
+    CorpusRatingSnapshot,
+    CuratedLabel,
+    GameRelease,
+    GameWork,
+)
 from catalogue.popularity import IGDB_ENGAGEMENT_TYPES
 
 # Bump when the vector-building or similarity rules change (part of the DTO,
-# REC-09). fs-v12 freezes curated-tag IDF, F0.5 and the optional confirmation
-# weights while keeping cached
-# vectors aligned with the shared facet contract. Cached rows from earlier
-# contracts must not be reused.
-FEATURE_SET_VERSION = "fs-v12-curated-tags-idf"
+# REC-09). fs-v13 splits the former single curated-tag bucket (fs-v12) into
+# tag (genre+subgenre)/theme/mode/feature, each with its own IDF, and gives
+# platform its own IDF instead of a flat 1/sqrt(k) split. Cached rows from
+# earlier contracts must not be reused.
+FEATURE_SET_VERSION = "fs-v13-family-weighted-tags"
 
 # Shared scalar-signal contract. The product workers and offline runner both
 # call the same ranker, so this version is included in the published
@@ -56,22 +91,41 @@ RATING_QUALITY_POWER = 2.0
 RATING_BAYESIAN_PRIOR_COUNT = 25.0
 RATING_CONFIDENCE_PRIOR_COUNT = RATING_BAYESIAN_PRIOR_COUNT
 
-# These weights express the semantic hierarchy of the content signal. The
-# current contract uses curated-tags/platform as the core and saga/developer
-# as bounded confirmation
-# bonuses. They remain part of the versioned contract, not request-time tuning
-# parameters.
+# These weights express the semantic hierarchy of the content signal
+# (2026-09-12 author decision, fs-v13): genre+subgenre anchors taste: theme,
+# mode, and feature are bounded confirmation bonuses layered on top -- the
+# same bonus treatment franchise/developer already had, just with different
+# maxima -- and platform is a minor core tie-break, not a taste signal in its
+# own right. They remain part of the versioned contract, not request-time
+# tuning parameters.
 FACET_WEIGHTS: dict[str, float] = {
-    "tag": 0.75,
-    "platform": 0.25,
+    "tag": 0.60,
+    "theme": 0.20,
+    "feature": 0.10,
+    "mode": 0.05,
+    "platform": 0.05,
     "franchise": 0.02,
     "developer": 0.015,
+}
+
+# Which CuratedLabel.Kind values feed which similarity family. Genre and
+# subgenre share the "tag" family/vector-namespace deliberately: a subgenre
+# is a refinement of a genre, not a competing signal (author decision,
+# 2026-09-12) -- see the module docstring.
+_FAMILY_KINDS: dict[str, tuple[str, ...]] = {
+    "tag": (CuratedLabel.Kind.GENRE, CuratedLabel.Kind.SUBGENRE),
+    "theme": (CuratedLabel.Kind.THEME,),
+    "mode": (CuratedLabel.Kind.MODE,),
+    "feature": (CuratedLabel.Kind.FEATURE,),
+}
+_KIND_TO_FAMILY: dict[str, str] = {
+    kind: family for family, kinds in _FAMILY_KINDS.items() for kind in kinds
 }
 
 # IDF is frozen per governed corpus version and is part of the feature-set
 # contract. Additive smoothing keeps every observed tag finite, including a
 # tag that appears in exactly one work.
-TAG_IDF_FORMULA_VERSION = "smoothed-idf-l2-v1"
+TAG_IDF_FORMULA_VERSION = "smoothed-idf-l2-per-family-v2"
 TAG_IDF_SMOOTHING = 1.0
 
 # Saga/franchise is semantically meaningful even when sparse; absent facets are
@@ -97,41 +151,127 @@ def _facet_weight(facet: str, count: int) -> float:
     return FACET_WEIGHTS[facet] / math.sqrt(count) if count else 0.0
 
 
+def _curated_slugs_by_family(work: GameWork) -> dict[str, list[str]]:
+    """Group a work's curated-label evidence into its similarity families.
+
+    ``GameWorkCuratedLabel`` is an evidence table: more than one row can
+    exist for the same (work, label) pair when independent curation sources
+    agree (see catalogue/serializers.py::_tags) -- this dedupes by slug per
+    family before returning, so a doubly-evidenced value is never counted
+    twice building the vector.
+    """
+
+    by_family: dict[str, set[str]] = {}
+    for label in work.curated_labels.all():
+        family = _KIND_TO_FAMILY.get(label.kind)
+        if family is None:
+            continue
+        by_family.setdefault(family, set()).add(label.slug)
+    return {family: sorted(slugs) for family, slugs in by_family.items()}
+
+
 def _tag_slugs(work: GameWork) -> list[str]:
-    return sorted({tag.slug for tag in work.curated_labels.all()})
+    """Genre + subgenre only -- see ``_FAMILY_KINDS["tag"]``."""
+
+    return _curated_slugs_by_family(work).get("tag", [])
 
 
-def _compute_tag_idf_profile(corpus_version: str | None = None) -> dict[str, float]:
-    """Return smoothed inverse-document-frequency values for curated tags.
+def _compute_family_idf_profile(
+    kinds: tuple[str, ...], corpus_version: str | None
+) -> dict[str, float]:
+    """Smoothed IDF for one CuratedLabel-based similarity family.
 
-    ``N`` is the number of governed works in the selected corpus version and
-    ``df`` is the number of those works carrying each tag. The profile is a
-    corpus statistic, never user-specific, so web and offline ranking can use
-    the same frozen values.
+    ``N`` is the number of governed works carrying at least one label from
+    THIS family, not the whole governed corpus (2026-09-12 author decision):
+    scoring a sparsely-covered family like ``feature`` (~13% coverage)
+    against the full corpus size would inflate its IDF values relative to a
+    near-universal family like ``tag``, purely because the reference
+    population is the wrong size for that family, not because its values are
+    genuinely rarer.
     """
 
     with _feature_stats_lock():
         works = governed_works(corpus_version)
-        document_count = works.count()
-        if not document_count:
+        family_label_ids = set(
+            CuratedLabel.objects.filter(kind__in=kinds).values_list("id", flat=True)
+        )
+        if not family_label_ids:
             return {}
 
         through = GameWork.curated_labels.through
-        frequencies = (
-            through.objects.filter(work_id__in=works.values("id"))
-            .values("label_id")
-            .annotate(document_frequency=Count("work_id", distinct=True))
+        rows = (
+            through.objects.filter(
+                work_id__in=works.values("id"), label_id__in=family_label_ids
+            )
+            .values("work_id", "label_id")
+            .distinct()
         )
-        slug_by_id = dict(CuratedLabel.objects.values_list("id", "slug"))
+        document_frequency: dict[object, int] = {}
+        works_with_family: set[object] = set()
+        for row in rows:
+            label_id = row["label_id"]
+            document_frequency[label_id] = document_frequency.get(label_id, 0) + 1
+            works_with_family.add(row["work_id"])
+        document_count = len(works_with_family)
+        if not document_count:
+            return {}
+
+        slug_by_id = dict(
+            CuratedLabel.objects.filter(id__in=family_label_ids).values_list("id", "slug")
+        )
         return {
-            slug_by_id[row["label_id"]]: math.log(
-                (document_count + TAG_IDF_SMOOTHING)
-                / (row["document_frequency"] + TAG_IDF_SMOOTHING)
+            slug_by_id[label_id]: math.log(
+                (document_count + TAG_IDF_SMOOTHING) / (df + TAG_IDF_SMOOTHING)
             )
             + 1.0
-            for row in frequencies
-            if row["label_id"] in slug_by_id
+            for label_id, df in document_frequency.items()
+            if label_id in slug_by_id
         }
+
+
+def _compute_platform_idf_profile(corpus_version: str | None = None) -> dict[str, float]:
+    """Smoothed IDF for allowlisted platforms, scoped the same way as
+    :func:`_compute_family_idf_profile` -- ``N`` is governed works with at
+    least one allowlisted release, not the whole corpus."""
+
+    with _feature_stats_lock():
+        works = governed_works(corpus_version)
+        rows = (
+            GameRelease.objects.filter(
+                work_id__in=works.values("id"), platform__slug__in=ALLOWLIST_SLUGS
+            )
+            .values("work_id", "platform__slug")
+            .distinct()
+        )
+        document_frequency: dict[str, int] = {}
+        works_with_platform: set[object] = set()
+        for row in rows:
+            slug = row["platform__slug"]
+            document_frequency[slug] = document_frequency.get(slug, 0) + 1
+            works_with_platform.add(row["work_id"])
+        document_count = len(works_with_platform)
+        if not document_count:
+            return {}
+        return {
+            slug: math.log((document_count + TAG_IDF_SMOOTHING) / (df + TAG_IDF_SMOOTHING)) + 1.0
+            for slug, df in document_frequency.items()
+        }
+
+
+def _compute_tag_idf_profile(corpus_version: str | None = None) -> dict[str, float]:
+    return _compute_family_idf_profile(_FAMILY_KINDS["tag"], corpus_version)
+
+
+def _compute_theme_idf_profile(corpus_version: str | None = None) -> dict[str, float]:
+    return _compute_family_idf_profile(_FAMILY_KINDS["theme"], corpus_version)
+
+
+def _compute_mode_idf_profile(corpus_version: str | None = None) -> dict[str, float]:
+    return _compute_family_idf_profile(_FAMILY_KINDS["mode"], corpus_version)
+
+
+def _compute_feature_idf_profile(corpus_version: str | None = None) -> dict[str, float]:
+    return _compute_family_idf_profile(_FAMILY_KINDS["feature"], corpus_version)
 
 
 @lru_cache(maxsize=8)
@@ -139,12 +279,78 @@ def _cached_tag_idf_profile(corpus_version: str | None) -> dict[str, float]:
     return _compute_tag_idf_profile(corpus_version)
 
 
-def tag_idf_profile(corpus_version: str | None = None) -> dict[str, float]:
-    """Return IDF values, cached only by long-lived worker processes."""
+@lru_cache(maxsize=8)
+def _cached_theme_idf_profile(corpus_version: str | None) -> dict[str, float]:
+    return _compute_theme_idf_profile(corpus_version)
 
+
+@lru_cache(maxsize=8)
+def _cached_mode_idf_profile(corpus_version: str | None) -> dict[str, float]:
+    return _compute_mode_idf_profile(corpus_version)
+
+
+@lru_cache(maxsize=8)
+def _cached_feature_idf_profile(corpus_version: str | None) -> dict[str, float]:
+    return _compute_feature_idf_profile(corpus_version)
+
+
+@lru_cache(maxsize=8)
+def _cached_platform_idf_profile(corpus_version: str | None) -> dict[str, float]:
+    return _compute_platform_idf_profile(corpus_version)
+
+
+def _cached_or_computed(
+    compute: Callable[[str | None], dict[str, float]],
+    cached: Callable[[str | None], dict[str, float]],
+    corpus_version: str | None,
+) -> dict[str, float]:
     if os.environ.get("SAVEPOINT_RECOMMENDATION_STATS_CACHE") == "1":
-        return dict(_cached_tag_idf_profile(corpus_version))
-    return _compute_tag_idf_profile(corpus_version)
+        return dict(cached(corpus_version))
+    return compute(corpus_version)
+
+
+def tag_idf_profile(corpus_version: str | None = None) -> dict[str, float]:
+    """Return genre+subgenre IDF values, cached only by long-lived workers."""
+
+    return _cached_or_computed(_compute_tag_idf_profile, _cached_tag_idf_profile, corpus_version)
+
+
+def theme_idf_profile(corpus_version: str | None = None) -> dict[str, float]:
+    """Return theme IDF values, cached only by long-lived workers."""
+
+    return _cached_or_computed(_compute_theme_idf_profile, _cached_theme_idf_profile, corpus_version)
+
+
+def mode_idf_profile(corpus_version: str | None = None) -> dict[str, float]:
+    """Return mode IDF values, cached only by long-lived workers."""
+
+    return _cached_or_computed(_compute_mode_idf_profile, _cached_mode_idf_profile, corpus_version)
+
+
+def feature_idf_profile(corpus_version: str | None = None) -> dict[str, float]:
+    """Return feature IDF values, cached only by long-lived workers."""
+
+    return _cached_or_computed(_compute_feature_idf_profile, _cached_feature_idf_profile, corpus_version)
+
+
+def platform_idf_profile(corpus_version: str | None = None) -> dict[str, float]:
+    """Return platform IDF values, cached only by long-lived workers."""
+
+    return _cached_or_computed(_compute_platform_idf_profile, _cached_platform_idf_profile, corpus_version)
+
+
+def all_family_idf_profiles(corpus_version: str | None = None) -> dict[str, dict[str, float]]:
+    """Convenience bundle of all five per-family IDF profiles at once, for
+    callers that precompute and thread every family through a batch ranking
+    pass (mirrors the historical single ``tag_idf`` threading pattern)."""
+
+    return {
+        "tag": tag_idf_profile(corpus_version),
+        "theme": theme_idf_profile(corpus_version),
+        "mode": mode_idf_profile(corpus_version),
+        "feature": feature_idf_profile(corpus_version),
+        "platform": platform_idf_profile(corpus_version),
+    }
 
 
 def _platform_slugs(work: GameWork) -> list[str]:
@@ -165,12 +371,43 @@ def _developer_slugs(work: GameWork) -> list[str]:
     return sorted({developer.slug for developer in work.developers.all()})
 
 
+def _family_vector_block(
+    slugs: list[str], facet: str, idf: dict[str, float] | None
+) -> dict[str, float]:
+    """Shared IDF-weighted, L2-normalised-to-budget block for one facet.
+
+    With an IDF profile, values are weighted by rarity and L2-normalised so
+    the family's contribution stays at its configured ``FACET_WEIGHTS``
+    budget regardless of how many or how rare a work's own values are.
+    Without one (flat fallback, matches pre-fs-v9 behaviour for isolated
+    callers with no corpus context), the budget just splits evenly by
+    ``1/sqrt(k)``.
+    """
+
+    if not slugs:
+        return {}
+    if idf:
+        idf_values = {slug: max(float(idf.get(slug, 1.0)), 0.0) for slug in slugs}
+        idf_norm = math.sqrt(math.fsum(value * value for value in idf_values.values()))
+        if not idf_norm:
+            return {}
+        return {
+            slug: FACET_WEIGHTS[facet] * value / idf_norm for slug, value in idf_values.items()
+        }
+    weight = _facet_weight(facet, len(slugs))
+    return {slug: weight for slug in slugs}
+
+
 def feature_vector(
     work: GameWork,
     *,
     include_franchise: bool = False,
     include_developer: bool = False,
     tag_idf: dict[str, float] | None = None,
+    theme_idf: dict[str, float] | None = None,
+    mode_idf: dict[str, float] | None = None,
+    feature_idf: dict[str, float] | None = None,
+    platform_idf: dict[str, float] | None = None,
     feature_set_version: str = FEATURE_SET_VERSION,  # noqa: ARG001  (reserved for future schemes)
 ) -> dict[str, float]:
     """Return the sparse content feature vector for ``work``.
@@ -180,29 +417,22 @@ def feature_vector(
     """
 
     vector: dict[str, float] = {}
+    by_family = _curated_slugs_by_family(work)
 
-    tag_slugs = _tag_slugs(work)
-    if tag_slugs:
-        if tag_idf:
-            idf_values = {
-                slug: max(float(tag_idf.get(slug, 1.0)), 0.0)
-                for slug in tag_slugs
-            }
-            idf_norm = math.sqrt(math.fsum(value * value for value in idf_values.values()))
-            tag_values = {
-                slug: FACET_WEIGHTS["tag"] * value / idf_norm
-                for slug, value in idf_values.items()
-            } if idf_norm else {}
-        else:
-            tag_weight = _facet_weight("tag", len(tag_slugs))
-            tag_values = {slug: tag_weight for slug in tag_slugs}
-        for slug, value in tag_values.items():
-            vector[f"tag:{slug}"] = value
+    for slug, value in _family_vector_block(by_family.get("tag", []), "tag", tag_idf).items():
+        vector[f"tag:{slug}"] = value
+    for slug, value in _family_vector_block(by_family.get("theme", []), "theme", theme_idf).items():
+        vector[f"theme:{slug}"] = value
+    for slug, value in _family_vector_block(by_family.get("mode", []), "mode", mode_idf).items():
+        vector[f"mode:{slug}"] = value
+    for slug, value in _family_vector_block(
+        by_family.get("feature", []), "feature", feature_idf
+    ).items():
+        vector[f"feature:{slug}"] = value
 
     platform_slugs = _platform_slugs(work)
-    platform_weight = _facet_weight("platform", len(platform_slugs))
-    for slug in platform_slugs:
-        vector[f"platform:{slug}"] = platform_weight
+    for slug, value in _family_vector_block(platform_slugs, "platform", platform_idf).items():
+        vector[f"platform:{slug}"] = value
 
     if include_franchise:
         franchise_slugs = _franchise_slugs(work)
@@ -300,11 +530,11 @@ def _compute_coverage_report(corpus_version: str | None = None) -> dict:
             "prior_count": RATING_BAYESIAN_PRIOR_COUNT,
             "observation_count_source": "total_rating_count",
         },
-        "tag_idf": {
+        "family_idf": {
             "formula_version": TAG_IDF_FORMULA_VERSION,
             "smoothing": TAG_IDF_SMOOTHING,
-            "document_count": total,
-            "document_frequency_definition": "governed works carrying the curated tag",
+            "document_count_definition": "governed works carrying >=1 value from that family (not the whole corpus)",
+            "document_frequency_definition": "governed works (within that family's own population) carrying the value",
         },
         "governed_count": total,
         "algorithm_candidate_count": candidate_count,
@@ -504,9 +734,17 @@ def tag_rating_profile(corpus_version: str | None = None) -> dict[str, float]:
     through = GameWork.curated_labels.through
     tag_slug_by_id = dict(CuratedLabel.objects.values_list("id", "slug"))
     buckets: dict[str, list[float]] = {}
-    for work_id, tag_id in through.objects.filter(
-        work_id__in=work_rating
-    ).values_list("work_id", "label_id"):
+    # GameWorkCuratedLabel is an evidence table: the same (work, label) pair
+    # can carry more than one row when independent curation sources agree
+    # (see catalogue/serializers.py::_tags). .distinct() collapses those back
+    # to one (work, tag) pair each, or an agreed-upon work's rating would be
+    # counted into the tag's average once per corroborating source instead
+    # of once per work.
+    for work_id, tag_id in (
+        through.objects.filter(work_id__in=work_rating)
+        .values_list("work_id", "label_id")
+        .distinct()
+    ):
         slug = tag_slug_by_id.get(tag_id)
         if slug is not None:
             buckets.setdefault(slug, []).append(work_rating[work_id])

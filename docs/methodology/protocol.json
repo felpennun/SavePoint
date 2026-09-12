@@ -1,7 +1,7 @@
 {
-  "protocol_version": 15,
+  "protocol_version": 16,
   "frozen_on": "2026-09-12",
-  "ratified_by": "Felipe — sustituye el leave-one-out de un único positivo por un leave-fraction-out centrado en el tag de contenido más pesado del propio perfil del usuario (evaluation/splits.py::leave_fraction_out_dominant_tag), tras identificar en sesión que retirar un número fijo (probado con 1 y con 3) o forzar que sobrevivieran K del mismo tag no escalaba con cuánta biblioteca tiene cada usuario de ese tag y podía dejar el género en cero. El nuevo mecanismo retira ceil(dominant_tag_fraction * pool_del_tag) obras del tag dominante, con retroceso de uno en uno si retirarlas tantas desplazaría ese tag del primer puesto en el perfil restante -- pero nunca por debajo de 1 (el mínimo manda sobre la condición de dominancia; facet_similarity pondera todos los tags que coinciden con el perfil, no solo el primero, así que un tag desplazado a 2º/3º sigue siendo una señal real, no un fallo de la prueba). Verificado antes de congelar con fracción=0.3 sobre los 400 usuarios: 0% se queda sin ningún ejemplo del tag tras la retirada; 78,6% conserva el tag en 1er puesto, 10,9% pasa a 2º, 10,4% pasa a 3º o peor. La población sintética también cambia (seed 20260911 -> 20260912): el conjunto de tags preferidos ahora se sortea por usuario, no compartido por los ~25-80 usuarios de un mismo arquetipo (evaluation/archetypes.py sigue igual; solo cambia evaluation/synthetic.py), y guaranteed_eligible_minimum sube de 5 a 8 con al menos 6 compartiendo el tag de agrupación del usuario, para que retirar varios del tag dominante no vacíe la biblioteca por debajo del umbral de arranque en frío del ranker de contenido (_COLD_START_ENTRIES=3). Ninguna fórmula de contenido, rating o PopScore cambia respecto a v14 (7b255fb2c00dc1c2675710595afd012f7528cf2ec02d27d80c9cf9c8c7f2bb6a).",
+  "ratified_by": "Felipe — reemplaza el bloque único de etiqueta curada (fs-v12, peso 0,75 compartido por género/subgénero/tema/modo/característica) por cinco familias independientes, cada una con su propio IDF y su propio presupuesto de peso (recommendations/content/features.py, fs-v13). Motivo, encontrado en sesión revisando el reparto real: bajo fs-v12 una etiqueta de subgénero rara (p. ej. souls-like) podía pesar más en el vector que los dos géneros combinados de una obra, solo por ser estadísticamente rara en el corpus -- invertido respecto a la intención declarada de que el género sea el eje principal de gusto. La corrección tiene dos partes. (1) Género y subgénero se fusionan en una sola familia 'tag' (0,60): un subgénero no compite con el género, lo refina, así que compartir presupuesto e IDF dentro de esa familia es coherente. (2) Tema (0,20), modo (0,05) y característica (0,10) pasan de facetas 'core' renormalizadas a facetas OPCIONALES/bono, con el mismo tratamiento que ya tenían franchise/developer: una coincidencia solo suma, y una ausencia en cualquiera de los dos lados no resta ni redistribuye peso hacia las demás -- corrigiendo un segundo sesgo encontrado en la misma revisión, donde una obra sin tema quedaba con MÁS peso relativo de género que una obra equivalente que sí tenía tema, premiando la escasez de metadatos. Solo tag y platform (peso bajado de 0,25 a 0,05: la plataforma indica dónde se puede jugar, no qué gusto tiene el usuario, y no debe pesar como si fuera una señal de contenido) siguen siendo core, renormalizados entre sí -- casi siempre ambos presentes, así que ese caso raro de renormalización no reproduce el sesgo. El IDF de cada familia (incluida platform, que antes no tenía IDF) se calcula ahora sobre la población propia de esa familia (obras que tienen al menos un valor de esa familia), no sobre el corpus gobernado completo -- de lo contrario una familia con poca cobertura (feature ~13%) saldría con IDF inflado frente a una casi universal (tag). Ninguna fórmula de rating, PopScore, recencia o el mecanismo de partición leave-fraction-out (protocol_version 15) cambia.",
   "simulation": true,
   "limitation": "Frozen offline evaluation protocol scored over seeded synthetic users. Every number produced under this protocol is simulation evidence about parameterised archetypes, not evidence about real SavePoint users (EVAL-10).",
   "relevance": {
@@ -22,12 +22,15 @@
     "composition": "rating_bayesian_normalized = (((n * rating_igdb) + (25 * corpus_prior)) / (n + 25) / 100)"
   },
   "content_similarity": {
-    "feature_set_version": "fs-v12-curated-tags-idf",
+    "feature_set_version": "fs-v13-family-weighted-tags",
     "core_facets": {
-      "tag": 0.75,
-      "platform": 0.25
+      "tag": 0.60,
+      "platform": 0.05
     },
     "optional_confirmation_facets": {
+      "theme": 0.20,
+      "feature": 0.10,
+      "mode": 0.05,
       "franchise": 0.02,
       "developer": 0.015
     },
@@ -38,14 +41,17 @@
       "purpose": "reduce the advantage of candidates declaring many genres or platforms"
     },
     "missing_metadata": "neutral",
+    "missing_metadata_note": "neutral applies to CORE facets too (protocol_version 16): an absent optional/bonus facet is excluded from the comparison entirely, never redistributed into the core (tag/platform) renormalisation -- a work without a theme is scored on genre alone, not on an inflated genre share relative to an equally-matched work that does have one.",
     "optional_match_rule": "positive_only_when_value_overlaps_weighted_user_profile",
     "optional_match_calibration": "overlap is scaled against the strongest profile value in each optional facet",
-    "similarity_rule_version": "facet-similarity-v7",
-    "tag_idf": {
-      "formula_version": "smoothed-idf-l2-v1",
+    "similarity_rule_version": "facet-similarity-v8",
+    "family_idf": {
+      "formula_version": "smoothed-idf-l2-per-family-v2",
       "smoothing": 1.0,
-      "formula": "ln((N + smoothing) / (df_tag + smoothing)) + 1",
-      "normalisation": "per_work_l2_to_tag_family_weight"
+      "formula": "ln((N_family + smoothing) / (df_value + smoothing)) + 1",
+      "normalisation": "per_work_l2_to_each_familys_own_facet_weight",
+      "families": ["tag", "theme", "mode", "feature", "platform"],
+      "n_definition": "governed works carrying >=1 value from that family, not the whole governed corpus"
     }
   },
   "k_values": [5, 10, 20],

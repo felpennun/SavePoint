@@ -8,7 +8,7 @@ import pytest
 from django.contrib.auth import get_user_model
 from django.utils import timezone as django_timezone
 
-from catalogue.models import CorpusRatingSnapshot, GameWork, Genre
+from catalogue.models import CorpusRatingSnapshot, CuratedLabel, GameWork, GameWorkCuratedLabel
 from library.models import LibraryEntry
 from recommendations.cancellation import RecommendationComputationCancelled
 from recommendations.content.features import (
@@ -40,13 +40,15 @@ def user(db):  # noqa: ANN001
 
 @pytest.fixture
 def genres(db):  # noqa: ANN001
+    # "genres" for call-site continuity; these are CuratedLabel rows (the
+    # profile/ranking pipeline reads work.curated_labels exclusively).
     return {
-        "rpg": Genre.objects.create(igdb_id=701, name="RPG", slug="rpg-v2"),
-        "puzzle": Genre.objects.create(igdb_id=702, name="Puzzle", slug="puzzle-v2"),
+        "rpg": CuratedLabel.objects.create(name="RPG", slug="rpg-v2", kind=CuratedLabel.Kind.GENRE, curation_version="test"),
+        "puzzle": CuratedLabel.objects.create(name="Puzzle", slug="puzzle-v2", kind=CuratedLabel.Kind.GENRE, curation_version="test"),
     }
 
 
-def work(slug: str, *genres: Genre) -> GameWork:
+def work(slug: str, *tags: CuratedLabel) -> GameWork:
     item = GameWork.objects.create(
         canonical_slug=slug,
         original_title=slug,
@@ -56,7 +58,8 @@ def work(slug: str, *genres: Genre) -> GameWork:
         total_rating_count=10,
         first_release_date=date(2020, 1, 1),
     )
-    item.genres.set(genres)
+    for tag in tags:
+        GameWorkCuratedLabel.objects.create(work=item, label=tag, source_kind="genre", source_value=tag.name)
     return item
 
 
@@ -170,7 +173,7 @@ def test_profile_accepts_playing_positive_ratings_and_ignores_pending(user, genr
     profile = build_profile_inputs(user, CORPUS)
 
     assert profile.positive_entry_count == 2
-    assert set(profile.positive) == {"genre:rpg-v2", "genre:puzzle-v2"}
+    assert set(profile.positive) == {"tag:rpg-v2", "tag:puzzle-v2"}
     assert profile.negative == {}
 
 
@@ -183,8 +186,8 @@ def test_negative_genre_is_isolated_until_three_low_ratings(user, genres) -> Non
     entry(user, work("low-rpg-third", genres["rpg"]), "playing", 4)
     profile = build_profile_inputs(user, CORPUS)
 
-    assert profile.negative_genres == ("genre:rpg-v2",)
-    assert profile.negative == {"genre:rpg-v2": pytest.approx(1.0)}
+    assert profile.negative_tags == ("tag:rpg-v2",)
+    assert profile.negative == {"tag:rpg-v2": pytest.approx(1.0)}
 
 
 @pytest.mark.django_db

@@ -28,7 +28,7 @@ from catalogue.corpus import evaluation_candidate_works
 from catalogue.models import GameWork
 from library.models import LibraryEntry
 from recommendations._weights import _entry_weight
-from recommendations.content.features import tag_idf_profile
+from recommendations.content.features import all_family_idf_profiles
 from recommendations.content.profile import _l2_normalize, _load_vectors, build_profile_inputs
 
 
@@ -262,8 +262,8 @@ def leave_fraction_out_dominant_tag(
         if not positives:
             return None
 
-    tag_idf = tag_idf_profile(corpus_version)
-    profile_inputs = build_profile_inputs(user, corpus_version, tag_idf)
+    family_idf = all_family_idf_profiles(corpus_version)
+    profile_inputs = build_profile_inputs(user, corpus_version, family_idf)
     if not profile_inputs.positive:
         return None
     # facet_similarity treats facet families as independent signals (each
@@ -301,7 +301,7 @@ def leave_fraction_out_dominant_tag(
     library_entries = list(
         LibraryEntry.objects.filter(user=user).values("work_id", "current_status", "rating_half_steps")
     )
-    vectors = _load_vectors([entry["work_id"] for entry in library_entries], corpus_version, tag_idf)
+    vectors = _load_vectors([entry["work_id"] for entry in library_entries], corpus_version, family_idf)
 
     n = target_n
     heldout: list[uuid.UUID] = shuffled_pool[:1]

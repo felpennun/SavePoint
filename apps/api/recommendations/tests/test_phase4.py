@@ -7,7 +7,7 @@ from datetime import date
 import pytest
 from django.contrib.auth import get_user_model
 
-from catalogue.models import GameWork, Genre
+from catalogue.models import CuratedLabel, GameWork, GameWorkCuratedLabel
 from library.models import LibraryEntry
 from recommendations.collaborative import rank_collaborative_user_knn_v1
 from recommendations.hybrid import rank_hybrid_mmr_v1, rank_hybrid_weighted_cf_v1
@@ -19,7 +19,7 @@ CORPUS = "phase-4-test"
 
 @pytest.fixture
 def phase4_data(db):  # noqa: ANN001
-    genre = Genre.objects.create(igdb_id=701, name="Role-playing", slug="rpg")
+    genre = CuratedLabel.objects.create(name="Role-playing", slug="rpg", kind=CuratedLabel.Kind.GENRE, curation_version="test")
     target = User.objects.create_user(username="phase4-target", password="Phase4-Target-9!")
     reference = User.objects.create_user(username="phase4-reference", password="Phase4-Reference-9!")
     seed = GameWork.objects.create(
@@ -50,10 +50,8 @@ def phase4_data(db):  # noqa: ANN001
         corpus_version=CORPUS,
         first_release_date=date(2022, 1, 1),
     )
-    seed.genres.set([genre])
-    seed_two.genres.set([genre])
-    candidate_a.genres.set([genre])
-    candidate_b.genres.set([genre])
+    for work in (seed, seed_two, candidate_a, candidate_b):
+        GameWorkCuratedLabel.objects.create(work=work, label=genre, source_kind="genre", source_value=genre.name)
     LibraryEntry.objects.create(user=target, work=seed, current_status="completed", rating_half_steps=9)
     LibraryEntry.objects.create(user=target, work=seed_two, current_status="completed", rating_half_steps=8)
     LibraryEntry.objects.create(user=reference, work=seed, current_status="completed", rating_half_steps=9)
@@ -62,8 +60,8 @@ def phase4_data(db):  # noqa: ANN001
     LibraryEntry.objects.create(user=reference, work=candidate_b, current_status="completed", rating_half_steps=2)
     prepared = {
         "works": [candidate_a, candidate_b],
-        "vectors": {candidate_a.id: {"genre:rpg": 1.0}, candidate_b.id: {"genre:rpg": 1.0}},
-        "genre_profile": {},
+        "vectors": {candidate_a.id: {"tag:rpg": 1.0}, candidate_b.id: {"tag:rpg": 1.0}},
+        "tag_profile": {},
         "snapshot_stats": {},
         "snapshot_sha256": "snapshot",
         "popscore_snapshot_sha256": "popscore",
@@ -95,7 +93,7 @@ def test_hybrid_reports_its_two_fixed_signal_weights(phase4_data) -> None:  # no
         corpus_version=CORPUS,
         reference_user_ids=[reference.id],
         prepared=prepared,
-        genre_profile={},
+        tag_profile={},
     )
 
     assert result["algorithm_id"] == "hybrid-weighted-cf-v1"
@@ -114,7 +112,7 @@ def test_hybrid_mmr_uses_shared_relevance_pool_and_auditable_mmr(phase4_data) ->
         corpus_version=CORPUS,
         reference_user_ids=[reference.id],
         prepared=prepared,
-        genre_profile={},
+        tag_profile={},
     )
 
     assert result["algorithm_id"] == "hybrid-mmr-v1"
@@ -127,7 +125,7 @@ def test_hybrid_mmr_uses_shared_relevance_pool_and_auditable_mmr(phase4_data) ->
         "lambda": 0.80,
         "pool_size": 100,
         "pool_rule": "max(100, 5*K)",
-        "feature_set_version": "fs-v9",
+        "feature_set_version": "fs-v13-family-weighted-tags",
         "presentation_limit": 20,
     }
     assert len(result["results"]) == 2

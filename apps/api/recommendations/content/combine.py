@@ -53,7 +53,12 @@ def rating_term(
     """
 
     profile = tag_profile if tag_profile is not None else tag_rating_profile(corpus_version)
-    tag_values = [profile[tag.slug] for tag in work.curated_labels.all() if tag.slug in profile]
+    # GameWorkCuratedLabel keeps one evidence row per independent curation
+    # source for the same tag (see catalogue/serializers.py::_tags), so a
+    # bare work.curated_labels.all() can repeat a slug -- deduplicate before
+    # taking the median or a doubly-evidenced tag counts twice.
+    candidate_tag_slugs = {tag.slug for tag in work.curated_labels.all()}
+    tag_values = [profile[slug] for slug in candidate_tag_slugs if slug in profile]
     if snapshot_stats is None:
         own_rating, _rating_count, _total_rating_count = _candidate_snapshot_rating(work, corpus_version)
     else:

@@ -27,9 +27,9 @@ from library.models import LibraryEntry
 from recommendations._weights import _entry_weight
 from recommendations.content.features import (
     FEATURE_SET_VERSION,
+    all_family_idf_profiles,
     coverage_report,
     feature_vector,
-    tag_idf_profile,
 )
 from recommendations.models import WorkFeatureVector
 
@@ -80,11 +80,12 @@ def _l2_normalize(vector: dict[str, float]) -> dict[str, float]:
 def _load_vectors(
     work_ids: list[object],
     corpus_version: str | None,
-    tag_idf: dict[str, float] | None = None,
+    family_idf: dict[str, dict[str, float]] | None = None,
 ) -> dict[object, dict[str, float]]:
     """Feature vector per work id -- cached rows first, computed fallback."""
 
     availability = coverage_report(corpus_version)
+    family_idf = family_idf or {}
     # The vector cache is rebuilt as an offline, versioned materialisation. It
     # is therefore safe to use it for optional facets too; missing rows alone
     # fall back to a bounded prefetch instead of loading the whole catalogue.
@@ -104,7 +105,11 @@ def _load_vectors(
                 work,
                 include_franchise=availability["include_franchise"],
                 include_developer=availability["include_developer"],
-                tag_idf=tag_idf,
+                tag_idf=family_idf.get("tag"),
+                theme_idf=family_idf.get("theme"),
+                mode_idf=family_idf.get("mode"),
+                feature_idf=family_idf.get("feature"),
+                platform_idf=family_idf.get("platform"),
             )
     return vectors
 
@@ -112,17 +117,17 @@ def _load_vectors(
 def build_profile(
     user: AbstractBaseUser,
     corpus_version: str | None = None,
-    tag_idf: dict[str, float] | None = None,
+    family_idf: dict[str, dict[str, float]] | None = None,
 ) -> dict[str, float]:
     """Return the positive component of :func:`build_profile_inputs`."""
 
-    return build_profile_inputs(user, corpus_version, tag_idf).positive
+    return build_profile_inputs(user, corpus_version, family_idf).positive
 
 
 def build_profile_inputs(
     user: AbstractBaseUser,
     corpus_version: str | None = None,
-    tag_idf: dict[str, float] | None = None,
+    family_idf: dict[str, dict[str, float]] | None = None,
 ) -> ProfileInputs:
     """Build separated positive and safeguarded negative taste evidence.
 
@@ -139,9 +144,9 @@ def build_profile_inputs(
     if not entries:
         return ProfileInputs({}, {}, 0, 0, ())
 
-    resolved_tag_idf = tag_idf if tag_idf is not None else tag_idf_profile(corpus_version)
+    resolved_family_idf = family_idf if family_idf is not None else all_family_idf_profiles(corpus_version)
     vectors = _load_vectors(
-        [entry["work_id"] for entry in entries], corpus_version, resolved_tag_idf
+        [entry["work_id"] for entry in entries], corpus_version, resolved_family_idf
     )
 
     accumulator: dict[str, float] = {}

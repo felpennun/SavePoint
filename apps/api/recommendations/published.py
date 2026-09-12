@@ -83,11 +83,12 @@ def configuration_fingerprint() -> str:
         "feature_set_version": FEATURE_SET_VERSION,
         "similarity_rule_version": SIMILARITY_RULE_VERSION,
         "facet_weights": FACET_WEIGHTS,
-        "tag_idf": {
+        "family_idf": {
             "formula_version": TAG_IDF_FORMULA_VERSION,
             "smoothing": TAG_IDF_SMOOTHING,
-            "formula": "ln((N + smoothing) / (df_tag + smoothing)) + 1",
-            "normalisation": "per_work_l2_to_tag_family_weight",
+            "formula": "ln((N_family + smoothing) / (df_value + smoothing)) + 1",
+            "normalisation": "per_work_l2_to_each_families_own_facet_weight",
+            "families": ("tag", "theme", "mode", "feature", "platform"),
         },
         "popscore": {
             "formula_version": POPSCORE_FORMULA_VERSION,

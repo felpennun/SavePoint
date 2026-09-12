@@ -9,13 +9,13 @@ from recommendations.content.similarity import facet_similarity
 
 def test_optional_metadata_is_not_a_bonus_by_itself() -> None:
     profile = {
-        "genre:rpg": 1.0,
+        "tag:rpg": 1.0,
         "platform:pc": 1.0,
         "franchise:trusted-saga": 1.0,
         "developer:trusted-studio": 1.0,
     }
     without_optional = {
-        "genre:rpg": 0.5,
+        "tag:rpg": 0.5,
         "platform:console": 0.25,
     }
     unrelated_optional = {
@@ -34,13 +34,13 @@ def test_optional_metadata_is_not_a_bonus_by_itself() -> None:
 
 def test_matching_saga_and_developer_add_only_a_personalised_bonus() -> None:
     profile = {
-        "genre:rpg": 1.0,
+        "tag:rpg": 1.0,
         "platform:pc": 1.0,
         "franchise:trusted-saga": 1.0,
         "developer:trusted-studio": 1.0,
     }
     candidate = {
-        "genre:rpg": 0.5,
+        "tag:rpg": 0.5,
         "platform:console": 0.25,
         "franchise:trusted-saga": 0.15,
         "developer:trusted-studio": 0.10,
@@ -48,7 +48,7 @@ def test_matching_saga_and_developer_add_only_a_personalised_bonus() -> None:
 
     result = facet_similarity(profile, candidate)
 
-    assert result["core_score"] == pytest.approx(2 / 3)
+    assert result["core_score"] == pytest.approx(0.6 / 0.65)
     assert result["optional_bonus"] > 0
     assert result["score"] > result["core_score"]
     assert result["score"] <= 1.0
@@ -58,7 +58,7 @@ def test_matching_saga_and_developer_add_only_a_personalised_bonus() -> None:
 
 def test_optional_match_is_not_diluted_by_unrelated_profile_values() -> None:
     profile = {
-        "genre:rpg": 1.0,
+        "tag:rpg": 1.0,
         "platform:pc": 1.0,
         "developer:team-cherry": 0.2,
         "developer:supergiant-games": 0.2,
@@ -66,7 +66,7 @@ def test_optional_match_is_not_diluted_by_unrelated_profile_values() -> None:
         "developer:fromsoftware": 0.2,
     }
     candidate = {
-        "genre:rpg": 0.5,
+        "tag:rpg": 0.5,
         "platform:console": 0.25,
         "developer:team-cherry": 0.1,
     }
@@ -79,14 +79,14 @@ def test_optional_match_is_not_diluted_by_unrelated_profile_values() -> None:
 
 def test_optional_bonus_uses_the_new_saga_and_developer_maxima() -> None:
     profile = {
-        "genre:rpg": 1.0,
+        "tag:rpg": 1.0,
         "platform:pc": 1.0,
         "franchise:trusted-saga": 1.0,
         "developer:trusted-studio": 1.0,
     }
     candidate = {
-        "genre:rpg": 0.5,
-        "genre:shooter": 0.5,
+        "tag:rpg": 0.5,
+        "tag:shooter": 0.5,
         "platform:console": 0.25,
         "franchise:trusted-saga": 0.20,
         "developer:trusted-studio": 0.15,
@@ -99,35 +99,35 @@ def test_optional_bonus_uses_the_new_saga_and_developer_maxima() -> None:
 
 def test_core_precision_favors_narrower_candidate_metadata() -> None:
     profile = {
-        "genre:rpg": 0.7,
-        "genre:adventure": 0.3,
+        "tag:rpg": 0.7,
+        "tag:adventure": 0.3,
         "platform:pc": 1.0,
     }
     narrow = {
-        "genre:rpg": 0.5,
+        "tag:rpg": 0.5,
         "platform:pc": 0.25,
     }
     broad = {
-        "genre:rpg": 0.25,
-        "genre:adventure": 0.25,
-        "genre:shooter": 0.25,
-        "genre:puzzle": 0.25,
+        "tag:rpg": 0.25,
+        "tag:adventure": 0.25,
+        "tag:shooter": 0.25,
+        "tag:puzzle": 0.25,
         "platform:pc": 0.25,
     }
 
     narrow_result = facet_similarity(profile, narrow)
     broad_result = facet_similarity(profile, broad)
 
-    assert narrow_result["facet_scores"]["genre"] > broad_result["facet_scores"]["genre"]
+    assert narrow_result["facet_scores"]["tag"] > broad_result["facet_scores"]["tag"]
 
 
 def test_core_genre_similarity_survives_missing_optional_facets() -> None:
-    profile = {"genre:rpg": 1.0, "platform:pc": 1.0}
-    candidate = {"genre:rpg": 0.5, "platform:console": 0.25}
+    profile = {"tag:rpg": 1.0, "platform:pc": 1.0}
+    candidate = {"tag:rpg": 0.5, "platform:console": 0.25}
 
     result = facet_similarity(profile, candidate)
 
-    assert result["core_score"] == pytest.approx(2 / 3)
+    assert result["core_score"] == pytest.approx(0.6 / 0.65)
     assert result["score"] == pytest.approx(result["core_score"])
     assert result["facet_scores"]["franchise"] == 0.0
     assert result["facet_scores"]["developer"] == 0.0

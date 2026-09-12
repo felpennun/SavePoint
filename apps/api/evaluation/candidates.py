@@ -51,7 +51,7 @@ def build_common(
 ) -> CandidateManifest:
     """Build the common non-future candidate universe for product requests."""
 
-    require_version(protocol, 15)
+    require_version(protocol, 16)
     cutoff = eligibility_cutoff_date or protocol.eligibility_cutoff_date or date.today()
     governed = governed_works(
         corpus_version,
@@ -98,7 +98,7 @@ def build(user, protocol, corpus_version: str) -> tuple[frozenset, frozenset, st
     actually left out of the study. See the 2026-09-12 vault note.
     """
 
-    require_version(protocol, 15)
+    require_version(protocol, 16)
     cutoff = protocol.eligibility_cutoff_date or date.today()
     strategy = protocol.split.get("strategy")
     if strategy == "leave_fraction_out_dominant_tag_per_user":

@@ -1,4 +1,4 @@
-"""Tests for the genre-taste-v1 heuristic and its authenticated API.
+"""Tests for the tag-taste-v1 heuristic and its authenticated API.
 
 Plan 01.1-05 (REC-10). The service mirrors ``library/popularity.py``'s
 deterministic-DTO contract but is scoped strictly to the signed-in user's
@@ -16,7 +16,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.test import APIClient
 
-from catalogue.models import AssetAttribution, GameWork, Genre
+from catalogue.models import AssetAttribution, CuratedLabel, GameWork, GameWorkCuratedLabel
 from library.models import LibraryEntry
 from recommendations.genre_heuristic import ALGORITHM_ID, rank_genre_taste_v1
 from recommendations.views import ContentRecsView, RecommendationsView
@@ -48,14 +48,17 @@ def user_b(db):  # noqa: ANN001
 
 @pytest.fixture
 def genres(db):  # noqa: ANN001
+    # "genres" for call-site continuity; these are CuratedLabel rows (the
+    # heuristic reads work.curated_labels exclusively -- see ALGORITHM_ID
+    # "tag-taste-v1").
     return {
-        "rpg": Genre.objects.create(igdb_id=12, name="Role-playing (RPG)", slug="role-playing-rpg"),
-        "shooter": Genre.objects.create(igdb_id=5, name="Shooter", slug="shooter"),
-        "puzzle": Genre.objects.create(igdb_id=9, name="Puzzle", slug="puzzle"),
+        "rpg": CuratedLabel.objects.create(name="Role-playing (RPG)", slug="role-playing-rpg", kind=CuratedLabel.Kind.GENRE, curation_version="test"),
+        "shooter": CuratedLabel.objects.create(name="Shooter", slug="shooter", kind=CuratedLabel.Kind.GENRE, curation_version="test"),
+        "puzzle": CuratedLabel.objects.create(name="Puzzle", slug="puzzle", kind=CuratedLabel.Kind.GENRE, curation_version="test"),
     }
 
 
-def _work(slug: str, *genre_objs: Genre, is_dlc: bool = False) -> GameWork:
+def _work(slug: str, *tags: CuratedLabel, is_dlc: bool = False) -> GameWork:
     work = GameWork.objects.create(
         canonical_slug=slug,
         original_title=slug.replace("-", " ").title(),
@@ -67,8 +70,8 @@ def _work(slug: str, *genre_objs: Genre, is_dlc: bool = False) -> GameWork:
         corpus_version="genre-test" if not is_dlc else "",
         first_release_date=date(2020, 1, 1),
     )
-    if genre_objs:
-        work.genres.set(genre_objs)
+    for tag in tags:
+        GameWorkCuratedLabel.objects.create(work=work, label=tag, source_kind="genre", source_value=tag.name)
     return work
 
 
@@ -91,8 +94,8 @@ def test_empty_history_returns_explicit_insufficient_result(user_a) -> None:  # 
 
     assert result["insufficient_history"] is True
     assert result["results"] == []
-    assert result["primary_genre"] is None
-    assert result["algorithm_id"] == ALGORITHM_ID == "genre-taste-v1"
+    assert result["primary_tag"] is None
+    assert result["algorithm_id"] == ALGORITHM_ID == "tag-taste-v1"
     # NEVER a silent fall-back to the public popularity baseline (D-09).
     assert "popularity" not in result["limitation"].lower()
 
@@ -104,12 +107,12 @@ def test_dto_always_declares_identity_hash_and_bounded_limitation(user_a, genres
 
     result = rank_genre_taste_v1(user_a, limit=10)
 
-    assert result["algorithm_id"] == "genre-taste-v1"
+    assert result["algorithm_id"] == "tag-taste-v1"
     assert "generated_at" in result
     assert isinstance(result["input_snapshot_sha256"], str)
     assert len(result["input_snapshot_sha256"]) == 64
     assert result["insufficient_history"] is False
-    assert result["primary_genre"] == {
+    assert result["primary_tag"] == {
         "slug": "role-playing-rpg",
         "name": "Role-playing (RPG)",
         "entry_count": 1,
@@ -188,13 +191,13 @@ def test_only_the_most_frequent_library_genre_is_recommended(user_a, genres) -> 
     result = rank_genre_taste_v1(user_a, limit=10)
     slugs = _slugs(result)
 
-    assert result["primary_genre"]["slug"] == "role-playing-rpg"
+    assert result["primary_tag"]["slug"] == "role-playing-rpg"
     assert slugs == [both.canonical_slug]
     assert only_shooter.canonical_slug not in slugs
 
 
 @pytest.mark.django_db
-def test_primary_genre_uses_library_frequency_not_rating_weight(user_a, genres) -> None:  # noqa: ANN001
+def test_primary_tag_uses_library_frequency_not_rating_weight(user_a, genres) -> None:  # noqa: ANN001
     _own(user_a, _work("owned-rpg-1", genres["rpg"]), status="pending", rating=None)
     _own(user_a, _work("owned-rpg-2", genres["rpg"]), status="pending", rating=None)
     _own(user_a, _work("owned-shooter", genres["shooter"]), status="completed", rating=10)
@@ -203,7 +206,7 @@ def test_primary_genre_uses_library_frequency_not_rating_weight(user_a, genres) 
 
     result = rank_genre_taste_v1(user_a, limit=20)
 
-    assert result["primary_genre"]["slug"] == "role-playing-rpg"
+    assert result["primary_tag"]["slug"] == "role-playing-rpg"
     assert _slugs(result) == ["unseen-rpg"]
 
 
@@ -351,9 +354,9 @@ def test_each_item_carries_genre_overlap_explanation_evidence(user_a, genres) ->
     result = rank_genre_taste_v1(user_a, limit=10)
     item = next(i for i in result["results"] if i["slug"] == "unseen-rpg")
 
-    assert set(item) >= {"work_id", "slug", "title", "score", "matched_genres"}
+    assert set(item) >= {"work_id", "slug", "title", "score", "matched_tags"}
     assert item["score"] > 0
-    matched = item["matched_genres"]
+    matched = item["matched_tags"]
     assert [g["slug"] for g in matched] == ["role-playing-rpg"]
     assert matched[0]["weight"] > 0
     assert matched[0]["name"] == "Role-playing (RPG)"
@@ -427,7 +430,7 @@ _DTO_KEYS = {
     "input_snapshot_sha256",
     "insufficient_history",
     "limitation",
-    "primary_genre",
+    "primary_tag",
     "results",
 }
 _ITEM_KEYS = {
@@ -441,7 +444,7 @@ _ITEM_KEYS = {
     "year",
     "platform_summary",
     "cover",
-    "matched_genres",
+    "matched_tags",
 }
 
 
@@ -456,7 +459,7 @@ def test_endpoint_returns_current_users_ranking_with_allowlisted_dto(user_a, gen
 
     assert response.status_code == 200
     body = response.json()
-    assert body["algorithm_id"] == "genre-taste-v1"
+    assert body["algorithm_id"] == "tag-taste-v1"
     assert "phase 6" in body["limitation"].lower()
     assert set(body) == _DTO_KEYS
     assert [item["slug"] for item in body["results"]] == ["unseen-rpg"]

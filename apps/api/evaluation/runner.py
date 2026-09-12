@@ -39,10 +39,10 @@ from evaluation.splits import user_split
 from evaluation.statistics import StatisticsConfig, compare_paired_algorithms
 from recommendations.content.features import (
     FEATURE_SET_VERSION,
+    all_family_idf_profiles,
     coverage_report,
     corpus_rating_prior,
     feature_vector,
-    tag_idf_profile,
     tag_rating_profile,
 )
 from recommendations.content.rank import rank_content_v1
@@ -354,7 +354,7 @@ def _training_item_probabilities(user_ids: set[object]) -> dict[str, float]:
 def _prepared_candidate_vectors(
     works: Sequence[Any],
     signal_availability: Mapping[str, Any],
-    tag_idf: Mapping[str, float],
+    family_idf: Mapping[str, Mapping[str, float]],
 ) -> dict[object, dict[str, float]]:
     """Load candidate feature vectors, preferring the shared ``WorkFeatureVector`` cache.
 
@@ -380,7 +380,11 @@ def _prepared_candidate_vectors(
             work,
             include_franchise=signal_availability["include_franchise"],
             include_developer=signal_availability["include_developer"],
-            tag_idf=tag_idf,
+            tag_idf=family_idf.get("tag"),
+            theme_idf=family_idf.get("theme"),
+            mode_idf=family_idf.get("mode"),
+            feature_idf=family_idf.get("feature"),
+            platform_idf=family_idf.get("platform"),
             feature_set_version=FEATURE_SET_VERSION,
         )
     return vectors
@@ -439,7 +443,7 @@ def build_evaluation_context(
         raise ValueError(f"no evaluable synthetic users in {split} split")
 
     evaluation_tag_profile = tag_rating_profile(corpus_version)
-    evaluation_tag_idf = tag_idf_profile(corpus_version)
+    evaluation_family_idf = all_family_idf_profiles(corpus_version)
     signal_availability = coverage_report(corpus_version)
     # Exists(), not .filter(curated_labels__isnull=False): the latter JOINs the
     # curated_labels M2M and duplicates a work once per label (bug fixed
@@ -480,10 +484,10 @@ def build_evaluation_context(
     evaluation_prepared = {
         "works": evaluation_works,
         "vectors": _prepared_candidate_vectors(
-            evaluation_works, signal_availability, evaluation_tag_idf
+            evaluation_works, signal_availability, evaluation_family_idf
         ),
         "tag_profile": evaluation_tag_profile,
-        "tag_idf": evaluation_tag_idf,
+        "family_idf": evaluation_family_idf,
         "snapshot_stats": evaluation_snapshot_stats,
         "snapshot_sha256": actual_snapshot_hash,
         "popscore_snapshot_sha256": actual_popscore_hash,
@@ -562,7 +566,7 @@ def precompute_shared_content_signals(
     works = prepared["works"]
     vectors = prepared["vectors"]
     tag_profile = prepared["tag_profile"]
-    tag_idf = prepared["tag_idf"]
+    family_idf = prepared["family_idf"]
     snapshot_stats = prepared["snapshot_stats"]
     rating_prior = prepared["rating_prior"]
     corpus_version = context["corpus_version"]
@@ -580,7 +584,7 @@ def precompute_shared_content_signals(
     for user, _candidate_ids, _heldout_id, _candidate_hash in context["candidates_by_user"]:
         if should_continue is not None and not should_continue():
             return
-        profile_inputs = build_profile_inputs(user, corpus_version, tag_idf)
+        profile_inputs = build_profile_inputs(user, corpus_version, family_idf)
         profile_cache[user.pk] = profile_inputs
         for work in works:
             vector = vectors.get(work.id)

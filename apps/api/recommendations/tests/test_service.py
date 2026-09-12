@@ -8,7 +8,7 @@ from datetime import date
 import pytest
 from django.utils import timezone
 
-from catalogue.models import CorpusRatingSnapshot, GameWork, Genre
+from catalogue.models import CorpusRatingSnapshot, CuratedLabel, GameWork, GameWorkCuratedLabel
 from evaluation import protocol
 from evaluation.protocol import ProtocolError
 from library.models import LibraryEntry
@@ -30,13 +30,14 @@ def service_user(db):  # noqa: ANN001
 
 @pytest.fixture
 def service_genres(db):  # noqa: ANN001
+    # "genres" for call-site continuity; these are CuratedLabel rows.
     return {
-        "rpg": Genre.objects.create(igdb_id=101, name="Role-playing", slug="rpg"),
-        "shooter": Genre.objects.create(igdb_id=102, name="Shooter", slug="shooter"),
+        "rpg": CuratedLabel.objects.create(name="Role-playing", slug="rpg", kind=CuratedLabel.Kind.GENRE, curation_version="test"),
+        "shooter": CuratedLabel.objects.create(name="Shooter", slug="shooter", kind=CuratedLabel.Kind.GENRE, curation_version="test"),
     }
 
 
-def make_work(slug: str, *genres: Genre, **overrides) -> GameWork:
+def make_work(slug: str, *tags: CuratedLabel, **overrides) -> GameWork:
     fields = {
         "in_corpus": True,
         "corpus_version": CORPUS,
@@ -48,7 +49,8 @@ def make_work(slug: str, *genres: Genre, **overrides) -> GameWork:
         original_title=slug.replace("-", " ").title(),
         **fields,
     )
-    work.genres.set(genres)
+    for tag in tags:
+        GameWorkCuratedLabel.objects.create(work=work, label=tag, source_kind="genre", source_value=tag.name)
     return work
 
 
@@ -128,7 +130,7 @@ def test_algorithms_share_the_same_manifest_and_payload_stays_score_ordered(
         for algorithm_id in ALGORITHM_REGISTRY
     ]
 
-    assert {payload["protocol_version"] for payload in payloads} == {15}
+    assert {payload["protocol_version"] for payload in payloads} == {16}
     assert len({payload["candidate_manifest_sha256"] for payload in payloads}) == 1
     assert all(
         all(left["score"] >= right["score"] for left, right in zip(payload["results"], payload["results"][1:]))
@@ -171,7 +173,7 @@ def test_service_rejects_v1_artifact(service_user) -> None:  # noqa: ANN001
     raw = copy.deepcopy(protocol.load().raw)
     raw["protocol_version"] = 1
 
-    with pytest.raises(ProtocolError, match="expected protocol_version 15"):
+    with pytest.raises(ProtocolError, match="expected protocol_version 16"):
         service.recommend_for_user(
             service_user,
             "content-cbf-weighted-v1",

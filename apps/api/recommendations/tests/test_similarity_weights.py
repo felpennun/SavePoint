@@ -17,14 +17,17 @@ from recommendations.content.similarity import SIMILARITY_RULE_VERSION, facet_si
 
 def test_curated_tags_are_the_primary_content_facet() -> None:
     assert FACET_WEIGHTS == {
-        "tag": 0.75,
-        "platform": 0.25,
+        "tag": 0.60,
+        "theme": 0.20,
+        "feature": 0.10,
+        "mode": 0.05,
+        "platform": 0.05,
         "franchise": 0.02,
         "developer": 0.015,
     }
-    assert FEATURE_SET_VERSION == "fs-v12-curated-tags-idf"
-    assert SIMILARITY_RULE_VERSION == "facet-similarity-v7"
-    assert TAG_IDF_FORMULA_VERSION == "smoothed-idf-l2-v1"
+    assert FEATURE_SET_VERSION == "fs-v13-family-weighted-tags"
+    assert SIMILARITY_RULE_VERSION == "facet-similarity-v8"
+    assert TAG_IDF_FORMULA_VERSION == "smoothed-idf-l2-per-family-v2"
 
 
 def test_tag_and_platform_core_weights_sum_to_one() -> None:
@@ -37,6 +40,9 @@ def test_tag_and_platform_core_weights_sum_to_one() -> None:
     assert evidence["facet_scores"] == {
         "tag": 1.0,
         "platform": 1.0,
+        "theme": 0.0,
+        "mode": 0.0,
+        "feature": 0.0,
         "franchise": 0.0,
         "developer": 0.0,
     }

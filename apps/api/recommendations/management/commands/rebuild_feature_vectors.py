@@ -18,9 +18,9 @@ from django.utils import timezone
 from catalogue.corpus import governed_works
 from recommendations.content.features import (
     FEATURE_SET_VERSION,
+    all_family_idf_profiles,
     coverage_report,
     feature_vector,
-    tag_idf_profile,
 )
 from recommendations.models import WorkFeatureVector
 
@@ -51,7 +51,7 @@ class Command(BaseCommand):
         batch_size = options["batch_size"]
 
         report = coverage_report(corpus_version)
-        tag_idf = tag_idf_profile(corpus_version)
+        family_idf = all_family_idf_profiles(corpus_version)
         include_franchise = report["include_franchise"]
         include_developer = report["include_developer"]
 
@@ -93,7 +93,11 @@ class Command(BaseCommand):
                         work,
                         include_franchise=include_franchise,
                         include_developer=include_developer,
-                        tag_idf=tag_idf,
+                        tag_idf=family_idf.get("tag"),
+                        theme_idf=family_idf.get("theme"),
+                        mode_idf=family_idf.get("mode"),
+                        feature_idf=family_idf.get("feature"),
+                        platform_idf=family_idf.get("platform"),
                     ),
                     updated_at=timezone.now(),
                 )
@@ -110,7 +114,7 @@ class Command(BaseCommand):
             "vectors_updated": updated,
             "include_franchise": include_franchise,
             "include_developer": include_developer,
-            "tag_idf": tag_idf,
+            "family_idf": family_idf,
             "coverage_report": report,
         }
 

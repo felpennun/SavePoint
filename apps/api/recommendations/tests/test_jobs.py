@@ -84,7 +84,7 @@ def test_snapshot_endpoint_keeps_previous_bundle_while_refreshing(transactional_
         configuration_fingerprint=configuration_fingerprint(),
         corpus_version=None,
         feature_set_version="fs-v6",
-        payload={"content": {}, "genre": {"results": []}},
+        payload={"content": {}, "tags": {"results": []}},
         generated_at=state.updated_at,
     )
     state.active_snapshot = snapshot
@@ -129,7 +129,7 @@ def test_snapshot_endpoint_does_not_report_obsolete_jobs_as_a_live_refresh(trans
         configuration_fingerprint="previous-config",
         corpus_version=None,
         feature_set_version="fs-v6",
-        payload={"content": {}, "genre": {"results": []}},
+        payload={"content": {}, "tags": {"results": []}},
         generated_at=state.updated_at,
     )
     state.active_snapshot = snapshot

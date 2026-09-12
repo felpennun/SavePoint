@@ -15,9 +15,9 @@ from recommendations.collaborative import rank_collaborative_user_knn_v1
 from recommendations.content.diversity import mmr_rerank
 from recommendations.content.features import (
     FEATURE_SET_VERSION,
+    all_family_idf_profiles,
     coverage_report,
     feature_vector,
-    tag_idf_profile,
 )
 from recommendations.content.rank import rank_content_v1
 
@@ -148,13 +148,17 @@ def _vectors_for_items(
             .prefetch_related("curated_labels", "releases__platform", "franchises", "developers")
         )
     availability = coverage_report(corpus_version)
-    tag_idf = (prepared or {}).get("tag_idf") or tag_idf_profile(corpus_version)
+    family_idf = (prepared or {}).get("family_idf") or all_family_idf_profiles(corpus_version)
     return {
         str(work.id): feature_vector(
             work,
             include_franchise=availability["include_franchise"],
             include_developer=availability["include_developer"],
-            tag_idf=tag_idf,
+            tag_idf=family_idf.get("tag"),
+            theme_idf=family_idf.get("theme"),
+            mode_idf=family_idf.get("mode"),
+            feature_idf=family_idf.get("feature"),
+            platform_idf=family_idf.get("platform"),
             feature_set_version=FEATURE_SET_VERSION,
         )
         for work in works

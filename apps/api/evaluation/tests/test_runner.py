@@ -321,8 +321,8 @@ def test_precompute_shared_content_signals_matches_uncached_rank_content_v1() ->
     # cache keys rank_content_v1 reads, with the same values an uncached
     # call would compute for itself.
     from recommendations.content.features import (
+        all_family_idf_profiles,
         corpus_rating_prior,
-        tag_idf_profile,
         tag_rating_profile,
     )
     from recommendations.content.rank import _load_candidate_vectors, rank_content_v1
@@ -364,10 +364,10 @@ def test_precompute_shared_content_signals_matches_uncached_rank_content_v1() ->
         )
 
     works = [candidate]
-    tag_idf = tag_idf_profile(corpus_version)
+    family_idf = all_family_idf_profiles(corpus_version)
     tag_profile = tag_rating_profile(corpus_version)
     vectors = _load_candidate_vectors(
-        works, ALGORITHM_REGISTRY["content-cbf-weighted-v1"], corpus_version, tag_idf=tag_idf
+        works, ALGORITHM_REGISTRY["content-cbf-weighted-v1"], corpus_version, family_idf=family_idf
     )
     context = {
         "corpus_version": corpus_version,
@@ -376,7 +376,7 @@ def test_precompute_shared_content_signals_matches_uncached_rank_content_v1() ->
             "works": works,
             "vectors": vectors,
             "tag_profile": tag_profile,
-            "tag_idf": tag_idf,
+            "family_idf": family_idf,
             "snapshot_stats": {candidate.id: (80.0, 10, 10)},
             "rating_prior": corpus_rating_prior(corpus_version, eligibility_cutoff_date=date.today()),
         },

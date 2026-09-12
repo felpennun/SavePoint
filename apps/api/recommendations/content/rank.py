@@ -32,7 +32,7 @@ from recommendations.content.features import (
     rating_confidence,
     rating_final,
     rating_quality,
-    tag_idf_profile,
+    all_family_idf_profiles,
 )
 from recommendations.content.profile import ProfileInputs, build_profile_inputs
 from recommendations.content.recency import recency_score
@@ -107,7 +107,7 @@ def _load_candidate_vectors(
     spec: VariantSpec,
     corpus_version: str | None,
     prepared_vectors: dict[object, dict[str, float]] | None = None,
-    tag_idf: dict[str, float] | None = None,
+    family_idf: dict[str, dict[str, float]] | None = None,
     should_continue: Callable[[], bool] | None = None,
 ) -> dict[object, dict[str, float]]:
     if prepared_vectors is not None:
@@ -129,6 +129,7 @@ def _load_candidate_vectors(
         for work in GameWork.objects.filter(id__in=[work_id for work_id in work_ids if work_id not in cached])
         .prefetch_related("curated_labels", "releases__platform", "franchises", "developers")
     }
+    family_idf = family_idf or {}
     for index, work in enumerate(works):
         if index % _CANCELLATION_CHECK_INTERVAL == 0:
             _ensure_current(should_continue)
@@ -139,7 +140,11 @@ def _load_candidate_vectors(
             source_work,
             include_franchise=availability["include_franchise"],
             include_developer=availability["include_developer"],
-            tag_idf=tag_idf,
+            tag_idf=family_idf.get("tag"),
+            theme_idf=family_idf.get("theme"),
+            mode_idf=family_idf.get("mode"),
+            feature_idf=family_idf.get("feature"),
+            platform_idf=family_idf.get("platform"),
             feature_set_version=FEATURE_SET_VERSION,
         )
     return cached
@@ -306,7 +311,7 @@ def _cold_start_results(
     popscore_by_work: dict[object, float],
     recency_by_work: dict[object, float],
     rating_prior: float | None,
-    tag_idf: dict[str, float],
+    family_idf: dict[str, dict[str, float]],
     should_continue: Callable[[], bool] | None,
 ) -> list[dict]:
     base_spec = _base_spec(spec)
@@ -314,7 +319,7 @@ def _cold_start_results(
         works,
         base_spec,
         corpus_version,
-        tag_idf=tag_idf,
+        family_idf=family_idf,
         should_continue=should_continue,
     )
     volume_ceiling = max(
@@ -389,7 +394,7 @@ def rank_content_v1(
     eligibility_cutoff_date: date | None = None,
     min_rating_count: int | None = None,
     tag_profile: dict[str, float] | None = None,
-    tag_idf: dict[str, float] | None = None,
+    family_idf: dict[str, dict[str, float]] | None = None,
     prepared: dict[str, Any] | None = None,
     should_continue: Callable[[], bool] | None = None,
     _limit_cap: int | None = None,
@@ -424,11 +429,11 @@ def rank_content_v1(
         )
         snapshot_sha256 = _snapshot_sha256(corpus_version, {work.id for work in candidates} | seen_ids)
     _ensure_current(should_continue)
-    resolved_tag_idf = (
-        tag_idf
-        if tag_idf is not None
-        else (prepared.get("tag_idf") if prepared is not None else None)
-    ) or tag_idf_profile(corpus_version)
+    resolved_family_idf = (
+        family_idf
+        if family_idf is not None
+        else (prepared.get("family_idf") if prepared is not None else None)
+    ) or all_family_idf_profiles(corpus_version)
     # Signal-sharing cache (2026-09-11): `profile_inputs`, `rating_term` and
     # facet similarity depend only on (user, work, corpus_version, tag data) --
     # never on which of the 16 algorithm_id variants is scoring them. A caller
@@ -441,7 +446,7 @@ def rank_content_v1(
     if profile_cache is not None and user.pk in profile_cache:
         profile_inputs = profile_cache[user.pk]
     else:
-        profile_inputs = build_profile_inputs(user, corpus_version, resolved_tag_idf)
+        profile_inputs = build_profile_inputs(user, corpus_version, resolved_family_idf)
         if profile_cache is not None:
             profile_cache[user.pk] = profile_inputs
     profile = profile_inputs.positive
@@ -510,7 +515,7 @@ def rank_content_v1(
             popscore_by_work,
             recency_by_work,
             rating_prior,
-            resolved_tag_idf,
+            resolved_family_idf,
             should_continue,
         )
         return _dto(
@@ -530,7 +535,7 @@ def rank_content_v1(
         base_spec,
         corpus_version,
         prepared_vectors=(prepared or {}).get("vectors"),
-        tag_idf=resolved_tag_idf,
+        family_idf=resolved_family_idf,
         should_continue=should_continue,
     )
     volume_ceiling = max(

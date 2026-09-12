@@ -37,7 +37,7 @@ from catalogue.models import CorpusRatingSnapshot, GameWork
 from library.models import LibraryEntry
 from recommendations.cancellation import RecommendationComputationCancelled
 from recommendations.content.combine import rating_term
-from recommendations.content.features import corpus_rating_prior, tag_idf_profile, tag_rating_profile
+from recommendations.content.features import all_family_idf_profiles, corpus_rating_prior, tag_rating_profile
 from recommendations.content.profile import ProfileInputs, build_profile_inputs
 from recommendations.content.rank import _load_candidate_vectors, _snapshot_sha256
 from recommendations.content.similarity import facet_similarity
@@ -80,10 +80,10 @@ def build_corpus_bundle(
         .filter(Exists(GameWork.objects.filter(pk=OuterRef("pk"), curated_labels__isnull=False)))
     )
     _ensure_current(should_continue)
-    tag_idf = tag_idf_profile(corpus_version)
+    family_idf = all_family_idf_profiles(corpus_version)
     tag_profile = tag_rating_profile(corpus_version)
     vectors = _load_candidate_vectors(
-        candidates, _ANY_SPEC, corpus_version, tag_idf=tag_idf, should_continue=should_continue
+        candidates, _ANY_SPEC, corpus_version, family_idf=family_idf, should_continue=should_continue
     )
     snapshot_rows = CorpusRatingSnapshot.objects.filter(
         work_id__in=[work.id for work in candidates], rating__isnull=False
@@ -115,7 +115,7 @@ def build_corpus_bundle(
         "works": candidates,
         "vectors": vectors,
         "tag_profile": tag_profile,
-        "tag_idf": tag_idf,
+        "family_idf": family_idf,
         "snapshot_stats": snapshot_stats,
         "snapshot_sha256": snapshot_sha256,
         "rating_prior": rating_prior,
@@ -139,11 +139,11 @@ def build_and_store_signal_cache(
     candidates: list[GameWork] = bundle["works"]
     vectors: dict[Any, dict[str, float]] = bundle["vectors"]
     tag_profile: dict[str, float] = bundle["tag_profile"]
-    tag_idf: dict[str, float] = bundle["tag_idf"]
+    family_idf: dict[str, dict[str, float]] = bundle["family_idf"]
     snapshot_stats = bundle["snapshot_stats"]
     rating_prior = bundle["rating_prior"]
 
-    profile_inputs = build_profile_inputs(user, corpus_version, tag_idf)
+    profile_inputs = build_profile_inputs(user, corpus_version, family_idf)
     rating_term_by_work: dict[str, list[Any]] = {}
     similarity_by_work: dict[str, list[Any]] = {}
     for index, work in enumerate(candidates):

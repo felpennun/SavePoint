@@ -14,15 +14,23 @@ from recommendations.content.features import FACET_WEIGHTS
 
 FeatureVector = dict[str, float]
 
-SIMILARITY_RULE_VERSION = "facet-similarity-v7"
+SIMILARITY_RULE_VERSION = "facet-similarity-v8"
 
 # Values below one give candidate precision more influence than profile
 # coverage. This limits the advantage of broad works that list many genres or
 # platforms while retaining a reward for covering the user's weighted taste.
 CORE_PRECISION_BETA = 0.5
 
+# CORE facets are the only ones renormalised against each other -- both have
+# near-universal coverage, so renormalising when one is absent from a
+# comparison is a rare edge case, not the common path. THEME/MODE/FEATURE
+# moved out of core into the optional/bonus group in fs-v13 (2026-09-12,
+# author decision): keeping only near-universal facets in the renormalised
+# core avoids rewarding a work for lacking rarer metadata (see the
+# fs-v13 note in content/features.py's module docstring for the worked
+# example that caught this).
 _CORE_FACETS = ("tag", "platform")
-_OPTIONAL_FACETS = ("franchise", "developer")
+_OPTIONAL_FACETS = ("theme", "mode", "feature", "franchise", "developer")
 
 
 def _facet_values(vector: FeatureVector, facet: str) -> dict[str, float]:
@@ -74,12 +82,17 @@ def _facet_affinity(
 def facet_similarity(profile: FeatureVector, candidate: FeatureVector) -> dict:
     """Compare a candidate using fixed core weights and gated optional bonuses.
 
-    Genre and platform form the candidate's core similarity. Their F0.5-style
-    affinity gives candidate precision more influence than weighted profile
-    coverage, so broad metadata lists do not win by default. Saga and developer
-    cannot score merely because a candidate has those fields: they contribute
-    only when their values overlap with the user's weighted profile. Missing
-    optional metadata is neutral and never redistributes a bonus to the work.
+    Genre (+subgenre) and platform form the candidate's core similarity.
+    Their F0.5-style affinity gives candidate precision more influence than
+    weighted profile coverage, so broad metadata lists do not win by
+    default. Theme, mode, feature, saga, and developer cannot score merely
+    because a candidate has those fields: they contribute only when their
+    values overlap with the user's weighted profile. Missing optional
+    metadata is neutral and never redistributes a bonus to the work, and --
+    just as importantly -- it never inflates the CORE facets either: a work
+    without a theme is compared on genre alone, not on a genre score that
+    got a bigger relative share because theme dropped out of a shared
+    average (fs-v13, 2026-09-12).
     """
 
     facet_scores: dict[str, float] = {}

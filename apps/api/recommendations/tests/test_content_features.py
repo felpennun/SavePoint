@@ -2,7 +2,7 @@
 ``WorkFeatureVector`` cache (Plan 02-10 Task 3, REC-03 / D-11 / D-12).
 
 Pure Python + stdlib (Task 1 ``checkpoint:decision`` = ``pure-python``).
-The feature vector is a sparse ``{feature_key: weight}`` dict with ``genre:``
+The feature vector is a sparse ``{feature_key: weight}`` dict with ``tag:``
 (guaranteed) and ``platform:`` (allowlist only) facets; ``franchise:`` /
 ``developer:`` is emitted only when measured coverage over the governed view
 clears a documented threshold (D-11); ``franchise:`` represents IGDB saga and
@@ -21,11 +21,12 @@ from django.core.management import call_command
 
 from catalogue.models import (
     CorpusRatingSnapshot,
+    CuratedLabel,
     Developer,
     Franchise,
     GameRelease,
     GameWork,
-    Genre,
+    GameWorkCuratedLabel,
     Platform,
 )
 from library.models import LibraryEntry
@@ -34,7 +35,7 @@ from recommendations.content.features import (
     FEATURE_SET_VERSION,
     coverage_report,
     feature_vector,
-    genre_rating_profile,
+    tag_rating_profile,
 )
 from recommendations.content.profile import build_profile, build_profile_inputs
 from recommendations.models import WorkFeatureVector
@@ -54,14 +55,19 @@ def user_a(db):  # noqa: ANN001
 
 @pytest.fixture
 def genres(db):  # noqa: ANN001
+    # Named "genres" for call-site continuity (genres["rpg"] etc.), but these
+    # are CuratedLabel rows -- feature_vector/tag_rating_profile/tag_idf all
+    # read work.curated_labels exclusively now, never the legacy Genre M2M
+    # (2026-09-12: fixed test/production drift found live via duplicated UI
+    # tags -- see ideas-vault "Evidencia UI-E2E ... QUAL-02").
     return {
-        "rpg": Genre.objects.create(igdb_id=12, name="Role-playing (RPG)", slug="role-playing-rpg"),
-        "shooter": Genre.objects.create(igdb_id=5, name="Shooter", slug="shooter"),
-        "puzzle": Genre.objects.create(igdb_id=9, name="Puzzle", slug="puzzle"),
+        "rpg": CuratedLabel.objects.create(name="Role-playing (RPG)", slug="role-playing-rpg", kind=CuratedLabel.Kind.GENRE, curation_version="test"),
+        "shooter": CuratedLabel.objects.create(name="Shooter", slug="shooter", kind=CuratedLabel.Kind.GENRE, curation_version="test"),
+        "puzzle": CuratedLabel.objects.create(name="Puzzle", slug="puzzle", kind=CuratedLabel.Kind.GENRE, curation_version="test"),
     }
 
 
-def _work(slug: str, *genre_objs: Genre, governed: bool = True) -> GameWork:
+def _work(slug: str, *tags: CuratedLabel, governed: bool = True) -> GameWork:
     work = GameWork.objects.create(
         canonical_slug=slug,
         original_title=slug.replace("-", " ").title(),
@@ -69,8 +75,10 @@ def _work(slug: str, *genre_objs: Genre, governed: bool = True) -> GameWork:
         in_corpus=governed,
         corpus_version=_CORPUS if governed else "",
     )
-    if genre_objs:
-        work.genres.set(genre_objs)
+    for tag in tags:
+        GameWorkCuratedLabel.objects.create(
+            work=work, label=tag, source_kind="genre", source_value=tag.name
+        )
     return work
 
 
@@ -96,9 +104,9 @@ def test_feature_vector_is_a_sparse_dict_with_no_rating_dimension(user_a, genres
     vector = feature_vector(work)
 
     assert set(vector) == {
-        "genre:role-playing-rpg",
-        "genre:shooter",
-        "genre:puzzle",
+        "tag:role-playing-rpg",
+        "tag:shooter",
+        "tag:puzzle",
     }
     assert all(weight > 0 for weight in vector.values())
     assert not any(key.startswith("rating") for key in vector)
@@ -110,7 +118,7 @@ def test_genre_weights_use_the_family_weight_over_sqrt_k(user_a, genres) -> None
 
     vector = feature_vector(work)
 
-    expected = FACET_WEIGHTS["genre"] / math.sqrt(3)
+    expected = FACET_WEIGHTS["tag"] / math.sqrt(3)
     assert all(value == pytest.approx(expected) for value in vector.values())
 
 
@@ -186,7 +194,7 @@ def test_franchise_and_developer_features_activate_only_above_measured_coverage(
     assert report["include_developer"] is True
 
     vector = feature_vector(works[0], include_franchise=True, include_developer=True)
-    assert vector["genre:role-playing-rpg"] == pytest.approx(FACET_WEIGHTS["genre"])
+    assert vector["tag:role-playing-rpg"] == pytest.approx(FACET_WEIGHTS["tag"])
     assert vector["franchise:quest-saga"] == pytest.approx(FACET_WEIGHTS["franchise"])
     assert vector["developer:quest-studio"] == pytest.approx(FACET_WEIGHTS["developer"])
 
@@ -199,21 +207,25 @@ def test_platform_weight_is_lower_than_genre_and_higher_than_optional_facets(gen
 
     vector = feature_vector(work)
 
-    assert vector["genre:role-playing-rpg"] == pytest.approx(FACET_WEIGHTS["genre"])
+    assert vector["tag:role-playing-rpg"] == pytest.approx(FACET_WEIGHTS["tag"])
     assert vector["platform:pc-microsoft-windows"] == pytest.approx(FACET_WEIGHTS["platform"])
     assert FACET_WEIGHTS == {
-        "genre": 0.50,
-        "platform": 0.25,
+        "tag": 0.60,
+        "theme": 0.20,
+        "feature": 0.10,
+        "mode": 0.05,
+        "platform": 0.05,
         "franchise": 0.02,
         "developer": 0.015,
     }
+    assert FACET_WEIGHTS["platform"] > FACET_WEIGHTS["franchise"] > FACET_WEIGHTS["developer"]
 
 
 # --------------------------------------------------------------------------- #
-# genre_rating_profile (corpus statistic, snapshot-derived)                    #
+# tag_rating_profile (corpus statistic, snapshot-derived)                      #
 # --------------------------------------------------------------------------- #
 @pytest.mark.django_db
-def test_genre_rating_profile_is_the_mean_snapshot_rating_per_genre(genres) -> None:  # noqa: ANN001
+def test_tag_rating_profile_is_the_mean_snapshot_rating_per_tag(genres) -> None:  # noqa: ANN001
     from django.utils import timezone
 
     w1 = _work("rated-a", genres["rpg"])
@@ -224,7 +236,7 @@ def test_genre_rating_profile_is_the_mean_snapshot_rating_per_genre(genres) -> N
             rating=rating, rating_count=100, retrieved_at=timezone.now(),
         )
 
-    profile = genre_rating_profile(_CORPUS)
+    profile = tag_rating_profile(_CORPUS)
 
     assert profile["role-playing-rpg"] == pytest.approx(85.0)
 
@@ -239,8 +251,8 @@ def test_profile_of_a_monogenre_library_is_dominated_by_that_genre(user_a, genre
 
     profile = build_profile(user_a, _CORPUS)
 
-    assert set(profile) == {"genre:role-playing-rpg"}
-    assert profile["genre:role-playing-rpg"] == pytest.approx(1.0)
+    assert set(profile) == {"tag:role-playing-rpg"}
+    assert profile["tag:role-playing-rpg"] == pytest.approx(1.0)
 
 
 @pytest.mark.django_db
@@ -251,9 +263,9 @@ def test_profile_uses_positive_rated_completed_and_playing_entries(user_a, genre
 
     profile = build_profile(user_a, _CORPUS)
 
-    assert profile["genre:role-playing-rpg"] > profile["genre:shooter"]
-    assert profile["genre:role-playing-rpg"] == pytest.approx(4.0 / 6.64)
-    assert profile["genre:shooter"] == pytest.approx(2.64 / 6.64)
+    assert profile["tag:role-playing-rpg"] > profile["tag:shooter"]
+    assert profile["tag:role-playing-rpg"] == pytest.approx(4.0 / 6.64)
+    assert profile["tag:shooter"] == pytest.approx(2.64 / 6.64)
 
 
 @pytest.mark.django_db
@@ -287,12 +299,12 @@ def test_profile_prefers_the_cached_work_feature_vector(user_a, genres) -> None:
     _own(user_a, work, status="completed", rating=10)
     # Cache says this work is pure shooter -- build_profile must use it.
     WorkFeatureVector.objects.create(
-        work=work, feature_set_version=FEATURE_SET_VERSION, vector_json={"genre:shooter": 1.0}
+        work=work, feature_set_version=FEATURE_SET_VERSION, vector_json={"tag:shooter": 1.0}
     )
 
     profile = build_profile(user_a, _CORPUS)
 
-    assert set(profile) == {"genre:shooter"}
+    assert set(profile) == {"tag:shooter"}
 
 
 # --------------------------------------------------------------------------- #
@@ -309,7 +321,7 @@ def test_rebuild_feature_vectors_populates_every_governed_work(genres) -> None: 
     for work in governed:
         row = WorkFeatureVector.objects.get(work=work, feature_set_version=FEATURE_SET_VERSION)
         assert row.vector_json == {
-            "genre:role-playing-rpg": pytest.approx(FACET_WEIGHTS["genre"])
+            "tag:role-playing-rpg": pytest.approx(FACET_WEIGHTS["tag"])
         }
 
 
