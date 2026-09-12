@@ -214,10 +214,12 @@ Plans:
 **Plans**: 4 plans in 3 waves; completed 2026-09-12 with the multi-seed limitation documented
 
 **Plan files**:
+
 - [x] 03-01-PLAN.md (Wave 1) — Tracer de ranking real, candidatos comunes y contrato v2 — completado 2026-09-08; `03-01-SUMMARY.md`, servicio v2, manifiesto común hashado y 403 pruebas backend.
 - [x] 03-02-PLAN.md (Wave 2) — Señales de contenido, variantes y explicaciones deterministas — completado 2026-09-09; `03-02-SUMMARY.md`, perfiles positivo/negativo, `fs-v2` y razones estructuradas.
 - [x] 03-03-PLAN.md (Wave 2) — Métricas beyond-accuracy, incertidumbre, contrastes estadísticos y desglose por cohortes; resumen `03-03-SUMMARY.md`. La repetición multi-semilla del punto 6 queda documentada como limitación.
 - [x] 03-04-PLAN.md (Wave 3) — Runner, captura futura de entorno/recursos, evidencia UI/E2E y vault; resumen `03-04-SUMMARY.md`. `QUAL-02` verificado mediante tres pruebas Playwright; la limitación multi-semilla queda documentada.
+
 **UI hint**: yes
 
 ### Phase 4: Collaborative and Hybrid Comparison
@@ -236,6 +238,7 @@ Plans:
 **Plans**: 3 plans in 2 waves; completed 2026-09-12 with the multi-seed limitation documented
 
 **Plan files**:
+
 - [x] 04-01-PLAN.md — Rankers colaborativo e híbrido compartidos, con pruebas y fallbacks.
 - [x] 04-02-PLAN.md — Workers independientes y estanterías web para ambos algoritmos.
 - [x] 04-03-PLAN.md — Evaluación offline paralela por proceso, tiempos y fallo explícito.
@@ -258,12 +261,14 @@ sensibilidad multi-semilla queda como limitación metodológica y trabajo futuro
   4. Exported spreadsheet cells cannot execute formulas; JSON export and import preview/conflict handling are explicitly assigned to Phase 7 and are not part of this closure.
   5. The workflows have accessible UI verification and contemporaneous design, test, limitation, agent, and author-decision evidence.
 
-**Plans**: 4 plans
+**Plans**: 1/4 plans executed
 Plans:
-- [ ] 05-01-PLAN.md — autenticación real, perfil, favoritos y privacidad
+
+- [x] 05-01-PLAN.md — autenticación real, perfil, favoritos y privacidad
 - [ ] 05-02-PLAN.md — comentarios únicos y listas personalizadas ordenables
 - [ ] 05-03-PLAN.md — metadatos avanzados de copias e inventario
 - [ ] 05-04-PLAN.md — exportación CSV, reconciliación de requisitos y evidencia
+
 **UI hint**: yes
 
 ### Phase 6: Public Discovery and Resilient Enrichment
@@ -325,6 +330,6 @@ schedule properly in a later phase-planning pass.
 | 2. Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender | 13/13 | Complete    | 2026-09-08 |
 | 3. Explainable Content Recommenders and Baseline Comparison | 4/4 | Complete with limitation | 2026-09-12 |
 | 4. Collaborative and Hybrid Comparison | 3/3 | Complete with limitation | 2026-09-12 |
-| 5. Complete Collection Workflows and Portability | 0/TBD | Not started | - |
+| 5. Complete Collection Workflows and Portability | 1/4 | In Progress | - |
 | 6. Public Discovery and Resilient Enrichment | 0/TBD | Not started | - |
 | 7. Research Panel, Hardening, and Evidence Freeze | 0/TBD | Not started | - |

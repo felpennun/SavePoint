@@ -9,7 +9,7 @@
 
 - [x] **AUTH-01**: User can sign in to and sign out of a controlled account.
 - [x] **AUTH-02**: System can load synthetic users that are clearly identified as simulated accounts.
-- [ ] **PROF-01**: User can edit their biography and optional HTTPS avatar while the login alias remains immutable.
+- [x] **PROF-01**: User can edit their biography and optional HTTPS avatar while the login alias remains immutable.
 - [x] **PROF-02**: An authorised visitor can view a public profile.
 - [ ] **PROF-03**: Public profile shows only permitted games, lists, ratings, comments, and statistics.
 - [ ] **PROF-04**: User can obtain a shareable URL for their public profile and public lists.
@@ -217,7 +217,7 @@
 | REC-04 | Phase 4 | Complete (`04-01-SUMMARY.md`, v15 artifact) |
 | REC-05 | Phase 4 | Complete (`04-01-SUMMARY.md`, v15 artifact) |
 | DOC-03 | Phase 4 | Complete (`docs/methodology/recommendation-algorithms.md`, phase signoff) |
-| PROF-01 | Phase 5 | Pending — alias immutable; biography/avatar editable |
+| PROF-01 | Phase 5 | Complete (Plan 05-01) |
 | LIB-03 | Phase 5 | Pending |
 | LIB-04 | Phase 5 | Pending |
 | INV-03 | Phase 5 | Pending |
