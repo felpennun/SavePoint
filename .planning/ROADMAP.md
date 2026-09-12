@@ -17,8 +17,8 @@ SavePoint begins with a three-day, publicly deployed vertical demonstration, the
 
 - [x] **Phase 1: Three-Day Public Demo Slice** - Deploy a lawful, locally reproducible controlled demo with catalogue, backlog, rating, inventory, public profile, and popularity recommendations. (completed 2026-09-05)
 - [x] **Phase 2: Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender** - Prune the corpus to a governed platform/quality allowlist (Steam included), ingest external ratings with provenance and experiment isolation, fix tolerant search over the real corpus, add multi-select filters and a product-grade UI pass, freeze the simulation-aware evaluation protocol, and ship a first ratings-aware content recommender evaluated under it. Accepted by the author on 2026-09-08; simulated limitations retained explicitly.
-- [ ] **Phase 3: Explainable Content Recommenders and Baseline Comparison** - Run the frozen harness over random/popularity baselines and content recommenders with cold-start routing, exclusions, deterministic explanations, the full metric suite, cohort reporting, and independently recalculable artifacts.
-- [ ] **Phase 4: Collaborative and Hybrid Comparison** - Compare collaborative and hybrid methods under the already-frozen protocol and document bounded conclusions.
+- [x] **Phase 3: Explainable Content Recommenders and Baseline Comparison** - Run the frozen harness over random/popularity baselines and content recommenders with cold-start routing, exclusions, deterministic explanations, the full metric suite, cohort reporting, and independently recalculable artifacts. Completed 2026-09-12 with the multi-seed limitation documented.
+- [x] **Phase 4: Collaborative and Hybrid Comparison** - Compare collaborative and hybrid methods under the already-frozen protocol and document bounded conclusions. Completed 2026-09-12 with the multi-seed limitation documented.
 - [ ] **Phase 5: Complete Collection Workflows and Portability** - Complete profiles, comments, lists, copy details, and safe deterministic import/export.
 - [ ] **Phase 6: Public Discovery and Resilient Enrichment** - Add public projections, catalogue discovery, and shareable public views without contaminating research data.
 - [ ] **Phase 7: Research Panel, Hardening, and Evidence Freeze** - Present thesis-ready comparisons and finish administration, security, recovery, accessibility, and reproducibility gates.
@@ -211,13 +211,13 @@ Plans:
   4. Comparisons use multiple seeds, uncertainty estimates, and justified statistical tests, and failed-run states are visible and cannot silently yield partial published evidence.
   5. Metric rationale, limitations, agent work, verification, and author interpretation are captured for direct thesis use.
 
-**Plans**: 4 plans in 3 waves
+**Plans**: 4 plans in 3 waves; completed 2026-09-12 with the multi-seed limitation documented
 
 **Plan files**:
 - [x] 03-01-PLAN.md (Wave 1) — Tracer de ranking real, candidatos comunes y contrato v2 — completado 2026-09-08; `03-01-SUMMARY.md`, servicio v2, manifiesto común hashado y 403 pruebas backend.
 - [x] 03-02-PLAN.md (Wave 2) — Señales de contenido, variantes y explicaciones deterministas — completado 2026-09-09; `03-02-SUMMARY.md`, perfiles positivo/negativo, `fs-v2` y razones estructuradas.
-- [ ] 03-03-PLAN.md (Wave 2) — Métricas beyond-accuracy, incertidumbre y contrastes estadísticos.
-- [ ] 03-04-PLAN.md (Wave 3) — Runner multi-semilla, evidencia, integración web y vault.
+- [x] 03-03-PLAN.md (Wave 2) — Métricas beyond-accuracy, incertidumbre, contrastes estadísticos y desglose por cohortes; resumen `03-03-SUMMARY.md`. La repetición multi-semilla del punto 6 queda documentada como limitación.
+- [x] 03-04-PLAN.md (Wave 3) — Runner, captura futura de entorno/recursos, evidencia UI/E2E y vault; resumen `03-04-SUMMARY.md`. `QUAL-02` verificado mediante tres pruebas Playwright; la limitación multi-semilla queda documentada.
 **UI hint**: yes
 
 ### Phase 4: Collaborative and Hybrid Comparison
@@ -233,12 +233,16 @@ Plans:
   3. Multi-seed results expose uncertainty, cohort trade-offs, diversity/novelty effects, timing, and sensitivity without tuning on the test set.
   4. Each algorithm's theory, formulation, parameters, limitations, implementation evidence, agent contribution, and author interpretation are thesis-ready.
 
-**Plans**: 3 plans in 2 waves
+**Plans**: 3 plans in 2 waves; completed 2026-09-12 with the multi-seed limitation documented
 
 **Plan files**:
 - [x] 04-01-PLAN.md — Rankers colaborativo e híbrido compartidos, con pruebas y fallbacks.
 - [x] 04-02-PLAN.md — Workers independientes y estanterías web para ambos algoritmos.
 - [x] 04-03-PLAN.md — Evaluación offline paralela por proceso, tiempos y fallo explícito.
+
+**Cierre:** REC-04, REC-05 y DOC-03 quedan verificados. La comparación v15
+está congelada y es reproducible, pero procede de una sola semilla; la
+sensibilidad multi-semilla queda como limitación metodológica y trabajo futuro.
 
 ### Phase 5: Complete Collection Workflows and Portability
 
@@ -313,8 +317,8 @@ schedule properly in a later phase-planning pass.
 | 1. Three-Day Public Demo Slice | 16/16 | Complete    | 2026-09-05 |
 | 01.1. Real-Scale Catalogue and Product Experience (inserted) | 10/10 | Complete    | 2026-09-06 |
 | 2. Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender | 13/13 | Complete    | 2026-09-08 |
-| 3. Explainable Content Recommenders and Baseline Comparison | 1/4 | In Progress | - |
-| 4. Collaborative and Hybrid Comparison | 0/TBD | Not started | - |
+| 3. Explainable Content Recommenders and Baseline Comparison | 4/4 | Complete with limitation | 2026-09-12 |
+| 4. Collaborative and Hybrid Comparison | 3/3 | Complete with limitation | 2026-09-12 |
 | 5. Complete Collection Workflows and Portability | 0/TBD | Not started | - |
 | 6. Public Discovery and Resilient Enrichment | 0/TBD | Not started | - |
 | 7. Research Panel, Hardening, and Evidence Freeze | 0/TBD | Not started | - |

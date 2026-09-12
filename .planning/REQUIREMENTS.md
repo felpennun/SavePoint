@@ -55,8 +55,8 @@
 - [x] **REC-01**: System produces a random recommendation baseline.
 - [x] **REC-02**: System produces a popularity recommendation baseline.
 - [x] **REC-03**: System implements a content-based recommender.
-- [ ] **REC-04**: System implements at least one collaborative-filtering method.
-- [ ] **REC-05**: System implements a hybrid recommender.
+- [x] **REC-04**: System implements at least one collaborative-filtering method.
+- [x] **REC-05**: System implements a hybrid recommender.
 - [x] **REC-06**: User without sufficient history receives recommendations through an explicit cold-start strategy.
 - [x] **REC-07**: Recommendations exclude already-consumed games according to configured rules.
 - [x] **REC-08**: Each recommendation presents a deterministic explanation grounded in actual model evidence.
@@ -112,7 +112,7 @@
 
 - [x] **DOC-01**: Architecture and technology decisions record alternatives and rationale.
 - [x] **DOC-02**: Dataset, API, data model, and normalisation processes are documented.
-- [ ] **DOC-03**: Each algorithm documents its theory, formulation, parameters, and limitations.
+- [x] **DOC-03**: Each algorithm documents its theory, formulation, parameters, and limitations.
 - [x] **DOC-04**: Experimental protocol, metrics, results, and threats to validity are documented.
 - [ ] **DOC-05**: Thesis tables and figures are generated from immutable experiment artifacts.
 - [ ] **DOC-06**: Future example theses, formatting rules, and lecturer annotations are registered as canonical project references.
@@ -214,9 +214,9 @@
 | EVAL-11 | Phase 3 | Pending |
 | EVAL-12 | Phase 3 | Pending |
 | QUAL-02 | Phase 3 | Pending |
-| REC-04 | Phase 4 | Pending |
-| REC-05 | Phase 4 | Pending |
-| DOC-03 | Phase 4 | Pending |
+| REC-04 | Phase 4 | Complete (`04-01-SUMMARY.md`, v15 artifact) |
+| REC-05 | Phase 4 | Complete (`04-01-SUMMARY.md`, v15 artifact) |
+| DOC-03 | Phase 4 | Complete (`docs/methodology/recommendation-algorithms.md`, phase signoff) |
 | PROF-01 | Phase 5 | Pending |
 | LIB-03 | Phase 5 | Pending |
 | LIB-04 | Phase 5 | Pending |

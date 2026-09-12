@@ -37,6 +37,8 @@ experimentos reproducibles, usuarios sinteticos y resultados explicables.
 - [[Cohortes de usuario]]
 - [[Artefacto de evaluacion reproducible]]
 - [[2026-09-10 - Checkpoint evaluacion offline 400 usuarios]]
+- [[2026-09-12 - Cierre backend Fase 3 y limitaciones metodologicas]]
+- [[2026-09-12 - Cierre Fase 4 colaborativa e hibrida]]
 
 ## Relacionado
 

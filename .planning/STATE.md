@@ -1,22 +1,22 @@
 ---
 gsd_state_version: 1.0
 status: in_progress
-stopped_at: Phase 3 plan 03-02 reabierto; revisión del autor pendiente antes de un nuevo corpus
-last_updated: "2026-09-09T16:10:01.451Z"
+stopped_at: Fase 4 firmada con limitación multi-semilla documentada
+last_updated: "2026-09-12T00:00:00.000Z"
 state_head: 81542ab
 progress:
   total_phases: 8
-  completed_phases: 2
-  total_plans: 43
-  completed_plans: 41
-  percent: 25
+  completed_phases: 5
+  total_plans: 46
+  completed_plans: 46
+  percent: 62.5
 last_activity: 2026-09-08
-next_phase: 3
-next_phase_name: Explainable Content Recommenders and Baseline Comparison
-next_action: Revisar el contrato de señales de 03-02 antes de gobernar un corpus nuevo o ejecutar 03-03
-current_phase: 03
-current_phase_name: Explainable Content Recommenders and Baseline Comparison
-last_activity_desc: "Fase 2 aceptada por Felipe: 13/13 planes, verificación y seguridad cerradas; primera simulación conservada con sus limitaciones. Preparando la planificación de la Fase 3."
+next_phase: 5
+next_phase_name: Complete Collection Workflows and Portability
+next_action: Planificar la Fase 5 tras el cierre documentado de las Fases 3 y 4
+current_phase: 05
+current_phase_name: Complete Collection Workflows and Portability
+last_activity_desc: "Fases 3 y 4 aceptadas por Felipe el 2026-09-12 con evidencias congeladas y limitación multi-semilla documentada."
 ---
 
 # Project State
@@ -29,7 +29,8 @@ Living project mirror: `ideas-vault/` (see `CONVENTIONS.md` and its README for t
 rule that applies to every LLM and collaborator).
 
 **Core value:** Users receive useful and explainable video-game recommendations from a well-organised collection, while every algorithmic result remains reproducible and defensible in the thesis.
-**Current focus:** Fase 3 lista para planificación a partir de `03-CONTEXT.md`, con la Fase 2 firmada y congelada.
+**Current focus:** Fases 3 y 4 cerradas; preparar la planificación de la Fase 5 con la
+evidencia offline y las limitaciones metodológicas congeladas.
 
 ## Current Position
 
@@ -379,3 +380,65 @@ totales. Ver `.planning/phases/04-collaborative-and-hybrid-comparison/`.
 | 260910-0u7 | Verificar la importación de facetas IGDB y dejar checkpoint para la interfaz | 2026-09-10 | a3f3a14 | [260910-0u7-verificar-importacion-de-facetas-igdb-y-](./quick/260910-0u7-verificar-importacion-de-facetas-igdb-y-/) |
 
 Last activity: 2026-09-10 - Verified hybrid MMR shelf runtime, rebuilt web, and prepared interface handoff
+
+## Reconciliación de continuidad — 2026-09-12
+
+La reanudación detectó que el `HANDOFF.json` anterior era histórico: indicaba que la
+evaluación offline aún no había comenzado, pero la rama `main` ya contiene la ejecución
+final del protocolo v15 y su documentación.
+
+- `main` está limpio y sincronizado con `origin/main` en `1a00474`.
+- La evaluación final del test v15 terminó con estado `succeeded`, 16/16 algoritmos,
+  79 usuarios evaluables y el marcador de test consumido una sola vez.
+- La evidencia canónica es
+  `docs/verification/evaluation-results-400-test-2026-09-12-v15.md` y el checkpoint
+  `docs/verification/evaluation-checkpoint-400-users-2026-09-12-v15.md`.
+- El protocolo vigente es v15 (`docs/methodology/protocol.json`); no se debe relanzar
+  el test ni modificar el marcador para continuar el trabajo documental.
+- Fase 4 tiene `04-01-SUMMARY.md`, `04-02-SUMMARY.md` y `04-03-SUMMARY.md`. Fase 3
+  ya tiene `03-03-SUMMARY.md` y `03-04-SUMMARY.md`, con el cierre backend/documental
+  y las limitaciones de semillas/UI reconciliadas contra la evidencia v15. No se
+  reejecutan cálculos.
+
+**Siguiente acción:** comenzar la planificación de la Fase 5; las Fases 3 y 4 quedan
+cerradas con sus firmas y la limitación multi-semilla documentada.
+
+## Cierre Fase 3 — 2026-09-12
+
+Se ejecutó el cierre backend/documental de la Fase 3 sin repetir el cálculo v15. Se
+añadieron los resúmenes `03-03-SUMMARY.md` y `03-04-SUMMARY.md`, el comando de análisis
+por cohortes y la captura futura de entorno/recursos del runner paralelo. El informe
+derivado confirma 79 usuarios evaluables del test dentro de la cohorte
+`active_history_10_to_20`; los 10 usuarios `no_history` quedan correctamente fuera de
+un ranking personalizado.
+
+El punto 6 (múltiples semillas) queda registrado como limitación metodológica: el test
+v15 es de un solo consumo y repetirlo exigiría un nuevo protocolo versionado, población,
+split y artefacto. El bootstrap y los contrastes pareados describen incertidumbre
+interna del run, pero no sustituyen un estudio de sensibilidad entre semillas.
+
+El punto 7 (UI/E2E) queda cubierto por `e2e/recommendations.spec.ts` y su evidencia
+registrada en el vault. Esta sesión no modificó `apps/web/**` ni `design/**`; la
+implementación y sus pruebas pertenecen a la otra sesión, pero `QUAL-02` ya queda
+integrado en el cierre documental.
+
+La firma formal queda en `docs/verification/phase-03-signoff-2026-09-12.md`.
+
+## Cierre Fase 4 — 2026-09-12
+
+La Fase 4 queda completada con limitación metodológica explícita. Sus tres planes
+están resumidos, verificados y enlazados a las issues #44, #45 y #46.
+
+- `cf-user-knn-v1` y `hybrid-weighted-cf-v1` comparten candidatos, exclusiones,
+  DTOs, fallbacks y protocolo con los algoritmos anteriores.
+- La web dispone de workers y estanterías independientes; la verificación de
+  Felipe confirmó 14 trabajos correctos y 20 resultados por sección nueva.
+- El runner offline registra procesos, hashes, estados, tiempos individuales y
+  tiempo de pared. El artefacto v15 contiene 16/16 algoritmos y 79/80 usuarios
+  evaluables.
+- REC-04, REC-05 y DOC-03 pasan a estado completo en la trazabilidad.
+
+La evidencia canónica está en `04-VERIFICATION.md`,
+`docs/verification/phase-04-signoff-2026-09-12.md` y los resultados v15. No se
+relanza el split `test`: la ejecución fue única y la ausencia de multi-semilla
+se registra como limitación, no como un resultado no observado.
