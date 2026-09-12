@@ -95,8 +95,52 @@ motivos concretos, no por preferencia arbitraria.
 | **Retirar N fijo global (1, o 3) sin ajuste adaptativo** | Probado esta misma sesión con N=1 (arranque en frío en 74% de usuarios bajo la población anterior) y N=3 (arranque en frío en 19% incluso tras subir el mínimo garantizado, más un 21% de vuelco de dominancia con el tag compartido). Ninguno escala con cuánta biblioteca tiene cada usuario del tag en cuestión — la fracción adaptativa sí. |
 | **Exigir que el tag se mantenga #1 sin excepción** | Habría excluido usuarios en los que ningún *n* ≥ 1 preserva la dominancia — contradice el argumento del punto 3 (un tag en 2º/3er puesto sigue siendo señal real, per `facet_similarity`) y habría vuelto a reducir la muestra evaluable sin necesidad. |
 
+## Correcciones encontradas durante la primera corrida real (mismo día)
+
+### 1. El tag dominante se comparaba contra la plataforma (bug)
+
+La primera implementación calculaba el "tag dominante" con
+`max(profile_inputs.positive.items(), key=...)` sobre el diccionario **completo** del
+perfil — que mezcla `tag:*`, `platform:*`, `franchise:*` y `developer:*` en las mismas
+claves. Si la plataforma acumulaba más peso bruto que cualquier tag individual (habitual en
+un usuario que tiene casi todo en la misma plataforma), el usuario quedaba excluido del
+estudio por "no tener un tag dominante" — aunque sí lo tuviera.
+
+El autor lo detectó en vivo, con el argumento correcto: `facet_similarity()` (el código real
+de puntuación, usado por los 16 algoritmos tanto en web como offline) trata cada familia de
+faceta como una señal **independiente**, combinadas después con pesos fijos del sistema
+(`FACET_WEIGHTS["tag"]=0.75`, `FACET_WEIGHTS["platform"]=0.25`, constantes, no dependientes
+de los datos del usuario) — el género nunca compite contra la plataforma en la puntuación
+real, así que tampoco debería competir en la selección de qué retirar para el estudio.
+Corregido: tanto la búsqueda del tag dominante como la comprobación de rango tras la
+retirada se restringen ahora a claves `tag:*` únicamente. Verificado: el bug nunca tocó
+`facet_similarity()`/`combine()` ni ninguna recomendación real (web u offline, en ningún
+protocolo anterior) — estaba aislado en esta función nueva de selección de candidatos para
+el estudio, no en el camino de puntuación.
+
+### 2. Caída a leave-one-out simple en vez de excluir al usuario
+
+Diseño inicial: si `leave_fraction_out_dominant_tag` no se podía construir para un usuario
+(sin ninguna señal de tag de contenido en su perfil, o su tag dominante sin candidatas que
+pasen el piso de rating), se excluía del estudio. El autor lo cuestionó con una corrida real
+en marcha: esos usuarios sí tienen un positivo elegible de verdad — el mecanismo simple
+(protocolo v6-v14) puede usarlo perfectamente, así que excluirlos no es necesario ni
+realista.
+
+Corregido en `evaluation/candidates.py::build()`: si `leave_fraction_out_dominant_tag`
+devuelve `None` bajo la estrategia `leave_fraction_out_dominant_tag_per_user`, se cae al
+`leave_one_out` simple para ese usuario específico, en vez de propagar la exclusión. **Solo
+queda excluido un usuario con cero positivos elegibles en absoluto** (los 10 del arquetipo
+`no_history`, que ningún mecanismo puede evaluar) — el resto siempre entra en el estudio,
+con el mecanismo más específico cuando se puede construir, con el genérico cuando no.
+
+No se registra todavía, en el propio artefacto, qué mecanismo se usó para cada usuario
+(fracción vs. respaldo de un único ítem) — se puede inferir de forma aproximada por el
+tamaño de `heldout_work_ids` (siempre 1 en el respaldo, variable en el mecanismo de
+fracción), pero un campo explícito quedaría más claro para el capítulo de metodología del
+TFG. Pendiente, no bloqueante.
+
 ## Pendiente
 
-Falta terminar de conectar este mecanismo en `evaluation/runner.py`/tests, y lanzar la
-evaluación real bajo protocolo v15. Ver la sesión de esta misma fecha para el estado exacto
-de la implementación.
+Lanzar la evaluación real bajo protocolo v15 con ambas correcciones aplicadas. Ver la
+sesión de esta misma fecha para el estado exacto de la implementación.
