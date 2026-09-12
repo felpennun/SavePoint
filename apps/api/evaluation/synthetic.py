@@ -47,20 +47,31 @@ RATING_COUNT_WEIGHT_BUCKETS = (
 # entries left after retiring one (D-17 relevance + the content profile's
 # `_COLD_START_ENTRIES` activity requirement, recommendations/content/rank.py).
 #
-# Candidate protocol v15 (2026-09-11, not yet frozen): raised from 5 to 8 to
-# support a proposed leave-THREE-out study where all 3 retired items must
+# Candidate protocol v15 (2026-09-11/12, not yet frozen): raised from 5 to 8
+# to support a proposed leave-THREE-out study where all 3 retired items must
 # also share the user's single most-weighted content tag. 5 guaranteed
 # positives only left a margin of 1 above _COLD_START_ENTRIES=3 after
 # retiring one; retiring three from that pool left as few as 2 for 19% of
 # the current test split (measured directly, not assumed). 8 guaranteed
 # restores the same +2 margin retiring three that 5 already gave retiring
-# one. Still drawn from the same archetype-preferred-tag-biased pool
+# one.
+#
+# GUARANTEED_SAME_TAG_POOL_MINIMUM guards a second, distinct failure mode
+# the author caught by inspection, not measurement: an earlier version of
+# this constant (named GUARANTEED_SAME_TAG_MINIMUM = 3) only guaranteed
+# *enough* same-tag positives to retire three -- if a user had exactly 3
+# sharing their dominant tag, retiring exactly those 3 would leave zero
+# remaining evidence of that tag in their profile, making "does it still
+# recommend genre-matching content" an impossible task by construction
+# (all the removed-genre signal is gone), not a meaningful one. 6 guarantees
+# 3 survive retiring 3, so the profile still signals the genre being tested.
+# Still drawn from the same archetype-preferred-tag-biased pool
 # (`_pool_for`), so it is also expected to raise same-tag availability, not
 # just the raw count -- verify empirically before freezing, same as every
 # other population change this session.
 POPSCORE_TIER_FRACTION = 0.75
 GUARANTEED_ELIGIBLE_MINIMUM = 8
-GUARANTEED_SAME_TAG_MINIMUM = 3
+GUARANTEED_SAME_TAG_POOL_MINIMUM = 6
 GUARANTEED_STATUS_CHOICES = (BacklogStatus.COMPLETED, BacklogStatus.PLAYING)
 GUARANTEED_RATING_HALF_STEPS = (7, 8, 9, 10)
 LEGACY_PHASE2_ARCHETYPES = frozenset(
@@ -269,13 +280,21 @@ def generate(
     available_tags = sorted({tag for work in works for tag in work.tags})
     users: list[SyntheticUser] = []
     for archetype in selected:
-        archetype_rng = random.Random(f"{seed}:{archetype.name}")
         min_tags, max_tags = archetype.genre_pref_range
-        tag_count = min(archetype_rng.randint(min_tags, max_tags), len(available_tags))
-        preferred = set(archetype_rng.sample(available_tags, tag_count)) if tag_count else set()
-        pool = _pool_for(archetype, preferred, works)
         for ordinal in range(1, archetype.n_users + 1):
             user_rng = random.Random(f"{seed}:{archetype.name}:{ordinal}")
+            # Candidate protocol v15 (2026-09-12, not yet frozen): each user
+            # now draws their *own* preferred-tag set, instead of one set
+            # shared by every user of the same archetype (the previous
+            # behaviour -- e.g. all 33 "cold-start-monogenero" users had the
+            # exact same 1-2 preferred tags). A tag that is only ever "most
+            # weighted" because it happens to win a near-tie inside a pool
+            # shared by dozens of people is a fragile signal to build a
+            # leave-N-out-by-tag study on; an individually induced
+            # preference is a real, stable one to test against.
+            tag_count = min(user_rng.randint(min_tags, max_tags), len(available_tags))
+            preferred = set(user_rng.sample(available_tags, tag_count)) if tag_count else set()
+            pool = _pool_for(archetype, preferred, works)
             min_size, max_size = archetype.library_size_range
             requested_size = user_rng.randint(min_size, max_size)
             if requested_size > len(pool):
@@ -333,7 +352,7 @@ def generate(
                 same_tag_pool = (
                     [work for work in popscore_pool if cluster_tag in work.tags] if cluster_tag else []
                 )
-                same_tag_target = min(GUARANTEED_SAME_TAG_MINIMUM, guaranteed_target, len(same_tag_pool))
+                same_tag_target = min(GUARANTEED_SAME_TAG_POOL_MINIMUM, guaranteed_target, len(same_tag_pool))
                 same_tag_chosen = (
                     _weighted_sample_without_replacement(same_tag_pool, same_tag_target, user_rng)
                     if same_tag_target
