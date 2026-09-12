@@ -87,4 +87,15 @@ Matriz completa de decisión en
 - [x] `nyquist_compliant: true` se marca tras ejecutar y registrar las verificaciones (04 planes, PostgreSQL real, suite completa `apps/api` en 619/619 tras el Plan 05-04).
 - [ ] El handoff Playwright/axe (`e2e/collection-workflows.spec.ts` + matriz de accesibilidad) corresponde a la sesión web y no se ha ejecutado desde esta rama backend; queda como evidencia pendiente para el signoff de fase (`docs/verification/phase-05-signoff.md`, Plan 05-04 Tarea 3).
 
-**Aprobación:** evidencia backend completa (04/04 planes); pendiente de evidencia de navegador (Playwright/axe) de la sesión web antes del signoff final de fase.
+## Signoff de evidencia backend (Plan 05-04, Tarea 3)
+
+`docs/verification/phase-05-signoff.md` registra, en español, los comandos ejecutados
+(`migrate --noinput`, `makemigrations --check --dry-run`, `pytest apps/api/accounts/tests
+apps/api/library/tests -q` → `247 passed`, suite completa `apps/api` → `619 passed`), la
+matriz de requisitos, las amenazas STRIDE mitigadas del Plan 05-04, el contrato del nuevo
+endpoint de exportación, las limitaciones explícitas y el handoff Playwright/axe asignado
+a la sesión web sin atribuir esa evidencia al backend.
+
+**Aprobación:** evidencia backend completa (04/04 planes, ver `phase-05-signoff.md`);
+pendiente de evidencia de navegador (Playwright/axe) de la sesión web antes del signoff
+final de fase.
