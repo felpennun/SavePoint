@@ -2,21 +2,21 @@
 gsd_state_version: 1.0
 status: in_progress
 stopped_at: Fase 4 firmada con limitación multi-semilla documentada
-last_updated: "2026-09-12T00:00:00.000Z"
-state_head: 81542ab
+last_updated: "2026-09-12T15:00:53.931Z"
+last_activity: 2026-09-10
+last_activity_desc: Fases 3 y 4 aceptadas por Felipe el 2026-09-12 con evidencias congeladas y limitación multi-semilla documentada.
+state_head: fb69fede0970c63d4cb1414cee2069d9d03ec47a
 progress:
   total_phases: 8
-  completed_phases: 5
+  completed_phases: 2
   total_plans: 46
   completed_plans: 46
-  percent: 62.5
-last_activity: 2026-09-08
+  percent: 25
 next_phase: 5
 next_phase_name: Complete Collection Workflows and Portability
 next_action: Planificar la Fase 5 tras el cierre documentado de las Fases 3 y 4
 current_phase: 05
 current_phase_name: Complete Collection Workflows and Portability
-last_activity_desc: "Fases 3 y 4 aceptadas por Felipe el 2026-09-12 con evidencias congeladas y limitación multi-semilla documentada."
 ---
 
 # Project State
@@ -228,11 +228,11 @@ Ver `.planning/quick/260909-nej-a-adir-cuatro-variantes-popscore-con-imp/`.
 
 ## Registro histórico de sesiones (prevalece el checkpoint de ejecución actual)
 
-**Stopped at:** Checkpoint NumPy/SciPy aprobado, lock regenerado y cambios subidos; sincronizacion de issues/board pendiente porque gh auth status aun devuelve token invalid
+**Stopped at:** Phase 5 context gathered
 
 **Resume (after the rate-limit reset):** `/gsd-plan-phase 2` re-spawns the planner from scratch. All inputs are committed: `02-CONTEXT.md`, `02-UI-SPEC.md` (verified 7/7), `02-RESEARCH.md`, `02-VALIDATION.md`, `02-PATTERNS.md`, `02-COVERAGE.md`. Then `gsd-plan-checker` → revision loop → present → `/gsd-execute-phase 2`. Full detail in `.planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/.continue-here.md`.
 
-Last session: 2026-09-08T20:17:51.769Z
+Last session: 2026-09-12T15:00:53.121Z
 
 ### Done this session (2026-09-06, all committed on `main`)
 
@@ -241,7 +241,7 @@ Last session: 2026-09-08T20:17:51.769Z
 - **Roadmap restructure** — `85e98ba`: Phase 2 enlarged (governed corpus + external ratings + evaluation contract + first advanced recommender + search/filters + UI pass); former phases 5+6 merged; 3/4/7/8 renumbered to 5/6/4/7. Requirement coverage 91/91.
 - **Phase 2 planning inputs** — `02-CONTEXT.md` `f5d65e7` (discuss-phase, D-01..D-24), `02-UI-SPEC.md` `e548a2e` (ui-phase, checker 7/7, `## UI Considerations` 45 explicit + 10 backstop), `02-RESEARCH.md` `a78510f`, `02-VALIDATION.md` `53b173f`, `02-PATTERNS.md` `df45a33`, `02-COVERAGE.md` `15006b3` (rescued from the rate-limited planner).
 
-Resume file: .planning\phases\03-explainable-content-recommenders-and-baseline-comparison\.continue-here.md
+Resume file: .planning/phases/05-complete-collection-workflows-and-portability/05-CONTEXT.md
 
 ## Session Continuity
 
@@ -266,6 +266,7 @@ La autenticación de GitHub CLI funciona desde el contexto elevado necesario par
 el scope `project` está concedido. No se han publicado credenciales ni logs sensibles.
 
 Siguiente acción: ejecutar `/gsd-execute-phase 3`, empezando por la Ola 1 (`03-01`).
+
 ## Tarea rápida completada — 2026-09-09
 
 Se adoptó el diseño de caché personal stale-while-revalidate en
@@ -314,6 +315,7 @@ con bonus opcional máximo `0,30`. La señal de rating observado es
 fs-v7 contiene 190.479 vectores y los diez workers de `felipe` publicaron la
 revisión 14. Ver `docs/verification/jornada-decisiones-recomendacion-2026-09-09.md`
 y `docs/verification/recommendation-fs-v7-felipe-2026-09-09.md`.
+
 ## Tarea rapida completada — 2026-09-09
 
 Se publico `fs-v8` / `facet-similarity-v4`: saga/franquicia tiene bonus maximo
