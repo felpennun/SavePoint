@@ -342,6 +342,50 @@ Bajo el protocolo `2026.09.2`/v15 y este split de test de un solo uso:
 - **Siguiente paso ya decidido por el autor**: estudio con 20 usuarios reales, evaluación
   de calidad por encuestas — capítulo complementario, no comparativo con este.
 
+### 10.1 Matiz: `cf-user-knn-v1` no es "malo", esta prueba no es su terreno
+
+El 9 % de acierto de usuario (§4.3) de `cf-user-knn-v1` no debe leerse como "el
+colaborativo es peor en general" — esta prueba mide específicamente la recuperación de
+obras del **tag de contenido** más pesado del perfil del usuario, y `cf-user-knn-v1` no usa
+tags en absoluto: pondera vecinos por similitud de patrones de valoración entre usuarios
+(coseno sobre valoraciones centradas, `recommendations/collaborative.py`), una señal
+completamente distinta y, por diseño de este protocolo, en desventaja frente a cualquier
+prueba centrada en contenido. La comparación es correcta y la diferencia es real y
+significativa (§5), pero **está midiendo precisamente lo que la señal colaborativa no
+modela** — no es evidencia de que el colaborativo sea inferior en una tarea distinta (p.
+ej. recuperar valoraciones de usuarios con gustos parecidos en general, sin restricción de
+género). Los híbridos (`hybrid-weighted-cf-v1`, `hybrid-mmr-v1`) combinan ambas señales
+precisamente para no depender de ninguna de las dos en solitario.
+
+### 10.2 Por qué este es el resultado más sólido de los tres, y qué lo consiguió
+
+La progresión v12 → v14 → v15 no es casualidad — cada paso corrigió un problema real,
+medido antes de decidir el siguiente:
+
+1. **Rediseño de población (v13, 2026-09-10/11)**: biblioteca 10-20, franja PopScore 75 %,
+   mínimo 5 positivos garantizados → eliminó el 74 % de `insufficient_history` que
+   colapsaba el contenido al mismo *fallback* que los baselines en v12.
+2. **Piso de rating externo en el LOO (v14, 2026-09-11)**: el positivo retirado ya no
+   dependía solo del gusto personal, también de superar la mediana de rating del corpus →
+   quitó el sesgo de popularidad de la selección, sin coste de usuarios (verificado antes
+   de congelar).
+3. **Gusto individual por usuario + mínimo garantizado más alto + agrupación por tag (v15,
+   población, 2026-09-12)**: cada usuario pasó a tener un tag dominante propio y robusto,
+   con suficiente oferta para retirar varios sin vaciar el género — en vez de un tag
+   compartido por decenas de personas con dominancia frágil.
+4. **Retención por fracción adaptativa en vez de un ítem fijo (v15, split)**: más
+   información por usuario (`Recall@K` continuo, no binario), la mejora directa detrás del
+   salto de potencia estadística (§5, §11).
+5. **Dos fallos corregidos en vivo antes del éxito** (§1.2): comparar el tag dominante solo
+   contra otros tags (no contra la plataforma), y no excluir a un usuario cuando el
+   mecanismo específico no se puede construir, si el respaldo de LOO simple sí puede
+   evaluarlo — maximizó cuántos usuarios entran en el estudio sin comprometer la validez.
+
+Ninguna mejora, por separado, habría bastado — la insuficiencia de datos (1), el sesgo de
+selección (2) y la falta de potencia estadística (4) son problemas distintos que exigían
+correcciones distintas, cada una verificada empíricamente antes de aplicarse a la
+siguiente.
+
 ## 11. Comparativa entre las tres evaluaciones de la semana (v12, v14, v15)
 
 | | **v12** (2026-09-10) | **v14** (2026-09-11) | **v15** (2026-09-12) |
