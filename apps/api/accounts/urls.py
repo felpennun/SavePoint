@@ -5,6 +5,7 @@ from accounts.views import (
     LoginView,
     LogoutView,
     MeView,
+    MyFavoritesView,
     MyProfileView,
     PublicProfileView,
     RegisterView,
@@ -19,5 +20,6 @@ urlpatterns = [
     path("logout/", LogoutView.as_view(), name="logout"),
     path("me/", MeView.as_view(), name="me"),
     path("me/profile/", MyProfileView.as_view(), name="my-profile"),
+    path("me/favorites/", MyFavoritesView.as_view(), name="my-favorites"),
     path("profiles/<str:alias>/", PublicProfileView.as_view(), name="public-profile"),
 ]

@@ -11,7 +11,8 @@ from __future__ import annotations
 from django.core.exceptions import ValidationError
 from django.db import transaction
 
-from accounts.models import AVATAR_URL_MAX_LENGTH, BIO_MAX_LENGTH, AccountProfile, ProfileVisibility
+from accounts.models import AVATAR_URL_MAX_LENGTH, BIO_MAX_LENGTH, AccountProfile, FavoriteSlot, ProfileVisibility
+from library.models import LibraryEntry
 
 VALID_VISIBILITIES = {choice.value for choice in ProfileVisibility}
 
@@ -72,3 +73,34 @@ def update_profile(
             profile.save(update_fields=[*update_fields, "updated_at"])
 
     return profile
+
+
+def replace_favorites(*, user, slots: list[dict]) -> list[FavoriteSlot]:  # noqa: ANN001
+    """Atomically replace the caller's complete favorites set (D-02).
+
+    Every work must belong to *this* user's own collection
+    (``LibraryEntry``) -- re-checked here, never trusted from the payload
+    or from any other user's ownership of the same work (IDOR boundary).
+    Validation happens before any delete/create so a rejected payload never
+    mutates the existing set.
+    """
+    work_ids = [str(item["work_id"]) for item in slots]
+
+    with transaction.atomic():
+        owned_work_ids = set(
+            str(work_id)
+            for work_id in LibraryEntry.objects.filter(
+                user=user, work_id__in=work_ids
+            ).values_list("work_id", flat=True)
+        )
+        missing = [work_id for work_id in work_ids if work_id not in owned_work_ids]
+        if missing:
+            raise ValidationError("Every favorite must belong to the owner's own collection.")
+
+        FavoriteSlot.objects.filter(user=user).delete()
+        created = [
+            FavoriteSlot.objects.create(user=user, slot=item["slot"], work_id=item["work_id"])
+            for item in slots
+        ]
+
+    return created
