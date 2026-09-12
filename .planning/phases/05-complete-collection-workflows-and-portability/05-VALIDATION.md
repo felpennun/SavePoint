@@ -1,10 +1,11 @@
 ---
 phase: "05"
 slug: "complete-collection-workflows-and-portability"
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: complete
+nyquist_compliant: true
+wave_0_complete: true
 created: "2026-09-12"
+updated: "2026-09-13"
 ---
 
 # Fase 05 — Estrategia de validación
@@ -60,11 +61,41 @@ created: "2026-09-12"
 - `CustomList` es el agregado primario de listas y su orden se prueba con posiciones consecutivas y transacciones collision-safe.
 - La UI, axe, teclado y responsive son un handoff separado; esta rama no modifica `apps/web/**` ni `design/**`.
 
+## Estado de requisitos al cierre de la Fase 5 (Plan 05-04, Tarea 2)
+
+Matriz completa de decisión en
+`.planning/phases/05-complete-collection-workflows-and-portability/05-PORTABILITY-RECONCILIATION.md`.
+
+| Requisito | Estado | Evidencia automatizada |
+|---|---|---|
+| PROF-01 | Implementado | `apps/api/accounts/tests/test_profile.py` (Plan 05-01) |
+| LIB-03 | Implementado | `apps/api/library/tests/test_comments.py` (Plan 05-02) |
+| LIB-04 | Implementado | `apps/api/library/tests/test_lists.py` (Plan 05-02) |
+| INV-03 | Implementado | `apps/api/library/tests/test_copies.py` (Plan 05-03) |
+| INV-04 | Implementado | `apps/api/library/tests/test_copies.py` (Plan 05-03) |
+| PORT-01 | Implementado (solo CSV; JSON fuera de alcance por D-08) | `apps/api/library/tests/test_export.py` (Plan 05-04, Tarea 1) |
+| PORT-02 | **Abierto** — pending, asignado a Phase 7 | Revisión documental; sin endpoint/parser/test de feature |
+| PORT-03 | **Abierto** — pending, asignado a Phase 7 | Revisión documental; sin endpoint/parser/test de feature |
+| PORT-04 | Implementado | `apps/api/library/tests/test_export.py::test_hostile_store_and_comment_values_are_neutralized_in_the_export` |
+| PRIV-01 | Implementado | `apps/api/accounts/tests/test_public_profile.py` (Plan 05-01/05-02) |
+
 ## Cierre de validación
 
-- [ ] Las 12 tareas de los cuatro planes tienen `<automated>` y `<fails_when>` explícitos.
-- [ ] Toda verificación de migración incluye `migrate --noinput` antes de tests de esquema o integración.
-- [ ] No se usa SQLite, watch mode ni una cadena de comandos que ignore un exit code.
-- [ ] `nyquist_compliant: true` se marcará únicamente después de ejecutar y registrar las verificaciones.
+- [x] Las 12 tareas de los cuatro planes tienen `<automated>` y `<fails_when>` explícitos.
+- [x] Toda verificación de migración incluye `migrate --noinput` antes de tests de esquema o integración.
+- [x] No se usa SQLite, watch mode ni una cadena de comandos que ignore un exit code.
+- [x] `nyquist_compliant: true` se marca tras ejecutar y registrar las verificaciones (04 planes, PostgreSQL real, suite completa `apps/api` en 619/619 tras el Plan 05-04).
+- [ ] El handoff Playwright/axe (`e2e/collection-workflows.spec.ts` + matriz de accesibilidad) corresponde a la sesión web y no se ha ejecutado desde esta rama backend; queda como evidencia pendiente para el signoff de fase (`docs/verification/phase-05-signoff.md`, Plan 05-04 Tarea 3).
 
-**Aprobación:** pendiente
+## Signoff de evidencia backend (Plan 05-04, Tarea 3)
+
+`docs/verification/phase-05-signoff.md` registra, en español, los comandos ejecutados
+(`migrate --noinput`, `makemigrations --check --dry-run`, `pytest apps/api/accounts/tests
+apps/api/library/tests -q` → `247 passed`, suite completa `apps/api` → `619 passed`), la
+matriz de requisitos, las amenazas STRIDE mitigadas del Plan 05-04, el contrato del nuevo
+endpoint de exportación, las limitaciones explícitas y el handoff Playwright/axe asignado
+a la sesión web sin atribuir esa evidencia al backend.
+
+**Aprobación:** evidencia backend completa (04/04 planes, ver `phase-05-signoff.md`);
+pendiente de evidencia de navegador (Playwright/axe) de la sesión web antes del signoff
+final de fase.
