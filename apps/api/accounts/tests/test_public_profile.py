@@ -12,7 +12,7 @@ from rest_framework.test import APIClient
 from accounts.models import AccountProfile, FavoriteSlot, ProfileVisibility
 from catalogue.models import GameWork
 from library import services
-from library.models import LibraryEntry
+from library.models import CustomList, CustomListItem, GameComment, LibraryEntry
 
 User = get_user_model()
 
@@ -40,6 +40,8 @@ FORBIDDEN_KEYS = {
     "purchase",
     "location",
     "rating_half_steps",
+    "visibility",
+    "version",
 }
 
 
@@ -248,3 +250,72 @@ def test_default_profile_without_explicit_settings_is_public(work, user_a) -> No
     body = response.json()
     assert body["activity"] != []
     assert body["favorites"][0] is not None
+
+
+# --------------------------------------------------------------------------
+# Plan 05-02 Task 3: public comments/lists aggregate (LIB-03/LIB-04),
+# independently gated by each item's own ``visibility`` field.
+# --------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_public_profile_includes_only_public_comments_for_third_parties(work, user_a, user_b) -> None:  # noqa: ANN001
+    LibraryEntry.objects.create(user=user_a, work=work, current_status="playing")
+    GameComment.objects.create(user=user_a, work=work, text="Public thoughts.", visibility="public")
+    private_work = GameWork.objects.create(canonical_slug="private-comment-game", original_title="Private Comment Game")
+    LibraryEntry.objects.create(user=user_a, work=private_work, current_status="playing")
+    GameComment.objects.create(user=user_a, work=private_work, text="Private thoughts.", visibility="private")
+
+    for viewer_client in (APIClient(), _client_for(user_b)):
+        response = viewer_client.get(f"/api/accounts/profiles/{user_a.username}/")
+        texts = {c["text"] for c in response.json()["comments"]}
+        assert texts == {"Public thoughts."}
+
+
+@pytest.mark.django_db
+def test_owner_sees_all_own_comments_regardless_of_visibility(work, user_a) -> None:  # noqa: ANN001
+    LibraryEntry.objects.create(user=user_a, work=work, current_status="playing")
+    GameComment.objects.create(user=user_a, work=work, text="Private thoughts.", visibility="private")
+
+    client = _client_for(user_a)
+    response = client.get(f"/api/accounts/profiles/{user_a.username}/")
+    texts = {c["text"] for c in response.json()["comments"]}
+    assert texts == {"Private thoughts."}
+
+
+@pytest.mark.django_db
+def test_public_profile_includes_only_public_lists_for_third_parties(work, user_a, user_b) -> None:  # noqa: ANN001
+    LibraryEntry.objects.create(user=user_a, work=work, current_status="playing")
+    public_list = CustomList.objects.create(user=user_a, name="Public List", visibility="public")
+    CustomListItem.objects.create(list=public_list, work=work, position=1)
+    private_list = CustomList.objects.create(user=user_a, name="Private List", visibility="private")
+    CustomListItem.objects.create(list=private_list, work=work, position=1)
+
+    for viewer_client in (APIClient(), _client_for(user_b)):
+        response = viewer_client.get(f"/api/accounts/profiles/{user_a.username}/")
+        names = {lst["name"] for lst in response.json()["lists"]}
+        assert names == {"Public List"}
+
+
+@pytest.mark.django_db
+def test_owner_sees_all_own_lists_regardless_of_visibility(work, user_a) -> None:  # noqa: ANN001
+    LibraryEntry.objects.create(user=user_a, work=work, current_status="playing")
+    private_list = CustomList.objects.create(user=user_a, name="Private List", visibility="private")
+    CustomListItem.objects.create(list=private_list, work=work, position=1)
+
+    client = _client_for(user_a)
+    response = client.get(f"/api/accounts/profiles/{user_a.username}/")
+    names = {lst["name"] for lst in response.json()["lists"]}
+    assert names == {"Private List"}
+
+
+@pytest.mark.django_db
+def test_public_list_projection_has_no_forbidden_keys(work, user_a) -> None:  # noqa: ANN001
+    LibraryEntry.objects.create(user=user_a, work=work, current_status="playing")
+    custom_list = CustomList.objects.create(user=user_a, name="Public List", visibility="public")
+    CustomListItem.objects.create(list=custom_list, work=work, position=1)
+    GameComment.objects.create(user=user_a, work=work, text="Some text.", visibility="public")
+
+    client = APIClient()
+    response = client.get(f"/api/accounts/profiles/{user_a.username}/")
+    _assert_no_forbidden_keys(response.json())
