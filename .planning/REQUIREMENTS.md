@@ -31,8 +31,8 @@
 - [x] **LIB-04**: User can create and order custom game lists.
 - [x] **INV-01**: User can register multiple owned copies of the same game.
 - [x] **INV-02**: Each copy can record physical or digital format, platform, and edition.
-- [ ] **INV-03**: Each copy can record purchase date, price, currency, and store.
-- [ ] **INV-04**: A physical copy can record conservation state and storage location.
+- [x] **INV-03**: Each copy can record purchase date, price, currency, and store.
+- [x] **INV-04**: A physical copy can record conservation state and storage location.
 - [x] **INV-05**: Private notes and purchase details never appear in public projections.
 - [ ] **PORT-01**: User can export their collection, ratings, and lists as versioned CSV; JSON is not part of the Phase 5 closure.
 - [ ] **PORT-02**: User can preview and validate an import before applying it (assigned to Phase 7; no Phase 5 endpoint or feature test).
@@ -92,7 +92,7 @@
 - [ ] **SEC-06**: Application applies rate limits, secure headers, and non-sensitive production error handling.
 - [ ] **SEC-07**: Delivery pipeline scans secrets, vulnerable dependencies, and insecure code.
 - [ ] **SEC-08**: Sensitive actions create audit events without recording credentials or secrets.
-- [ ] **PRIV-01**: Public projections use an explicit allowlist of fields.
+- [x] **PRIV-01**: Public projections use an explicit allowlist of fields.
 - [ ] **PRIV-02**: A controlled account can be deleted or anonymised.
 
 ### Operations, Quality, and Delivery
@@ -220,13 +220,13 @@
 | PROF-01 | Phase 5 | Complete (Plan 05-01) |
 | LIB-03 | Phase 5 | Complete |
 | LIB-04 | Phase 5 | Complete |
-| INV-03 | Phase 5 | Pending |
-| INV-04 | Phase 5 | Pending |
+| INV-03 | Phase 5 | Complete |
+| INV-04 | Phase 5 | Complete |
 | PORT-01 | Phase 5 | Pending — versioned CSV only |
 | PORT-02 | Phase 7 | Pending — deferred; no Phase 5 endpoint or feature test |
 | PORT-03 | Phase 7 | Pending — deferred; no Phase 5 endpoint or feature test |
 | PORT-04 | Phase 5 | Pending |
-| PRIV-01 | Phase 5 | Pending |
+| PRIV-01 | Phase 5 | Complete |
 | PROF-03 | Phase 6 | Pending |
 | PROF-04 | Phase 6 | Pending |
 | CAT-05 | Phase 6 | Pending |
