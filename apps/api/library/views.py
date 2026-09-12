@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Count, Q
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
@@ -20,6 +21,7 @@ from catalogue.models import GameWork
 from catalogue.ratings import display_rating, savepoint_rating_stats
 from catalogue.serializers import _cover, _platform_summary
 from library import services
+from library.export import EXPORT_FILENAME, render_collection_csv
 from library.models import BacklogStatus, CustomList, CustomListItem, GameComment, LibraryEntry, OwnedCopy, StatusTransition
 from library.popularity import rank_popularity_v1
 from library.serializers import (
@@ -270,6 +272,25 @@ class PopularityView(APIView):
 
     def get(self, request: Request) -> Response:
         return Response(rank_popularity_v1())
+
+
+class ExportCollectionView(APIView):
+    """GET /api/library/export/collection.csv (PORT-01/PORT-04, D-08/D-09).
+
+    Owner-scoped by construction: ``render_collection_csv`` queries only
+    ``request.user``'s own favorites/collection/copies/comments/list items.
+    Returns a single deterministic, versioned, UTF-8 CSV -- there is no JSON
+    variant and no import counterpart; both remain explicitly pending
+    (see ``05-PORTABILITY-RECONCILIATION.md``)."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request) -> HttpResponse:
+        content = render_collection_csv(request.user)
+        response = HttpResponse(content, content_type="text/csv; charset=utf-8")
+        response["Content-Disposition"] = f'attachment; filename="{EXPORT_FILENAME}"'
+        response["Content-Length"] = str(len(content))
+        return response
 
 
 class WorkCommentsView(APIView):
