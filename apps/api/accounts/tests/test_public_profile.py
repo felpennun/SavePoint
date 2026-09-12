@@ -9,6 +9,7 @@ import pytest
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 
+from accounts.models import AccountProfile, FavoriteSlot, ProfileVisibility
 from catalogue.models import GameWork
 from library import services
 from library.models import LibraryEntry
@@ -161,3 +162,89 @@ def test_hostile_game_title_returned_as_inert_text(user_a) -> None:  # noqa: ANN
     response = client.get(f"/api/accounts/profiles/{user_a.username}/")
     activity = response.json()["activity"]
     assert activity[0]["work_title"] == hostile_title
+
+
+# --------------------------------------------------------------------------
+# Task 2: independent collection_visibility/favorites_visibility (D-02/D-03).
+# --------------------------------------------------------------------------
+
+
+def _client_for(user) -> APIClient:  # noqa: ANN001
+    client = APIClient()
+    client.force_authenticate(user=user)
+    return client
+
+
+_PRIVACY_COMBINATIONS = [
+    (ProfileVisibility.PUBLIC, ProfileVisibility.PUBLIC),
+    (ProfileVisibility.PUBLIC, ProfileVisibility.PRIVATE),
+    (ProfileVisibility.PRIVATE, ProfileVisibility.PUBLIC),
+    (ProfileVisibility.PRIVATE, ProfileVisibility.PRIVATE),
+]
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("collection_visibility,favorites_visibility", _PRIVACY_COMBINATIONS)
+def test_privacy_combination_is_enforced_for_anonymous_and_user_b(  # noqa: ANN201
+    work, user_a, user_b, collection_visibility, favorites_visibility
+):
+    LibraryEntry.objects.create(user=user_a, work=work, current_status="playing")
+    AccountProfile.objects.create(
+        user=user_a,
+        collection_visibility=collection_visibility,
+        favorites_visibility=favorites_visibility,
+    )
+    FavoriteSlot.objects.create(user=user_a, slot=1, work=work)
+
+    for viewer_client in (APIClient(), _client_for(user_b)):
+        response = viewer_client.get(f"/api/accounts/profiles/{user_a.username}/")
+        assert response.status_code == 200
+        body = response.json()
+
+        if collection_visibility == ProfileVisibility.PUBLIC:
+            assert body["activity"] != []
+        else:
+            assert body["activity"] == []
+
+        if favorites_visibility == ProfileVisibility.PUBLIC:
+            assert body["favorites"][0] is not None
+        else:
+            assert all(item is None for item in body["favorites"])
+
+        _assert_no_forbidden_keys(body)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("collection_visibility,favorites_visibility", _PRIVACY_COMBINATIONS)
+def test_owner_always_sees_their_own_data_regardless_of_visibility(  # noqa: ANN201
+    work, user_a, collection_visibility, favorites_visibility
+):
+    LibraryEntry.objects.create(user=user_a, work=work, current_status="playing")
+    AccountProfile.objects.create(
+        user=user_a,
+        collection_visibility=collection_visibility,
+        favorites_visibility=favorites_visibility,
+    )
+    FavoriteSlot.objects.create(user=user_a, slot=1, work=work)
+
+    client = _client_for(user_a)
+    response = client.get(f"/api/accounts/profiles/{user_a.username}/")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["activity"] != []
+    assert body["favorites"][0] is not None
+
+
+@pytest.mark.django_db
+def test_default_profile_without_explicit_settings_is_public(work, user_a) -> None:  # noqa: ANN001
+    """No AccountProfile row at all (never edited) behaves like the
+    Phase 1 default: public, matching pre-existing accounts that predate
+    this phase's privacy toggle."""
+    LibraryEntry.objects.create(user=user_a, work=work, current_status="playing")
+    FavoriteSlot.objects.create(user=user_a, slot=1, work=work)
+
+    client = APIClient()
+    response = client.get(f"/api/accounts/profiles/{user_a.username}/")
+    body = response.json()
+    assert body["activity"] != []
+    assert body["favorites"][0] is not None

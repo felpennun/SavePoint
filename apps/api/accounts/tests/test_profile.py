@@ -19,7 +19,9 @@ from django.contrib.sessions.models import Session
 from django.core.cache import cache
 from rest_framework.test import APIClient
 
-from accounts.models import AccountProfile
+from accounts.models import AccountProfile, FavoriteSlot
+from catalogue.models import GameWork
+from library.models import LibraryEntry
 
 User = get_user_model()
 
@@ -251,3 +253,189 @@ def test_duplicate_registration_case_insensitive_returns_uniform_error() -> None
     )
     assert response.status_code == 409
     assert User.objects.filter(username__iexact="case-owner-profile").count() == 1
+
+
+# --------------------------------------------------------------------------
+# Task 2: five favorite slots (D-02) -- full-replace, owner-scoped.
+# --------------------------------------------------------------------------
+
+
+def _client_for(user) -> APIClient:  # noqa: ANN001
+    client = APIClient()
+    client.force_authenticate(user=user)
+    return client
+
+
+@pytest.fixture
+def favorite_owner(db):  # noqa: ANN001
+    return User.objects.create_user(username="favorite-owner", password="Corridor-Halcyon-7734-Reef!")
+
+
+@pytest.fixture
+def favorite_works(db):  # noqa: ANN001
+    return [
+        GameWork.objects.create(canonical_slug=f"favorite-work-{i}", original_title=f"Favorite Work {i}")
+        for i in range(1, 7)
+    ]
+
+
+@pytest.mark.django_db
+def test_replacing_five_favorite_slots_from_owned_collection(favorite_owner, favorite_works) -> None:  # noqa: ANN001
+    for work in favorite_works[:5]:
+        LibraryEntry.objects.create(user=favorite_owner, work=work, current_status="completed")
+
+    client = _client_for(favorite_owner)
+    payload = {
+        "slots": [{"slot": i + 1, "work_id": str(work.id)} for i, work in enumerate(favorite_works[:5])]
+    }
+    response = client.put("/api/accounts/me/favorites/", payload, format="json")
+    assert response.status_code == 200
+    body = response.json()["slots"]
+    assert len(body) == 5
+    assert all(item["work_id"] is not None for item in body)
+
+
+@pytest.mark.django_db
+def test_favorite_slots_allow_null_gaps(favorite_owner, favorite_works) -> None:  # noqa: ANN001
+    LibraryEntry.objects.create(user=favorite_owner, work=favorite_works[0], current_status="completed")
+
+    client = _client_for(favorite_owner)
+    response = client.put(
+        "/api/accounts/me/favorites/",
+        {"slots": [{"slot": 3, "work_id": str(favorite_works[0].id)}]},
+        format="json",
+    )
+    assert response.status_code == 200
+    body = response.json()["slots"]
+    assert body[2]["work_id"] == str(favorite_works[0].id)
+    assert body[0]["work_id"] is None
+    assert body[1]["work_id"] is None
+
+
+@pytest.mark.django_db
+def test_slot_number_six_is_rejected_without_mutation(favorite_owner, favorite_works) -> None:  # noqa: ANN001
+    LibraryEntry.objects.create(user=favorite_owner, work=favorite_works[0], current_status="completed")
+
+    client = _client_for(favorite_owner)
+    response = client.put(
+        "/api/accounts/me/favorites/",
+        {"slots": [{"slot": 6, "work_id": str(favorite_works[0].id)}]},
+        format="json",
+    )
+    assert response.status_code == 400
+    assert not FavoriteSlot.objects.filter(user=favorite_owner).exists()
+
+
+@pytest.mark.django_db
+def test_duplicate_slot_number_in_payload_is_rejected(favorite_owner, favorite_works) -> None:  # noqa: ANN001
+    for work in favorite_works[:2]:
+        LibraryEntry.objects.create(user=favorite_owner, work=work, current_status="completed")
+
+    client = _client_for(favorite_owner)
+    response = client.put(
+        "/api/accounts/me/favorites/",
+        {
+            "slots": [
+                {"slot": 1, "work_id": str(favorite_works[0].id)},
+                {"slot": 1, "work_id": str(favorite_works[1].id)},
+            ]
+        },
+        format="json",
+    )
+    assert response.status_code == 400
+    assert not FavoriteSlot.objects.filter(user=favorite_owner).exists()
+
+
+@pytest.mark.django_db
+def test_duplicate_work_in_payload_is_rejected(favorite_owner, favorite_works) -> None:  # noqa: ANN001
+    LibraryEntry.objects.create(user=favorite_owner, work=favorite_works[0], current_status="completed")
+
+    client = _client_for(favorite_owner)
+    response = client.put(
+        "/api/accounts/me/favorites/",
+        {
+            "slots": [
+                {"slot": 1, "work_id": str(favorite_works[0].id)},
+                {"slot": 2, "work_id": str(favorite_works[0].id)},
+            ]
+        },
+        format="json",
+    )
+    assert response.status_code == 400
+    assert not FavoriteSlot.objects.filter(user=favorite_owner).exists()
+
+
+@pytest.mark.django_db
+def test_work_outside_collection_is_rejected_without_mutation(favorite_owner, favorite_works) -> None:  # noqa: ANN001
+    client = _client_for(favorite_owner)
+    response = client.put(
+        "/api/accounts/me/favorites/",
+        {"slots": [{"slot": 1, "work_id": str(favorite_works[0].id)}]},
+        format="json",
+    )
+    assert response.status_code == 400
+    assert not FavoriteSlot.objects.filter(user=favorite_owner).exists()
+
+
+@pytest.mark.django_db
+def test_replace_is_a_full_overwrite_not_a_merge(favorite_owner, favorite_works) -> None:  # noqa: ANN001
+    for work in favorite_works[:3]:
+        LibraryEntry.objects.create(user=favorite_owner, work=work, current_status="completed")
+
+    client = _client_for(favorite_owner)
+    first = client.put(
+        "/api/accounts/me/favorites/",
+        {
+            "slots": [
+                {"slot": 1, "work_id": str(favorite_works[0].id)},
+                {"slot": 2, "work_id": str(favorite_works[1].id)},
+            ]
+        },
+        format="json",
+    )
+    assert first.status_code == 200
+
+    second = client.put(
+        "/api/accounts/me/favorites/",
+        {"slots": [{"slot": 5, "work_id": str(favorite_works[2].id)}]},
+        format="json",
+    )
+    assert second.status_code == 200
+    slots = second.json()["slots"]
+    assert slots[0]["work_id"] is None
+    assert slots[1]["work_id"] is None
+    assert slots[4]["work_id"] == str(favorite_works[2].id)
+    assert FavoriteSlot.objects.filter(user=favorite_owner).count() == 1
+
+
+@pytest.mark.django_db
+def test_anonymous_cannot_read_or_write_favorites(favorite_owner, favorite_works) -> None:  # noqa: ANN001
+    client = APIClient()
+    get_response = client.get("/api/accounts/me/favorites/")
+    assert get_response.status_code in (401, 403)
+
+    put_response = client.put("/api/accounts/me/favorites/", {"slots": []}, format="json")
+    assert put_response.status_code in (401, 403)
+    assert not FavoriteSlot.objects.filter(user=favorite_owner).exists()
+
+
+@pytest.mark.django_db
+def test_favorite_payload_cannot_reference_another_users_work_ownership(  # noqa: ANN201
+    favorite_owner, favorite_works
+):
+    """IDOR guard: user B cannot add a favorite tied to user A's own
+    LibraryEntry -- ownership must be re-checked for the requesting user,
+    not merely "does any LibraryEntry for this work exist"."""
+    other_owner = User.objects.create_user(
+        username="favorite-other-owner", password="Ashgrove-Talon-2209-Bluff!"
+    )
+    LibraryEntry.objects.create(user=other_owner, work=favorite_works[0], current_status="completed")
+
+    client = _client_for(favorite_owner)
+    response = client.put(
+        "/api/accounts/me/favorites/",
+        {"slots": [{"slot": 1, "work_id": str(favorite_works[0].id)}]},
+        format="json",
+    )
+    assert response.status_code == 400
+    assert not FavoriteSlot.objects.filter(user=favorite_owner).exists()
