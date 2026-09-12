@@ -9,7 +9,7 @@
 
 - [x] **AUTH-01**: User can sign in to and sign out of a controlled account.
 - [x] **AUTH-02**: System can load synthetic users that are clearly identified as simulated accounts.
-- [ ] **PROF-01**: User can edit their alias, avatar, and biography.
+- [ ] **PROF-01**: User can edit their biography and optional HTTPS avatar while the login alias remains immutable.
 - [x] **PROF-02**: An authorised visitor can view a public profile.
 - [ ] **PROF-03**: Public profile shows only permitted games, lists, ratings, comments, and statistics.
 - [ ] **PROF-04**: User can obtain a shareable URL for their public profile and public lists.
@@ -34,9 +34,9 @@
 - [ ] **INV-03**: Each copy can record purchase date, price, currency, and store.
 - [ ] **INV-04**: A physical copy can record conservation state and storage location.
 - [x] **INV-05**: Private notes and purchase details never appear in public projections.
-- [ ] **PORT-01**: User can export their collection, ratings, and lists as versioned CSV and JSON.
-- [ ] **PORT-02**: User can preview and validate an import before applying it.
-- [ ] **PORT-03**: Import reports row-level errors and applies deterministic duplicate and conflict rules.
+- [ ] **PORT-01**: User can export their collection, ratings, and lists as versioned CSV; JSON is not part of the Phase 5 closure.
+- [ ] **PORT-02**: User can preview and validate an import before applying it (assigned to Phase 7; no Phase 5 endpoint or feature test).
+- [ ] **PORT-03**: Import reports row-level errors and applies deterministic duplicate and conflict rules (assigned to Phase 7; no Phase 5 endpoint or feature test).
 - [ ] **PORT-04**: CSV exports neutralise potentially malicious spreadsheet formulas.
 
 ### Data and Provenance
@@ -217,14 +217,14 @@
 | REC-04 | Phase 4 | Complete (`04-01-SUMMARY.md`, v15 artifact) |
 | REC-05 | Phase 4 | Complete (`04-01-SUMMARY.md`, v15 artifact) |
 | DOC-03 | Phase 4 | Complete (`docs/methodology/recommendation-algorithms.md`, phase signoff) |
-| PROF-01 | Phase 5 | Pending |
+| PROF-01 | Phase 5 | Pending — alias immutable; biography/avatar editable |
 | LIB-03 | Phase 5 | Pending |
 | LIB-04 | Phase 5 | Pending |
 | INV-03 | Phase 5 | Pending |
 | INV-04 | Phase 5 | Pending |
-| PORT-01 | Phase 5 | Pending |
-| PORT-02 | Phase 5 | Pending |
-| PORT-03 | Phase 5 | Pending |
+| PORT-01 | Phase 5 | Pending — versioned CSV only |
+| PORT-02 | Phase 7 | Pending — deferred; no Phase 5 endpoint or feature test |
+| PORT-03 | Phase 7 | Pending — deferred; no Phase 5 endpoint or feature test |
 | PORT-04 | Phase 5 | Pending |
 | PRIV-01 | Phase 5 | Pending |
 | PROF-03 | Phase 6 | Pending |

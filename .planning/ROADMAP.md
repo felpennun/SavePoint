@@ -19,7 +19,7 @@ SavePoint begins with a three-day, publicly deployed vertical demonstration, the
 - [x] **Phase 2: Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender** - Prune the corpus to a governed platform/quality allowlist (Steam included), ingest external ratings with provenance and experiment isolation, fix tolerant search over the real corpus, add multi-select filters and a product-grade UI pass, freeze the simulation-aware evaluation protocol, and ship a first ratings-aware content recommender evaluated under it. Accepted by the author on 2026-09-08; simulated limitations retained explicitly.
 - [x] **Phase 3: Explainable Content Recommenders and Baseline Comparison** - Run the frozen harness over random/popularity baselines and content recommenders with cold-start routing, exclusions, deterministic explanations, the full metric suite, cohort reporting, and independently recalculable artifacts. Completed 2026-09-12 with the multi-seed limitation documented.
 - [x] **Phase 4: Collaborative and Hybrid Comparison** - Compare collaborative and hybrid methods under the already-frozen protocol and document bounded conclusions. Completed 2026-09-12 with the multi-seed limitation documented.
-- [ ] **Phase 5: Complete Collection Workflows and Portability** - Complete profiles, comments, lists, copy details, and safe deterministic import/export.
+- [ ] **Phase 5: Complete Collection Workflows and Portability** - Complete profiles, comments, lists, copy details, and safe deterministic versioned CSV export.
 - [ ] **Phase 6: Public Discovery and Resilient Enrichment** - Add public projections, catalogue discovery, and shareable public views without contaminating research data.
 - [ ] **Phase 7: Research Panel, Hardening, and Evidence Freeze** - Present thesis-ready comparisons and finish administration, security, recovery, accessibility, and reproducibility gates.
 
@@ -247,15 +247,15 @@ sensibilidad multi-semilla queda como limitación metodológica y trabajo futuro
 ### Phase 5: Complete Collection Workflows and Portability
 
 **Mode:** mvp
-**Goal**: Controlled users can fully curate and safely move their profile, collection, commentary, and lists.
+**Goal**: Controlled users can fully curate their profile, collection, commentary, lists, and copy inventory, and can safely export the visible data as versioned CSV.
 **Depends on**: Phase 4
-**Requirements**: PROF-01, LIB-03, LIB-04, INV-03, INV-04, PORT-01, PORT-02, PORT-03, PORT-04, PRIV-01
+**Requirements**: PROF-01, LIB-03, LIB-04, INV-03, INV-04, PORT-01, PORT-04, PRIV-01
 **Success Criteria** (what must be TRUE):
 
   1. A user can edit profile details, create/edit/delete comments, and create and reorder custom lists.
   2. A user can record purchase information for any copy and conservation/storage details for physical copies, while public responses expose only allowlisted fields.
-  3. A user can export versioned CSV and JSON and preview an import before applying it.
-  4. Invalid or duplicate import rows receive deterministic row-level outcomes, and exported spreadsheet cells cannot execute formulas.
+  3. A user can export a deterministic, versioned CSV containing the visible collection, ratings, lists, commentary, and favorites.
+  4. Exported spreadsheet cells cannot execute formulas; JSON export and import preview/conflict handling are explicitly assigned to Phase 7 and are not part of this closure.
   5. The workflows have accessible UI verification and contemporaneous design, test, limitation, agent, and author-decision evidence.
 
 **Plans**: 4 plans
@@ -288,7 +288,8 @@ Plans:
 **Mode:** mvp
 **Goal**: The deployed and offline demonstrator is securely operable and presents an accessible, immutable, thesis-ready comparison of the completed research.
 **Depends on**: Phase 6
-**Requirements**: EVAL-13, EVAL-14, ADMIN-01, ADMIN-02, SEC-01, SEC-03, SEC-04, SEC-05, SEC-06, SEC-07, SEC-08, PRIV-02, OPS-04, OPS-05, QUAL-01, QUAL-04, DOC-05, DOC-06, AGENT-05, AGENT-06
+**Portability carry-over**: PORT-02 and PORT-03 are deferred from Phase 5 to this identifiable later phase; their endpoints, parsers, preview, row-level validation, and conflict rules are not part of the Phase 5 plans.
+**Requirements**: EVAL-13, EVAL-14, ADMIN-01, ADMIN-02, SEC-01, SEC-03, SEC-04, SEC-05, SEC-06, SEC-07, SEC-08, PRIV-02, OPS-04, OPS-05, QUAL-01, QUAL-04, DOC-05, DOC-06, AGENT-05, AGENT-06, PORT-02, PORT-03
 **Success Criteria** (what must be TRUE):
 
   1. A researcher can compare immutable runs, configurations, algorithms, cohorts, metrics, timings, provenance, and limitations through accessible tables/charts and export thesis-ready figures/data.
