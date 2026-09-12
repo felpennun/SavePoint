@@ -64,10 +64,38 @@ class CopyFormat(models.TextChoices):
     DIGITAL = "digital", "Digital"
 
 
+class ConservationState(models.TextChoices):
+    """D-01/discretion, INV-04: a small, documented conservation taxonomy for
+    physical copies. Deliberately not modeled for digital copies -- there is
+    nothing physical to conserve, and the model-level CheckConstraint below
+    rejects any digital row that carries one."""
+
+    NEW = "new", "New"
+    GOOD = "good", "Good"
+    FAIR = "fair", "Fair"
+    POOR = "poor", "Poor"
+    DAMAGED = "damaged", "Damaged"
+
+
+COPY_CURRENCY_LENGTH = 3
+COPY_STORE_MAX_LENGTH = 120
+COPY_STORAGE_LOCATION_MAX_LENGTH = 200
+COPY_PRICE_MAX_DIGITS = 10
+COPY_PRICE_DECIMAL_PLACES = 2
+
+
 class OwnedCopy(models.Model):
     """A single owned copy (D-15/D-16). Status/rating live on LibraryEntry,
     not here -- multiple copies of the same work are independent ownership
-    records that never fork the work-level status or rating."""
+    records that never fork the work-level status or rating.
+
+    INV-03/INV-04: ``purchase_date``/``price``/``currency``/``store`` are
+    auditable purchase metadata for any copy; ``conservation_state``/
+    ``storage_location`` are physical-only and must stay null for a
+    ``format="digital"`` row -- enforced here at the serializer/service
+    layers and, as the last line of defense, by
+    ``library_copy_digital_excludes_conservation`` below. None of these
+    fields are ever part of a public projection (INV-05, PRIV-01)."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="owned_copies")
@@ -80,6 +108,19 @@ class OwnedCopy(models.Model):
     # Client-supplied idempotency key: replaying the same key for the same
     # user returns the existing copy instead of creating a duplicate.
     idempotency_key = models.CharField(max_length=100)
+    purchase_date = models.DateField(null=True, blank=True)
+    price = models.DecimalField(
+        max_digits=COPY_PRICE_MAX_DIGITS, decimal_places=COPY_PRICE_DECIMAL_PLACES, null=True, blank=True
+    )
+    # Three uppercase letters (e.g. "EUR", "USD") -- never a float, never a
+    # locale-formatted string; validated in serializer/service and by
+    # ``library_copy_currency_format_valid`` below.
+    currency = models.CharField(max_length=COPY_CURRENCY_LENGTH, null=True, blank=True)
+    store = models.CharField(max_length=COPY_STORE_MAX_LENGTH, null=True, blank=True)
+    conservation_state = models.CharField(
+        max_length=8, choices=ConservationState.choices, null=True, blank=True
+    )
+    storage_location = models.CharField(max_length=COPY_STORAGE_LOCATION_MAX_LENGTH, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -88,6 +129,24 @@ class OwnedCopy(models.Model):
             models.UniqueConstraint(
                 fields=("user", "idempotency_key"),
                 name="library_unique_copy_idempotency_per_user",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(price__isnull=True) | models.Q(price__gte=0),
+                name="library_copy_price_non_negative",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(currency__isnull=True) | models.Q(currency__regex=r"^[A-Z]{3}$"),
+                name="library_copy_currency_format_valid",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(conservation_state__isnull=True)
+                | models.Q(conservation_state__in=[choice.value for choice in ConservationState]),
+                name="library_copy_conservation_state_valid",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(format="physical")
+                | (models.Q(conservation_state__isnull=True) & models.Q(storage_location__isnull=True)),
+                name="library_copy_digital_excludes_conservation",
             ),
         ]
 

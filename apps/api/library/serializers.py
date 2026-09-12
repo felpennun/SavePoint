@@ -1,11 +1,28 @@
 """Library DTOs for rating, owned copies, comments, and custom lists
-(D-13/D-15/D-16/D-04..D-07)."""
+(D-13/D-15/D-16/D-04..D-07/INV-03/INV-04)."""
 
 from __future__ import annotations
 
+import re
+from decimal import Decimal
+
 from rest_framework import serializers
 
-from library.models import COMMENT_TEXT_MAX_LENGTH, LIST_NAME_MAX_LENGTH, ContentVisibility, GameComment, OwnedCopy
+from library.models import (
+    COMMENT_TEXT_MAX_LENGTH,
+    COPY_PRICE_DECIMAL_PLACES,
+    COPY_PRICE_MAX_DIGITS,
+    COPY_STORAGE_LOCATION_MAX_LENGTH,
+    COPY_STORE_MAX_LENGTH,
+    LIST_NAME_MAX_LENGTH,
+    ConservationState,
+    ContentVisibility,
+    GameComment,
+    OwnedCopy,
+)
+
+_CURRENCY_PATTERN = re.compile(r"^[A-Z]{3}$")
+_CONSERVATION_STATE_CHOICES = [choice.value for choice in ConservationState]
 
 
 class RatingRequestSerializer(serializers.Serializer):
@@ -15,11 +32,46 @@ class RatingRequestSerializer(serializers.Serializer):
     rating_half_steps = serializers.IntegerField(min_value=1, max_value=10, allow_null=True)
 
 
+def _validate_currency(value: str | None) -> str | None:
+    """Normalizes to uppercase and rejects anything but exactly three
+    letters (INV-03). Shared by every serializer that accepts a currency so
+    the rule can never drift between the two entry points (single-copy
+    creation vs. full configuration replace)."""
+    if value is None:
+        return value
+    normalized = value.upper()
+    if not _CURRENCY_PATTERN.fullmatch(normalized):
+        raise serializers.ValidationError("currency must be exactly three letters (e.g. EUR, USD).")
+    return normalized
+
+
+def _validate_physical_digital_rule(attrs: dict) -> dict:
+    """INV-04: conservation_state/storage_location are physical-only. A
+    digital copy carrying either is rejected here (400) before any
+    mutation -- the model's CheckConstraint is the last line of defense for
+    writes that bypass this serializer entirely."""
+    if attrs.get("format") == "digital" and (
+        attrs.get("conservation_state") is not None or attrs.get("storage_location") is not None
+    ):
+        raise serializers.ValidationError(
+            {"conservation_state": "digital copies cannot record conservation_state or storage_location."}
+        )
+    return attrs
+
+
 class OwnedCopySerializer(serializers.Serializer):
     id = serializers.UUIDField()
     release_id = serializers.UUIDField()
     edition_id = serializers.UUIDField(allow_null=True)
     format = serializers.ChoiceField(choices=["physical", "digital"])
+    purchase_date = serializers.DateField(allow_null=True)
+    price = serializers.DecimalField(
+        max_digits=COPY_PRICE_MAX_DIGITS, decimal_places=COPY_PRICE_DECIMAL_PLACES, allow_null=True
+    )
+    currency = serializers.CharField(allow_null=True)
+    store = serializers.CharField(allow_null=True)
+    conservation_state = serializers.CharField(allow_null=True)
+    storage_location = serializers.CharField(allow_null=True)
     created_at = serializers.DateTimeField()
 
 
@@ -28,6 +80,28 @@ class CreateOwnedCopyRequestSerializer(serializers.Serializer):
     edition_id = serializers.UUIDField(required=False, allow_null=True)
     format = serializers.ChoiceField(choices=["physical", "digital"])
     idempotency_key = serializers.CharField(max_length=100, allow_blank=False)
+    purchase_date = serializers.DateField(required=False, allow_null=True)
+    price = serializers.DecimalField(
+        max_digits=COPY_PRICE_MAX_DIGITS,
+        decimal_places=COPY_PRICE_DECIMAL_PLACES,
+        min_value=Decimal("0"),
+        required=False,
+        allow_null=True,
+    )
+    currency = serializers.CharField(min_length=3, max_length=3, required=False, allow_null=True)
+    store = serializers.CharField(max_length=COPY_STORE_MAX_LENGTH, required=False, allow_null=True)
+    conservation_state = serializers.ChoiceField(
+        choices=_CONSERVATION_STATE_CHOICES, required=False, allow_null=True
+    )
+    storage_location = serializers.CharField(
+        max_length=COPY_STORAGE_LOCATION_MAX_LENGTH, required=False, allow_null=True
+    )
+
+    def validate_currency(self, value: str | None) -> str | None:
+        return _validate_currency(value)
+
+    def validate(self, attrs: dict) -> dict:
+        return _validate_physical_digital_rule(attrs)
 
 
 class LibraryCopyConfigurationSerializer(serializers.Serializer):
@@ -38,6 +112,28 @@ class LibraryCopyConfigurationSerializer(serializers.Serializer):
     edition_id = serializers.UUIDField(required=False, allow_null=True)
     format = serializers.ChoiceField(choices=["physical", "digital"])
     idempotency_key = serializers.CharField(max_length=100, required=False, allow_blank=False)
+    purchase_date = serializers.DateField(required=False, allow_null=True)
+    price = serializers.DecimalField(
+        max_digits=COPY_PRICE_MAX_DIGITS,
+        decimal_places=COPY_PRICE_DECIMAL_PLACES,
+        min_value=Decimal("0"),
+        required=False,
+        allow_null=True,
+    )
+    currency = serializers.CharField(min_length=3, max_length=3, required=False, allow_null=True)
+    store = serializers.CharField(max_length=COPY_STORE_MAX_LENGTH, required=False, allow_null=True)
+    conservation_state = serializers.ChoiceField(
+        choices=_CONSERVATION_STATE_CHOICES, required=False, allow_null=True
+    )
+    storage_location = serializers.CharField(
+        max_length=COPY_STORAGE_LOCATION_MAX_LENGTH, required=False, allow_null=True
+    )
+
+    def validate_currency(self, value: str | None) -> str | None:
+        return _validate_currency(value)
+
+    def validate(self, attrs: dict) -> dict:
+        return _validate_physical_digital_rule(attrs)
 
 
 class LibraryConfigurationSerializer(serializers.Serializer):
