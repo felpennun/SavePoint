@@ -35,7 +35,19 @@ def _release_year(work: GameWork) -> int | None:
 
 
 def _tags(work: GameWork) -> list[dict]:
-    return [{"slug": tag.slug, "name": tag.name} for tag in work.curated_labels.all()]
+    # GameWorkCuratedLabel is an evidence table, not a plain tag-assignment
+    # M2M: curate_labels can (deliberately) record more than one row for the
+    # same (work, label) pair -- e.g. both an IGDB theme and a subgenre
+    # independently mapping to the same curated tag -- to keep the curation
+    # provenance auditable. A naive work.curated_labels.all() therefore
+    # yields the same CuratedLabel once per evidence row, which rendered as
+    # visibly duplicated tag chips (2026-09-12, reported live). Dedupe by
+    # slug here, first occurrence wins; the underlying evidence rows are
+    # untouched and still queryable for provenance.
+    seen: dict[str, dict] = {}
+    for tag in work.curated_labels.all():
+        seen.setdefault(tag.slug, {"slug": tag.slug, "name": tag.name})
+    return list(seen.values())
 
 
 def _platform_summary(work: GameWork) -> str:
