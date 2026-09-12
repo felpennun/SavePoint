@@ -20,16 +20,26 @@ from catalogue.models import GameWork
 from catalogue.ratings import display_rating, savepoint_rating_stats
 from catalogue.serializers import _cover, _platform_summary
 from library import services
-from library.models import BacklogStatus, LibraryEntry, OwnedCopy, StatusTransition
+from library.models import BacklogStatus, CustomList, CustomListItem, GameComment, LibraryEntry, OwnedCopy, StatusTransition
 from library.popularity import rank_popularity_v1
 from library.serializers import (
+    AddListItemSerializer,
+    CommentInputSerializer,
     CreateOwnedCopyRequestSerializer,
+    CustomListInputSerializer,
     LibraryConfigurationSerializer,
     RatingRequestSerializer,
+    ReorderListSerializer,
+    serialize_comment,
     serialize_copy,
+    serialize_list,
 )
 
 VALID_STATUSES = {choice.value for choice in BacklogStatus}
+
+
+def _service_error_detail(exc: ValidationError) -> str:
+    return str(exc.message if hasattr(exc, "message") else exc)
 
 
 class MyLibraryView(APIView):
@@ -254,3 +264,210 @@ class PopularityView(APIView):
 
     def get(self, request: Request) -> Response:
         return Response(rank_popularity_v1())
+
+
+class WorkCommentsView(APIView):
+    """GET/POST /api/library/entries/<work_id>/comments/ (LIB-03/D-04/D-05).
+
+    GET is public: every ``public`` comment for this work, plus the
+    caller's own comment regardless of visibility when authenticated. POST
+    requires authentication and creates the caller's single comment for
+    this work -- a second attempt returns 409 without touching the
+    existing row."""
+
+    permission_classes = [AllowAny]
+
+    def get_permissions(self) -> list:
+        if self.request.method == "POST":
+            return [IsAuthenticated()]
+        return [AllowAny()]
+
+    def get(self, request: Request, work_id: str) -> Response:
+        work = get_object_or_404(GameWork, id=work_id, is_dlc=False)
+        viewer = request.user if request.user.is_authenticated else None
+        comments = services.list_visible_comments(work=work, viewer=viewer)
+        return Response({"comments": [serialize_comment(comment, viewer=viewer) for comment in comments]})
+
+    def post(self, request: Request, work_id: str) -> Response:
+        serializer = CommentInputSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({"detail": "Invalid comment.", "errors": serializer.errors}, status=400)
+
+        work = get_object_or_404(GameWork, id=work_id, is_dlc=False)
+        try:
+            comment = services.create_comment(user=request.user, work=work, **serializer.validated_data)
+        except services.CommentAlreadyExists:
+            return Response({"detail": "You already have a comment for this work."}, status=409)
+        except ValidationError as exc:
+            return Response({"detail": _service_error_detail(exc)}, status=400)
+
+        return Response(serialize_comment(comment, viewer=request.user), status=201)
+
+
+class CommentDetailView(APIView):
+    """GET/PATCH/DELETE /api/library/comments/<comment_id>/ -- owner-only by
+    construction: every query below filters on ``user=request.user``, so a
+    non-owner's request is indistinguishable from a nonexistent comment."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request, comment_id: str) -> Response:
+        comment = GameComment.objects.filter(id=comment_id, user=request.user).select_related("user").first()
+        if comment is None:
+            return Response({"detail": "Not found."}, status=404)
+        return Response(serialize_comment(comment, viewer=request.user))
+
+    def patch(self, request: Request, comment_id: str) -> Response:
+        serializer = CommentInputSerializer(data=request.data, partial=True)
+        if not serializer.is_valid():
+            return Response({"detail": "Invalid comment.", "errors": serializer.errors}, status=400)
+
+        comment = GameComment.objects.filter(id=comment_id, user=request.user).select_related("user").first()
+        if comment is None:
+            return Response({"detail": "Not found."}, status=404)
+        try:
+            comment = services.update_comment(comment=comment, **serializer.validated_data)
+        except ValidationError as exc:
+            return Response({"detail": _service_error_detail(exc)}, status=400)
+
+        return Response(serialize_comment(comment, viewer=request.user))
+
+    def delete(self, request: Request, comment_id: str) -> Response:
+        if not services.delete_comment(user=request.user, comment_id=comment_id):
+            return Response({"detail": "Not found."}, status=404)
+        return Response(status=204)
+
+
+class MyListsView(APIView):
+    """GET/POST /api/library/lists/ -- the caller's own custom lists
+    (LIB-04/D-06/D-07). Owner-scoped by construction: filtered to
+    request.user, never accepts a target user."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request) -> Response:
+        custom_lists = (
+            CustomList.objects.filter(user=request.user)
+            .prefetch_related("items__work")
+            .order_by("created_at", "id")
+        )
+        return Response({"lists": [serialize_list(custom_list) for custom_list in custom_lists]})
+
+    def post(self, request: Request) -> Response:
+        serializer = CustomListInputSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({"detail": "Invalid list.", "errors": serializer.errors}, status=400)
+        try:
+            custom_list = services.create_list(user=request.user, **serializer.validated_data)
+        except ValidationError as exc:
+            return Response({"detail": _service_error_detail(exc)}, status=400)
+        return Response(serialize_list(custom_list), status=201)
+
+
+class ListDetailView(APIView):
+    """GET/PATCH/DELETE /api/library/lists/<list_id>/ -- owner-only."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request, list_id: str) -> Response:
+        custom_list = (
+            CustomList.objects.filter(id=list_id, user=request.user).prefetch_related("items__work").first()
+        )
+        if custom_list is None:
+            return Response({"detail": "Not found."}, status=404)
+        return Response(serialize_list(custom_list))
+
+    def patch(self, request: Request, list_id: str) -> Response:
+        serializer = CustomListInputSerializer(data=request.data, partial=True)
+        if not serializer.is_valid():
+            return Response({"detail": "Invalid list.", "errors": serializer.errors}, status=400)
+
+        custom_list = CustomList.objects.filter(id=list_id, user=request.user).first()
+        if custom_list is None:
+            return Response({"detail": "Not found."}, status=404)
+        try:
+            custom_list = services.update_list(custom_list=custom_list, **serializer.validated_data)
+        except ValidationError as exc:
+            return Response({"detail": _service_error_detail(exc)}, status=400)
+        return Response(serialize_list(custom_list))
+
+    def delete(self, request: Request, list_id: str) -> Response:
+        deleted, _ = CustomList.objects.filter(id=list_id, user=request.user).delete()
+        if not deleted:
+            return Response({"detail": "Not found."}, status=404)
+        return Response(status=204)
+
+
+class ListItemsView(APIView):
+    """POST /api/library/lists/<list_id>/items/ -- append one work already
+    in the caller's own collection to the caller's own list."""
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request: Request, list_id: str) -> Response:
+        serializer = AddListItemSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({"detail": "Invalid item.", "errors": serializer.errors}, status=400)
+
+        custom_list = CustomList.objects.filter(id=list_id, user=request.user).first()
+        if custom_list is None:
+            return Response({"detail": "Not found."}, status=404)
+
+        work = get_object_or_404(GameWork, id=str(serializer.validated_data["work_id"]), is_dlc=False)
+        try:
+            services.add_list_item(user=request.user, custom_list=custom_list, work=work)
+        except ValidationError as exc:
+            return Response({"detail": _service_error_detail(exc)}, status=400)
+
+        custom_list = CustomList.objects.filter(id=list_id, user=request.user).prefetch_related("items__work").first()
+        return Response(serialize_list(custom_list), status=201)
+
+
+class ListItemDetailView(APIView):
+    """DELETE /api/library/lists/<list_id>/items/<item_id>/ -- owner-only,
+    filtered through the parent list's ownership in the same query."""
+
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request: Request, list_id: str, item_id: str) -> Response:
+        deleted, _ = CustomListItem.objects.filter(
+            id=item_id, list_id=list_id, list__user=request.user
+        ).delete()
+        if not deleted:
+            return Response({"detail": "Not found."}, status=404)
+        return Response(status=204)
+
+
+class ListReorderView(APIView):
+    """POST /api/library/lists/<list_id>/reorder/
+
+    Body: ``{"expected_version": N, "item_ids": [...]}``. ``expected_version``
+    is mandatory -- a request without it is rejected with 400 before any
+    mutation. A stale version is rejected with 409 without touching any
+    item; only a matching version is processed under ``select_for_update()``
+    and committed atomically (D-06, Pattern 4)."""
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request: Request, list_id: str) -> Response:
+        serializer = ReorderListSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({"detail": "Invalid reorder request.", "errors": serializer.errors}, status=400)
+
+        if not CustomList.objects.filter(id=list_id, user=request.user).exists():
+            return Response({"detail": "Not found."}, status=404)
+
+        try:
+            custom_list = services.reorder_list_items(
+                user=request.user,
+                list_id=list_id,
+                expected_version=serializer.validated_data["expected_version"],
+                item_ids=[str(item_id) for item_id in serializer.validated_data["item_ids"]],
+            )
+        except services.StaleListVersion:
+            return Response({"detail": "List has changed; reload and try again.", "conflict": True}, status=409)
+        except ValidationError as exc:
+            return Response({"detail": _service_error_detail(exc)}, status=400)
+
+        custom_list = CustomList.objects.filter(id=custom_list.id).prefetch_related("items__work").first()
+        return Response(serialize_list(custom_list))
