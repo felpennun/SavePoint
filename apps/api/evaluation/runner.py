@@ -423,15 +423,18 @@ def build_evaluation_context(
     user_ids = set(getattr(partition, split))
     training_probabilities = _training_item_probabilities(set(partition.train))
     selected_users = [user for user in users if user.pk in user_ids]
-    candidates_by_user: list[tuple[Any, list[Any], Any, str]] = []
+    # heldout_ids is always a frozenset (one element under leave_one_out_per_user,
+    # one or more under the candidate v15 leave_fraction_out_dominant_tag_per_user
+    # strategy) -- see evaluation.candidates.build().
+    candidates_by_user: list[tuple[Any, list[Any], frozenset, str]] = []
     skipped_user_count = 0
     for user in selected_users:
         built = build(user, protocol, corpus_version)
         if built is None:
             skipped_user_count += 1
             continue
-        candidate_ids, heldout_id, candidate_hash = built
-        candidates_by_user.append((user, list(candidate_ids), heldout_id, candidate_hash))
+        candidate_ids, heldout_ids, candidate_hash = built
+        candidates_by_user.append((user, list(candidate_ids), heldout_ids, candidate_hash))
     if not candidates_by_user:
         raise ValueError(f"no evaluable synthetic users in {split} split")
 
@@ -497,12 +500,15 @@ def build_evaluation_context(
     }
     candidate_universe = {
         str(candidate_id)
-        for _user, candidate_ids, _heldout_id, _candidate_hash in candidates_by_user
+        for _user, candidate_ids, _heldout_ids, _candidate_hash in candidates_by_user
         for candidate_id in candidate_ids
     }
+    # frozenset iteration order is not stable across processes (str hash
+    # randomisation), so the manifest row joins a *sorted* rendering of the
+    # held-out ids rather than str()-ing the frozenset directly.
     all_manifest_rows = [
-        (str(user.pk), str(heldout_id), candidate_hash)
-        for user, _candidate_ids, heldout_id, candidate_hash in candidates_by_user
+        (str(user.pk), ",".join(sorted(str(h) for h in heldout_ids)), candidate_hash)
+        for user, _candidate_ids, heldout_ids, candidate_hash in candidates_by_user
     ]
     split_manifest_hash = _hash_payload(sorted(all_manifest_rows))
 
@@ -629,12 +635,12 @@ def run(
         ranked_lists: dict[str, list[list[str]]] = {str(k): [] for k in K_VALUES}
         candidate_lists: dict[str, list[list[str]]] = {str(k): [] for k in K_VALUES}
         beyond_rows: dict[str, list[dict[str, float | None]]] = {str(k): [] for k in K_VALUES}
-        for user, candidate_ids, heldout_id, candidate_hash in candidates_by_user:
+        for user, candidate_ids, heldout_ids, candidate_hash in candidates_by_user:
             result = algorithm(
                 user=user,
                 algorithm_id=algorithm_id,
                 candidate_ids=tuple(candidate_ids),
-                heldout_work_id=heldout_id,
+                heldout_work_ids=heldout_ids,
                 protocol=protocol,
                 corpus_version=corpus_version,
                 tag_profile=evaluation_prepared["tag_profile"],
@@ -653,16 +659,19 @@ def run(
                 f"algorithm {algorithm_id} returned a ranked list with duplicate ids "
                 f"for user {user.pk} (metrics like nDCG/recall assume one entry per id)"
             )
-            relevant = {str(heldout_id)}
+            # One heldout id under leave_one_out_per_user; one or more under
+            # the candidate v15 leave_fraction_out_dominant_tag_per_user
+            # strategy -- evaluation.metrics is already written for the
+            # general multi-relevant case, so this needs no metric changes.
+            relevant = {str(h) for h in heldout_ids}
             row: dict[str, Any] = {
                 "user_id": str(user.pk),
-                "heldout_work_id": str(heldout_id),
+                "heldout_work_ids": sorted(relevant),
                 "candidate_sha256": candidate_hash,
-                "heldout_rank": (
-                    ranked_ids.index(str(heldout_id)) + 1
-                    if str(heldout_id) in ranked_ids
-                    else None
-                ),
+                "heldout_ranks": {
+                    h: (ranked_ids.index(h) + 1 if h in ranked_ids else None)
+                    for h in sorted(relevant)
+                },
                 "metrics": {},
                 "beyond_accuracy": {},
             }

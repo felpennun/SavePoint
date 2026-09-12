@@ -137,6 +137,20 @@ class Protocol:
         value = self.relevance.get("heldout_min_external_rating")
         return float(value) if value is not None else None
 
+    @property
+    def dominant_tag_loo_fraction(self) -> float | None:
+        """Optional fraction of a user's dominant-tag pool to hold out (candidate v15).
+
+        Read by ``evaluation.splits.leave_fraction_out_dominant_tag`` when
+        ``protocol.split.strategy`` opts into that mechanism; ``None`` (the
+        default -- absent on every protocol frozen before this field existed)
+        means the frozen contract still uses the single-item
+        ``leave_one_out``.
+        """
+
+        value = self.split.get("dominant_tag_fraction")
+        return float(value) if value is not None else None
+
     def frozen_hash(self) -> str:
         """SHA-256 over the canonical JSON of the whole contract.
 

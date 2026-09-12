@@ -10,7 +10,7 @@ from datetime import date
 from catalogue.corpus import evaluation_candidate_works, governed_works
 from library.models import LibraryEntry
 from evaluation.protocol import require_version
-from evaluation.splits import leave_one_out
+from evaluation.splits import leave_fraction_out_dominant_tag, leave_one_out
 
 
 @dataclass(frozen=True)
@@ -51,7 +51,7 @@ def build_common(
 ) -> CandidateManifest:
     """Build the common non-future candidate universe for product requests."""
 
-    require_version(protocol, 14)
+    require_version(protocol, 15)
     cutoff = eligibility_cutoff_date or protocol.eligibility_cutoff_date or date.today()
     governed = governed_works(
         corpus_version,
@@ -77,24 +77,44 @@ def build_common(
     )
 
 
-def build(user, protocol, corpus_version: str) -> tuple[frozenset, object, str] | None:
+def build(user, protocol, corpus_version: str) -> tuple[frozenset, frozenset, str] | None:
     """Return the shared candidate tuple, or ``None`` when it is not evaluable.
 
-    The leave-one-out implementation owns the exclusion rule.  Keeping this
-    function deliberately small gives every algorithm in a run the exact same
-    immutable candidate set and manifest rather than letting rankers rebuild it.
+    The leave-one-out (or, candidate protocol v15, leave-fraction-out)
+    implementation owns the exclusion rule. Keeping this function
+    deliberately small gives every algorithm in a run the exact same
+    immutable candidate set and manifest rather than letting rankers rebuild
+    it. The held-out set is always a ``frozenset`` -- one element under the
+    frozen ``leave_one_out_per_user`` strategy, one or more under the
+    candidate ``leave_fraction_out_dominant_tag_per_user`` strategy -- so a
+    caller never needs to know which mechanism produced it.
     """
 
-    require_version(protocol, 14)
+    require_version(protocol, 15)
+    cutoff = protocol.eligibility_cutoff_date or date.today()
+    strategy = protocol.split.get("strategy")
+    if strategy == "leave_fraction_out_dominant_tag_per_user":
+        fraction_split = leave_fraction_out_dominant_tag(
+            user,
+            seed=protocol.loo_seed,
+            protocol=protocol,
+            corpus_version=corpus_version,
+            eligibility_cutoff_date=cutoff,
+        )
+        if fraction_split is None:
+            return None
+        return (
+            fraction_split.candidate_ids,
+            fraction_split.heldout_work_ids,
+            fraction_split.candidate_manifest_sha256,
+        )
     split = leave_one_out(
         user,
         seed=protocol.loo_seed,
         protocol=protocol,
         corpus_version=corpus_version,
-        eligibility_cutoff_date=(
-            protocol.eligibility_cutoff_date or date.today()
-        ),
+        eligibility_cutoff_date=cutoff,
     )
     if split is None:
         return None
-    return split.candidate_ids, split.heldout_work_id, split.candidate_manifest_sha256
+    return split.candidate_ids, frozenset({split.heldout_work_id}), split.candidate_manifest_sha256

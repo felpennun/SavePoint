@@ -128,7 +128,7 @@ def test_algorithms_share_the_same_manifest_and_payload_stays_score_ordered(
         for algorithm_id in ALGORITHM_REGISTRY
     ]
 
-    assert {payload["protocol_version"] for payload in payloads} == {14}
+    assert {payload["protocol_version"] for payload in payloads} == {15}
     assert len({payload["candidate_manifest_sha256"] for payload in payloads}) == 1
     assert all(
         all(left["score"] >= right["score"] for left, right in zip(payload["results"], payload["results"][1:]))
@@ -171,7 +171,7 @@ def test_service_rejects_v1_artifact(service_user) -> None:  # noqa: ANN001
     raw = copy.deepcopy(protocol.load().raw)
     raw["protocol_version"] = 1
 
-    with pytest.raises(ProtocolError, match="expected protocol_version 14"):
+    with pytest.raises(ProtocolError, match="expected protocol_version 15"):
         service.recommend_for_user(
             service_user,
             "content-cbf-weighted-v1",

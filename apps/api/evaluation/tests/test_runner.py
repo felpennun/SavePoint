@@ -38,6 +38,14 @@ def frozen_protocol():
     mapping["popscore_snapshot_sha256"] = None
     mapping["user_split"] = {"train": 0, "validation": 0, "test": 1, "seed": 20260908}
     mapping["synthetic_population"]["phase_3_population"] = 1
+    # This suite exercises run()/build() infrastructure (shared candidate
+    # sets, drift detection, artifact shape), not which LOO mechanism is
+    # live in the real frozen protocol -- pin the simple single-item
+    # strategy so these fixtures (small, mostly untagged works) don't need
+    # the content-profile machinery leave_fraction_out_dominant_tag
+    # requires. That mechanism gets its own dedicated tests in
+    # test_splits.py.
+    mapping["split"]["strategy"] = "leave_one_out_per_user"
     return protocol_module.from_mapping(mapping)
 
 
@@ -85,11 +93,11 @@ def runner_fixture(db):
 def test_build_returns_one_shared_candidate_set(runner_fixture, frozen_protocol):
     user, works, _identity = runner_fixture
 
-    candidate_ids, heldout_id, candidate_sha256 = build(
+    candidate_ids, heldout_ids, candidate_sha256 = build(
         user, frozen_protocol, CORPUS_VERSION
     )
 
-    assert heldout_id == works[0].id
+    assert heldout_ids == frozenset({works[0].id})
     assert set(candidate_ids) == {works[0].id}
     assert works[1].id not in candidate_ids
     assert works[2].id not in candidate_ids

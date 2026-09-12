@@ -1,7 +1,7 @@
 {
-  "protocol_version": 14,
-  "frozen_on": "2026-09-11",
-  "ratified_by": "Felipe — la selección leave-one-out (evaluation/splits.py) elegía el positivo retirado únicamente por el gusto personal del usuario (completed o rating_half_steps>=7), sin piso sobre su rating externo de IGDB; como la mayoría de las 16 variantes combinan similitud de contenido con rating_confidence y/o PopScore, un positivo retirado con rating externo bajo podía hundirse en el ranking pase lo que pase con la calidad del modelado de contenido, sesgando la comparación. Se añade relevance.heldout_min_external_rating=70 (mediana del rating IGDB sobre las 13.618 candidatas elegibles de 2026.09.2) como piso adicional solo para la selección del positivo retirado -- verificado antes de congelar: 0 usuarios de los 400 (232/80/80) pierden todos sus positivos elegibles a ese umbral. No se regenera la población ni cambia ninguna fórmula/peso respecto a v13 (2b76dbc55716012b574bde7889b1dae3f19640f376a4b9f9cf93c9c5923be51c).",
+  "protocol_version": 15,
+  "frozen_on": "2026-09-12",
+  "ratified_by": "Felipe — sustituye el leave-one-out de un único positivo por un leave-fraction-out centrado en el tag de contenido más pesado del propio perfil del usuario (evaluation/splits.py::leave_fraction_out_dominant_tag), tras identificar en sesión que retirar un número fijo (probado con 1 y con 3) o forzar que sobrevivieran K del mismo tag no escalaba con cuánta biblioteca tiene cada usuario de ese tag y podía dejar el género en cero. El nuevo mecanismo retira ceil(dominant_tag_fraction * pool_del_tag) obras del tag dominante, con retroceso de uno en uno si retirarlas tantas desplazaría ese tag del primer puesto en el perfil restante -- pero nunca por debajo de 1 (el mínimo manda sobre la condición de dominancia; facet_similarity pondera todos los tags que coinciden con el perfil, no solo el primero, así que un tag desplazado a 2º/3º sigue siendo una señal real, no un fallo de la prueba). Verificado antes de congelar con fracción=0.3 sobre los 400 usuarios: 0% se queda sin ningún ejemplo del tag tras la retirada; 78,6% conserva el tag en 1er puesto, 10,9% pasa a 2º, 10,4% pasa a 3º o peor. La población sintética también cambia (seed 20260911 -> 20260912): el conjunto de tags preferidos ahora se sortea por usuario, no compartido por los ~25-80 usuarios de un mismo arquetipo (evaluation/archetypes.py sigue igual; solo cambia evaluation/synthetic.py), y guaranteed_eligible_minimum sube de 5 a 8 con al menos 6 compartiendo el tag de agrupación del usuario, para que retirar varios del tag dominante no vacíe la biblioteca por debajo del umbral de arranque en frío del ranker de contenido (_COLD_START_ENTRIES=3). Ninguna fórmula de contenido, rating o PopScore cambia respecto a v14 (7b255fb2c00dc1c2675710595afd012f7528cf2ec02d27d80c9cf9c8c7f2bb6a).",
   "simulation": true,
   "limitation": "Frozen offline evaluation protocol scored over seeded synthetic users. Every number produced under this protocol is simulation evidence about parameterised archetypes, not evidence about real SavePoint users (EVAL-10).",
   "relevance": {
@@ -51,9 +51,11 @@
   "k_values": [5, 10, 20],
   "headline": "ndcg@10",
   "split": {
-    "strategy": "leave_one_out_per_user",
+    "strategy": "leave_fraction_out_dominant_tag_per_user",
     "seed": 20260907,
-    "heldout_returned_to_candidates": true
+    "heldout_returned_to_candidates": true,
+    "dominant_tag_fraction": 0.3,
+    "dominant_tag_backoff": "decrement the held-out count by one whenever holding it out would knock the user's own most-weighted content tag out of first place in their remaining profile; never below 1, which always wins over the dominance check"
   },
   "candidate_set": "eligible_governed_corpus_user_rating_present_and_total_rating_count_gte_5_minus_user_library_plus_heldout",
   "exclusions": "any_library_entry",
@@ -128,8 +130,8 @@
     "phase_3_population": 400,
     "replaces_phase_2_population": true,
     "schema_version": "phase3-synthetic-population-v2",
-    "revision_note": "protocol_version 13: uniform 10-20 library size, PopScore realism tier, guaranteed-eligible minimum -- replaces the sparse/normal/intensive size stratification of protocol_version 12 (see docs/verification/evaluation-results-400-test-2026-09-10.md and the 2026-09-11 vault note for why).",
-    "seed": 20260911,
+    "revision_note": "protocol_version 15: each user now draws their own preferred-tag set (evaluation/synthetic.py), instead of one set shared by every user of the same archetype -- a tag that only wins a near-tie inside a pool shared by dozens of people is a fragile signal to build leave-fraction-out-by-tag on. guaranteed_eligible_minimum raised 5 -> 8 and guaranteed_same_tag_pool_minimum (new) added at 6, so retiring several of the dominant tag per the new split strategy does not empty the profile below the content ranker's cold-start threshold. Replaces protocol_version 13's uniform 10-20 library size design (still in effect; see docs/verification/evaluation-results-400-test-2026-09-10.md and the 2026-09-11/12 vault notes).",
+    "seed": 20260912,
     "rating_count_min": 1,
     "rating_count_weight_buckets": [
       {"max_exclusive": 5, "weight": 1},
@@ -142,9 +144,11 @@
     "library_size_range": [10, 20],
     "popscore_tier_fraction": 0.75,
     "popscore_tier_rounding": "ceil",
-    "guaranteed_eligible_minimum": 5,
+    "guaranteed_eligible_minimum": 8,
+    "guaranteed_same_tag_pool_minimum": 6,
     "guaranteed_rating_half_steps_choices": [7, 8, 9, 10],
     "guaranteed_status_choices": ["completed", "playing"],
+    "preferred_tags_sampled_per": "user",
     "cohorts": {
       "no_history": 10,
       "active_history_10_to_20": 390

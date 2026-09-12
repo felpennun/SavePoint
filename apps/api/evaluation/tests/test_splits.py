@@ -11,11 +11,15 @@ from __future__ import annotations
 import pytest
 from django.contrib.auth import get_user_model
 
-from catalogue.models import GameWork
+from datetime import date
+
+from catalogue.models import CorpusVersion, CuratedLabel, GameWork
 from evaluation import protocol as protocol_module
 from evaluation.splits import (
+    LeaveFractionOut,
     LeaveOneOut,
     UserSplit,
+    leave_fraction_out_dominant_tag,
     leave_one_out,
     relevant_positive_ids,
     user_split,
@@ -295,3 +299,139 @@ def test_user_split_is_deterministic(two_hundred_user_ids, frozen_protocol) -> N
 def test_user_split_rejects_wrong_user_count(two_hundred_user_ids, frozen_protocol) -> None:
     with pytest.raises(ValueError, match="expects exactly"):
         user_split(two_hundred_user_ids[:10], frozen_protocol)
+
+
+# --------------------------------------------------------------------------- #
+# leave-fraction-out on the dominant content tag (protocol v15)               #
+# --------------------------------------------------------------------------- #
+DOMINANT_TAG_CORPUS = "dominant-tag-loo-test"
+
+
+@pytest.fixture
+def dominant_tag_corpus(db):  # noqa: ANN001
+    CorpusVersion.objects.create(
+        version=DOMINANT_TAG_CORPUS, ruleset_sha256="d" * 64, is_active=True, governed_count=10
+    )
+
+
+def _label(slug: str) -> CuratedLabel:
+    return CuratedLabel.objects.create(
+        name=slug, slug=slug, kind=CuratedLabel.Kind.GENRE, curation_version="test"
+    )
+
+
+def _tagged_work(slug: str, *labels: CuratedLabel, rating: float = 80.0) -> GameWork:
+    work = GameWork.objects.create(
+        canonical_slug=slug,
+        original_title=slug,
+        in_corpus=True,
+        corpus_version=DOMINANT_TAG_CORPUS,
+        rating=rating,
+        total_rating_count=10,
+        first_release_date=date(2020, 1, 1),
+    )
+    work.curated_labels.set(labels)
+    return work
+
+
+def _positive(user, work) -> None:
+    LibraryEntry.objects.create(user=user, work=work, current_status="completed", rating_half_steps=10)
+
+
+@pytest.fixture
+def dominant_tag_user(db):  # noqa: ANN001
+    return User.objects.create_user(username="dominant-tag-loo", password="Dominant-Tag-Loo-9!")
+
+
+def test_leave_fraction_out_holds_out_a_fraction_of_the_dominant_tag(
+    dominant_tag_corpus, dominant_tag_user
+) -> None:
+    rpg = _label("dominant-tag-rpg")
+    puzzle = _label("dominant-tag-puzzle")
+    # 6 RPG positives (a clear majority) + 1 puzzle positive.
+    for index in range(6):
+        _positive(dominant_tag_user, _tagged_work(f"dominant-tag-rpg-{index}", rpg))
+    _positive(dominant_tag_user, _tagged_work("dominant-tag-puzzle-0", puzzle))
+
+    frozen = protocol_module.load()
+    result = leave_fraction_out_dominant_tag(
+        dominant_tag_user, seed=frozen.loo_seed, protocol=frozen, corpus_version=DOMINANT_TAG_CORPUS,
+        eligibility_cutoff_date=date(2026, 9, 12),
+    )
+
+    assert isinstance(result, LeaveFractionOut)
+    assert result.dominant_tag == "tag:dominant-tag-rpg"
+    # ceil(0.3 * 6) == 2, and removing 2 of 6 RPG positives (4 remain) should
+    # not knock RPG out of first place against a single puzzle positive.
+    assert len(result.heldout_work_ids) == 2
+    assert result.achieved_rank == 1
+    assert result.heldout_work_ids <= {
+        w.id for w in GameWork.objects.filter(canonical_slug__startswith="dominant-tag-rpg-")
+    }
+    # The held-out items return to the shared candidate set.
+    assert result.heldout_work_ids <= result.candidate_ids
+    assert result.candidate_manifest_sha256
+
+
+def test_leave_fraction_out_never_holds_out_fewer_than_one(
+    dominant_tag_corpus, dominant_tag_user
+) -> None:
+    rpg = _label("dominant-tag-rpg-solo")
+    # Only one eligible positive of the dominant tag: ceil(0.3 * 1) == 1, and
+    # the floor of 1 is accepted unconditionally regardless of rank outcome.
+    _positive(dominant_tag_user, _tagged_work("dominant-tag-rpg-solo-0", rpg))
+
+    frozen = protocol_module.load()
+    result = leave_fraction_out_dominant_tag(
+        dominant_tag_user, seed=frozen.loo_seed, protocol=frozen, corpus_version=DOMINANT_TAG_CORPUS,
+        eligibility_cutoff_date=date(2026, 9, 12),
+    )
+
+    assert isinstance(result, LeaveFractionOut)
+    assert len(result.heldout_work_ids) == 1
+
+
+def test_leave_fraction_out_is_deterministic_per_seed_and_user(
+    dominant_tag_corpus, dominant_tag_user
+) -> None:
+    rpg = _label("dominant-tag-rpg-determinism")
+    for index in range(6):
+        _positive(dominant_tag_user, _tagged_work(f"dominant-tag-rpg-determinism-{index}", rpg))
+
+    frozen = protocol_module.load()
+    first = leave_fraction_out_dominant_tag(
+        dominant_tag_user, seed=99, protocol=frozen, corpus_version=DOMINANT_TAG_CORPUS,
+        eligibility_cutoff_date=date(2026, 9, 12),
+    )
+    second = leave_fraction_out_dominant_tag(
+        dominant_tag_user, seed=99, protocol=frozen, corpus_version=DOMINANT_TAG_CORPUS,
+        eligibility_cutoff_date=date(2026, 9, 12),
+    )
+
+    assert first.heldout_work_ids == second.heldout_work_ids
+    assert first.candidate_manifest_sha256 == second.candidate_manifest_sha256
+
+
+def test_leave_fraction_out_returns_none_without_any_positive(
+    dominant_tag_corpus, dominant_tag_user
+) -> None:
+    frozen = protocol_module.load()
+    assert leave_fraction_out_dominant_tag(
+        dominant_tag_user, seed=frozen.loo_seed, protocol=frozen, corpus_version=DOMINANT_TAG_CORPUS,
+        eligibility_cutoff_date=date(2026, 9, 12),
+    ) is None
+
+
+def test_leave_fraction_out_returns_none_below_the_external_rating_floor(
+    dominant_tag_corpus, dominant_tag_user
+) -> None:
+    rpg = _label("dominant-tag-rpg-lowrated")
+    # Below the frozen heldout_min_external_rating (70): never eligible for
+    # this mechanism, exactly like leave_one_out's own floor.
+    _positive(dominant_tag_user, _tagged_work("dominant-tag-rpg-lowrated-0", rpg, rating=40.0))
+
+    frozen = protocol_module.load()
+    assert leave_fraction_out_dominant_tag(
+        dominant_tag_user, seed=frozen.loo_seed, protocol=frozen, corpus_version=DOMINANT_TAG_CORPUS,
+        eligibility_cutoff_date=date(2026, 9, 12),
+    ) is None
