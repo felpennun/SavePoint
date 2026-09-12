@@ -25,7 +25,14 @@ from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
-from accounts.serializers import build_public_profile
+from accounts.serializers import (
+    AccountProfileSerializer,
+    ReplaceFavoritesRequestSerializer,
+    build_public_profile,
+    serialize_account_profile,
+    serialize_favorite_slots,
+)
+from accounts.services import get_or_create_profile, replace_favorites, update_profile
 
 User = get_user_model()
 
@@ -214,20 +221,77 @@ class MeView(APIView):
         return Response({"username": user.username, "is_demo": is_demo})
 
 
+class MyProfileView(APIView):
+    """GET/PATCH /api/accounts/me/profile/ -- the signed-in owner's editable
+    profile (PROF-01).
+
+    The alias (``User.username``) is never accepted or returned here -- D-01
+    keeps it immutable, and the owner is always ``request.user``: no
+    identity is ever accepted from the request body (IDOR boundary).
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request) -> Response:
+        profile = get_or_create_profile(user=request.user)
+        return Response(serialize_account_profile(profile))
+
+    def patch(self, request: Request) -> Response:
+        serializer = AccountProfileSerializer(data=request.data, partial=True)
+        if not serializer.is_valid():
+            return Response({"detail": "Invalid profile update.", "errors": serializer.errors}, status=400)
+
+        try:
+            profile = update_profile(user=request.user, **serializer.validated_data)
+        except DjangoValidationError as exc:
+            return Response({"detail": str(exc.message if hasattr(exc, "message") else exc)}, status=400)
+
+        return Response(serialize_account_profile(profile))
+
+
+class MyFavoritesView(APIView):
+    """GET/PUT /api/accounts/me/favorites/ -- the signed-in owner's five
+    favorite-shelf slots (D-02).
+
+    PUT is a full replace: the submitted set is authoritative, matching the
+    ``save_library_configuration`` pattern in ``library.services``. Every
+    work must already belong to the caller's own collection -- the owner is
+    always ``request.user``, never accepted from the payload (IDOR
+    boundary).
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request) -> Response:
+        return Response({"slots": serialize_favorite_slots(request.user)})
+
+    def put(self, request: Request) -> Response:
+        serializer = ReplaceFavoritesRequestSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({"detail": "Invalid favorites payload.", "errors": serializer.errors}, status=400)
+
+        try:
+            replace_favorites(user=request.user, slots=serializer.validated_data["slots"])
+        except DjangoValidationError as exc:
+            return Response({"detail": str(exc.message if hasattr(exc, "message") else exc)}, status=400)
+
+        return Response({"slots": serialize_favorite_slots(request.user)})
+
+
 class PublicProfileView(APIView):
     """GET /api/accounts/profiles/<alias>/
 
     PROF-02/INV-05: an unauthorized or nonexistent alias returns the exact
-    same 404 -- never reveal which case occurred. Phase 1 has no
-    public/private toggle (a small controlled demo where every account is
-    public by design; FLAGGED ASSUMPTION -- see plan 01-07), so today the
-    only 404 case is "no such user", but the response is built to stay
-    indistinguishable if a privacy toggle is added later.
+    same 404 -- never reveal which case occurred. D-02/D-03 (Phase 5):
+    ``collection_visibility``/``favorites_visibility`` are resolved inside
+    ``build_public_profile`` before any private data is even queried; the
+    owner viewing their own alias always sees their own full data, while
+    every other caller (anonymous or a different account) gets the
+    privacy-resolved projection. An account with no explicit privacy
+    settings yet defaults to public, matching the pre-Phase-5 behavior.
 
     An anonymous scoped throttle blunts scripted alias enumeration -- a
     200-vs-404 still reveals existence, but not at scraping speed (M-03).
-    Narrowing the 200 body to aggregate counts only is a separate product
-    decision tracked with the plan 01-07 public/private toggle.
     """
 
     permission_classes = [AllowAny]
@@ -238,4 +302,4 @@ class PublicProfileView(APIView):
         user = User.objects.filter(username=alias, is_active=True).first()
         if user is None:
             return Response({"detail": "Not found."}, status=404)
-        return Response(build_public_profile(user))
+        return Response(build_public_profile(user, viewer=request.user))

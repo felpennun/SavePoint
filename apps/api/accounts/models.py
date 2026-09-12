@@ -72,3 +72,94 @@ class DemoAccountIdentity(models.Model):
 
     def __str__(self) -> str:
         return f"demo identity {self.seed_key} ({self.id})"
+
+
+class ProfileVisibility(models.TextChoices):
+    """D-02/D-03: only two verifiable states -- "friends-only" is
+    deliberately never modeled here because the backend has no friendship
+    relation to resolve it against."""
+
+    PUBLIC = "public", "Public"
+    PRIVATE = "private", "Private"
+
+
+BIO_MAX_LENGTH = 500
+AVATAR_URL_MAX_LENGTH = 500
+
+
+class AccountProfile(models.Model):
+    """Editable profile data layered onto the immutable login alias (D-01).
+
+    ``User.username`` remains the public, non-editable alias; this table only
+    ever adds biography/avatar/visibility. The owning user is always derived
+    from ``request.user`` in the service layer -- this model never accepts a
+    substitutable owner from a request payload.
+    """
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile"
+    )
+    bio = models.CharField(max_length=BIO_MAX_LENGTH, blank=True, default="")
+    # HTTPS-only, validated URL with no server-side fetch/proxy (avoids SSRF);
+    # the client is responsible for actually rendering the image safely.
+    avatar_url = models.URLField(max_length=AVATAR_URL_MAX_LENGTH, blank=True, default="")
+    collection_visibility = models.CharField(
+        max_length=8, choices=ProfileVisibility.choices, default=ProfileVisibility.PUBLIC
+    )
+    favorites_visibility = models.CharField(
+        max_length=8, choices=ProfileVisibility.choices, default=ProfileVisibility.PUBLIC
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(collection_visibility__in=[choice.value for choice in ProfileVisibility]),
+                name="accounts_profile_collection_visibility_valid",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(favorites_visibility__in=[choice.value for choice in ProfileVisibility]),
+                name="accounts_profile_favorites_visibility_valid",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"profile for user {self.user_id}"
+
+
+MIN_FAVORITE_SLOT = 1
+MAX_FAVORITE_SLOT = 5
+
+
+class FavoriteSlot(models.Model):
+    """One of the five favorite-shelf positions (D-02).
+
+    Populated only from works already present in the owner's own collection
+    (``LibraryEntry``, enforced in the service layer); slot range and
+    per-user uniqueness are enforced again here as the last line of defense,
+    matching the ``LibraryEntry``/``OwnedCopy`` constraint pattern.
+    """
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="favorite_slots"
+    )
+    slot = models.PositiveSmallIntegerField()
+    work = models.ForeignKey(
+        "catalogue.GameWork", on_delete=models.PROTECT, related_name="favorited_by"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("slot",)
+        constraints = [
+            models.UniqueConstraint(fields=("user", "slot"), name="accounts_favorite_unique_user_slot"),
+            models.UniqueConstraint(fields=("user", "work"), name="accounts_favorite_unique_user_work"),
+            models.CheckConstraint(
+                condition=models.Q(slot__gte=MIN_FAVORITE_SLOT) & models.Q(slot__lte=MAX_FAVORITE_SLOT),
+                name="accounts_favorite_slot_range",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"favorite slot {self.slot} for user {self.user_id}"
