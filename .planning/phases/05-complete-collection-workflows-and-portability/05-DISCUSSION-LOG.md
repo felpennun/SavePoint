@@ -5,7 +5,21 @@
 
 **Fecha:** 2026-09-12
 **Fase:** 5 - Complete Collection Workflows and Portability
-**Áreas discutidas:** Perfil y privacidad, comentarios por juego, listas personalizadas, exportación de colección
+**Áreas discutidas:** Identidad y sesión real, perfil y privacidad, comentarios por juego, listas personalizadas, exportación de colección
+
+---
+
+## Identidad y sesión real
+
+| Opción | Descripción | Seleccionada |
+|--------|-------------|--------------|
+| Solo cuentas demo | Permite trabajar únicamente con usuarios sembrados. | |
+| Registro y login reales | Persiste usuarios, valida credenciales, autoriza por propietario y protege el flujo completo. | ✓ |
+
+**Elección del usuario:** La Fase 5 debe tener registro e inicio de sesión
+reales, con validación, autorización, seguridad y persistencia en base de datos.
+**Notas:** Las cuentas sintéticas permanecen como demo separada; el usuario de
+login es también el alias público inmutable.
 
 ---
 

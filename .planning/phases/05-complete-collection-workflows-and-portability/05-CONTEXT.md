@@ -6,11 +6,16 @@
 <domain>
 ## Límite de la fase
 
-La Fase 5 completa la curación personal de la colección: edición de biografía y
-avatar, comentarios por juego, listas personalizadas ordenables, metadatos
-avanzados de copias, privacidad básica de las proyecciones y exportación CSV de
-los datos que el usuario puede ver en la aplicación. El alias sigue siendo el
-usuario de autenticación y no se edita.
+La Fase 5 completa la curación personal de la colección: registro e inicio de
+sesión reales, edición de biografía y avatar, comentarios por juego, listas
+personalizadas ordenables, metadatos avanzados de copias, privacidad básica de
+las proyecciones y exportación CSV de los datos que el usuario puede ver en la
+aplicación. El alias sigue siendo el usuario de autenticación y no se edita.
+
+El acceso no puede depender de cuentas demo sembradas: debe persistir usuarios
+reales en PostgreSQL, validar credenciales y entradas, aplicar autenticación y
+autorización por propietario, proteger sesiones y CSRF, limitar abusos, y estar
+cubierto por pruebas backend y de navegador.
 
 La fase no incorpora una red social ni amistades. Por tanto, la privacidad
 efectiva en esta fase se limita a `público` o `privado`; `solo amigos` queda
@@ -21,6 +26,18 @@ amistad real.
 
 <decisions>
 ## Decisiones de implementación
+
+### Identidad, registro y sesión
+
+- **D-00:** La Fase 5 debe ofrecer registro e inicio de sesión reales, no solo
+  cuentas demo. Se reutiliza el sistema de sesión de Django y la persistencia
+  PostgreSQL existente, con contraseñas hasheadas, validación de contraseña,
+  protección CSRF, respuestas que no enumeren usuarios, rate limiting,
+  autorización owner-scoped y pruebas de seguridad, persistencia y flujo de
+  navegador.
+- **D-00b:** El registro crea una cuenta persistente y autenticada; las cuentas
+  sintéticas siguen existiendo como fixtures de demo separadas de las cuentas
+  reales. El nombre de usuario es el alias público inmutable.
 
 ### Perfil y privacidad
 
@@ -118,6 +135,10 @@ implementar.**
 - `apps/api/accounts/serializers.py` — proyección pública construida mediante
   allowlist explícita.
 - `apps/api/accounts/views.py` — endpoints de cuenta, perfil público y sesión.
+- `apps/api/accounts/tests/test_auth.py` y
+  `apps/api/accounts/tests/test_registration.py` — controles existentes de
+  login, registro, CSRF y validación que deben conservarse y ampliarse si la
+  fase añade campos de perfil.
 - `apps/api/library/models.py` — `LibraryEntry`, `OwnedCopy`, estados, rating e
   idempotencia de copias.
 - `apps/api/library/serializers.py` — DTOs existentes de rating y copias.
@@ -131,6 +152,9 @@ implementar.**
 - `apps/web/app/[locale]/profiles/[alias]/page.tsx` — perfil público.
 - `apps/web/app/[locale]/games/[id]/page.tsx` — detalle de juego y futura
   sección de comentarios.
+- `apps/web/app/[locale]/login/page.tsx` y
+  `apps/web/app/[locale]/register/page.tsx` — flujos visibles de acceso y
+  creación de cuenta que deben quedar cubiertos por E2E.
 
 </canonical_refs>
 
@@ -184,6 +208,9 @@ implementar.**
   algorítmicas ni búsquedas guardadas.
 - El CSV debe contener los datos visibles en la página; no se ha autorizado
   añadir JSON ni importación en esta fase.
+- El registro y el login reales son un criterio de aceptación transversal: el
+  sistema debe funcionar sin depender de credenciales de demo y cada operación
+  de colección debe quedar aislada por el usuario autenticado.
 
 </specifics>
 
