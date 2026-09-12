@@ -48,10 +48,13 @@ describe("shared product polish tokens", () => {
   });
 
   it("gives facet summaries a 44px target and removes native markers", () => {
-    const summary = block(css, ".sp-facet > summary");
+    // 2026-09-12: the popover chrome (summary, chevron, floating panel)
+    // generalised from .sp-facet to .sp-dropdown, shared by every filter
+    // (platform/tag's checkbox lists included) -- same guarantees, new name.
+    const summary = block(css, ".sp-dropdown > summary");
     expect(value(summary, "min-height")).toBe("2.75rem");
     expect(value(summary, "list-style")).toBe("none");
-    expect(value(block(css, ".sp-facet > summary::-webkit-details-marker"), "display")).toBe("none");
+    expect(value(block(css, ".sp-dropdown > summary::-webkit-details-marker"), "display")).toBe("none");
   });
 
   it("keeps polish utilities neutral without new accent references", () => {
@@ -59,6 +62,6 @@ describe("shared product polish tokens", () => {
     expect(utilities, "Missing phase 2 polish utilities").toBeDefined();
     expect(utilities).not.toContain("--color-accent");
     expect(block(css, ".sp-contrib-table")).toContain("var(--space-md)");
-    expect(block(css, ".sp-facet[open] > summary .sp-facet-chevron")).toContain("rotate(180deg)");
+    expect(block(css, ".sp-dropdown[open] > summary .sp-dropdown-chevron")).toContain("rotate(180deg)");
   });
 });

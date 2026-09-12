@@ -687,21 +687,10 @@ input[type="radio"] {
   font-size: var(--text-body);
 }
 
-/* Filter panel header -- "Filtros" + a mono "N activos" count (artboard 2d). */
-.sp-filterbar-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-sm);
-  margin-bottom: var(--space-md);
-}
-
-.sp-filterbar-title {
-  font-size: var(--text-body);
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
+/* Active-filter count badge, next to the toolbar's Apply/Clear actions
+   (redesigned 2026-09-12 -- was part of a sidebar panel header, artboard
+   2d; the panel header itself is gone now that every filter is its own
+   popover in a thin bar). */
 .sp-filterbar-count {
   font-family: var(--font-mono);
   font-size: var(--text-meta);
@@ -1247,6 +1236,15 @@ a.sp-chip--active:hover {
   gap: var(--space-md);
 }
 
+/* One owned game's DLC group inside the DLC shelf (OwnedGamesDlcShelf): a
+   plain wrapper around its own heading + horizontal track. As a grid item
+   of .sp-shelf it needs the same min-width: 0 override, or its track's
+   max-content width forces the whole shelf -- and the page -- to overflow
+   horizontally at narrow viewports (2026-09-12 mobile-reflow fix). */
+.sp-shelf-dlc-group {
+  min-width: 0;
+}
+
 .sp-shelf > .sp-h2,
 .sp-shelf > .sp-shelf-head,
 .sp-shelf > .sp-muted,
@@ -1274,6 +1272,12 @@ a.sp-chip--active:hover {
   column-gap: var(--space-md);
   row-gap: 0;
   overflow-x: auto;
+  /* A grid item's implicit min-width is auto (its max-content size) --
+     without this, the track's own overflow-x never engages and the whole
+     row of cards instead forces `.sp-shelf`, `main`, and the page itself
+     to scroll horizontally at narrow viewports (2026-09-12 mobile-reflow
+     fix; same class of bug as .sp-field's own min-width: 0 note above). */
+  min-width: 0;
   scroll-snap-type: x proximity;
   /* The scrollbar is hidden: horizontal movement comes from the mouse
      wheel (ShelfWheelScroll) or from tabbing through the cards. A visible
@@ -1423,13 +1427,25 @@ a.sp-chip--active:hover {
   font-size: var(--text-body);
 }
 
-.sp-pagination a {
+/* Chevron pagination arrows (2026-09-12, replaces "Anterior"/"Siguiente"
+   text links): a round 44px target in the design's purple accent. */
+.sp-pagination-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 999px;
   color: var(--color-accent-strong);
-  text-decoration: none;
 }
 
-.sp-pagination a:hover {
-  text-decoration: underline;
+.sp-pagination-arrow:hover {
+  background: var(--color-surface-overlay);
+}
+
+.sp-pagination-arrow:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
 }
 
 .sp-pagination-current {
@@ -1458,39 +1474,6 @@ a.sp-chip--active:hover {
   flex-wrap: wrap;
   gap: var(--space-lg);
   align-items: end;
-}
-
-.sp-content-sidebar {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(216px, 260px);
-  gap: var(--space-xl);
-  align-items: start;
-}
-
-.sp-results-column {
-  min-width: 0;
-}
-
-.sp-filter-column {
-  min-width: 0;
-  order: 2;
-  position: sticky;
-  top: var(--space-lg);
-}
-
-.sp-filter-column .sp-filterbar {
-  margin: 0;
-}
-
-.sp-filter-column .sp-filterbar-body,
-.sp-filter-column .sp-controls-row {
-  grid-template-columns: 1fr;
-}
-
-.sp-filter-column .sp-controls-row {
-  display: grid;
-  align-items: stretch;
-  padding: var(--space-lg);
 }
 
 .sp-library-controls {
@@ -1863,21 +1846,28 @@ a.sp-chip--active:hover {
   color: var(--color-secondary-mid);
 }
 
-/* Filter bar: a right-hand desktop column, collapsing into a disclosure on
-   mobile (01.1-UI-SPEC Screen Contracts 2 and 6). */
+/* Filter bar (redesigned 2026-09-12): a single thin strip above the
+   results grid on both the catalogue and the collection page, not a
+   sidebar. Every filter beyond free-text search lives behind its own
+   <FilterDropdown> popover, so this row itself never needs to grow past
+   one line on desktop and only wraps, rather than stacking tall, on
+   narrow viewports (01.1-UI-SPEC Screen Contracts 2 and 6). */
 .sp-filterbar {
-  margin: var(--space-xl) 0;
+  margin: var(--space-lg) 0;
+  padding: var(--space-sm) var(--space-md);
 }
 
-.sp-filterbar > summary {
-  display: none;
+.sp-filterbar-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
 }
 
-.sp-filterbar-body {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: var(--space-md);
-  align-items: end;
+.sp-filterbar-row .sp-search {
+  flex: 1 1 14rem;
+  min-width: 0;
+  max-width: 22rem;
 }
 
 .sp-detail-summary {
@@ -1979,54 +1969,92 @@ a.sp-chip--active:hover {
   }
 }
 
-.sp-facet {
+/* Generic popover control for the filter toolbar (redesigned 2026-09-12):
+   a pill-shaped <summary> trigger plus a floating panel anchored below it.
+   FacetMenu's checkbox list (.sp-facet, further down) reuses this chrome
+   and adds only its own option-list styling. */
+.sp-dropdown {
   position: relative;
   min-width: 0;
 }
 
-.sp-facet > summary {
+.sp-dropdown > summary {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
+  /* 44px touch target (01.1-UI-SPEC accessibility gate), same as every
+     other interactive control in the filter bar. */
   min-height: 2.75rem;
   list-style: none;
   cursor: pointer;
+  padding: 0 var(--space-ctl);
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-overlay);
   font-size: var(--text-meta);
   font-weight: 600;
   color: var(--color-text-secondary);
   overflow-wrap: anywhere;
+  white-space: nowrap;
 }
 
-.sp-facet > summary:focus-visible {
+.sp-dropdown[open] > summary {
+  color: var(--color-text-primary);
+}
+
+.sp-dropdown > summary:focus-visible {
   outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
 
-.sp-facet[aria-disabled="true"] > summary {
+.sp-dropdown[aria-disabled="true"] > summary {
   cursor: not-allowed;
   opacity: 0.7;
   pointer-events: none;
 }
 
-.sp-facet > summary::-webkit-details-marker {
+.sp-dropdown > summary::-webkit-details-marker {
   display: none;
 }
 
-.sp-facet-chevron {
+.sp-dropdown-summary {
+  font-family: var(--font-mono);
+  color: var(--color-secondary-mid);
+}
+
+.sp-dropdown[open] > summary .sp-dropdown-summary {
+  color: inherit;
+}
+
+.sp-dropdown-chevron {
   display: inline-block;
   flex-shrink: 0;
   transition: transform 150ms ease;
 }
 
-.sp-facet[open] > summary .sp-facet-chevron {
+.sp-dropdown[open] > summary .sp-dropdown-chevron {
   transform: rotate(180deg);
 }
 
-.sp-facet > .sp-surface {
-  margin-top: var(--space-xs);
-  max-width: 100%;
+/* The floating panel: anchored to the trigger, not inline -- this is what
+   keeps the bar itself thin regardless of how much a given filter's
+   content needs (a checkbox list, two number inputs, a select). */
+.sp-dropdown > .sp-dropdown-panel {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + var(--space-xs));
+  left: 0;
+  margin-top: 0;
+  min-width: 14rem;
+  max-width: min(20rem, calc(100vw - 2 * var(--space-md)));
   max-height: 20rem;
   overflow: auto;
+  box-shadow: var(--shadow-overlay);
+}
+
+.sp-dropdown-fields {
+  display: grid;
+  gap: var(--space-md);
 }
 
 .sp-facet-options {
@@ -2065,30 +2093,11 @@ a.sp-chip--active:hover {
 }
 
 @media (min-width: 48rem) {
-  /* On desktop the filter facets read as inline, always-open bordered
-     lists (artboard 2d), not a popover -- the <details> still toggles for
-     no-JS mobile, but the list stays visible here regardless.
-     ::details-content is the modern hook; the older display override is
-     kept for engines that hide the slotted child instead. */
-  .sp-facet::details-content {
-    content-visibility: visible;
-    display: block;
-  }
-  .sp-facet:not([open]) > .sp-surface {
-    display: block;
-  }
-  .sp-facet > .sp-surface {
-    margin-top: var(--space-xs);
-    padding: var(--space-ctl);
-  }
-  .sp-facet > summary {
-    cursor: default;
-  }
-  .sp-facet > summary .sp-facet-chevron {
-    display: none;
-  }
-  /* The 44px checkbox is a mobile touch target; on desktop the whole
-     label row carries the target and the tick is drawn small. */
+  /* On every viewport the filter dropdowns are real popovers now
+     (redesigned 2026-09-12 -- a thin bar has no room for an always-open
+     inline list). This breakpoint only re-tunes the checkbox list's touch
+     target: the 44px row is a mobile target, and on desktop the whole
+     label row carries the target while the tick draws small. */
   .sp-facet-option {
     gap: var(--space-sm);
     padding: 0 var(--space-xs);
@@ -2154,6 +2163,9 @@ a.sp-chip--active:hover {
   gap: var(--space-ctl);
   align-items: center;
   flex-wrap: wrap;
+  /* Pushed to the right end of the toolbar row (2026-09-12): the filters
+     read left-to-right, Apply/Clear are the row's own trailing action. */
+  margin-left: auto;
 }
 
 .sp-chip-row {
@@ -2163,44 +2175,15 @@ a.sp-chip--active:hover {
   margin: var(--space-md) 0 var(--space-sm);
 }
 
-@media (min-width: 721px) {
-  /* Desktop: always expanded regardless of the [open] toggle state. */
-  .sp-filterbar .sp-filterbar-body {
-    display: grid !important;
-  }
-}
-
 @media (max-width: 720px) {
-  .sp-content-sidebar {
-    grid-template-columns: 1fr;
-    gap: var(--space-lg);
-  }
-
-  .sp-filter-column {
-    position: static;
-    order: -1;
-  }
-
   .sp-collection-grid > li {
     height: 23rem;
   }
 
-  .sp-filterbar > summary {
-    display: flex;
-    align-items: center;
-    gap: var(--space-xs);
-    min-height: 2.75rem;
-    font-size: var(--text-meta);
-    font-weight: 600;
-    color: var(--color-text-secondary);
-    cursor: pointer;
-    list-style: none;
-  }
-  .sp-filterbar > summary::-webkit-details-marker {
-    display: none;
-  }
-  .sp-filterbar-body {
-    grid-template-columns: 1fr 1fr;
-    margin-top: var(--space-md);
+  /* The thin bar still wraps onto more than one row below this width;
+     each dropdown's own popover panel already caps its width to the
+     viewport (.sp-dropdown-panel), so nothing else needs to change here. */
+  .sp-filterbar-row .sp-search {
+    max-width: none;
   }
 }

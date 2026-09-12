@@ -3,13 +3,19 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { GameCard } from "@/components/GameCard";
-import { CollectionBulkActions } from "@/components/CollectionBulkActions";
+import { PaginationArrow } from "@/components/PaginationArrow";
+import { FilterDropdown } from "@/components/FilterDropdown";
+import { FilterDropdownScript } from "@/components/FilterDropdownScript";
 import { StatusPill, type BacklogStatus } from "@/components/StatusPill";
 import { formatCount, getDictionary } from "@/i18n";
 import { fetchMyLibrary, type GameCard as GameCardData, type MyLibraryItem } from "@/lib/api";
 
 type RawParams = Record<string, string | string[] | undefined>;
 const STATUSES: BacklogStatus[] = ["pending", "playing", "completed", "abandoned"];
+// Display order for the per-status count summary only (2026-09-12, author
+// request) -- distinct from STATUSES, which still drives the filter
+// dropdown's option order.
+const STATUS_SUMMARY_ORDER: BacklogStatus[] = ["completed", "playing", "pending", "abandoned"];
 const SORTS = ["recently_updated", "rating_desc", "title_asc", "release_year"] as const;
 type CollSort = (typeof SORTS)[number];
 const COPY_FILTERS = ["all", "with_copy", "without_copy"] as const;
@@ -122,19 +128,72 @@ export default async function CollectionPage({
     release_year: dict.collection.sort.releaseYear,
   };
 
+  const activeStatusSummary = activeStatus === "all" ? undefined : dict.status.labels[activeStatus];
+  const activeSortSummary = activeSort === "recently_updated" ? undefined : sortLabels[activeSort];
+  const activeCopySummary =
+    activeCopy === "all" ? undefined : activeCopy === "with_copy" ? dict.collection.withCopy : dict.collection.withoutCopy;
+
   return (
     <main className="sp-page">
-      <h1 className="sp-h1">{dict.collection.heading}</h1>
-      <p className="sp-lead">{dict.collection.subheading}</p>
-      <div className="sp-content-sidebar">
-        <section className="sp-results-column" aria-label={dict.collection.heading}>
+      {libraryTotal > 0 ? (
+        <div className="sp-filterbar sp-surface">
+          <form method="get" action={basePath} className="sp-filterbar-row">
+            <FilterDropdown label={dict.collection.filterByStatus} summary={activeStatusSummary}>
+              <div className="sp-field">
+                <label htmlFor="status">{dict.collection.filterByStatus}</label>
+                <select id="status" name="status" defaultValue={activeStatus === "all" ? "" : activeStatus}>
+                  <option value="">{dict.collection.allStatuses}</option>
+                  {STATUSES.map((s) => (
+                    <option key={s} value={s}>
+                      {dict.status.labels[s]}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </FilterDropdown>
+
+            <FilterDropdown label={dict.collection.sort.label} summary={activeSortSummary}>
+              <div className="sp-field">
+                <label htmlFor="sort">{dict.collection.sort.label}</label>
+                <select id="sort" name="sort" defaultValue={activeSort}>
+                  {SORTS.map((s) => (
+                    <option key={s} value={s}>
+                      {sortLabels[s]}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </FilterDropdown>
+
+            <FilterDropdown label={dict.collection.filterByCopy} summary={activeCopySummary}>
+              <div className="sp-field">
+                <label htmlFor="copy">{dict.collection.filterByCopy}</label>
+                <select id="copy" name="copy" defaultValue={activeCopy}>
+                  <option value="all">{dict.collection.allCopyStates}</option>
+                  <option value="with_copy">{dict.collection.withCopy}</option>
+                  <option value="without_copy">{dict.collection.withoutCopy}</option>
+                </select>
+              </div>
+            </FilterDropdown>
+
+            <div className="sp-filterbar-actions">
+              <button type="submit" className="sp-btn-primary">
+                {dict.catalogue.filters.apply}
+              </button>
+            </div>
+          </form>
+          <FilterDropdownScript />
+        </div>
+      ) : null}
+
+      <section aria-label={dict.collection.heading}>
       <p role="status" className="sp-meta">
         {formatCount(dict.collection.count, total)}
       </p>
 
       {libraryTotal > 0 ? (
         <dl className="sp-summary-dl" aria-label={locale === "es" ? "Resumen por estado" : "Status summary"}>
-          {STATUSES.map((s) => (
+          {STATUS_SUMMARY_ORDER.map((s) => (
             <div key={s}>
               <dt>
                 <StatusPill status={s} label={dict.status.labels[s]} bare />
@@ -187,70 +246,27 @@ export default async function CollectionPage({
           {pageCount > 1 ? (
             <nav className="sp-pagination" aria-label={locale === "es" ? "Paginación" : "Pagination"}>
               {currentPage > 1 ? (
-                <Link href={buildHref({ page: String(currentPage - 1) })}>
-                  {locale === "es" ? "Anterior" : "Previous"}
-                </Link>
+                <PaginationArrow
+                  href={buildHref({ page: String(currentPage - 1) })}
+                  direction="prev"
+                  label={locale === "es" ? "Anterior" : "Previous"}
+                />
               ) : null}
               <span aria-current="page" className="sp-pagination-current">
                 {currentPage}
               </span>
               {currentPage < pageCount ? (
-                <Link href={buildHref({ page: String(currentPage + 1) })}>
-                  {locale === "es" ? "Siguiente" : "Next"}
-                </Link>
+                <PaginationArrow
+                  href={buildHref({ page: String(currentPage + 1) })}
+                  direction="next"
+                  label={locale === "es" ? "Siguiente" : "Next"}
+                />
               ) : null}
             </nav>
           ) : null}
         </>
       )}
-        </section>
-
-        <aside className="sp-filter-column" aria-label={dict.collection.filterByStatus}>
-          <form method="get" action={basePath} className="sp-surface sp-controls-row">
-            <div className="sp-filterbar-head">
-              <span className="sp-filterbar-title">
-                {locale === "es" ? "Filtrar y ordenar" : "Filter and sort"}
-              </span>
-            </div>
-            <div className="sp-field">
-              <label htmlFor="status">{dict.collection.filterByStatus}</label>
-              <select id="status" name="status" defaultValue={activeStatus === "all" ? "" : activeStatus}>
-                <option value="">{dict.collection.allStatuses}</option>
-                {STATUSES.map((s) => (
-                  <option key={s} value={s}>
-                    {dict.status.labels[s]}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="sp-field">
-              <label htmlFor="sort">{dict.collection.sort.label}</label>
-              <select id="sort" name="sort" defaultValue={activeSort}>
-                {SORTS.map((s) => (
-                  <option key={s} value={s}>
-                    {sortLabels[s]}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="sp-field">
-              <label htmlFor="copy">{dict.collection.filterByCopy}</label>
-              <select id="copy" name="copy" defaultValue={activeCopy}>
-                <option value="all">{dict.collection.allCopyStates}</option>
-                <option value="with_copy">{dict.collection.withCopy}</option>
-                <option value="without_copy">{dict.collection.withoutCopy}</option>
-              </select>
-            </div>
-            <CollectionBulkActions
-              locale={locale}
-              items={items.map((item) => ({ workId: item.work_id, title: item.work_title }))}
-            />
-            <button type="submit" className="sp-btn-primary">
-              {dict.catalogue.filters.apply}
-            </button>
-          </form>
-        </aside>
-      </div>
+      </section>
     </main>
   );
 }

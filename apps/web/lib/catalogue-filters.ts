@@ -23,7 +23,7 @@ export function resolveSort(raw: string | undefined): SortKey {
   return DEFAULT_SORT;
 }
 
-export const MIN_RATING_OPTIONS = ["70", "80", "90"] as const;
+export const MIN_RATING_OPTIONS = ["50", "60", "70", "80", "90"] as const;
 
 /** A selectable filter option, as rendered in a FacetMenu checkbox list. The
  * catalogue page derives these from the API `facets` payload. */
@@ -32,7 +32,7 @@ export interface FilterOption {
   label: string;
 }
 
-export const FILTER_PARAM_KEYS = ["q", "platform", "tag", "year_from", "year_to", "min_rating", "sort"] as const;
+export const FILTER_PARAM_KEYS = ["q", "platform", "tag", "year", "min_rating", "sort"] as const;
 
 /** Stable presentation order for the governed platform allowlist. Current
  * consoles come first, followed by previous generations and other platforms.
@@ -91,15 +91,15 @@ export interface CatalogueFilters {
   q?: string;
   platform: string[];
   tag: string[];
-  year_from?: string;
-  year_to?: string;
+  year?: string;
   min_rating?: string;
   sort: SortKey;
 }
 
 /** Parse + validate raw searchParams into a safe filter object. Unknown
  * min_rating values are dropped; platform/tag slugs pass through (the API
- * validates them); years are clamped and swapped if from > to. */
+ * validates them); year is a single exact value (2026-09-12: was a
+ * year_from/year_to range), clamped to the governed catalogue's bounds. */
 export function parseFilters(
   sp: Record<string, string | string[] | undefined>,
   currentYear: number,
@@ -123,16 +123,13 @@ export function parseFilters(
     if (!Number.isInteger(n)) return undefined;
     return Math.min(Math.max(n, 1958), currentYear + 2);
   };
-  let from = clampYear(firstValue(sp.year_from));
-  let to = clampYear(firstValue(sp.year_to));
-  if (from != null && to != null && from > to) [from, to] = [to, from];
+  const year = clampYear(firstValue(sp.year));
 
   return {
     q,
     platform,
     tag,
-    year_from: from != null ? String(from) : undefined,
-    year_to: to != null ? String(to) : undefined,
+    year: year != null ? String(year) : undefined,
     min_rating: minRating,
     sort: resolveSort(firstValue(sp.sort)),
   };
@@ -145,8 +142,7 @@ export function countActiveFilters(f: CatalogueFilters): number {
   if (f.q) n += 1;
   n += f.platform.length;
   n += f.tag.length;
-  if (f.year_from) n += 1;
-  if (f.year_to) n += 1;
+  if (f.year) n += 1;
   if (f.min_rating) n += 1;
   return n;
 }
@@ -162,8 +158,7 @@ export function buildQuery(f: Partial<CatalogueFilters>, page?: number): string 
   if (f.tag) {
     for (const tag of f.tag) params.append("tag", tag);
   }
-  if (f.year_from) params.set("year_from", f.year_from);
-  if (f.year_to) params.set("year_to", f.year_to);
+  if (f.year) params.set("year", f.year);
   if (f.min_rating) params.set("min_rating", f.min_rating);
   if (f.sort && f.sort !== DEFAULT_SORT) params.set("sort", f.sort);
   if (page && page > 1) params.set("page", String(page));

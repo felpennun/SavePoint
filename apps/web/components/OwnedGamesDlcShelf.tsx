@@ -43,7 +43,7 @@ export function OwnedGamesDlcShelf({
       {groups.map((group) => {
         if (group.dlc.length === 0) return null;
         return (
-          <div key={group.base_game.slug}>
+          <div key={group.base_game.slug} className="sp-shelf-dlc-group">
             <h3 className="sp-h2">{labels.baseGameLabel.replace("{game}", group.base_game.title)}</h3>
             <ul className="sp-shelf-track sp-shelf-track--dense">
               {group.dlc.map((item) => (

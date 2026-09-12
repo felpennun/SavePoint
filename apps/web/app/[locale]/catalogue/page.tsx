@@ -3,6 +3,7 @@ import Link from "next/link";
 import { FilterBar } from "@/components/FilterBar";
 import { FilterChip } from "@/components/FilterChip";
 import { GameCard } from "@/components/GameCard";
+import { PaginationArrow } from "@/components/PaginationArrow";
 import { getDictionary } from "@/i18n";
 import { fetchCatalogueList } from "@/lib/api";
 import {
@@ -64,8 +65,10 @@ export default async function CataloguePage({
       page: currentPage,
       platform: filters.platform,
       tag: filters.tag,
-      year_from: filters.year_from,
-      year_to: filters.year_to,
+      // A single exact year (2026-09-12: was a year_from/year_to range in
+      // the UI) still maps onto the API's range contract as one point.
+      year_from: filters.year,
+      year_to: filters.year,
       min_rating: filters.min_rating,
       sort: filters.sort,
     });
@@ -91,11 +94,21 @@ export default async function CataloguePage({
 
   return (
     <main className="sp-page">
-      <h1 className="sp-h1">{dict.catalogue.heading}</h1>
+      <FilterBar
+        filters={filters}
+        locale={locale}
+        basePath={basePath}
+        activeCount={activeCount}
+        platformOptions={platformOptions}
+        tagOptions={tagOptions}
+        currentQuery={currentQuery}
+        yearMin={yearRange?.min ?? 1958}
+        yearMax={yearRange?.max ?? currentYear + 2}
+        optionsUnavailable={failed}
+      />
 
-      <div className="sp-content-sidebar">
-        <section className="sp-results-column" aria-label={dict.catalogue.heading}>
-          {activeCount > 0 ? (
+      <section aria-label={dict.catalogue.heading}>
+        {activeCount > 0 ? (
             <div className="sp-chip-row" aria-label={dict.catalogue.filters.activeLabel.many(activeCount)}>
               {visibleFilters.tag.map((value) => {
                 const label = dict.catalogue.chip.tag.replace("{value}", tagLabels.get(value) ?? value);
@@ -176,40 +189,28 @@ export default async function CataloguePage({
               </ul>
               <nav className="sp-pagination" aria-label={locale === "es" ? "Paginación" : "Pagination"}>
                 {currentPage > 1 ? (
-                  <Link href={`${basePath}${buildQuery(visibleFilters, currentPage - 1)}`}>
-                    {locale === "es" ? "Anterior" : "Previous"}
-                  </Link>
+                  <PaginationArrow
+                    href={`${basePath}${buildQuery(visibleFilters, currentPage - 1)}`}
+                    direction="prev"
+                    label={locale === "es" ? "Anterior" : "Previous"}
+                  />
                 ) : null}
                 <span aria-current="page" className="sp-pagination-current">
                   {currentPage}
                 </span>
                 {result.has_next ? (
-                  <Link href={`${basePath}${buildQuery(visibleFilters, currentPage + 1)}`}>
-                    {locale === "es" ? "Siguiente" : "Next"}
-                  </Link>
+                  <PaginationArrow
+                    href={`${basePath}${buildQuery(visibleFilters, currentPage + 1)}`}
+                    direction="next"
+                    label={locale === "es" ? "Siguiente" : "Next"}
+                  />
                 ) : null}
               </nav>
             </>
           )}
         </>
           )}
-        </section>
-
-        <aside className="sp-filter-column" aria-label={dict.catalogue.filters.heading}>
-          <FilterBar
-            filters={filters}
-            locale={locale}
-            basePath={basePath}
-            activeCount={activeCount}
-            platformOptions={platformOptions}
-            tagOptions={tagOptions}
-            currentQuery={currentQuery}
-            yearMin={yearRange?.min ?? 1958}
-            yearMax={yearRange?.max ?? currentYear + 2}
-            optionsUnavailable={failed}
-          />
-        </aside>
-      </div>
+      </section>
     </main>
   );
 }

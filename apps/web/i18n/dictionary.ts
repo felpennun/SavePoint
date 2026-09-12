@@ -40,8 +40,7 @@ export interface Dictionary {
       heading: string;
       platform: string;
       tag: string;
-      yearFrom: string;
-      yearTo: string;
+      year: string;
       minRating: string;
       anyOption: string;
       apply: string;

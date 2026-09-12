@@ -35,7 +35,7 @@ TRIGRAM_SIMILARITY_THRESHOLD = 0.3
 # Cap the fuzzy-match candidate set so a single request can never fan out to
 # the whole alias table (M-05). Comfortably larger than any realistic page.
 TRIGRAM_CANDIDATE_CAP = 200
-DEFAULT_PAGE_SIZE = 24
+DEFAULT_PAGE_SIZE = 25
 
 YEAR_MIN = 1958
 RATING_MIN = 0.0

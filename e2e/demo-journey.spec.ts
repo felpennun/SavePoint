@@ -131,9 +131,12 @@ test.describe("demo account login journey (AUTH-01, D-02/D-03, LIB-01)", () => {
     await page.getByLabel("Contraseña").fill(password);
     await page.getByRole("button", { name: "Entrar" }).click();
 
-    // D-03: successful login lands on the catalogue, not a dashboard.
+    // D-03: successful login lands on the catalogue, not a dashboard. The
+    // page no longer renders a visible <h1> (2026-09-12: the navbar title
+    // is enough); "Catálogo" survives as the results section's accessible
+    // name, exposed as an ARIA region landmark.
     await page.waitForURL(/\/es\/catalogue$/);
-    await expect(page.getByRole("heading", { name: "Catálogo" })).toBeVisible();
+    await expect(page.getByRole("region", { name: "Catálogo" })).toBeVisible();
 
     // GameCard renders title and year/platform as separate paragraphs
     // within the same link -- target the title paragraph specifically
@@ -146,11 +149,17 @@ test.describe("demo account login journey (AUTH-01, D-02/D-03, LIB-01)", () => {
     await firstGameLink.click();
     await expect(page.getByRole("heading", { level: 1 })).toContainText(gameTitle);
 
-    // Set a status, save, and confirm the UI never claims success before
-    // the request actually completes.
-    await page.getByRole("radio", { name: "Jugando" }).check();
-    await page.getByRole("button", { name: "Guardar estado" }).click();
-    await expect(page.getByTestId("status-feedback")).toHaveText("Estado guardado");
+    // LibraryControls (redesign, predates this session) saves status,
+    // rating, and copies together through one "Guardar configuración"
+    // action and one shared feedback message -- not three separate
+    // save/feedback pairs. The status control is a visually-hidden native
+    // radio behind a styled <label>/<span> (Nocturne "chip" pattern): a
+    // real pointer click lands on the label via HTML's own label-forwarding
+    // even though the input itself is pointer-events: none, so this clicks
+    // the visible label text, the same target a sighted user would use.
+    await page.getByText("Jugando", { exact: true }).click();
+    await page.getByRole("button", { name: "Guardar configuración" }).click();
+    await expect(page.getByTestId("configuration-feedback")).toHaveText("Configuración guardada");
 
     // D-14/reload contract: reloading re-reads the persisted PostgreSQL
     // value, never trusting only the client-side selection that was just
@@ -168,17 +177,18 @@ test.describe("demo account login journey (AUTH-01, D-02/D-03, LIB-01)", () => {
     const copyListLocator = page.locator("main").getByText(/^(Física|Digital)$/);
     const copyCountBefore = await copyListLocator.count();
 
-    await page.locator("#rating-range").fill("7");
-    await page.getByRole("button", { name: "Guardar valoración" }).click();
-    await expect(page.getByTestId("rating-feedback")).toHaveText("Valoración guardada");
-
-    await page.getByRole("button", { name: "Añadir copia" }).click();
-    await expect(page.getByTestId("copy-feedback")).toHaveText("Copia añadida");
-    await page.getByRole("button", { name: "Añadir copia" }).click();
-    await expect(page.getByTestId("copy-feedback")).toHaveText("Copia añadida");
+    // The rating control is five stars, each split into a left/right half
+    // button; "3.5 de 5 estrellas" is the accessible name for half-step 7.
+    await page.getByRole("button", { name: "3.5 de 5 estrellas" }).click();
+    // Adding a copy only touches local state -- both are persisted by the
+    // same single save below, alongside the rating.
+    await page.getByRole("button", { name: "Añadir otra copia" }).click();
+    await page.getByRole("button", { name: "Añadir otra copia" }).click();
+    await page.getByRole("button", { name: "Guardar configuración" }).click();
+    await expect(page.getByTestId("configuration-feedback")).toHaveText("Configuración guardada");
 
     await page.reload();
-    await expect(page.locator("#rating-range")).toHaveValue("7");
+    await expect(page.getByRole("button", { name: "3.5 de 5 estrellas" })).toHaveAttribute("aria-pressed", "true");
     await expect(page.locator("main").getByText(/^(Física|Digital)$/)).toHaveCount(copyCountBefore + 2);
   });
 
@@ -255,7 +265,7 @@ test.describe("controlled-account journey + authenticated recommendations (D-01.
     // server-rendered navigation).
     await page.waitForURL(/\/es\/catalogue$/);
     await page.reload();
-    await expect(page.getByRole("heading", { level: 1, name: "Catálogo" })).toBeVisible();
+    await expect(page.getByRole("region", { name: "Catálogo" })).toBeVisible();
 
     // AUTH-02: the account is visibly simulated and the authenticated-only
     // nav links appear now that a session exists.
@@ -268,13 +278,17 @@ test.describe("controlled-account journey + authenticated recommendations (D-01.
     // state, reached through the nav link.
     await collectionLink.click();
     await page.waitForURL(/\/es\/collection$/);
-    await expect(page.getByRole("heading", { level: 1, name: "Colección" })).toBeVisible();
+    await expect(page.getByRole("region", { name: "Colección" })).toBeVisible();
     await expect(page.getByText("Tu colección está vacía")).toBeVisible();
 
-    // D-04: personalized recommendations navigation from the authenticated nav.
+    // D-04: personalized recommendations navigation from the authenticated
+    // nav. This account's library is empty (asserted above), so the page
+    // must never silently fall back to some other ranking -- it settles on
+    // the insufficient-history onboarding state, possibly after a brief
+    // "preparing" state while the async snapshot job runs for the first time.
     await page.getByRole("link", { name: "Recomendaciones" }).click();
     await page.waitForURL(/\/es\/recommendations$/);
-    await expect(page.locator("section.sp-disclosure")).toContainText("genre-taste-v1");
+    await expect(page.getByText("Aún no hay suficiente actividad")).toBeVisible({ timeout: 15_000 });
   });
 
   // D-02 / D-03 / D-04 + the recommendations screenshot evidence, via the
@@ -299,25 +313,36 @@ test.describe("controlled-account journey + authenticated recommendations (D-01.
         await page.setViewportSize(size);
 
         // Collection: the signed-in user's own library view renders (grid or
-        // its documented empty state), auth-gated behind the session.
+        // its documented empty state), auth-gated behind the session. The
+        // page no longer renders a visible <h1> (2026-09-12: the navbar
+        // title is enough); "Colección" survives as the results section's
+        // accessible name.
         await page.goto("/es/collection");
-        await expect(page.getByRole("heading", { level: 1, name: "Colección" })).toBeVisible();
+        await expect(page.getByRole("region", { name: "Colección" })).toBeVisible();
         const hasGrid = (await page.locator("main ul.sp-grid li").count()) > 0;
         const hasEmpty = (await page.getByText("Tu colección está vacía").count()) > 0;
         expect(hasGrid || hasEmpty).toBe(true);
 
-        // Recommendations: D-09 disclosure (algorithm_id + limitation) is
-        // always present; the body is either genre shelves or the explicit
-        // insufficient-history onboarding state -- never a silent fallback to
-        // the popularity baseline.
+        // Recommendations: the body is either one or more shelves (content,
+        // tag-taste, or owned-DLC -- all render as section.sp-shelf) or the
+        // explicit insufficient-history onboarding state -- never a silent
+        // fallback to the popularity baseline. Per-algorithm shelf content,
+        // ordering against the API payload, and the absence of any
+        // methodology surface are covered in detail by
+        // e2e/recommendations.spec.ts (QUAL-02); this is only the
+        // lightweight smoke check alongside the rest of the journey.
         await page.goto("/es/recommendations");
-        await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-        const disclosure = page.locator("section.sp-disclosure");
-        await expect(disclosure).toBeVisible();
-        await expect(disclosure).toContainText("genre-taste-v1");
-        const shelfCount = await page.locator('section h2:has-text("Porque juegas mucho a")').count();
-        const onboardingCount = await page.getByText("Aún no hay suficiente actividad").count();
-        expect(shelfCount + onboardingCount).toBeGreaterThan(0);
+        await expect(page.getByRole("heading", { level: 1, name: "Recomendaciones" })).toBeVisible();
+        // The snapshot may still be "building" on first-ever load -- poll
+        // rather than asserting on the first render.
+        await expect
+          .poll(
+            async () =>
+              (await page.locator("section.sp-shelf").count()) +
+              (await page.getByText("Aún no hay suficiente actividad").count()),
+            { message: "expected at least one shelf or the onboarding empty state", timeout: 15_000 },
+          )
+          .toBeGreaterThan(0);
 
         if (viewportName === "mobile") {
           // The recommendations content region must reflow with no horizontal
