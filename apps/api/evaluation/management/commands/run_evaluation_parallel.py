@@ -22,6 +22,7 @@ from evaluation.runner import (
     precompute_shared_content_signals,
     run,
 )
+from evaluation.runtime import process_resource_usage, runtime_environment
 
 # Built once in the parent process (Command.handle, before any worker is
 # forked) and left as a module-level global rather than passed through the
@@ -63,6 +64,7 @@ def _run_algorithm_process(payload: dict[str, Any]) -> dict[str, Any]:
             "started_at": started_at.isoformat(),
             "finished_at": datetime.now(timezone.utc).isoformat(),
             "duration_seconds": round(time.perf_counter() - started, 6),
+            "resource_usage": process_resource_usage(),
             "artifact": artifact,
         }
         connections.close_all()
@@ -75,6 +77,7 @@ def _run_algorithm_process(payload: dict[str, Any]) -> dict[str, Any]:
             "started_at": started_at.isoformat(),
             "finished_at": datetime.now(timezone.utc).isoformat(),
             "duration_seconds": round(time.perf_counter() - started, 6),
+            "resource_usage": process_resource_usage(),
             "error_type": type(exc).__name__,
             "error": str(exc)[:500],
         }
@@ -114,7 +117,9 @@ def _merge_worker_artifacts(
                 "wall_started_at": wall_started_at,
                 "wall_finished_at": wall_finished_at,
                 "wall_duration_seconds": round(wall_duration_seconds, 6),
+                "resource_usage": process_resource_usage(),
             },
+            "runtime_environment": runtime_environment(),
             "errors": errors,
             "algorithms": {},
         }
@@ -156,7 +161,9 @@ def _merge_worker_artifacts(
             "sum_worker_duration_seconds": round(
                 sum(float(result["duration_seconds"]) for result in worker_results), 6
             ),
+            "resource_usage": process_resource_usage(),
         },
+        "runtime_environment": runtime_environment(),
         "statistical_comparisons": {
             frozen.headline: _headline_statistical_comparison(frozen, algorithms),
         },

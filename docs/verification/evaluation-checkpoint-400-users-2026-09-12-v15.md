@@ -145,6 +145,24 @@ por defecto para lanzamientos sin supervisión de `run_evaluation_parallel` en e
 No se ejecutó `--force-new-protocol`, no se regeneró la población después de fijar el
 manifiesto, y el split `test` se ejecutó una sola vez.
 
+## Adenda de cierre de Fase 3
+
+El análisis posterior del artefacto se conserva en
+[`evaluation-cohorts-400-test-2026-09-12-v15.md`](./evaluation-cohorts-400-test-2026-09-12-v15.md).
+Confirma 79 usuarios evaluables en `active_history_10_to_20` y 10 usuarios
+`no_history` descriptivos de cold start. Las métricas por usuario se desglosan sin
+recalcular rankings; cobertura, HHI y cobertura de predicción permanecen globales
+porque v15 no guardó listas completas por usuario.
+
+El punto 6 solicitado (múltiples semillas) queda documentado como limitación: el test
+v15 tiene un único consumo y repetirlo exigiría un protocolo versionado distinto. El
+bootstrap de este run mide incertidumbre interna, no estabilidad entre semillas.
+
+El punto 7 (UI/E2E) queda respaldado por `e2e/recommendations.spec.ts`, cuya nota del
+vault registra tres pruebas Playwright pasadas. La implementación fue realizada por la
+otra LLM; este checkpoint incorpora la evidencia sin modificar `apps/web/**` ni
+`design/**` desde esta sesión.
+
 ## Artefactos conservados al terminar
 
 El cálculo se considera terminado porque se conservan, todos comprometidos en `main`:

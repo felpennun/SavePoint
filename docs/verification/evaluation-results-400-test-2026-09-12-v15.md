@@ -416,6 +416,64 @@ Fuentes: [`evaluation-results-400-test-2026-09-10.md`](./evaluation-results-400-
 
 ## 12. Artefactos y reproducibilidad
 
+### 12.1 Desglose por cohortes
+
+El desglose reproducible está en
+[`evaluation-cohorts-400-test-2026-09-12-v15.md`](./evaluation-cohorts-400-test-2026-09-12-v15.md)
+y en su equivalente JSON. Se generó únicamente leyendo el artefacto v15 y el
+manifiesto `synthetic-population-manifest-v15-candidate.json`; no consulta PostgreSQL,
+IGDB ni el estado actual de la aplicación y no vuelve a ejecutar ningún algoritmo.
+
+El manifiesto v15 contiene dos cohortes: `active_history_10_to_20` (390 usuarios) y
+`no_history` (10 usuarios). El split `test` aporta 79 usuarios evaluables, todos dentro
+de la primera cohorte; los 10 usuarios sin historial no tienen un positivo que retirar
+y se tratan como condición descriptiva de cold start, no como recomendaciones con
+puntuación cero. Para cada algoritmo y K=5, 10 y 20 se recalculan desde las filas
+conservadas por usuario precisión, recall, nDCG, MAP, diversidad intra-lista y novedad.
+
+El artefacto histórico sí conserva cobertura de catálogo, HHI y cobertura de predicción
+como métricas globales por algoritmo y K, pero no conserva las listas recomendadas
+completas por usuario. Por eso no se reparte ninguna de esas métricas por cohorte: una
+atribución aproximada habría producido evidencia no auditable. El runner queda preparado
+para futuras extensiones, pero este informe no altera retroactivamente v15.
+
+### 12.2 Entorno y recursos
+
+El artefacto v15 conserva tiempos de pared y duración individual de los workers. No
+conserva, porque la versión ejecutada todavía no lo registraba, las versiones exactas
+del entorno ni el pico de memoria/CPU de cada proceso. Se añadió al runner paralelo una
+captura para futuras ejecuciones de Python, plataforma, CPU, versiones de paquetes,
+CPU de usuario/sistema y RSS máximo por proceso. La captura excluye secretos, rutas
+privadas, nombres de máquina y valores de variables de entorno.
+
+No se presenta una medición posterior como si describiera históricamente v15: hacerlo
+confundiría el entorno actual con el entorno del cálculo. La limitación queda localizada
+y la solución queda implementada para el siguiente artefacto versionado.
+
+### 12.3 Limitación multi-semilla (punto 6)
+
+El test v15 se ejecutó una sola vez, tal como declara `tuning.test_runs: 1`, y el
+marcador de consumo impide volver a usarlo accidentalmente. No se ejecutó una batería
+de semillas adicionales. Esta decisión preserva el aislamiento del test: cambiar la
+semilla altera la población generada, la partición de usuarios, los positivos
+retenidos y el artefacto; ya no sería una réplica del mismo test, sino un nuevo
+protocolo que debería congelarse con su propia versión y hash.
+
+El bootstrap BCa y las pruebas pareadas cuantifican incertidumbre de las 79
+observaciones disponibles dentro de esta ejecución. No son un sustituto de la
+variabilidad entre semillas, por lo que las conclusiones deben formularse de manera
+condicional: describen este corpus, esta población sintética, este split y esta semilla.
+La sensibilidad multi-semilla queda como extensión metodológica futura, no como un
+resultado que pueda afirmarse sin cálculo.
+
+### 12.4 Evidencia de interfaz (punto 7)
+
+La verificación Playwright y E2E queda respaldada por `e2e/recommendations.spec.ts` y
+por la nota de evidencia del vault. Las tres pruebas cubren correspondencia API/DOM,
+ausencia de superficie metodológica y reflow/temas/teclado. La implementación visual
+fue realizada por la otra sesión; este cierre incorpora su resultado sin modificar el
+contrato público de recomendaciones.
+
 | Artefacto | Ruta | SHA-256 |
 |---|---|---|
 | Artefacto final (éxito) | `apps/api/evaluation-400-test-2026-09-12-v15.artifact.json` | `5fd46ebed2814fca62fdf094a744671383abf66f7d822caeb873ea44be67b8ab` |

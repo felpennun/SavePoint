@@ -48,6 +48,8 @@ def test_parallel_merge_preserves_each_algorithm_and_records_sum() -> None:
     assert artifact["status"] == "succeeded"
     assert set(artifact["algorithms"]) == {"first", "second"}
     assert artifact["parallel_execution"]["sum_worker_duration_seconds"] == 2.0
+    assert "runtime_environment" in artifact
+    assert "resource_usage" in artifact["parallel_execution"]
 
 
 def test_parallel_merge_returns_explicit_failure_manifest() -> None:

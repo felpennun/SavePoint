@@ -1,9 +1,9 @@
 ---
 phase: "03"
 slug: "explainable-content-recommenders-and-baseline-comparison"
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: completed
+nyquist_compliant: true
+wave_0_complete: true
 created: "2026-09-08"
 ---
 
@@ -71,4 +71,28 @@ cobertura de todos los requisitos.
   por usuario y estado válido/inválido.
 - `nyquist_compliant: true` se marca solo después de ejecutar el gate de validación.
 
-**Aprobación:** pendiente
+## Cierre de esta ejecución
+
+La parte backend, runner, métricas, estadística, evidencia, análisis por cohortes y
+UI/E2E queda verificada. La evaluación final v15 ya estaba ejecutada y no se repitió:
+el marcador de test consumido es una guarda metodológica, no un fallo del cierre.
+
+La evidencia UI/E2E de `QUAL-02` está en `e2e/recommendations.spec.ts` y en la nota
+del vault correspondiente. Registra tres pruebas Playwright en verde: correspondencia
+API/DOM y orden score-descendente, ausencia de superficie metodológica en producto, y
+reflow a 320 px con temas claro/oscuro y navegación por teclado.
+
+Se acepta una limitación metodológica explícita:
+
+1. **Punto 6 — varias semillas:** no se repite el test v15 con otras semillas. El
+   protocolo fija un único consumo del test; hacerlo ahora produciría otra población,
+   split y protocolo, no una réplica del mismo experimento. Se conserva como amenaza
+   a la robustez entre semillas y como trabajo futuro versionado.
+
+El informe por cohortes cubre las métricas por usuario que el artefacto v15 conserva.
+Cobertura de catálogo, HHI y cobertura de predicción se mantienen correctamente como
+métricas globales porque el artefacto no guardó rankings completos por usuario.
+
+**Aprobación:** cierre de la Fase 3 aceptado por Felipe (autor) el 2026-09-12, con la
+limitación multi-semilla anterior. La evidencia UI/E2E queda integrada en el contrato
+de validación; no se declara que la evaluación tenga robustez entre semillas.
