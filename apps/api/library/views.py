@@ -194,6 +194,12 @@ class OwnedCopiesView(APIView):
                 edition_id=str(data["edition_id"]) if data.get("edition_id") else None,
                 format=data["format"],
                 idempotency_key=data["idempotency_key"],
+                purchase_date=data.get("purchase_date"),
+                price=data.get("price"),
+                currency=data.get("currency"),
+                store=data.get("store"),
+                conservation_state=data.get("conservation_state"),
+                storage_location=data.get("storage_location"),
             )
         except ValidationError as exc:
             return Response({"detail": str(exc.message if hasattr(exc, "message") else exc)}, status=400)

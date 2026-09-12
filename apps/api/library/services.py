@@ -3,8 +3,10 @@ and idempotent copy creation with release/edition ownership validation."""
 
 from __future__ import annotations
 
+import re
 import uuid
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
+from decimal import Decimal
 
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, models, transaction
@@ -12,6 +14,7 @@ from django.db import IntegrityError, models, transaction
 from catalogue.models import Edition, GameRelease, GameWork
 from library.models import (
     BacklogStatus,
+    ConservationState,
     ContentVisibility,
     CopyFormat,
     CustomList,
@@ -26,6 +29,33 @@ VALID_RATING_RANGE = range(1, 11)
 VALID_FORMATS = {choice.value for choice in CopyFormat}
 VALID_STATUSES = {choice.value for choice in BacklogStatus}
 VALID_VISIBILITIES = {choice.value for choice in ContentVisibility}
+VALID_CONSERVATION_STATES = {choice.value for choice in ConservationState}
+_CURRENCY_PATTERN = re.compile(r"^[A-Z]{3}$")
+
+
+def _validate_copy_metadata(
+    *,
+    format: str,  # noqa: A002 - matches the domain vocabulary (D-15)
+    price: Decimal | None = None,
+    currency: str | None = None,
+    conservation_state: str | None = None,
+    storage_location: str | None = None,
+) -> str | None:
+    """Cross-field validation for purchase/conservation metadata (INV-03/
+    INV-04), duplicated here (not just in the serializer) so a caller that
+    invokes the service directly still gets the same guarantees. Returns
+    the normalized (uppercase) currency, or None. Raises ``ValidationError``
+    without ever touching the database."""
+    if price is not None and price < 0:
+        raise ValidationError("price must not be negative.")
+    normalized_currency = currency.upper() if currency else None
+    if normalized_currency is not None and not _CURRENCY_PATTERN.fullmatch(normalized_currency):
+        raise ValidationError("currency must be exactly three uppercase letters.")
+    if conservation_state is not None and conservation_state not in VALID_CONSERVATION_STATES:
+        raise ValidationError("conservation_state is invalid.")
+    if format == CopyFormat.DIGITAL and (conservation_state is not None or storage_location is not None):
+        raise ValidationError("digital copies cannot record conservation_state or storage_location.")
+    return normalized_currency
 
 
 class CommentAlreadyExists(Exception):
@@ -69,10 +99,20 @@ def create_owned_copy(
     edition_id: str | None,
     format: str,  # noqa: A002 - matches the domain vocabulary (D-15)
     idempotency_key: str,
+    purchase_date: date | None = None,
+    price: Decimal | None = None,
+    currency: str | None = None,
+    store: str | None = None,
+    conservation_state: str | None = None,
+    storage_location: str | None = None,
 ) -> tuple[OwnedCopy, bool]:
     """Create a copy, or return the existing one for a replayed idempotency
     key (D-16: multiple copies are independent records; replay never
-    duplicates). Returns (copy, created)."""
+    duplicates). Returns (copy, created).
+
+    Purchase/conservation metadata (INV-03/INV-04) is only applied on the
+    first creation -- a replay never re-applies a differing payload to the
+    already-persisted copy, matching the idempotency contract above."""
     if not idempotency_key:
         raise ValidationError("idempotency_key is required.")
     if format not in VALID_FORMATS:
@@ -81,6 +121,14 @@ def create_owned_copy(
     existing = OwnedCopy.objects.filter(user=user, idempotency_key=idempotency_key).first()
     if existing is not None:
         return existing, False
+
+    normalized_currency = _validate_copy_metadata(
+        format=format,
+        price=price,
+        currency=currency,
+        conservation_state=conservation_state,
+        storage_location=storage_location,
+    )
 
     try:
         release = GameRelease.objects.get(id=release_id, work=work)
@@ -115,6 +163,12 @@ def create_owned_copy(
                 edition=edition,
                 format=format,
                 idempotency_key=idempotency_key,
+                purchase_date=purchase_date,
+                price=price,
+                currency=normalized_currency,
+                store=store,
+                conservation_state=conservation_state,
+                storage_location=storage_location,
             )
         return copy, True
     except IntegrityError:
@@ -178,6 +232,14 @@ def save_library_configuration(
                 except Edition.DoesNotExist as exc:
                     raise ValidationError("edition does not belong to the selected release.") from exc
 
+            normalized_currency = _validate_copy_metadata(
+                format=copy_data["format"],
+                price=copy_data.get("price"),
+                currency=copy_data.get("currency"),
+                conservation_state=copy_data.get("conservation_state"),
+                storage_location=copy_data.get("storage_location"),
+            )
+
             if copy_id:
                 copy = existing.get(copy_id)
                 if copy is None:
@@ -185,7 +247,25 @@ def save_library_configuration(
                 copy.release = release
                 copy.edition = edition
                 copy.format = copy_data["format"]
-                copy.save(update_fields=["release", "edition", "format"])
+                copy.purchase_date = copy_data.get("purchase_date")
+                copy.price = copy_data.get("price")
+                copy.currency = normalized_currency
+                copy.store = copy_data.get("store")
+                copy.conservation_state = copy_data.get("conservation_state")
+                copy.storage_location = copy_data.get("storage_location")
+                copy.save(
+                    update_fields=[
+                        "release",
+                        "edition",
+                        "format",
+                        "purchase_date",
+                        "price",
+                        "currency",
+                        "store",
+                        "conservation_state",
+                        "storage_location",
+                    ]
+                )
                 keep_ids.add(copy_id)
                 continue
 
@@ -203,6 +283,12 @@ def save_library_configuration(
                 edition=edition,
                 format=copy_data["format"],
                 idempotency_key=key,
+                purchase_date=copy_data.get("purchase_date"),
+                price=copy_data.get("price"),
+                currency=normalized_currency,
+                store=copy_data.get("store"),
+                conservation_state=copy_data.get("conservation_state"),
+                storage_location=copy_data.get("storage_location"),
             )
             keep_ids.add(str(copy.id))
 
