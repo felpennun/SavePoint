@@ -266,9 +266,20 @@ def leave_fraction_out_dominant_tag(
     profile_inputs = build_profile_inputs(user, corpus_version, tag_idf)
     if not profile_inputs.positive:
         return None
-    dominant_tag = max(profile_inputs.positive.items(), key=lambda kv: kv[1])[0]
-    if not dominant_tag.startswith("tag:"):
+    # facet_similarity treats facet families as independent signals (each
+    # with its own weight, combined afterwards) -- a work's platform match
+    # and its tag match are never in competition there. Comparing raw
+    # weight across families here (2026-09-12 bug, caught in session) would
+    # let a user with almost everything on one platform "lose" to that
+    # platform against any single content tag purely because it repeats in
+    # every entry, and wrongly exclude them from a tag-focused study even
+    # when they do have a clear dominant genre. Restrict the search to
+    # tag: keys before taking the max, instead of taking the global max and
+    # checking after the fact whether it happened to be a tag.
+    tag_weights = {key: value for key, value in profile_inputs.positive.items() if key.startswith("tag:")}
+    if not tag_weights:
         return None
+    dominant_tag = max(tag_weights.items(), key=lambda kv: kv[1])[0]
     dominant_slug = dominant_tag.split(":", 1)[1]
 
     same_tag_pool = sorted(
@@ -300,7 +311,11 @@ def leave_fraction_out_dominant_tag(
         excluded = set(candidate_heldout)
         remaining_entries = [entry for entry in library_entries if entry["work_id"] not in excluded]
         new_profile = _profile_from_entries(remaining_entries, vectors)
-        rank = _rank_of(dominant_tag, new_profile) if new_profile else None
+        # Same reasoning as the dominant-tag search above: rank dominant_tag
+        # only against other tags, never against platform/franchise/
+        # developer entries in the same combined profile dict.
+        new_tag_weights = {key: value for key, value in new_profile.items() if key.startswith("tag:")}
+        rank = _rank_of(dominant_tag, new_tag_weights) if new_tag_weights else None
         if n == 1 or rank == 1:
             heldout = candidate_heldout
             achieved_rank = rank if rank is not None else n + 1  # worse than any observed rank
