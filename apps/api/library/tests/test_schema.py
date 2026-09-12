@@ -147,3 +147,58 @@ def test_custom_list_has_a_default_version_of_one() -> None:
     custom_list_model = apps.get_model("library", "CustomList")
     field = custom_list_model._meta.get_field("version")
     assert field.default == 1
+
+
+# ---------------------------------------------------------------------------
+# Plan 05-03 Task 2: OwnedCopy purchase/conservation metadata schema and
+# constraints (INV-03/INV-04). The migration must already be applied
+# (docker compose `migrate --noinput` per the plan's [BLOCKING] gate) before
+# these run.
+# ---------------------------------------------------------------------------
+
+
+def test_phase5_copy_metadata_migration_depends_on_comments_lists_migration() -> None:
+    module = importlib.import_module("library.migrations.0004_phase5_copy_metadata")
+    library_deps = [dep[1] for dep in module.Migration.dependencies if dep[0] == "library"]
+    assert "0003_phase5_comments_lists" in library_deps
+
+
+@pytest.mark.django_db
+def test_owned_copy_table_has_metadata_columns() -> None:
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT column_name FROM information_schema.columns WHERE table_name = 'library_ownedcopy'")
+        columns = {row[0] for row in cursor.fetchall()}
+    assert {
+        "purchase_date",
+        "price",
+        "currency",
+        "store",
+        "conservation_state",
+        "storage_location",
+    } <= columns
+
+
+@pytest.mark.django_db
+def test_owned_copy_metadata_constraints_are_enforced() -> None:
+    with connection.cursor() as cursor:
+        cursor.execute(
+            "SELECT conname FROM pg_constraint WHERE conname IN ("
+            "'library_copy_price_non_negative', "
+            "'library_copy_currency_format_valid', "
+            "'library_copy_conservation_state_valid', "
+            "'library_copy_digital_excludes_conservation')"
+        )
+        found = {row[0] for row in cursor.fetchall()}
+    assert found == {
+        "library_copy_price_non_negative",
+        "library_copy_currency_format_valid",
+        "library_copy_conservation_state_valid",
+        "library_copy_digital_excludes_conservation",
+    }
+
+
+def test_owned_copy_conservation_fields_are_nullable() -> None:
+    owned_copy_model = apps.get_model("library", "OwnedCopy")
+    for field_name in ("purchase_date", "price", "currency", "store", "conservation_state", "storage_location"):
+        field = owned_copy_model._meta.get_field(field_name)
+        assert field.null is True
