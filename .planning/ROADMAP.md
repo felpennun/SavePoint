@@ -258,7 +258,12 @@ sensibilidad multi-semilla queda como limitación metodológica y trabajo futuro
   4. Invalid or duplicate import rows receive deterministic row-level outcomes, and exported spreadsheet cells cannot execute formulas.
   5. The workflows have accessible UI verification and contemporaneous design, test, limitation, agent, and author-decision evidence.
 
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 05-01-PLAN.md — autenticación real, perfil, favoritos y privacidad
+- [ ] 05-02-PLAN.md — comentarios únicos y listas personalizadas ordenables
+- [ ] 05-03-PLAN.md — metadatos avanzados de copias e inventario
+- [ ] 05-04-PLAN.md — exportación CSV, reconciliación de requisitos y evidencia
 **UI hint**: yes
 
 ### Phase 6: Public Discovery and Resilient Enrichment
