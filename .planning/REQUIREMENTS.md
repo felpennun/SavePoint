@@ -34,10 +34,10 @@
 - [x] **INV-03**: Each copy can record purchase date, price, currency, and store.
 - [x] **INV-04**: A physical copy can record conservation state and storage location.
 - [x] **INV-05**: Private notes and purchase details never appear in public projections.
-- [ ] **PORT-01**: User can export their collection, ratings, and lists as versioned CSV; JSON is not part of the Phase 5 closure.
+- [x] **PORT-01**: User can export their collection, ratings, and lists as versioned CSV; JSON is not part of the Phase 5 closure.
 - [ ] **PORT-02**: User can preview and validate an import before applying it (assigned to Phase 7; no Phase 5 endpoint or feature test).
 - [ ] **PORT-03**: Import reports row-level errors and applies deterministic duplicate and conflict rules (assigned to Phase 7; no Phase 5 endpoint or feature test).
-- [ ] **PORT-04**: CSV exports neutralise potentially malicious spreadsheet formulas.
+- [x] **PORT-04**: CSV exports neutralise potentially malicious spreadsheet formulas.
 
 ### Data and Provenance
 
@@ -222,10 +222,10 @@
 | LIB-04 | Phase 5 | Complete |
 | INV-03 | Phase 5 | Complete |
 | INV-04 | Phase 5 | Complete |
-| PORT-01 | Phase 5 | Pending — versioned CSV only |
+| PORT-01 | Phase 5 | Complete (Plan 05-04, CSV only — JSON out of scope) |
 | PORT-02 | Phase 7 | Pending — deferred; no Phase 5 endpoint or feature test |
 | PORT-03 | Phase 7 | Pending — deferred; no Phase 5 endpoint or feature test |
-| PORT-04 | Phase 5 | Pending |
+| PORT-04 | Phase 5 | Complete |
 | PRIV-01 | Phase 5 | Complete |
 | PROF-03 | Phase 6 | Pending |
 | PROF-04 | Phase 6 | Pending |

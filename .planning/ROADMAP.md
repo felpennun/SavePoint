@@ -261,13 +261,15 @@ sensibilidad multi-semilla queda como limitación metodológica y trabajo futuro
   4. Exported spreadsheet cells cannot execute formulas; JSON export and import preview/conflict handling are explicitly assigned to Phase 7 and are not part of this closure.
   5. The workflows have accessible UI verification and contemporaneous design, test, limitation, agent, and author-decision evidence.
 
-**Plans**: 3/4 plans executed
+**Plans**: 4/4 plans executed (backend only — no `apps/web/**` plan in this phase, see `05-01`..`05-04` `<handoff>` blocks)
 Plans:
 
 - [x] 05-01-PLAN.md — autenticación real, perfil, favoritos y privacidad
 - [x] 05-02-PLAN.md — comentarios únicos y listas personalizadas ordenables
 - [x] 05-03-PLAN.md — metadatos avanzados de copias e inventario
-- [ ] 05-04-PLAN.md — exportación CSV, reconciliación de requisitos y evidencia
+- [x] 05-04-PLAN.md — exportación CSV, reconciliación de requisitos y evidencia
+
+**Estado (2026-09-13):** las 4 plans de backend están completas y verificadas (619/619 tests, `docs/verification/phase-05-signoff.md`). Los criterios de éxito 1 y 5 exigen que el flujo sea usable en la interfaz con verificación accesible — pendiente de integración en `apps/web/**` y evidencia Playwright/axe antes de marcar la fase como cerrada.
 
 **UI hint**: yes
 
@@ -330,6 +332,6 @@ schedule properly in a later phase-planning pass.
 | 2. Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender | 13/13 | Complete    | 2026-09-08 |
 | 3. Explainable Content Recommenders and Baseline Comparison | 4/4 | Complete with limitation | 2026-09-12 |
 | 4. Collaborative and Hybrid Comparison | 3/3 | Complete with limitation | 2026-09-12 |
-| 5. Complete Collection Workflows and Portability | 3/4 | In Progress | - |
+| 5. Complete Collection Workflows and Portability | 4/4 backend | In Progress (UI pendiente) | - |
 | 6. Public Discovery and Resilient Enrichment | 0/TBD | Not started | - |
 | 7. Research Panel, Hardening, and Evidence Freeze | 0/TBD | Not started | - |
