@@ -25,7 +25,8 @@ from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
-from accounts.serializers import build_public_profile
+from accounts.serializers import AccountProfileSerializer, build_public_profile, serialize_account_profile
+from accounts.services import get_or_create_profile, update_profile
 
 User = get_user_model()
 
@@ -212,6 +213,34 @@ class MeView(APIView):
         user = request.user
         is_demo = hasattr(user, "demo_identity") or hasattr(user, "demo_anchor")
         return Response({"username": user.username, "is_demo": is_demo})
+
+
+class MyProfileView(APIView):
+    """GET/PATCH /api/accounts/me/profile/ -- the signed-in owner's editable
+    profile (PROF-01).
+
+    The alias (``User.username``) is never accepted or returned here -- D-01
+    keeps it immutable, and the owner is always ``request.user``: no
+    identity is ever accepted from the request body (IDOR boundary).
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request) -> Response:
+        profile = get_or_create_profile(user=request.user)
+        return Response(serialize_account_profile(profile))
+
+    def patch(self, request: Request) -> Response:
+        serializer = AccountProfileSerializer(data=request.data, partial=True)
+        if not serializer.is_valid():
+            return Response({"detail": "Invalid profile update.", "errors": serializer.errors}, status=400)
+
+        try:
+            profile = update_profile(user=request.user, **serializer.validated_data)
+        except DjangoValidationError as exc:
+            return Response({"detail": str(exc.message if hasattr(exc, "message") else exc)}, status=400)
+
+        return Response(serialize_account_profile(profile))
 
 
 class PublicProfileView(APIView):

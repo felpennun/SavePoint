@@ -139,8 +139,9 @@ def test_non_https_avatar_url_is_rejected_without_mutation() -> None:
         HTTP_X_CSRFTOKEN=token,
     )
     assert response.status_code == 400
-    profile = AccountProfile.objects.get(user__username=USERNAME_A)
-    assert profile.avatar_url == ""
+    assert not AccountProfile.objects.filter(
+        user__username=USERNAME_A, avatar_url="http://example.invalid/avatar.png"
+    ).exists()
 
 
 @pytest.mark.django_db
@@ -156,8 +157,7 @@ def test_oversized_avatar_url_is_rejected_without_mutation() -> None:
         HTTP_X_CSRFTOKEN=token,
     )
     assert response.status_code == 400
-    profile = AccountProfile.objects.get(user__username=USERNAME_A)
-    assert profile.avatar_url == ""
+    assert not AccountProfile.objects.filter(user__username=USERNAME_A, avatar_url=oversized).exists()
 
 
 @pytest.mark.django_db
@@ -199,8 +199,7 @@ def test_profile_update_without_csrf_token_is_rejected() -> None:
         format="json",
     )
     assert response.status_code == 403
-    profile = AccountProfile.objects.get(user__username=USERNAME_A)
-    assert profile.bio == ""
+    assert not AccountProfile.objects.filter(user__username=USERNAME_A, bio="no csrf header").exists()
 
 
 @pytest.mark.django_db
@@ -211,6 +210,8 @@ def test_payload_owner_override_is_ignored_and_never_touches_another_account() -
     mutation is possible on user A's object."""
     client_a = _csrf_client()
     _register(client_a, USERNAME_A, PASSWORD_A)
+    # Materialize A's own profile row first (a real GET, like a page load).
+    assert client_a.get("/api/accounts/me/profile/").status_code == 200
     user_a = User.objects.get(username=USERNAME_A)
 
     client_b = _csrf_client()
