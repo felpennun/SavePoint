@@ -27,8 +27,8 @@
 
 - [x] **LIB-01**: User can mark a game as pending, playing, completed, or abandoned.
 - [x] **LIB-02**: User can rate a game using a consistent rating scale.
-- [ ] **LIB-03**: User can create, edit, and delete their own comments.
-- [ ] **LIB-04**: User can create and order custom game lists.
+- [x] **LIB-03**: User can create, edit, and delete their own comments.
+- [x] **LIB-04**: User can create and order custom game lists.
 - [x] **INV-01**: User can register multiple owned copies of the same game.
 - [x] **INV-02**: Each copy can record physical or digital format, platform, and edition.
 - [ ] **INV-03**: Each copy can record purchase date, price, currency, and store.
@@ -218,8 +218,8 @@
 | REC-05 | Phase 4 | Complete (`04-01-SUMMARY.md`, v15 artifact) |
 | DOC-03 | Phase 4 | Complete (`docs/methodology/recommendation-algorithms.md`, phase signoff) |
 | PROF-01 | Phase 5 | Complete (Plan 05-01) |
-| LIB-03 | Phase 5 | Pending |
-| LIB-04 | Phase 5 | Pending |
+| LIB-03 | Phase 5 | Complete |
+| LIB-04 | Phase 5 | Complete |
 | INV-03 | Phase 5 | Pending |
 | INV-04 | Phase 5 | Pending |
 | PORT-01 | Phase 5 | Pending — versioned CSV only |
