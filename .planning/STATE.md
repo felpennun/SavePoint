@@ -18,7 +18,7 @@ total_plans_in_phase: 6
 next_phase: 07
 next_phase_name: Research Panel, Hardening, and Evidence Freeze
 next_action: Ejecutar 07-01-PLAN.md
-current_plan: 00
+current_plan: 01
 ---
 
 # Project State

@@ -159,6 +159,8 @@ Commit adicional requerido por `AGENTS.md` para sincronizar el vault vivo: `d1c9
 
 - La deriva v15/v16 descrita arriba fue resuelta de forma explícita y queda visible para los siguientes planes. No hubo gates de autenticación, instalaciones de dependencias ni verificaciones omitidas.
 
+El gate global de requisitos compartidos no autoriza todavia el cierre de los IDs declarados por planes posteriores: EVAL-13, EVAL-14, DOC-05 y AGENT-05 tambien pertenecen a otras entregas de la fase. Por eso `REQUIREMENTS.md` permanece en `Pending` hasta que se completen esos planes.
+
 ## Authentication Gates
 
 None - no se necesitaron servicios externos ni credenciales.
