@@ -5,6 +5,7 @@ import {
   countActiveFilters,
   parseFilters,
   removeHref,
+  restrictSelectedFilters,
 } from "@/lib/catalogue-filters";
 
 describe("catalogue multi-select filters", () => {
@@ -39,5 +40,105 @@ describe("catalogue multi-select filters", () => {
     expect(removeHref("?q=zelda&tag=rpg&tag=strategy&platform=switch&page=2", "tag", "rpg")).toBe(
       "?q=zelda&tag=strategy&platform=switch&page=2",
     );
+  });
+
+  it("serializes every CAT-05 repeated facet with backend parameter names", () => {
+    const filters = parseFilters(
+      {
+        platform: ["switch", "pc"],
+        tag: ["rpg", "strategy"],
+        edition: "deluxe",
+        genre: ["role-playing-games-rpg", "adventure"],
+        franchise: "zelda",
+        developer: "nintendo",
+        publisher: "nintendo",
+        mode: "single-player",
+        year_from: "1990",
+        year_to: "2020",
+        date_from: "1990-01-01",
+        date_to: "2020-12-31",
+        min_rating: "80",
+        sort: "rating_desc",
+      },
+      2026,
+    );
+
+    expect(buildQuery(filters, 3)).toBe(
+      "?platform=switch&platform=pc&tag=rpg&tag=strategy&edition=deluxe&genre=role-playing-games-rpg&genre=adventure&franchise=zelda&developer=nintendo&publisher=nintendo&mode=single-player&year_from=1990&year_to=2020&date_from=1990-01-01&date_to=2020-12-31&min_rating=80&sort=rating_desc&page=3",
+    );
+  });
+
+  it("keeps the complete query when moving between pages", () => {
+    const filters = parseFilters(
+      {
+        q: "zelda",
+        platform: ["switch", "pc"],
+        genre: "adventure",
+        date_from: "2010",
+        date_to: "2020",
+        sort: "title_asc",
+      },
+      2026,
+    );
+
+    const pageTwo = buildQuery(filters, 2);
+    expect(pageTwo).toContain("platform=switch&platform=pc");
+    expect(pageTwo).toContain("genre=adventure");
+    expect(pageTwo).toContain("date_from=2010&date_to=2020");
+    expect(pageTwo).toContain("sort=title_asc");
+    expect(pageTwo).toContain("page=2");
+    expect(pageTwo).not.toContain("page=1");
+  });
+
+  it("drops malformed scalar bounds while retaining valid repeated facets", () => {
+    const filters = parseFilters(
+      {
+        platform: ["switch"],
+        year_from: "not-a-year",
+        date_to: "2020-13-40",
+        min_rating: "101",
+      },
+      2026,
+    );
+
+    expect(filters.platform).toEqual(["switch"]);
+    expect(filters.year_from).toBeUndefined();
+    expect(filters.date_to).toBeUndefined();
+    expect(filters.min_rating).toBeUndefined();
+  });
+
+  it("removes one value from any repeated CAT-05 facet", () => {
+    expect(
+      removeHref("?genre=rpg&genre=adventure&publisher=nintendo&mode=co-op", "genre", "rpg"),
+    ).toBe("?genre=adventure&publisher=nintendo&mode=co-op");
+  });
+
+  it("does not render unknown facet values as selectable controls", () => {
+    const filters = parseFilters(
+      { genre: ["known-genre", "untrusted-slug"], publisher: "untrusted-publisher" },
+      2026,
+    );
+
+    const visible = restrictSelectedFilters(filters, {
+      genres: [{ value: "known-genre", label: "Known genre" }],
+      publishers: [],
+    });
+
+    expect(visible.genre).toEqual(["known-genre"]);
+    expect(visible.publisher).toEqual([]);
+  });
+
+  it("counts all selected CAT-05 dimensions as active filters", () => {
+    const filters = parseFilters(
+      {
+        edition: "deluxe",
+        genre: ["rpg", "adventure"],
+        date_from: "2010",
+        date_to: "2020",
+      },
+      2026,
+    );
+
+    expect(countActiveFilters(filters)).toBe(5);
   });
 });
