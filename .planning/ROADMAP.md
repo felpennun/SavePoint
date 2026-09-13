@@ -290,16 +290,34 @@ Plans:
 
 **Plans**: 10 plans
 Plans:
+**Wave 1**
+
 - [ ] 06-00-PLAN.md — Reconciliación semántica de requisitos, decisiones y trazabilidad
 - [ ] 06-01-PLAN.md — Núcleo transaccional de relaciones sociales
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 06-02-PLAN.md — Contrato CAT-05 y enriquecimiento local resiliente
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 06-03-PLAN.md — Perfil básico, proyecciones autorizadas y listas compartibles
-- [ ] 06-04-PLAN.md — Comentarios autorizados, recomendaciones e inbox backend
 - [ ] 06-05-PLAN.md — Descubrimiento de catálogo en Next.js
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 06-04-PLAN.md — Comentarios autorizados, recomendaciones e inbox backend
 - [ ] 06-06-PLAN.md — Perfiles, amistades y acciones sociales en Next.js
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
 - [ ] 06-07-PLAN.md — Inbox privado, navegación y badge de pendientes
 - [ ] 06-08-PLAN.md — Comentarios en ficha, traducciones y estados visuales
+
+**Wave 6** *(blocked on Wave 5 completion)*
+
 - [ ] 06-09-PLAN.md — E2E, gates PostgreSQL y evidencia final
+
 **UI hint**: yes
 
 ### Phase 7: Research Panel, Hardening, and Evidence Freeze
