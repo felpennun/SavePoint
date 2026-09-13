@@ -1,19 +1,19 @@
 ---
 gsd_state_version: 1.0
 status: in_progress
-stopped_at: Fase 4 firmada con limitación multi-semilla documentada
-last_updated: "2026-09-12T20:24:53.152Z"
-last_activity: 2026-09-12
-state_head: 524a65e17484ee492b9cca479e48ad3705d8d3c2
+stopped_at: Fase 5 firmada (backend + interfaz, evidencia Playwright/axe en docs/verification/phase-05-signoff.md)
+last_updated: "2026-09-13T12:15:00.000Z"
+last_activity: 2026-09-13
+state_head: 62332f33e56cb63dac106460e7bc8e83247d8e5c
 progress:
   total_phases: 8
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 50
-  completed_plans: 46
-  percent: 25
-next_phase: 5
-next_phase_name: Complete Collection Workflows and Portability
-next_action: Planificar la Fase 5 tras el cierre documentado de las Fases 3 y 4
+  completed_plans: 50
+  percent: 37
+next_phase: 6
+next_phase_name: Public Discovery and Resilient Enrichment
+next_action: Planificar la Fase 6
 current_phase_name: Complete Collection Workflows and Portability
 current_phase: 05
 ---

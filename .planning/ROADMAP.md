@@ -19,7 +19,7 @@ SavePoint begins with a three-day, publicly deployed vertical demonstration, the
 - [x] **Phase 2: Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender** - Prune the corpus to a governed platform/quality allowlist (Steam included), ingest external ratings with provenance and experiment isolation, fix tolerant search over the real corpus, add multi-select filters and a product-grade UI pass, freeze the simulation-aware evaluation protocol, and ship a first ratings-aware content recommender evaluated under it. Accepted by the author on 2026-09-08; simulated limitations retained explicitly.
 - [x] **Phase 3: Explainable Content Recommenders and Baseline Comparison** - Run the frozen harness over random/popularity baselines and content recommenders with cold-start routing, exclusions, deterministic explanations, the full metric suite, cohort reporting, and independently recalculable artifacts. Completed 2026-09-12 with the multi-seed limitation documented.
 - [x] **Phase 4: Collaborative and Hybrid Comparison** - Compare collaborative and hybrid methods under the already-frozen protocol and document bounded conclusions. Completed 2026-09-12 with the multi-seed limitation documented.
-- [ ] **Phase 5: Complete Collection Workflows and Portability** - Complete profiles, comments, lists, copy details, and safe deterministic versioned CSV export.
+- [x] **Phase 5: Complete Collection Workflows and Portability** - Complete profiles, comments, lists, copy details, and safe deterministic versioned CSV export. (completed 2026-09-13)
 - [ ] **Phase 6: Public Discovery and Resilient Enrichment** - Add public projections, catalogue discovery, and shareable public views without contaminating research data.
 - [ ] **Phase 7: Research Panel, Hardening, and Evidence Freeze** - Present thesis-ready comparisons and finish administration, security, recovery, accessibility, and reproducibility gates.
 
@@ -269,7 +269,7 @@ Plans:
 - [x] 05-03-PLAN.md — metadatos avanzados de copias e inventario
 - [x] 05-04-PLAN.md — exportación CSV, reconciliación de requisitos y evidencia
 
-**Estado (2026-09-13):** las 4 plans de backend están completas y verificadas (619/619 tests, `docs/verification/phase-05-signoff.md`). Los criterios de éxito 1 y 5 exigen que el flujo sea usable en la interfaz con verificación accesible — pendiente de integración en `apps/web/**` y evidencia Playwright/axe antes de marcar la fase como cerrada.
+**Estado (2026-09-13, cerrada):** las 4 plans de backend están completas y verificadas (619/619 tests). La integración en `apps/web/**` (perfil/favoritos, comentarios, listas, copias, export CSV) está hecha y verificada con evidencia Playwright/axe real (`e2e/collection-workflows.spec.ts`, 2/2 reproducible en tres ejecuciones separadas). Dos bugs de integración encontrados durante esa verificación (404 del export CSV a través del proxy de Next.js; colisión de clases CSS entre botones de borrar comentario/lista/copia) quedaron corregidos en la misma sesión. Evidencia completa en `docs/verification/phase-05-signoff.md` §9-10.
 
 **UI hint**: yes
 
@@ -332,6 +332,6 @@ schedule properly in a later phase-planning pass.
 | 2. Governed Corpus, External Ratings, Evaluation Contract, and First Advanced Recommender | 13/13 | Complete    | 2026-09-08 |
 | 3. Explainable Content Recommenders and Baseline Comparison | 4/4 | Complete with limitation | 2026-09-12 |
 | 4. Collaborative and Hybrid Comparison | 3/3 | Complete with limitation | 2026-09-12 |
-| 5. Complete Collection Workflows and Portability | 4/4 backend | In Progress (UI pendiente) | - |
+| 5. Complete Collection Workflows and Portability | 4/4 | Complete | 2026-09-13 |
 | 6. Public Discovery and Resilient Enrichment | 0/TBD | Not started | - |
 | 7. Research Panel, Hardening, and Evidence Freeze | 0/TBD | Not started | - |

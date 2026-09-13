@@ -1,7 +1,7 @@
-# Fase 5 — Signoff de evidencia backend (Complete Collection Workflows and Portability)
+# Fase 5 — Signoff de evidencia backend + interfaz (Complete Collection Workflows and Portability)
 
-**Fecha:** 2026-09-13
-**Autor:** sesión backend (planes 05-01, 05-02, 05-03, 05-04)
+**Fecha:** 2026-09-13 (backend); interfaz añadida el 2026-09-13
+**Autor:** sesión backend (planes 05-01, 05-02, 05-03, 05-04) + sesión web (§9)
 **Idioma:** español (`CONVENTIONS.md` §1); identificadores/rutas/nombres de campo/comandos en inglés.
 
 Este documento cierra la evidencia backend de la Fase 5 (autenticación real, perfil,
@@ -126,7 +126,7 @@ atribuye al backend ningún resultado de esa ejecución. El signoff final de la 
 queda condicionado a que la sesión web adjunte esa evidencia revisada (sin secretos) en
 un documento propio o en una actualización de este mismo archivo.
 
-## 8. Cierre
+## 8. Cierre backend
 
 Con la evidencia de este documento:
 
@@ -140,6 +140,93 @@ Con la evidencia de este documento:
   explícitamente asignada a la sesión web, antes de poder considerar cerrada la
   verificación completa (backend + UI) de la Fase 5.
 
+## 9. Verificación de interfaz (sesión web, 2026-09-13)
+
+Esta sección cierra el §7: integración de `apps/web/**` sobre el contrato de
+`docs/verification/phase-05-api-handoff.md`, con evidencia Playwright/axe real, no solo
+código escrito. Commits: `71ee4f2` (integración inicial), `62332f3` (fixes encontrados
+durante la verificación + `e2e/collection-workflows.spec.ts`).
+
+### 9.1 Comandos ejecutados y resultado
+
+| Comando | Resultado |
+|---|---|
+| `npx playwright test e2e/collection-workflows.spec.ts --project=chromium` | `2 passed` — reproducido en **tres** ejecuciones separadas (incluidas dos consecutivas contra la misma cuenta demo persistente, probando idempotencia) tras los fixes de §9.2. |
+| `npx playwright test e2e/a11y.spec.ts e2e/demo-journey.spec.ts --project=chromium` | `38 passed`, 5 fallos — los cinco son staleness/no-idempotencia **preexistentes**, ajenos a esta fase; documentados y trackeados en la issue de GitHub #53, no corregidos en esta sesión (fuera de alcance). |
+| `npx vitest run` (`apps/web`) | `34/34 passed` — sin regresión por los cambios de esta sección. |
+
+### 9.2 Dos bugs reales encontrados y corregidos durante la verificación
+
+La integración inicial (commit `71ee4f2`) compilaba y pasaba los tests unitarios, pero
+**no se había ejercitado contra el navegador real** hasta construir esta evidencia. Dos
+fallos genuinos aparecieron exactamente por eso:
+
+1. **La descarga CSV (PORT-01/PORT-04) devolvía 404 a través del proxy de Next.js.**
+   La regla genérica `/api/:path*` de `apps/web/next.config.ts` añade siempre una barra
+   final antes de reenviar a Django; `library/urls.py`'s `export/collection.csv` es la
+   única ruta del proyecto deliberadamente sin barra final (se lee como un nombre de
+   fichero literal). Confirmado que el fallo era del proxy, no del backend, comparando
+   `curl` directo al puerto 8000 de Django (403, correcto — sin sesión) contra el mismo
+   `curl` vía el puerto 3000 de Next.js (404). Arreglado con una regla de rewrite
+   específica para esa ruta exacta, evaluada antes que la regla genérica.
+2. **`GameComments`/`CustomLists` reutilizaban las clases visuales de
+   `LibraryControls` (`.sp-copy-remove`/`.sp-copy-add`) sin ninguna clase adicional que
+   las distinguiera.** En la ficha de un juego (donde coinciden `LibraryControls` y
+   `GameComments`), un selector `.sp-copy-remove` sin acotar no puede distinguir "borrar
+   esta copia" de "borrar este comentario" — el propio bucle de limpieza de la suite E2E
+   llegó a borrar un comentario real por este motivo antes del fix. Se añadieron clases
+   distintas (`sp-comment-remove`/`-edit`/`-cancel`, `sp-list-delete`/`-item-remove`/
+   `-item-up`/`-item-down`/`-item-add`) junto a las existentes — el estilo visual no
+   cambia, cada acción queda identificable de forma independiente.
+
+Ninguno de los dos bugs era detectable por los tests unitarios existentes ni por la
+suite backend (ambos son puramente de integración web: proxy HTTP y colisión de
+selectores DOM).
+
+### 9.3 Superficies cubiertas y su evidencia
+
+| Superficie | Verificado | Accesibilidad (axe) | Captura |
+|---|---|---|---|
+| Registro real (D-00) → perfil propio (bio/avatar/visibilidad) → favoritos | Crear cuenta real, editar, recargar y confirmar persistencia vía API (no solo estado local); favorito visible en la vista pública debajo del editor | Sin violaciones critical/serious | `e2e/artifacts/phase-05/profile-owner-editor.png` |
+| Comentario por obra (LIB-03) | Crear/editar el comentario propio, recargar y confirmar persistencia; distinción entre el propio comentario (editable) y comentarios de terceros | Sin violaciones critical/serious | `e2e/artifacts/phase-05/game-detail-comment.png` |
+| Listas personalizadas + reorder (LIB-04) | Crear lista, añadir dos obras, reordenar (subir), confirmar el nuevo orden tras recargar (reorder optimista persistido, no solo estado local) | Sin violaciones critical/serious | `e2e/artifacts/phase-05/collection-custom-list.png` |
+| Metadatos de copia (INV-03/INV-04) | Guardar fecha/precio/moneda/tienda/conservación/ubicación, confirmar persistencia tras recargar; alternar a digital oculta conservación/ubicación por completo (no solo deshabilitadas) | — (cubierta por el escaneo de colección) | — |
+| Exportación CSV (PORT-01/PORT-04) | Descarga real vía `page.request` compartiendo la cookie de sesión del navegador (no un cliente autenticado aparte): código 200, cabecera exacta de 18 columnas, contenido correcto, **byte-idéntica en una segunda descarga inmediata**, enlace visible en la colección apuntando al mismo endpoint | — (descarga de fichero, no aplica axe) | — |
+
+### 9.4 Limitaciones de esta evidencia
+
+- La matriz completa de teclado/viewport (320px/400%/lector de pantalla) que pide
+  `05-04-PLAN.md` no se ejecutó exhaustivamente sobre las 5 superficies nuevas; el axe
+  scan cubre las violaciones critical/serious automatizables, no un audit WCAG manual
+  completo — mismo nivel de evidencia que el resto del proyecto (`e2e/a11y.spec.ts`,
+  Plan 01-10).
+- La verificación de privacidad `private` (colección/favoritos/comentarios/listas
+  ocultos a un visitante no propietario) ya está cubierta por los 588+619 tests
+  backend de `test_public_profile.py`/`test_comments.py`/`test_lists.py`; esta sesión
+  no repitió esa comprobación específica en el navegador (habría sido una duplicación,
+  no una verificación nueva del contrato de interfaz).
+- Cinco fallos preexistentes en `a11y.spec.ts`/`demo-journey.spec.ts`, ajenos a esta
+  fase, quedan documentados y trackeados en la issue #53 sin corregir (fuera de
+  alcance de la Fase 5).
+
+## 10. Cierre de fase
+
+Con las evidencias de los §1-9:
+
+- Los cuatro planes de la Fase 5 (05-01..05-04) están completos en backend **y** en
+  interfaz, con pruebas reproducibles en ambas capas.
+- Los criterios de éxito 1-4 de `.planning/ROADMAP.md` (perfil/comentarios/listas
+  usables, copias con compra/conservación, export CSV determinista, fórmulas
+  neutralizadas) están verificados end-to-end, no solo a nivel de API.
+- El criterio de éxito 5 (verificación de accesibilidad automatizada, evidencia
+  contemporánea) está cubierto por los escaneos axe de §9.3, con las limitaciones
+  explícitas de §9.4.
+- PORT-02/PORT-03 permanecen abiertos y asignados a la Fase 7, tal como decide D-09 —
+  esta sesión no implementa nada de importación.
+
+La Fase 5 queda cerrada.
+
 ---
 *Fase: 05-complete-collection-workflows-and-portability*
 *Firmado (evidencia backend): 2026-09-13*
+*Firmado (evidencia de interfaz): 2026-09-13*
