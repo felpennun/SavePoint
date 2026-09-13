@@ -24,6 +24,9 @@ import os
 import re
 import time
 from collections.abc import Callable, Iterator
+import hashlib
+import json
+from pathlib import Path
 
 import requests
 
@@ -43,7 +46,7 @@ GAME_FIELDS = (
     "rating,rating_count,summary,genres.id,genres.name,platforms.id,platforms.name,"
     "alternative_names.name,franchises.id,franchises.name,collections.name,"
     "involved_companies.company.id,involved_companies.company.name,"
-    "involved_companies.developer,cover.image_id,"
+    "involved_companies.developer,involved_companies.publisher,cover.image_id,"
     "themes.id,themes.name,keywords.id,keywords.name,"
     "player_perspectives.id,player_perspectives.name,game_modes.id,game_modes.name"
 )
@@ -76,6 +79,60 @@ class IgdbClientError(RuntimeError):
 
     def __init__(self, message: object) -> None:
         super().__init__(redact(str(message)))
+
+
+class ApprovedSnapshotError(ValueError):
+    """Raised when a local catalogue snapshot is not explicitly approved."""
+
+
+class ApprovedSnapshotClient:
+    """Id-cursor client backed by an immutable, approved local JSON snapshot.
+
+    The interface intentionally mirrors the read methods used by
+    :class:`IgdbClient`, allowing the management command to share its
+    idempotent upsert path without introducing a request-time provider.
+    """
+
+    def __init__(self, path: str | Path) -> None:
+        self.path = Path(path)
+        try:
+            raw = self.path.read_bytes()
+            payload = json.loads(raw.decode("utf-8"))
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise ApprovedSnapshotError("approved snapshot could not be read") from exc
+        if not isinstance(payload, dict) or payload.get("status") != "APPROVED":
+            raise ApprovedSnapshotError("snapshot status must be APPROVED")
+        if payload.get("source") not in {None, "igdb"}:
+            raise ApprovedSnapshotError("snapshot source must be igdb")
+        rows = payload.get("records", payload.get("games"))
+        if not isinstance(rows, list):
+            raise ApprovedSnapshotError("snapshot records must be a JSON array")
+        indexed: list[tuple[int, dict]] = []
+        seen: set[int] = set()
+        for row in rows:
+            if not isinstance(row, dict):
+                raise ApprovedSnapshotError("snapshot contains a non-object record")
+            try:
+                row_id = int(row["id"])
+            except (KeyError, TypeError, ValueError) as exc:
+                raise ApprovedSnapshotError("snapshot record has no integer id") from exc
+            if row_id in seen:
+                raise ApprovedSnapshotError("snapshot contains duplicate ids")
+            seen.add(row_id)
+            indexed.append((row_id, row))
+        self._rows = sorted(indexed)
+        self.snapshot_sha256 = hashlib.sha256(raw).hexdigest()
+        declared = payload.get("snapshot_sha256") or payload.get("sha256")
+        if declared is not None and str(declared).lower() != self.snapshot_sha256:
+            raise ApprovedSnapshotError("snapshot checksum does not match its file")
+
+    def count_eligible(self, where: str = "game_type = 0") -> int:  # noqa: ARG002
+        return len(self._rows)
+
+    def fetch_page(
+        self, after_id: int, page_size: int = 500, where: str = "game_type = 0"
+    ) -> list[dict]:  # noqa: ARG002
+        return [row for row_id, row in self._rows if row_id > int(after_id)][: int(page_size)]
 
 
 class IgdbClient:

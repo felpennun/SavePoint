@@ -23,6 +23,7 @@ from catalogue.management.commands.import_igdb_catalogue import IGDB_TERMS_URL
 from catalogue.models import (
     AssetAttribution,
     Developer,
+    Edition,
     Franchise,
     GameAlias,
     GameMode,
@@ -33,6 +34,7 @@ from catalogue.models import (
     Keyword,
     Platform,
     PlayerPerspective,
+    Publisher,
     SourceRecord,
     Theme,
 )
@@ -141,6 +143,7 @@ def _game(
     title_en: str | None = None,
     franchises: tuple[tuple[int, str], ...] = (),
     developers: tuple[tuple[int, str], ...] = (),
+    publishers: tuple[tuple[int, str], ...] = (),
     themes: tuple[tuple[int, str], ...] = (),
     player_perspectives: tuple[tuple[int, str], ...] = (),
     game_modes: tuple[tuple[int, str], ...] = (),
@@ -183,6 +186,8 @@ def _game(
             {"company": {"id": item_id, "name": name}, "developer": True}
             for item_id, name in developers
         ]
+    if publishers:
+        row["publishers"] = [{"id": item_id, "name": name} for item_id, name in publishers]
     return row
 
 
@@ -315,6 +320,52 @@ def test_igdb_import_persists_stable_franchises_and_developers() -> None:
     assert list(work.developers.values_list("igdb_id", "slug")) == [(88, "signal-studio")]
     assert Franchise.objects.count() == 1
     assert Developer.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_publisher_is_not_imported_from_provider_client_payload() -> None:
+    """Publisher enrichment is a local-approved-snapshot boundary."""
+    _run_import(
+        FakeIgdbClient(
+            [[_game(915, "Provider Publisher Quest", publishers=((9151, "Live House"),))]],
+            eligible=1,
+        )
+    )
+
+    assert not Publisher.objects.filter(igdb_id=9151).exists()
+
+
+@pytest.mark.django_db
+def test_approved_snapshot_imports_publisher_with_provenance_and_keeps_edition(tmp_path) -> None:
+    import json
+
+    row = _game(
+        916,
+        "Approved Publisher Quest",
+        platforms=((6, "PC"),),
+        publishers=((9161, "Approved House"),),
+    )
+    snapshot = tmp_path / "approved-catalogue.json"
+    snapshot.write_text(
+        json.dumps({"status": "APPROVED", "source": "igdb", "records": [row]}),
+        encoding="utf-8",
+    )
+    _run_import(FakeIgdbClient([]), snapshot=str(snapshot))
+
+    work = GameWork.objects.get(canonical_slug="approved-publisher-quest")
+    release = work.releases.get()
+    Edition.objects.create(release=release, name="Collector Edition")
+    # Re-running the same approved snapshot must preserve the existing
+    # hierarchy and converge the publisher relation.
+    _run_import(FakeIgdbClient([]), snapshot=str(snapshot))
+
+    publisher = Publisher.objects.get(igdb_id=9161)
+    assert publisher.name == "Approved House"
+    assert publisher.source == "igdb"
+    assert publisher.source_url == IGDB_TERMS_URL
+    assert publisher.snapshot_sha256
+    assert list(work.publishers.values_list("igdb_id", flat=True)) == [9161]
+    assert work.releases.get().editions.values_list("name", flat=True).get() == "Collector Edition"
 
 
 @pytest.mark.django_db

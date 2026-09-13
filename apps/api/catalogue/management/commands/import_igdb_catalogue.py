@@ -45,7 +45,7 @@ from django.db import IntegrityError, connection, transaction
 from django.db.models import Count
 from django.utils.text import slugify
 
-from catalogue.igdb import IgdbClient, redact
+from catalogue.igdb import ApprovedSnapshotClient, IgdbClient, redact
 from catalogue.models import (
     AssetAttribution,
     Developer,
@@ -59,6 +59,7 @@ from catalogue.models import (
     Keyword,
     Platform,
     PlayerPerspective,
+    Publisher,
     SourceRecord,
     Theme,
 )
@@ -100,6 +101,11 @@ class Command(BaseCommand):
             help="stop after N committed batches (0 = no limit); leaves the run resumable",
         )
         parser.add_argument("--dry-run", action="store_true")
+        parser.add_argument(
+            "--snapshot",
+            default="",
+            help="read an explicitly APPROVED local JSON snapshot instead of IGDB",
+        )
         parser.add_argument(
             "--evidence-json",
             default="",
@@ -182,6 +188,7 @@ class Command(BaseCommand):
             if isinstance(item, dict) and str(item.get("name") or "").strip()
         ]
         involved_companies = []
+        publishers = []
         for item in row.get("involved_companies") or []:
             if not isinstance(item, dict):
                 continue
@@ -195,6 +202,23 @@ class Command(BaseCommand):
                 involved_companies.append(
                     {"id": company_id, "name": company_name}
                 )
+            if company_name and bool(item.get("publisher")):
+                publishers.append({"id": company_id, "name": company_name})
+
+        # Approved local snapshots may contain a normalised publisher list
+        # even when the upstream capture used a different nested shape. Live
+        # provider responses are deliberately not allowed to populate this
+        # editorial relation; ``handle`` sets the boundary flag below.
+        for item in row.get("publishers") or []:
+            if not isinstance(item, dict):
+                continue
+            try:
+                company_id = int(item["id"])
+            except (KeyError, TypeError, ValueError):
+                continue
+            company_name = str(item.get("name") or "").strip()
+            if company_name:
+                publishers.append({"id": company_id, "name": company_name})
 
         genres = []
         for g in row.get("genres") or []:
@@ -250,6 +274,9 @@ class Command(BaseCommand):
             "collections": sorted(set(collections)),
             "developers": sorted(
                 {(item["id"], item["name"]) for item in involved_companies}
+            ),
+            "publishers": sorted(
+                {(item["id"], item["name"]) for item in publishers}
             ),
             "genres": genres,
             "platforms": sorted(set(platforms)),
@@ -461,6 +488,23 @@ class Command(BaseCommand):
             work.developers.add(
                 *[self._developer_for(developer_id, name) for developer_id, name in norm["developers"]]
             )
+        if getattr(self, "_publisher_source_allowed", False) and norm["publishers"]:
+            publishers = []
+            for publisher_id, publisher_name in norm["publishers"]:
+                publisher, _ = Publisher.objects.update_or_create(
+                    igdb_id=publisher_id,
+                    defaults={
+                        "name": publisher_name,
+                        "slug": self._facet_slug(publisher_name, publisher_id, Publisher),
+                        "source": "igdb",
+                        "source_url": IGDB_TERMS_URL,
+                        "licence": IGDB_LICENCE,
+                        "snapshot_sha256": getattr(self, "_snapshot_sha256", ""),
+                        "retrieved_at": now,
+                    },
+                )
+                publishers.append(publisher)
+            work.publishers.add(*publishers)
         # Additive classification facets. ``.add()`` is idempotent and only
         # ever inserts join rows -- it never clears an existing membership, so
         # a facet IGDB later stops returning for a work is preserved, matching
@@ -692,7 +736,21 @@ class Command(BaseCommand):
     # -- entrypoint --------------------------------------------------------
 
     def handle(self, *args: Any, **options: Any) -> None:
-        client = options.get("client") or IgdbClient()
+        snapshot_path = options.get("snapshot") or ""
+        if snapshot_path:
+            try:
+                client = ApprovedSnapshotClient(snapshot_path)
+            except Exception as exc:  # noqa: BLE001 - bounded, non-secret error
+                raise CommandError(f"approved snapshot rejected: {redact(str(exc))}") from None
+            self._publisher_source_allowed = True
+            self._snapshot_sha256 = client.snapshot_sha256
+        else:
+            client = options.get("client") or IgdbClient()
+            # An injected client is still treated as provider-shaped input for
+            # this boundary. Publisher is populated only by the explicit local
+            # ApprovedSnapshotClient branch above, never by live/provider data.
+            self._publisher_source_allowed = False
+            self._snapshot_sha256 = ""
         query_identity = options["query_identity"]
         where = options["where"]
         page_size = options["page_size"]
