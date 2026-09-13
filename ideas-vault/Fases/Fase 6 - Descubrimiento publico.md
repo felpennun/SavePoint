@@ -33,6 +33,32 @@ recomendacion entre amigos.
 
 Fuente canónica: [[../../.planning/phases/06-public-discovery-and-resilient-enrichment/06-CONTEXT]]
 
+## Contrato visual — 2026-09-13
+
+Propuesta de interfaz para la fase: se conserva el sistema CSS first-party
+Nocturne, con catálogo GET compartible, filtros completos preparados en backend
+sin congelar todavía la selección visual de facetas, perfil mínimo para no
+amigos y proyección allowlisted para amistades aceptadas. El módulo de
+amistades distingue rechazar, eliminar y bloquear; la bandeja privada se llama
+“Mensajes de amigos” y el icono de perfil muestra un punto rojo accesible cuando
+hay pendientes.
+
+Fuente canónica: [[../../.planning/phases/06-public-discovery-and-resilient-enrichment/06-UI-SPEC]]
+
+## Implicaciones de planificación — 2026-09-13
+
+La investigación técnica recomienda un módulo Django `social` separado, con
+políticas de visibilidad centralizadas, proyecciones allowlist independientes
+para perfil básico y amistades, y transiciones de relaciones dentro de
+`transaction.atomic()`. La ventana de recomendaciones debe comprobarse por
+pareja emisor-receptor y tiempo móvil, con pruebas de concurrencia y de frontera.
+
+El catálogo debe ampliar `search.py` y sus facets a todas las dimensiones de
+`CAT-05`; `Publisher` y el mapping de `Edition` necesitan una decisión de fuente
+y procedencia antes de modificar el importer. La investigación completa,
+incluidos los desajustes que deben reconciliarse en roadmap y requirements,
+está en [[../../.planning/phases/06-public-discovery-and-resilient-enrichment/06-RESEARCH]].
+
 ## Enlaces
 
 - [[Allowlist de campos publicos]] · [[Perfil publico]] · [[Catalogo]]
