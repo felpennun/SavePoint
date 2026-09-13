@@ -1,23 +1,24 @@
 ---
 gsd_state_version: 1.0
-status: in_progress
-stopped_at: Completed 06-08-PLAN.md
-last_updated: "2026-09-13T19:55:13.642Z"
+current_phase: 7
+current_phase_name: Research Panel, Hardening, and Evidence Freeze
+status: planning
+stopped_at: Phase 06 complete, ready to plan Phase 7
+last_updated: "2026-09-13T20:07:06.960Z"
 last_activity: 2026-09-13
-state_head: 518aa6f80d960eb39d00e89ea5df01a8f781557a
+last_activity_desc: Phase 06 complete, transitioned to Phase 7
+state_head: 7bb360d6eb331a8b161b00ed0f30efa5797fbb96
 progress:
   total_phases: 8
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 60
   completed_plans: 60
-  percent: 25
+  percent: 38
 completed_plans: 59
 percent: 98
 next_phase: 6
 next_phase_name: Public Discovery and Resilient Enrichment
 next_action: Ejecutar 06-09-PLAN.md
-current_phase: 06
-current_phase_name: Public Discovery and Resilient Enrichment
 ---
 
 # Project State
@@ -34,10 +35,10 @@ rule that applies to every LLM and collaborator).
 
 ## Current Position
 
-**Phase:** 06
-**Plan:** 09
+**Phase:** 7 — Research Panel, Hardening, and Evidence Freeze
+**Plan:** Not started
 **Plans in Phase:** 10
-**Status:** complete
+**Status:** Ready to plan
 
 ### Snapshot de ejecucion vigente (2026-09-07)
 
@@ -89,7 +90,7 @@ Progreso global: 2/8 fases (25%).
 
 **Velocity:**
 
-- Total plans completed: 29
+- Total plans completed: 39
 - Average duration: 25 min
 - Total execution time: 25 min
 
@@ -99,6 +100,7 @@ Progreso global: 2/8 fases (25%).
 |-------|-------|-------|----------|
 | 01 | 16 | - | - |
 | 2 | 13 | - | - |
+| 06 | 10 | - | - |
 
 **Recent Trend:**
 
@@ -275,7 +277,7 @@ Resume file: None
 
 Last session: 2026-09-07
 
-Stopped at: Phase 2 complete, ready to plan Phase 03
+Stopped at: Phase 06 complete, ready to plan Phase 7
 blocking-human checkpoint: IGDB final governed-corpus user-rating coverage measured at
 13,933 % (27.014/193.885); awaiting author decision to run the bounded RAWG enrichment
 (N=10000) or record IGDB-only in ADR-008. RAWG code + ADR committed in wip commit a718e8d.
@@ -409,7 +411,7 @@ totales. Ver `.planning/phases/04-collaborative-and-hybrid-comparison/`.
 | 260909-ws8 | Implementar hybrid-mmr-v1 y adoptar rating_final compartido en web y offline | 2026-09-10 | 2c12838 | [260909-ws8-implementar-hybrid-mmr-v1-en-web-y-offli](./quick/260909-ws8-implementar-hybrid-mmr-v1-en-web-y-offli/) |
 | 260910-0u7 | Verificar la importación de facetas IGDB y dejar checkpoint para la interfaz | 2026-09-10 | a3f3a14 | [260910-0u7-verificar-importacion-de-facetas-igdb-y-](./quick/260910-0u7-verificar-importacion-de-facetas-igdb-y-/) |
 
-Last activity: 2026-09-13
+Last activity: 2026-09-13 — Phase 06 complete, transitioned to Phase 7
 
 ## Reconciliación de continuidad — 2026-09-12
 

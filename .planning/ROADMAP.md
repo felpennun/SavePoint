@@ -20,7 +20,7 @@ SavePoint begins with a three-day, publicly deployed vertical demonstration, the
 - [x] **Phase 3: Explainable Content Recommenders and Baseline Comparison** - Run the frozen harness over random/popularity baselines and content recommenders with cold-start routing, exclusions, deterministic explanations, the full metric suite, cohort reporting, and independently recalculable artifacts. Completed 2026-09-12 with the multi-seed limitation documented.
 - [x] **Phase 4: Collaborative and Hybrid Comparison** - Compare collaborative and hybrid methods under the already-frozen protocol and document bounded conclusions. Completed 2026-09-12 with the multi-seed limitation documented.
 - [x] **Phase 5: Complete Collection Workflows and Portability** - Complete profiles, comments, lists, copy details, and safe deterministic versioned CSV export. (completed 2026-09-13)
-- [ ] **Phase 6: Public Discovery and Resilient Enrichment** - Add public projections, catalogue discovery, and shareable public views without contaminating research data.
+- [x] **Phase 6: Public Discovery and Resilient Enrichment** - Add public projections, catalogue discovery, and shareable public views without contaminating research data. (completed 2026-09-13)
 - [ ] **Phase 7: Research Panel, Hardening, and Evidence Freeze** - Present thesis-ready comparisons and finish administration, security, recovery, accessibility, and reproducibility gates.
 
 ## Phase Details
@@ -363,5 +363,5 @@ schedule properly in a later phase-planning pass.
 | 3. Explainable Content Recommenders and Baseline Comparison | 4/4 | Complete with limitation | 2026-09-12 |
 | 4. Collaborative and Hybrid Comparison | 3/3 | Complete with limitation | 2026-09-12 |
 | 5. Complete Collection Workflows and Portability | 4/4 | Complete | 2026-09-13 |
-| 6. Public Discovery and Resilient Enrichment | 10/10 | In Progress|  |
+| 6. Public Discovery and Resilient Enrichment | 10/10 | Complete    | 2026-09-13 |
 | 7. Research Panel, Hardening, and Evidence Freeze | 0/TBD | Not started | - |

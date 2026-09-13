@@ -36,7 +36,7 @@
     {
       "number": "6",
       "name": "Public Discovery and Resilient Enrichment",
-      "status": "pending"
+      "status": "complete"
     },
     {
       "number": "7",
@@ -45,9 +45,9 @@
     }
   ],
   "next": {
-    "command": "/gsd-progress --next",
-    "label": "Advance to the next step",
-    "reason": "Phase 5 of 8 · 25% · executing"
+    "command": "/gsd:progress --next",
+    "label": "Advance to the next step (plan phase 7)",
+    "reason": "Phase 7 of 8 — needs a plan"
   },
-  "updated_at": "2026-09-13T13:21:12.358Z"
+  "updated_at": "2026-09-13T20:07:07.019Z"
 }
