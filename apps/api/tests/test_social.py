@@ -1,10 +1,12 @@
 from django.contrib.auth import get_user_model
+from django.db import close_old_connections
 from django.urls import reverse
 from rest_framework.test import APIClient
 
 import pytest
 
-from social.models import Friendship, FriendshipRequest
+from social import services
+from social.models import Block, Friendship, FriendshipRequest, RelationshipPair
 
 
 User = get_user_model()
@@ -25,6 +27,14 @@ def users(db):
     }
 
 
+def establish_friendship(api_client, users):
+    api_client.force_authenticate(users["alice"])
+    request_response = api_client.post(reverse("social:requests"), {"alias": "Bob"}, format="json")
+    request_id = request_response.json()["request"]["id"]
+    api_client.force_authenticate(users["bob"])
+    assert api_client.post(reverse("social:request-accept", args=[request_id])).status_code == 200
+
+
 @pytest.mark.django_db
 def test_exact_alias_search_does_not_return_partial_matches(api_client, users):
     api_client.force_authenticate(users["alice"])
@@ -36,6 +46,13 @@ def test_exact_alias_search_does_not_return_partial_matches(api_client, users):
     assert [row["alias"] for row in response.json()["results"]] == ["Felipe"]
     assert partial_response.status_code == 200
     assert partial_response.json()["results"] == []
+
+    repeated = api_client.get(
+        reverse("social:search"), [("alias", "Felipe"), ("alias", "FelipeTwo")]
+    )
+    extra = api_client.get(reverse("social:search"), {"alias": "Felipe", "owner_id": "2"})
+    assert repeated.status_code == 400
+    assert extra.status_code == 400
 
 
 @pytest.mark.django_db
@@ -81,3 +98,109 @@ def test_invalid_social_request_does_not_mutate_data(api_client, users):
     self_response = api_client.post(reverse("social:requests"), {"alias": "Alice"}, format="json")
     assert self_response.status_code == 400
     assert FriendshipRequest.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_reject_and_remove_are_distinct_and_allow_a_future_request(api_client, users):
+    api_client.force_authenticate(users["alice"])
+    first = api_client.post(reverse("social:requests"), {"alias": "Bob"}, format="json")
+    first_id = first.json()["request"]["id"]
+    api_client.force_authenticate(users["bob"])
+    assert api_client.post(reverse("social:request-reject", args=[first_id])).status_code == 200
+
+    api_client.force_authenticate(users["alice"])
+    second = api_client.post(reverse("social:requests"), {"alias": "Bob"}, format="json")
+    assert second.status_code == 201
+    api_client.force_authenticate(users["bob"])
+    assert api_client.post(reverse("social:request-accept", args=[second.json()["request"]["id"]])).status_code == 200
+    api_client.force_authenticate(users["alice"])
+    assert api_client.post(reverse("social:friendship-remove", args=["Bob"])).status_code == 200
+    assert api_client.get(reverse("social:relationship", args=["Bob"])).json()["relationship"] == "none"
+    assert api_client.post(reverse("social:requests"), {"alias": "Bob"}, format="json").status_code == 201
+
+
+@pytest.mark.django_db
+def test_block_cancels_requests_removes_friendship_and_hides_both_directions(api_client, users):
+    establish_friendship(api_client, users)
+    api_client.force_authenticate(users["alice"])
+    response = api_client.post(reverse("social:friendship-block", args=["Bob"]))
+
+    assert response.status_code == 200
+    assert Block.objects.filter(blocker=users["alice"], blocked=users["bob"], is_active=True).exists()
+    assert not Friendship.objects.filter(pair__low_user__in=[users["alice"], users["bob"]]).exists()
+    assert api_client.get(reverse("social:relationship", args=["Bob"])).status_code == 404
+    assert api_client.get(reverse("social:search"), {"alias": "Bob"}).json()["results"] == []
+
+    api_client.force_authenticate(users["bob"])
+    assert api_client.get(reverse("social:relationship", args=["Alice"])).status_code == 404
+    assert api_client.post(reverse("social:requests"), {"alias": "Alice"}, format="json").status_code == 404
+
+
+@pytest.mark.django_db
+def test_unblock_revokes_only_block_and_allows_a_new_request_without_restoring_friendship(api_client, users):
+    api_client.force_authenticate(users["alice"])
+    assert api_client.post(reverse("social:friendship-block", args=["Bob"])).status_code == 200
+    assert api_client.post(reverse("social:unblock", args=["Bob"])).status_code == 200
+    assert not Block.objects.filter(blocker=users["alice"], blocked=users["bob"], is_active=True).exists()
+    assert api_client.get(reverse("social:relationship", args=["Bob"])).json()["relationship"] == "none"
+    request_response = api_client.post(reverse("social:requests"), {"alias": "Bob"}, format="json")
+    assert request_response.status_code == 201
+    assert not Friendship.objects.exists()
+
+
+@pytest.mark.django_db
+def test_duplicate_and_reverse_pending_requests_are_deterministic(api_client, users):
+    api_client.force_authenticate(users["alice"])
+    assert api_client.post(reverse("social:requests"), {"alias": "Bob"}, format="json").status_code == 201
+    assert api_client.post(reverse("social:requests"), {"alias": "Bob"}, format="json").status_code == 409
+    api_client.force_authenticate(users["bob"])
+    assert api_client.post(reverse("social:requests"), {"alias": "Alice"}, format="json").status_code == 409
+    assert FriendshipRequest.objects.filter(status="pending").count() == 1
+    assert RelationshipPair.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_social_mutations_reject_client_identity_fields(api_client, users):
+    api_client.force_authenticate(users["alice"])
+    response = api_client.post(
+        reverse("social:requests"),
+        {"alias": "Bob", "sender_id": str(users["bob"].pk), "receiver_id": str(users["alice"].pk)},
+        format="json",
+    )
+
+    assert response.status_code == 400
+    assert FriendshipRequest.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_block_cancels_pending_request_and_unblock_reopens_request_path(api_client, users):
+    api_client.force_authenticate(users["alice"])
+    request_response = api_client.post(reverse("social:requests"), {"alias": "Bob"}, format="json")
+    request_id = request_response.json()["request"]["id"]
+    api_client.force_authenticate(users["bob"])
+    assert api_client.post(reverse("social:friendship-block", args=["Alice"])).status_code == 200
+    assert FriendshipRequest.objects.get(pk=request_id).status == "blocked"
+    assert api_client.post(reverse("social:unblock", args=["Alice"])).status_code == 200
+    api_client.force_authenticate(users["alice"])
+    assert api_client.post(reverse("social:requests"), {"alias": "Bob"}, format="json").status_code == 201
+
+
+@pytest.mark.django_db(transaction=True)
+def test_concurrent_requests_create_one_pending_row(users):
+    def send_request():
+        close_old_connections()
+        try:
+            services.request_friendship(sender=users["alice"], alias="Bob")
+            return "created"
+        except services.SocialConflict:
+            return "conflict"
+        finally:
+            close_old_connections()
+
+    from concurrent.futures import ThreadPoolExecutor
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        results = list(executor.map(lambda _item: send_request(), range(2)))
+
+    assert sorted(results) == ["conflict", "created"]
+    assert FriendshipRequest.objects.filter(status="pending").count() == 1
