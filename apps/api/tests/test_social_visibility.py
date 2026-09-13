@@ -260,3 +260,36 @@ def test_game_comments_are_visible_only_to_owner_or_accepted_friend(owner, frien
     assert stranger_response.json()["comments"] == []
     assert {item["text"] for item in friend_response.json()["comments"]} == {"Owner comment", "Friend comment"}
     assert set(friend_response.json()["comments"][0]) == {"author_alias", "text", "date"}
+
+
+@pytest.mark.django_db
+def test_private_third_party_comments_and_blocked_relationships_stay_hidden(owner, friend, stranger, work):  # noqa: ANN001
+    LibraryEntry.objects.create(user=owner, work=work, current_status="completed")
+    GameComment.objects.create(user=owner, work=work, text="Owner public", visibility="public")
+    GameComment.objects.create(user=stranger, work=work, text="Stranger private", visibility="private")
+    _make_friendship(owner, friend)
+
+    friend_response = _client(friend).get(f"/api/library/entries/{work.id}/comments/")
+    assert {item["text"] for item in friend_response.json()["comments"]} == {"Owner public"}
+
+    social_services.block_user(actor=owner, alias=friend.username)
+    blocked_response = _client(friend).get(f"/api/library/entries/{work.id}/comments/")
+    assert blocked_response.json() == {"comments": []}
+
+
+@pytest.mark.django_db
+def test_comment_projection_ignores_identity_fields_and_keeps_hostile_text_plain(owner, work):  # noqa: ANN001
+    LibraryEntry.objects.create(user=owner, work=work, current_status="completed")
+    payload = {
+        "text": "<img src=x onerror=alert(1)>",
+        "visibility": "public",
+        "owner_id": "someone-else",
+        "author_id": "someone-else",
+    }
+    created = _client(owner).post(f"/api/library/entries/{work.id}/comments/", payload, format="json")
+    assert created.status_code == 201
+    assert created.json()["text"] == payload["text"]
+    assert not {"owner_id", "author_id", "sender_id", "recipient_id"}.intersection(created.json())
+    listed = _client(owner).get(f"/api/library/entries/{work.id}/comments/").json()
+    assert listed["comments"][0]["text"] == payload["text"]
+    assert set(listed["comments"][0]) == {"author_alias", "text", "date"}
