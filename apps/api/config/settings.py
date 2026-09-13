@@ -150,6 +150,10 @@ REST_FRAMEWORK = {
         "social_mutation": "60/min",
         "research": "60/min",
     },
+    # ``format`` belongs to the allowlisted research export query, not to
+    # DRF's renderer override.  Keeping the override disabled also prevents
+    # arbitrary format negotiation from bypassing endpoint validation.
+    "URL_FORMAT_OVERRIDE": None,
     "NUM_PROXIES": int(_num_proxies_raw) if _num_proxies_raw.isdigit() else None,
 }
 

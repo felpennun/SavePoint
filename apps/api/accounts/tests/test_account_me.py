@@ -68,4 +68,8 @@ def test_me_projection_is_a_minimal_allowlist() -> None:
 
     body = client.get("/api/accounts/me/").json()
 
-    assert set(body.keys()) == {"username", "is_demo"}
+    assert set(body.keys()) == {"username", "is_demo", "capabilities"}
+    assert body["capabilities"] == {
+        "can_view_research": False,
+        "can_manage_platform": False,
+    }

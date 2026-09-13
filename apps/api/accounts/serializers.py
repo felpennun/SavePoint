@@ -15,6 +15,7 @@ from urllib.parse import urlparse
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
+from evaluation.access import can_manage_platform, can_view_research
 from accounts.models import (
     AVATAR_URL_MAX_LENGTH,
     BIO_MAX_LENGTH,
@@ -32,6 +33,15 @@ User = get_user_model()
 
 _STATUS_ORDER = [choice.value for choice in BacklogStatus]
 _VISIBILITY_CHOICES = [choice.value for choice in ProfileVisibility]
+
+
+def serialize_capabilities(user) -> dict[str, bool]:  # noqa: ANN001
+    """Project only server-computed navigation capabilities."""
+
+    return {
+        "can_view_research": can_view_research(user),
+        "can_manage_platform": can_manage_platform(user),
+    }
 
 
 def _escape_text(value: str) -> str:

@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
-
 from django.http import HttpResponse
 from rest_framework.permissions import BasePermission
 from rest_framework.request import Request

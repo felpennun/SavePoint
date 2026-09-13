@@ -6,7 +6,6 @@ from collections.abc import Mapping, Sequence
 from pathlib import PurePosixPath
 from typing import Any
 
-from evaluation.access import can_manage_platform, can_view_research
 from evaluation.panel_contract import (
     ARTIFACT_RELATIVE_PATH,
     COHORT_RELATIVE_PATH,
@@ -171,16 +170,8 @@ def serialize_artifacts(published: PublishedRun) -> dict[str, Any]:
     }
 
 
-def serialize_capabilities(user) -> dict[str, bool]:  # noqa: ANN001
-    return {
-        "can_view_research": can_view_research(user),
-        "can_manage_platform": can_manage_platform(user),
-    }
-
-
 __all__ = [
     "serialize_artifacts",
-    "serialize_capabilities",
     "serialize_comparison",
     "serialize_run",
     "serialize_runs",

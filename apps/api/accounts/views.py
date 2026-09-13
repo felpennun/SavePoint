@@ -30,6 +30,7 @@ from accounts.serializers import (
     ReplaceFavoritesRequestSerializer,
     build_public_profile,
     serialize_account_profile,
+    serialize_capabilities,
     serialize_favorite_slots,
 )
 from accounts.services import get_or_create_profile, replace_favorites, update_profile
@@ -218,7 +219,13 @@ class MeView(APIView):
     def get(self, request: Request) -> Response:
         user = request.user
         is_demo = hasattr(user, "demo_identity") or hasattr(user, "demo_anchor")
-        return Response({"username": user.username, "is_demo": is_demo})
+        return Response(
+            {
+                "username": user.username,
+                "is_demo": is_demo,
+                "capabilities": serialize_capabilities(user),
+            }
+        )
 
 
 class MyProfileView(APIView):

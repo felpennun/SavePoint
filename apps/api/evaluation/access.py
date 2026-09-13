@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from rest_framework.exceptions import NotFound
+from rest_framework.permissions import BasePermission
 
 
 RESEARCH_VIEW_PERMISSION = "evaluation.view_research_panel"
@@ -36,7 +37,7 @@ def can_manage_platform(user) -> bool:  # noqa: ANN001
     )
 
 
-class ResearchViewerPermission:
+class ResearchViewerPermission(BasePermission):
     """Allow published research reads, hiding the surface from other users.
 
     DRF turns the ``False`` result for an anonymous request into its normal
