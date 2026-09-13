@@ -23,7 +23,7 @@
 - [ ] **CAT-02**: User can filter and sort the catalogue using available metadata. Phase 01.1 owns the requirement; Phase 6 extends its backend/query traceability under D-01/D-02 without changing the ownership or research snapshots.
 - [x] **CAT-03**: Each game has a detail page showing available data and its provenance.
 - [x] **CAT-04**: Catalogue uses canonical game identifiers that do not depend on the enrichment API.
-- [ ] **CAT-05**: Catalogue can represent games, platforms, editions, genres, franchises, developers, publishers, dates, modes, and tags available from approved sources.
+- [x] **CAT-05**: Catalogue can represent games, platforms, editions, genres, franchises, developers, publishers, dates, modes, and tags available from approved sources.
 - [x] **CAT-06**: Catalogue remains usable with local data when the enrichment API is unavailable.
 
 ### Backlog, Lists, and Inventory
@@ -237,7 +237,7 @@ system.
 | PRIV-01 | Phase 5 | Complete |
 | PROF-03 | Phase 6 | Pending |
 | PROF-04 | Phase 6 | Pending |
-| CAT-05 | Phase 6 | Pending |
+| CAT-05 | Phase 6 | Complete |
 | SOCIAL-03 | Phase 6 | Pending |
 | SOCIAL-04 | Phase 6 | Pending |
 | SOCIAL-05 | Phase 6 | Pending |

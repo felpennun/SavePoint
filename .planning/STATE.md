@@ -1,20 +1,20 @@
 ---
 gsd_state_version: 1.0
 status: in_progress
-stopped_at: Fase 5 firmada (backend + interfaz, evidencia Playwright/axe en docs/verification/phase-05-signoff.md)
-last_updated: "2026-09-13T13:31:30.973Z"
+stopped_at: Completed 06-02-PLAN.md
+last_updated: "2026-09-13T16:39:30.000Z"
 last_activity: 2026-09-13
-state_head: cf7943e389ecd04b2afa71797d655488aa1caf54
+state_head: 5b005fd46fe33c7b915b723fee237358fa4195ee
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 60
-  completed_plans: 51
-  percent: 25
+  completed_plans: 56
+  percent: 93
 next_phase: 6
 next_phase_name: Public Discovery and Resilient Enrichment
-next_action: Planificar la Fase 6
-current_phase: 05
+next_action: Ejecutar 06-03-PLAN.md
+current_phase: 06
 current_phase_name: Public Discovery and Resilient Enrichment
 ---
 
@@ -118,6 +118,7 @@ Progreso global: 2/8 fases (25%).
 | Phase 02 P08 | 18 min | 3 tasks | 12 files |
 | Phase 02 P02 | ~80 min | 3 tasks | 7 files |
 | Phase 06 P00 | 10min | 2 tasks | 4 files |
+| Phase 06 P02 | 35min | 3 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -155,6 +156,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 05]: Phase 6 confirma SOCIAL-03/04/05 como alcance social controlado y conserva SOCIAL-01/02 con su semántica v2.
 - [Phase 05]: PROF-03 fija una allowlist exacta y D-07 como única excepción del perfil básico no-amigo; PROF-04 exige autorización server-side y 404 genérico.
 - [Phase 05]: CAT-05 mantiene juegos, plataformas, ediciones, géneros, franquicias, desarrolladores, editoriales, fechas, modos y tags en el contrato backend aunque la selección visual quede abierta.
+- [Phase 05]: CAT-05 usa filtros GET allowlisted y facets calculados antes de paginar, con orden determinista y slugs desconocidos ignorados.
+- [Phase 05]: Publisher solo se enriquece desde snapshots locales APPROVED con SHA-256 y procedencia; Edition permanece anidada bajo GameRelease.
 
 ### Pending Todos
 
@@ -230,11 +233,11 @@ Ver `.planning/quick/260909-nej-a-adir-cuatro-variantes-popscore-con-imp/`.
 
 ## Registro histórico de sesiones (prevalece el checkpoint de ejecución actual)
 
-**Stopped at:** Completed 06-00-PLAN.md
+**Stopped at:** Completed 06-02-PLAN.md
 
 **Resume (after the rate-limit reset):** `/gsd-plan-phase 2` re-spawns the planner from scratch. All inputs are committed: `02-CONTEXT.md`, `02-UI-SPEC.md` (verified 7/7), `02-RESEARCH.md`, `02-VALIDATION.md`, `02-PATTERNS.md`, `02-COVERAGE.md`. Then `gsd-plan-checker` → revision loop → present → `/gsd-execute-phase 2`. Full detail in `.planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/.continue-here.md`.
 
-Last session: 2026-09-13T13:31:30.337Z
+Last session: 2026-09-13T14:46:23.555Z
 
 ### Done this session (2026-09-06, all committed on `main`)
 
