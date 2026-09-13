@@ -1,8 +1,8 @@
 # Reconciliación de requisitos y decisiones — Fase 6
 
-**Fecha:** 2026-09-13  
-**Fuente funcional:** [`06-CONTEXT.md`](./06-CONTEXT.md)  
-**Fuente de investigación:** [`06-RESEARCH.md`](./06-RESEARCH.md)  
+**Fecha:** 2026-09-13
+**Fuente funcional:** [`06-CONTEXT.md`](./06-CONTEXT.md)
+**Fuente de investigación:** [`06-RESEARCH.md`](./06-RESEARCH.md)
 **Estado:** propuesta de implementación `[ASSUMED]` ratificada para la planificación; la verificación de comportamiento queda asignada a los planes indicados.
 
 ## Propósito y límites
@@ -125,4 +125,3 @@ una vía de acceso a contenido protegido.
   autorización server-side/404 genérico.
 - `CAT-05` enumera juegos, plataformas, ediciones, géneros, franquicias,
   desarrolladores, editoriales, fechas, modos y tags.
-
