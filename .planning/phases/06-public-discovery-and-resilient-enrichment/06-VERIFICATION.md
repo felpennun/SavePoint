@@ -39,6 +39,14 @@ Esto no afecta a los gates backend, contratos, privacidad, regresión, TypeScrip
 
 La Fase 6 queda **completada con limitaciones documentadas**. El alcance funcional y de seguridad está implementado y verificado en sus capas automatizables; la validación browser/visual debe ejecutarse en un entorno con Chromium y las variables de demostración disponibles.
 
+## Actualización de verificación browser
+
+El 2026-09-13 se instaló Chromium únicamente en un contenedor efímero y el journey de
+catálogo pasó **2/2 tests** contra el stack Compose, incluyendo reflow equivalente a 400%
+de zoom, reduced motion, axe y ausencia de llamadas externas. El journey social permanece
+diferido porque no existen `DEMO_USERNAME` ni `DEMO_PASSWORD` en el entorno de ejecución;
+no se generaron credenciales ni se alteró la base de datos para forzarlo.
+
 ## Fuentes canónicas
 
 - `06-00-SUMMARY.md` … `06-09-SUMMARY.md`

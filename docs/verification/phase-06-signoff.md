@@ -72,6 +72,15 @@ La pasada completa de ambos journeys, axe, teclado, foco, 320px y 400% queda
 como aprobación browser. El backend, contratos, regresión y evidencia reproducible sí
 quedan cerrados. No se instalaron navegadores ni se consignaron credenciales.
 
+## Actualización UAT — 2026-09-13
+
+Tras instalar temporalmente Chromium y sus librerías dentro de un contenedor efímero,
+el journey de catálogo se ejecutó contra el stack Compose publicado y terminó con **2/2
+tests PASS**, incluyendo filtros/facets, ausencia de llamadas externas, 320 px, reduced
+motion, axe y el reflow equivalente a 400% de zoom. La prueba social completa se mantiene
+diferida porque este entorno no expone `DEMO_USERNAME` ni `DEMO_PASSWORD`; Playwright la
+omite de forma segura sin inventar cuentas ni credenciales.
+
 ## Fuentes canónicas
 
 - [`06-REQUIREMENTS-RECONCILIATION.md`](../../.planning/phases/06-public-discovery-and-resilient-enrichment/06-REQUIREMENTS-RECONCILIATION.md)

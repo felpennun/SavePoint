@@ -83,14 +83,12 @@ test.describe("Phase 6 catalogue discovery: real GET filters and local provenanc
     await assertNoPageOverflow(page, "game detail at 320px");
     assertNoSeriousAxe(await axe(page), "game detail at 320px");
 
-    // A 400% browser zoom exposes a 320 CSS-pixel layout through a 1280px
-    // device viewport. Do not combine a 320px viewport with CSS zoom: that
-    // double-scales the page and tests an impossible 1600% equivalent.
-    await page.setViewportSize({ width: 1280, height: 800 });
-    await page.evaluate(() => {
-      document.documentElement.style.zoom = "400%";
-    });
-    await assertNoPageOverflow(page, "game detail at 400% zoom");
+    // A 400% browser zoom exposes approximately a 320 CSS-pixel layout.
+    // Playwright cannot set browser zoom directly, so use the equivalent CSS
+    // viewport width instead of applying CSS zoom (which scales content
+    // without triggering responsive media queries).
+    await page.setViewportSize({ width: 320, height: 800 });
+    await assertNoPageOverflow(page, "game detail at 400% equivalent reflow");
     await page.keyboard.press("Tab");
     await expect(page.locator(":focus")).toBeVisible();
   });
