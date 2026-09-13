@@ -274,6 +274,9 @@ export interface MyLibraryItem {
   platform_summary: string;
   cover: Cover;
   updated_at?: string;
+  /** Owner-only "platinum" mark -- rendered exclusively on the Collection
+   * page (never the catalogue, home shelves, or the public profile). */
+  is_platinum?: boolean;
 }
 
 export interface MyLibraryResult {

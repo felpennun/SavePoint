@@ -14,6 +14,7 @@ const COPY = {
     configHeading: "Tu configuración",
     statusLegend: "Estado",
     statusLabels: { pending: "Pendiente", playing: "Jugando", completed: "Completado", abandoned: "Abandonado" },
+    platinumLabel: "Marcar como platinado",
     ratingLabel: "Tu valoración",
     ratingUnrated: "Sin valorar",
     starLabel: "{n} de 5 estrellas",
@@ -45,6 +46,7 @@ const COPY = {
     configHeading: "Your setup",
     statusLegend: "Status",
     statusLabels: { pending: "Pending", playing: "Playing", completed: "Completed", abandoned: "Abandoned" },
+    platinumLabel: "Mark as platinum",
     ratingLabel: "Your rating",
     ratingUnrated: "Unrated",
     starLabel: "{n} of 5 stars",
@@ -154,6 +156,7 @@ export function LibraryControls({
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [copies, setCopies] = useState<OwnedCopyItem[]>([]);
+  const [isPlatinum, setIsPlatinum] = useState(false);
 
   /** While the pointer or keyboard focus is over the stars, preview that
    * value; otherwise show the saved rating. Both are in half-steps (1..10). */
@@ -166,12 +169,17 @@ export function LibraryControls({
       fetch(`/api/library/entries/${workId}/status/`, { credentials: "same-origin" }).then((r) => r.json()),
       fetch(`/api/library/entries/${workId}/rating/`, { credentials: "same-origin" }).then((r) => r.json()),
       fetch(`/api/library/entries/${workId}/copies/`, { credentials: "same-origin" }).then((r) => r.json()),
+      // is_platinum has no bespoke endpoint of its own -- it rides the
+      // combined configuration/ GET alongside status/rating/copies, which
+      // are still fetched individually above for backward compatibility.
+      fetch(`/api/library/entries/${workId}/configuration/`, { credentials: "same-origin" }).then((r) => r.json()),
     ])
-      .then(([statusBody, ratingBody, copiesBody]) => {
+      .then(([statusBody, ratingBody, copiesBody, configurationBody]) => {
         if (cancelled) return;
         setStatus(statusBody.status ?? "");
         setRating(ratingBody.rating_half_steps ?? 0);
         if (Array.isArray(copiesBody.copies)) setCopies(copiesBody.copies);
+        setIsPlatinum(Boolean(configurationBody.is_platinum));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -195,6 +203,7 @@ export function LibraryControls({
       const response = await apiPost(`/api/library/entries/${workId}/configuration/`, {
         status: status || null,
         rating_half_steps: rating || null,
+        is_platinum: isPlatinum,
         copies: copies.map(
           ({ id, release_id, edition_id, format, idempotency_key, purchase_date, price, currency, store, conservation_state, storage_location }) => ({
             ...(id ? { id } : { idempotency_key }),
@@ -218,6 +227,7 @@ export function LibraryControls({
       setStatus(body.status ?? "");
       setRating(body.rating_half_steps ?? 0);
       setCopies(Array.isArray(body.copies) ? body.copies : []);
+      setIsPlatinum(Boolean(body.is_platinum));
       setFeedback(copy.success);
       router.refresh();
     } catch {
@@ -241,6 +251,18 @@ export function LibraryControls({
           ))}
         </div>
       </fieldset>
+
+      <div className="sp-library-section">
+        <label className="sp-choice sp-platinum-toggle">
+          <input
+            type="checkbox"
+            checked={isPlatinum}
+            onChange={(event) => setIsPlatinum(event.target.checked)}
+            disabled={saving}
+          />
+          <span>{copy.platinumLabel}</span>
+        </label>
+      </div>
 
       <div className="sp-library-section">
         <div className="sp-section-heading-row">

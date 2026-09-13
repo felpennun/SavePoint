@@ -28,6 +28,11 @@ class LibraryEntry(models.Model):
     # half-steps (1..10); null means unrated. Never a float -- see
     # RESEARCH.md anti-pattern "Guardar rating como float".
     rating_half_steps = models.IntegerField(null=True, blank=True)
+    # Personal "platinum" mark (own accomplishment, not an external trophy
+    # feed) -- a simple owner-set boolean on the same per-user/work entity
+    # as status and rating. Only ever shown on the owner's own collection
+    # view; never surfaced on the public profile or the shared catalogue.
+    is_platinum = models.BooleanField(default=False)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:

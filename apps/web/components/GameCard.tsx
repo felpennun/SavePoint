@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { CoverImage } from "@/components/CoverImage";
+import { PlatinumBadge } from "@/components/PlatinumBadge";
 import { ScorePill } from "@/components/ScorePill";
 import { StarRating } from "@/components/StarRating";
 import { StatusPill, type BacklogStatus } from "@/components/StatusPill";
@@ -29,6 +30,7 @@ export function GameCard({
   coverVariant = "grid",
   evidence,
   bare = false,
+  isPlatinum = false,
 }: {
   game: GameCardData;
   locale: string;
@@ -45,6 +47,10 @@ export function GameCard({
    * no score pill, no foot. Used for the logged-out home sample and the
    * "Novedades" shelf, where the browse journey leads with the artwork. */
   bare?: boolean;
+  /** Personal "platinum" mark -- Collection page only. GameCard never
+   * fetches this itself; the caller decides whether the current context
+   * (owner's own collection) is allowed to show it at all. */
+  isPlatinum?: boolean;
 }) {
   const dict = getDictionary(locale);
   const { width, height } = coverVariant === "shelf" ? { width: 164, height: 246 } : { width: 200, height: 300 };
@@ -84,7 +90,10 @@ export function GameCard({
   return (
     <li>
       <Link href={`/${locale}/games/${game.slug}`} className="sp-card">
-        <div className="sp-cover">{cover}</div>
+        <div className="sp-cover">
+          {cover}
+          {isPlatinum ? <PlatinumBadge label={dict.card.platinum.label} /> : null}
+        </div>
         <div className="sp-card-body">
           <div className="sp-card-head">
             <p className="sp-card-title">{game.title}</p>

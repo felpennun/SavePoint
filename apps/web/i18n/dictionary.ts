@@ -79,6 +79,9 @@ export interface Dictionary {
     rating: {
       aria: string;
     };
+    platinum: {
+      label: string;
+    };
   };
   detail: {
     synopsis: {
@@ -164,6 +167,10 @@ export interface Dictionary {
     allCopyStates: string;
     withCopy: string;
     withoutCopy: string;
+    filterByPlatinum: string;
+    allPlatinumStates: string;
+    platinumOnly: string;
+    notPlatinum: string;
     statusEmptyGroup: string;
     showAll: string;
     statusSummaryCount: CountCopy;

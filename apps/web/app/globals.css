@@ -85,6 +85,16 @@
      blurple. */
   --color-rating: #e0a24a;
 
+  /* Platinum-badge trophy: a warm gold medal reads correctly sitting on
+     the brand-purple ribbon, in both themes. */
+  /* Deliberately not swapped with --color-accent itself: this needs to
+     stay visibly darker than whatever --color-accent renders as in this
+     theme (the badge's border/ribbon fill), never lighter. */
+  --color-platinum-medal-fill: #443b6e;
+  --color-platinum-medal-trophy: #f2c744;
+  --color-platinum-medal-trophy-light: #ffe497;
+  --color-platinum-medal-outline: #2a1f0a;
+
   /* IGDB critic-score pill ramp (total_rating is 0-100). Tier
      text/border colour + a tinted tier ground. */
   --color-score-weak: #a9abb5; /* total_rating < 40 */
@@ -185,6 +195,10 @@
   --color-focus-ring: #5d5294;
 
   --color-rating: #b0730f;
+  --color-platinum-medal-fill: #3a3160;
+  --color-platinum-medal-trophy: #f2c744;
+  --color-platinum-medal-trophy-light: #ffe497;
+  --color-platinum-medal-outline: #2a1f0a;
   --color-score-weak: #5c5e6b;
   --color-score-weak-bg: #eceef4;
   --color-score-fair: #8a5a09;
@@ -975,6 +989,59 @@ input[type="radio"] {
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+/* Personal "platinum" mark (Collection only) -- a diagonal corner ribbon
+   with a bordered edge, plus a medal seal centred on it, clipped by
+   .sp-cover's own overflow:hidden, so it never needs its own rounding.
+   Sized in percentages of the cover box so the same markup reads
+   correctly at both the grid (200x300) and shelf (164x246) card sizes.
+   The medal's border is the exact brand-logo purple (--color-accent, same
+   token BrandLockup's checkpoint marker uses); the ribbon's interior and
+   the medal's face share that same fixed darker purple, with the piped
+   edge (ribbon) and seal ring (medal) both in --color-accent, so the two
+   shapes read as one consistent material. */
+.sp-platinum-badge {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.sp-platinum-ribbon {
+  position: absolute;
+  top: 6%;
+  left: -26%;
+  width: 102%;
+  height: 9%;
+  transform: rotate(-45deg);
+  transform-origin: center;
+  background: var(--color-platinum-medal-fill);
+  border-top: 3.5px solid var(--color-accent);
+  border-bottom: 3.5px solid var(--color-accent);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+/* Centred on the ribbon's own centreline (computed from the ribbon's
+   top/height and left/width above, converting its height-% vertical
+   centre and width-% horizontal centre into the medal's matching
+   top/left -- covers use a 3:4 width:height ratio, so a width-%-sized
+   square element's height in "top%" terms is width% * 0.75). The seal
+   circle sits in the box's upper portion (viewBox 44x58); the tails
+   hang below it, outside the centring math. */
+.sp-platinum-medal {
+  position: absolute;
+  top: 1.1%;
+  left: 12.5%;
+  width: 25%;
+  aspect-ratio: 44 / 58;
+}
+
+.sp-platinum-medal svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
 }
 
 .sp-cover-placeholder {

@@ -176,7 +176,13 @@ def create_owned_copy(
 
 
 def save_library_configuration(
-    *, user, work: GameWork, status: str | None, rating_half_steps: int | None, copies: list[dict]
+    *,
+    user,
+    work: GameWork,
+    status: str | None,
+    rating_half_steps: int | None,
+    copies: list[dict],
+    is_platinum: bool = False,
 ) -> LibraryEntry | None:
     """Atomically persist the complete work configuration.
 
@@ -196,7 +202,11 @@ def save_library_configuration(
         old_status = entry.current_status if entry else None
         if entry is None:
             entry = LibraryEntry.objects.create(
-                user=user, work=work, current_status=status, rating_half_steps=rating_half_steps
+                user=user,
+                work=work,
+                current_status=status,
+                rating_half_steps=rating_half_steps,
+                is_platinum=is_platinum,
             )
             if status is not None:
                 StatusTransition.objects.create(
@@ -206,7 +216,8 @@ def save_library_configuration(
             status_changed = old_status != status
             entry.current_status = status
             entry.rating_half_steps = rating_half_steps
-            entry.save(update_fields=["current_status", "rating_half_steps", "updated_at"])
+            entry.is_platinum = is_platinum
+            entry.save(update_fields=["current_status", "rating_half_steps", "is_platinum", "updated_at"])
             if status_changed and status is not None:
                 StatusTransition.objects.create(
                     entry=entry, from_status=old_status, to_status=status, changed_at=datetime.now(timezone.utc)

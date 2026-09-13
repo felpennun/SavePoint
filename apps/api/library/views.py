@@ -86,6 +86,12 @@ class MyLibraryView(APIView):
                         savepoint_stats=display_stats.get(entry.work_id, (None, 0)),
                     ),
                     "owned_copy_count": entry.owned_copy_count,
+                    # Owner-only mark, rendered by the client exclusively on
+                    # the Collection page -- never on the shared catalogue
+                    # or the public profile (this endpoint itself is already
+                    # IsAuthenticated + owner-scoped, so that's enforced here
+                    # too, not just by client-side omission).
+                    "is_platinum": entry.is_platinum,
                     # Enough for the Collection page's client-side sorts
                     # (recently_updated / release_year) to actually work; the
                     # enrichment is kept in the same allowlisted shape as
@@ -210,9 +216,27 @@ class OwnedCopiesView(APIView):
 
 
 class LibraryConfigurationView(APIView):
-    """POST the complete status/rating/copies configuration for one work."""
+    """GET/POST the complete status/rating/platinum/copies configuration for
+    one work. GET is used by the client to read back is_platinum without a
+    fifth bespoke endpoint (status/rating/copies already have their own
+    narrower GETs, kept as-is)."""
 
     permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request, work_id: str) -> Response:
+        work = get_object_or_404(GameWork, id=work_id, is_dlc=False)
+        entry = LibraryEntry.objects.filter(user=request.user, work=work).first()
+        return Response(
+            {
+                "status": entry.current_status if entry else None,
+                "rating_half_steps": entry.rating_half_steps if entry else None,
+                "is_platinum": entry.is_platinum if entry else False,
+                "copies": [
+                    serialize_copy(copy)
+                    for copy in OwnedCopy.objects.filter(user=request.user, work=work)
+                ],
+            }
+        )
 
     def post(self, request: Request, work_id: str) -> Response:
         serializer = LibraryConfigurationSerializer(data=request.data)
@@ -227,6 +251,7 @@ class LibraryConfigurationView(APIView):
             {
                 "status": entry.current_status if entry else None,
                 "rating_half_steps": entry.rating_half_steps if entry else None,
+                "is_platinum": entry.is_platinum if entry else False,
                 "copies": [
                     serialize_copy(copy)
                     for copy in OwnedCopy.objects.filter(user=request.user, work=work)

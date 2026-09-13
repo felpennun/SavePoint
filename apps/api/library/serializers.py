@@ -143,6 +143,7 @@ class LibraryConfigurationSerializer(serializers.Serializer):
         choices=["pending", "playing", "completed", "abandoned"], allow_null=True
     )
     rating_half_steps = serializers.IntegerField(min_value=1, max_value=10, allow_null=True)
+    is_platinum = serializers.BooleanField(required=False, default=False)
     copies = LibraryCopyConfigurationSerializer(many=True)
 
 

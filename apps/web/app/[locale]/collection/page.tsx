@@ -21,6 +21,8 @@ const SORTS = ["recently_updated", "rating_desc", "title_asc", "release_year"] a
 type CollSort = (typeof SORTS)[number];
 const COPY_FILTERS = ["all", "with_copy", "without_copy"] as const;
 type CopyFilter = (typeof COPY_FILTERS)[number];
+const PLATINUM_FILTERS = ["all", "platinum", "not_platinum"] as const;
+type PlatinumFilter = (typeof PLATINUM_FILTERS)[number];
 const PAGE_SIZE = 50;
 
 function first(v: string | string[] | undefined): string | undefined {
@@ -82,12 +84,18 @@ export default async function CollectionPage({
   const activeSort: CollSort = (SORTS as readonly string[]).includes(rawSort ?? "") ? (rawSort as CollSort) : "recently_updated";
   const rawCopy = first(sp.copy);
   const activeCopy: CopyFilter = (COPY_FILTERS as readonly string[]).includes(rawCopy ?? "") ? (rawCopy as CopyFilter) : "all";
+  const rawPlatinum = first(sp.platinum);
+  const activePlatinum: PlatinumFilter = (PLATINUM_FILTERS as readonly string[]).includes(rawPlatinum ?? "")
+    ? (rawPlatinum as PlatinumFilter)
+    : "all";
   const currentPage = Math.max(1, Number(first(sp.page)) || 1);
 
   let items = [...library.items];
   if (activeStatus !== "all") items = items.filter((i) => i.status === activeStatus);
   if (activeCopy === "with_copy") items = items.filter((i) => i.owned_copy_count > 0);
   if (activeCopy === "without_copy") items = items.filter((i) => i.owned_copy_count === 0);
+  if (activePlatinum === "platinum") items = items.filter((i) => i.is_platinum === true);
+  if (activePlatinum === "not_platinum") items = items.filter((i) => !i.is_platinum);
   if (activeSort === "title_asc") {
     items.sort((a, b) => a.work_title.localeCompare(b.work_title, locale));
   } else if (activeSort === "rating_desc") {
@@ -113,10 +121,12 @@ export default async function CollectionPage({
     const status = patch.status !== undefined ? patch.status : activeStatus !== "all" ? activeStatus : undefined;
     const sort = patch.sort !== undefined ? patch.sort : activeSort !== "recently_updated" ? activeSort : undefined;
     const copy = patch.copy !== undefined ? patch.copy : activeCopy !== "all" ? activeCopy : undefined;
+    const platinum = patch.platinum !== undefined ? patch.platinum : activePlatinum !== "all" ? activePlatinum : undefined;
     const page = patch.page;
     if (status) params.set("status", status);
     if (sort) params.set("sort", sort);
     if (copy) params.set("copy", copy);
+    if (platinum) params.set("platinum", platinum);
     if (page && page !== "1") params.set("page", page);
     const s = params.toString();
     return `${basePath}${s ? `?${s}` : ""}`;
@@ -133,6 +143,12 @@ export default async function CollectionPage({
   const activeSortSummary = activeSort === "recently_updated" ? undefined : sortLabels[activeSort];
   const activeCopySummary =
     activeCopy === "all" ? undefined : activeCopy === "with_copy" ? dict.collection.withCopy : dict.collection.withoutCopy;
+  const activePlatinumSummary =
+    activePlatinum === "all"
+      ? undefined
+      : activePlatinum === "platinum"
+        ? dict.collection.platinumOnly
+        : dict.collection.notPlatinum;
 
   return (
     <main className="sp-page">
@@ -173,6 +189,17 @@ export default async function CollectionPage({
                   <option value="all">{dict.collection.allCopyStates}</option>
                   <option value="with_copy">{dict.collection.withCopy}</option>
                   <option value="without_copy">{dict.collection.withoutCopy}</option>
+                </select>
+              </div>
+            </FilterDropdown>
+
+            <FilterDropdown label={dict.collection.filterByPlatinum} summary={activePlatinumSummary}>
+              <div className="sp-field">
+                <label htmlFor="platinum">{dict.collection.filterByPlatinum}</label>
+                <select id="platinum" name="platinum" defaultValue={activePlatinum}>
+                  <option value="all">{dict.collection.allPlatinumStates}</option>
+                  <option value="platinum">{dict.collection.platinumOnly}</option>
+                  <option value="not_platinum">{dict.collection.notPlatinum}</option>
                 </select>
               </div>
             </FilterDropdown>
@@ -247,6 +274,7 @@ export default async function CollectionPage({
                 status={STATUSES.includes(item.status as BacklogStatus) ? (item.status as BacklogStatus) : undefined}
                 ratingHalfSteps={item.rating_half_steps}
                 ownedCopyCount={item.owned_copy_count}
+                isPlatinum={item.is_platinum}
               />
             ))}
           </ul>

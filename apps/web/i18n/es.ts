@@ -96,6 +96,9 @@ export const es: Dictionary = {
     rating: {
       aria: "Tu valoración: {n} de 5",
     },
+    platinum: {
+      label: "Platinado",
+    },
   },
   detail: {
     synopsis: {
@@ -226,6 +229,10 @@ export const es: Dictionary = {
     allCopyStates: "Con y sin copia",
     withCopy: "Con copia",
     withoutCopy: "Sin copia",
+    filterByPlatinum: "Platino",
+    allPlatinumStates: "Todos",
+    platinumOnly: "Platinados",
+    notPlatinum: "No platinados",
     statusEmptyGroup: "Ningún juego marcado como {status}.",
     showAll: "Mostrar todos",
     statusSummaryCount: {
