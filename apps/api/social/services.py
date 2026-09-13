@@ -224,7 +224,10 @@ def friendships_for(*, user) -> list[RelationshipPair]:
 
 def _safe_now():  # noqa: ANN001
     """Return an aware clock value or fail closed before any message write."""
-    now = timezone.now()
+    try:
+        now = timezone.now()
+    except Exception as exc:  # noqa: BLE001 - an uncertain clock must fail closed
+        raise RecommendationCooldown() from exc
     if not timezone.is_aware(now):
         raise RecommendationCooldown()
     return now
@@ -243,7 +246,10 @@ def send_recommendation(*, sender, recipient_alias: str, work_id, text: str = ""
     uncertainty from the clock or database aborts the transaction and maps to
     the same conservative 429 as a known cooldown.
     """
-    recipient = _resolve_active_user(recipient_alias)
+    try:
+        recipient = _resolve_active_user(recipient_alias)
+    except DatabaseError as exc:
+        raise RecommendationCooldown() from exc
     if sender.pk == recipient.pk:
         raise SocialNotFound()
     if not isinstance(text, str) or len(text) > 2000:
@@ -269,6 +275,8 @@ def send_recommendation(*, sender, recipient_alias: str, work_id, text: str = ""
                 work = GameWork.objects.get(id=work_id, is_dlc=False)
             except GameWork.DoesNotExist as exc:
                 raise ValidationError("work is invalid.") from exc
+            except DatabaseError as exc:
+                raise RecommendationCooldown() from exc
             try:
                 return SocialMessage.objects.create(
                     sender=sender,
