@@ -554,21 +554,29 @@ Los servicios `api`, `web` y `db` están definidos en `infra/compose.yaml`; el p
 | A2 | La amistad actual y el historial de requests se almacenan en entidades separadas. | Social Data Model | Cambia la migración, auditoría y transición reject/remove/re-request. |
 | A3 | El cooldown es direccional, exacto a `7 * 24` horas y global por sender-receiver, no por juego. | Pattern 4 | Un significado distinto cambia constraints, API errors y tests. |
 | A4 | Un lock row de pareja es suficiente y aceptable para serializar el envío. | Pattern 4 | Puede necesitar estrategia PostgreSQL distinta si se exige mayor concurrencia. |
-| A5 | `Publisher` se añadirá como entidad y relación de `GameWork`. | Catalogue gaps | La fuente aprobada podría modelarlo como otro tipo de credit y cambiar importer/facets. |
+| A5 | `Publisher` solo se añade como entidad/relación de `GameWork` cuando el snapshot local aprobado aporta el dato; `Edition` reutiliza la entidad existente bajo `GameRelease`. | Catalogue gaps | La fuente aprobada puede no aportar publishers y entonces la dimensión queda sin valores inventados. |
 | A6 | El badge se deriva de unread messages y pending requests, sin entidad Notification. | Frontend Integration | Una futura taxonomía de notificaciones exigiría modelo/retención adicional. |
-| A7 | Los nombres de rutas, DTOs, componentes e IDs sociales propuestos no están fijados. | All | Deben convertirse en decisiones de plan/discussion antes de implementación. |
+| A7 | Los nombres de rutas y DTOs quedan a criterio del agente salvo el locator owner+slug y los IDs SOCIAL-03/04/05, que ya están fijados por las resoluciones. | All | Los planes deben respetar el locator y los IDs resueltos. |
 | A8 | La semántica propuesta de operadores de facets nuevas preserva tags/plataformas actuales. | Catalogue Filter contract | Puede alterar resultados y compatibilidad de URLs si el autor quiere OR uniforme. |
 | A9 | El host seguirá usando contenedores para pnpm y resolverá el mismatch Node engine. | Environment | El build puede fallar localmente o necesitar actualización del runtime. |
-| A10 | El límite de longitud del mensaje será acotado en servidor, pero su valor concreto aún no está decidido. | Security / SocialMessage | Sin límite, aumenta abuso, almacenamiento y carga de UI. |
+| A10 | El límite de longitud del mensaje será acotado en servidor; el valor concreto sigue siendo una parametrización técnica del plan, no una cuestión funcional abierta. | Security / SocialMessage | Sin límite, aumenta abuso, almacenamiento y carga de UI. |
 
-## Open Questions
+La tabla de supuestos queda subordinada a estas resoluciones: Publisher se limita a snapshots locales aprobados, Edition reutiliza la entidad existente, el locator owner+slug y los IDs SOCIAL-03/04/05 quedan fijados para la fase, y el límite de texto sigue siendo server-side sin modificar el contrato funcional.
 
-1. **¿Qué IDs nuevos y qué redacción oficial cubrirán el social ampliado?** El estado actual solo traza `PROF-03`, `PROF-04` y `CAT-05` a Phase 6, mientras `SOCIAL-01`/`SOCIAL-02` siguen en v2. [VERIFIED: .planning/REQUIREMENTS.md:126-139,220-232] Recomendación: resolverlo en Wave 0 y actualizar roadmap/requirements antes de dividir planes. [ASSUMED]
-2. **¿Qué fuente aprobada aporta `Publisher` y qué forma tiene `Edition` en facets?** El modelo abierto no contiene `Publisher` y editions cuelgan de releases. [VERIFIED: apps/api/catalogue/models.py:312-370] Recomendación: documentar mapping, licence y snapshot antes de modificar importer. [ASSUMED]
-3. **¿Se permite mostrar el perfil básico a anonymous con botón de request deshabilitado, o solo a authenticated non-friends?** D-07 define el mínimo para no amigos, pero D-06 restringe contenido social; el contrato debe fijar el caso anonymous. [VERIFIED: .planning/phases/06-public-discovery-and-resilient-enrichment/06-CONTEXT.md:63-72] Recomendación: mostrar basic profile sin acción mutante a anonymous y ocultar contenido. [ASSUMED]
-4. **¿Cuál es el nombre final de la ruta de lista y qué identificador compartible se admite?** El requisito exige URL pero no fija ruta/DTO. [VERIFIED: .planning/REQUIREMENTS.md:12-17; .planning/phases/06-public-discovery-and-resilient-enrichment/06-CONTEXT.md:106-107] Recomendación: usar ID opaco/UUID existente solo como locator y nunca devolverlo en DTO friend-visible. [ASSUMED]
-5. **¿Se conservarán mensajes históricos después de remove/block?** El contexto exige revocar acceso, pero no fija retention/deletion. [VERIFIED: .planning/phases/06-public-discovery-and-resilient-enrichment/06-CONTEXT.md:54-59,99-101] Recomendación: ocultar inmediatamente por política; fijar retención y auditoría en decisión de seguridad antes de migrar. [ASSUMED]
-6. **¿Qué responde la API al cooldown?** Recomendación: error validable sin revelar mensajes de otros usuarios, con retry time solo al sender autenticado; fijar código de error y contrato antes del frontend. [ASSUMED]
+## Open Questions (RESOLVED)
+
+Las seis cuestiones quedan resueltas como decisiones de planificación `[ASSUMED]`,
+coherentes con `06-CONTEXT.md` y obligatorias para todos los planes posteriores. La
+reconciliación de requisitos de `06-00` debe registrar estas decisiones sin reabrirlas.
+
+| Cuestión | Decisión resuelta | Trazabilidad |
+|---|---|---|
+| IDs y redacción del social ampliado | Confirmar `SOCIAL-03` para búsqueda exacta, solicitudes, aceptación, rechazo, eliminación y bloqueo; `SOCIAL-04` para perfil básico, proyecciones de amistad, listas, comentarios y URLs protegidas; y `SOCIAL-05` para recomendaciones privadas, inbox, lectura y badge. `SOCIAL-01`/`SOCIAL-02` conservan su significado v2 y no se sustituyen. | `[ASSUMED]`, D-03..D-05, D-06..D-08, D-13..D-15; `.planning/REQUIREMENTS.md:126-139` |
+| Publisher y Edition | `Publisher` solo se incorpora cuando el snapshot local aprobado contiene el dato y su procedencia/licencia; no se inventan publishers ni se consulta el proveedor durante HTTP. `Edition` es la entidad ya existente bajo `GameRelease` y se filtra/facetiza mediante esa relación, sin crear otra entidad equivalente. | `[ASSUMED]`, D-01, `apps/api/catalogue/models.py:312-370` |
+| Perfil anónimo | El catálogo permanece accesible a anónimos. Un perfil no-amigo conserva únicamente alias, avatar, biografía y acción contextual; para anónimos la acción es no mutante (iniciar sesión o CTA equivalente), mientras que solo una sesión autenticada puede enviar/aceptar una solicitud. No se muestra contenido social. | `[ASSUMED]`, D-06, D-07 |
+| Locator de listas | La URL canónica es `/{locale}/profiles/{alias}/lists/{listSlug}` y el locator es `owner alias + public_slug` estable y único por propietario. El slug se resuelve server-side; no se expone un ID interno ni se permite que un owner enviado por cliente altere la resolución. Todo acceso no autorizado devuelve el 404 genérico de D-08. | `[ASSUMED]`, D-08, D-10 |
+| Retención después de remove/block | `remove` y `block` revocan el acceso inmediatamente. Se conserva únicamente el estado mínimo de relación necesario para auditoría, cooldown e impedir reintentos durante un bloqueo; los mensajes existentes dejan de ser visibles, y el bloqueo conserva su tombstone activo hasta `unblock`. `unblock` no restaura amistad ni contenido automáticamente. | `[ASSUMED]`, D-05, D-13, D-15 |
+| Contrato del cooldown | Una recomendación bloqueada por la ventana móvil responde `429` con código estable `recommendation_cooldown`, cabecera HTTP `Retry-After` y `retry_after_seconds` únicamente al emisor autenticado. Si falla el lock, el reloj o la lectura necesaria para decidir, el servicio falla cerrado con `429` y un `Retry-After` conservador; nunca crea el mensaje ni revela datos de otra cuenta. | `[ASSUMED]`, D-15 |
 
 ## Environment Availability
 

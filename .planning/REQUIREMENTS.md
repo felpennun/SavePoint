@@ -13,6 +13,9 @@
 - [x] **PROF-02**: An authorised visitor can view a public profile.
 - [ ] **PROF-03**: Public profile shows only permitted games, lists, ratings, comments, and statistics.
 - [ ] **PROF-04**: User can obtain a shareable URL for their public profile and public lists.
+- [ ] **SOCIAL-03**: Authenticated users can find exact aliases and manage friendship requests, accepted friendships, rejection, removal, blocking, and unblocking.
+- [ ] **SOCIAL-04**: Owners and accepted friends can access allowlisted profile, collection, list, and comment projections through protected URLs.
+- [ ] **SOCIAL-05**: Friends can send private game recommendations with optional text to an inbox with unread state and a directional seven-day cooldown.
 
 ### Catalogue
 
@@ -147,7 +150,7 @@
 
 | Feature | Reason |
 |---------|--------|
-| Full social network in v1 | Public profiles meet the initial Letterboxd/Goodreads-inspired scope without moderation-heavy community features. |
+| Open community social network in v1 | Phase 6 includes controlled, relationship-gated social workflows, not an unrestricted moderation-heavy community. |
 | Open production registration in v1 | Initial release is a controlled academic demonstration. |
 | Real-time or continuous model training | Offline, versioned training is safer and more reproducible for the thesis. |
 | Generative recommendation explanations | Deterministic evidence-based explanations are more faithful and auditable. |
@@ -230,6 +233,9 @@
 | PROF-03 | Phase 6 | Pending |
 | PROF-04 | Phase 6 | Pending |
 | CAT-05 | Phase 6 | Pending |
+| SOCIAL-03 | Phase 6 | Pending |
+| SOCIAL-04 | Phase 6 | Pending |
+| SOCIAL-05 | Phase 6 | Pending |
 | EVAL-13 | Phase 7 | Pending |
 | EVAL-14 | Phase 7 | Pending |
 | ADMIN-01 | Phase 7 | Pending |

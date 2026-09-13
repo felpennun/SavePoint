@@ -278,16 +278,28 @@ Plans:
 **Mode:** mvp
 **Goal**: Visitors can discover and share rich public catalogue and profile views that expose only permitted activity and that never contaminate research data.
 **Depends on**: Phase 5
-**Requirements**: PROF-03, PROF-04, CAT-05
+**Requirements**: PROF-03, PROF-04, CAT-05, SOCIAL-03, SOCIAL-04, SOCIAL-05
 **Note**: CAT-02 and DATA-04 were reprioritized by the author into Phase 01.1 and are owned there. DATA-05, DATA-06, DATA-07, and DATA-08 (live enrichment provenance and experiment isolation) moved into the enlarged Phase 2 in the 2026-09-06 roadmap revision.
 **Success Criteria** (what must be TRUE):
 
   1. A visitor can filter and sort broad catalogue metadata (games, platforms, editions, genres, franchises, developers, publishers, dates, modes, tags) drawn from approved sources.
   2. A visitor can open shareable profile and list URLs that expose only permitted games, lists, ratings, comments, and statistics.
   3. Public projections use an explicit allowlist of fields and cannot leak private ownership or note data.
-  4. Accessibility, security, thesis rationale, agent contribution, automated checks, and author decisions are recorded with the phase evidence.
+  4. Authenticated users can manage exact-alias friendship requests, accepted friendships, rejection/removal/block transitions, and private recommendations with a seven-day directional cooldown.
+  5. Accessibility, security, thesis rationale, agent contribution, automated checks, and author decisions are recorded with the phase evidence.
 
-**Plans**: TBD
+**Plans**: 10 plans
+Plans:
+- [ ] 06-00-PLAN.md — Reconciliación semántica de requisitos, decisiones y trazabilidad
+- [ ] 06-01-PLAN.md — Núcleo transaccional de relaciones sociales
+- [ ] 06-02-PLAN.md — Contrato CAT-05 y enriquecimiento local resiliente
+- [ ] 06-03-PLAN.md — Perfil básico, proyecciones autorizadas y listas compartibles
+- [ ] 06-04-PLAN.md — Comentarios autorizados, recomendaciones e inbox backend
+- [ ] 06-05-PLAN.md — Descubrimiento de catálogo en Next.js
+- [ ] 06-06-PLAN.md — Perfiles, amistades y acciones sociales en Next.js
+- [ ] 06-07-PLAN.md — Inbox privado, navegación y badge de pendientes
+- [ ] 06-08-PLAN.md — Comentarios en ficha, traducciones y estados visuales
+- [ ] 06-09-PLAN.md — E2E, gates PostgreSQL y evidencia final
 **UI hint**: yes
 
 ### Phase 7: Research Panel, Hardening, and Evidence Freeze
