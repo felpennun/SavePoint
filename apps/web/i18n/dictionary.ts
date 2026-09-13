@@ -154,6 +154,82 @@ export interface Dictionary {
     refreshUpdating: string;
     refreshNeedsCollectionChange: string;
   };
+  social: {
+    friends: {
+      heading: string;
+      searchHeading: string;
+      searchLabel: string;
+      search: string;
+      received: string;
+      sent: string;
+      list: string;
+      receivedEmpty: string;
+      sentEmpty: string;
+      emptyHeading: string;
+      emptyBody: string;
+      exactAliasEmpty: string;
+      exactAliasEmptyBody: string;
+      requestCount: CountCopy;
+      friendCount: CountCopy;
+      relationship: string;
+      pending: string;
+      none: string;
+      accepted: string;
+      blocked: string;
+    };
+    messages: {
+      nav: string;
+      heading: string;
+      emptyHeading: string;
+      emptyBody: string;
+      markRead: string;
+      markUnread: string;
+      unreadCount: CountCopy;
+      recommend: string;
+      optionalMessage: string;
+      send: string;
+      sending: string;
+      sent: string;
+    };
+    profile: {
+      basicNotice: string;
+    };
+    privacy: {
+      collectionEmpty: string;
+      listEmpty: string;
+      commentsHidden: string;
+    };
+    actions: {
+      sendRequest: string;
+      requestSent: string;
+      acceptRequest: string;
+      rejectRequest: string;
+      removeFriendship: string;
+      block: string;
+      unblock: string;
+      cancel: string;
+      confirm: string;
+      rejectConfirm: (alias: string) => string;
+      removeConfirm: (alias: string) => string;
+      blockConfirm: (alias: string) => string;
+      accepted: string;
+      rejected: string;
+      removed: string;
+      blocked: string;
+      failed: string;
+      retry: string;
+    };
+    errors: {
+      load: string;
+      mutation: string;
+      retry: string;
+    };
+    cooldown: string;
+    notFound: {
+      heading: string;
+      body: string;
+    };
+  };
   collection: {
     heading: string;
     subheading: string;

@@ -631,6 +631,121 @@ input[type="radio"] {
   gap: var(--space-md);
 }
 
+/* Social surfaces share the detail column's width constraint so long aliases,
+   comments, and server-provided messages cannot widen the page at 320px or
+   at 400% zoom. */
+.sp-game-comments-region,
+.sp-game-comments,
+.sp-social-list,
+.sp-social-card,
+.sp-social-popover {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.sp-game-comments textarea,
+.sp-game-comments select {
+  width: 100%;
+  max-width: 100%;
+}
+
+.sp-game-comments .sp-profile-comments-list > li,
+.sp-social-card,
+.sp-social-status {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Pending-message badge: the red dot is deliberately paired with visible
+   text/aria-label supplied by the component, and has no animation. */
+.sp-social-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: 2.75rem;
+  padding: 0 var(--space-sm);
+  color: var(--color-danger);
+  font-size: var(--text-meta);
+  font-weight: 600;
+  white-space: normal;
+}
+
+.sp-social-badge__dot {
+  width: 0.625rem;
+  height: 0.625rem;
+  flex: 0 0 0.625rem;
+  border-radius: 999px;
+  background: var(--color-danger);
+}
+
+.sp-social-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 var(--space-sm);
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-control);
+  color: var(--color-text-secondary);
+}
+
+.sp-social-list {
+  display: grid;
+  gap: var(--space-md);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sp-social-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-ctl);
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-raised);
+}
+
+.sp-social-card > :first-child {
+  flex: 0 0 auto;
+}
+
+.sp-social-card > :not(:first-child) {
+  min-width: 0;
+}
+
+.sp-social-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.sp-social-popover {
+  width: min(24rem, calc(100vw - 2 * var(--space-md)));
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 20rem) {
+  /* The 20rem floor covers a 320px viewport and the same reflow under 400%
+     zoom: actions become full-width rows instead of causing horizontal scroll. */
+  .sp-game-comments .sp-filterbar-actions,
+  .sp-social-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .sp-game-comments .sp-filterbar-actions > *,
+  .sp-social-actions > * {
+    width: 100%;
+  }
+
+  .sp-social-card {
+    align-items: flex-start;
+  }
+}
+
 .sp-custom-lists {
   display: grid;
   gap: var(--space-lg);
