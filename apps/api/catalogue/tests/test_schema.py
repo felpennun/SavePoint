@@ -60,4 +60,3 @@ def test_cat05_keeps_edition_nested_under_game_release() -> None:
     release = apps.get_model("catalogue", "GameRelease")
     assert edition._meta.get_field("release").remote_field.model is release
     assert edition._meta.get_field("release").remote_field.on_delete.__name__ == "PROTECT"
-
