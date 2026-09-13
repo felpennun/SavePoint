@@ -160,7 +160,9 @@ export default async function GameDetailPage({
               </>
             ) : null}
 
-            <GameComments workId={game.id} locale={locale} isAuthenticated={isAuthenticated} />
+            <div className="sp-game-comments-region" data-testid="game-comments-region">
+              <GameComments workId={game.id} locale={locale} isAuthenticated={isAuthenticated} />
+            </div>
           </div>
         </div>
 
