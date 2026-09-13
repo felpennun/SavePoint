@@ -25,3 +25,13 @@ artefactos congelados y no relanzar el split de evaluación consumido.
 ## Siguiente acción
 
 Ejecutar `07-00-PLAN.md` tras revisar los seis planes y sus issues #65–#70.
+
+## Contrato UI — 2026-09-14
+
+El contrato visual canónico del panel está en
+`[.planning/phases/07-research-panel-hardening-and-evidence-freeze/07-UI-SPEC.md]`.
+Mantiene el sistema manual de tokens, define `/[locale]/research` como superficie privada
+de lectura/exportación y exige que cada gráfico SVG tenga una tabla semántica equivalente.
+La visibilidad del enlace Research depende de una capacidad server-side, no de la mera
+presencia de sesión; `Platform Admin` continúa separado en Django Admin. No se añaden
+dependencias de gráficos, servicios ni costes recurrentes.
