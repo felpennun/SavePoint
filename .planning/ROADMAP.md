@@ -276,16 +276,16 @@ Plans:
 ### Phase 6: Public Discovery and Resilient Enrichment
 
 **Mode:** mvp
-**Goal**: Visitors can discover and share rich public catalogue and profile views that expose only permitted activity and that never contaminate research data.
+**Goal**: Visitors can discover and share rich local catalogue and profile views that expose only permitted activity, while controlled authenticated users can build friendships and exchange private game recommendations without contaminating research data.
 **Depends on**: Phase 5
 **Requirements**: PROF-03, PROF-04, CAT-05, SOCIAL-03, SOCIAL-04, SOCIAL-05
 **Note**: CAT-02 and DATA-04 were reprioritized by the author into Phase 01.1 and are owned there. DATA-05, DATA-06, DATA-07, and DATA-08 (live enrichment provenance and experiment isolation) moved into the enlarged Phase 2 in the 2026-09-06 roadmap revision.
 **Success Criteria** (what must be TRUE):
 
   1. A visitor can filter and sort broad catalogue metadata (games, platforms, editions, genres, franchises, developers, publishers, dates, modes, tags) drawn from approved sources.
-  2. A visitor can open shareable profile and list URLs that expose only permitted games, lists, ratings, comments, and statistics.
-  3. Public projections use an explicit allowlist of fields and cannot leak private ownership or note data.
-  4. Authenticated users can manage exact-alias friendship requests, accepted friendships, rejection/removal/block transitions, and private recommendations with a seven-day directional cooldown.
+  2. A visitor can open the basic profile allowed by D-07, while an owner or accepted friend can open shareable profile and list URLs that expose only permitted games, lists, ratings, comments, and no private ownership data.
+  3. Public projections use an explicit allowlist of fields; direct protected URLs re-authorise server-side and return a generic indistinguishable `404` when access is not allowed.
+  4. Authenticated users can manage exact-alias friendship requests, accepted friendships, rejection/removal/block transitions, and private game recommendations in an inbox with unread state and a seven-day directional rolling cooldown.
   5. Accessibility, security, thesis rationale, agent contribution, automated checks, and author decisions are recorded with the phase evidence.
 
 **Plans**: 10 plans

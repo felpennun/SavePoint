@@ -11,16 +11,16 @@
 - [x] **AUTH-02**: System can load synthetic users that are clearly identified as simulated accounts.
 - [x] **PROF-01**: User can edit their biography and optional HTTPS avatar while the login alias remains immutable.
 - [x] **PROF-02**: An authorised visitor can view a public profile.
-- [ ] **PROF-03**: Public profile shows only permitted games, lists, ratings, comments, and statistics.
-- [ ] **PROF-04**: User can obtain a shareable URL for their public profile and public lists.
-- [ ] **SOCIAL-03**: Authenticated users can find exact aliases and manage friendship requests, accepted friendships, rejection, removal, blocking, and unblocking.
-- [ ] **SOCIAL-04**: Owners and accepted friends can access allowlisted profile, collection, list, and comment projections through protected URLs.
-- [ ] **SOCIAL-05**: Friends can send private game recommendations with optional text to an inbox with unread state and a directional seven-day cooldown.
+- [ ] **PROF-03**: Public projections expose only the exact allowlist `alias`, `avatar_url`, `bio`, `game`, `cover`, `year`, `platform`, `backlog_status`, `personal_rating`, `author_alias`, `text`, and `date`; the only non-friend exception is the basic profile in D-07, with no collection, lists, comments, activity, statistics, copies, purchases, prices, stores, locations, private notes, or internal identifiers.
+- [ ] **PROF-04**: Owner and accepted friends can use shareable profile and public-list URLs; every direct URL is authorised server-side and unauthorised, blocked, anonymous-protected, and nonexistent resources return an indistinguishable generic `404`.
+- [ ] **SOCIAL-03**: Authenticated users can find exact aliases and manage friendship requests, accepted friendships, rejection, removal, blocking, and unblocking; these controlled relationship workflows do not replace v2 `SOCIAL-01` or `SOCIAL-02`. `[ASSUMED]` for Phase 6 planning.
+- [ ] **SOCIAL-04**: Owners and accepted friends can access allowlisted profile, collection, list, and comment projections through protected URLs, while a non-friend receives only the D-07 basic profile. `[ASSUMED]` for Phase 6 planning.
+- [ ] **SOCIAL-05**: Friends can send private game recommendations with optional text to an inbox with unread state, accessible pending badge, and a directional seven-day rolling cooldown. `[ASSUMED]` for Phase 6 planning.
 
 ### Catalogue
 
 - [x] **CAT-01**: User can search video games by title.
-- [ ] **CAT-02**: User can filter and sort the catalogue using available metadata.
+- [ ] **CAT-02**: User can filter and sort the catalogue using available metadata. Phase 01.1 owns the requirement; Phase 6 extends its backend/query traceability under D-01/D-02 without changing the ownership or research snapshots.
 - [x] **CAT-03**: Each game has a detail page showing available data and its provenance.
 - [x] **CAT-04**: Catalogue uses canonical game identifiers that do not depend on the enrichment API.
 - [ ] **CAT-05**: Catalogue can represent games, platforms, editions, genres, franchises, developers, publishers, dates, modes, and tags available from approved sources.
@@ -136,6 +136,11 @@
 
 ### Social and Integrations
 
+`SOCIAL-01` and `SOCIAL-02` remain v2 requirements with their original meaning.
+Phase 6 adds the controlled, relationship-gated workflows in `SOCIAL-03`,
+`SOCIAL-04`, and `SOCIAL-05`; these are not an open community feed or reaction
+system.
+
 - **SOCIAL-01**: User can follow other profiles and view a social activity feed.
 - **SOCIAL-02**: User can react to or interact with community content.
 - **AUTH-03**: Visitor can register an unrestricted production account.
@@ -150,7 +155,7 @@
 
 | Feature | Reason |
 |---------|--------|
-| Open community social network in v1 | Phase 6 includes controlled, relationship-gated social workflows, not an unrestricted moderation-heavy community. |
+| Unrestricted open community social network in v1 | Phase 6 includes only controlled, relationship-gated friendship, protected projections, and private recommendations; it does not include an unrestricted moderation-heavy feed or reaction network. |
 | Open production registration in v1 | Initial release is a controlled academic demonstration. |
 | Real-time or continuous model training | Offline, versioned training is safer and more reproducible for the thesis. |
 | Generative recommendation explanations | Deterministic evidence-based explanations are more faithful and auditable. |
@@ -185,7 +190,7 @@
 | AGENT-01 | Phase 1 | Complete |
 | AGENT-02 | Phase 1 | Complete |
 | AGENT-03 | Phase 1 | Complete |
-| CAT-02 | Phase 01.1 | Pending |
+| CAT-02 | Phase 01.1 (extended by Phase 6) | Pending |
 | AUTH-02 | Phase 2 | Complete (Plan 02-09) |
 | DATA-04 | Phase 01.1 | Complete (ADR-006, Plan 01.1-01) |
 | REC-10 | Phase 01.1 | Pending |
