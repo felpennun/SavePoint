@@ -1,8 +1,15 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 
 import { en } from "@/i18n/en";
 import { es } from "@/i18n/es";
 import { formatCount } from "@/i18n/dictionary";
+
+const globalStyles = readFileSync(
+  fileURLToPath(new URL("../app/globals.css", import.meta.url)),
+  "utf8",
+).replaceAll("\r\n", "\n");
 
 /** Recursively collects every leaf key path (dotted), treating a
  * CountCopy's `many` function as a single leaf, not an object to descend
@@ -57,5 +64,44 @@ describe("formatCount canonical zero/one/many (Copywriting Contract)", () => {
   it("returns the many form for count > 1", () => {
     expect(formatCount(es.catalogue.resultCount, 42)).toBe("42 resultados");
     expect(formatCount(en.catalogue.resultCount, 42)).toBe("42 results");
+  });
+});
+
+describe("social copy and responsive UI contract", () => {
+  it("keeps the complete social copy contract in both locales", () => {
+    const requiredPaths = [
+      "social.friends.emptyHeading",
+      "social.friends.emptyBody",
+      "social.friends.exactAliasEmpty",
+      "social.messages.emptyHeading",
+      "social.messages.emptyBody",
+      "social.profile.basicNotice",
+      "social.privacy.collectionEmpty",
+      "social.privacy.listEmpty",
+      "social.actions.sendRequest",
+      "social.actions.rejectConfirm",
+      "social.errors.load",
+      "social.errors.mutation",
+      "social.cooldown",
+      "social.notFound.heading",
+      "social.notFound.body",
+    ];
+    const esKeys = new Set(collectKeyPaths((es as unknown as Record<string, unknown>).social));
+    const enKeys = new Set(collectKeyPaths((en as unknown as Record<string, unknown>).social));
+
+    for (const path of requiredPaths) {
+      expect(esKeys.has(path.replace(/^social\./, "")), `missing es.${path}`).toBe(true);
+      expect(enKeys.has(path.replace(/^social\./, "")), `missing en.${path}`).toBe(true);
+    }
+  });
+
+  it("provides wrapping, focus, touch targets, and reduced-motion-safe social styles", () => {
+    expect(globalStyles).toContain(".sp-game-comments-region");
+    expect(globalStyles).toContain(".sp-social-badge");
+    expect(globalStyles).toContain(".sp-social-status");
+    expect(globalStyles).toContain("overflow-wrap: anywhere;");
+    expect(globalStyles).toContain("min-height: 2.75rem;");
+    expect(globalStyles).toContain("@media (prefers-reduced-motion: reduce)");
+    expect(globalStyles).not.toMatch(/\.sp-social-badge[\s\S]{0,500}animation\s*:/);
   });
 });
