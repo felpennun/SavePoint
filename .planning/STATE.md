@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 status: in_progress
 stopped_at: Fase 5 firmada (backend + interfaz, evidencia Playwright/axe en docs/verification/phase-05-signoff.md)
-last_updated: "2026-09-13T10:55:34.243Z"
+last_updated: "2026-09-13T11:39:46.201Z"
 last_activity: 2026-09-13
-state_head: 3b652496c54654933eb93b5bfc1ae605acc62eb3
+state_head: 581472b76b148fec6ee7babd673e4186576c1b5f
 progress:
   total_phases: 8
   completed_phases: 2
@@ -14,8 +14,8 @@ progress:
 next_phase: 6
 next_phase_name: Public Discovery and Resilient Enrichment
 next_action: Planificar la Fase 6
-current_phase: 05
 current_phase_name: Complete Collection Workflows and Portability
+current_phase: 05
 ---
 
 # Project State
@@ -379,7 +379,7 @@ totales. Ver `.planning/phases/04-collaborative-and-hybrid-comparison/`.
 | 260909-ws8 | Implementar hybrid-mmr-v1 y adoptar rating_final compartido en web y offline | 2026-09-10 | 2c12838 | [260909-ws8-implementar-hybrid-mmr-v1-en-web-y-offli](./quick/260909-ws8-implementar-hybrid-mmr-v1-en-web-y-offli/) |
 | 260910-0u7 | Verificar la importación de facetas IGDB y dejar checkpoint para la interfaz | 2026-09-10 | a3f3a14 | [260910-0u7-verificar-importacion-de-facetas-igdb-y-](./quick/260910-0u7-verificar-importacion-de-facetas-igdb-y-/) |
 
-Last activity: 2026-09-12
+Last activity: 2026-09-13
 
 ## Reconciliación de continuidad — 2026-09-12
 
