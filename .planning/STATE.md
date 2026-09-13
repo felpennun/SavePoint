@@ -2,20 +2,20 @@
 gsd_state_version: 1.0
 status: in_progress
 stopped_at: Fase 5 firmada (backend + interfaz, evidencia Playwright/axe en docs/verification/phase-05-signoff.md)
-last_updated: "2026-09-13T13:16:45.091Z"
+last_updated: "2026-09-13T13:31:30.973Z"
 last_activity: 2026-09-13
-state_head: 63ffde80b68cfc8b99934c0f395fb177868c1bbd
+state_head: cf7943e389ecd04b2afa71797d655488aa1caf54
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 60
-  completed_plans: 50
+  completed_plans: 51
   percent: 25
 next_phase: 6
 next_phase_name: Public Discovery and Resilient Enrichment
 next_action: Planificar la Fase 6
 current_phase: 05
-current_phase_name: Complete Collection Workflows and Portability
+current_phase_name: Public Discovery and Resilient Enrichment
 ---
 
 # Project State
@@ -28,7 +28,7 @@ Living project mirror: `ideas-vault/` (see `CONVENTIONS.md` and its README for t
 rule that applies to every LLM and collaborator).
 
 **Core value:** Users receive useful and explainable video-game recommendations from a well-organised collection, while every algorithmic result remains reproducible and defensible in the thesis.
-**Current focus:** Phase 05 — Complete Collection Workflows and Portability.
+**Current focus:** Phase 06 — Public Discovery and Resilient Enrichment
 
 ## Current Position
 
@@ -117,6 +117,7 @@ Progreso global: 2/8 fases (25%).
 | Phase 01 P14 | 1 session | 1 tasks | 4 files |
 | Phase 02 P08 | 18 min | 3 tasks | 12 files |
 | Phase 02 P02 | ~80 min | 3 tasks | 7 files |
+| Phase 06 P00 | 10min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -151,6 +152,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 01]: Deliberately left QUAL-03 open despite the tool reporting it structurally ready to mark complete -- the sign-off document explicitly states 400% zoom reflow and a screen-reader pass are still unverified manual checklist items — Marking a requirement complete when its own sign-off evidence names an open gap would misrepresent the actual state; readiness-to-mark-complete is structural (all declaring plans have summaries), not a substitute for checking the requirement's real acceptance criteria
 - [Phase 01]: Phase 1 (Three-Day Public Demo Slice) ACCEPTED by the author, 2026-09-05, against commit 1af981e at https://save-point-orpin.vercel.app — All five ROADMAP success criteria linked to evidence in docs/verification/phase-01-signoff.md; two named open limitations (400% zoom, screen reader) stated rather than hidden
 - [Phase 01.1]: IGDB v4 chosen as the real-scale catalogue source (ADR-006, DATA-04), over RAWG and scaled Wikidata, from a live authenticated probe (2026-09-05): 374,555 total games, 312,418 primary (game_type = 0), no monthly quota, 4 req/s + 8 concurrent. Import boundary is game_type = 0 only; covers are hotlinked to images.igdb.com (not mirrored) with the Phase 1 first-party placeholder as fallback; Phase 1's Wikidata offline corpus and the no-runtime-provider rule are retained. `requests==2.34.2` pinned (author-approved, PyPI-verified real release); django-allauth/dj-rest-auth explicitly rejected. The Twitch DSA (24h cache, no redistribution) is reconciled against IGDB's own API FAQ (store + serve permitted, keep after termination) treated as the "written authorization otherwise" the DSA contemplates — a reasoned position recorded verbatim for the thesis, not legal advice.
+- [Phase 05]: Phase 6 confirma SOCIAL-03/04/05 como alcance social controlado y conserva SOCIAL-01/02 con su semántica v2.
+- [Phase 05]: PROF-03 fija una allowlist exacta y D-07 como única excepción del perfil básico no-amigo; PROF-04 exige autorización server-side y 404 genérico.
+- [Phase 05]: CAT-05 mantiene juegos, plataformas, ediciones, géneros, franquicias, desarrolladores, editoriales, fechas, modos y tags en el contrato backend aunque la selección visual quede abierta.
 
 ### Pending Todos
 
@@ -226,11 +230,11 @@ Ver `.planning/quick/260909-nej-a-adir-cuatro-variantes-popscore-con-imp/`.
 
 ## Registro histórico de sesiones (prevalece el checkpoint de ejecución actual)
 
-**Stopped at:** Phase 6 plans created and GitHub-synced
+**Stopped at:** Completed 06-00-PLAN.md
 
 **Resume (after the rate-limit reset):** `/gsd-plan-phase 2` re-spawns the planner from scratch. All inputs are committed: `02-CONTEXT.md`, `02-UI-SPEC.md` (verified 7/7), `02-RESEARCH.md`, `02-VALIDATION.md`, `02-PATTERNS.md`, `02-COVERAGE.md`. Then `gsd-plan-checker` → revision loop → present → `/gsd-execute-phase 2`. Full detail in `.planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/.continue-here.md`.
 
-Last session: 2026-09-13T13:16:44.147Z
+Last session: 2026-09-13T13:31:30.337Z
 
 ### Done this session (2026-09-06, all committed on `main`)
 
@@ -239,7 +243,7 @@ Last session: 2026-09-13T13:16:44.147Z
 - **Roadmap restructure** — `85e98ba`: Phase 2 enlarged (governed corpus + external ratings + evaluation contract + first advanced recommender + search/filters + UI pass); former phases 5+6 merged; 3/4/7/8 renumbered to 5/6/4/7. Requirement coverage 91/91.
 - **Phase 2 planning inputs** — `02-CONTEXT.md` `f5d65e7` (discuss-phase, D-01..D-24), `02-UI-SPEC.md` `e548a2e` (ui-phase, checker 7/7, `## UI Considerations` 45 explicit + 10 backstop), `02-RESEARCH.md` `a78510f`, `02-VALIDATION.md` `53b173f`, `02-PATTERNS.md` `df45a33`, `02-COVERAGE.md` `15006b3` (rescued from the rate-limited planner).
 
-Resume file: .planning/phases/06-public-discovery-and-resilient-enrichment/06-00-PLAN.md
+Resume file: None
 
 ## Session Continuity
 
