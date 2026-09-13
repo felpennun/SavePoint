@@ -50,9 +50,22 @@ export interface FacetOption {
   count: number;
 }
 
+export interface CatalogueDateFacet {
+  value: string;
+  label: string;
+  count: number;
+}
+
 export interface CatalogueFacets {
   platforms: FacetOption[];
+  editions: FacetOption[];
+  genres: FacetOption[];
+  franchises: FacetOption[];
+  developers: FacetOption[];
+  publishers: FacetOption[];
+  modes: FacetOption[];
   tags: FacetOption[];
+  dates: CatalogueDateFacet[];
   year_range: { min: number | null; max: number | null };
 }
 
@@ -61,8 +74,16 @@ export interface CatalogueListParams {
   page?: number;
   platform?: string[];
   tag?: string[];
+  edition?: string[];
+  genre?: string[];
+  franchise?: string[];
+  developer?: string[];
+  publisher?: string[];
+  mode?: string[];
   year_from?: string;
   year_to?: string;
+  date_from?: string;
+  date_to?: string;
   min_rating?: string;
   sort?: string;
 }
@@ -153,7 +174,10 @@ export interface OwnedDlcResult {
   groups: OwnedDlcGroup[];
 }
 
-export async function fetchCatalogueList(params: CatalogueListParams = {}): Promise<CatalogueListResult> {
+export async function fetchCatalogueList(
+  params: CatalogueListParams = {},
+  cookieHeader?: string,
+): Promise<CatalogueListResult> {
   const url = new URL("/api/catalogue/games/", API_BASE);
   if (params.q) url.searchParams.set("q", params.q);
   if (params.page) url.searchParams.set("page", String(params.page));
@@ -163,12 +187,35 @@ export async function fetchCatalogueList(params: CatalogueListParams = {}): Prom
   if (params.tag) {
     for (const tag of params.tag) url.searchParams.append("tag", tag);
   }
+  if (params.edition) {
+    for (const edition of params.edition) url.searchParams.append("edition", edition);
+  }
+  if (params.genre) {
+    for (const genre of params.genre) url.searchParams.append("genre", genre);
+  }
+  if (params.franchise) {
+    for (const franchise of params.franchise) url.searchParams.append("franchise", franchise);
+  }
+  if (params.developer) {
+    for (const developer of params.developer) url.searchParams.append("developer", developer);
+  }
+  if (params.publisher) {
+    for (const publisher of params.publisher) url.searchParams.append("publisher", publisher);
+  }
+  if (params.mode) {
+    for (const mode of params.mode) url.searchParams.append("mode", mode);
+  }
   if (params.year_from) url.searchParams.set("year_from", params.year_from);
   if (params.year_to) url.searchParams.set("year_to", params.year_to);
+  if (params.date_from) url.searchParams.set("date_from", params.date_from);
+  if (params.date_to) url.searchParams.set("date_to", params.date_to);
   if (params.min_rating) url.searchParams.set("min_rating", params.min_rating);
   if (params.sort) url.searchParams.set("sort", params.sort);
 
-  const response = await fetch(url, { cache: "no-store" });
+  const response = await fetch(url, {
+    cache: "no-store",
+    headers: cookieHeader ? { Cookie: cookieHeader } : undefined,
+  });
   if (!response.ok) {
     throw new Error(`Failed to load catalogue (status ${response.status})`);
   }

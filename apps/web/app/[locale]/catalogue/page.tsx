@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 
 import { FilterBar } from "@/components/FilterBar";
 import { FilterChip } from "@/components/FilterChip";
@@ -8,10 +9,13 @@ import { getDictionary } from "@/i18n";
 import { fetchCatalogueList } from "@/lib/api";
 import {
   type FilterOption,
+  type CatalogueFacetOptions,
+  REPEATED_FACET_KEYS,
   buildQuery,
   countActiveFilters,
   parseFilters,
   removeHref,
+  restrictSelectedFilters,
   sortPlatformOptions,
 } from "@/lib/catalogue-filters";
 
@@ -56,6 +60,7 @@ export default async function CataloguePage({
   const currentPage = Math.max(1, Number(first(sp.page)) || 1);
   const basePath = `/${locale}/catalogue`;
   const currentQuery = toQueryString(sp);
+  const cookieHeader = (await cookies()).toString();
 
   let result: Awaited<ReturnType<typeof fetchCatalogueList>> | null = null;
   let failed = false;
@@ -65,32 +70,50 @@ export default async function CataloguePage({
       page: currentPage,
       platform: filters.platform,
       tag: filters.tag,
-      // A single exact year (2026-09-12: was a year_from/year_to range in
-      // the UI) still maps onto the API's range contract as one point.
-      year_from: filters.year,
-      year_to: filters.year,
+      edition: filters.edition,
+      genre: filters.genre,
+      franchise: filters.franchise,
+      developer: filters.developer,
+      publisher: filters.publisher,
+      mode: filters.mode,
+      year_from: filters.year_from,
+      year_to: filters.year_to,
+      date_from: filters.date_from,
+      date_to: filters.date_to,
       min_rating: filters.min_rating,
       sort: filters.sort,
-    });
+    }, cookieHeader);
   } catch {
     failed = true;
   }
 
-  const platformOptions: FilterOption[] =
-    sortPlatformOptions(result?.facets.platforms.map((p) => ({ value: p.slug, label: p.name })) ?? []);
-  const tagOptions: FilterOption[] =
-    result?.facets.tags.map((tag) => ({ value: tag.slug, label: tag.name })) ?? [];
+  const platformOptions: FilterOption[] = sortPlatformOptions(
+    result?.facets.platforms.map((p) => ({ value: p.slug, label: p.name })) ?? [],
+  );
+  const facetOptions: CatalogueFacetOptions = result
+    ? {
+        platforms: platformOptions,
+        tags: result.facets.tags.map((facet) => ({ value: facet.slug, label: facet.name })),
+        editions: result.facets.editions.map((facet) => ({ value: facet.slug, label: facet.name })),
+        genres: result.facets.genres.map((facet) => ({ value: facet.slug, label: facet.name })),
+        franchises: result.facets.franchises.map((facet) => ({ value: facet.slug, label: facet.name })),
+        developers: result.facets.developers.map((facet) => ({ value: facet.slug, label: facet.name })),
+        publishers: result.facets.publishers.map((facet) => ({ value: facet.slug, label: facet.name })),
+        modes: result.facets.modes.map((facet) => ({ value: facet.slug, label: facet.name })),
+      }
+    : {};
   const yearRange = result?.facets.year_range;
-  const platformSlugs = new Set(platformOptions.map((option) => option.value));
-  const tagSlugs = new Set(tagOptions.map((option) => option.value));
-  const visibleFilters = {
-    ...filters,
-    platform: filters.platform.filter((value) => platformSlugs.has(value)),
-    tag: filters.tag.filter((value) => tagSlugs.has(value)),
-  };
+  const visibleFilters = result ? restrictSelectedFilters(filters, facetOptions) : filters;
   const activeCount = countActiveFilters(visibleFilters);
-  const platformLabels = new Map(platformOptions.map((option) => [option.value, option.label]));
-  const tagLabels = new Map(tagOptions.map((option) => [option.value, option.label]));
+  const facetLabels: Record<string, string> = locale === "en"
+    ? { platform: "Platform", tag: "Tag", edition: "Edition", genre: "Genre", franchise: "Franchise", developer: "Developer", publisher: "Publisher", mode: "Mode" }
+    : { platform: "Plataforma", tag: "Etiqueta", edition: "Edición", genre: "Género", franchise: "Franquicia", developer: "Desarrollador", publisher: "Editorial", mode: "Modo" };
+  const facetValueLabels = Object.fromEntries(
+    REPEATED_FACET_KEYS.map((key) => {
+      const optionKey = `${key}s` as keyof CatalogueFacetOptions;
+      return [key, new Map((facetOptions[optionKey] ?? []).map((option) => [option.value, option.label]))];
+    }),
+  ) as Record<string, Map<string, string>>;
 
   return (
     <main className="sp-page">
@@ -99,8 +122,7 @@ export default async function CataloguePage({
         locale={locale}
         basePath={basePath}
         activeCount={activeCount}
-        platformOptions={platformOptions}
-        tagOptions={tagOptions}
+        facets={facetOptions}
         currentQuery={currentQuery}
         yearMin={yearRange?.min ?? 1958}
         yearMax={yearRange?.max ?? currentYear + 2}
@@ -110,28 +132,19 @@ export default async function CataloguePage({
       <section aria-label={dict.catalogue.heading}>
         {activeCount > 0 ? (
             <div className="sp-chip-row" aria-label={dict.catalogue.filters.activeLabel.many(activeCount)}>
-              {visibleFilters.tag.map((value) => {
-                const label = dict.catalogue.chip.tag.replace("{value}", tagLabels.get(value) ?? value);
-                return (
-                  <FilterChip
-                    key={`tag-${value}`}
-                    label={label}
-                    removeHref={`${basePath}${removeHref(currentQuery, "tag", value)}`}
-                    removeAriaLabel={`${locale === "es" ? "Quitar filtro" : "Remove filter"} ${label}`}
-                  />
-                );
-              })}
-              {visibleFilters.platform.map((value) => {
-                const label = dict.catalogue.chip.platform.replace("{value}", platformLabels.get(value) ?? value);
-                return (
-                  <FilterChip
-                    key={`platform-${value}`}
-                    label={label}
-                    removeHref={`${basePath}${removeHref(currentQuery, "platform", value)}`}
-                    removeAriaLabel={`${locale === "es" ? "Quitar filtro" : "Remove filter"} ${label}`}
-                  />
-                );
-              })}
+              {REPEATED_FACET_KEYS.flatMap((key) =>
+                (visibleFilters[key] ?? []).map((value) => {
+                  const label = `${facetLabels[key]}: ${facetValueLabels[key]?.get(value) ?? value}`;
+                  return (
+                    <FilterChip
+                      key={`${key}-${value}`}
+                      label={label}
+                      removeHref={`${basePath}${removeHref(currentQuery, key, value)}`}
+                      removeAriaLabel={`${locale === "es" ? "Quitar filtro" : "Remove filter"} ${label}`}
+                    />
+                  );
+                }),
+              )}
             </div>
           ) : null}
           {failed || !result ? (

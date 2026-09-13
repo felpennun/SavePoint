@@ -1,18 +1,16 @@
 /**
- * Shared catalogue filter/sort vocabulary (01.1-UI-SPEC Screen Contract 2,
- * CAT-02). All controls submit via GET so every filtered view is a
- * shareable URL.
- *
- * The `sort` and `min_rating` vocabularies are fixed client-side; the
- * catalogue API validates them again and returns a bounded 400 for anything
- * off-list (RESEARCH security V5). Platform/tag slugs are open-ended (the
- * real option lists come from the API `facets` payload at request time), so
- * `parseFilters` passes them through untouched and lets the server drop any
- * value it does not recognise.
+ * Shared catalogue filter/sort vocabulary. Every value is submitted through
+ * GET so a copied URL is a reproducible catalogue query.
  */
 
 export const SORT_KEYS = [
   "popscore_desc",
+  "relevance",
+  "title_asc",
+  "title_desc",
+  "release_newest",
+  "release_oldest",
+  "rating_desc",
 ] as const;
 export type SortKey = (typeof SORT_KEYS)[number];
 
@@ -25,18 +23,35 @@ export function resolveSort(raw: string | undefined): SortKey {
 
 export const MIN_RATING_OPTIONS = ["50", "60", "70", "80", "90"] as const;
 
-/** A selectable filter option, as rendered in a FacetMenu checkbox list. The
- * catalogue page derives these from the API `facets` payload. */
 export interface FilterOption {
   value: string;
   label: string;
 }
 
-export const FILTER_PARAM_KEYS = ["q", "platform", "tag", "year", "min_rating", "sort"] as const;
+export const REPEATED_FACET_KEYS = [
+  "platform",
+  "tag",
+  "edition",
+  "genre",
+  "franchise",
+  "developer",
+  "publisher",
+  "mode",
+] as const;
+export type RepeatedFacetKey = (typeof REPEATED_FACET_KEYS)[number];
 
-/** Stable presentation order for the governed platform allowlist. Current
- * consoles come first, followed by previous generations and other platforms.
- * Options not in this list are retained at the end in label order. */
+export const FILTER_PARAM_KEYS = [
+  "q",
+  ...REPEATED_FACET_KEYS,
+  "year_from",
+  "year_to",
+  "date_from",
+  "date_to",
+  "min_rating",
+  "sort",
+] as const;
+
+/** Stable presentation order for the governed platform allowlist. */
 export const PLATFORM_DISPLAY_ORDER = [
   "nintendo-switch",
   "playstation-5",
@@ -91,84 +106,152 @@ export interface CatalogueFilters {
   q?: string;
   platform: string[];
   tag: string[];
-  year?: string;
+  edition?: string[];
+  genre?: string[];
+  franchise?: string[];
+  developer?: string[];
+  publisher?: string[];
+  mode?: string[];
+  year_from?: string;
+  year_to?: string;
+  date_from?: string;
+  date_to?: string;
   min_rating?: string;
   sort: SortKey;
 }
 
-/** Parse + validate raw searchParams into a safe filter object. Unknown
- * min_rating values are dropped; platform/tag slugs pass through (the API
- * validates them); year is a single exact value (2026-09-12: was a
- * year_from/year_to range), clamped to the governed catalogue's bounds. */
+export type FacetOptionKey =
+  | "platforms"
+  | "editions"
+  | "genres"
+  | "franchises"
+  | "developers"
+  | "publishers"
+  | "modes"
+  | "tags";
+
+export type CatalogueFacetOptions = Partial<Record<FacetOptionKey, FilterOption[]>>;
+
+const FACET_OPTION_KEYS: Record<RepeatedFacetKey, FacetOptionKey> = {
+  platform: "platforms",
+  tag: "tags",
+  edition: "editions",
+  genre: "genres",
+  franchise: "franchises",
+  developer: "developers",
+  publisher: "publishers",
+  mode: "modes",
+};
+
+const FACET_DEFAULTS: Pick<CatalogueFilters, RepeatedFacetKey> = {
+  platform: [],
+  tag: [],
+  edition: [],
+  genre: [],
+  franchise: [],
+  developer: [],
+  publisher: [],
+  mode: [],
+};
+
+function validDateBound(raw: string | undefined, currentYear: number): string | undefined {
+  if (!raw) return undefined;
+  const value = raw.trim();
+  const yearMatch = /^(\d{4})$/.exec(value);
+  if (yearMatch) {
+    const year = Number(yearMatch[1]);
+    return year >= 1958 && year <= currentYear + 2 ? value : undefined;
+  }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return undefined;
+  const parsed = new Date(`${value}T00:00:00Z`);
+  if (Number.isNaN(parsed.valueOf()) || parsed.toISOString().slice(0, 10) !== value) return undefined;
+  const year = Number(value.slice(0, 4));
+  return year >= 1958 && year <= currentYear + 2 ? value : undefined;
+}
+
+function firstValue(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function normalizedFacetValues(value: string | string[] | undefined): string[] {
+  const values = Array.isArray(value) ? value : value == null ? [] : [value];
+  return [...new Set(values.map((item) => item.trim()).filter(Boolean))];
+}
+
+/** Parse raw Next.js searchParams into a safe, backend-shaped filter object. */
 export function parseFilters(
   sp: Record<string, string | string[] | undefined>,
   currentYear: number,
 ): CatalogueFilters {
-  const firstValue = (value: string | string[] | undefined): string | undefined =>
-    Array.isArray(value) ? value[0] : value;
-  const normalizeFacet = (value: string | string[] | undefined): string[] => {
-    const values = Array.isArray(value) ? value : value == null ? [] : [value];
-    return [...new Set(values.map((item) => item.trim()).filter(Boolean))];
-  };
+  const values = Object.fromEntries(
+    REPEATED_FACET_KEYS.map((key) => [key, normalizedFacetValues(sp[key])]),
+  ) as Pick<CatalogueFilters, RepeatedFacetKey>;
 
-  const q = firstValue(sp.q)?.trim() || undefined;
-  const platform = normalizeFacet(sp.platform);
-  const tag = normalizeFacet(sp.tag);
   const minRatingRaw = firstValue(sp.min_rating);
-  const minRating = (MIN_RATING_OPTIONS as readonly string[]).includes(minRatingRaw ?? "") ? minRatingRaw : undefined;
-
-  const clampYear = (v: string | undefined): number | undefined => {
-    if (!v) return undefined;
-    const n = Number(v);
-    if (!Number.isInteger(n)) return undefined;
-    return Math.min(Math.max(n, 1958), currentYear + 2);
-  };
-  const year = clampYear(firstValue(sp.year));
+  const minRating = (MIN_RATING_OPTIONS as readonly string[]).includes(minRatingRaw ?? "")
+    ? minRatingRaw
+    : undefined;
 
   return {
-    q,
-    platform,
-    tag,
-    year: year != null ? String(year) : undefined,
+    q: firstValue(sp.q)?.trim() || undefined,
+    ...FACET_DEFAULTS,
+    ...values,
+    year_from: validDateBound(firstValue(sp.year_from), currentYear),
+    year_to: validDateBound(firstValue(sp.year_to), currentYear),
+    date_from: validDateBound(firstValue(sp.date_from), currentYear),
+    date_to: validDateBound(firstValue(sp.date_to), currentYear),
     min_rating: minRating,
     sort: resolveSort(firstValue(sp.sort)),
   };
 }
 
-/** Count of user-set filters (sort at its default and empty q do not
- * count). */
+/** Count each selected value and each scalar bound as an active filter. */
 export function countActiveFilters(f: CatalogueFilters): number {
-  let n = 0;
-  if (f.q) n += 1;
-  n += f.platform.length;
-  n += f.tag.length;
-  if (f.year) n += 1;
-  if (f.min_rating) n += 1;
-  return n;
+  let count = f.q ? 1 : 0;
+  for (const key of REPEATED_FACET_KEYS) count += f[key]?.length ?? 0;
+  if (f.year_from) count += 1;
+  if (f.year_to) count += 1;
+  if (f.date_from) count += 1;
+  if (f.date_to) count += 1;
+  if (f.min_rating) count += 1;
+  return count;
 }
 
-/** Build a query string from a filter object (+ optional page), omitting
- * empties and the default sort. */
+/** Restrict selected controls to options returned by the local API facets. */
+export function restrictSelectedFilters(
+  filters: CatalogueFilters,
+  facets: CatalogueFacetOptions,
+): CatalogueFilters {
+  const next = { ...filters };
+  for (const key of REPEATED_FACET_KEYS) {
+    const options = facets[FACET_OPTION_KEYS[key]];
+    if (options) {
+      next[key] = (filters[key] ?? []).filter((value) => options.some((option) => option.value === value));
+    }
+  }
+  return next;
+}
+
+/** Build a deterministic query using the backend's exact parameter names. */
 export function buildQuery(f: Partial<CatalogueFilters>, page?: number): string {
   const params = new URLSearchParams();
   if (f.q) params.set("q", f.q);
-  if (f.platform) {
-    for (const platform of f.platform) params.append("platform", platform);
+  for (const key of REPEATED_FACET_KEYS) {
+    for (const value of f[key] ?? []) params.append(key, value);
   }
-  if (f.tag) {
-    for (const tag of f.tag) params.append("tag", tag);
-  }
-  if (f.year) params.set("year", f.year);
+  if (f.year_from) params.set("year_from", f.year_from);
+  if (f.year_to) params.set("year_to", f.year_to);
+  if (f.date_from) params.set("date_from", f.date_from);
+  if (f.date_to) params.set("date_to", f.date_to);
   if (f.min_rating) params.set("min_rating", f.min_rating);
   if (f.sort && f.sort !== DEFAULT_SORT) params.set("sort", f.sort);
   if (page && page > 1) params.set("page", String(page));
-  const s = params.toString();
-  return s ? `?${s}` : "";
+  const query = params.toString();
+  return query ? `?${query}` : "";
 }
 
-/** Remove one occurrence of a repeated query parameter while preserving all
- * other values and parameters. */
-export function removeHref(current: string, key: "tag" | "platform", value: string): string {
+/** Remove one occurrence of a repeated facet while preserving all other GET state. */
+export function removeHref(current: string, key: RepeatedFacetKey, value: string): string {
   const params = new URLSearchParams(current.startsWith("?") ? current.slice(1) : current);
   const next = new URLSearchParams();
   let removed = false;

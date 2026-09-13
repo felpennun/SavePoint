@@ -4,29 +4,38 @@ import { FilterDropdown } from "@/components/FilterDropdown";
 import { FilterDropdownScript } from "@/components/FilterDropdownScript";
 import {
   MIN_RATING_OPTIONS,
+  type CatalogueFacetOptions,
   type CatalogueFilters,
   type FilterOption,
+  type RepeatedFacetKey,
 } from "@/lib/catalogue-filters";
 
+const FACET_ORDER: Array<{
+  name: RepeatedFacetKey;
+  optionKey: keyof CatalogueFacetOptions;
+  label: { es: string; en: string };
+}> = [
+  { name: "platform", optionKey: "platforms", label: { es: "Plataforma", en: "Platform" } },
+  { name: "tag", optionKey: "tags", label: { es: "Etiquetas", en: "Tags" } },
+  { name: "edition", optionKey: "editions", label: { es: "Edición", en: "Edition" } },
+  { name: "genre", optionKey: "genres", label: { es: "Género", en: "Genre" } },
+  { name: "franchise", optionKey: "franchises", label: { es: "Franquicia", en: "Franchise" } },
+  { name: "developer", optionKey: "developers", label: { es: "Desarrollador", en: "Developer" } },
+  { name: "publisher", optionKey: "publishers", label: { es: "Editorial", en: "Publisher" } },
+  { name: "mode", optionKey: "modes", label: { es: "Modo", en: "Mode" } },
+];
+
 /**
- * FilterBar (01.1-UI-SPEC Screen Contract 2 / First-Party Component
- * Contracts; redesigned 2026-09-12 -- moved from a sidebar to a thin bar
- * above the results grid). A single <form method="get"> -- every control
- * is URL-shareable. Server component, no client state beyond the shared
- * <FilterDropdownScript> enhancement. Every filter besides free-text search
- * lives behind its own popover so the bar stays one row on desktop and
- * wraps onto as few rows as possible on narrow viewports; each popover
- * degrades to an always-openable native <details> without JavaScript.
- * Year and rating open straight onto a flat, single-select option list
- * (same `.sp-facet-options` markup as platform/tag) -- never a `<select>`
- * nested inside the popover. Year is a single exact value, not a range.
- * Degrades to search-only if an option list is empty.
+ * GET-based catalogue toolbar. Every visible facet uses the local API's
+ * allowlisted vocabulary and native controls, so it remains usable without
+ * JavaScript and its query can be copied as a reproducible URL.
  */
 export function FilterBar({
   filters,
   locale,
   basePath,
   activeCount,
+  facets = {},
   platformOptions,
   tagOptions,
   currentQuery,
@@ -38,8 +47,10 @@ export function FilterBar({
   locale: string;
   basePath: string;
   activeCount: number;
-  platformOptions: FilterOption[];
-  tagOptions: FilterOption[];
+  facets?: CatalogueFacetOptions;
+  /** Kept as a compatibility bridge for callers from the previous toolbar. */
+  platformOptions?: FilterOption[];
+  tagOptions?: FilterOption[];
   currentQuery: string;
   yearMin?: number;
   yearMax?: number;
@@ -47,15 +58,15 @@ export function FilterBar({
 }) {
   const dict = getDictionary(locale);
   const f = dict.catalogue.filters;
-  const platformsUnavailable = optionsUnavailable || platformOptions.length === 0;
-  const tagsUnavailable = optionsUnavailable || tagOptions.length === 0;
+  const optionLists: CatalogueFacetOptions = {
+    ...facets,
+    platforms: facets.platforms ?? platformOptions ?? [],
+    tags: facets.tags ?? tagOptions ?? [],
+  };
   const currentYear = new Date().getUTCFullYear();
   const yearCeiling = yearMax ?? currentYear + 2;
-  // A single exact year, newest first (2026-09-12: was a year_from/year_to
-  // range) -- a flat list, same as platform/tag, not a nested control.
-  const yearOptions = Array.from({ length: Math.max(0, yearCeiling - yearMin + 1) }, (_, i) => yearCeiling - i);
-
-  const ratingSummary = filters.min_rating ? `${filters.min_rating}+` : undefined;
+  const yearSummary = [filters.year_from, filters.year_to].filter(Boolean).join(" – ") || undefined;
+  const unavailable = optionsUnavailable;
 
   return (
     <div className="sp-filterbar sp-surface">
@@ -65,85 +76,48 @@ export function FilterBar({
             <circle cx="11" cy="11" r="7" />
             <path d="M16.5 16.5 21 21" />
           </svg>
-          <label htmlFor="q" className="visually-hidden">
-            {dict.catalogue.searchLabel}
-          </label>
+          <label htmlFor="q" className="visually-hidden">{dict.catalogue.searchLabel}</label>
           <input id="q" name="q" type="search" placeholder={dict.catalogue.searchLabel} defaultValue={filters.q ?? ""} />
         </div>
 
-        <FacetMenu
-          name="platform"
-          label={f.platform}
-          options={platformOptions}
-          selected={filters.platform}
-          locale={locale}
-          currentQuery={currentQuery}
-          unavailable={platformsUnavailable}
-        />
+        {FACET_ORDER.map(({ name, optionKey, label }) => (
+          <FacetMenu
+            key={name}
+            name={name}
+            label={name === "platform" ? f.platform : name === "tag" ? f.tag : label[locale === "en" ? "en" : "es"]}
+            options={optionLists[optionKey] ?? []}
+            selected={filters[name] ?? []}
+            locale={locale}
+            currentQuery={currentQuery}
+            unavailable={unavailable}
+          />
+        ))}
 
-        <FacetMenu
-          name="tag"
-          label={f.tag}
-          options={tagOptions}
-          selected={filters.tag}
-          locale={locale}
-          currentQuery={currentQuery}
-          unavailable={tagsUnavailable}
-        />
-
-        <FilterDropdown label={f.year} summary={filters.year}>
-          <ul className="sp-facet-options">
-            <li>
-              <label className="sp-facet-option">
-                <input type="radio" name="year" value="" defaultChecked={!filters.year} />
-                <span>{f.anyOption}</span>
-              </label>
-            </li>
-            {yearOptions.map((y) => (
-              <li key={y}>
-                <label className="sp-facet-option">
-                  <input type="radio" name="year" value={y} defaultChecked={filters.year === String(y)} />
-                  <span>{y}</span>
-                </label>
-              </li>
-            ))}
-          </ul>
+        <FilterDropdown label={f.year} summary={yearSummary}>
+          <div className="sp-dropdown-fields">
+            <label htmlFor="year-from">{locale === "en" ? "From year" : "Desde año"}</label>
+            <input id="year-from" name="year_from" type="number" min={yearMin} max={yearCeiling} defaultValue={filters.year_from ?? ""} />
+            <label htmlFor="year-to">{locale === "en" ? "To year" : "Hasta año"}</label>
+            <input id="year-to" name="year_to" type="number" min={yearMin} max={yearCeiling} defaultValue={filters.year_to ?? ""} />
+          </div>
         </FilterDropdown>
 
-        <FilterDropdown label={f.minRating} summary={ratingSummary}>
+        <FilterDropdown label={f.minRating} summary={filters.min_rating ? `${filters.min_rating}+` : undefined}>
           <ul className="sp-facet-options">
-            <li>
-              <label className="sp-facet-option">
-                <input type="radio" name="min_rating" value="" defaultChecked={!filters.min_rating} />
-                <span>{f.anyOption}</span>
-              </label>
-            </li>
-            {MIN_RATING_OPTIONS.map((v) => (
-              <li key={v}>
-                <label className="sp-facet-option">
-                  <input type="radio" name="min_rating" value={v} defaultChecked={filters.min_rating === v} />
-                  <span>{v}+</span>
-                </label>
-              </li>
+            <li><label className="sp-facet-option"><input type="radio" name="min_rating" value="" defaultChecked={!filters.min_rating} /><span>{f.anyOption}</span></label></li>
+            {MIN_RATING_OPTIONS.map((value) => (
+              <li key={value}><label className="sp-facet-option"><input type="radio" name="min_rating" value={value} defaultChecked={filters.min_rating === value} /><span>{value}+</span></label></li>
             ))}
           </ul>
         </FilterDropdown>
 
         <div className="sp-filterbar-actions">
-          <button type="submit" className="sp-btn-primary">
-            {f.apply}
-          </button>
-          {activeCount > 0 ? (
-            <a href={basePath} className="sp-link">
-              {f.clearAll}
-            </a>
-          ) : null}
+          <button type="submit" className="sp-btn-primary">{f.apply}</button>
+          {activeCount > 0 ? <a href={basePath} className="sp-link">{f.clearAll}</a> : null}
           {activeCount > 0 ? <span className="sp-filterbar-count">{f.activeLabel.many(activeCount)}</span> : null}
         </div>
 
-        {platformsUnavailable || tagsUnavailable ? (
-          <p className="sp-muted sp-filterbar-note">{f.unavailable}</p>
-        ) : null}
+        {unavailable ? <p className="sp-muted sp-filterbar-note">{f.unavailable}</p> : null}
       </form>
       <FilterDropdownScript />
     </div>
