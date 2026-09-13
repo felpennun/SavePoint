@@ -24,6 +24,7 @@ from library.models import (
     OwnedCopy,
     StatusTransition,
 )
+from social.models import Block, Friendship
 
 VALID_RATING_RANGE = range(1, 11)
 VALID_FORMATS = {choice.value for choice in CopyFormat}
@@ -334,15 +335,31 @@ def clear_library_configuration(*, user, work: GameWork) -> None:
 
 
 def list_visible_comments(*, work: GameWork, viewer):  # noqa: ANN001
-    """Every ``public`` comment for this work, plus the viewer's own comment
-    regardless of its visibility (D-05) -- an anonymous viewer only ever
-    sees the public set."""
-    queryset = GameComment.objects.filter(work=work).select_related("user").order_by("created_at", "id")
-    if viewer is not None and getattr(viewer, "is_authenticated", False):
-        queryset = queryset.filter(models.Q(visibility=ContentVisibility.PUBLIC) | models.Q(user=viewer))
-    else:
-        queryset = queryset.filter(visibility=ContentVisibility.PUBLIC)
-    return queryset
+    """Return only comments authorized for the session actor.
+
+    Public comments are friend-scoped in this phase; the author retains their
+    own comment regardless of visibility. Anonymous callers receive an empty
+    queryset so authorization happens before serialization or counting.
+    """
+    if viewer is None or not getattr(viewer, "is_authenticated", False):
+        return GameComment.objects.none()
+    pair_rows = Friendship.objects.filter(
+        models.Q(pair__low_user=viewer) | models.Q(pair__high_user=viewer)
+    ).values_list("pair__low_user_id", "pair__high_user_id")
+    friend_ids = {user_id for row in pair_rows for user_id in row if user_id != viewer.pk}
+    blocked_ids = set(
+        Block.objects.filter(
+            models.Q(blocker=viewer) | models.Q(blocked=viewer), is_active=True
+        ).values_list("blocker_id", "blocked_id")
+    )
+    blocked_ids = {user_id for row in blocked_ids for user_id in row if user_id != viewer.pk}
+    return (
+        GameComment.objects.filter(work=work)
+        .filter(models.Q(user=viewer) | models.Q(user_id__in=friend_ids, visibility=ContentVisibility.PUBLIC))
+        .exclude(user_id__in=blocked_ids)
+        .select_related("user")
+        .order_by("created_at", "id")
+    )
 
 
 def create_comment(

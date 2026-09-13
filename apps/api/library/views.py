@@ -40,7 +40,6 @@ from library.serializers import (
     serialize_list,
     serialize_shared_comment,
 )
-from social.policies import ProfileAccess, resolve_profile_access
 
 VALID_STATUSES = {choice.value for choice in BacklogStatus}
 User = get_user_model()
@@ -411,19 +410,7 @@ class WorkCommentsView(APIView):
         if viewer is None:
             return Response({"comments": []})
         comments = services.list_visible_comments(work=work, viewer=viewer)
-        visible_comments = [
-            comment
-            for comment in comments
-            if (
-                resolve_profile_access(viewer=viewer, owner=comment.user) == ProfileAccess.OWNER
-                or (
-                    resolve_profile_access(viewer=viewer, owner=comment.user)
-                    == ProfileAccess.ACCEPTED_FRIEND
-                    and comment.visibility == "public"
-                )
-            )
-        ]
-        return Response({"comments": [serialize_shared_comment(comment) for comment in visible_comments]})
+        return Response({"comments": [serialize_shared_comment(comment) for comment in comments]})
 
     def post(self, request: Request, work_id: str) -> Response:
         serializer = CommentInputSerializer(data=request.data)
