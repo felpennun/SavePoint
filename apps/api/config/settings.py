@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "library.apps.LibraryConfig",
     "recommendations.apps.RecommendationsConfig",
     "evaluation.apps.EvaluationConfig",
+    "social.apps.SocialConfig",
 ]
 
 MIDDLEWARE = [
@@ -144,6 +145,8 @@ REST_FRAMEWORK = {
         # `?q=<random>` loop that would otherwise drive an unauthenticated
         # trigram scan on every hit (M-05).
         "catalogue_search": "120/min",
+        "social_search": "30/min",
+        "social_mutation": "60/min",
     },
     "NUM_PROXIES": int(_num_proxies_raw) if _num_proxies_raw.isdigit() else None,
 }

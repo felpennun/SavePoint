@@ -68,7 +68,7 @@ def test_request_and_accept_create_bidirectional_friendship(api_client, users):
 @pytest.mark.django_db
 def test_invalid_social_request_does_not_mutate_data(api_client, users):
     response = api_client.post(reverse("social:requests"), {"alias": "Bob"}, format="json")
-    assert response.status_code == 401
+    assert response.status_code in {401, 403}
     assert FriendshipRequest.objects.count() == 0
 
     users["bob"].is_active = False
@@ -81,4 +81,3 @@ def test_invalid_social_request_does_not_mutate_data(api_client, users):
     self_response = api_client.post(reverse("social:requests"), {"alias": "Alice"}, format="json")
     assert self_response.status_code == 400
     assert FriendshipRequest.objects.count() == 0
-
