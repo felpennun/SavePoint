@@ -1,8 +1,8 @@
 import { formatCount, getDictionary } from "@/i18n";
 import { FilterDropdown } from "@/components/FilterDropdown";
-import { type FilterOption, removeHref } from "@/lib/catalogue-filters";
+import { type FilterOption, type RepeatedFacetKey, removeHref } from "@/lib/catalogue-filters";
 
-type FacetName = "tag" | "platform";
+type FacetName = RepeatedFacetKey;
 
 function withoutFacet(currentQuery: string, name: FacetName): string {
   const params = new URLSearchParams(currentQuery.startsWith("?") ? currentQuery.slice(1) : currentQuery);
@@ -63,9 +63,14 @@ export function FacetMenu({
               </li>
             ))}
           </ul>
-          <a href={clearHref} className="sp-link">
-            {dict.catalogue.facet.clear}
-          </a>
+          <div className="sp-filterbar-actions">
+            <button type="submit" className="sp-btn-primary">
+              {dict.catalogue.filters.apply}
+            </button>
+            <a href={clearHref} className="sp-link">
+              {dict.catalogue.facet.clear}
+            </a>
+          </div>
         </>
       )}
     </FilterDropdown>

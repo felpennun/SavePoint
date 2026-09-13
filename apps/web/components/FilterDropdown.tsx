@@ -31,7 +31,6 @@ export function FilterDropdown({
     <details
       className={`sp-dropdown${className ? ` ${className}` : ""}`}
       aria-disabled={unavailable ? "true" : undefined}
-      {...(unavailable ? { disabled: true } : {})}
     >
       <summary>
         <span>{label}</span>
@@ -49,7 +48,9 @@ export function FilterDropdown({
           <path d="m6 9 6 6 6-6" />
         </svg>
       </summary>
-      <div className="sp-surface sp-dropdown-panel">{children}</div>
+      <div className="sp-surface sp-dropdown-panel" role="group" aria-label={label}>
+        {children}
+      </div>
     </details>
   );
 }
