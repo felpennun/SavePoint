@@ -98,6 +98,30 @@ def test_cohort_rows_preserve_backend_order_and_null_non_evaluable_values() -> N
     assert "desagregable" in row["metrics"]["catalogue_coverage@10"]["unavailable_reason"]
 
 
+def test_filter_options_and_rows_use_one_stable_publication_order() -> None:
+    payload = panel_contract.build_comparison_payload(
+        algorithm_id="random-v1",
+        cohort_id="active_history_10_to_20",
+    )
+
+    assert [item["id"] for item in payload["filter_options"]["algorithms"]][:3] == [
+        "cf-user-knn-v1",
+        "content-cbf-mmr-pop-v1",
+        "content-cbf-mmr-v1",
+    ]
+    assert [row["k"] for row in payload["rows"]] == [5, 10, 20]
+    assert {row["algorithm_id"] for row in payload["rows"]} == {"random-v1"}
+    assert [item["id"] for item in payload["filter_options"]["formats"]] == ["csv", "json", "svg"]
+
+
+def test_export_format_is_strictly_allowlisted() -> None:
+    with pytest.raises(PublicationContractError, match="format is not allowlisted"):
+        panel_contract.build_export_payload(format="yaml")
+
+    with pytest.raises(PublicationContractError, match="format is not allowlisted"):
+        panel_contract.build_export_payload(format=["json"])  # type: ignore[arg-type]
+
+
 @pytest.mark.parametrize("export_format", ["csv", "json", "svg"])
 def test_exports_are_allowlisted_and_contain_only_public_rows(export_format: str) -> None:
     export = panel_contract.build_export_payload(
@@ -125,4 +149,3 @@ def test_contract_module_does_not_import_or_invoke_evaluation_runner() -> None:
     assert "from evaluation.runner" not in source
     assert "run_evaluation_parallel" not in source
     assert "rank_content" not in source
-
