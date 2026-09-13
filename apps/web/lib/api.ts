@@ -349,6 +349,61 @@ export function fetchSharedList(alias: string, listSlug: string, cookieHeader: s
   );
 }
 
+export type SocialRelationship = "none" | "pending_sent" | "pending_received" | "friend" | "blocked";
+
+export interface SocialAccount {
+  alias: string;
+  avatar_url: string;
+  bio: string;
+  relationship: SocialRelationship;
+}
+
+export interface SocialFriendshipRequest {
+  id: string;
+  sender_alias: string;
+  receiver_alias: string;
+  status: "pending";
+  created_at: string;
+}
+
+export interface SocialRequests {
+  received: SocialFriendshipRequest[];
+  sent: SocialFriendshipRequest[];
+}
+
+export interface SocialFriend {
+  alias: string;
+  relationship: "friend";
+}
+
+export interface SocialFriends {
+  friends: SocialFriend[];
+}
+
+export interface SocialHubData {
+  requests: SocialRequests;
+  friendships: SocialFriends;
+}
+
+async function fetchSocialJson<T>(path: string, cookieHeader: string): Promise<T | null> {
+  const response = await fetch(new URL(path, API_BASE), {
+    cache: "no-store",
+    headers: { Cookie: cookieHeader },
+  });
+  if (response.status === 401 || response.status === 403) return null;
+  if (!response.ok) throw new Error(`Failed to load social data (status ${response.status})`);
+  return (await response.json()) as T;
+}
+
+export async function fetchSocialHubData(cookieHeader: string): Promise<SocialHubData | null> {
+  const [requests, friendships] = await Promise.all([
+    fetchSocialJson<SocialRequests>("/api/social/requests/", cookieHeader),
+    fetchSocialJson<SocialFriends>("/api/social/friendships/", cookieHeader),
+  ]);
+  if (!requests || !friendships) return null;
+  return { requests, friendships };
+}
+
 export interface PopularityResultItem {
   work_id: string;
   slug: string;

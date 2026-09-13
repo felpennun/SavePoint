@@ -5,10 +5,11 @@ export type Locale = (typeof SUPPORTED_LOCALES)[number];
 export const DEFAULT_LOCALE: Locale = "es";
 
 // Paths (locale-relative, i.e. without the /{locale} prefix) reachable
-// without an authenticated Django session. Per UI-SPEC, only Collection
-// (and any future purely-private page) requires auth -- homepage, login,
-// catalogue, game detail, and sources are all public browsing surfaces.
+// without an authenticated Django session. Profile routes remain public only
+// for the backend's basic projection; protected profile/list content is still
+// authorized by Django and never by this UX-only middleware.
 const PUBLIC_PATHS = ["/", "/login", "/register", "/sources", "/catalogue", "/games", "/profiles"];
+const AUTHENTICATED_PATHS = ["/collection", "/recommendations", "/friends"];
 
 function isSupportedLocale(value: string): value is Locale {
   return (SUPPORTED_LOCALES as readonly string[]).includes(value);
@@ -43,13 +44,16 @@ export function middleware(request: NextRequest): NextResponse {
   const isPublic = PUBLIC_PATHS.some(
     (p) => normalizedRest === p || (p !== "/" && normalizedRest.startsWith(`${p}/`))
   );
+  const requiresSession = AUTHENTICATED_PATHS.some(
+    (p) => normalizedRest === p || normalizedRest.startsWith(`${p}/`),
+  );
 
   // D-03: session cookie is Django's own sessionid, same-origin via the
   // rewrite proxy in next.config.ts -- the middleware never inspects its
   // value, only whether it exists.
   const hasSession = request.cookies.has("sessionid");
 
-  if (!isPublic && !hasSession) {
+  if ((requiresSession || !isPublic) && !hasSession) {
     const url = request.nextUrl.clone();
     url.pathname = `/${locale}/login`;
     // Only ever a same-origin path -- the login handler itself re-validates

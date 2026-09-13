@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   getSocialActionDescriptors,
+  buildSocialActionPath,
   type SocialActionRelationship,
 } from "@/components/SocialActions";
 import {
@@ -33,6 +34,11 @@ describe("social hub contract", () => {
       "block",
     ]);
     expect(getSocialActionDescriptors("blocked", "es").map((action) => action.key)).toEqual(["unblock"]);
+    expect(buildSocialActionPath("accept", "alice", "request-1")).toBe("/api/social/requests/request-1/accept/");
+    expect(buildSocialActionPath("reject", "alice", "request-1")).toBe("/api/social/requests/request-1/reject/");
+    expect(buildSocialActionPath("remove", "alice")).toBe("/api/social/friendships/alice/remove/");
+    expect(buildSocialActionPath("block", "alice")).toBe("/api/social/friendships/alice/block/");
+    expect(buildSocialActionPath("unblock", "alice")).toBe("/api/social/blocks/alice/unblock/");
   });
 
   it("renders named sections, live feedback, and a non-autocomplete search control", () => {
@@ -48,7 +54,7 @@ describe("social hub contract", () => {
     expect(markup).toContain("Solicitudes enviadas");
     expect(markup).toContain("Amistades");
     expect(markup).toContain('aria-live="polite"');
-    expect(markup).toContain('autocomplete="off"');
+    expect(markup).toContain('autoComplete="off"');
     expect(markup).not.toContain("<datalist");
   });
 
