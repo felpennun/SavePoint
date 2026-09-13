@@ -29,6 +29,8 @@ class SocialSearchView(APIView):
     throttle_scope = "social_search"
 
     def get(self, request: Request) -> Response:
+        if set(request.query_params) != {"alias"} or len(request.query_params.getlist("alias")) != 1:
+            return Response({"detail": "Invalid exact alias."}, status=400)
         serializer = ExactAliasSerializer(data=request.query_params)
         if not serializer.is_valid():
             return Response({"detail": "Invalid exact alias."}, status=400)

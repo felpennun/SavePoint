@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.db import close_old_connections
+from django.db import close_old_connections, connections
 from django.urls import reverse
 from rest_framework.test import APIClient
 
@@ -195,12 +195,13 @@ def test_concurrent_requests_create_one_pending_row(users):
         except services.SocialConflict:
             return "conflict"
         finally:
-            close_old_connections()
+            connections.close_all()
 
     from concurrent.futures import ThreadPoolExecutor
 
     with ThreadPoolExecutor(max_workers=2) as executor:
         results = list(executor.map(lambda _item: send_request(), range(2)))
+    close_old_connections()
 
     assert sorted(results) == ["conflict", "created"]
     assert FriendshipRequest.objects.filter(status="pending").count() == 1

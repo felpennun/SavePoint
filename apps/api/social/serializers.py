@@ -19,7 +19,9 @@ class SocialAliasRequestSerializer(ExactAliasSerializer):
             raise serializers.ValidationError("A JSON object is required.")
         unexpected = set(data) - {"alias"}
         if unexpected:
-            raise serializers.ValidationError("Only an exact alias may be supplied.")
+            raise serializers.ValidationError(
+                {"non_field_errors": ["Only an exact alias may be supplied."]}
+            )
         return super().to_internal_value(data)
 
 
