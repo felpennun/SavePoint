@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 5
+open_count: 6
 waived_count: 0
 fixed_count: 0
-total_count: 5
-last_updated: 2026-09-07T09:42:03.280Z
+total_count: 6
+last_updated: 2026-09-13T15:11:32.391Z
 ---
 
 # Broken Windows Ledger
@@ -20,6 +20,7 @@ last_updated: 2026-09-07T09:42:03.280Z
 | 3 | 01.1 | stub | apps/web/app/[locale]/register/page.tsx |  | Register submit maps errors but backend /api/accounts/register/ is Plan 04/08 | open |  | 2026-09-05T21:19:42.695Z |  |
 | 4 | 02 | deviation | apps/api/catalogue/management/commands/enrich_rawg_ratings.py | 142 | RAWG SourceRecord update_or_create on (source, source_id) overwrites work FK when one RAWG game reconciles to 2 governed works (22 rows in the N=10000 run); snapshots correct, provenance row points to one work only | open |  | 2026-09-07T08:54:03.534Z |  |
 | 5 | 02 | deviation | apps/api/catalogue/ratings.py |  | display_rating D-09: reparto de pesos externo/local (min(max(n,1),50)) y conjunto de cuentas implementado por must_haves; pendiente ratificacion del autor antes de que 02-13 cierre DATA-07 (coverage D6, human_judgment:true) | open |  | 2026-09-07T09:42:03.280Z |  |
+| 6 | 06 | unrun-verify | .planning/phases/06-public-discovery-and-resilient-enrichment/deferred-items.md | 5 | La suite agregada de catalogue-filters no puede completar nav-overflow porque falta Chromium en el contenedor; las pruebas focalizadas y TypeScript pasan. | open |  | 2026-09-13T15:11:32.391Z |  |
 
 ````json
 [
@@ -81,6 +82,18 @@ last_updated: 2026-09-07T09:42:03.280Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-09-07T09:42:03.280Z",
+    "resolved_at": null
+  },
+  {
+    "id": 6,
+    "kind": "unrun-verify",
+    "phase": "06",
+    "file": ".planning/phases/06-public-discovery-and-resilient-enrichment/deferred-items.md",
+    "line": 5,
+    "description": "La suite agregada de catalogue-filters no puede completar nav-overflow porque falta Chromium en el contenedor; las pruebas focalizadas y TypeScript pasan.",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-09-13T15:11:32.391Z",
     "resolved_at": null
   }
 ]

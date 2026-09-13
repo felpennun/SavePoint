@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
 status: in_progress
-stopped_at: Completed 06-02-PLAN.md
-last_updated: "2026-09-13T16:39:30.000Z"
+stopped_at: Completed 06-05-PLAN.md
+last_updated: "2026-09-13T17:22:00.000Z"
 last_activity: 2026-09-13
-state_head: 5b005fd46fe33c7b915b723fee237358fa4195ee
+state_head: 23e3390ee6ab4f66f636a789a09cd2fe77e42f43
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 60
-  completed_plans: 56
-  percent: 93
+  completed_plans: 54
+  percent: 25
 next_phase: 6
 next_phase_name: Public Discovery and Resilient Enrichment
 next_action: Ejecutar 06-03-PLAN.md
@@ -119,6 +119,7 @@ Progreso global: 2/8 fases (25%).
 | Phase 02 P02 | ~80 min | 3 tasks | 7 files |
 | Phase 06 P00 | 10min | 2 tasks | 4 files |
 | Phase 06 P02 | 35min | 3 tasks | 10 files |
+| Phase 06 P05 | 25min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -158,6 +159,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 05]: CAT-05 mantiene juegos, plataformas, ediciones, géneros, franquicias, desarrolladores, editoriales, fechas, modos y tags en el contrato backend aunque la selección visual quede abierta.
 - [Phase 05]: CAT-05 usa filtros GET allowlisted y facets calculados antes de paginar, con orden determinista y slugs desconocidos ignorados.
 - [Phase 05]: Publisher solo se enriquece desde snapshots locales APPROVED con SHA-256 y procedencia; Edition permanece anidada bajo GameRelease.
+- [Phase 06]: La UI de catálogo usa los nombres exactos del contrato CAT-05 y mantiene filtros, orden y paginación en GET SSR.
+- [Phase 06]: Los controles de facets solo presentan opciones procedentes del API local y no invocan proveedores externos.
 
 ### Pending Todos
 
@@ -233,11 +236,11 @@ Ver `.planning/quick/260909-nej-a-adir-cuatro-variantes-popscore-con-imp/`.
 
 ## Registro histórico de sesiones (prevalece el checkpoint de ejecución actual)
 
-**Stopped at:** Completed 06-02-PLAN.md
+**Stopped at:** Completed 06-05-PLAN.md
 
 **Resume (after the rate-limit reset):** `/gsd-plan-phase 2` re-spawns the planner from scratch. All inputs are committed: `02-CONTEXT.md`, `02-UI-SPEC.md` (verified 7/7), `02-RESEARCH.md`, `02-VALIDATION.md`, `02-PATTERNS.md`, `02-COVERAGE.md`. Then `gsd-plan-checker` → revision loop → present → `/gsd-execute-phase 2`. Full detail in `.planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/.continue-here.md`.
 
-Last session: 2026-09-13T14:46:23.555Z
+Last session: 2026-09-13T15:14:37.653Z
 
 ### Done this session (2026-09-06, all committed on `main`)
 
