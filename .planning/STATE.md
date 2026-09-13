@@ -2,13 +2,15 @@
 gsd_state_version: 1.0
 status: in_progress
 stopped_at: Completed 06-08-PLAN.md
-last_updated: "2026-09-13T19:35:00.000Z"
+last_updated: "2026-09-13T19:55:13.642Z"
 last_activity: 2026-09-13
-state_head: 40106e30cb7ac7b434b721444a03d21f28b45b2a
+state_head: 518aa6f80d960eb39d00e89ea5df01a8f781557a
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 60
+  completed_plans: 60
+  percent: 25
 completed_plans: 59
 percent: 98
 next_phase: 6
@@ -31,6 +33,11 @@ rule that applies to every LLM and collaborator).
 **Current focus:** Phase 06 — Public Discovery and Resilient Enrichment
 
 ## Current Position
+
+**Phase:** 06
+**Plan:** 09
+**Plans in Phase:** 10
+**Status:** complete
 
 ### Snapshot de ejecucion vigente (2026-09-07)
 
@@ -123,6 +130,7 @@ Progreso global: 2/8 fases (25%).
 | Phase 06 P04 | 1h+ | 3 tasks | 11 files |
 | Phase 06 P06 | 45min | 2 tasks | 12 files |
 | Phase 06 P07 | 12min | 2 tasks | 8 files |
+| Phase 06 P09 | 30m | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -171,6 +179,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 06]: Las acciones sociales usan rutas separadas, CSRF, busy por fila y confirmaciones accesibles.
 - [Phase 06]: La bandeja social usa DTOs allowlisted, Cookie/no-store en SSR y CSRF same-origin en mutaciones; el backend conserva la autoridad de privacidad y cooldown.
 - [Phase 06]: AccountSwitcher refleja el aggregate autenticado de pendientes con texto accesible y punto rojo, y se sincroniza tras mark_read.
+- [Phase 06]: Se cierra el gate de backend y evidencia con PostgreSQL 18.6, snapshots inmutables y sin relanzar evaluación offline.
+- [Phase 06]: Los journeys browser quedan diferidos de forma explícita cuando el entorno Compose no aporta e2e/configuración y el journey social no dispone de variables runtime.
 
 ### Pending Todos
 
@@ -246,11 +256,11 @@ Ver `.planning/quick/260909-nej-a-adir-cuatro-variantes-popscore-con-imp/`.
 
 ## Registro histórico de sesiones (prevalece el checkpoint de ejecución actual)
 
-**Stopped at:** Completed 06-08-PLAN.md
+**Stopped at:** Completed 06-09-PLAN.md
 
 **Resume (after the rate-limit reset):** `/gsd-plan-phase 2` re-spawns the planner from scratch. All inputs are committed: `02-CONTEXT.md`, `02-UI-SPEC.md` (verified 7/7), `02-RESEARCH.md`, `02-VALIDATION.md`, `02-PATTERNS.md`, `02-COVERAGE.md`. Then `gsd-plan-checker` → revision loop → present → `/gsd-execute-phase 2`. Full detail in `.planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/.continue-here.md`.
 
-Last session: 2026-09-13T19:23:17.672Z
+Last session: 2026-09-13T19:55:12.982Z
 
 ### Done this session (2026-09-06, all committed on `main`)
 

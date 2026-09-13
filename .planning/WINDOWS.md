@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 9
+open_count: 11
 waived_count: 0
 fixed_count: 0
-total_count: 9
-last_updated: 2026-09-13T19:31:19.089Z
+total_count: 11
+last_updated: 2026-09-13T19:54:06.081Z
 ---
 
 # Broken Windows Ledger
@@ -24,6 +24,8 @@ last_updated: 2026-09-13T19:31:19.089Z
 | 7 | 06 | unrun-verify | apps/web/components/SocialActions.tsx |  | Verificacion browser-level de foco, Escape y responsive no ejecutada por ausencia de Chromium en la imagen web | open |  | 2026-09-13T19:04:30.104Z |  |
 | 8 | 06 | unrun-verify | apps/web/tests/social-comments.test.ts |  | La orden amplia del frontend arrastra el contrato social-comments pendiente de 06-08 y Playwright no puede iniciar por ausencia de Chromium; la prueba focalizada social-messages y TypeScript pasan. | open |  | 2026-09-13T19:21:44.046Z |  |
 | 9 | 06 | unrun-verify | apps/web/components/__tests__/nav-overflow.test.tsx |  | La suite completa de Vitest no puede ejecutar nav-overflow porque falta Chromium; los 53 tests no browser, los 3 social-comments, los 7 i18n y TypeScript pasan. | open |  | 2026-09-13T19:31:19.089Z |  |
+| 10 | 06 | unrun-verify | e2e/catalogue-discovery.spec.ts |  | Journey browser completo y revisión axe visual diferidos por limitaciones de la imagen Compose. | open |  | 2026-09-13T19:54:05.633Z |  |
+| 11 | 06 | unrun-verify | e2e/social-workflows.spec.ts |  | Journey social browser completo diferido por limitaciones de la imagen Compose y variables de ejecución no consignadas. | open |  | 2026-09-13T19:54:06.081Z |  |
 
 ````json
 [
@@ -133,6 +135,30 @@ last_updated: 2026-09-13T19:31:19.089Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-09-13T19:31:19.089Z",
+    "resolved_at": null
+  },
+  {
+    "id": 10,
+    "kind": "unrun-verify",
+    "phase": "06",
+    "file": "e2e/catalogue-discovery.spec.ts",
+    "line": null,
+    "description": "Journey browser completo y revisión axe visual diferidos por limitaciones de la imagen Compose.",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-09-13T19:54:05.633Z",
+    "resolved_at": null
+  },
+  {
+    "id": 11,
+    "kind": "unrun-verify",
+    "phase": "06",
+    "file": "e2e/social-workflows.spec.ts",
+    "line": null,
+    "description": "Journey social browser completo diferido por limitaciones de la imagen Compose y variables de ejecución no consignadas.",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-09-13T19:54:06.081Z",
     "resolved_at": null
   }
 ]
