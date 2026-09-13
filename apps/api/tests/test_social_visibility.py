@@ -11,7 +11,7 @@ from rest_framework.test import APIClient
 from accounts.models import AccountProfile
 from catalogue.models import GameWork
 from library import services as library_services
-from library.models import CustomList, CustomListItem, LibraryEntry
+from library.models import CustomList, CustomListItem, GameComment, LibraryEntry
 from social import services as social_services
 
 User = get_user_model()
@@ -243,3 +243,20 @@ def test_collection_and_list_order_is_not_inferred_from_creation_time(owner, fri
     assert response.status_code == 200
     assert [item["game"]["slug"] for item in response.json()["items"]] == ["second-game", "visibility-game"]
     assert [item["backlog_status"] for item in response.json()["items"]] == ["completed", "pending"]
+
+
+@pytest.mark.django_db
+def test_game_comments_are_visible_only_to_owner_or_accepted_friend(owner, friend, stranger, work):  # noqa: ANN001
+    LibraryEntry.objects.create(user=owner, work=work, current_status="completed")
+    GameComment.objects.create(user=owner, work=work, text="Owner comment", visibility="public")
+    GameComment.objects.create(user=friend, work=work, text="Friend comment", visibility="public")
+    _make_friendship(owner, friend)
+
+    anonymous = _client().get(f"/api/library/entries/{work.id}/comments/")
+    stranger_response = _client(stranger).get(f"/api/library/entries/{work.id}/comments/")
+    friend_response = _client(friend).get(f"/api/library/entries/{work.id}/comments/")
+
+    assert anonymous.json()["comments"] == []
+    assert stranger_response.json()["comments"] == []
+    assert {item["text"] for item in friend_response.json()["comments"]} == {"Owner comment", "Friend comment"}
+    assert set(friend_response.json()["comments"][0]) == {"author_alias", "text", "date"}

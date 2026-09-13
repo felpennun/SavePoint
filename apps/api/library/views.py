@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.contrib.auth import get_user_model
 from django.db.models import Count, Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -34,14 +35,84 @@ from library.serializers import (
     ReorderListSerializer,
     serialize_comment,
     serialize_copy,
+    serialize_friend_collection_item,
+    serialize_friend_list,
     serialize_list,
+    serialize_shared_comment,
 )
+from social.policies import ProfileAccess, resolve_profile_access
 
 VALID_STATUSES = {choice.value for choice in BacklogStatus}
+User = get_user_model()
+
+
+def _generic_not_found() -> Response:
+    return Response({"detail": "Not found."}, status=404)
+
+
+def _shared_owner(request: Request, alias: str):  # noqa: ANN001
+    """Resolve alias and relationship before querying protected content."""
+    owner = User.objects.filter(username=alias, is_active=True).first()
+    if owner is None:
+        return None, ProfileAccess.HIDDEN
+    access = resolve_profile_access(viewer=request.user, owner=owner)
+    if access not in {ProfileAccess.OWNER, ProfileAccess.ACCEPTED_FRIEND}:
+        return None, access
+    return owner, access
 
 
 def _service_error_detail(exc: ValidationError) -> str:
     return str(exc.message if hasattr(exc, "message") else exc)
+
+
+class SharedCollectionView(APIView):
+    """GET a friend's collection through the canonical alias locator."""
+
+    permission_classes = [AllowAny]
+
+    def get(self, request: Request, alias: str) -> Response:
+        owner, access = _shared_owner(request, alias)
+        if owner is None:
+            return _generic_not_found()
+        profile = getattr(owner, "profile", None)
+        if access == ProfileAccess.ACCEPTED_FRIEND and profile is not None and profile.collection_visibility != "public":
+            return _generic_not_found()
+        entries = (
+            LibraryEntry.objects.filter(user=owner)
+            .select_related("work")
+            .prefetch_related("work__assets", "work__releases__platform")
+            .order_by("work__original_title", "id")
+        )
+        return Response({"items": [serialize_friend_collection_item(entry) for entry in entries]})
+
+
+class SharedListView(APIView):
+    """GET a public list through the owner alias + stable public slug."""
+
+    permission_classes = [AllowAny]
+
+    def get(self, request: Request, alias: str, list_slug: str) -> Response:
+        owner, access = _shared_owner(request, alias)
+        if owner is None:
+            return _generic_not_found()
+        custom_list = (
+            CustomList.objects.filter(user=owner, public_slug=list_slug)
+            .prefetch_related(
+                "items__work__assets",
+                "items__work__releases__platform",
+            )
+            .first()
+        )
+        if custom_list is None:
+            return _generic_not_found()
+        if access == ProfileAccess.ACCEPTED_FRIEND and custom_list.visibility != "public":
+            return _generic_not_found()
+        work_ids = [item.work_id for item in custom_list.items.all()]
+        entries_by_work = {
+            entry.work_id: entry
+            for entry in LibraryEntry.objects.filter(user=owner, work_id__in=work_ids).select_related("work")
+        }
+        return Response(serialize_friend_list(custom_list, entries_by_work=entries_by_work))
 
 
 class MyLibraryView(APIView):
@@ -337,8 +408,22 @@ class WorkCommentsView(APIView):
     def get(self, request: Request, work_id: str) -> Response:
         work = get_object_or_404(GameWork, id=work_id, is_dlc=False)
         viewer = request.user if request.user.is_authenticated else None
+        if viewer is None:
+            return Response({"comments": []})
         comments = services.list_visible_comments(work=work, viewer=viewer)
-        return Response({"comments": [serialize_comment(comment, viewer=viewer) for comment in comments]})
+        visible_comments = [
+            comment
+            for comment in comments
+            if (
+                resolve_profile_access(viewer=viewer, owner=comment.user) == ProfileAccess.OWNER
+                or (
+                    resolve_profile_access(viewer=viewer, owner=comment.user)
+                    == ProfileAccess.ACCEPTED_FRIEND
+                    and comment.visibility == "public"
+                )
+            )
+        ]
+        return Response({"comments": [serialize_shared_comment(comment) for comment in visible_comments]})
 
     def post(self, request: Request, work_id: str) -> Response:
         serializer = CommentInputSerializer(data=request.data)

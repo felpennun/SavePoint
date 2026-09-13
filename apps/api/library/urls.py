@@ -16,6 +16,8 @@ from library.views import (
     PopularityView,
     SetRatingView,
     SetStatusView,
+    SharedCollectionView,
+    SharedListView,
     WorkCommentsView,
 )
 
@@ -23,6 +25,8 @@ app_name = "library"
 
 urlpatterns = [
     path("entries/", MyLibraryView.as_view(), name="my-library"),
+    path("profiles/<str:alias>/collection/", SharedCollectionView.as_view(), name="shared-collection"),
+    path("profiles/<str:alias>/lists/<slug:list_slug>/", SharedListView.as_view(), name="shared-list"),
     path("export/collection.csv", ExportCollectionView.as_view(), name="export-collection-csv"),
     path("entries/<uuid:work_id>/status/", SetStatusView.as_view(), name="set-status"),
     path("entries/<uuid:work_id>/rating/", SetRatingView.as_view(), name="set-rating"),

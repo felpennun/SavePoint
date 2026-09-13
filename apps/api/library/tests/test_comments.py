@@ -163,7 +163,7 @@ def test_author_sees_own_private_comment_via_the_by_work_listing(work, user_a) -
     comments = response.json()["comments"]
     assert len(comments) == 1
     assert comments[0]["text"] == "Private thoughts."
-    assert comments[0]["is_own"] is True
+    assert set(comments[0]) == {"author_alias", "text", "date"}
 
 
 @pytest.mark.django_db
@@ -175,18 +175,19 @@ def test_third_parties_only_receive_public_comments(work, user_a, user_b) -> Non
 
     anonymous_response = APIClient().get(f"/api/library/entries/{work.id}/comments/")
     anonymous_texts = {c["text"] for c in anonymous_response.json()["comments"]}
-    assert anonymous_texts == {"Public B."}
+    assert anonymous_texts == set()
 
-    # B is a third party relative to A's private comment -- B's own comment
-    # is already public, so B sees the same public-only set as anonymous.
+    # B is not an accepted friend of A, so neither account can see the other
+    # account's comment through the shared game boundary.
     b_response = _client_for(user_b).get(f"/api/library/entries/{work.id}/comments/")
     b_texts = {c["text"] for c in b_response.json()["comments"]}
     assert b_texts == {"Public B."}
 
-    # A, as the author, still sees their own private comment plus B's public one.
+    # A, as the author, sees their own private comment; B is not an accepted
+    # friend, so B's public comment remains hidden here.
     a_response = _client_for(user_a).get(f"/api/library/entries/{work.id}/comments/")
     a_texts = {c["text"] for c in a_response.json()["comments"]}
-    assert a_texts == {"Private A.", "Public B."}
+    assert a_texts == {"Private A."}
 
 
 @pytest.mark.django_db
@@ -203,5 +204,5 @@ def test_hostile_comment_text_is_returned_as_inert_text(work, user_a) -> None:  
     assert created.json()["text"] == hostile_text
     assert isinstance(created.json()["text"], str)
 
-    listed = APIClient().get(f"/api/library/entries/{work.id}/comments/").json()["comments"]
+    listed = client.get(f"/api/library/entries/{work.id}/comments/").json()["comments"]
     assert listed[0]["text"] == hostile_text

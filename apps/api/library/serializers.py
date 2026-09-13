@@ -223,6 +223,15 @@ def serialize_comment(comment: GameComment, *, viewer=None) -> dict:  # noqa: AN
     }
 
 
+def serialize_shared_comment(comment: GameComment) -> dict:
+    """D-11 allowlist for a comment shown to an authorized friend."""
+    return {
+        "author_alias": _escape_text(comment.user.username),
+        "text": _escape_text(comment.text),
+        "date": comment.created_at.isoformat(),
+    }
+
+
 def serialize_profile_comment(comment: GameComment) -> dict:
     """Minimal allowlist for the public-profile aggregate (PRIV-01): no
     comment id, no visibility flag, no author key (the profile itself is
