@@ -21,7 +21,7 @@ const SORTS = ["recently_updated", "rating_desc", "title_asc", "release_year"] a
 type CollSort = (typeof SORTS)[number];
 const COPY_FILTERS = ["all", "with_copy", "without_copy"] as const;
 type CopyFilter = (typeof COPY_FILTERS)[number];
-const PAGE_SIZE = 48;
+const PAGE_SIZE = 50;
 
 function first(v: string | string[] | undefined): string | undefined {
   return Array.isArray(v) ? v[0] : v;
