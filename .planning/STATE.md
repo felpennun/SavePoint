@@ -1,19 +1,19 @@
 ---
 gsd_state_version: 1.0
 status: in_progress
-stopped_at: Completed 06-05-PLAN.md
-last_updated: "2026-09-13T17:22:00.000Z"
+stopped_at: Completed 06-04-PLAN.md
+last_updated: "2026-09-13T18:08:16.994Z"
 last_activity: 2026-09-13
-state_head: 23e3390ee6ab4f66f636a789a09cd2fe77e42f43
+state_head: 8b3daa4ec55814d65ada8d69f4b82062164049d8
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 60
-  completed_plans: 54
+  completed_plans: 56
   percent: 25
 next_phase: 6
 next_phase_name: Public Discovery and Resilient Enrichment
-next_action: Ejecutar 06-03-PLAN.md
+next_action: Ejecutar 06-06-PLAN.md
 current_phase: 06
 current_phase_name: Public Discovery and Resilient Enrichment
 ---
@@ -120,6 +120,7 @@ Progreso global: 2/8 fases (25%).
 | Phase 06 P00 | 10min | 2 tasks | 4 files |
 | Phase 06 P02 | 35min | 3 tasks | 10 files |
 | Phase 06 P05 | 25min | 2 tasks | 8 files |
+| Phase 06 P04 | 1h+ | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -161,6 +162,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 05]: Publisher solo se enriquece desde snapshots locales APPROVED con SHA-256 y procedencia; Edition permanece anidada bajo GameRelease.
 - [Phase 06]: La UI de catálogo usa los nombres exactos del contrato CAT-05 y mantiene filtros, orden y paginación en GET SSR.
 - [Phase 06]: Los controles de facets solo presentan opciones procedentes del API local y no invocan proveedores externos.
+- [Phase 06]: Las recomendaciones solo se crean entre amistades aceptadas y el receptor se deriva por alias único sin IDs de identidad alternativos.
+- [Phase 06]: El cooldown direccional usa una ventana exacta de siete días y responde 429 con Retry-After de forma fail-closed.
+- [Phase 06]: Remove/block convierten mensajes en tombstones mínimos y los comentarios aplican la policy antes del queryset.
 
 ### Pending Todos
 
@@ -236,11 +240,11 @@ Ver `.planning/quick/260909-nej-a-adir-cuatro-variantes-popscore-con-imp/`.
 
 ## Registro histórico de sesiones (prevalece el checkpoint de ejecución actual)
 
-**Stopped at:** Completed 06-05-PLAN.md
+**Stopped at:** Completed 06-04-PLAN.md
 
 **Resume (after the rate-limit reset):** `/gsd-plan-phase 2` re-spawns the planner from scratch. All inputs are committed: `02-CONTEXT.md`, `02-UI-SPEC.md` (verified 7/7), `02-RESEARCH.md`, `02-VALIDATION.md`, `02-PATTERNS.md`, `02-COVERAGE.md`. Then `gsd-plan-checker` → revision loop → present → `/gsd-execute-phase 2`. Full detail in `.planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/.continue-here.md`.
 
-Last session: 2026-09-13T15:14:37.653Z
+Last session: 2026-09-13T18:08:02.182Z
 
 ### Done this session (2026-09-06, all committed on `main`)
 
