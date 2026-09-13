@@ -14,11 +14,16 @@ from catalogue.models import (
     CorpusPopularityScore,
     CorpusVersion,
     CuratedLabel,
+    Developer,
+    Edition,
+    Franchise,
     GameAlias,
+    GameMode,
     GameRelease,
     GameWork,
     GameWorkCuratedLabel,
     Platform,
+    Publisher,
     SourceRecord,
 )
 from catalogue.normalization import normalize_title
@@ -680,3 +685,94 @@ def test_endpoint_rejects_more_than_twenty_repeated_values_with_bounded_400() ->
     )
     assert response.status_code == 400
     assert "results" not in response.json()
+
+
+# ---------------------------------------------------------------------------
+# Phase 06 Plan 02 -- complete CAT-05 discovery contract
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_cat05_query_and_facets_cover_every_catalogue_dimension() -> None:
+    genre = Genre.objects.create(igdb_id=501, name="Role Playing", slug="role-playing")
+    franchise = Franchise.objects.create(igdb_id=502, name="Signal Saga", slug="signal-saga")
+    developer = Developer.objects.create(
+        igdb_id=503, name="Signal Studio", slug="signal-studio"
+    )
+    publisher = Publisher.objects.create(
+        igdb_id=504, name="Signal Publishing", slug="signal-publishing"
+    )
+    mode = GameMode.objects.create(igdb_id=505, name="Single Player", slug="single-player")
+    tag = _genre("Curated Signal", 506)
+    work = _work("Signal Edition Quest", year=2022, platforms=("PC",), in_corpus=True)
+    work.genres.add(genre)
+    work.franchises.add(franchise)
+    work.developers.add(developer)
+    work.publishers.add(publisher)
+    work.game_modes.add(mode)
+    GameWorkCuratedLabel.objects.create(
+        work=work, label=tag, source_kind="genre", source_value=tag.name
+    )
+    release = work.releases.get()
+    Edition.objects.create(release=release, name="Deluxe Edition")
+
+    query = {
+        "platform": "pc",
+        "edition": "deluxe-edition",
+        "genre": "role-playing",
+        "franchise": "signal-saga",
+        "developer": "signal-studio",
+        "publisher": "signal-publishing",
+        "year_from": "2022",
+        "year_to": "2022",
+        "mode": "single-player",
+        "tag": "curated-signal",
+        "sort": "title_asc",
+    }
+    result = search_games(cq=parse_catalogue_query(query))
+
+    assert [item.original_title for item in result["results"]] == ["Signal Edition Quest"]
+    assert {item["slug"] for item in result["facets"]["editions"]} == {"deluxe-edition"}
+    assert {item["slug"] for item in result["facets"]["genres"]} == {"role-playing"}
+    assert {item["slug"] for item in result["facets"]["franchises"]} == {"signal-saga"}
+    assert {item["slug"] for item in result["facets"]["developers"]} == {"signal-studio"}
+    assert {item["slug"] for item in result["facets"]["publishers"]} == {"signal-publishing"}
+    assert {item["slug"] for item in result["facets"]["modes"]} == {"single-player"}
+    assert {item["slug"] for item in result["facets"]["tags"]} >= {"curated-signal"}
+    assert result["facets"]["dates"] == [{"value": "2022", "label": "2022", "count": 1}]
+
+
+@pytest.mark.django_db
+def test_cat05_repeated_filters_pagination_and_sort_are_reproducible() -> None:
+    genre = Genre.objects.create(igdb_id=601, name="Puzzle", slug="puzzle")
+    for index in range(3):
+        work = _work(f"Repeatable Edition {index}", year=2020 + index, platforms=("PC",))
+        work.genres.add(genre)
+        release = work.releases.get()
+        Edition.objects.create(release=release, name="Standard")
+
+    params = _qd(genre=["puzzle", "puzzle"], platform=["pc", "pc"], edition=["standard"])
+    params["sort"] = "title_desc"
+    first = search_games(cq=parse_catalogue_query(params), page=1, page_size=2)
+    second = search_games(cq=parse_catalogue_query(params), page=1, page_size=2)
+
+    assert [item.id for item in first["results"]] == [item.id for item in second["results"]]
+    assert first["count"] == second["count"] == 3
+    assert first["has_next"] is True
+
+
+@pytest.mark.django_db
+def test_cat05_invalid_bounds_fail_before_orm_and_unknown_slugs_are_ignored() -> None:
+    _work("Known Local Work", year=2020, platforms=("PC",))
+    with pytest.raises(FilterValidationError):
+        parse_catalogue_query({"sort": "release_newest; DROP TABLE catalogue_gamework"})
+    with pytest.raises(FilterValidationError):
+        parse_catalogue_query({"date_from": "not-a-date"})
+
+    client = APIClient()
+    response = client.get(
+        "/api/catalogue/games/",
+        {"publisher": "does-not-exist", "edition": "does-not-exist"},
+    )
+    assert response.status_code == 200
+    assert response.json()["count"] == 1
