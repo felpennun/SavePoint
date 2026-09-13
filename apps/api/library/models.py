@@ -4,6 +4,7 @@ import uuid
 
 from django.conf import settings
 from django.db import models
+from django.utils.text import slugify
 
 from catalogue.models import Edition, GameRelease, GameWork
 
@@ -221,6 +222,7 @@ class CustomList(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="custom_lists")
     name = models.CharField(max_length=LIST_NAME_MAX_LENGTH)
+    public_slug = models.SlugField(max_length=140, editable=False)
     visibility = models.CharField(
         max_length=8, choices=ContentVisibility.choices, default=ContentVisibility.PUBLIC
     )
@@ -235,7 +237,26 @@ class CustomList(models.Model):
                 condition=models.Q(visibility__in=[choice.value for choice in ContentVisibility]),
                 name="library_list_visibility_valid",
             ),
+            models.UniqueConstraint(
+                fields=("user", "public_slug"), name="library_unique_public_slug_per_owner"
+            ),
         ]
+
+    def save(self, *args, **kwargs):  # noqa: ANN002, ANN003
+        """Assign a stable owner-scoped locator on first persistence."""
+        if not self.public_slug:
+            base = slugify(self.name) or "list"
+            candidate = base[:140]
+            suffix = 2
+            queryset = type(self).objects.filter(user_id=self.user_id)
+            if self.pk is not None:
+                queryset = queryset.exclude(pk=self.pk)
+            while queryset.filter(public_slug=candidate).exists():
+                suffix_text = f"-{suffix}"
+                candidate = f"{base[: 140 - len(suffix_text)]}{suffix_text}"
+                suffix += 1
+            self.public_slug = candidate
+        return super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f"list {self.name} ({self.id})"

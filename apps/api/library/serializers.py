@@ -8,6 +8,7 @@ from decimal import Decimal
 
 from rest_framework import serializers
 
+from catalogue.serializers import _cover, _display_title, _platform_summary, _release_year
 from library.models import (
     COMMENT_TEXT_MAX_LENGTH,
     COPY_PRICE_DECIMAL_PLACES,
@@ -17,7 +18,9 @@ from library.models import (
     LIST_NAME_MAX_LENGTH,
     ConservationState,
     ContentVisibility,
+    CustomList,
     GameComment,
+    LibraryEntry,
     OwnedCopy,
 )
 
@@ -156,6 +159,34 @@ def _escape_text(value: str) -> str:
     never markup -- the client renders them, they never become HTML here
     (XSS boundary), matching accounts.serializers._escape_text."""
     return str(value)
+
+
+def serialize_friend_collection_item(entry: LibraryEntry) -> dict:
+    """D-09 allowlist for collection data shared with an accepted friend."""
+    work = entry.work
+    return {
+        "game": {"slug": _escape_text(work.canonical_slug), "title": _escape_text(_display_title(work))},
+        "cover": _cover(work),
+        "year": _release_year(work),
+        "platform": _platform_summary(work),
+        "backlog_status": entry.current_status,
+        "personal_rating": entry.rating_half_steps,
+    }
+
+
+def serialize_friend_list(custom_list: CustomList, *, entries_by_work: dict) -> dict:
+    """D-10 allowlist preserving the owner's explicit item ordering."""
+    items = list(custom_list.items.select_related("work").order_by("position", "id"))
+    return {
+        "name": _escape_text(custom_list.name),
+        "items": [
+            serialize_friend_collection_item(
+                entries_by_work.get(item.work_id)
+                or LibraryEntry(user=custom_list.user, work=item.work)
+            )
+            for item in items
+        ],
+    }
 
 
 _VISIBILITY_CHOICES = [choice.value for choice in ContentVisibility]
