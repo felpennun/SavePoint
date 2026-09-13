@@ -213,6 +213,10 @@ export function AppShell({
                   current: dict.account.switcher.current,
                   logout: dict.nav.logout,
                   listHeading: dict.account.list.heading,
+                  messagesLabel: locale === "es" ? "Mensajes de amigos" : "Messages from friends",
+                  unreadLabel: (count: number) => locale === "es" ? `${count} mensajes sin leer` : `${count} unread messages`,
+                  noUnreadLabel: locale === "es" ? "Sin mensajes pendientes" : "No pending messages",
+                  unreadLoadingLabel: locale === "es" ? "Comprobando mensajes pendientes" : "Checking pending messages",
                 }}
               />
             ) : (

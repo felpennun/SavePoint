@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { SocialInbox } from "@/components/SocialInbox";
+import { AccountSwitcher, buildAccountTriggerLabel, buildMessagesHref } from "@/components/AccountSwitcher";
 import {
   fetchSocialInbox,
   type SocialMessage,
@@ -11,6 +12,10 @@ import {
   markSocialMessageRead,
   sendSocialRecommendation,
 } from "@/lib/client-api";
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
+}));
 
 const message: SocialMessage = {
   id: "message-private-id",
@@ -78,5 +83,25 @@ describe("private social messages contract", () => {
     expect(markup).toContain("Te gustaría este juego.");
     expect(markup).toContain('aria-live="polite"');
     expect(markup).not.toContain(message.id);
+  });
+
+  it("names the account messages entry, unread state and exact private route accessibly", () => {
+    expect(buildMessagesHref("es")).toBe("/es/messages");
+    expect(buildAccountTriggerLabel("Cuenta simulada", "Mensajes de amigos", 2)).toContain("2 mensajes sin leer");
+    const markup = renderToStaticMarkup(createElement(AccountSwitcher, {
+      locale: "es",
+      labels: {
+        label: "Cuenta simulada",
+        change: "Cambiar de cuenta",
+        current: "Sesión de {alias} (simulada)",
+        logout: "Cerrar sesión",
+        listHeading: "Elige una cuenta simulada",
+        messagesLabel: "Mensajes de amigos",
+        unreadLabel: (count: number) => `${count} mensajes sin leer`,
+        noUnreadLabel: "Sin mensajes pendientes",
+      },
+    }));
+    expect(markup).toContain("Mensajes de amigos");
+    expect(markup).toContain('aria-controls="account-menu"');
   });
 });
