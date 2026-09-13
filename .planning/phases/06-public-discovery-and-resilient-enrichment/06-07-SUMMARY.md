@@ -151,7 +151,7 @@ Task 1 tiene commits RED/GREEN separados. En Task 2 la prueba RED se ejecutó y 
 
 ## Issues Encountered
 
-- La orden declarada con `pnpm --dir apps/web test -- --run social-messages` arrastra suites del proyecto por la forma en que el script reenvía `--`; además, `nav-overflow` no puede iniciar Chromium en la imagen web y `social-comments.test.ts` sigue siendo un artefacto no integrado de `06-08`. La verificación equivalente focalizada `vitest run tests/social-messages.test.ts` pasa con 4/4 y TypeScript pasa. El caso queda registrado en `.planning/WINDOWS.md` como `unrun-verify`; no se modificó el trabajo ajeno.
+- La orden declarada con `pnpm --dir apps/web test -- --run social-messages` arrastra suites del proyecto por la forma en que el script reenvía `--`; además, `nav-overflow` no puede iniciar Chromium en la imagen web y `social-comments.test.ts` sigue siendo un artefacto no integrado de `06-08`. La verificación equivalente focalizada `vitest run apps/web/tests/social-messages.test.ts` pasa con 4/4 y TypeScript pasa. El caso queda registrado en `.planning/WINDOWS.md` como `unrun-verify`; no se modificó el trabajo ajeno.
 - Los handlers `state.advance-plan` y `state.update-progress` no pudieron interpretar el formato histórico de `STATE.md`; se conservaron sus actualizaciones válidas y se ajustaron manualmente `stopped_at`, `next_action` y el porcentaje calculado 58/60.
 
 ## User Setup Required

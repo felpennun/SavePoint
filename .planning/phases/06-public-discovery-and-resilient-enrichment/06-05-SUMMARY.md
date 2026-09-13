@@ -146,7 +146,7 @@ Se aplicaron D-01 y D-02: el backend sigue siendo completo y la URL GET es la fu
 
 ### Verificación diferida fuera de alcance
 
-La invocación exacta del plan ejecuta también `components/__tests__/nav-overflow.test.tsx`, que no puede iniciar porque Chromium no está instalado en la imagen web. No se instaló ninguna dependencia ni se modificó esa suite; la incidencia está registrada en `deferred-items.md` y en `.planning/WINDOWS.md`. La suite focalizada CAT-05 (11/11) y TypeScript sí pasan.
+La invocación exacta del plan ejecuta también `apps/web/components/__tests__/nav-overflow.test.tsx`, que no puede iniciar porque Chromium no está instalado en la imagen web. No se instaló ninguna dependencia ni se modificó esa suite; la incidencia está registrada en `deferred-items.md` y en `.planning/WINDOWS.md`. La suite focalizada CAT-05 (11/11) y TypeScript sí pasan.
 
 ## Issues Encountered
 

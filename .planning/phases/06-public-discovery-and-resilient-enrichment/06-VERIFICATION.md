@@ -47,6 +47,11 @@ de zoom, reduced motion, axe y ausencia de llamadas externas. El journey social 
 diferido porque no existen `DEMO_USERNAME` ni `DEMO_PASSWORD` en el entorno de ejecución;
 no se generaron credenciales ni se alteró la base de datos para forzarlo.
 
+## Trazabilidad documental
+
+Se normalizaron las rutas citadas por los SUMMARY de 06-05 y 06-07 para que sean
+rutas desde la raíz del repositorio; las referencias apuntan ahora a archivos existentes.
+
 ## Fuentes canónicas
 
 - `06-00-SUMMARY.md` … `06-09-SUMMARY.md`
