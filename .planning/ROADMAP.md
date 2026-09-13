@@ -336,6 +336,14 @@ Plans:
   5. A clean checkout reproduces the final evidence and accessible deployed/offline workflows; canonical thesis references, generated tables/figures, AI-use disclosure, costs, limitations, threats to validity, agent records, and author decisions are frozen together.
 
 **Plans**: TBD
+
+- [x] 07-00-PLAN.md
+- [ ] 07-01-PLAN.md
+- [ ] 07-02-PLAN.md
+- [ ] 07-03-PLAN.md
+- [ ] 07-04-PLAN.md
+- [ ] 07-05-PLAN.md
+
 **UI hint**: yes
 
 ### Candidate phase (not yet numbered or scheduled): Real-User Study and Survey-Based Quality Evaluation
@@ -364,4 +372,4 @@ schedule properly in a later phase-planning pass.
 | 4. Collaborative and Hybrid Comparison | 3/3 | Complete with limitation | 2026-09-12 |
 | 5. Complete Collection Workflows and Portability | 4/4 | Complete | 2026-09-13 |
 | 6. Public Discovery and Resilient Enrichment | 10/10 | Complete    | 2026-09-13 |
-| 7. Research Panel, Hardening, and Evidence Freeze | 0/TBD | Not started | - |
+| 7. Research Panel, Hardening, and Evidence Freeze | 1/6 | In Progress|  |
