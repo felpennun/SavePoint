@@ -22,6 +22,7 @@ from catalogue.models import (
     GameRelease,
     GameWork,
     GameWorkCuratedLabel,
+    Genre,
     Platform,
     Publisher,
     SourceRecord,
@@ -274,6 +275,18 @@ def test_list_endpoint_no_external_network_call(monkeypatch: pytest.MonkeyPatch)
     response = client.get("/api/catalogue/games/", {"q": "Local"})
     assert response.status_code == 200
     assert response.json()["count"] == 1
+
+
+@pytest.mark.django_db
+def test_cat05_view_fails_closed_if_igdb_client_is_invoked(monkeypatch: pytest.MonkeyPatch) -> None:
+    def _blocked(*args, **kwargs):  # type: ignore[no-untyped-def]
+        raise AssertionError("CAT-05 request must never invoke the IGDB client")
+
+    monkeypatch.setattr("catalogue.igdb.IgdbClient._post", _blocked)
+    _make_work("Request Local Only")
+
+    response = APIClient().get("/api/catalogue/games/", {"publisher": "missing"})
+    assert response.status_code == 200
 
 
 # ---------------------------------------------------------------------------
