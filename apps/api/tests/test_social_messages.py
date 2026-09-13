@@ -1,6 +1,7 @@
 """Tests for private friendship recommendations and inbox isolation."""
 
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone as dt_timezone
+from unittest.mock import patch
 
 import pytest
 from django.utils import timezone
@@ -8,7 +9,7 @@ from rest_framework.test import APIClient
 
 from catalogue.models import GameWork
 from social import services
-from social.models import Block, Friendship, FriendshipRequest
+from social.models import Block, Friendship, FriendshipRequest, SocialMessage
 
 
 @pytest.fixture
@@ -163,3 +164,37 @@ def test_message_payload_is_allowlisted_and_plain_text(message_users, message_wo
     )
     assert response.status_code == 400
 
+
+@pytest.mark.django_db
+def test_cooldown_window_is_exactly_seven_days_and_naive_clock_fails_closed(message_users, message_work):
+    alice = message_users["alice"]
+    bob = message_users["bob"]
+    accept_friendship(alice, bob)
+    fixed_now = datetime(2026, 9, 13, 12, 0, tzinfo=dt_timezone.utc)
+    with patch("social.services.timezone.now", return_value=fixed_now):
+        boundary_message = SocialMessage.objects.create(
+            sender=alice,
+            receiver=bob,
+            work=message_work,
+            message="Boundary",
+        )
+        SocialMessage.objects.filter(pk=boundary_message.pk).update(
+            created_at=fixed_now - timedelta(days=7)
+        )
+        boundary = client_for(alice).post(
+            "/api/social/recommendations/",
+            {"recipient_alias": bob.username, "work_id": str(message_work.id)},
+            format="json",
+        )
+    assert boundary.status_code == 201
+
+    before = SocialMessage.objects.count()
+    with patch("social.services.timezone.now", return_value=datetime(2026, 9, 13, 12, 0)):
+        uncertain = client_for(alice).post(
+            "/api/social/recommendations/",
+            {"recipient_alias": bob.username, "work_id": str(message_work.id)},
+            format="json",
+        )
+    assert uncertain.status_code == 429
+    assert uncertain["Retry-After"] == str(services.CONSERVATIVE_RETRY_AFTER)
+    assert SocialMessage.objects.count() == before

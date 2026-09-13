@@ -12,10 +12,12 @@ from rest_framework.views import APIView
 from social import services
 from social.serializers import (
     ExactAliasSerializer,
+    RecommendationInputSerializer,
     SocialAliasRequestSerializer,
     serialize_account,
     serialize_friendship_request,
     serialize_pair,
+    serialize_social_message,
 )
 
 
@@ -171,3 +173,71 @@ class RelationshipView(APIView):
         if status == "blocked":
             return Response({"detail": "Not found."}, status=404)
         return Response({"relationship": status, "profile": serialize_account(target, relationship=status)})
+
+
+class RecommendationCollectionView(APIView):
+    permission_classes = [IsAuthenticated]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "social_mutation"
+
+    def post(self, request: Request) -> Response:
+        serializer = RecommendationInputSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({"detail": "Invalid recommendation.", "errors": serializer.errors}, status=400)
+        try:
+            message = services.send_recommendation(sender=request.user, **serializer.validated_data)
+        except services.RecommendationCooldown as exc:
+            response = Response(
+                {
+                    "detail": "recommendation_cooldown",
+                    "code": "recommendation_cooldown",
+                    "retry_after_seconds": exc.retry_after_seconds,
+                },
+                status=429,
+            )
+            response["Retry-After"] = str(exc.retry_after_seconds)
+            return response
+        except services.SocialNotFound:
+            return Response({"detail": "Not found."}, status=404)
+        except ValidationError as exc:
+            return Response({"detail": _validation_detail(exc)}, status=400)
+        message = type(message).objects.select_related("sender", "receiver", "work").prefetch_related(
+            "work__assets"
+        ).get(pk=message.pk)
+        return Response({"message": serialize_social_message(message)}, status=201)
+
+
+class SocialMessageCollectionView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request) -> Response:
+        return Response({"messages": [
+            serialize_social_message(message) for message in services.inbox_for(recipient=request.user)
+        ]})
+
+
+class SocialMessageUnreadCountView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request) -> Response:
+        return Response({"unread_count": services.unread_count_for(recipient=request.user)})
+
+
+class SocialMessageReadView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request: Request, message_id: str) -> Response:
+        message = services.mark_message(recipient=request.user, message_id=message_id, read=True)
+        if message is None:
+            return Response({"detail": "Not found."}, status=404)
+        return Response({"message": serialize_social_message(message)})
+
+
+class SocialMessageUnreadView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request: Request, message_id: str) -> Response:
+        message = services.mark_message(recipient=request.user, message_id=message_id, read=False)
+        if message is None:
+            return Response({"detail": "Not found."}, status=404)
+        return Response({"message": serialize_social_message(message)})

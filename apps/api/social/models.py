@@ -5,6 +5,9 @@ import uuid
 from django.conf import settings
 from django.db import models
 
+from catalogue.models import GameWork
+from catalogue.models import GameWork
+
 
 class FriendshipRequestStatus(models.TextChoices):
     PENDING = "pending", "Pending"
@@ -113,4 +116,41 @@ class Block(models.Model):
         indexes = [
             models.Index(fields=("blocker", "is_active"), name="social_blocker_active"),
             models.Index(fields=("blocked", "is_active"), name="social_blocked_active"),
+        ]
+
+
+class SocialMessage(models.Model):
+    """A private game recommendation delivered to one accepted friend."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    sender = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="social_messages_sent"
+    )
+    receiver = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="social_messages_received"
+    )
+    work = models.ForeignKey(
+        GameWork, on_delete=models.SET_NULL, null=True, blank=True, related_name="social_recommendations"
+    )
+    message = models.CharField(max_length=2000, blank=True, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+    read_at = models.DateTimeField(null=True, blank=True)
+    hidden_at = models.DateTimeField(null=True, blank=True)
+    hidden_reason = models.CharField(max_length=24, blank=True, default="")
+
+    class Meta:
+        ordering = ("-created_at", "id")
+        constraints = [
+            models.CheckConstraint(
+                condition=~models.Q(sender=models.F("receiver")), name="social_message_no_self"
+            ),
+            models.CheckConstraint(
+                condition=models.Q(hidden_at__isnull=True, hidden_reason="")
+                | models.Q(hidden_at__isnull=False),
+                name="social_message_hidden_reason_consistent",
+            ),
+        ]
+        indexes = [
+            models.Index(fields=("receiver", "read_at"), name="social_message_unread"),
+            models.Index(fields=("sender", "receiver", "created_at"), name="social_msg_cooldown_idx"),
         ]

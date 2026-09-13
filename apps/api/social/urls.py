@@ -10,7 +10,12 @@ from social.views import (
     RelationshipView,
     RejectFriendshipRequestView,
     RemoveFriendshipView,
+    RecommendationCollectionView,
     SocialSearchView,
+    SocialMessageCollectionView,
+    SocialMessageReadView,
+    SocialMessageUnreadCountView,
+    SocialMessageUnreadView,
     UnblockUserView,
 )
 
@@ -18,6 +23,11 @@ app_name = "social"
 
 urlpatterns = [
     path("search/", SocialSearchView.as_view(), name="search"),
+    path("recommendations/", RecommendationCollectionView.as_view(), name="recommendations"),
+    path("messages/", SocialMessageCollectionView.as_view(), name="messages"),
+    path("messages/unread-count/", SocialMessageUnreadCountView.as_view(), name="messages-unread-count"),
+    path("messages/<uuid:message_id>/read/", SocialMessageReadView.as_view(), name="message-read"),
+    path("messages/<uuid:message_id>/unread/", SocialMessageUnreadView.as_view(), name="message-unread"),
     path("requests/", FriendshipRequestCollectionView.as_view(), name="requests"),
     path("requests/<uuid:request_id>/accept/", AcceptFriendshipRequestView.as_view(), name="request-accept"),
     path("requests/<uuid:request_id>/reject/", RejectFriendshipRequestView.as_view(), name="request-reject"),

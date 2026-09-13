@@ -2,17 +2,22 @@
 
 from __future__ import annotations
 
+import math
+from datetime import timedelta
+
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-from django.db import models, transaction
+from django.db import DatabaseError, models, transaction
 from django.utils import timezone
 
+from catalogue.models import GameWork
 from social.models import (
     Block,
     Friendship,
     FriendshipRequest,
     FriendshipRequestStatus,
     RelationshipPair,
+    SocialMessage,
 )
 
 
@@ -25,6 +30,18 @@ class SocialNotFound(LookupError):
 
 class SocialConflict(Exception):
     """A valid actor attempted a transition incompatible with current state."""
+
+
+RECOMMENDATION_WINDOW = timedelta(days=7)
+CONSERVATIVE_RETRY_AFTER = int(RECOMMENDATION_WINDOW.total_seconds())
+
+
+class RecommendationCooldown(Exception):
+    """The directional recommendation window is active or cannot be proven safe."""
+
+    def __init__(self, retry_after_seconds: int = CONSERVATIVE_RETRY_AFTER):
+        self.retry_after_seconds = max(1, int(retry_after_seconds))
+        super().__init__("recommendation_cooldown")
 
 
 def _resolve_active_user(alias: str):  # noqa: ANN001
@@ -148,6 +165,7 @@ def remove_friendship(*, actor, alias: str) -> None:
         deleted, _ = Friendship.objects.filter(pair=pair).delete()
         if not deleted:
             raise SocialNotFound()
+        hide_messages_for_pair(first=actor, second=target, reason="removed")
 
 
 def block_user(*, actor, alias: str) -> Block:
@@ -166,6 +184,7 @@ def block_user(*, actor, alias: str) -> Block:
         FriendshipRequest.objects.select_for_update().filter(
             sender__in=[actor, target], receiver__in=[actor, target], status=FriendshipRequestStatus.PENDING
         ).update(status=FriendshipRequestStatus.BLOCKED, responded_at=timezone.now())
+        hide_messages_for_pair(first=actor, second=target, reason="blocked")
     return block
 
 
@@ -201,3 +220,106 @@ def friendships_for(*, user) -> list[RelationshipPair]:
             models.Q(low_user=user) | models.Q(high_user=user), friendship__isnull=False
         ).select_related("low_user", "high_user")
     )
+
+
+def _safe_now():  # noqa: ANN001
+    """Return an aware clock value or fail closed before any message write."""
+    now = timezone.now()
+    if not timezone.is_aware(now):
+        raise RecommendationCooldown()
+    return now
+
+
+def _cooldown_seconds(*, created_at, now) -> int:  # noqa: ANN001
+    if not timezone.is_aware(created_at) or not timezone.is_aware(now):
+        raise RecommendationCooldown()
+    return max(1, math.ceil((created_at + RECOMMENDATION_WINDOW - now).total_seconds()))
+
+
+def send_recommendation(*, sender, recipient_alias: str, work_id, text: str = "") -> SocialMessage:  # noqa: ANN001
+    """Create one private recommendation for an accepted friend.
+
+    The canonical pair is locked before friendship and cooldown checks. Any
+    uncertainty from the clock or database aborts the transaction and maps to
+    the same conservative 429 as a known cooldown.
+    """
+    recipient = _resolve_active_user(recipient_alias)
+    if sender.pk == recipient.pk:
+        raise SocialNotFound()
+    if not isinstance(text, str) or len(text) > 2000:
+        raise ValidationError("text is invalid.")
+    now = _safe_now()
+    try:
+        with transaction.atomic():
+            pair = _lock_pair(sender, recipient)
+            if _has_active_block(sender, recipient) or not Friendship.objects.filter(pair=pair).exists():
+                raise SocialNotFound()
+            try:
+                recent = (
+                    SocialMessage.objects.select_for_update()
+                    .filter(sender=sender, receiver=recipient, created_at__gt=now - RECOMMENDATION_WINDOW)
+                    .order_by("-created_at")
+                    .first()
+                )
+            except DatabaseError as exc:
+                raise RecommendationCooldown() from exc
+            if recent is not None:
+                raise RecommendationCooldown(_cooldown_seconds(created_at=recent.created_at, now=now))
+            try:
+                work = GameWork.objects.get(id=work_id, is_dlc=False)
+            except GameWork.DoesNotExist as exc:
+                raise ValidationError("work is invalid.") from exc
+            try:
+                return SocialMessage.objects.create(
+                    sender=sender,
+                    receiver=recipient,
+                    work=work,
+                    message=text,
+                    created_at=now,
+                )
+            except DatabaseError as exc:
+                raise RecommendationCooldown() from exc
+    except RecommendationCooldown:
+        raise
+    except DatabaseError as exc:
+        raise RecommendationCooldown() from exc
+
+
+def inbox_for(*, recipient) -> list[SocialMessage]:
+    """Return only visible messages addressed to the authenticated user."""
+    return list(
+        SocialMessage.objects.filter(receiver=recipient, hidden_at__isnull=True, work__isnull=False)
+        .select_related("sender", "work")
+        .prefetch_related("work__assets")
+    )
+
+
+def unread_count_for(*, recipient) -> int:
+    return SocialMessage.objects.filter(
+        receiver=recipient, hidden_at__isnull=True, work__isnull=False, read_at__isnull=True
+    ).count()
+
+
+def mark_message(*, recipient, message_id, read: bool) -> SocialMessage | None:  # noqa: ANN001
+    """Mark one visible message read/unread without crossing recipient scope."""
+    now = _safe_now()
+    with transaction.atomic():
+        message = (
+            SocialMessage.objects.select_for_update()
+            .filter(id=message_id, receiver=recipient, hidden_at__isnull=True, work__isnull=False)
+            .select_related("sender", "work")
+            .first()
+        )
+        if message is None:
+            return None
+        message.read_at = now if read else None
+        message.save(update_fields=["read_at"])
+        return message
+
+
+def hide_messages_for_pair(*, first, second, reason: str) -> int:  # noqa: ANN001
+    """Replace message content with an audit tombstone on remove/block."""
+    now = _safe_now()
+    return SocialMessage.objects.filter(
+        sender__in=[first, second], receiver__in=[first, second], hidden_at__isnull=True
+    ).update(work=None, message="", read_at=now, hidden_at=now, hidden_reason=reason)
