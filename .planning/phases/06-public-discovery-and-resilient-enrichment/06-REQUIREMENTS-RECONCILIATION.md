@@ -21,7 +21,7 @@ aceptada, proyecciones protegidas y recomendaciones privadas.
 
 | Decisión | Requisito | Conducta observable y límite | Plan responsable | Prueba o evidencia exigida |
 |---|---|---|---|---|
-| D-01 | CAT-05 | El contrato local representa y puede consultar juegos, plataformas, ediciones, géneros, franquicias, desarrolladores, editoriales, fechas, modos y tags disponibles en fuentes aprobadas. La interfaz puede mostrar una selección posterior sin reducir el backend. | 06-02, 06-05, 06-09 | Tests de modelos, parser, facets y DTO; combinaciones de filtros; evidencia de que no se modifican snapshots de evaluación. |
+| D-01 | CAT-05 | El contrato local representa y puede consultar juegos, plataformas, ediciones, géneros, franquicias, desarrolladores, editoriales (`publisher`), fechas, modos (`mode`) y tags (`tag`) disponibles en fuentes aprobadas. La interfaz puede mostrar una selección posterior sin reducir el backend. | 06-02, 06-05, 06-09 | Tests de modelos, parser, facets y DTO; combinaciones de filtros; evidencia de que no se modifican snapshots de evaluación. |
 | D-02 | CAT-02 (extensión de la capacidad de Phase 01.1) y CAT-05 | Búsquedas y filtros usan GET compartible, parámetros repetibles, ordenación determinista y paginación que conserva toda la query. No existe estado de filtro exclusivo del cliente. | 06-02, 06-05, 06-09 | Repetición de URL produce el mismo resultado; tests de `CatalogueQuery`, constructor de URL y paginación. |
 | D-03 | SOCIAL-03 `[ASSUMED]` | Solo una cuenta autenticada puede buscar un alias exacto y enviar/aceptar una solicitud. No hay autocomplete ni directorio parcial; la amistad nace al aceptar y es bidireccional. | 06-01, 06-06, 06-09 | Alias exacto existente/inexistente, usuario inactivo, self-request, solicitud inversa y transición request→accept. |
 | D-04 | SOCIAL-03 `[ASSUMED]` | El módulo social separa solicitudes recibidas, solicitudes enviadas y amistades, y ofrece acciones diferenciadas de aceptar, rechazar, eliminar y bloquear. | 06-01, 06-06, 06-09 | Matriz de estados API y flujo E2E; cada acción deriva el actor de `request.user`. |
@@ -78,7 +78,7 @@ da acceso a las proyecciones.
 
 El contrato de catálogo enumera literalmente estas dimensiones disponibles en las
 fuentes aprobadas: **juegos, plataformas, ediciones, géneros, franquicias,
-desarrolladores, editoriales, fechas, modos y tags**. `CAT-02` conserva su
+desarrolladores, editoriales (`publisher`), fechas, modos (`mode`) y tags (`tag`)**. `CAT-02` conserva su
 asignación a Phase 01.1; esta fase amplía su capacidad de consulta y trazabilidad
 sin transferir la titularidad del requisito ni modificar snapshots de evaluación.
 La presentación visual de facets se mantiene abierta según D-01, pero no puede
@@ -124,4 +124,4 @@ una vía de acceso a contenido protegido.
 - `PROF-04` distingue perfil básico, proyecciones protegidas y URL directa con
   autorización server-side/404 genérico.
 - `CAT-05` enumera juegos, plataformas, ediciones, géneros, franquicias,
-  desarrolladores, editoriales, fechas, modos y tags.
+  desarrolladores, editoriales (`publisher`), fechas, modos (`mode`) y tags (`tag`).
