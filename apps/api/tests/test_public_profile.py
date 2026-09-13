@@ -96,11 +96,12 @@ def test_blocked_profile_is_generic_404_like_missing_profile(populated_profile, 
 
 @pytest.mark.django_db
 def test_anonymous_profile_read_never_mutates_friendship(populated_profile):  # noqa: ANN001
+    before_requests = social_services.FriendshipRequest.objects.count()
     response = _client().get("/api/accounts/profiles/profile-owner/")
 
     assert response.status_code == 200
     assert response.json()["action"] == "login"
-    assert not social_services.FriendshipRequest.objects.exists()
+    assert social_services.FriendshipRequest.objects.count() == before_requests
 
 
 @pytest.mark.django_db

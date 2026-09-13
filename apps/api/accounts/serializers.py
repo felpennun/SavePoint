@@ -26,6 +26,7 @@ from accounts.models import (
 )
 from library.models import BacklogStatus, ContentVisibility, CustomList, GameComment, LibraryEntry
 from library.serializers import serialize_profile_comment, serialize_profile_list
+from social.policies import ProfileAccess, resolve_profile_access
 
 User = get_user_model()
 
@@ -83,7 +84,27 @@ def _serialize_public_lists(user, *, is_owner: bool) -> list:  # noqa: ANN001
     return [serialize_profile_list(custom_list) for custom_list in queryset]
 
 
-def build_public_profile(user, *, viewer=None) -> dict:  # noqa: ANN001
+def serialize_basic_profile(user, *, viewer=None) -> dict:  # noqa: ANN001
+    """D-07's exact non-friend allowlist, with a contextual action only."""
+    action = "login"
+    if viewer is not None and getattr(viewer, "is_authenticated", False):
+        from social.services import relationship_status
+
+        action = {
+            "none": "send_friend_request",
+            "pending_sent": "request_sent",
+            "pending_received": "review_friend_request",
+        }.get(relationship_status(viewer=viewer, target=user), "send_friend_request")
+    profile = getattr(user, "profile", None)
+    return {
+        "alias": _escape_text(user.username),
+        "avatar_url": _escape_text(profile.avatar_url) if profile is not None else "",
+        "bio": _escape_text(profile.bio) if profile is not None else "",
+        "action": action,
+    }
+
+
+def _build_friend_profile(user, *, viewer=None, access: ProfileAccess) -> dict:  # noqa: ANN001
     """PRIV-01 allowlist, now also gating collection/favorites behind D-02's
     independent ``collection_visibility``/``favorites_visibility`` policies,
     plus comments/lists (LIB-03/LIB-04) whose own ``visibility`` field gates
@@ -98,8 +119,14 @@ def build_public_profile(user, *, viewer=None) -> dict:  # noqa: ANN001
     """
     profile = getattr(user, "profile", None)
     is_owner = bool(viewer is not None and getattr(viewer, "is_authenticated", False) and viewer.pk == user.pk)
-    collection_visible = is_owner or profile is None or profile.collection_visibility == ProfileVisibility.PUBLIC
-    favorites_visible = is_owner or profile is None or profile.favorites_visibility == ProfileVisibility.PUBLIC
+    collection_visible = is_owner or (
+        access == ProfileAccess.ACCEPTED_FRIEND
+        and (profile is None or profile.collection_visibility == ProfileVisibility.PUBLIC)
+    )
+    favorites_visible = is_owner or (
+        access == ProfileAccess.ACCEPTED_FRIEND
+        and (profile is None or profile.favorites_visibility == ProfileVisibility.PUBLIC)
+    )
 
     if collection_visible:
         entries = (
@@ -137,6 +164,16 @@ def build_public_profile(user, *, viewer=None) -> dict:  # noqa: ANN001
         "comments": _serialize_public_comments(user, is_owner=is_owner),
         "lists": _serialize_public_lists(user, is_owner=is_owner),
     }
+
+
+def build_public_profile(user, *, viewer=None) -> dict | None:  # noqa: ANN001
+    """Return exactly one server-authorized profile projection."""
+    access = resolve_profile_access(viewer=viewer, owner=user)
+    if access == ProfileAccess.HIDDEN:
+        return None
+    if access == ProfileAccess.BASIC:
+        return serialize_basic_profile(user, viewer=viewer)
+    return _build_friend_profile(user, viewer=viewer, access=access)
 
 
 class AccountProfileSerializer(serializers.Serializer):

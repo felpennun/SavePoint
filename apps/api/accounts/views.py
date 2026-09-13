@@ -302,4 +302,7 @@ class PublicProfileView(APIView):
         user = User.objects.filter(username=alias, is_active=True).first()
         if user is None:
             return Response({"detail": "Not found."}, status=404)
-        return Response(build_public_profile(user, viewer=request.user))
+        profile = build_public_profile(user, viewer=request.user)
+        if profile is None:
+            return Response({"detail": "Not found."}, status=404)
+        return Response(profile)
