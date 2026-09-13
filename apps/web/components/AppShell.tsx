@@ -26,6 +26,7 @@ function buildNavItems(dict: Dictionary, locale: string, isAuthenticated: boolea
   if (isAuthenticated) {
     base.push({ href: `/${locale}/collection`, label: dict.nav.collection });
     base.push({ href: `/${locale}/recommendations`, label: dict.nav.recommendations });
+    base.push({ href: `/${locale}/friends`, label: locale === "es" ? "Amistades" : "Friends" });
   }
   base.push({ href: `/${locale}/sources`, label: dict.nav.sources });
   return base;

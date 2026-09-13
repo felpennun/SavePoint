@@ -262,7 +262,16 @@ export interface PublicProfileList {
   items: PublicProfileListItem[];
 }
 
-export interface PublicProfile {
+export interface BasicPublicProfile {
+  kind: "basic";
+  alias: string;
+  bio: string;
+  avatar_url: string;
+  action: "login" | "send_friend_request" | "request_sent" | "review_friend_request";
+}
+
+export interface ProtectedPublicProfile {
+  kind: "protected";
   alias: string;
   bio: string;
   avatar_url: string;
@@ -273,16 +282,71 @@ export interface PublicProfile {
   lists: PublicProfileList[];
 }
 
-export async function fetchPublicProfile(alias: string): Promise<PublicProfile | null> {
+export type PublicProfile = BasicPublicProfile | ProtectedPublicProfile;
+
+function normalizePublicProfile(body: unknown): PublicProfile {
+  if (!body || typeof body !== "object") throw new Error("Invalid public profile response");
+  const value = body as Record<string, unknown>;
+  if (value.kind === "basic" || value.kind === "protected") return value as unknown as PublicProfile;
+  // Django's response predates the explicit discriminator. Add it once at
+  // the SSR boundary so UI callers never infer access from empty content.
+  if (typeof value.action === "string") return { ...value, kind: "basic" } as BasicPublicProfile;
+  return { ...value, kind: "protected" } as ProtectedPublicProfile;
+}
+
+export async function fetchPublicProfile(alias: string, cookieHeader = ""): Promise<PublicProfile | null> {
   const url = new URL(`/api/accounts/profiles/${encodeURIComponent(alias)}/`, API_BASE);
-  const response = await fetch(url, { cache: "no-store" });
+  const response = await fetch(url, {
+    cache: "no-store",
+    ...(cookieHeader ? { headers: { Cookie: cookieHeader } } : {}),
+  });
   if (response.status === 404) {
     return null;
   }
   if (!response.ok) {
     throw new Error(`Failed to load public profile (status ${response.status})`);
   }
-  return (await response.json()) as PublicProfile;
+  return normalizePublicProfile(await response.json());
+}
+
+export interface FriendCollectionItem {
+  game: { slug: string; title: string };
+  cover: Cover;
+  year: number | null;
+  platform: string;
+  backlog_status: string | null;
+  personal_rating: number | null;
+}
+
+export interface SharedCollection {
+  items: FriendCollectionItem[];
+}
+
+export interface SharedList {
+  name: string;
+  items: FriendCollectionItem[];
+}
+
+async function fetchSharedProjection<T>(path: string, cookieHeader: string): Promise<T | null> {
+  const url = new URL(path, API_BASE);
+  const response = await fetch(url, { cache: "no-store", headers: { Cookie: cookieHeader } });
+  if (response.status === 404) return null;
+  if (!response.ok) throw new Error(`Failed to load protected social projection (status ${response.status})`);
+  return (await response.json()) as T;
+}
+
+export function fetchSharedCollection(alias: string, cookieHeader: string): Promise<SharedCollection | null> {
+  return fetchSharedProjection<SharedCollection>(
+    `/api/library/profiles/${encodeURIComponent(alias)}/collection/`,
+    cookieHeader,
+  );
+}
+
+export function fetchSharedList(alias: string, listSlug: string, cookieHeader: string): Promise<SharedList | null> {
+  return fetchSharedProjection<SharedList>(
+    `/api/library/profiles/${encodeURIComponent(alias)}/lists/${encodeURIComponent(listSlug)}/`,
+    cookieHeader,
+  );
 }
 
 export interface PopularityResultItem {

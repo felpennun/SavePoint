@@ -77,7 +77,7 @@ describe("protected profile SSR contract", () => {
     expect(buildProfileNavigation("es", "alice", "profile")).toEqual([
       { href: "/es/profiles/alice", label: "Perfil", current: true },
       { href: "/es/profiles/alice#collection", label: "Colección", current: false },
-      { href: "/es/profiles/alice/lists", label: "Listas", current: false },
+      { href: "/es/profiles/alice#lists", label: "Listas", current: false },
     ]);
     expect(buildProfileNavigation("en", "alice", "list")[2]).toMatchObject({ current: true });
   });
