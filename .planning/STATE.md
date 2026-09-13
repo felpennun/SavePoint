@@ -2,20 +2,20 @@
 gsd_state_version: 1.0
 status: in_progress
 stopped_at: Fase 5 firmada (backend + interfaz, evidencia Playwright/axe en docs/verification/phase-05-signoff.md)
-last_updated: "2026-09-13T11:39:46.201Z"
+last_updated: "2026-09-13T13:16:45.091Z"
 last_activity: 2026-09-13
-state_head: 581472b76b148fec6ee7babd673e4186576c1b5f
+state_head: 63ffde80b68cfc8b99934c0f395fb177868c1bbd
 progress:
   total_phases: 8
   completed_phases: 2
-  total_plans: 50
+  total_plans: 60
   completed_plans: 50
   percent: 25
 next_phase: 6
 next_phase_name: Public Discovery and Resilient Enrichment
 next_action: Planificar la Fase 6
-current_phase_name: Complete Collection Workflows and Portability
 current_phase: 05
+current_phase_name: Complete Collection Workflows and Portability
 ---
 
 # Project State
@@ -226,11 +226,11 @@ Ver `.planning/quick/260909-nej-a-adir-cuatro-variantes-popscore-con-imp/`.
 
 ## Registro histórico de sesiones (prevalece el checkpoint de ejecución actual)
 
-**Stopped at:** Phase 6 context gathered
+**Stopped at:** Phase 6 plans created and GitHub-synced
 
 **Resume (after the rate-limit reset):** `/gsd-plan-phase 2` re-spawns the planner from scratch. All inputs are committed: `02-CONTEXT.md`, `02-UI-SPEC.md` (verified 7/7), `02-RESEARCH.md`, `02-VALIDATION.md`, `02-PATTERNS.md`, `02-COVERAGE.md`. Then `gsd-plan-checker` → revision loop → present → `/gsd-execute-phase 2`. Full detail in `.planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/.continue-here.md`.
 
-Last session: 2026-09-13T10:55:33.189Z
+Last session: 2026-09-13T13:16:44.147Z
 
 ### Done this session (2026-09-06, all committed on `main`)
 
@@ -239,7 +239,7 @@ Last session: 2026-09-13T10:55:33.189Z
 - **Roadmap restructure** — `85e98ba`: Phase 2 enlarged (governed corpus + external ratings + evaluation contract + first advanced recommender + search/filters + UI pass); former phases 5+6 merged; 3/4/7/8 renumbered to 5/6/4/7. Requirement coverage 91/91.
 - **Phase 2 planning inputs** — `02-CONTEXT.md` `f5d65e7` (discuss-phase, D-01..D-24), `02-UI-SPEC.md` `e548a2e` (ui-phase, checker 7/7, `## UI Considerations` 45 explicit + 10 backstop), `02-RESEARCH.md` `a78510f`, `02-VALIDATION.md` `53b173f`, `02-PATTERNS.md` `df45a33`, `02-COVERAGE.md` `15006b3` (rescued from the rate-limited planner).
 
-Resume file: .planning/phases/06-public-discovery-and-resilient-enrichment/06-CONTEXT.md
+Resume file: .planning/phases/06-public-discovery-and-resilient-enrichment/06-00-PLAN.md
 
 ## Session Continuity
 
