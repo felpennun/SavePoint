@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 status: in_progress
 stopped_at: Completed 06-04-PLAN.md
-last_updated: "2026-09-13T18:08:16.994Z"
+last_updated: "2026-09-13T18:13:19.137Z"
 last_activity: 2026-09-13
-state_head: 8b3daa4ec55814d65ada8d69f4b82062164049d8
+state_head: 2f1cb652c90ead90a0686fff9a3ab14149ee2b4a
 progress:
   total_phases: 8
   completed_phases: 2
@@ -197,6 +197,8 @@ WHAT'S DONE (committed, tested, working): apps/api/accounts/{views,urls}.py + te
 WHAT'S UNCOMMITTED (working tree, not yet type-checked clean): apps/web/app/[locale]/** (layout, homepage, login page, catalogue page, game detail page + StatusControl), apps/web/lib/api.ts, apps/web/middleware.ts, apps/web/next.config.ts (rewrite proxy to Django + ignoreBuildErrors removed), and the deletion of the old flat apps/web/app/layout.tsx + page.tsx (replaced by the [locale] structure).
 
 TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<version matching react 19.2.7> @types/react-dom@<matching>` at the repo root (deps are hoisted there, see package.json), run `pnpm exec tsc --noEmit` in apps/web to confirm the errors clear, then continue: verify the dev server actually renders each page, write/run the e2e/demo-journey.spec.ts real login journey (replacing the 01-15 skip block), run the plan's two <verify> commands, then close out Plan 01-04 (SUMMARY.md, STATE/ROADMAP/REQUIREMENTS updates) exactly like 01-05/01-06/01-15 before it.
+
+- El commit documental final de 06-04 no pudo stagear .planning/06-04-SUMMARY.md: git no puede crear .git/index.lock (Permission denied); los seis commits de código y el resumen en disco están completos.
 
 ## Tareas rápidas completadas
 
