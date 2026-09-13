@@ -288,7 +288,7 @@ Plans:
   4. Authenticated users can manage exact-alias friendship requests, accepted friendships, rejection/removal/block transitions, and private game recommendations in an inbox with unread state and a seven-day directional rolling cooldown.
   5. Accessibility, security, thesis rationale, agent contribution, automated checks, and author decisions are recorded with the phase evidence.
 
-**Plans**: 7/10 plans executed
+**Plans**: 9/10 plans executed
 Plans:
 **Wave 1**
 
@@ -311,8 +311,8 @@ Plans:
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 06-07-PLAN.md — Inbox privado, navegación y badge de pendientes
-- [ ] 06-08-PLAN.md — Comentarios en ficha, traducciones y estados visuales
+- [x] 06-07-PLAN.md — Inbox privado, navegación y badge de pendientes
+- [x] 06-08-PLAN.md — Comentarios en ficha, traducciones y estados visuales
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
@@ -363,5 +363,5 @@ schedule properly in a later phase-planning pass.
 | 3. Explainable Content Recommenders and Baseline Comparison | 4/4 | Complete with limitation | 2026-09-12 |
 | 4. Collaborative and Hybrid Comparison | 3/3 | Complete with limitation | 2026-09-12 |
 | 5. Complete Collection Workflows and Portability | 4/4 | Complete | 2026-09-13 |
-| 6. Public Discovery and Resilient Enrichment | 7/10 | In Progress|  |
+| 6. Public Discovery and Resilient Enrichment | 9/10 | In Progress|  |
 | 7. Research Panel, Hardening, and Evidence Freeze | 0/TBD | Not started | - |

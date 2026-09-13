@@ -79,6 +79,14 @@ La verificación focalizada y TypeScript pasan en Docker. La validación interac
 
 Fuente canónica: [[../../.planning/phases/06-public-discovery-and-resilient-enrichment/06-06-SUMMARY]].
 
+## Bandeja privada y badge de pendientes - 2026-09-13
+
+El plan [[../../.planning/phases/06-public-discovery-and-resilient-enrichment/06-07-SUMMARY]] integra la bandeja privada `Mensajes de amigos` en Next.js. Los fetchers SSR reenvían la sesión con `Cookie` y `no-store`; las mutaciones usan CSRF same-origin. `SocialInbox` normaliza el DTO allowlisted, conserva juego y texto cuando el API devuelve `429`, y muestra el `Retry-After` autoritativo. `AccountSwitcher` consulta el aggregate autenticado y comunica los no leídos con texto, `aria-label` y punto rojo; el punto solo desaparece cuando el servidor confirma que no quedan pendientes.
+
+La validación focalizada de `social-messages.test.ts` (4/4) y TypeScript pasa. La validación browser-level de foco y responsive queda pendiente porque la imagen web no incluye Chromium; se registra en [[../../.planning/WINDOWS]].
+
+Fuente canónica: [[../../.planning/phases/06-public-discovery-and-resilient-enrichment/06-07-SUMMARY]].
+
 ## Enlaces
 
 - [[Allowlist de campos publicos]] · [[Perfil publico]] · [[Catalogo]]
