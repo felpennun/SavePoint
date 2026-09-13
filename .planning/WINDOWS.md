@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 6
+open_count: 7
 waived_count: 0
 fixed_count: 0
-total_count: 6
-last_updated: 2026-09-13T15:11:32.391Z
+total_count: 7
+last_updated: 2026-09-13T19:04:30.104Z
 ---
 
 # Broken Windows Ledger
@@ -21,6 +21,7 @@ last_updated: 2026-09-13T15:11:32.391Z
 | 4 | 02 | deviation | apps/api/catalogue/management/commands/enrich_rawg_ratings.py | 142 | RAWG SourceRecord update_or_create on (source, source_id) overwrites work FK when one RAWG game reconciles to 2 governed works (22 rows in the N=10000 run); snapshots correct, provenance row points to one work only | open |  | 2026-09-07T08:54:03.534Z |  |
 | 5 | 02 | deviation | apps/api/catalogue/ratings.py |  | display_rating D-09: reparto de pesos externo/local (min(max(n,1),50)) y conjunto de cuentas implementado por must_haves; pendiente ratificacion del autor antes de que 02-13 cierre DATA-07 (coverage D6, human_judgment:true) | open |  | 2026-09-07T09:42:03.280Z |  |
 | 6 | 06 | unrun-verify | .planning/phases/06-public-discovery-and-resilient-enrichment/deferred-items.md | 5 | La suite agregada de catalogue-filters no puede completar nav-overflow porque falta Chromium en el contenedor; las pruebas focalizadas y TypeScript pasan. | open |  | 2026-09-13T15:11:32.391Z |  |
+| 7 | 06 | unrun-verify | apps/web/components/SocialActions.tsx |  | Verificacion browser-level de foco, Escape y responsive no ejecutada por ausencia de Chromium en la imagen web | open |  | 2026-09-13T19:04:30.104Z |  |
 
 ````json
 [
@@ -94,6 +95,18 @@ last_updated: 2026-09-13T15:11:32.391Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-09-13T15:11:32.391Z",
+    "resolved_at": null
+  },
+  {
+    "id": 7,
+    "kind": "unrun-verify",
+    "phase": "06",
+    "file": "apps/web/components/SocialActions.tsx",
+    "line": null,
+    "description": "Verificacion browser-level de foco, Escape y responsive no ejecutada por ausencia de Chromium en la imagen web",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-09-13T19:04:30.104Z",
     "resolved_at": null
   }
 ]

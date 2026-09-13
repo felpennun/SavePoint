@@ -12,8 +12,8 @@
 - [x] **PROF-01**: User can edit their biography and optional HTTPS avatar while the login alias remains immutable.
 - [x] **PROF-02**: An authorised visitor can view a public profile.
 - [x] **PROF-03**: Public projections expose only the exact allowlist `alias`, `avatar_url`, `bio`, `game`, `cover`, `year`, `platform`, `backlog_status`, `personal_rating`, `author_alias`, `text`, and `date`; the only non-friend exception is the basic profile in D-07, with no collection, lists, comments, activity, statistics, copies, purchases, prices, stores, locations, private notes, or internal identifiers.
-- [ ] **PROF-04**: Owner and accepted friends can use shareable profile and public-list URLs; every direct URL is authorised server-side and unauthorised, blocked, anonymous-protected, and nonexistent resources return an indistinguishable generic `404`.
-- [ ] **SOCIAL-03**: Authenticated users can find exact aliases and manage friendship requests, accepted friendships, rejection, removal, blocking, and unblocking; these controlled relationship workflows do not replace v2 `SOCIAL-01` or `SOCIAL-02`. `[ASSUMED]` for Phase 6 planning.
+- [x] **PROF-04**: Owner and accepted friends can use shareable profile and public-list URLs; every direct URL is authorised server-side and unauthorised, blocked, anonymous-protected, and nonexistent resources return an indistinguishable generic `404`.
+- [x] **SOCIAL-03**: Authenticated users can find exact aliases and manage friendship requests, accepted friendships, rejection, removal, blocking, and unblocking; these controlled relationship workflows do not replace v2 `SOCIAL-01` or `SOCIAL-02`. `[ASSUMED]` for Phase 6 planning.
 - [x] **SOCIAL-04**: Owners and accepted friends can access allowlisted profile, collection, list, and comment projections through protected URLs, while a non-friend receives only the D-07 basic profile. `[ASSUMED]` for Phase 6 planning.
 - [x] **SOCIAL-05**: Friends can send private game recommendations with optional text to an inbox with unread state, accessible pending badge, and a directional seven-day rolling cooldown. `[ASSUMED]` for Phase 6 planning.
 
@@ -236,9 +236,9 @@ system.
 | PORT-04 | Phase 5 | Complete |
 | PRIV-01 | Phase 5 | Complete |
 | PROF-03 | Phase 6 | Complete |
-| PROF-04 | Phase 6 | Pending |
+| PROF-04 | Phase 6 | Complete |
 | CAT-05 | Phase 6 | Complete |
-| SOCIAL-03 | Phase 6 | Pending |
+| SOCIAL-03 | Phase 6 | Complete |
 | SOCIAL-04 | Phase 6 | Complete |
 | SOCIAL-05 | Phase 6 | Complete |
 | EVAL-13 | Phase 7 | Pending |

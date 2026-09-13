@@ -1,5 +1,10 @@
 # Elementos diferidos de la Fase 6
 
+## Verificacion interactiva de amistades pendiente
+
+- No se ejecuto una comprobacion browser-level de foco, Escape y responsive del hub de amistades porque la imagen web no contiene el binario Chromium de Playwright.
+- Las pruebas focalizadas `social-profile` + `social-friends` (10 tests) y TypeScript pasan; la limitacion no bloquea el write-set ni la verificacion automatizada declarada.
+
 ## Verificación de navegador pendiente
 
 - La ejecución declarada `docker compose -f infra/compose.yaml run --rm web pnpm --dir apps/web test -- --run catalogue-filters` ejecuta también `components/__tests__/nav-overflow.test.tsx`.

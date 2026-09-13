@@ -71,6 +71,14 @@ ubicaciones, notas e identificadores internos.
 
 Fuente canónica: [[../../.planning/phases/06-public-discovery-and-resilient-enrichment/06-03-PLAN]] y [[../../.planning/phases/06-public-discovery-and-resilient-enrichment/06-03-SUMMARY]].
 
+## Write-set Next.js de perfiles y amistades - 2026-09-13
+
+El plan [[../../.planning/phases/06-public-discovery-and-resilient-enrichment/06-06-PLAN]] conecta las proyecciones protegidas del backend con SSR de perfiles y listas, y añade el hub de amistades. El frontend conserva la privacidad por defecto: los perfiles no-amigos muestran solo la proyección básica y las URLs de colecciones/listas dependen del 404 genérico del backend. Las acciones de aceptar, rechazar, eliminar, bloquear y desbloquear usan rutas separadas, CSRF y estados ocupados por fila.
+
+La verificación focalizada y TypeScript pasan en Docker. La validación interactiva de Chromium queda limitada porque la imagen web no incluye el binario del navegador; la limitación se registra en [[../../.planning/phases/06-public-discovery-and-resilient-enrichment/deferred-items]].
+
+Fuente canónica: [[../../.planning/phases/06-public-discovery-and-resilient-enrichment/06-06-SUMMARY]].
+
 ## Enlaces
 
 - [[Allowlist de campos publicos]] · [[Perfil publico]] · [[Catalogo]]
