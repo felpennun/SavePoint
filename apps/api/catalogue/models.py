@@ -215,6 +215,32 @@ class Developer(models.Model):
         return self.name
 
 
+class Publisher(models.Model):
+    """An editorial company imported from an approved local snapshot.
+
+    ``igdb_id`` is the stable source identity for the current approved
+    snapshot.  The remaining provenance fields make the source boundary
+    explicit so a publisher can never be mistaken for an application-owned
+    editorial value.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    igdb_id = models.PositiveIntegerField(unique=True)
+    name = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=200, unique=True)
+    source = models.CharField(max_length=50, default="igdb")
+    source_url = models.URLField(max_length=500, blank=True)
+    licence = models.CharField(max_length=150, blank=True)
+    snapshot_sha256 = models.CharField(max_length=64, blank=True)
+    retrieved_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ("name",)
+
+    def __str__(self) -> str:
+        return self.name
+
+
 class GameWork(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     canonical_slug = models.SlugField(max_length=200, unique=True)
@@ -244,6 +270,7 @@ class GameWork(models.Model):
     genres = models.ManyToManyField(Genre, blank=True, related_name="works")
     franchises = models.ManyToManyField(Franchise, blank=True, related_name="works")
     developers = models.ManyToManyField(Developer, blank=True, related_name="works")
+    publishers = models.ManyToManyField(Publisher, blank=True, related_name="works")
     # Additive IGDB classification facets (import-only, not governed, not yet
     # consumed by any recommender -- see the model docstrings). Kept off the
     # content checksum so attaching them never perturbs the frozen catalogue

@@ -63,8 +63,10 @@ def _parse_page(raw: str | None) -> int:
     try:
         value = int(raw) if raw else 1
     except (TypeError, ValueError):
-        return 1
-    return value if value > 0 else 1
+        raise FilterValidationError("invalid_page", "page must be a positive integer") from None
+    if value < 1:
+        raise FilterValidationError("invalid_page", "page must be a positive integer")
+    return value
 
 
 class GameListView(APIView):
@@ -89,7 +91,10 @@ class GameListView(APIView):
             cq = parse_catalogue_query(request.query_params)
         except FilterValidationError as exc:
             return Response({"detail": str(exc), "code": exc.code}, status=400)
-        page = _parse_page(request.query_params.get("page"))
+        try:
+            page = _parse_page(request.query_params.get("page"))
+        except FilterValidationError as exc:
+            return Response({"detail": str(exc), "code": exc.code}, status=400)
         result = search_games(cq.q, page=page, page_size=DEFAULT_PAGE_SIZE, cq=cq)
         results = list(result["results"])
         return Response(

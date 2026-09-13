@@ -25,10 +25,37 @@ from dataclasses import dataclass
 from datetime import date
 
 from django.contrib.postgres.search import TrigramSimilarity
-from django.db.models import Case, Count, F, IntegerField, Max, Min, OuterRef, QuerySet, Subquery, Value, When
+from django.db.models import (
+    Case,
+    Count,
+    F,
+    IntegerField,
+    Max,
+    Min,
+    OuterRef,
+    QuerySet,
+    Subquery,
+    Value,
+    When,
+)
+from django.db.models.functions import ExtractYear
 
 from catalogue.corpus import ALLOWLIST_SLUGS, governed_works
-from catalogue.models import CorpusPopularityScore, CorpusVersion, CuratedLabel, GameAlias, GameWork, Platform
+from catalogue.models import (
+    CorpusPopularityScore,
+    CorpusVersion,
+    CuratedLabel,
+    Developer,
+    Edition,
+    Franchise,
+    GameAlias,
+    GameMode,
+    GameWork,
+    Genre,
+    Platform,
+    Publisher,
+)
+from django.utils.text import slugify
 from catalogue.normalization import normalize_title
 
 TRIGRAM_SIMILARITY_THRESHOLD = 0.3
@@ -96,8 +123,16 @@ class CatalogueQuery:
     q: str | None = None
     tags: tuple[str, ...] = ()
     platforms: tuple[str, ...] = ()
+    editions: tuple[str, ...] = ()
+    genres: tuple[str, ...] = ()
+    franchises: tuple[str, ...] = ()
+    developers: tuple[str, ...] = ()
+    publishers: tuple[str, ...] = ()
+    modes: tuple[str, ...] = ()
     year_from: int | None = None
     year_to: int | None = None
+    date_from: date | None = None
+    date_to: date | None = None
     min_rating: float | None = None
     sort: str = "relevance"
 
@@ -116,7 +151,15 @@ def _parse_float(raw: str, code: str, label: str) -> float:
         raise FilterValidationError(code, f"{label} must be a number") from None
 
 
-def _multi_values(params: Mapping[str, str], key: str) -> tuple[str, ...]:
+def _raw_values(params: Mapping[str, str], key: str) -> list[str]:
+    getlist = getattr(params, "getlist", None)
+    if callable(getlist):
+        return list(getlist(key))
+    one = params.get(key)
+    return [one] if one is not None else []
+
+
+def _multi_values(params: Mapping[str, str], key: str, *aliases: str) -> tuple[str, ...]:
     """Read every repeated value of ``key`` -- ``getlist`` when the mapping
     supports it (DRF ``request.query_params`` / Django ``QueryDict``), else the
     single ``get`` value -- then trim, drop blanks, and de-duplicate in order.
@@ -125,12 +168,9 @@ def _multi_values(params: Mapping[str, str], key: str) -> tuple[str, ...]:
     repeated values so a request cannot fan a query out into an unbounded join
     chain (threat T-02-03-02).
     """
-    getlist = getattr(params, "getlist", None)
-    if callable(getlist):
-        raw = list(getlist(key))
-    else:
-        one = params.get(key)
-        raw = [one] if one is not None else []
+    raw: list[str] = []
+    for candidate in (key, *aliases):
+        raw.extend(_raw_values(params, candidate))
     if len(raw) > MAX_MULTISELECT_VALUES:
         raise FilterValidationError(
             "too_many_facet_values",
@@ -143,6 +183,17 @@ def _multi_values(params: Mapping[str, str], key: str) -> tuple[str, ...]:
             f"at most {MAX_MULTISELECT_VALUES} {key} values allowed",
         )
     return cleaned
+
+
+def _parse_date_bound(raw: str, code: str, label: str, *, end: bool) -> date:
+    value = str(raw).strip()
+    try:
+        if len(value) == 4 and value.isdigit():
+            year = int(value)
+            return date(year, 12, 31) if end else date(year, 1, 1)
+        return date.fromisoformat(value)
+    except (TypeError, ValueError):
+        raise FilterValidationError(code, f"{label} must be YYYY or YYYY-MM-DD") from None
 
 
 def parse_catalogue_query(params: Mapping[str, str]) -> CatalogueQuery:
@@ -188,15 +239,47 @@ def parse_catalogue_query(params: Mapping[str, str]) -> CatalogueQuery:
                 f"min_rating must be between {int(RATING_MIN)} and {int(RATING_MAX)}",
             )
 
-    tags = _multi_values(params, "tag")
-    platforms = _multi_values(params, "platform")
+    tags = _multi_values(params, "tag", "tags")
+    platforms = _multi_values(params, "platform", "platforms")
+    editions = _multi_values(params, "edition", "editions")
+    genres = _multi_values(params, "genre", "genres")
+    franchises = _multi_values(params, "franchise", "franchises")
+    developers = _multi_values(params, "developer", "developers")
+    publishers = _multi_values(params, "publisher", "publishers")
+    modes = _multi_values(params, "mode", "modes")
+
+    date_from = date_to = None
+    if params.get("date_from"):
+        date_from = _parse_date_bound(params["date_from"], "invalid_date", "date_from", end=False)
+    elif year_from is not None:
+        date_from = date(year_from, 1, 1)
+    if params.get("date_to"):
+        date_to = _parse_date_bound(params["date_to"], "invalid_date", "date_to", end=True)
+    elif year_to is not None:
+        date_to = date(year_to, 12, 31)
+    date_ceiling = date(year_ceiling, 12, 31)
+    for value in (date_from, date_to):
+        if value is not None and not (date(YEAR_MIN, 1, 1) <= value <= date_ceiling):
+            raise FilterValidationError(
+                "date_out_of_range", f"date must be between {YEAR_MIN} and {year_ceiling}"
+            )
+    if date_from is not None and date_to is not None and date_from > date_to:
+        date_from, date_to = date_to, date_from
 
     return CatalogueQuery(
         q=q,
         tags=tags,
         platforms=platforms,
+        editions=editions,
+        genres=genres,
+        franchises=franchises,
+        developers=developers,
+        publishers=publishers,
+        modes=modes,
         year_from=year_from,
         year_to=year_to,
+        date_from=date_from,
+        date_to=date_to,
         min_rating=min_rating,
         sort=sort,
     )
@@ -220,6 +303,35 @@ def _apply_filters(qs: QuerySet[GameWork], cq: CatalogueQuery) -> QuerySet[GameW
         if valid_platforms:
             qs = qs.filter(releases__platform__slug__in=valid_platforms)
             joined = True
+    if cq.editions:
+        editions = Edition.objects.filter(release__work__in=qs).values_list("name", flat=True)
+        requested_editions = set(cq.editions)
+        valid_editions = {
+            name for name in editions if slugify(name) in requested_editions
+        }
+        if valid_editions:
+            qs = qs.filter(releases__editions__name__in=valid_editions)
+            joined = True
+    for values, relation in (
+        (cq.genres, "genres"),
+        (cq.franchises, "franchises"),
+        (cq.developers, "developers"),
+        (cq.publishers, "publishers"),
+        (cq.modes, "game_modes"),
+    ):
+        if values:
+            model = {
+                "genres": Genre,
+                "franchises": Franchise,
+                "developers": Developer,
+                "publishers": Publisher,
+                "game_modes": GameMode,
+            }[relation]
+            valid = set(model.objects.filter(slug__in=values).values_list("slug", flat=True))
+            for slug in values:
+                if slug in valid:
+                    qs = qs.filter(**{f"{relation}__slug": slug})
+                    joined = True
     if cq.tags:
         valid_tags = set(
             CuratedLabel.objects.filter(slug__in=cq.tags).values_list("slug", flat=True)
@@ -232,6 +344,10 @@ def _apply_filters(qs: QuerySet[GameWork], cq: CatalogueQuery) -> QuerySet[GameW
         qs = qs.filter(first_release_date__gte=date(cq.year_from, 1, 1))
     if cq.year_to is not None:
         qs = qs.filter(first_release_date__lte=date(cq.year_to, 12, 31))
+    if cq.date_from is not None:
+        qs = qs.filter(first_release_date__gte=cq.date_from)
+    if cq.date_to is not None:
+        qs = qs.filter(first_release_date__lte=cq.date_to)
     if cq.min_rating is not None:
         qs = qs.filter(total_rating__gte=cq.min_rating)
     if joined:
@@ -240,7 +356,11 @@ def _apply_filters(qs: QuerySet[GameWork], cq: CatalogueQuery) -> QuerySet[GameW
 
 
 def _prefetched(qs: QuerySet[GameWork]) -> QuerySet[GameWork]:
-    return qs.prefetch_related("releases__platform", "assets", "curated_labels")
+    return qs.prefetch_related(
+        "releases__platform",
+        "assets",
+        "curated_labels",
+    )
 
 
 def _ordered_matching_work_ids(normalized_query: str) -> list[str]:
@@ -287,11 +407,47 @@ def _ordered_matching_work_ids(normalized_query: str) -> list[str]:
     return ordered
 
 
-def _facets(scoped: QuerySet[GameWork]) -> dict:
-    """Facet options + counts over the text-scoped result set (before the
-    platform/genre/year/rating filters and before pagination).
+def _relation_facets(scoped: QuerySet[GameWork], model, relation: str) -> list[dict]:
+    rows = (
+        model.objects.filter(**{f"{relation}__in": scoped})
+        .annotate(count=Count(f"{relation}", distinct=True))
+        .order_by("name", "slug")
+        .values("slug", "name", "count")
+    )
+    return [
+        {"slug": row["slug"], "name": row["name"], "count": row["count"]}
+        for row in rows
+    ]
 
-    Three aggregate queries, none of which scale with the page size.
+
+def _edition_facets(scoped: QuerySet[GameWork]) -> list[dict]:
+    """Return Edition options using a derived slug, preserving its hierarchy."""
+    rows = (
+        Edition.objects.filter(release__work__in=scoped)
+        .annotate(count=Count("release__work", distinct=True))
+        .order_by("name", "id")
+        .values("name", "count")
+    )
+    deduped: dict[str, dict] = {}
+    for row in rows:
+        option_slug = slugify(row["name"])
+        if not option_slug:
+            continue
+        entry = deduped.setdefault(
+            option_slug,
+            {"slug": option_slug, "name": row["name"], "count": 0},
+        )
+        entry["count"] += row["count"]
+    return [deduped[key] for key in sorted(deduped, key=lambda value: (deduped[value]["name"], value))]
+
+
+def _facets(scoped: QuerySet[GameWork]) -> dict:
+    """Facet options + counts over the text-scoped governed set.
+
+    Facets are deliberately calculated before the requested page (and before
+    the optional facet filters) so a copied GET URL always describes the same
+    available catalogue vocabulary. Each dimension is one bounded aggregate;
+    no page-sized Python loop or external provider is involved.
     """
     platforms = [
         {"slug": row["slug"], "name": row["name"], "count": row["count"]}
@@ -302,17 +458,31 @@ def _facets(scoped: QuerySet[GameWork]) -> dict:
         .order_by("name")
         .values("slug", "name", "count")
     ]
-    tags = [
-        {"slug": row["slug"], "name": row["name"], "count": row["count"]}
-        for row in CuratedLabel.objects.filter(works__in=scoped)
-        .annotate(count=Count("works", distinct=True))
-        .order_by("name")
-        .values("slug", "name", "count")
+    tags = _relation_facets(scoped, CuratedLabel, "works")
+    genres = _relation_facets(scoped, Genre, "works")
+    franchises = _relation_facets(scoped, Franchise, "works")
+    developers = _relation_facets(scoped, Developer, "works")
+    publishers = _relation_facets(scoped, Publisher, "works")
+    modes = _relation_facets(scoped, GameMode, "works")
+    dates = [
+        {"value": str(row["year"]), "label": str(row["year"]), "count": row["count"]}
+        for row in scoped.filter(first_release_date__isnull=False)
+        .annotate(year=ExtractYear("first_release_date"))
+        .values("year")
+        .annotate(count=Count("id"))
+        .order_by("year")
     ]
     span = scoped.aggregate(min=Min("first_release_date"), max=Max("first_release_date"))
     return {
         "platforms": platforms,
+        "editions": _edition_facets(scoped),
+        "genres": genres,
+        "franchises": franchises,
+        "developers": developers,
+        "publishers": publishers,
+        "modes": modes,
         "tags": tags,
+        "dates": dates,
         "year_range": {
             "min": span["min"].year if span["min"] else None,
             "max": span["max"].year if span["max"] else None,
@@ -339,6 +509,7 @@ def _relevance_order(qs: QuerySet[GameWork]) -> QuerySet[GameWork]:
         "relevance_tier",
         F("total_rating").desc(nulls_last=True),
         "canonical_slug",
+        "id",
     )
 
 
@@ -360,6 +531,7 @@ def _popscore_order(qs: QuerySet[GameWork]) -> QuerySet[GameWork]:
     return qs.annotate(popscore=Subquery(score)).order_by(
         F("popscore").desc(nulls_last=True),
         "canonical_slug",
+        "id",
     )
 
 

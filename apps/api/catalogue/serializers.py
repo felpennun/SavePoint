@@ -50,6 +50,28 @@ def _tags(work: GameWork) -> list[dict]:
     return list(seen.values())
 
 
+def _dimension_values(work: GameWork, relation: str) -> list[dict]:
+    """Serialize an allowlisted catalogue facet without exposing model data."""
+    values = getattr(work, relation).all()
+    return [{"slug": value.slug, "name": value.name} for value in values]
+
+
+def _editions(work: GameWork) -> list[dict]:
+    values = (
+        edition
+        for release in work.releases.all()
+        for edition in release.editions.all()
+    )
+    seen: set[str] = set()
+    result: list[dict] = []
+    for edition in values:
+        if edition.name in seen:
+            continue
+        seen.add(edition.name)
+        result.append({"name": edition.name})
+    return result
+
+
 def _platform_summary(work: GameWork) -> str:
     names = sorted({r.platform.name for r in work.releases.all() if r.platform_id})
     if not names:
@@ -188,6 +210,11 @@ class GameDetailSerializer(serializers.Serializer):
     # (never per-user rows -- threat T-02-05-02).
     rating_breakdown = serializers.SerializerMethodField()
     tags = serializers.SerializerMethodField()
+    genres = serializers.SerializerMethodField()
+    franchises = serializers.SerializerMethodField()
+    developers = serializers.SerializerMethodField()
+    publishers = serializers.SerializerMethodField()
+    modes = serializers.SerializerMethodField()
     cover = serializers.SerializerMethodField()
     releases = serializers.SerializerMethodField()
     related_content = serializers.SerializerMethodField()
@@ -212,6 +239,21 @@ class GameDetailSerializer(serializers.Serializer):
 
     def get_tags(self, work: GameWork) -> list[dict]:
         return _tags(work)
+
+    def get_genres(self, work: GameWork) -> list[dict]:
+        return _dimension_values(work, "genres")
+
+    def get_franchises(self, work: GameWork) -> list[dict]:
+        return _dimension_values(work, "franchises")
+
+    def get_developers(self, work: GameWork) -> list[dict]:
+        return _dimension_values(work, "developers")
+
+    def get_publishers(self, work: GameWork) -> list[dict]:
+        return _dimension_values(work, "publishers")
+
+    def get_modes(self, work: GameWork) -> list[dict]:
+        return _dimension_values(work, "game_modes")
 
     def get_cover(self, work: GameWork) -> dict:
         return _cover(work)
