@@ -69,6 +69,23 @@ ejecución paralela y el feature set; el entorno es `null` porque v15 no lo regi
 históricamente. No se exponen usuarios individuales, `per_user`, logs, dumps privados,
 rutas absolutas, cookies, tokens, credenciales ni payloads internos.
 
+## Mapeo de campos de la publicación
+
+| Entrada allowlisted | Proyección del contrato | Regla |
+|---|---|---|
+| `artifact.protocol_version`, `protocol_sha256`, `code_commit` | `RunSummary` y `provenance` | Se conserva la identidad declarada por v15; `unavailable` no se reemplaza. |
+| `corpus_version`, `snapshot_sha256`, `popscore_snapshot_sha256` | `RunSummary` y `provenance` | Los tres valores deben coincidir con la publicación antes de servir filas. |
+| `seeds`, `split`, `feature_set_version`, `evaluation_population` | `configuration` | Se proyectan como metadatos; nunca se convierten en una nueva evaluación. |
+| `algorithms[*].aggregates` y `duration_seconds` | `ComparisonRow.metrics` y `timing` | Se mantiene el orden del artefacto y los valores numéricos publicados. |
+| `cohorts[*].algorithms[*].summary_by_k` | `ComparisonRow` | Es la única fuente de métricas por cohorte; la cohorte sin evaluables conserva `null`. |
+| `cohorts.limitations.run_level_only_metrics` | métricas `null` y `unavailable_reason` | No se copia una magnitud global como si fuera una observación de cohorte. |
+| `parallel_execution.wall_finished_at` | `RunSummary.published_at` | Es una fecha observable del artefacto, no la fecha de lectura del panel. |
+
+Las claves no incluidas en esta tabla no forman parte del contrato público. En
+particular, `algorithms[*].per_user`, `heldout_work_ids`, `heldout_ranks`, hashes de
+candidatos individuales y el contenido de `worker_timings[*].artifact` quedan fuera de
+la proyección aunque estén presentes en el archivo de origen.
+
 ### `ExportPayload`
 
 `build_export_payload` solo acepta `csv`, `json` y `svg`. Cada salida incluye `run_id`,
@@ -95,6 +112,12 @@ evaluación. La lectura es de solo lectura: JSON y bytes se abren para lectura, 
 validan y se proyectan manualmente a DTOs congelados. El sentinel de publicación
 rechaza checksum, versión, corpus, split, población, cohortes o hashes que se separen
 de la identidad v15 antes de servir datos.
+
+La diferencia entre el checksum historico declarado por el artefacto y la version mas
+reciente del puntero `protocol.json` se trata como una condicion de procedencia: el
+contrato fija la identidad v15 del artefacto y solo acepta del puntero posterior los
+anclajes que siguen siendo comunes. No se presenta el protocolo v16 como si hubiese
+producido las cifras v15, ni se altera el JSON congelado para resolver la diferencia.
 
 ## Trazabilidad de requisitos
 
