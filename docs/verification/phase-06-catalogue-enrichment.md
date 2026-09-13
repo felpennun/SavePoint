@@ -64,3 +64,20 @@ powershell -ExecutionPolicy Bypass -File scripts/check-secrets.ps1
 La evidencia social/browser está separada en `phase-06-signoff.md`; este documento no
 pretende convertir una prueba de contrato o una limitación de navegador en una medición
 del corpus.
+
+## Estado de journeys browser
+
+Los dos journeys están versionados en `e2e/catalogue-discovery.spec.ts` y
+`e2e/social-workflows.spec.ts`, sin mocks de Django ni credenciales en fixtures. El
+chequeo TypeScript pasa y los cinco grupos Vitest focalizados de catálogo/social pasan
+(19 tests). En el anfitrión, Playwright pudo abrir Chromium: el primer intento obtuvo
+1 journey de catálogo aprobado, 1 fallo de la aserción de 400% causado por una doble
+simulación de zoom y 1 social omitido por no disponer de las variables de ejecución;
+la aserción se corrigió en el commit del journey. El reintento fue interrumpido al
+priorizar el cierre documental, por lo que no se declara una pasada browser completa.
+
+El comando Compose prescrito tampoco puede ejecutar esos ficheros en la imagen `web`:
+la imagen no monta `e2e/` ni `playwright.config.ts` y devuelve que el proyecto
+`chromium` no está disponible. Esta limitación de entorno queda registrada como
+verificación diferida, no como evidencia verde. No se instaló ningún navegador ni se
+relanzó la evaluación offline.

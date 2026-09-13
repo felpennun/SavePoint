@@ -87,6 +87,23 @@ La validación focalizada de `social-messages.test.ts` (4/4) y TypeScript pasa. 
 
 Fuente canónica: [[../../.planning/phases/06-public-discovery-and-resilient-enrichment/06-07-SUMMARY]].
 
+## Cierre de gates y signoff - 2026-09-13
+
+El plan [[../../.planning/phases/06-public-discovery-and-resilient-enrichment/06-09-PLAN]]
+deja cerrado el gate de PostgreSQL 18.6, la cadena de migraciones, la regresión API,
+los escaneos de dependencias/secretos y la integridad SHA-256 de los snapshots. La
+evidencia de reconstrucción está en [[../../docs/verification/phase-06-catalogue-enrichment]]
+y la matriz de requisitos/decisiones en [[../../docs/verification/phase-06-signoff]].
+
+Los journeys reales de catálogo y social están versionados y cubren D-01..D-15,
+privacidad, relaciones, recomendaciones, inbox, cooldown, axe, teclado, 320px y
+400%. La pasada browser completa queda **deferred**: el anfitrión pudo abrir Chromium,
+pero la imagen Compose `web` no monta `e2e/` ni su configuración, y el journey social
+requiere credenciales de ejecución que no se registran. No se relanzó evaluación offline
+ni se añadieron secretos o logs al vault.
+
+Fuente canónica de cierre: [[../../docs/verification/phase-06-signoff]].
+
 ## Enlaces
 
 - [[Allowlist de campos publicos]] · [[Perfil publico]] · [[Catalogo]]
