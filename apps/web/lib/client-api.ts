@@ -46,3 +46,71 @@ export async function apiFetch(
     ...(init.body !== undefined ? { body: JSON.stringify(init.body) } : {}),
   });
 }
+
+export interface SocialRecommendationInput {
+  recipient_alias: string;
+  work_id: string;
+  text: string;
+}
+
+export type SocialRecommendationResult =
+  | { kind: "ok" }
+  | { kind: "cooldown"; retryAfterSeconds: number }
+  | { kind: "error"; status: number };
+
+function retryAfterSeconds(response: Response, body: unknown): number {
+  const headerValue = response.headers.get("Retry-After");
+  const headerSeconds = headerValue === null ? NaN : Number(headerValue);
+  if (Number.isFinite(headerSeconds) && headerSeconds > 0) return Math.ceil(headerSeconds);
+  if (typeof body === "object" && body !== null) {
+    const value = (body as { retry_after_seconds?: unknown }).retry_after_seconds;
+    if (typeof value === "number" && Number.isFinite(value) && value > 0) return Math.ceil(value);
+  }
+  return 1;
+}
+
+export async function sendSocialRecommendation(
+  input: SocialRecommendationInput,
+): Promise<SocialRecommendationResult> {
+  let response: Response;
+  try {
+    response = await apiFetch("/api/social/recommendations/", { method: "POST", body: input });
+  } catch {
+    return { kind: "error", status: 0 };
+  }
+  let body: unknown = null;
+  try {
+    body = await response.json();
+  } catch {
+    // A status code remains authoritative when the response has no JSON body.
+  }
+  if (response.status === 429) {
+    return { kind: "cooldown", retryAfterSeconds: retryAfterSeconds(response, body) };
+  }
+  return response.ok ? { kind: "ok" } : { kind: "error", status: response.status };
+}
+
+export async function markSocialMessageRead(messageId: string): Promise<boolean> {
+  try {
+    const response = await apiFetch(
+      `/api/social/messages/${encodeURIComponent(messageId)}/read/`,
+      { method: "POST" },
+    );
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+export async function getSocialUnreadCount(): Promise<number | null> {
+  try {
+    const response = await apiFetch("/api/social/messages/unread-count/");
+    if (!response.ok) return null;
+    const body = (await response.json()) as { unread_count?: unknown };
+    return typeof body.unread_count === "number" && Number.isInteger(body.unread_count) && body.unread_count >= 0
+      ? body.unread_count
+      : null;
+  } catch {
+    return null;
+  }
+}

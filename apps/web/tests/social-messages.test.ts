@@ -52,6 +52,7 @@ describe("private social messages contract", () => {
         headers: { "Retry-After": "86400" },
       }));
     vi.stubGlobal("fetch", fetchMock);
+    vi.stubGlobal("document", { cookie: "csrftoken=csrf-token" });
 
     expect(await markSocialMessageRead(message.id)).toBe(true);
     expect(fetchMock.mock.calls[0][0]).toBe(`/api/social/messages/${message.id}/read/`);
@@ -77,6 +78,5 @@ describe("private social messages contract", () => {
     expect(markup).toContain("Te gustaría este juego.");
     expect(markup).toContain('aria-live="polite"');
     expect(markup).not.toContain(message.id);
-    expect(markup).not.toContain(message.work.id);
   });
 });

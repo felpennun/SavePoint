@@ -385,6 +385,75 @@ export interface SocialHubData {
   friendships: SocialFriends;
 }
 
+/** Recipient-scoped recommendation DTO. The backend's private identifier is
+ * kept only for the mark-read mutation and is never rendered as text. */
+export interface SocialMessage {
+  id: string;
+  sender_alias: string;
+  recipient_alias: string;
+  work: {
+    id: string;
+    title: string;
+    cover: Cover;
+  };
+  text: string;
+  date: string;
+  read: boolean;
+}
+
+export interface SocialInbox {
+  messages: SocialMessage[];
+}
+
+export interface SocialUnreadCount {
+  unread_count: number;
+}
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return typeof value === "object" && value !== null ? value as Record<string, unknown> : null;
+}
+
+function normalizeSocialCover(value: unknown, title: string): Cover {
+  const cover = asRecord(value);
+  return {
+    url: typeof cover?.url === "string" ? cover.url : null,
+    is_placeholder: cover?.is_placeholder === true,
+    alt: typeof cover?.alt === "string" ? cover.alt : title,
+  };
+}
+
+/** Normalize the private response at the trust boundary so React receives an
+ * explicit allowlist even if the API grows extra audit fields later. */
+export function normalizeSocialMessage(value: unknown): SocialMessage | null {
+  const message = asRecord(value);
+  const work = asRecord(message?.work);
+  if (
+    typeof message?.id !== "string" ||
+    typeof message.sender_alias !== "string" ||
+    typeof message.recipient_alias !== "string" ||
+    typeof message.text !== "string" ||
+    typeof message.date !== "string" ||
+    typeof message.read !== "boolean" ||
+    typeof work?.id !== "string" ||
+    typeof work.title !== "string"
+  ) {
+    return null;
+  }
+  return {
+    id: message.id,
+    sender_alias: message.sender_alias,
+    recipient_alias: message.recipient_alias,
+    work: {
+      id: work.id,
+      title: work.title,
+      cover: normalizeSocialCover(work.cover, work.title),
+    },
+    text: message.text,
+    date: message.date,
+    read: message.read,
+  };
+}
+
 async function fetchSocialJson<T>(path: string, cookieHeader: string): Promise<T | null> {
   const response = await fetch(new URL(path, API_BASE), {
     cache: "no-store",
@@ -402,6 +471,24 @@ export async function fetchSocialHubData(cookieHeader: string): Promise<SocialHu
   ]);
   if (!requests || !friendships) return null;
   return { requests, friendships };
+}
+
+export async function fetchSocialInbox(cookieHeader: string): Promise<SocialInbox | null> {
+  const body = await fetchSocialJson<unknown>("/api/social/messages/", cookieHeader);
+  if (!body) return null;
+  const record = asRecord(body);
+  const rawMessages = Array.isArray(record?.messages) ? record.messages : [];
+  return { messages: rawMessages.map(normalizeSocialMessage).filter((item): item is SocialMessage => item !== null) };
+}
+
+export async function fetchSocialUnreadCount(cookieHeader: string): Promise<SocialUnreadCount | null> {
+  const body = await fetchSocialJson<unknown>("/api/social/messages/unread-count/", cookieHeader);
+  if (!body) return null;
+  const record = asRecord(body);
+  const unreadCount = record?.unread_count;
+  return typeof unreadCount === "number" && Number.isInteger(unreadCount) && unreadCount >= 0
+    ? { unread_count: unreadCount }
+    : { unread_count: 0 };
 }
 
 export interface PopularityResultItem {
