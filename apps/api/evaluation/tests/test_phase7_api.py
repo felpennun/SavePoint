@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Permission
 from django.core.cache import cache
@@ -40,9 +41,16 @@ def research_permission(db):  # noqa: ANN001
 
 
 @pytest.fixture
-def viewer(db, research_permission):  # noqa: ANN001
+def research_group(db, research_permission):  # noqa: ANN001
+    group = Group.objects.create(name="Research Viewer")
+    group.permissions.add(research_permission)
+    return group
+
+
+@pytest.fixture
+def viewer(db, research_group):  # noqa: ANN001
     user = User.objects.create_user(username="research-viewer", password="test-password")
-    user.user_permissions.add(research_permission)
+    user.groups.add(research_group)
     return user
 
 
@@ -166,3 +174,81 @@ def test_query_and_export_inputs_fail_closed(viewer_client, url: str) -> None:  
 
     assert response.status_code == 400
     assert response.json() == {"detail": "Invalid research request."}
+
+
+@pytest.fixture
+def platform_permission(db):  # noqa: ANN001
+    content_type, _ = ContentType.objects.get_or_create(
+        app_label="accounts",
+        model="platformcapability",
+    )
+    permission, _ = Permission.objects.get_or_create(
+        content_type=content_type,
+        codename="manage_platform",
+        defaults={"name": "Can manage the platform"},
+    )
+    return permission
+
+
+@pytest.mark.django_db
+def test_platform_admin_without_research_viewer_is_still_hidden(platform_permission) -> None:
+    user = User.objects.create_user(username="platform-admin", password="test-password")
+    user.user_permissions.add(platform_permission)
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    response = client.get(COMPARISON_URL)
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Not found."}
+
+
+@pytest.mark.django_db
+def test_combined_capabilities_are_separate_server_decisions(viewer, platform_permission) -> None:  # noqa: ANN001
+    viewer.user_permissions.add(platform_permission)
+    client = APIClient()
+    client.force_authenticate(user=viewer)
+
+    body = client.get("/api/accounts/me/").json()
+
+    assert body["capabilities"] == {
+        "can_view_research": True,
+        "can_manage_platform": True,
+    }
+
+
+@pytest.mark.parametrize("path", [RUNS_URL, COMPARISON_URL, ARTIFACTS_URL, EXPORTS_URL])
+@pytest.mark.django_db
+def test_anonymous_research_requests_require_authentication(path: str) -> None:
+    response = APIClient().get(path)
+
+    assert response.status_code in (401, 403)
+    assert "run_id" not in response.content.decode()
+
+
+@pytest.mark.parametrize("method", ["post", "put", "patch", "delete"])
+@pytest.mark.django_db
+def test_non_get_methods_are_csrf_protected_and_never_mutate(viewer, method: str) -> None:  # noqa: ANN001
+    client = APIClient(enforce_csrf_checks=True)
+    assert client.login(username=viewer.username, password="test-password")
+
+    response = client.generic(method, COMPARISON_URL, data="{}", content_type="application/json")
+
+    assert response.status_code == 403
+    assert "per_user" not in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_no_rerun_route_is_published(viewer_client) -> None:  # noqa: ANN001
+    response = viewer_client.get("/api/evaluation/rerun/")
+
+    assert response.status_code == 404
+    assert "runner" not in response.content.decode().lower()
+
+
+@pytest.mark.django_db
+def test_research_scope_throttles_repeated_reads(viewer_client) -> None:  # noqa: ANN001
+    statuses = [viewer_client.get(RUNS_URL).status_code for _ in range(61)]
+
+    assert 429 in statuses
+    assert set(statuses) <= {200, 429}
