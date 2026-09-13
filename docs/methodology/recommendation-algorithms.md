@@ -2,12 +2,15 @@
 
 # Algoritmos de recomendación de SavePoint
 
-**Estado:** especificación técnica vigente, aceptada el 2026-09-10  
-**Protocolo de evaluación:** `protocol_version = 12`  
+**Estado:** especificación técnica vigente, aceptada el 2026-09-10;
+sección 3 (pesos y familias de contenido) y sección 5.1 (núcleo de
+similitud) revisadas el 2026-09-13 para `fs-v13` — ver ADR-009 y
+[[2026-09-12 - fs-v13, pesos por familia de etiqueta y correccion del sesgo de metadatos ausentes]]  
+**Protocolo de evaluación:** `protocol_version = 16`  
 **Corpus congelado:** `2026.09.2`  
-**Feature set:** `fs-v12-curated-tags-idf`  
-**Regla de similitud:** `facet-similarity-v7`  
-**Fórmula IDF:** `smoothed-idf-l2-v1`
+**Feature set:** `fs-v13-family-weighted-tags`  
+**Regla de similitud:** `facet-similarity-v8`  
+**Fórmula IDF:** `smoothed-idf-l2-per-family-v2`
 
 Este documento es la descripción técnica canónica del sistema de recomendación
 implementado. Define qué algoritmos existen, qué datos consumen, cómo se
@@ -117,79 +120,127 @@ usuario. Por ello, las cifras responden a una prueba de recuperación de un
 ### 3.1 Señal editorial unificada
 
 La dimensión semántica principal es `GameWork.curated_labels`, expuesta en el
-vector como `tag:<slug>`. Es el conjunto editorial unificado que incorpora las
-etiquetas de género y los subgéneros aceptados, junto con las incorporaciones
-decididas de Theme, como `Anime`, `Casual`, `Family Friendly`, `Metroidvania`,
-`Souls-like` y `Story Rich`. Las keywords crudas, Theme crudo,
-Player-Perspective y GameMode no entran directamente como dimensiones.
+vector como `tag:<slug>`. **Desde `fs-v13` (2026-09-13), esta familia contiene
+únicamente género y subgénero** (`CuratedLabel.Kind.GENRE`/`SUBGENRE`): un
+subgénero como `Souls-like` es un refinamiento de un género como RPG, no una
+señal competidora, así que comparten un único bloque IDF. Tema, modo y
+característica —antes parcialmente fundidos aquí— ahora tienen sus propias
+familias (`theme:`, `mode:`, `feature:`; ver §3.2). Las keywords crudas, Theme
+crudo sin curar, Player-Perspective y GameMode no entran directamente como
+dimensiones.
 
 Esto evita que sinónimos o metadatos editoriales de distinto nivel pesen como
 si fueran conceptos independientes. Por ejemplo, variantes normalizadas de
 roguelike comparten una única etiqueta curada; `Superhero`, `Pixel Art` y
 `Cyberpunk` se representan como etiquetas del corpus con la política editorial
-vigente. `Cyberpunk` es una etiqueta de género/tag, no una señal separada.
+vigente. `Cyberpunk` es una etiqueta de género/tag; `Superhero` es de tema
+(`theme:`) y `Pixel Art` de característica (`feature:`) desde `fs-v13` — cada
+una vive ahora en su propia familia en vez de competir por IDF dentro de un
+único bloque `tag:`.
 
-### 3.2 Pesos de familias
+### 3.2 Pesos de familias (revisado 2026-09-13, `fs-v13`)
 
 El contrato de familias es:
 
-| Familia | Namespace del vector | Peso máximo | Función |
-|---|---|---:|---|
-| Etiquetas curadas | `tag:` | `0,75` | Semántica diferenciativa principal |
-| Plataformas permitidas | `platform:` | `0,25` | Compatibilidad material |
-| Franquicia/saga | `franchise:` | `0,02` | Confirmación positiva |
-| Desarrollador | `developer:` | `0,015` | Confirmación positiva |
+| Familia | Namespace del vector | Peso máximo | Tipo | Función |
+|---|---|---:|---|---|
+| Etiquetas curadas (género + subgénero) | `tag:` | `0,60` | Núcleo | Semántica diferenciativa principal |
+| Tema | `theme:` | `0,20` | Opcional/bono | Ambiente/escenario (Horror, Fantasía, Sci-fi…) |
+| Característica | `feature:` | `0,10` | Opcional/bono | Descriptor técnico/formato (Mundo abierto, VR, Retro…) |
+| Modo | `mode:` | `0,05` | Opcional/bono | Contexto social (Un jugador, Cooperativo…) |
+| Plataformas permitidas | `platform:` | `0,05` | Núcleo | Compatibilidad material |
+| Franquicia/saga | `franchise:` | `0,02` | Opcional/bono | Confirmación positiva |
+| Desarrollador | `developer:` | `0,015` | Opcional/bono | Confirmación positiva |
 
-Las dos primeras forman el núcleo. Franquicia y desarrollador no pueden crear
-una recomendación por sí solos: únicamente añaden un bonus si coinciden con un
-valor que ya aparece en el perfil ponderado del usuario. El bonus combinado
-queda limitado a `0,035`.
+**Núcleo vs. opcional/bono, y por qué solo dos familias son núcleo.** Hasta
+`fs-v12`, género, subgénero, tema, modo y característica compartían un único
+presupuesto (`0,75`) repartido por IDF dentro de ese bloque, con plataforma
+como segundo núcleo (`0,25`). Dos hallazgos en sesión revisando el reparto de
+peso motivaron el cambio a `fs-v13`, ambos documentados en detalle en
+[[2026-09-12 - fs-v13, pesos por familia de etiqueta y correccion del sesgo de metadatos ausentes]]
+y en ADR-009:
+
+1. Un subgénero estadísticamente raro (p. ej. `souls-like`, IDF≈7,54) podía
+   pesar más que los géneros de una obra juntos (p. ej. `rpg`+`action`,
+   IDF≈2,88+1,97) solo por su rareza en el corpus, invirtiendo la jerarquía
+   semántica declarada del proyecto ("género como núcleo").
+2. La primera corrección probada —repartir el mismo presupuesto entre las
+   cinco familias, renormalizado dinámicamente solo sobre las familias
+   presentes en ambos lados— introducía un sesgo distinto: si una familia
+   (p. ej. tema) faltaba en una comparación, las familias restantes recibían
+   automáticamente una cuota *relativa* mayor. Dos obras con la misma
+   afinidad de género exacta podían puntuar distinto según si la otra
+   además tenía un tema flojo o ningún tema, premiando la escasez de
+   metadatos en vez de ser neutral a ella.
+
+La solución final limita el **núcleo renormalizado** (`core` en §5.1) a
+`tag` y `platform` — las dos familias con cobertura casi universal, así que
+el caso de renormalización (una de las dos ausente) es realmente raro, no el
+camino común. `theme`, `mode` y `feature` reciben el mismo tratamiento que ya
+tenían `franchise`/`developer`: una coincidencia solo suma al resultado final
+(fuera del núcleo), y una ausencia en cualquiera de los dos lados no resta ni
+redistribuye — se excluye de esa comparación por completo, nunca se pliega en
+el denominador renormalizado del núcleo. El bonus opcional combinado
+(`theme + feature + mode + franchise + developer`) queda acotado por
+construcción a la suma de sus pesos máximos.
 
 Las plataformas se restringen a la allowlist de
 `catalogue.corpus.PLATFORM_ALLOWLIST`. Un facet ausente se omite; no se imputa
 ni redistribuye su peso a otra familia.
 
-### 3.3 IDF por rareza de etiqueta
+### 3.3 IDF por familia (revisado 2026-09-13, `fs-v13`)
 
 La rareza se calcula una vez por versión del corpus, nunca con datos privados
-del usuario:
+del usuario — pero **desde `fs-v13`, cada familia tiene su propio universo de
+referencia `N`**: "obras gobernadas con al menos un valor de esa familia", no
+el corpus gobernado completo. De lo contrario, una familia con cobertura baja
+(`feature`, ~13 %) saldría con un IDF inflado frente a una casi universal
+(`tag`, ~100 %) solo por tener un denominador mal dimensionado para su propia
+población — no por ser realmente más rara dentro de su propio dominio.
 
 ```text
-N       = número de obras gobernadas del corpus
-df_t    = número de obras gobernadas que tienen la etiqueta t
+N_f     = número de obras gobernadas con al menos un valor de la familia f
+df_t    = número de esas obras que tienen el valor t
 s       = 1,0  (suavizado aditivo)
 
-idf(t)  = ln((N + s) / (df_t + s)) + 1
+idf(t)  = ln((N_f + s) / (df_t + s)) + 1
 ```
 
-El suavizado mantiene un valor finito incluso para una etiqueta observada en
-una sola obra. Para una obra con conjunto de etiquetas `T`, su bloque de tags
-se normaliza conservando exactamente la familia de peso `0,75`:
+El suavizado mantiene un valor finito incluso para un valor observado en una
+sola obra. Para una obra con conjunto de valores `T` de la familia `f`, su
+bloque se normaliza conservando exactamente el peso configurado de esa
+familia (`FACET_WEIGHTS[f]`, tabla de §3.2):
 
 ```text
 q_t       = idf(t)
 norm_T    = sqrt(sum(q_t² para t en T))
-w(tag:t)  = 0,75 * q_t / norm_T
+w(f:t)    = FACET_WEIGHTS[f] * q_t / norm_T
 ```
 
-Una etiqueta genérica y muy frecuente aporta menos en la dirección del vector;
-una etiqueta rara y diferenciativa aporta más. La normalización L2 por obra es
-esencial: IDF cambia la dirección semántica, pero no permite que una obra con
-muchas etiquetas gane únicamente por tener más campos.
+Una etiqueta genérica y muy frecuente **dentro de su propia familia** aporta
+menos en la dirección del vector; una etiqueta rara y diferenciativa aporta
+más. La normalización L2 por obra y por familia es esencial: IDF cambia la
+dirección semántica, pero no permite que una obra con muchos valores de una
+familia gane únicamente por tener más campos. `platform` recibe ahora IDF
+propio por la misma vía (antes usaba un reparto plano `1/√k`, ver más abajo).
 
 Si no se proporciona un perfil IDF, la función de bajo nivel mantiene el modo
-uniforme `0,75 / sqrt(|T|)` para compatibilidad de fixtures. Los rankers web,
-offline, el perfil y la caché de vectores siempre resuelven el perfil IDF del
-corpus activo.
+uniforme `peso_familia / sqrt(|T|)` para compatibilidad de fixtures. Los
+rankers web, offline, el perfil y la caché de vectores siempre resuelven los
+cinco perfiles IDF (`tag`/`theme`/`mode`/`feature`/`platform`) del corpus
+activo (`all_family_idf_profiles`).
 
-Para las demás familias, si una obra tiene `k` valores observados:
+Franquicia y desarrollador no usan IDF: si una obra tiene `k` valores
+observados,
 
 ```text
 w(f:v) = peso_familia / sqrt(k)
 ```
 
 La caché `WorkFeatureVector` almacena estos vectores dispersos. Es una caché
-determinista, no un modelo entrenado.
+determinista, no un modelo entrenado. `FEATURE_SET_VERSION` cambió a
+`fs-v13-family-weighted-tags` y las 190.479 obras gobernadas fueron
+rematerializadas bajo el nuevo contrato el 2026-09-12.
 
 ## 4. Perfil de preferencias del usuario
 
@@ -278,32 +329,42 @@ cobertura del perfil. Así, una obra que declara muchos géneros o plataformas
 no gana automáticamente por enumerar más valores.
 
 La similitud de núcleo es una media ponderada solo sobre las familias que
-tienen datos en ambos lados:
+tienen datos en ambos lados. **Desde `fs-v13`, el núcleo se limita a `tag` y
+`platform`** (§3.2) — las únicas dos con cobertura casi universal, por lo que
+renormalizar cuando una falta es de verdad un caso raro:
 
 ```text
 core = sum(weight_f * F_beta_f) / sum(weight_f activos)
 ```
 
-Con datos completos, `weight_tag = 0,75` y `weight_platform = 0,25`.
+Con datos completos, `weight_tag = 0,60` y `weight_platform = 0,05`.
 
-### 5.2 Bonus de confirmación
+### 5.2 Bonus de confirmación (revisado 2026-09-13, `fs-v13`)
 
-Para franquicia y desarrollador se usa una escala de coincidencia positiva
-contra el valor más fuerte del perfil de esa familia:
+Tema, característica, modo, franquicia y desarrollador son ahora familias
+opcionales/bono con el mismo tratamiento: una escala de coincidencia positiva
+contra el valor más fuerte del perfil de esa familia, fuera del núcleo
+renormalizado:
 
 ```text
 optional_affinity_f = min(1,
     sum(P_f[t] para t en overlap_f) / max(P_f[t] para t en P_f))
 
-optional_bonus = 0,02 * affinity_franchise
+optional_bonus = 0,20 * affinity_theme
+               + 0,10 * affinity_feature
+               + 0,05 * affinity_mode
+               + 0,02 * affinity_franchise
                + 0,015 * affinity_developer
 
 similarity = min(1, core + optional_bonus)
 ```
 
-Una franquicia o desarrollador que no coincide aporta `0`; una familia ausente
-es neutral. Esta asimetría es deliberada: una saga o estudio confirma un
-interés ya observado, pero no debe reemplazar la similitud semántica.
+Una familia opcional que no coincide aporta `0`; una familia ausente en
+cualquiera de los dos lados es neutral — ni resta, ni redistribuye su peso al
+núcleo. Esta asimetría es deliberada: un tema, una saga o un estudio
+confirman un interés ya observado, pero no deben reemplazar la similitud
+semántica de género/plataforma, y su ausencia no debe inflar artificialmente
+esa similitud de núcleo (ver el hallazgo 2 de §3.2).
 
 ### 5.3 Coseno
 
@@ -491,7 +552,7 @@ Con `lambda = 0,80`:
 MMR(i) = 0,80 * relevance(i) - 0,20 * redundancia(i)
 ```
 
-Se usa el coseno de los vectores `fs-v12` para la redundancia. MMR reduce
+Se usa el coseno de los vectores `fs-v13` (§3) para la redundancia. MMR reduce
 listas dominadas por obras casi idénticas sin cambiar la fórmula de relevancia
 del algoritmo base. El payload expone `mmr_relevance`, `mmr_redundancy` y
 `mmr_score`.
@@ -726,7 +787,9 @@ La distinción es importante para el TFG:
 - **Fundamento científico:** contenido, ponderación de términos, similitud,
   vecinos colaborativos, híbridos, diversificación y métricas tienen
   antecedentes publicados.
-- **Decisión de diseño de SavePoint:** `0,75/0,25`, los bonuses, `beta = 0,5`,
+- **Decisión de diseño de SavePoint:** los pesos por familia de `fs-v13`
+  (`tag = 0,60`, `theme = 0,20`, `feature = 0,10`, `mode = 0,05`,
+  `platform = 0,05`), los bonuses, `beta = 0,5`,
   `m = 25`, los pesos de estado, el umbral de tres obras, `lambda = 0,80`,
   `K = 5/10/20`, el mínimo de cinco ratings, los pesos de PopScore y
   `year_decay = 0,35` son elecciones explícitas para este corpus y este TFG.
@@ -739,11 +802,11 @@ La distinción es importante para el TFG:
 | Elemento implementado | Base científica | Qué se toma de la literatura | Qué se decide localmente |
 |---|---|---|---|
 | Recomendador basado en contenido | Pazzani y Billsus (2007), [DOI 10.1007/978-3-540-72079-9_10](https://doi.org/10.1007/978-3-540-72079-9_10) | Describir los ítems, construir un perfil de intereses y comparar ambos para recomendar | Tags curados, uso de biblioteca, estados y rating personal como intensidad |
-| Vector disperso, IDF y coseno | Salton y Buckley (1988), [DOI 10.1016/0306-4573(88)90021-0](https://doi.org/10.1016/0306-4573(88)90021-0) | La ponderación estadística de términos y la representación vectorial permiten discriminar rasgos informativos | Aplicar IDF a tags editoriales, suavizado `+1`, normalización L2 y peso total `0,75` |
+| Vector disperso, IDF y coseno | Salton y Buckley (1988), [DOI 10.1016/0306-4573(88)90021-0](https://doi.org/10.1016/0306-4573(88)90021-0) | La ponderación estadística de términos y la representación vectorial permiten discriminar rasgos informativos | IDF por familia curada (tag/theme/mode/feature/platform), suavizado `+1`, normalización L2 y peso de familia `0,60` para `tag` (`fs-v13`) |
 | F-beta | van Rijsbergen (1979), referencia bibliográfica en [Information Retrieval](https://www.dcs.gla.ac.uk/Keith/Preface.html) | Equilibrar precisión y cobertura con un parámetro `beta` | `beta = 0,5` para priorizar precisión de la candidata y limitar el efecto de metadata abundante |
 | User-KNN colaborativo | Resnick et al. (1994), [GroupLens, DOI 10.1145/192844.192905](https://doi.org/10.1145/192844.192905), y Herlocker et al. (2004), [DOI 10.1145/963770.963772](https://doi.org/10.1145/963770.963772) | Filtrado colaborativo por preferencias de usuarios similares, similitud sobre ratings y agregación ponderada | Ratings explícitos, centrado por la media, mínimo de dos coincidencias y `K = 20` vecinos positivos |
 | Híbrido | Burke (2002), [DOI 10.1023/A:1021240730564](https://doi.org/10.1023/A:1021240730564) | Combinar fuentes complementarias para aprovechar sus ventajas y compensar sus debilidades | Suma `0,60` contenido + `0,40` CF y fallback de contenido en cold start |
-| MMR y diversidad | Carbonell y Goldstein (1998), [DOI 10.1145/290941.291025](https://doi.org/10.1145/290941.291025) | Reordenar maximizando relevancia y penalizando redundancia con `lambda` | Pool `max(100, 5K)`, `lambda = 0,80` y coseno sobre `fs-v12` |
+| MMR y diversidad | Carbonell y Goldstein (1998), [DOI 10.1145/290941.291025](https://doi.org/10.1145/290941.291025) | Reordenar maximizando relevancia y penalizando redundancia con `lambda` | Pool `max(100, 5K)`, `lambda = 0,80` y coseno sobre `fs-v13` |
 | Evaluación de ranking | Järvelin y Kekäläinen (2002), [DOI 10.1145/582415.582418](https://doi.org/10.1145/582415.582418), y Herlocker et al. (2004) | La posición importa; nDCG, precision, recall y MAP son familias adecuadas para listas ordenadas | `nDCG@10` como headline, `K = 5/10/20`, un positivo leave-one-out y métricas más-allá-del-acierto |
 | Diversidad y novedad | McNee, Riedl y Konstan (2006), [DOI 10.1145/1125451.1125659](https://doi.org/10.1145/1125451.1125659), y Vargas y Castells (2011), [DOI 10.1145/2043932.2043955](https://doi.org/10.1145/2043932.2043955) | La exactitud no agota la utilidad; diversidad, novedad y cobertura deben medirse aparte | MMR solo como capa de reordenación y métricas `intra_list_diversity`, novedad y cobertura sin ocultarlas en nDCG |
 | Shrinkage bayesiano | Fundamento de Empirical Bayes y shrinkage, [Cambridge, Large-Scale Inference](https://doi.org/10.1017/CBO9780511761362.002) | Las observaciones escasas pueden contraerse hacia un prior común para reducir varianza | Prior de media ponderada del corpus, `m = 25`, potencia de calidad `2` y confianza `n/(n+25)` |

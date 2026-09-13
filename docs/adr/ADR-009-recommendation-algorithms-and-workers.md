@@ -2,7 +2,7 @@
 
 # ADR-009: Algoritmos de recomendación y workers paralelos
 
-**Estado:** aceptado  
+**Estado:** aceptado, revisado el 2026-09-13 (`fs-v13`)  
 **Fecha:** 2026-09-10  
 **Autor de la decisión:** Felipe
 
@@ -41,17 +41,33 @@ Se adopta un catálogo versionado compuesto por:
 - `cf-user-knn-v1`, `hybrid-weighted-cf-v1` y `hybrid-mmr-v1`;
 - `tag-taste-v1` como heurística de producto fuera de la comparación académica.
 
-El vector de contenido usa `tag = 0,75`, `platform = 0,25`, y bonuses máximos
-de `franchise = 0,02` y `developer = 0,015`. Los tags usan:
+**Revisado el 2026-09-13 (`fs-v13`, reemplaza `fs-v12` en este punto).** El
+vector de contenido separa las etiquetas curadas en familias independientes,
+cada una con su propio IDF: `tag = 0,60` (género+subgénero fusionados),
+`theme = 0,20`, `feature = 0,10`, `mode = 0,05`, `platform = 0,05`, y bonuses
+máximos de `franchise = 0,02` y `developer = 0,015`. Solo `tag` y `platform`
+son núcleo (renormalizado entre ambos si uno falta); `theme`/`mode`/`feature`
+reciben el mismo tratamiento que `franchise`/`developer` — solo suman, nunca
+restan ni redistribuyen. Cada familia usa:
 
 ```text
-idf(t) = ln((N + 1) / (df_t + 1)) + 1
-w(tag:t) = 0,75 * idf(t) / sqrt(sum(idf(tag_j)^2))
+idf_f(t) = ln((N_f + 1) / (df_t + 1)) + 1   # N_f: solo obras con esa familia
+w(f:t)   = peso_f * idf_f(t) / sqrt(sum(idf_f(v)^2 para v en la familia))
 ```
 
+Este reemplaza el diseño original de `fs-v12` (un único presupuesto `tag=0,75`
+compartiendo IDF entre género/subgénero/tema/modo/característica), corregido
+por dos hallazgos: un subgénero raro podía pesar más que el género por pura
+rareza estadística, y una primera corrección (renormalizar las cinco familias
+juntas) premiaba a las obras con menos metadatos. Detalle completo, ejemplos
+numéricos y verificación con datos reales en
+[[2026-09-12 - fs-v13, pesos por familia de etiqueta y correccion del sesgo de metadatos ausentes]]
+y en `docs/methodology/recommendation-algorithms.md` §3.2/§3.3/§5.1-5.2.
+
 La similitud de tags/plataformas usa una afinidad F0,5 que prioriza precisión de
-la candidata. Franquicia y desarrollador solo confirman coincidencias ya
-presentes en el perfil. Ratings externos usan shrinkage bayesiano con `m = 25`,
+la candidata. Franquicia, desarrollador, tema, modo y característica solo
+confirman coincidencias ya presentes en el perfil. Ratings externos usan
+shrinkage bayesiano con `m = 25`,
 calidad cuadrática y confianza `n/(n+25)`. PopScore normaliza por snapshot y
 combina `Visits`, `Playing`, `Played` y `Want to Play` con pesos
 `0,40/0,25/0,25/0,10`. MMR se aplica después de la relevancia con
@@ -137,3 +153,15 @@ la cobertura colaborativa deja de ser suficiente o si una evaluación con datos
 reales justifica comparar modelos de mayor complejidad. La revisión debe
 actualizar simultáneamente este ADR, el documento metodológico, el protocolo y
 la nota enlazada del vault de Obsidian.
+
+**Revisión del 2026-09-13 (`fs-v13`):** aceptada por **Felipe** tras detectar,
+en sesión, que un subgénero raro podía pesar más que el género por rareza
+estadística, y que la primera corrección probada premiaba a las obras con
+menos metadatos. Género y subgénero se fusionan en una sola familia `tag`
+(peso `0,60`); tema/modo/característica pasan de competir dentro de `tag` a
+ser familias opcionales/bono como franquicia/desarrollador; solo `tag` y
+`platform` quedan como núcleo renormalizado. `protocol_version` avanza a
+`16`; las 190.479 obras gobernadas se rematerializaron bajo el nuevo
+contrato. Este ADR, `docs/methodology/recommendation-algorithms.md` y la nota
+del vault se actualizaron en la misma sesión, tal como exige el párrafo
+anterior.
