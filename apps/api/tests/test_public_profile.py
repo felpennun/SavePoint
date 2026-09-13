@@ -78,6 +78,7 @@ def test_owner_and_accepted_friend_receive_separate_authorized_projection(popula
         assert set(body) == {"alias", "bio", "avatar_url", "activity", "summary", "favorites", "comments", "lists"}
         assert body["activity"][0]["status"] == "playing"
         assert body["comments"][0]["text"] == "Public comment"
+        assert set(body["comments"][0]) == {"work_slug", "work_title", "text"}
         assert body["lists"][0]["name"] == "Public list"
 
     assert owner_body != friend_body or owner_body["alias"] == "profile-owner"

@@ -40,6 +40,7 @@ from library.serializers import (
     serialize_list,
     serialize_shared_comment,
 )
+from social.policies import ProfileAccess, resolve_profile_access
 
 VALID_STATUSES = {choice.value for choice in BacklogStatus}
 User = get_user_model()
