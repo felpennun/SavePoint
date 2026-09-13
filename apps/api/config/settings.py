@@ -124,6 +124,7 @@ AUTH_PASSWORD_VALIDATORS = [
 #   public_profile -- blunts unauthenticated alias enumeration (M-03)
 #   recommendations -- caps authenticated CPU/DB-heavy ranking runs
 #   popularity      -- caps the public aggregate ranking endpoint
+#   research        -- caps read-only publication-panel access
 # ScopedRateThrottle keys on the client IP. Behind the deployed
 # browser -> Vercel rewrite -> Render chain, REMOTE_ADDR is a single
 # upstream address, so per-IP scoping only works if NUM_PROXIES matches the
@@ -147,6 +148,7 @@ REST_FRAMEWORK = {
         "catalogue_search": "120/min",
         "social_search": "30/min",
         "social_mutation": "60/min",
+        "research": "60/min",
     },
     "NUM_PROXIES": int(_num_proxies_raw) if _num_proxies_raw.isdigit() else None,
 }
