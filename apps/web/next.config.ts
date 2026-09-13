@@ -68,6 +68,19 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     return [
+      // PORT-01/PORT-04 (Phase 5): the collection CSV export is the one
+      // Django URL in this project that deliberately has NO trailing slash
+      // -- library/urls.py's `export/collection.csv` reads as a literal
+      // downloadable filename, not a resource collection. It must be
+      // rewritten before the generic `/api/:path*` rule below, which always
+      // appends a trailing slash (see that rule's own comment); matched
+      // first here, this route keeps its exact slash-less path end to end
+      // instead of 404ing against a `.../collection.csv/` Django never
+      // registered.
+      {
+        source: "/api/library/export/collection.csv",
+        destination: `${API_PROXY_TARGET}/api/library/export/collection.csv`,
+      },
       { source: "/api/:path*", destination: `${API_PROXY_TARGET}/api/:path*/` },
       // Same-origin deployment evidence endpoint. The browser smoke never
       // needs (or learns) the API service's separate provider hostname.

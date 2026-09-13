@@ -267,7 +267,7 @@ export function CustomLists({
               <div className="sp-profile-list-card" key={list.id}>
                 <div className="sp-section-heading-row">
                   <h3 className="sp-library-title">{list.name}</h3>
-                  <button type="button" className="sp-copy-remove" onClick={() => deleteList(list.id)} disabled={busy}>
+                  <button type="button" className="sp-copy-remove sp-list-delete" onClick={() => deleteList(list.id)} disabled={busy}>
                     {busy ? copy.deleting : copy.delete}
                   </button>
                 </div>
@@ -284,7 +284,7 @@ export function CustomLists({
                         <span className="sp-list-item-actions">
                           <button
                             type="button"
-                            className="sp-copy-add"
+                            className="sp-copy-add sp-list-item-up"
                             aria-label={copy.moveUp}
                             onClick={() => reorder(list, index, -1)}
                             disabled={busy || index === 0}
@@ -293,7 +293,7 @@ export function CustomLists({
                           </button>
                           <button
                             type="button"
-                            className="sp-copy-add"
+                            className="sp-copy-add sp-list-item-down"
                             aria-label={copy.moveDown}
                             onClick={() => reorder(list, index, 1)}
                             disabled={busy || index === list.items.length - 1}
@@ -302,7 +302,7 @@ export function CustomLists({
                           </button>
                           <button
                             type="button"
-                            className="sp-copy-remove"
+                            className="sp-copy-remove sp-list-item-remove"
                             onClick={() => removeItem(list.id, item.id)}
                             disabled={busy}
                           >
@@ -332,7 +332,7 @@ export function CustomLists({
                     </select>
                     <button
                       type="button"
-                      className="sp-copy-add"
+                      className="sp-copy-add sp-list-item-add"
                       onClick={() => addItem(list.id)}
                       disabled={busy || !pickerByList[list.id]}
                     >

@@ -166,10 +166,10 @@ export function GameComments({
             </p>
             <p style={{ margin: 0 }}>{ownComment.text}</p>
             <div className="sp-filterbar-actions" style={{ marginLeft: 0, gap: "var(--space-sm)" }}>
-              <button type="button" className="sp-copy-add" onClick={() => setEditing(true)}>
+              <button type="button" className="sp-copy-add sp-comment-edit" onClick={() => setEditing(true)}>
                 {copy.edit}
               </button>
-              <button type="button" className="sp-copy-remove" onClick={deleteComment} disabled={saving}>
+              <button type="button" className="sp-copy-remove sp-comment-remove" onClick={deleteComment} disabled={saving}>
                 {saving ? copy.deleting : copy.delete}
               </button>
             </div>
@@ -207,7 +207,7 @@ export function GameComments({
               {ownComment ? (
                 <button
                   type="button"
-                  className="sp-copy-add"
+                  className="sp-copy-add sp-comment-cancel"
                   onClick={() => {
                     setEditing(false);
                     setText(ownComment.text);
