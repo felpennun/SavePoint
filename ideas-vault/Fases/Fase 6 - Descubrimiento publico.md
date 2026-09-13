@@ -59,6 +59,18 @@ y procedencia antes de modificar el importer. La investigación completa,
 incluidos los desajustes que deben reconciliarse en roadmap y requirements,
 está en [[../../.planning/phases/06-public-discovery-and-resilient-enrichment/06-RESEARCH]].
 
+## Frontera de privacidad backend - 2026-09-13
+
+`06-03` implementa la policy server-side `owner`/`accepted_friend`/`basic`/`hidden`.
+Los perfiles no-amigos reciben únicamente alias, avatar, biografía y acción
+contextual; colección, listas y comentarios requieren propietario o amistad
+aceptada. Las listas usan `owner alias + public_slug`, con slugs estables,
+unicidad por propietario y 404 genérico para URLs inexistentes, no autorizadas o
+bloqueadas. Las proyecciones compartidas omiten inventario, compras, precios,
+ubicaciones, notas e identificadores internos.
+
+Fuente canónica: [[../../.planning/phases/06-public-discovery-and-resilient-enrichment/06-03-PLAN]] y [[../../.planning/phases/06-public-discovery-and-resilient-enrichment/06-03-SUMMARY]].
+
 ## Enlaces
 
 - [[Allowlist de campos publicos]] · [[Perfil publico]] · [[Catalogo]]
