@@ -179,7 +179,10 @@ test.describe("demo account login journey (AUTH-01, D-02/D-03, LIB-01)", () => {
 
     // The rating control is five stars, each split into a left/right half
     // button; "3.5 de 5 estrellas" is the accessible name for half-step 7.
-    await page.getByRole("button", { name: "3.5 de 5 estrellas" }).click();
+    const ratingButton = page.getByRole("button", { name: "3.5 de 5 estrellas" });
+    if ((await ratingButton.getAttribute("aria-pressed")) !== "true") {
+      await ratingButton.click();
+    }
     // Adding a copy only touches local state -- both are persisted by the
     // same single save below, alongside the rating.
     await page.getByRole("button", { name: "Añadir otra copia" }).click();
