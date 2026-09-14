@@ -43,7 +43,7 @@ try {
     Invoke-Checked @("compose", "-f", $ComposeFile, "cp", $dumpPath, "db:$containerDump")
     Invoke-Checked @("compose", "-f", $ComposeFile, "exec", "-T", "db", "pg_restore", "--no-owner", "--no-privileges", "-U", "savepoint_test", "-d", $dbName, $containerDump)
     Invoke-Checked @("compose", "-f", $ComposeFile, "run", "--rm", "-e", "DATABASE_URL=", "-e", "POSTGRES_DB=$dbName", "api", "python", "manage.py", "migrate", "--noinput")
-    $countQuery = "SELECT 'users=' || count(*) FROM accounts_user UNION ALL SELECT 'works=' || count(*) FROM catalogue_gamework UNION ALL SELECT 'library_entries=' || count(*) FROM library_libraryentry UNION ALL SELECT 'owned_copies=' || count(*) FROM library_ownedcopy;"
+    $countQuery = "SELECT 'users=' || count(*) FROM auth_user UNION ALL SELECT 'works=' || count(*) FROM catalogue_gamework UNION ALL SELECT 'library_entries=' || count(*) FROM library_libraryentry UNION ALL SELECT 'owned_copies=' || count(*) FROM library_ownedcopy;"
     $countOutput = & docker compose -f $ComposeFile exec -T db psql -Atqc $countQuery -U savepoint_test -d $dbName
     if ($LASTEXITCODE -ne 0) { throw "Could not collect restored database counts." }
     $actualCounts = @{}

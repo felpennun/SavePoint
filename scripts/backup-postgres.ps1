@@ -66,7 +66,7 @@ $migrationFiles = @(Get-ChildItem (Join-Path $repoRoot "apps/api") -Recurse -Fil
 $migrationHashInput = ($migrationFiles | ForEach-Object { (Get-FileHash -Algorithm SHA256 -LiteralPath $_.FullName).Hash }) -join "`n"
 $migrationHash = if ($migrationHashInput) { $sha = [Security.Cryptography.SHA256]::Create(); try { ([BitConverter]::ToString($sha.ComputeHash([Text.Encoding]::UTF8.GetBytes($migrationHashInput))) -replace "-", "").ToLowerInvariant() } finally { $sha.Dispose() } } else { "" }
 $essentialCounts = [ordered]@{}
-$essentialTables = [ordered]@{ users = "accounts_user"; works = "catalogue_gamework"; library_entries = "library_libraryentry"; owned_copies = "library_ownedcopy" }
+$essentialTables = [ordered]@{ users = "auth_user"; works = "catalogue_gamework"; library_entries = "library_libraryentry"; owned_copies = "library_ownedcopy" }
 foreach ($table in $essentialTables.GetEnumerator()) {
     $existsQuery = "SELECT to_regclass('public.$($table.Value)');"
     if ($Native) { $exists = & psql -Atqc $existsQuery } else { $exists = & docker compose -f $ComposeFile exec -T db psql -Atqc $existsQuery -U savepoint_test -d savepoint_test }
