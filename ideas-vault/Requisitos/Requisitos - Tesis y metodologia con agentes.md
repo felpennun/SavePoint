@@ -21,6 +21,14 @@ tags: [requisitos, tema/metodologia]
 - [[Controles metodologicos AGENT-04]] · [[Separacion propuesta, verificacion y decision]]
 - [[ADR (concepto)]]
 
+## 2026-09-14: integración LaTeX condensada
+
+La memoria activa en `thesis/TFG.tex` carga capítulos condensados con el núcleo en
+`06_algoritmos.tex` y `07_experimentos_resultados.tex`. Estos documentos remiten a las
+matrices verificadas y mantienen la frontera v15/v16. Las tablas de resultados usan
+`tabularx` con ancho acotado; la comprobación visual final y cualquier captura no existente
+continúan pendientes de compilación en Prism y de confirmación del autor.
+
 ## 2026-09-14: inventario de la Fase A de la memoria
 
 La Fase B quedó bloqueada hasta superar el gate integral de la Fase A. El gate integral
