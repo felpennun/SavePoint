@@ -23,6 +23,7 @@ from catalogue.ratings import display_rating, savepoint_rating_stats
 from catalogue.serializers import _cover, _platform_summary
 from library import services
 from library.export import EXPORT_FILENAME, render_collection_csv
+from library.portability import apply_import, parse_import_csv
 from library.models import BacklogStatus, CustomList, CustomListItem, GameComment, LibraryEntry, OwnedCopy, StatusTransition
 from library.popularity import rank_popularity_v1
 from library.serializers import (
@@ -39,6 +40,7 @@ from library.serializers import (
     serialize_friend_list,
     serialize_list,
     serialize_shared_comment,
+    CollectionImportSerializer,
 )
 from social.policies import ProfileAccess, resolve_profile_access
 
@@ -387,6 +389,37 @@ class ExportCollectionView(APIView):
         response["Content-Disposition"] = f'attachment; filename="{EXPORT_FILENAME}"'
         response["Content-Length"] = str(len(content))
         return response
+
+
+class ImportCollectionPreviewView(APIView):
+    """POST /api/library/import/preview/ -- validate without writes."""
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request: Request) -> Response:
+        serializer = CollectionImportSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({"detail": "Invalid import upload.", "errors": serializer.errors}, status=400)
+        report = parse_import_csv(serializer.validated_data["file"].read(), user=request.user)
+        return Response(report.as_dict())
+
+
+class ImportCollectionApplyView(APIView):
+    """POST /api/library/import/apply/ -- digest-bound atomic import."""
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request: Request) -> Response:
+        serializer = CollectionImportSerializer(data=request.data)
+        if not serializer.is_valid() or not serializer.validated_data.get("preview_sha256"):
+            errors = serializer.errors or {"preview_sha256": ["This field is required."]}
+            return Response({"detail": "Invalid import apply request.", "errors": errors}, status=400)
+        report = parse_import_csv(serializer.validated_data["file"].read(), user=request.user)
+        if report.preview_sha256 != serializer.validated_data["preview_sha256"]:
+            return Response({"detail": "The upload does not match the preview digest."}, status=409)
+        if report.errors or report.conflicts:
+            return Response(report.as_dict(), status=400)
+        return Response(apply_import(report, user=request.user))
 
 
 class WorkCommentsView(APIView):

@@ -35,6 +35,15 @@ class RatingRequestSerializer(serializers.Serializer):
     rating_half_steps = serializers.IntegerField(min_value=1, max_value=10, allow_null=True)
 
 
+class CollectionImportSerializer(serializers.Serializer):
+    """Multipart CSV upload and optional preview digest for apply."""
+
+    file = serializers.FileField(allow_empty_file=False)
+    preview_sha256 = serializers.RegexField(
+        regex=r"^[a-f0-9]{64}$", required=False, allow_blank=False
+    )
+
+
 def _validate_currency(value: str | None) -> str | None:
     """Normalizes to uppercase and rejects anything but exactly three
     letters (INV-03). Shared by every serializer that accepts a currency so
