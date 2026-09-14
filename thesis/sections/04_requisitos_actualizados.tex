@@ -5,3 +5,18 @@ Los actores son visitante, usuario autenticado, propietario de colección, amist
 Las reglas críticas sitúan la autoridad de permisos en backend: listas y colecciones compartidas solo alcanzan amistades aceptadas; una ruta alternativa no puede exponer contenido privado; rechazar o eliminar una amistad no equivale a bloquear; el bloqueo impide interacción y oculta la relación; la recomendación social se limita a una por semana. Los snapshots de investigación son inmutables, Research Viewer y Platform Admin son capacidades distintas y la interfaz no recalcula resultados científicos.
 
 Los requisitos no funcionales incluyen reproducibilidad, accesibilidad, diseño responsive, privacidad, seguridad, procedencia, trazabilidad, integridad, disponibilidad, portabilidad, mantenibilidad, auditabilidad y rendimiento. La cadena completa de requisitos y casos de uso se mantiene en \texttt{REQUIREMENTS-TRACEABILITY.md}; los flujos extensos y el diagrama permanecen \todo{PENDIENTE: confirmar con el autor} cuando no existe captura o diagrama verificable.
+
+La Tabla~\ref{tab:trazabilidad-resumida} resume tres cadenas representativas. La matriz documental conserva el detalle de identificadores, planes y localizadores para no convertir esta tabla de lectura en una fuente paralela.
+
+\begin{table}[htbp]
+\centering
+\caption{Trazabilidad resumida de requisitos de SavePoint.}\label{tab:trazabilidad-resumida}
+\tablecompact
+\begin{tabularx}{\textwidth}{@{}>{\ttfamily\raggedright\arraybackslash}p{0.15\textwidth}YYY@{}}
+\textnormal{Requisito} & \textnormal{Caso de uso} & \textnormal{Implementación y test} & \textnormal{Evidencia} \\
+\hline
+Privacidad de perfil & Consultar perfil compartido & cuentas, biblioteca y permisos de backend & signoff y auditoría de seguridad de Fase 7 \\
+Recomendación offline & Ejecutar comparación & \texttt{evaluation/}, \texttt{recommendations/} y pruebas de runner & manifiesto y resultados v15 \\
+Recuperación operativa & Restaurar copia & scripts e infraestructura versionados & \texttt{backup-recovery.md} \\
+\end{tabularx}
+\end{table}
