@@ -85,18 +85,18 @@
 
 ### Administration, Privacy, and Security
 
-- [ ] **ADMIN-01**: Authorised administrator can manage demo users and catalogue data.
-- [ ] **ADMIN-02**: Authorised administrator can supervise imports, jobs, and experiments without directly editing the database.
+- [x] **ADMIN-01**: Authorised administrator can manage demo users and catalogue data.
+- [x] **ADMIN-02**: Authorised administrator can supervise imports, jobs, and experiments without directly editing the database.
 - [x] **SEC-01**: Server validates every permission and tests access by role and ownership.
 - [x] **SEC-02**: No secret or API key is present in Git, browser bundles, logs, public images, or public artifacts.
 - [x] **SEC-03**: Database access uses an ORM or parameterised queries and is tested against SQL injection.
 - [x] **SEC-04**: Inputs and outputs are validated and protected against XSS, CSRF, and malicious content.
 - [x] **SEC-05**: External URLs and requests are constrained against SSRF, unsafe redirects, and URL manipulation.
 - [x] **SEC-06**: Application applies rate limits, secure headers, and non-sensitive production error handling.
-- [ ] **SEC-07**: Delivery pipeline scans secrets, vulnerable dependencies, and insecure code.
-- [ ] **SEC-08**: Sensitive actions create audit events without recording credentials or secrets.
+- [x] **SEC-07**: Delivery pipeline scans secrets, vulnerable dependencies, and insecure code.
+- [x] **SEC-08**: Sensitive actions create audit events without recording credentials or secrets.
 - [x] **PRIV-01**: Public projections use an explicit allowlist of fields.
-- [ ] **PRIV-02**: A controlled account can be deleted or anonymised.
+- [x] **PRIV-02**: A controlled account can be deleted or anonymised.
 
 ### Operations, Quality, and Delivery
 
@@ -104,7 +104,7 @@
 - [x] **OPS-02**: Project can be run locally through a reproducible documented process.
 - [x] **OPS-03**: A lawful offline demo mode works without the external API or Internet access.
 - [ ] **OPS-04**: PostgreSQL and experimental artifacts have tested backup and recovery procedures.
-- [ ] **OPS-05**: System emits structured logs and observable job states without sensitive data.
+- [x] **OPS-05**: System emits structured logs and observable job states without sensitive data.
 - [x] **QUAL-01**: Project has unit, integration, and browser tests for critical workflows.
 - [ ] **QUAL-02**: A clean installation can reproduce experiments and their evidence.
 - [x] **QUAL-03**: Core workflows are responsive and verifiable against WCAG 2.2 AA.
@@ -243,18 +243,18 @@ system.
 | SOCIAL-05 | Phase 6 | Complete |
 | EVAL-13 | Phase 7 | Complete |
 | EVAL-14 | Phase 7 | Complete |
-| ADMIN-01 | Phase 7 | Pending |
-| ADMIN-02 | Phase 7 | Pending |
+| ADMIN-01 | Phase 7 | Complete |
+| ADMIN-02 | Phase 7 | Complete |
 | SEC-01 | Phase 7 | Complete |
 | SEC-03 | Phase 7 | Complete |
 | SEC-04 | Phase 7 | Complete |
 | SEC-05 | Phase 7 | Complete |
 | SEC-06 | Phase 7 | Complete |
-| SEC-07 | Phase 7 | Pending |
-| SEC-08 | Phase 7 | Pending |
-| PRIV-02 | Phase 7 | Pending |
+| SEC-07 | Phase 7 | Complete |
+| SEC-08 | Phase 7 | Complete |
+| PRIV-02 | Phase 7 | Complete |
 | OPS-04 | Phase 7 | Pending |
-| OPS-05 | Phase 7 | Pending |
+| OPS-05 | Phase 7 | Complete |
 | QUAL-01 | Phase 7 | Complete |
 | QUAL-04 | Phase 7 | Pending |
 | DOC-05 | Phase 7 | Pending |

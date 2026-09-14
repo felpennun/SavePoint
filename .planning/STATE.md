@@ -3,22 +3,22 @@ gsd_state_version: 1.0
 current_phase: 07
 current_phase_name: Research Panel, Hardening, and Evidence Freeze
 status: in_progress
-stopped_at: Completed 07-00-PLAN.md
-last_updated: "2026-09-13T23:59:44.141Z"
-last_activity: 2026-09-13
-last_activity_desc: Phase 06 complete, transitioned to Phase 7
-state_head: 27c1c59ef22d907f94e4f1f0808dc84fdf1204f4
+stopped_at: Completed 07-02-PLAN.md
+last_updated: "2026-09-14T00:37:40.648Z"
+last_activity: 2026-09-14
+last_activity_desc: Phase 07 Plan 02 complete
+state_head: e2837afb54d9b3fe33da8bcdbbe58506cde7c34f
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 66
-  completed_plans: 62
+  completed_plans: 63
   percent: 38
 total_plans_in_phase: 6
 next_phase: 07
 next_phase_name: Research Panel, Hardening, and Evidence Freeze
-next_action: Ejecutar 07-01-PLAN.md
-current_plan: 01
+next_action: Ejecutar 07-03-PLAN.md
+current_plan: 03
 ---
 
 # Project State
@@ -36,9 +36,9 @@ rule that applies to every LLM and collaborator).
 ## Current Position
 
 **Phase:** 07 (Research Panel, Hardening, and Evidence Freeze) — IN PROGRESS
-**Plan:** 2 of 6
+**Plan:** 3 of 6
 **Plans in Phase:** 6
-**Status:** In progress; 07-00 complete
+**Status:** In progress; 07-00, 07-01 y 07-02 complete
 
 ### Snapshot de ejecucion vigente (2026-09-07)
 
@@ -135,6 +135,7 @@ Progreso global: 2/8 fases (25%).
 | Phase 06 P09 | 30m | 3 tasks | 6 files |
 | Phase 07 P00 | 18 min | 3 tasks | 4 files |
 | Phase 07 P01 | 26 min | 3 tasks | 12 files |
+| Phase 07 P02 | 35min | 3 tasks | 32 files |
 
 ## Accumulated Context
 
@@ -191,6 +192,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 07]: Research Viewer se resuelve en cada endpoint con evaluation.view_research_panel mediante has_perm; Platform Admin conserva una capability separada.
 - [Phase 07]: La API consume únicamente la publicación v15 inmutable y sus exportaciones saneadas; no recalcula rankings ni expone per_user, logs, dumps o secretos.
 - [Phase 07]: El parámetro export format queda bajo la allowlist de Django y URL_FORMAT_OVERRIDE de DRF permanece desactivado para evitar negociación no controlada.
+- [Phase 07]: [Phase 07 Plan 02]: Platform Admin usa exclusivamente evaluation.access_platform_admin; no se autoriza por is_staff, auth.change_user, cookies, nombres o frontend.
+- [Phase 07]: [Phase 07 Plan 02]: La privacidad normal es desactivar y anonimizar; el borrado irreversible exige superusuario, confirmación exacta y auditoría previa.
+- [Phase 07]: [Phase 07 Plan 02]: AuditEvent es allowlisted y append-only mediante trigger PostgreSQL, sin payload libre ni PII.
 
 ### Pending Todos
 
@@ -266,11 +270,11 @@ Ver `.planning/quick/260909-nej-a-adir-cuatro-variantes-popscore-con-imp/`.
 
 ## Registro histórico de sesiones (prevalece el checkpoint de ejecución actual)
 
-**Stopped at:** Completed 07-01-PLAN.md
+**Stopped at:** Completed 07-02-PLAN.md
 
 **Resume (after the rate-limit reset):** `/gsd-plan-phase 2` re-spawns the planner from scratch. All inputs are committed: `02-CONTEXT.md`, `02-UI-SPEC.md` (verified 7/7), `02-RESEARCH.md`, `02-VALIDATION.md`, `02-PATTERNS.md`, `02-COVERAGE.md`. Then `gsd-plan-checker` → revision loop → present → `/gsd-execute-phase 2`. Full detail in `.planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/.continue-here.md`.
 
-Last session: 2026-09-13T23:59:43.130Z
+Last session: 2026-09-14T00:37:39.768Z
 
 ### Done this session (2026-09-06, all committed on `main`)
 
