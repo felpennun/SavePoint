@@ -211,7 +211,7 @@ function Test-RecommendationSemantics {
     Assert-ContainsAll $algorithmText @("evaluation-400-test-2026-09-12-v15", "feature set", "v16", "K=5", "K=10", "K=20", "población sintética", "79", "único run publicado") "Algorithm matrix"
     Assert-ContainsAll $signalText @("v15", "v16", "no se atribuyen a los resultados v15") "Signal matrix temporal boundary"
     Assert-ContainsAll $evidenceText @("La evaluación publicada v15 usa población sintética", "Existe una única ejecución publicada", "No representa usuarios reales ni permite generalización automática", "No atribuir resultados v15 a fórmulas o pesos posteriores") "Evidence limitations"
-    $algorithmIds = @([regex]::Matches($algorithmText, '(?m)^\\| `([^`]+-v1)` \\|') | ForEach-Object { $_.Groups[1].Value })
+    $algorithmIds = @([regex]::Matches($algorithmText, '(?m)^\|\s*`([^`]+-v1)`\s*\|') | ForEach-Object { $_.Groups[1].Value })
     Assert-Condition ($algorithmIds.Count -eq 16) "Algorithm matrix must reconcile exactly 16 published v15 algorithm identifiers."
     Assert-Condition (($algorithmIds | Sort-Object -Unique).Count -eq $algorithmIds.Count) "Algorithm matrix contains duplicate v15 algorithm identifiers."
 }
