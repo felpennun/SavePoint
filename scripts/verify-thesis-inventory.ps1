@@ -179,7 +179,7 @@ function Get-MatrixText {
 function Assert-ContainsAll {
     param([string]$Text, [string[]]$Tokens, [string]$Context)
     foreach ($token in $Tokens) {
-        Assert-Condition ($Text.Contains($token)) "$Context is missing required token: $token"
+        Assert-Condition ($Text.IndexOf($token, [StringComparison]::OrdinalIgnoreCase) -ge 0) "$Context is missing required token: $token"
     }
 }
 
