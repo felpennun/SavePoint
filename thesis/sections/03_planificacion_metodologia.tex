@@ -1,4 +1,4 @@
-\chapter{Planificación y metodología de trabajo}\label{cap:metodologia}
+﻿\chapter{Planificación y metodología de trabajo}\label{cap:metodologia}
 
 Este capítulo describe cómo se ha organizado el trabajo. Empieza por los objetivos de
 gestión y por el método de desarrollo iterativo. Después detalla la metodología de ingeniería
@@ -12,7 +12,7 @@ commits y de idioma.
 La gestión del proyecto persigue cuatro objetivos. El primero es entregar valor de forma
 incremental, con cada incremento vertical utilizable y verificado, en lugar de una
 integración final de riesgo. El segundo es que toda afirmación de la memoria tenga respaldo:
-una decisión registrada, una verificación independiente o una firma del autor. El tercero es
+una decisión registrada, una verificación independiente o una firma de aceptación. El tercero es
 mantener el alcance bajo control a lo largo de sucesivos incrementos, sin que el trabajo de
 uno contamine el de otro. El cuarto es que el proceso de ingeniería quede documentado con el
 mismo rigor que el producto, de modo que un tercero pueda reconstruir no solo el sistema,
@@ -45,7 +45,7 @@ implementa ese plan, confirma los cambios en el control de versiones y registra 
 lo realmente hecho y las desviaciones. Por último, la verificación comprueba, de forma
 independiente, que el objetivo se ha alcanzado. Una revisión de código somete después los
 cambios a un análisis de seguridad, rendimiento y corrección con un contexto distinto del que
-los escribió. Cada incremento termina con una firma de aceptación del autor.
+los escribió. Cada incremento termina con una firma de aceptación del proyecto.
 
 Las órdenes de este flujo se usaron de verdad durante el proyecto: \texttt{discuss-phase},
 \texttt{ui-phase}, \texttt{plan-phase}, \texttt{execute-phase}, \texttt{verify-work},
@@ -172,7 +172,7 @@ biblioteca, ratings y estados se conservan en el informe de verificación del re
 
 \subsection{Ratificaciones, incidencias y límites}
 
-El autor ratificó la lista de plataformas, la incorporación acotada de RAWG, el protocolo
+Se ratificó la lista de plataformas, la incorporación acotada de RAWG, el protocolo
 propuesto y la implementación del primer modelo de features con Python puro. RAWG se ejecutó
 en 18 lotes de 500 peticiones para limitar el coste de un reinicio y mantener la idempotencia.
 Se emparejaron 8.575 de 10.000 obras, pero la cobertura combinada siguió siendo 27.014 de
@@ -182,7 +182,7 @@ adicional en ese corte.
 
 El importador actual no tiene cobertura suficiente de franquicias ni desarrolladores. El
 vector de contenido los excluye mediante un gate de cobertura en lugar de imputarlos. La
-mezcla de rating mostrada en la ficha también quedó señalada para confirmación del autor y
+mezcla de rating mostrada en la ficha también quedó señalada para confirmación del proyecto y
 no debe confundirse con el término de rating del laboratorio, que procede del snapshot
 inmutable.
 
@@ -192,7 +192,7 @@ El proyecto se desarrolló con asistencia sistemática de agentes de inteligenci
 Conviene delimitar desde el principio el reparto de responsabilidades, que la
 Sección~\ref{sec:met-encuadre} retoma: los agentes ejecutan, mientras que la definición del
 alcance, los criterios de aceptación, la revisión de cada entrega y la decisión final son
-del autor. El uso de agentes se describe aquí como una metodología de trabajo que el autor
+del proyecto. El uso de agentes se describe aquí como una metodología de trabajo que se
 diseñó, dirigió y evaluó, no como una coautoría.
 
 \subsection{El problema que resuelve el enfoque}\label{sec:met-context-rot}
@@ -270,7 +270,7 @@ textuales conservan su idioma original para no perder valor probatorio.
 \subsection{Memoria persistente y reglas derivadas}\label{sec:met-memoria}
 
 Los ficheros de memoria del agente sobreviven entre sesiones. Cuando un error del agente o
-una corrección del autor tiene valor general, se destila en una regla que se relee al iniciar
+una corrección del proyecto tiene valor general, se destila en una regla que se relee al iniciar
 cada tarea, de modo que el fallo no se repite. El proyecto acumuló varias reglas de este
 tipo a partir de incidencias reales:
 
@@ -339,7 +339,7 @@ individual. Los agentes cometieron errores que hubo que detectar y corregir, alg
 recogidos en la Sección~\ref{sec:met-memoria}. Las revisiones de código encontraron defectos
 de seguridad reales en trabajo ya dado por bueno. Un agente no es un evaluador independiente
 de su propia propuesta, del mismo modo que un hash prueba identidad de bytes, no veracidad ni
-calidad. Por último, el enfoque no sustituye el juicio del autor sobre arquitectura, alcance
+calidad. Por último, el enfoque no sustituye el juicio del proyecto sobre arquitectura, alcance
 y aceptación, sino que lo enmarca. Existe un informe de uso de inteligencia artificial
 independiente y posterior que cubre la transparencia de la herramienta; esta memoria ni lo
 suple ni lo contradice.
@@ -371,9 +371,9 @@ reducido, una cuenta y la recomendación por popularidad. Los incrementos siguie
 ampliaron el catálogo a escala real, rediseñaron la interfaz con criterio de producto,
 añadieron la ordenación y el filtrado, las cuentas simuladas de demostración y la página de
 recomendaciones por géneros. Cada incremento se cerró con una verificación de objetivo
-independiente y una firma de aceptación del autor.
+independiente y una firma de aceptación del proyecto.
 
-\todo[inline]{Añadir un diagrama de Gantt o una línea de tiempo con las fechas reales de inicio y fin de cada bloque de entrega cuando el autor consolide el registro temporal.}
+\todo[inline]{Añadir un diagrama de Gantt o una línea de tiempo con las fechas reales de inicio y fin de cada bloque de entrega cuando se consolide el registro temporal.}
 % PENDIENTE: cronograma detallado (figures/cronograma.pdf) con fechas reales.
 
 \section{Estimación de esfuerzo y presupuesto}\label{sec:met-presupuesto}
@@ -409,7 +409,7 @@ Las cifras son una estimación, no una medición.
 \label{tab:presupuesto}
 \end{table}
 
-\todo[inline]{El autor debe consolidar el registro temporal (horas por bloque) y documentar una tarifa de referencia vigente para completar la Tabla \ref{tab:presupuesto}.}
+\todo[inline]{Se debe consolidar el registro temporal (horas por bloque) y documentar una tarifa de referencia vigente para completar la Tabla \ref{tab:presupuesto}.}
 % PENDIENTE: rellenar horas y coste reales en la Tabla \ref{tab:presupuesto}.
 
 \section{Riesgos y mitigaciones}\label{sec:met-riesgos}
@@ -435,7 +435,7 @@ mantienen bajo vigilancia.
     \hline
     Errores del agente en trabajo dado por bueno & Verificación de objetivos independiente y revisión de código de todo el repositorio con contexto propio. \\
     \hline
-    Despliegue no conectado a datos reales & Decisión registrada del autor de posponer esa conexión al final del proyecto; el entorno local reproducible es la vía de demostración. \\
+    Despliegue no conectado a datos reales & Decisión registrada del proyecto de posponer esa conexión al final del proyecto; el entorno local reproducible es la vía de demostración. \\
     \hline
 \end{tabularx}
 \caption{Riesgos identificados y sus mitigaciones.}

@@ -1,4 +1,4 @@
-\chapter{Despliegue}\label{cap:despliegue}
+﻿\chapter{Despliegue}\label{cap:despliegue}
 
 Este capítulo describe cómo se despliega SavePoint en internet, qué relación guarda ese
 despliegue con el entorno local reproducible y en qué estado se encuentra.
@@ -62,12 +62,12 @@ El rediseño de la interfaz y el catálogo a escala real no están en el desplie
 Todo ese trabajo está integrado en la rama principal y se ejecuta en el entorno local de
 Docker Compose. El frontend rediseñado llegó a construirse en Vercel, pero la base de datos
 desplegada todavía contiene solo el corpus curado, de modo que la vista de catálogo da error
-contra ese despliegue. El autor revisó esta situación y decidió dejar el despliegue público
+contra ese despliegue. Se revisó esta situación y decidió dejar el despliegue público
 actual como está por ahora. La demostración ante el tribunal se ejecuta desde el entorno
 local reproducible. Conectar el despliegue a datos reales de internet, es decir, cargar el
 catálogo de IGDB en una base de datos desplegada, aplicar las migraciones nuevas y ajustar
 la configuración de hosts y de proxies, queda pospuesto al final del proyecto. Es una
-decisión registrada del autor, no un defecto pendiente.
+decisión registrada del proyecto, no un defecto pendiente.
 
 Este capítulo ha descrito el despliegue y su estado. El capítulo final valora el grado de
 cumplimiento de los objetivos y detalla el trabajo futuro.
