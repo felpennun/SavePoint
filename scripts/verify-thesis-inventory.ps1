@@ -229,7 +229,7 @@ function Test-TraceabilitySemantics {
 function Test-FigureSemantics {
     $text = Get-MatrixText "thesis/FIGURE-PLAN.md"
     Assert-ContainsAll $text @("caption", "label", "cita previa", "F-01", "F-15", "C-01", "C-11", "Desktop y mobile") "Figure plan"
-    $rows = @($text -split "`n" | Where-Object { $_ -match '^\\| (?:F|C)-\\d+ \\|' })
+    $rows = @($text -split "`n" | Where-Object { $_ -match '^\| (?:F|C)-\d+ \|' })
     Assert-Condition ($rows.Count -eq 26) "Figure plan must contain exactly 26 planned figures and captures."
     $labels = @()
     foreach ($row in $rows) {
@@ -240,10 +240,10 @@ function Test-FigureSemantics {
     }
     Assert-Condition (($labels | Sort-Object -Unique).Count -eq $labels.Count) "Figure plan contains duplicate labels."
     foreach ($capture in @("C-01", "C-02", "C-03", "C-04", "C-05", "C-06", "C-07", "C-08", "C-09", "C-10")) {
-        $row = @($rows | Where-Object { $_ -match "^\\| $capture \\|" })
+        $row = @($rows | Where-Object { $_ -match "^\| $capture \|" })
         Assert-Condition ($row.Count -eq 1 -and $row[0].Contains("Desktop y mobile")) "Capture $capture must declare desktop and mobile variants."
     }
-    $admin = @($rows | Where-Object { $_ -match '^\\| C-11 \\|' })
+    $admin = @($rows | Where-Object { $_ -match '^\| C-11 \|' })
     Assert-Condition ($admin.Count -eq 1 -and $admin[0].Contains("Desktop")) "Administrative capture must declare its desktop variant."
 }
 
