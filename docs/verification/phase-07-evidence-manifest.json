@@ -7241,7 +7241,7 @@
                           {
                               "path":  "infra/compose.yaml",
                               "role":  "local_runtime_declaration",
-                              "sha256":  "3c2a633c9bd3319fde3d14792d006c567f2090f1d0093aa9aaaa0750e889e9e8"
+                              "sha256":  "ebec0e6e7d547a0f4421db7dee76c4249fd970aea4704aa26f3a59a833f7a5b3"
                           },
                           {
                               "path":  "docs/verification/phase-07-evidence-contract.md",

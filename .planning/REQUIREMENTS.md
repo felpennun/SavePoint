@@ -117,14 +117,14 @@
 - [x] **DOC-02**: Dataset, API, data model, and normalisation processes are documented.
 - [x] **DOC-03**: Each algorithm documents its theory, formulation, parameters, and limitations.
 - [x] **DOC-04**: Experimental protocol, metrics, results, and threats to validity are documented.
-- [ ] **DOC-05**: Thesis tables and figures are generated from immutable experiment artifacts.
-- [ ] **DOC-06**: Future example theses, formatting rules, and lecturer annotations are registered as canonical project references.
+- [x] **DOC-05**: Thesis tables and figures are generated from immutable experiment artifacts.
+- [x] **DOC-06**: Future example theses, formatting rules, and lecturer annotations are registered as canonical project references.
 - [x] **AGENT-01**: Project records the roles and responsibilities of agents used.
 - [x] **AGENT-02**: Project retains relevant protocols or prompts, configuration, models, tools, and generated artifacts.
 - [x] **AGENT-03**: Evidence distinguishes agent proposals, automated verification, and author decisions.
 - [x] **AGENT-04**: Methodology documents controls against hallucination, bias, error, and information exposure.
-- [ ] **AGENT-05**: Methodology analyses reproducibility, costs, limitations, and threats to validity of agent-assisted work.
-- [ ] **AGENT-06**: AI use is disclosed according to future university rules and lecturer guidance.
+- [x] **AGENT-05**: Methodology analyses reproducibility, costs, limitations, and threats to validity of agent-assisted work.
+- [x] **AGENT-06**: AI use is disclosed according to future university rules and lecturer guidance.
 
 ## v2 Requirements
 
@@ -253,14 +253,14 @@ system.
 | SEC-07 | Phase 7 | Complete |
 | SEC-08 | Phase 7 | Complete |
 | PRIV-02 | Phase 7 | Complete |
-| OPS-04 | Phase 7 | Pending |
+| OPS-04 | Phase 7 | Complete |
 | OPS-05 | Phase 7 | Complete |
 | QUAL-01 | Phase 7 | Complete |
 | QUAL-04 | Phase 7 | Complete |
-| DOC-05 | Phase 7 | Pending |
-| DOC-06 | Phase 7 | Pending |
-| AGENT-05 | Phase 7 | Pending |
-| AGENT-06 | Phase 7 | Pending |
+| DOC-05 | Phase 7 | Complete |
+| DOC-06 | Phase 7 | Complete |
+| AGENT-05 | Phase 7 | Complete |
+| AGENT-06 | Phase 7 | Complete |
 
 **Coverage:**
 

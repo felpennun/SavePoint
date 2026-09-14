@@ -68,6 +68,11 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     return [
+      // Django Platform Admin is intentionally allowlisted as a same-origin
+      // browser boundary; it must bypass locale middleware and reach Django
+      // with the session cookie intact.
+      { source: "/admin/", destination: `${API_PROXY_TARGET}/admin/` },
+      { source: "/admin/:path*", destination: `${API_PROXY_TARGET}/admin/:path*/` },
       // PORT-01/PORT-04 (Phase 5): the collection CSV export is the one
       // Django URL in this project that deliberately has NO trailing slash
       // -- library/urls.py's `export/collection.csv` reads as a literal

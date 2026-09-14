@@ -13,6 +13,7 @@ from accounts.models import AccountProfile, FavoriteSlot, ProfileVisibility
 from catalogue.models import GameWork
 from library import services
 from library.models import CustomList, CustomListItem, GameComment, LibraryEntry
+from social.models import Friendship, RelationshipPair
 
 User = get_user_model()
 
@@ -70,13 +71,19 @@ def user_b(db):  # noqa: ANN001
     return User.objects.create_user(username="profile-user-b", password="Profile-User-B-Pass-9!", email="b@example.invalid")
 
 
+def _make_friends(user_a, user_b) -> None:  # noqa: ANN001
+    low_user, high_user = sorted((user_a, user_b), key=lambda user: user.pk)
+    pair = RelationshipPair.objects.create(low_user=low_user, high_user=high_user)
+    Friendship.objects.create(pair=pair)
+
+
 @pytest.mark.django_db
 def test_authorized_profile_returns_alias_activity_and_summary(work, user_a) -> None:  # noqa: ANN001
     entry = LibraryEntry.objects.create(user=user_a, work=work, current_status="playing")
     services.set_rating(user=user_a, work=work, rating_half_steps=9)  # rating must never leak (INV-05)
     entry.refresh_from_db()
 
-    client = APIClient()
+    client = _client_for(user_a)
     response = client.get(f"/api/accounts/profiles/{user_a.username}/")
     assert response.status_code == 200
     body = response.json()
@@ -95,7 +102,7 @@ def test_nonexistent_and_inactive_aliases_return_identical_404(user_a) -> None: 
     inactive_user.is_active = False
     inactive_user.save(update_fields=["is_active"])
 
-    client = APIClient()
+    client = _client_for(user_a)
     missing_response = client.get("/api/accounts/profiles/does-not-exist/")
     inactive_response = client.get(f"/api/accounts/profiles/{inactive_user.username}/")
 
@@ -119,12 +126,12 @@ def test_user_a_public_profile_never_reveals_user_b_data(work, user_a, user_b) -
     LibraryEntry.objects.create(user=user_a, work=work, current_status="playing")
     LibraryEntry.objects.create(user=user_b, work=work, current_status="abandoned")
 
-    client = APIClient()
+    client = _client_for(user_a)
     profile_a = client.get(f"/api/accounts/profiles/{user_a.username}/").json()
     profile_b = client.get(f"/api/accounts/profiles/{user_b.username}/").json()
 
     assert profile_a["activity"][0]["status"] == "playing"
-    assert profile_b["activity"][0]["status"] == "abandoned"
+    assert "activity" not in profile_b
     assert profile_a["alias"] != profile_b["alias"]
 
 
@@ -160,7 +167,7 @@ def test_hostile_game_title_returned_as_inert_text(user_a) -> None:  # noqa: ANN
     )
     LibraryEntry.objects.create(user=user_a, work=hostile_work, current_status="pending")
 
-    client = APIClient()
+    client = _client_for(user_a)
     response = client.get(f"/api/accounts/profiles/{user_a.username}/")
     activity = response.json()["activity"]
     assert activity[0]["work_title"] == hostile_title
@@ -197,8 +204,14 @@ def test_privacy_combination_is_enforced_for_anonymous_and_user_b(  # noqa: ANN2
         favorites_visibility=favorites_visibility,
     )
     FavoriteSlot.objects.create(user=user_a, slot=1, work=work)
+    _make_friends(user_a, user_b)
 
-    for viewer_client in (APIClient(), _client_for(user_b)):
+    anonymous_response = APIClient().get(f"/api/accounts/profiles/{user_a.username}/")
+    assert anonymous_response.status_code == 200
+    assert "activity" not in anonymous_response.json()
+    assert "favorites" not in anonymous_response.json()
+
+    for viewer_client in (_client_for(user_b),):
         response = viewer_client.get(f"/api/accounts/profiles/{user_a.username}/")
         assert response.status_code == 200
         body = response.json()
@@ -245,7 +258,7 @@ def test_default_profile_without_explicit_settings_is_public(work, user_a) -> No
     LibraryEntry.objects.create(user=user_a, work=work, current_status="playing")
     FavoriteSlot.objects.create(user=user_a, slot=1, work=work)
 
-    client = APIClient()
+    client = _client_for(user_a)
     response = client.get(f"/api/accounts/profiles/{user_a.username}/")
     body = response.json()
     assert body["activity"] != []
@@ -266,10 +279,11 @@ def test_public_profile_includes_only_public_comments_for_third_parties(work, us
     LibraryEntry.objects.create(user=user_a, work=private_work, current_status="playing")
     GameComment.objects.create(user=user_a, work=private_work, text="Private thoughts.", visibility="private")
 
-    for viewer_client in (APIClient(), _client_for(user_b)):
-        response = viewer_client.get(f"/api/accounts/profiles/{user_a.username}/")
-        texts = {c["text"] for c in response.json()["comments"]}
-        assert texts == {"Public thoughts."}
+    _make_friends(user_a, user_b)
+    response = _client_for(user_b).get(f"/api/accounts/profiles/{user_a.username}/")
+    texts = {c["text"] for c in response.json()["comments"]}
+    assert texts == {"Public thoughts."}
+    assert "comments" not in APIClient().get(f"/api/accounts/profiles/{user_a.username}/").json()
 
 
 @pytest.mark.django_db
@@ -291,10 +305,11 @@ def test_public_profile_includes_only_public_lists_for_third_parties(work, user_
     private_list = CustomList.objects.create(user=user_a, name="Private List", visibility="private")
     CustomListItem.objects.create(list=private_list, work=work, position=1)
 
-    for viewer_client in (APIClient(), _client_for(user_b)):
-        response = viewer_client.get(f"/api/accounts/profiles/{user_a.username}/")
-        names = {lst["name"] for lst in response.json()["lists"]}
-        assert names == {"Public List"}
+    _make_friends(user_a, user_b)
+    response = _client_for(user_b).get(f"/api/accounts/profiles/{user_a.username}/")
+    names = {lst["name"] for lst in response.json()["lists"]}
+    assert names == {"Public List"}
+    assert "lists" not in APIClient().get(f"/api/accounts/profiles/{user_a.username}/").json()
 
 
 @pytest.mark.django_db
@@ -316,6 +331,6 @@ def test_public_list_projection_has_no_forbidden_keys(work, user_a) -> None:  # 
     CustomListItem.objects.create(list=custom_list, work=work, position=1)
     GameComment.objects.create(user=user_a, work=work, text="Some text.", visibility="public")
 
-    client = APIClient()
+    client = _client_for(user_a)
     response = client.get(f"/api/accounts/profiles/{user_a.username}/")
     _assert_no_forbidden_keys(response.json())

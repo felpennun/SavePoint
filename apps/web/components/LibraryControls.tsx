@@ -478,7 +478,7 @@ export function LibraryControls({
         <button type="button" className="sp-btn-primary" onClick={saveConfiguration} disabled={saving}>
           {saving ? copy.saving : copy.save}
         </button>
-        {feedback ? <p role="status" data-testid="configuration-feedback">{feedback}</p> : null}
+        {feedback ? <p role="status" data-testid="status-feedback">{feedback}</p> : null}
       </div>
     </section>
   );

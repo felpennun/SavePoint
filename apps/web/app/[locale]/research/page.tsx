@@ -7,6 +7,7 @@ import {
   fetchResearchArtifacts,
   fetchResearchComparison,
   fetchResearchRuns,
+  fetchAccountMe,
   type ResearchComparison,
   type ResearchQueryFilters,
 } from "@/lib/api";
@@ -48,6 +49,13 @@ export default async function ResearchPage({
   const cookieStore = await cookies();
   const cookieHeader = cookieStore.toString();
   if (!cookieStore.has("sessionid")) redirect(`/${locale}/login?next=/${locale}/research`);
+
+  // The API remains the final authority, but the SSR route must also gate the
+  // page before rendering any research data. This keeps a session cookie (or
+  // an accidental staff flag) from becoming a capability grant and makes the
+  // denied and unknown resource paths indistinguishable in the browser.
+  const account = await fetchAccountMe(cookieHeader);
+  if (account?.capabilities?.can_view_research !== true) notFound();
 
   handleResearchResponse(await fetchResearchRuns(cookieHeader), locale);
   const comparison = handleResearchResponse<ResearchComparison>(

@@ -264,7 +264,9 @@ services:
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/es', r => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))"]
       interval: 3s
-      timeout: 3s
+      # The catalogue landing page performs server-side data loading before
+      # returning; keep the probe longer than the observed local cold response.
+      timeout: 20s
       retries: 60
       start_period: 60s
     volumes:

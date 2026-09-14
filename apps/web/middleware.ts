@@ -72,5 +72,5 @@ export const config = {
   // marker), but that rewrite never runs if the middleware gets to it first
   // -- "health" isn't a supported locale, so it was being 307-redirected to
   // /es/health/ instead of proxied, breaking the health check itself.
-  matcher: ["/((?!api|health|_next|favicon.ico).*)"],
+  matcher: ["/((?!api|health|admin|_next|favicon.ico).*)"],
 };

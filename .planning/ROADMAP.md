@@ -21,7 +21,7 @@ SavePoint begins with a three-day, publicly deployed vertical demonstration, the
 - [x] **Phase 4: Collaborative and Hybrid Comparison** - Compare collaborative and hybrid methods under the already-frozen protocol and document bounded conclusions. Completed 2026-09-12 with the multi-seed limitation documented.
 - [x] **Phase 5: Complete Collection Workflows and Portability** - Complete profiles, comments, lists, copy details, and safe deterministic versioned CSV export. (completed 2026-09-13)
 - [x] **Phase 6: Public Discovery and Resilient Enrichment** - Add public projections, catalogue discovery, and shareable public views without contaminating research data. (completed 2026-09-13)
-- [ ] **Phase 7: Research Panel, Hardening, and Evidence Freeze** - Present thesis-ready comparisons and finish administration, security, recovery, accessibility, and reproducibility gates.
+- [x] **Phase 7: Research Panel, Hardening, and Evidence Freeze** - Present thesis-ready comparisons and finish administration, security, recovery, accessibility, and reproducibility gates. (completed 2026-09-14)
 
 ## Phase Details
 
@@ -323,7 +323,7 @@ Plans:
 ### Phase 7: Research Panel, Hardening, and Evidence Freeze
 
 **Mode:** mvp
-**Goal**: The deployed and offline demonstrator is securely operable and presents an accessible, immutable, thesis-ready comparison of the completed research.
+**Goal**: As a thesis researcher, I want to compare immutable, accessible research runs and operate the demonstrator safely, so that I can defend reproducible thesis evidence and a reliable academic demo.
 **Depends on**: Phase 6
 **Portability carry-over**: PORT-02 and PORT-03 are deferred from Phase 5 to this identifiable later phase; their endpoints, parsers, preview, row-level validation, and conflict rules are not part of the Phase 5 plans.
 **Requirements**: EVAL-13, EVAL-14, ADMIN-01, ADMIN-02, SEC-01, SEC-03, SEC-04, SEC-05, SEC-06, SEC-07, SEC-08, PRIV-02, OPS-04, OPS-05, QUAL-01, QUAL-04, DOC-05, DOC-06, AGENT-05, AGENT-06, PORT-02, PORT-03
@@ -342,7 +342,7 @@ Plans:
 - [x] 07-02-PLAN.md
 - [x] 07-03-PLAN.md
 - [x] 07-04-PLAN.md
-- [ ] 07-05-PLAN.md
+- [x] 07-05-PLAN.md
 
 **UI hint**: yes
 
@@ -372,4 +372,4 @@ schedule properly in a later phase-planning pass.
 | 4. Collaborative and Hybrid Comparison | 3/3 | Complete with limitation | 2026-09-12 |
 | 5. Complete Collection Workflows and Portability | 4/4 | Complete | 2026-09-13 |
 | 6. Public Discovery and Resilient Enrichment | 10/10 | Complete    | 2026-09-13 |
-| 7. Research Panel, Hardening, and Evidence Freeze | 5/6 | In Progress|  |
+| 7. Research Panel, Hardening, and Evidence Freeze | 7/6 | Complete    | 2026-09-14 |

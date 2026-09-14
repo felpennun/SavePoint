@@ -1,7 +1,10 @@
 import { getDictionary } from "@/i18n";
 
-export default async function ResearchLoading({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale: rawLocale } = await params;
+export default async function ResearchLoading({ params }: { params?: Promise<{ locale: string }> } = {}) {
+  // Next may render a route loading boundary without route params. Keep the
+  // skeleton renderable in that transient state instead of turning navigation
+  // into an error page.
+  const rawLocale = params ? (await params).locale : "es";
   const dict = getDictionary(rawLocale);
   return (
     <main className="sp-page sp-research-page" aria-busy="true">

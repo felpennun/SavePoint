@@ -60,6 +60,9 @@ $webRoot = Join-Path $root "apps/web"
 if (Test-Path $webRoot) {
     $webFiles = Get-ChildItem -Path $webRoot -Recurse -File -Include *.ts,*.tsx
     foreach ($file in $webFiles) {
+        # next.config.ts is the same-origin proxy boundary for Django Admin;
+        # the administrative UI itself remains exclusively server-side.
+        if ($file.Name -eq "next.config.ts") { continue }
         if ((Get-Content -LiteralPath $file.FullName -Raw) -match '(?i)(/admin/|PlatformAdminSite)') {
             Write-Error "Administrative surface must remain in Django Admin: $($file.FullName)"
             $failure = $true

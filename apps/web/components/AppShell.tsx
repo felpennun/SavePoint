@@ -232,7 +232,9 @@ export function AppShell({
         </div>
       </header>
       {isAuthenticated ? <DemoAccountBanner text={dict.account.banner} /> : null}
-      <div id="main-content">{children}</div>
+      <div id="main-content" tabIndex={-1}>
+        {children}
+      </div>
       <ShelfWheelScroll />
     </>
   );

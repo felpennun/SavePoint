@@ -130,7 +130,7 @@ def test_platinum_never_appears_in_the_public_profile_projection(work, user_a) -
         {"status": "completed", "rating_half_steps": 10, "is_platinum": True, "copies": []},
         format="json",
     )
-    profile = build_public_profile(user_a, viewer=None)
+    profile = build_public_profile(user_a, viewer=user_a)
     assert "is_platinum" not in profile
     for activity_item in profile["activity"]:
         assert "is_platinum" not in activity_item

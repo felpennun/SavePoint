@@ -6,7 +6,10 @@
  * proxy targets. Never imported from a Client Component.
  */
 
-const API_BASE = process.env.API_PROXY_TARGET ?? "http://127.0.0.1:8000";
+// Read the Compose target at request time. Next's server bundle may retain a
+// fallback literal during the build, but the running container must resolve
+// Django through the private service name rather than its own loopback.
+const API_BASE = process.env["API_PROXY_TARGET"] ?? "http://api:8000";
 
 export interface CoverAttribution {
   creator: string;

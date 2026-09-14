@@ -136,7 +136,7 @@ $SourceSpecs = @(
     [pscustomobject]@{ path = "package.json"; role = "node_environment_declaration"; sha256 = "0cacf29f609414c3b6b6333e43fbd3294aff403e634c5bdcde29cbb8a5430cb7" },
     [pscustomobject]@{ path = "pnpm-lock.yaml"; role = "node_dependency_lock"; sha256 = "66229cd8b371f77fefdea23dec8f250c3b55dfb7f09020628b0cdfce437a9284" },
     [pscustomobject]@{ path = "apps/web/package.json"; role = "frontend_package_declaration"; sha256 = "7052c7dc80d441b2b8bca6fc570e41185c46dfa1b113966c2547284b8491ec20" },
-    [pscustomobject]@{ path = "infra/compose.yaml"; role = "local_runtime_declaration"; sha256 = "3c2a633c9bd3319fde3d14792d006c567f2090f1d0093aa9aaaa0750e889e9e8" },
+    [pscustomobject]@{ path = "infra/compose.yaml"; role = "local_runtime_declaration"; sha256 = "ebec0e6e7d547a0f4421db7dee76c4249fd970aea4704aa26f3a59a833f7a5b3" },
     [pscustomobject]@{ path = "docs/verification/phase-07-evidence-contract.md"; role = "panel_publication_contract"; sha256 = "5e5f4f903e3be4d62a820e58980ac5d93f5873f2ccd7fa3c15e4929cdab4c01a" },
     [pscustomobject]@{ path = "docs/verification/igdb-catalogue-freeze.md"; role = "catalogue_provenance_and_licence"; sha256 = "150f3aab21f4e3749e53610d65eba0f97d05cb55ad2b30781e2633ae03ea6871" },
     [pscustomobject]@{ path = "docs/adr/ADR-006-igdb-source.md"; role = "source_decision_and_licence"; sha256 = "b9b54b886e6483699e9576a6818ea99739f05c588f97f903fe447638f12f9dd5" },
