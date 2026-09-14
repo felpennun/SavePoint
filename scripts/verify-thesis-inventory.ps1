@@ -42,7 +42,8 @@ function Get-LfBytes {
     param([string]$AbsolutePath)
     $text = [IO.File]::ReadAllText($AbsolutePath)
     $normalized = $text.Replace("`r`n", "`n").Replace("`r", "`n")
-    return [Text.UTF8Encoding]::new($false).GetBytes($normalized)
+    # Preserve empty files as an empty byte array instead of emitting no pipeline value.
+    return ,([Text.UTF8Encoding]::new($false).GetBytes($normalized))
 }
 
 function Get-Sha256Hex {
@@ -139,10 +140,28 @@ function Invoke-Canaries {
 
 function Get-TrackedPaths {
     param([string[]]$PathSpecs)
-    $arguments = @("-c", "core.quotepath=false", "ls-files", "--") + $PathSpecs
-    $paths = @(& git @arguments)
-    Assert-Condition ($LASTEXITCODE -eq 0) "git ls-files failed."
-    return @($paths | ForEach-Object { $_.Replace('\', '/') } | Where-Object { $_ })
+    $startInfo = [Diagnostics.ProcessStartInfo]::new()
+    $startInfo.FileName = "git"
+    $startInfo.UseShellExecute = $false
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
+    # Path specs are fixed repository directories, so a single native argument string is safe on Windows PowerShell.
+    $startInfo.Arguments = '-c "core.quotepath=false" ls-files -z -- ' + ($PathSpecs -join ' ')
+    $process = [Diagnostics.Process]::new()
+    $process.StartInfo = $startInfo
+    [void]$process.Start()
+    $output = [IO.MemoryStream]::new()
+    try {
+        $process.StandardOutput.BaseStream.CopyTo($output)
+        $standardError = $process.StandardError.ReadToEnd()
+        $process.WaitForExit()
+        Assert-Condition ($process.ExitCode -eq 0) "git ls-files failed: $standardError"
+        $text = [Text.UTF8Encoding]::new($false).GetString($output.ToArray())
+        return @($text -split [char]0 | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | ForEach-Object { $_.Replace('\', '/') })
+    } finally {
+        $output.Dispose()
+        $process.Dispose()
+    }
 }
 
 function Get-Category {
@@ -202,12 +221,12 @@ function New-SourceEntry {
             $chunkSize = 20
         } finally { $archive.Dispose() }
     } elseif ($hashMode -eq "lf") {
-        $lineCount = Get-TextLineCount $hashBytes
+        $lineCount = Get-TextLineCount -Bytes $hashBytes
         if ($lineCount -gt 1) { $unitKind = "line"; $totalUnits = $lineCount; $chunkSize = 500 }
     }
     $ranges = @(New-ReadRanges $totalUnits $chunkSize)
     $locator = if ($totalUnits -gt 0) { "$unitKind 1-$totalUnits" } else { "fichero vacío comprobado" }
-    return [ordered]@{ path=$RelativePath; source_alias=$SourceAlias; bytes=[int64]$rawBytes.Length; sha256=(Get-Sha256Hex $hashBytes); hash_mode=$hashMode; category=(Get-Category $RelativePath); read_status="complete"; locator=$locator; unit_kind=$unitKind; total_units=[int64]$totalUnits; read_ranges=$ranges; notes="Lectura completa por unidades declaradas; el hash identifica contenido, no demuestra veracidad, calidad ni legalidad." }
+    return [ordered]@{ path=$RelativePath; source_alias=$SourceAlias; bytes=[int64]$rawBytes.Length; sha256=(Get-Sha256Hex -Bytes $hashBytes); hash_mode=$hashMode; category=(Get-Category $RelativePath); read_status="complete"; locator=$locator; unit_kind=$unitKind; total_units=[int64]$totalUnits; read_ranges=$ranges; notes="Lectura completa por unidades declaradas; el hash identifica contenido, no demuestra veracidad, calidad ni legalidad." }
 }
 
 function Compare-HistoricalArchive {
@@ -223,9 +242,9 @@ function Compare-HistoricalArchive {
             $targetPath = Join-Path $repoRoot ("thesis/" + $name).Replace('/', '\')
             if (-not (Test-Path -LiteralPath $targetPath -PathType Leaf)) { $missing++; continue }
             $stream = $entry.Open()
-            try { $memory = [IO.MemoryStream]::new(); $stream.CopyTo($memory); $entryHash = Get-Sha256Hex $memory.ToArray(); $memory.Dispose() }
+            try { $memory = [IO.MemoryStream]::new(); $stream.CopyTo($memory); $entryHash = Get-Sha256Hex -Bytes ($memory.ToArray()); $memory.Dispose() }
             finally { $stream.Dispose() }
-            $targetHash = Get-Sha256Hex ([IO.File]::ReadAllBytes($targetPath))
+            $targetHash = Get-Sha256Hex -Bytes ([IO.File]::ReadAllBytes($targetPath))
             if ($entryHash -eq $targetHash) { $same++ } else { $different++ }
         }
     } finally { $archive.Dispose() }
@@ -289,7 +308,7 @@ function Write-SourceManifest {
         entries = @($entries | Sort-Object path)
     }
     $json = $manifest | ConvertTo-Json -Depth 12
-    [IO.File]::WriteAllText($manifestPath, $json + "`n", [Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText($manifestPath, $json + "`n", [Text.UTF8Encoding]::new($true))
     Write-Host "Source manifest refreshed: $($manifest.entries.Count) entries"
 }
 
@@ -307,7 +326,7 @@ function Test-Manifest {
             $absolutePath = Join-Path $repoRoot ([string]$entry.path).Replace('/', '\')
             Assert-Condition (Test-Path -LiteralPath $absolutePath -PathType Leaf) "Complete source is missing: $($entry.path)"
             $bytes = if ($entry.hash_mode -eq "lf") { Get-LfBytes $absolutePath } else { [IO.File]::ReadAllBytes($absolutePath) }
-            Assert-Condition ((Get-Sha256Hex $bytes) -eq $entry.sha256) "Source hash drifted: $($entry.path)"
+            Assert-Condition ((Get-Sha256Hex -Bytes $bytes) -eq $entry.sha256) "Source hash drifted: $($entry.path)"
         }
     }
     $requiredAliases = @(
