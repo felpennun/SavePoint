@@ -66,6 +66,19 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
 
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"operations_console": {"class": "logging.StreamHandler"}},
+    "loggers": {
+        "savepoint.operations": {
+            "handlers": ["operations_console"],
+            "level": "INFO",
+            "propagate": False,
+        }
+    },
+}
+
 
 def _postgres_database() -> dict[str, object]:
     """Parse only PostgreSQL URLs; unsupported engines fail closed."""

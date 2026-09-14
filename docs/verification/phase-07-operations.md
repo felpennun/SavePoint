@@ -19,6 +19,16 @@ base `savepoint_restore_*` generado en cada ejecución y elimina solo ese nombre
 en `finally`; nunca recibe la base canónica como destino. Las tareas programadas
 no llevan secretos en sus argumentos.
 
+## Observabilidad
+
+`config.observability` emite JSON únicamente con `operation_ref`, actor técnico,
+tipo, estado, timestamps, recurso allowlisted y duración. Las transiciones
+operativas usan `queued`, `running`, `succeeded` y `failed`; cualquier excepción
+se transforma en `operation_failed`. No se serializan filenames, URLs, payloads,
+cookies, tokens, cadenas de conexión ni mensajes de excepción. Django configura
+el logger `savepoint.operations` con salida de consola para que Admin y los
+operadores puedan correlacionar una operación sin consultar datos sensibles.
+
 ## Verificaciones
 
 - `git diff --check`
@@ -34,7 +44,7 @@ no llevan secretos en sus argumentos.
 |---|---|
 | PORT-02 / PORT-03 | `apps/api/library/tests/test_portability.py` y los endpoints de preview/apply |
 | OPS-04 | `docs/deployment/backup-recovery.md` y scripts de backup/rotación/restore |
-| OPS-05 | `apps/api/config/observability.py` y `apps/api/tests/test_phase7_operations.py` |
+| OPS-05 | `apps/api/config/observability.py`, `apps/api/config/settings.py` y `apps/api/tests/test_phase7_operations.py` |
 | ADMIN-02 | Estados saneados consultables desde Django Admin, sin edición directa |
 
 Los límites de tamaño, retención y restauración son decisiones operativas

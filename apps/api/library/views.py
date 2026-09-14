@@ -5,6 +5,7 @@ client before the PostgreSQL commit actually lands."""
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import uuid
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -12,6 +13,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Count, Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.utils import timezone as django_timezone
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -24,6 +26,7 @@ from catalogue.serializers import _cover, _platform_summary
 from library import services
 from library.export import EXPORT_FILENAME, render_collection_csv
 from library.portability import apply_import, parse_import_csv
+from config.observability import emit_operation_event
 from library.models import BacklogStatus, CustomList, CustomListItem, GameComment, LibraryEntry, OwnedCopy, StatusTransition
 from library.popularity import rank_popularity_v1
 from library.serializers import (
@@ -400,7 +403,21 @@ class ImportCollectionPreviewView(APIView):
         serializer = CollectionImportSerializer(data=request.data)
         if not serializer.is_valid():
             return Response({"detail": "Invalid import upload.", "errors": serializer.errors}, status=400)
+        operation_ref = uuid.uuid4()
+        started_at = django_timezone.now()
         report = parse_import_csv(serializer.validated_data["file"].read(), user=request.user)
+        emit_operation_event(
+            operation_ref=operation_ref,
+            actor="authenticated-user",
+            operation_type="collection_import",
+            status="succeeded" if not report.errors and not report.conflicts else "failed",
+            started_at=started_at,
+            finished_at=django_timezone.now(),
+            duration_ms=max(0, int((django_timezone.now() - started_at).total_seconds() * 1000)),
+            resource_type="collection_import",
+            resource_id=report.preview_sha256[:16],
+            error=report.errors[0]["code"] if report.errors else None,
+        )
         return Response(report.as_dict())
 
 
@@ -414,12 +431,58 @@ class ImportCollectionApplyView(APIView):
         if not serializer.is_valid() or not serializer.validated_data.get("preview_sha256"):
             errors = serializer.errors or {"preview_sha256": ["This field is required."]}
             return Response({"detail": "Invalid import apply request.", "errors": errors}, status=400)
+        operation_ref = uuid.uuid4()
+        started_at = django_timezone.now()
+        emit_operation_event(
+            operation_ref=operation_ref,
+            actor="authenticated-user",
+            operation_type="collection_import",
+            status="queued",
+            started_at=started_at,
+            resource_type="collection_import",
+            resource_id=serializer.validated_data["preview_sha256"][:16],
+        )
         report = parse_import_csv(serializer.validated_data["file"].read(), user=request.user)
         if report.preview_sha256 != serializer.validated_data["preview_sha256"]:
+            emit_operation_event(
+                operation_ref=operation_ref,
+                actor="authenticated-user",
+                operation_type="collection_import",
+                status="failed",
+                started_at=started_at,
+                finished_at=django_timezone.now(),
+                resource_type="collection_import",
+                resource_id=report.preview_sha256[:16],
+                error="digest_mismatch",
+            )
             return Response({"detail": "The upload does not match the preview digest."}, status=409)
         if report.errors or report.conflicts:
+            emit_operation_event(
+                operation_ref=operation_ref,
+                actor="authenticated-user",
+                operation_type="collection_import",
+                status="failed",
+                started_at=started_at,
+                finished_at=django_timezone.now(),
+                resource_type="collection_import",
+                resource_id=report.preview_sha256[:16],
+                error="validation_failed",
+            )
             return Response(report.as_dict(), status=400)
-        return Response(apply_import(report, user=request.user))
+        payload = apply_import(report, user=request.user)
+        emit_operation_event(
+            operation_ref=operation_ref,
+            actor="authenticated-user",
+            operation_type="collection_import",
+            status="succeeded" if payload.get("applied") else "failed",
+            started_at=started_at,
+            finished_at=django_timezone.now(),
+            duration_ms=max(0, int((django_timezone.now() - started_at).total_seconds() * 1000)),
+            resource_type="collection_import",
+            resource_id=report.preview_sha256[:16],
+            error=None if payload.get("applied") else "conflict",
+        )
+        return Response(payload)
 
 
 class WorkCommentsView(APIView):
