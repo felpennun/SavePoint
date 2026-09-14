@@ -4,15 +4,15 @@ current_phase: 07
 current_phase_name: Research Panel, Hardening, and Evidence Freeze
 status: in_progress
 stopped_at: Completed 07-03-PLAN.md
-last_updated: "2026-09-14T01:11:05.490Z"
+last_updated: "2026-09-14T01:14:23.473Z"
 last_activity: 2026-09-14
 last_activity_desc: Phase 07 Plan 03 complete
-state_head: a3e8f5142089a9ff009c759e9077f41cf3e9d1f0
+state_head: 6beade43436a795970736f79c3677b9149335b35
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 66
-  completed_plans: 64
+  completed_plans: 65
   percent: 38
 total_plans_in_phase: 6
 next_phase: 07
@@ -137,6 +137,7 @@ Progreso global: 2/8 fases (25%).
 | Phase 07 P01 | 26 min | 3 tasks | 12 files |
 | Phase 07 P02 | 35min | 3 tasks | 32 files |
 | Phase 07-research-panel-hardening-and-evidence-freeze P03 | 2h 00m | 3 tasks | 20 files |
+| Phase 07 P04 | 75 | 3 tasks | 17 files |
 
 ## Accumulated Context
 
@@ -231,6 +232,8 @@ WHAT'S UNCOMMITTED (working tree, not yet type-checked clean): apps/web/app/[loc
 
 TO RESUME: get the user's explicit approval, then `pnpm add -D @types/react@<version matching react 19.2.7> @types/react-dom@<matching>` at the repo root (deps are hoisted there, see package.json), run `pnpm exec tsc --noEmit` in apps/web to confirm the errors clear, then continue: verify the dev server actually renders each page, write/run the e2e/demo-journey.spec.ts real login journey (replacing the 01-15 skip block), run the plan's two <verify> commands, then close out Plan 01-04 (SUMMARY.md, STATE/ROADMAP/REQUIREMENTS updates) exactly like 01-05/01-06/01-15 before it.
 
+- 07-04 restore mensual desechable no verificable: el dump copia y checksum pasan, pero accounts.0004_phase7_anonymization falla con UniqueViolation por admin_uuid duplicado; requiere corregir dump/fixture o migracion propietaria.
+
 ## Tareas rápidas completadas
 
 | Fecha | Tarea | Resultado |
@@ -273,11 +276,11 @@ Ver `.planning/quick/260909-nej-a-adir-cuatro-variantes-popscore-con-imp/`.
 
 ## Registro histórico de sesiones (prevalece el checkpoint de ejecución actual)
 
-**Stopped at:** Completed 07-03-PLAN.md
+**Stopped at:** Checkpoint 07-04: restore desechable bloqueado por UniqueViolation; implementacion y verificaciones restantes completas
 
 **Resume (after the rate-limit reset):** `/gsd-plan-phase 2` re-spawns the planner from scratch. All inputs are committed: `02-CONTEXT.md`, `02-UI-SPEC.md` (verified 7/7), `02-RESEARCH.md`, `02-VALIDATION.md`, `02-PATTERNS.md`, `02-COVERAGE.md`. Then `gsd-plan-checker` → revision loop → present → `/gsd-execute-phase 2`. Full detail in `.planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/.continue-here.md`.
 
-Last session: 2026-09-14T01:11:04.199Z
+Last session: 2026-09-14T01:14:22.480Z
 
 ### Done this session (2026-09-06, all committed on `main`)
 
@@ -286,7 +289,7 @@ Last session: 2026-09-14T01:11:04.199Z
 - **Roadmap restructure** — `85e98ba`: Phase 2 enlarged (governed corpus + external ratings + evaluation contract + first advanced recommender + search/filters + UI pass); former phases 5+6 merged; 3/4/7/8 renumbered to 5/6/4/7. Requirement coverage 91/91.
 - **Phase 2 planning inputs** — `02-CONTEXT.md` `f5d65e7` (discuss-phase, D-01..D-24), `02-UI-SPEC.md` `e548a2e` (ui-phase, checker 7/7, `## UI Considerations` 45 explicit + 10 backstop), `02-RESEARCH.md` `a78510f`, `02-VALIDATION.md` `53b173f`, `02-PATTERNS.md` `df45a33`, `02-COVERAGE.md` `15006b3` (rescued from the rate-limited planner).
 
-Resume file: None
+Resume file: .planning/phases/07-research-panel-hardening-and-evidence-freeze/07-04-SUMMARY.md
 
 ## Session Continuity
 

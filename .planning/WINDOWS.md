@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 11
+open_count: 12
 waived_count: 0
 fixed_count: 0
-total_count: 11
-last_updated: 2026-09-13T19:54:06.081Z
+total_count: 12
+last_updated: 2026-09-14T01:12:45.312Z
 ---
 
 # Broken Windows Ledger
@@ -26,6 +26,7 @@ last_updated: 2026-09-13T19:54:06.081Z
 | 9 | 06 | unrun-verify | apps/web/components/__tests__/nav-overflow.test.tsx |  | La suite completa de Vitest no puede ejecutar nav-overflow porque falta Chromium; los 53 tests no browser, los 3 social-comments, los 7 i18n y TypeScript pasan. | open |  | 2026-09-13T19:31:19.089Z |  |
 | 10 | 06 | unrun-verify | e2e/catalogue-discovery.spec.ts |  | Journey browser completo y revisión axe visual diferidos por limitaciones de la imagen Compose. | open |  | 2026-09-13T19:54:05.633Z |  |
 | 11 | 06 | unrun-verify | e2e/social-workflows.spec.ts |  | Journey social browser completo diferido por limitaciones de la imagen Compose y variables de ejecución no consignadas. | open |  | 2026-09-13T19:54:06.081Z |  |
+| 12 | 07 | unrun-verify | docs/verification/phase-07-operations.md |  | Restore mensual desechable bloqueado por UniqueViolation de admin_uuid duplicado en accounts.0004_phase7_anonymization | open |  | 2026-09-14T01:12:45.312Z |  |
 
 ````json
 [
@@ -159,6 +160,18 @@ last_updated: 2026-09-13T19:54:06.081Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-09-13T19:54:06.081Z",
+    "resolved_at": null
+  },
+  {
+    "id": 12,
+    "kind": "unrun-verify",
+    "phase": "07",
+    "file": "docs/verification/phase-07-operations.md",
+    "line": null,
+    "description": "Restore mensual desechable bloqueado por UniqueViolation de admin_uuid duplicado en accounts.0004_phase7_anonymization",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-09-14T01:12:45.312Z",
     "resolved_at": null
   }
 ]
