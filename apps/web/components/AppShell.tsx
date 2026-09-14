@@ -18,7 +18,7 @@ interface NavItem {
   label: string;
 }
 
-function buildNavItems(dict: Dictionary, locale: string, isAuthenticated: boolean): NavItem[] {
+function buildNavItems(dict: Dictionary, locale: string, isAuthenticated: boolean, canViewResearch: boolean): NavItem[] {
   const base: NavItem[] = [
     { href: `/${locale}`, label: dict.nav.home },
     { href: `/${locale}/catalogue`, label: dict.nav.catalogue },
@@ -27,6 +27,9 @@ function buildNavItems(dict: Dictionary, locale: string, isAuthenticated: boolea
     base.push({ href: `/${locale}/collection`, label: dict.nav.collection });
     base.push({ href: `/${locale}/recommendations`, label: dict.nav.recommendations });
     base.push({ href: `/${locale}/friends`, label: locale === "es" ? "Amistades" : "Friends" });
+  }
+  if (canViewResearch) {
+    base.push({ href: `/${locale}/research`, label: dict.nav.research });
   }
   base.push({ href: `/${locale}/sources`, label: dict.nav.sources });
   return base;
@@ -176,13 +179,15 @@ export function AppShell({
   children,
   locale,
   isAuthenticated,
+  canViewResearch = false,
 }: {
   children: ReactNode;
   locale: string;
   isAuthenticated: boolean;
+  canViewResearch?: boolean;
 }) {
   const dict = getDictionary(locale);
-  const items = buildNavItems(dict, locale, isAuthenticated);
+  const items = buildNavItems(dict, locale, isAuthenticated, canViewResearch);
 
   return (
     <>

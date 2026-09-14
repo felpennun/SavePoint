@@ -9,7 +9,7 @@ export const DEFAULT_LOCALE: Locale = "es";
 // for the backend's basic projection; protected profile/list content is still
 // authorized by Django and never by this UX-only middleware.
 const PUBLIC_PATHS = ["/", "/login", "/register", "/sources", "/catalogue", "/games", "/profiles"];
-const AUTHENTICATED_PATHS = ["/collection", "/recommendations", "/friends"];
+const AUTHENTICATED_PATHS = ["/collection", "/recommendations", "/friends", "/research"];
 
 function isSupportedLocale(value: string): value is Locale {
   return (SUPPORTED_LOCALES as readonly string[]).includes(value);

@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import "../globals.css";
 import { AppShell } from "@/components/AppShell";
 import { SUPPORTED_LOCALES, type Locale } from "@/middleware";
+import { fetchAccountMe } from "@/lib/api";
 
 /** Nocturne identity: Inter for display and body, JetBrains Mono for
  * figures, identifiers and the score pill. next/font self-hosts both from
@@ -57,12 +58,17 @@ export default async function LocaleLayout({
 
   const cookieStore = await cookies();
   const isAuthenticated = cookieStore.has("sessionid");
+  const account = isAuthenticated ? await fetchAccountMe(cookieStore.toString()) : null;
   const theme = cookieStore.get("sp-theme")?.value === "light" ? "light" : "dark";
 
   return (
     <html lang={locale} data-theme={theme} className={`${inter.variable} ${jetBrainsMono.variable}`}>
       <body>
-        <AppShell locale={locale} isAuthenticated={isAuthenticated}>
+        <AppShell
+          locale={locale}
+          isAuthenticated={isAuthenticated}
+          canViewResearch={account?.capabilities?.can_view_research === true}
+        >
           {children}
         </AppShell>
       </body>

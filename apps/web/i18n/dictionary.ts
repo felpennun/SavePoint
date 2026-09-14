@@ -15,6 +15,7 @@ export interface Dictionary {
     catalogue: string;
     collection: string;
     recommendations: string;
+    research: string;
     profile: string;
     sources: string;
     login: string;
@@ -153,6 +154,72 @@ export interface Dictionary {
     refreshPreparing: string;
     refreshUpdating: string;
     refreshNeedsCollectionChange: string;
+  };
+  research: {
+    heading: string;
+    intro: string;
+    viewerBadge: string;
+    adminBadge: string;
+    filters: {
+      heading: string;
+      formLabel: string;
+      run: string;
+      algorithm: string;
+      cohort: string;
+      metric: string;
+      any: string;
+      apply: string;
+      reset: string;
+    };
+    comparison: {
+      heading: string;
+      chartLabel: string;
+      chartDescription: string;
+      scaleLabel: string;
+      tableCaption: string;
+      algorithm: string;
+      cohort: string;
+      evaluable: string;
+      metric: string;
+      wallTime: string;
+      cpuTime: string;
+      scrollHelp: string;
+    };
+    evidence: {
+      heading: string;
+      run: string;
+      status: string;
+      publishedAt: string;
+      protocol: string;
+      corpus: string;
+      split: string;
+      commit: string;
+      featureSet: string;
+      seedCount: string;
+      artifactHash: string;
+      cohortHash: string;
+      protocolHash: string;
+      snapshotHash: string;
+      popscoreHash: string;
+      splitManifestHash: string;
+      provenanceHeading: string;
+      limitationsHeading: string;
+      unavailable: string;
+      partial: string;
+    };
+    downloads: {
+      heading: string;
+      exportEvidence: string;
+      csv: string;
+      json: string;
+      svg: string;
+      noActions: string;
+    };
+    emptyHeading: string;
+    emptyBody: string;
+    errorHeading: string;
+    errorBody: string;
+    retry: string;
   };
   social: {
     friends: {

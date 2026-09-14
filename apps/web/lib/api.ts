@@ -815,6 +815,10 @@ export function primaryTagRecommendationShelf(
 
 export interface AccountMe {
   username: string;
+  capabilities?: {
+    can_view_research: boolean;
+    can_manage_platform: boolean;
+  };
 }
 
 /**
@@ -827,11 +831,197 @@ export async function fetchAccountMe(cookieHeader: string): Promise<AccountMe | 
   try {
     const response = await fetch(url, { cache: "no-store", headers: { Cookie: cookieHeader } });
     if (!response.ok) return null;
-    const body = (await response.json()) as { username?: unknown };
-    return typeof body.username === "string" ? { username: body.username } : null;
+    const body = (await response.json()) as {
+      username?: unknown;
+      capabilities?: { can_view_research?: unknown; can_manage_platform?: unknown };
+    };
+    if (typeof body.username !== "string") return null;
+    return {
+      username: body.username,
+      capabilities: {
+        can_view_research: body.capabilities?.can_view_research === true,
+        can_manage_platform: body.capabilities?.can_manage_platform === true,
+      },
+    };
   } catch {
     return null;
   }
+}
+
+export interface ResearchFilterOption {
+  id: string;
+  label: string;
+}
+
+export interface ResearchRunSummary {
+  run_id: string;
+  status: string;
+  published_at: string | null;
+  protocol_version: number;
+  corpus_version: string;
+  split: string;
+  commit_sha: string;
+  feature_set_version: string;
+  seed_count: number;
+  artifact_sha256: string;
+  cohort_sha256: string;
+  protocol_sha256: string;
+  snapshot_sha256: string;
+  popscore_snapshot_sha256: string;
+  split_manifest_sha256: string;
+}
+
+export interface ResearchMetricValue {
+  metric_id: string;
+  value: number | null;
+  unit: string;
+  higher_is_better: boolean;
+  unavailable_reason: string | null;
+}
+
+export interface ResearchComparisonRow {
+  algorithm_id: string;
+  algorithm_label: string;
+  cohort_id: string;
+  cohort_label: string;
+  k: number;
+  evaluable_count: number;
+  population_count: number;
+  metrics: Record<string, ResearchMetricValue>;
+  timing: {
+    duration_seconds: number | null;
+    wall_ms: number | null;
+    cpu_ms: number | null;
+    unavailable_reason: string | null;
+  };
+  not_evaluable_reason: string | null;
+}
+
+export interface ResearchDownload {
+  format: "csv" | "json" | "svg";
+  run_id: string;
+  available: boolean;
+}
+
+export interface ResearchComparison {
+  run: ResearchRunSummary;
+  filters: {
+    run_id?: string;
+    algorithm_id?: string;
+    cohort_id?: string;
+    metric_id?: string;
+  };
+  filter_options: {
+    runs: ResearchFilterOption[];
+    algorithms: ResearchFilterOption[];
+    cohorts: ResearchFilterOption[];
+    metrics: ResearchFilterOption[];
+    formats: ResearchFilterOption[];
+  };
+  selected_metric_id: string;
+  rows: ResearchComparisonRow[];
+  metric_definitions: Array<{
+    metric_id: string;
+    label: string;
+    unit: string;
+    higher_is_better: boolean;
+    k: number;
+    run_level_only: boolean;
+  }>;
+  timings: Array<ResearchComparisonRow["timing"] & { algorithm_id: string }>;
+  provenance: Record<string, string | number | boolean | null>;
+  limitations: string[];
+  downloads: ResearchDownload[];
+}
+
+export interface ResearchArtifactSpec {
+  artifact_id: string;
+  filename: string;
+  format: string;
+  content_type: string;
+  sha256: string;
+  published: boolean;
+}
+
+export interface ResearchArtifacts {
+  run: ResearchRunSummary;
+  artifacts: ResearchArtifactSpec[];
+  provenance: Record<string, string | number | boolean | null>;
+}
+
+export type ResearchResponse<T> =
+  | { kind: "ok"; data: T }
+  | { kind: "unauthorized" }
+  | { kind: "forbidden" }
+  | { kind: "error" };
+
+export interface ResearchQueryFilters {
+  run?: string;
+  algorithm?: string;
+  cohort?: string;
+  metric?: string;
+}
+
+async function fetchResearchJson<T>(path: string, cookieHeader: string): Promise<ResearchResponse<T>> {
+  try {
+    const response = await fetch(new URL(path, API_BASE), {
+      cache: "no-store",
+      headers: { Cookie: cookieHeader },
+    });
+    if (response.status === 401) return { kind: "unauthorized" };
+    if (response.status === 403 || response.status === 404) return { kind: "forbidden" };
+    if (!response.ok) return { kind: "error" };
+    return { kind: "ok", data: (await response.json()) as T };
+  } catch {
+    return { kind: "error" };
+  }
+}
+
+function appendResearchFilters(url: URL, filters: ResearchQueryFilters): void {
+  for (const [key, value] of Object.entries(filters)) {
+    if (typeof value === "string" && value) url.searchParams.set(key, value);
+  }
+}
+
+export function fetchResearchRuns(cookieHeader: string): Promise<ResearchResponse<{
+  runs: ResearchRunSummary[];
+  algorithms: ResearchFilterOption[];
+  cohorts: ResearchFilterOption[];
+  metrics: ResearchFilterOption[];
+  formats: ResearchFilterOption[];
+}>> {
+  return fetchResearchJson("/api/evaluation/runs/", cookieHeader);
+}
+
+export function fetchResearchComparison(
+  cookieHeader: string,
+  filters: ResearchQueryFilters = {},
+): Promise<ResearchResponse<ResearchComparison>> {
+  const url = new URL("/api/evaluation/comparison/", API_BASE);
+  appendResearchFilters(url, filters);
+  return fetchResearchJson(`${url.pathname}${url.search}`, cookieHeader);
+}
+
+export function fetchResearchArtifacts(
+  cookieHeader: string,
+  runId: string,
+): Promise<ResearchResponse<ResearchArtifacts>> {
+  const url = new URL("/api/evaluation/artifacts/", API_BASE);
+  url.searchParams.set("run", runId);
+  return fetchResearchJson(`${url.pathname}${url.search}`, cookieHeader);
+}
+
+export function buildResearchExportHref(
+  comparison: Pick<ResearchComparison, "run" | "filters">,
+  format: ResearchDownload["format"],
+): string {
+  const url = new URL("/api/evaluation/exports/", "http://same-origin.invalid");
+  url.searchParams.set("run", comparison.run.run_id);
+  if (comparison.filters.algorithm_id) url.searchParams.set("algorithm", comparison.filters.algorithm_id);
+  if (comparison.filters.cohort_id) url.searchParams.set("cohort", comparison.filters.cohort_id);
+  if (comparison.filters.metric_id) url.searchParams.set("metric", comparison.filters.metric_id);
+  url.searchParams.set("format", format);
+  return `${url.pathname}${url.search}`;
 }
 
 /** Owner-facing profile read DTO (PROF-01, `serialize_account_profile`) --
