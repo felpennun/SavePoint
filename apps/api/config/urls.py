@@ -5,6 +5,8 @@ import os
 from django.http import JsonResponse
 from django.urls import include, path
 
+from platform_admin.admin_site import platform_admin_site
+
 
 def health(_request):
     # Render supplies RENDER_GIT_COMMIT at runtime. Exposing the non-secret
@@ -14,6 +16,7 @@ def health(_request):
 
 
 urlpatterns = [
+    path("admin/", platform_admin_site.urls),
     path("health/", health, name="health"),
     path("api/catalogue/", include("catalogue.urls")),
     path("api/accounts/", include("accounts.urls")),

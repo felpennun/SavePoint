@@ -7,8 +7,8 @@ from rest_framework.permissions import BasePermission
 
 
 RESEARCH_VIEW_PERMISSION = "evaluation.view_research_panel"
-PLATFORM_ADMIN_PERMISSION = "accounts.manage_platform"
-PLATFORM_ADMIN_FALLBACK_PERMISSION = "auth.change_user"
+RESEARCH_EXPORT_PERMISSION = "evaluation.export_research_panel"
+PLATFORM_ADMIN_PERMISSION = "evaluation.access_platform_admin"
 
 
 def can_view_research(user) -> bool:  # noqa: ANN001
@@ -21,20 +21,11 @@ def can_view_research(user) -> bool:  # noqa: ANN001
 
 
 def can_manage_platform(user) -> bool:  # noqa: ANN001
-    """Return the separately granted platform-admin capability.
-
-    ``accounts.manage_platform`` is the project capability.  The built-in
-    user-management permission remains an explicit compatibility fallback for
-    Django Admin installations that have not provisioned the project alias.
-    Neither branch relies on ``is_staff`` or a frontend assertion.
-    """
+    """Return the separately granted platform-admin capability."""
 
     if not getattr(user, "is_authenticated", False):
         return False
-    return bool(
-        user.has_perm(PLATFORM_ADMIN_PERMISSION)
-        or user.has_perm(PLATFORM_ADMIN_FALLBACK_PERMISSION)
-    )
+    return bool(user.has_perm(PLATFORM_ADMIN_PERMISSION))
 
 
 class ResearchViewerPermission(BasePermission):
@@ -55,8 +46,8 @@ class ResearchViewerPermission(BasePermission):
 
 
 __all__ = [
-    "PLATFORM_ADMIN_FALLBACK_PERMISSION",
     "PLATFORM_ADMIN_PERMISSION",
+    "RESEARCH_EXPORT_PERMISSION",
     "RESEARCH_VIEW_PERMISSION",
     "ResearchViewerPermission",
     "can_manage_platform",

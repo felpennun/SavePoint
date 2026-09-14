@@ -21,6 +21,7 @@ if render_hostname := os.environ.get("RENDER_EXTERNAL_HOSTNAME"):
     ALLOWED_HOSTS.append(render_hostname)
 
 INSTALLED_APPS = [
+    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
