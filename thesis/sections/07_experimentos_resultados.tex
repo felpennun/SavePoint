@@ -38,6 +38,34 @@ hybrid-mmr-v1 & híbrido + diversidad & 0.15913 & 0.09741 \\
 \end{tabularx}
 \end{table}
 
+La Tabla~\ref{tab:ndcg-todos-k} conserva \(nDCG\) en los tres cortes solicitados para el catálogo completo de variantes v15. Precision, recall y MAP permanecen en el artefacto y en la matriz de algoritmos para evitar una tabla de dieciséis filas y doce métricas que perdería legibilidad.
+
+\begin{table}[htbp]
+\centering
+\caption{nDCG publicado por algoritmo y corte $K$ en v15.}\label{tab:ndcg-todos-k}
+\tablecompact
+\begin{tabularx}{\textwidth}{@{}>{\ttfamily\raggedright\arraybackslash}p{0.45\textwidth}Yrrr@{}}
+\textnormal{Algoritmo} & \textnormal{Familia} & \textnormal{$K=5$} & \textnormal{$K=10$} & \textnormal{$K=20$} \\
+\hline
+random-v1 & baseline & 0.00000 & 0.00000 & 0.00000 \\
+popularity-v1 & baseline & 0.00191 & 0.00340 & 0.00340 \\
+content-cbf-weighted-v1 & contenido & 0.14114 & 0.17245 & 0.18987 \\
+content-cbf-multiplicative-v1 & contenido & 0.07707 & 0.08558 & 0.10241 \\
+content-cbf-twostage-v1 & contenido & 0.08827 & 0.11724 & 0.14002 \\
+content-cbf-neg-v1 & contenido & 0.09656 & 0.11778 & 0.12992 \\
+content-cbf-weighted-pop-v1 & contenido + popularidad & 0.13179 & 0.15181 & 0.17409 \\
+content-cbf-multiplicative-pop-v1 & contenido + popularidad & 0.07677 & 0.08517 & 0.10200 \\
+content-cbf-twostage-pop-v1 & contenido + popularidad & 0.08338 & 0.11410 & 0.14538 \\
+content-cbf-neg-pop-v1 & contenido + popularidad & 0.08602 & 0.09936 & 0.11582 \\
+recency-v1 & contenido + novedad & 0.00594 & 0.00594 & 0.00594 \\
+content-cbf-mmr-v1 & contenido + diversidad & 0.11600 & 0.13888 & 0.16160 \\
+content-cbf-mmr-pop-v1 & contenido + diversidad & 0.12211 & 0.13824 & 0.15362 \\
+cf-user-knn-v1 & colaborativo & 0.01585 & 0.02098 & 0.03163 \\
+hybrid-weighted-cf-v1 & híbrido & 0.14305 & 0.16989 & 0.18962 \\
+hybrid-mmr-v1 & híbrido + diversidad & 0.13195 & 0.15913 & 0.17401 \\
+\end{tabularx}
+\end{table}
+
 La diferencia numérica más visible en \(nDCG@10\) aparece entre \texttt{content-cbf-weighted-v1} y los baselines. El híbrido ponderado queda próximo a esa variante de contenido, mientras que el colaborativo aislado recupera menos positivos bajo este split. Esta observación es interna al artefacto: no prueba que contenido sea superior en una comunidad real, ni que los pesos del híbrido sean óptimos. La ejecución conserva una única muestra de 79 usuarios evaluables; por tanto, las conclusiones deben diferenciar diferencia numérica, contraste estadístico y relevancia metodológica.
 
 Para \(K=5\), \texttt{hybrid-weighted-cf-v1} publica \(nDCG=0.14305\), frente a \(0.14114\) de Weighted. Para \(K=20\), Weighted publica \(0.18987\) y el híbrido ponderado \(0.18962\). La proximidad de esas cifras ilustra por qué no es correcto proclamar un ganador. El baseline aleatorio permanece en cero en la cohorte publicada, y popularidad alcanza \(0.00340\) en \(nDCG@10\), lo que contextualiza la señal de contenido pero no mide utilidad subjetiva.
