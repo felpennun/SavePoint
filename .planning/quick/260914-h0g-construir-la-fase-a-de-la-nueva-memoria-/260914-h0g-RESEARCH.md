@@ -1,7 +1,7 @@
 # Investigación previa: inventario de la nueva memoria de SavePoint
 
-**Fecha:** 2026-09-14  
-**Dominio:** inventario académico, trazabilidad y preparación de LaTeX  
+**Fecha:** 2026-09-14
+**Dominio:** inventario académico, trazabilidad y preparación de LaTeX
 **Confianza:** ALTA, basada en inspección local del repositorio
 
 ## Resumen
