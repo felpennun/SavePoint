@@ -108,7 +108,7 @@
 - [x] **QUAL-01**: Project has unit, integration, and browser tests for critical workflows.
 - [ ] **QUAL-02**: A clean installation can reproduce experiments and their evidence.
 - [x] **QUAL-03**: Core workflows are responsive and verifiable against WCAG 2.2 AA.
-- [ ] **QUAL-04**: Charts and visualisations provide accessible textual or tabular alternatives.
+- [x] **QUAL-04**: Charts and visualisations provide accessible textual or tabular alternatives.
 - [ ] **QUAL-05**: Interface presents a professional, product-grade visual design comparable to established cataloguing applications (density, typography, imagery treatment), not a minimal utilitarian layout.
 
 ### Thesis and Agent-Assisted Methodology
@@ -256,7 +256,7 @@ system.
 | OPS-04 | Phase 7 | Pending |
 | OPS-05 | Phase 7 | Complete |
 | QUAL-01 | Phase 7 | Complete |
-| QUAL-04 | Phase 7 | Pending |
+| QUAL-04 | Phase 7 | Complete |
 | DOC-05 | Phase 7 | Pending |
 | DOC-06 | Phase 7 | Pending |
 | AGENT-05 | Phase 7 | Pending |

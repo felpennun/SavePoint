@@ -3,21 +3,21 @@ gsd_state_version: 1.0
 current_phase: 07
 current_phase_name: Research Panel, Hardening, and Evidence Freeze
 status: in_progress
-stopped_at: Completed 07-02-PLAN.md
-last_updated: "2026-09-14T00:37:40.648Z"
+stopped_at: Completed 07-03-PLAN.md
+last_updated: "2026-09-14T01:11:05.490Z"
 last_activity: 2026-09-14
-last_activity_desc: Phase 07 Plan 02 complete
-state_head: e2837afb54d9b3fe33da8bcdbbe58506cde7c34f
+last_activity_desc: Phase 07 Plan 03 complete
+state_head: a3e8f5142089a9ff009c759e9077f41cf3e9d1f0
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 66
-  completed_plans: 63
+  completed_plans: 64
   percent: 38
 total_plans_in_phase: 6
 next_phase: 07
 next_phase_name: Research Panel, Hardening, and Evidence Freeze
-next_action: Ejecutar 07-03-PLAN.md
+next_action: Ejecutar 07-04-PLAN.md
 current_plan: 03
 ---
 
@@ -36,7 +36,7 @@ rule that applies to every LLM and collaborator).
 ## Current Position
 
 **Phase:** 07 (Research Panel, Hardening, and Evidence Freeze) — IN PROGRESS
-**Plan:** 3 of 6
+**Plan:** 4 of 6
 **Plans in Phase:** 6
 **Status:** In progress; 07-00, 07-01 y 07-02 complete
 
@@ -136,6 +136,7 @@ Progreso global: 2/8 fases (25%).
 | Phase 07 P00 | 18 min | 3 tasks | 4 files |
 | Phase 07 P01 | 26 min | 3 tasks | 12 files |
 | Phase 07 P02 | 35min | 3 tasks | 32 files |
+| Phase 07-research-panel-hardening-and-evidence-freeze P03 | 2h 00m | 3 tasks | 20 files |
 
 ## Accumulated Context
 
@@ -195,6 +196,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 07]: [Phase 07 Plan 02]: Platform Admin usa exclusivamente evaluation.access_platform_admin; no se autoriza por is_staff, auth.change_user, cookies, nombres o frontend.
 - [Phase 07]: [Phase 07 Plan 02]: La privacidad normal es desactivar y anonimizar; el borrado irreversible exige superusuario, confirmación exacta y auditoría previa.
 - [Phase 07]: [Phase 07 Plan 02]: AuditEvent es allowlisted y append-only mediante trigger PostgreSQL, sin payload libre ni PII.
+- [Phase 07]: La UI del panel delega autorización, métricas, orden y serialización al backend y expone filtros GET allowlisted.
+- [Phase 07]: La imagen web fija las bibliotecas Debian y Chromium de Playwright para ejecutar la suite sin dependencias globales.
 
 ### Pending Todos
 
@@ -270,11 +273,11 @@ Ver `.planning/quick/260909-nej-a-adir-cuatro-variantes-popscore-con-imp/`.
 
 ## Registro histórico de sesiones (prevalece el checkpoint de ejecución actual)
 
-**Stopped at:** Completed 07-02-PLAN.md
+**Stopped at:** Completed 07-03-PLAN.md
 
 **Resume (after the rate-limit reset):** `/gsd-plan-phase 2` re-spawns the planner from scratch. All inputs are committed: `02-CONTEXT.md`, `02-UI-SPEC.md` (verified 7/7), `02-RESEARCH.md`, `02-VALIDATION.md`, `02-PATTERNS.md`, `02-COVERAGE.md`. Then `gsd-plan-checker` → revision loop → present → `/gsd-execute-phase 2`. Full detail in `.planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/.continue-here.md`.
 
-Last session: 2026-09-14T00:37:39.768Z
+Last session: 2026-09-14T01:11:04.199Z
 
 ### Done this session (2026-09-06, all committed on `main`)
 
