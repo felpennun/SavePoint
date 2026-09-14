@@ -42,11 +42,10 @@ describen cada entidad.
 
 \begin{figure}[htp]
     \centering
-    \missingfigure[figwidth=0.9\textwidth]{Diagrama entidad-relación del modelo de dominio: catálogo (GameWork, GameRelease, Edition, Platform, Genre, GameAlias, RelatedContent, SourceRecord, AssetAttribution, IgdbImportRun), biblioteca (LibraryEntry, StatusTransition, OwnedCopy) y cuentas (User, DemoAccountAnchor, DemoAccountIdentity). Pendiente de dibujar a partir de apps/api/*/models.py.}
-    \caption{Modelo de dominio de SavePoint.}
+    \includegraphics[width=0.95\textwidth]{figures/modelo-dominio.pdf}
+    \caption{Modelo de dominio de SavePoint, agrupado por catálogo, biblioteca personal, cuentas e investigación. Las flechas indican la dirección de la relación entre entidades; \texttt{IgdbImportRun} y \texttt{AssetAttribution} se omiten de la figura y se describen en el texto.}
     \label{fig:modelo-dominio}
 \end{figure}
-% PENDIENTE: diagrama entidad-relación real (figures/modelo-dominio.pdf) generado desde los modelos Django.
 
 En el catálogo, la entidad central es la obra (\texttt{GameWork}), la identidad canónica de
 un título de videojuego con independencia de la plataforma y de la edición. Su clave primaria
@@ -233,11 +232,10 @@ esta memoria.
 
 \begin{figure}[htp]
     \centering
-    \missingfigure[figwidth=0.9\textwidth]{Diagrama de casos de uso: Visitante (buscar juego, consultar ficha y procedencia, ver perfil público, ver recomendacion por popularidad, filtrar y ordenar catalogo, registrarse); Persona usuaria (iniciar y cerrar sesion, cambiar estado de backlog, valorar juego, registrar copias, abrir pagina de recomendaciones por generos). Pendiente de dibujar.}
-    \caption{Diagrama de casos de uso del sistema.}
+    \includegraphics[width=0.95\textwidth]{figures/casos-uso.pdf}
+    \caption{Diagrama de casos de uso del sistema, por actor principal.}
     \label{fig:casos-uso}
 \end{figure}
-% PENDIENTE: diagrama de casos de uso real (figures/casos-uso.pdf).
 
 La Tabla~\ref{tab:casos-uso} describe cada caso de uso con su actor principal y el requisito
 funcional que satisface.

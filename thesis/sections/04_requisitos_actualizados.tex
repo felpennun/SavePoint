@@ -1,12 +1,115 @@
 \chapter{Análisis de requisitos}\label{cap:requisitos}
 
-Los actores son visitante, usuario autenticado, propietario de colección, amistad aceptada, Research Viewer, Platform Admin, importación, evaluación, copia de seguridad y recuperación. El dominio incluye usuario, perfil, obra canónica, edición, plataforma, biblioteca, valoración, copias, lista, comentario, amistad, bloqueo, mensajes y recomendaciones sociales, snapshot, ejecución, algoritmo, métrica, artefacto y procedencia.
+Este capítulo fija qué debe hacer el sistema y bajo qué restricciones, antes de entrar en cómo
+se ha construido. Los requisitos se identifican con los mismos códigos estables que
+\texttt{.planning/REQUIREMENTS.md} usa en el repositorio, de modo que la matriz de
+trazabilidad de este capítulo y la del propio proyecto coinciden sin necesidad de mantener dos
+numeraciones distintas.
 
-Las reglas críticas sitúan la autoridad de permisos en backend: listas y colecciones compartidas solo alcanzan amistades aceptadas; una ruta alternativa no puede exponer contenido privado; rechazar o eliminar una amistad no equivale a bloquear; el bloqueo impide interacción y oculta la relación; la recomendación social se limita a una por semana. Los snapshots de investigación son inmutables, Research Viewer y Platform Admin son capacidades distintas y la interfaz no recalcula resultados científicos.
+\section{Actores del sistema}\label{sec:req-actores}
 
-Los requisitos no funcionales incluyen reproducibilidad, accesibilidad, diseño responsive, privacidad, seguridad, procedencia, trazabilidad, integridad, disponibilidad, portabilidad, mantenibilidad, auditabilidad y rendimiento. La cadena completa de requisitos y casos de uso se mantiene en \texttt{REQUIREMENTS-TRACEABILITY.md}; los flujos extensos y el diagrama permanecen \todo{PENDIENTE: confirmar con el autor} cuando no existe captura o diagrama verificable.
+El sistema distingue tres actores con acceso real. El visitante, sin autenticar, puede
+consultar el catálogo, la ficha de cada juego con su procedencia, un perfil público y la
+recomendación por popularidad. La persona usuaria, titular de una cuenta controlada, gestiona
+además su propia lista de pendientes, valora juegos e inventaría sus copias físicas y
+digitales. La cuenta simulada es una variante etiquetada con claridad como tal, precargada
+para que el tribunal y cualquier visitante puedan recorrer el sistema sin crear una cuenta
+propia. Dos actores adicionales, un perfil de administración de cuentas y catálogo y un perfil
+de personal investigador con acceso al panel de comparación de algoritmos, se incluyen en el
+análisis para dar contexto completo al modelo, aunque su implementación queda fuera del
+alcance descrito en esta memoria.
 
-La Tabla~\ref{tab:trazabilidad-resumida} resume tres cadenas representativas. La matriz documental conserva el detalle de identificadores, planes y localizadores para no convertir esta tabla de lectura en una fuente paralela.
+\section{Requisitos de información: modelo de dominio}\label{sec:req-informacion}
+
+El modelo de dominio distingue tres áreas: catálogo, biblioteca personal y cuentas. En el
+catálogo, la entidad central es la obra (\texttt{GameWork}), la identidad canónica de un
+título de videojuego con independencia de la plataforma y de la edición concreta. Su clave
+primaria es un identificador único universal (UUID) generado en el momento de la importación,
+de modo que cambiar de proveedor de enriquecimiento, o prescindir de él, nunca obliga a
+renumerar el catálogo. Cada obra puede tener varias publicaciones, una por plataforma; cada
+publicación puede tener a su vez varias ediciones. La obra guarda también, de forma
+deliberadamente desnormalizada, la fecha de primer lanzamiento y la valoración agregada de
+origen, para que filtrar por año o por nota sea un recorrido de índice y no una agregación
+sobre cientos de miles de publicaciones en cada consulta. Los alias bilingües sostienen la
+búsqueda tolerante a errores tipográficos mediante un índice de trigramas. La procedencia de
+cada obra (fuente, identificador de origen, licencia, fecha de recuperación y huella del
+contenido) se conserva junto a ella, no como un metadato aparte que se pueda perder.
+
+En la biblioteca personal, la entrada de biblioteca representa la relación entre una persona y
+una obra: su estado en la lista de pendientes y su valoración, esta última almacenada como un
+entero de medias estrellas entre uno y diez, nunca como un número en coma flotante que
+introduciría precisión falsa. Una restricción de unicidad impide más de una entrada por
+persona y obra. El historial de cambios de estado se conserva como un registro de solo
+anexado, de forma que se puede reconstruir cuándo una persona empezó, dejó o retomó un juego.
+Las copias en propiedad representan cada ejemplar físico o digital, con su formato, su
+publicación y su edición. Llevan además una clave de idempotencia que evita duplicados cuando
+el usuario reintenta un alta que en realidad ya se había registrado.
+
+En cuentas, el sistema usa el modelo de usuario de Django directamente y añade sobre él las
+entidades necesarias para identificar de forma inequívoca qué cuentas son simuladas, con una
+restricción de base de datos que impide, incluso por error de aplicación, que una cuenta
+simulada deje de estar marcada como tal.
+
+\section{Requisitos funcionales y su estado}\label{sec:req-funcionales}
+
+De los noventa y cuatro requisitos identificados en el análisis, ochenta y uno están
+completos, con evidencia verificable en \texttt{docs/verification/} o en las firmas de
+aceptación por fase; los trece restantes quedan como trabajo futuro explícito. Entre los completos están
+la autenticación con cuentas simuladas, la búsqueda y el filtrado del catálogo, la ficha de
+detalle con su procedencia, el ciclo completo de biblioteca y copias, la privacidad de perfil,
+el baseline de popularidad y, como desarrolla en profundidad la
+Parte~\ref{part:algoritmos} de esta memoria, las tres familias completas de recomendación
+(basada en contenido, colaborativa e híbrida) con su protocolo de evaluación offline. Entre lo
+que queda pendiente, la mayor parte pertenece a un mismo bloque coherente: el contrato de
+evaluación ampliado (cobertura, novedad, significación estadística y arranque en frío medido de
+forma sistemática, más que demostrada puntualmente) y la exportación e importación completa de
+colecciones en formatos adicionales al ya soportado, ambos documentados como líneas de
+continuación en el Capítulo~\ref{cap:conclusiones} en lugar de presentarse como si ya
+existieran.
+
+\section{Requisitos no funcionales}\label{sec:req-no-funcionales}
+
+Los requisitos no funcionales se agrupan en cinco familias. La \textbf{reproducibilidad} exige
+que el sistema arranque de forma determinista en un entorno local documentado, con todas las
+dependencias fijadas a una versión exacta. La \textbf{legalidad y procedencia de datos} exige
+que cada dato del catálogo conserve su fuente, su licencia y su fecha de recuperación, con la
+elección de cada fuente documentada junto con sus términos de uso. La
+\textbf{accesibilidad y el diseño responsive} exigen que los flujos principales funcionen con
+teclado y en anchuras de escritorio y de móvil, verificables frente a las Pautas de
+Accesibilidad para el Contenido Web (WCAG) 2.2 en nivel AA~\cite{wcag22}. La
+\textbf{seguridad de la demostración controlada} exige que ningún secreto aparezca en el
+control de versiones, en los paquetes servidos al navegador ni en ningún artefacto público, y
+que toda acción de escritura quede protegida contra falsificación de petición en sitios
+cruzados. La \textbf{calidad visual de producto}, por último, exige que la interfaz presente
+la densidad, la tipografía y el tratamiento de imagen propios de un producto de catalogación
+cuidado, no de un prototipo funcional sin pulir.
+
+\section{Reglas de negocio}\label{sec:req-reglas}
+
+Algunas reglas gobiernan el comportamiento del sistema con independencia de la pantalla desde
+la que se disparen; conviene enunciarlas aquí una sola vez. La identidad de una obra es
+siempre un identificador interno propio: el identificador del proveedor externo se guarda solo
+como procedencia, nunca como clave. El contenido descargable y las expansiones se muestran
+dentro de la página de su obra padre, nunca como resultado independiente del catálogo. Los
+detalles privados de propiedad, como notas o datos de compra, no aparecen en ninguna
+proyección pública bajo ninguna circunstancia. La valoración se almacena siempre como un entero
+de medias estrellas. La recomendación por popularidad se calcula solo sobre actividad de
+cuentas simuladas y nunca se presenta como personalizada, mientras que la recomendación
+basada en la actividad propia de una persona nunca cae de forma silenciosa al baseline de
+popularidad cuando no hay suficiente historial: muestra en su lugar un estado explícito de
+bienvenida. Registrar de nuevo una copia con la misma clave de idempotencia devuelve la copia
+existente en lugar de crear un duplicado. El acceso a fuentes de datos externas, por último,
+queda siempre confinado a comandos de gestión fuera de línea: ninguna petición de un visitante o de una
+persona usuaria dispara, directa o indirectamente, una llamada a un proveedor externo.
+
+\section{Matriz de trazabilidad}\label{sec:req-trazabilidad}
+
+La Tabla~\ref{tab:trazabilidad-resumida} muestra tres cadenas representativas, cada una
+enlazando un requisito con su implementación y con la evidencia que certifica que se cumple. La
+matriz completa, con el detalle de cada uno de los noventa y cuatro requisitos, vive en
+\texttt{.planning/REQUIREMENTS.md} y en la traza documental por fase de
+\texttt{docs/verification/}, para no convertir esta tabla de lectura en una fuente paralela que
+se pueda desincronizar del repositorio.
 
 \begin{table}[htbp]
 \centering
@@ -15,8 +118,11 @@ La Tabla~\ref{tab:trazabilidad-resumida} resume tres cadenas representativas. La
 \begin{tabularx}{\textwidth}{@{}>{\ttfamily\raggedright\arraybackslash}p{0.15\textwidth}YYY@{}}
 \textnormal{Requisito} & \textnormal{Caso de uso} & \textnormal{Implementación y test} & \textnormal{Evidencia} \\
 \hline
-Privacidad de perfil & Consultar perfil compartido & cuentas, biblioteca y permisos de backend & signoff y auditoría de seguridad de Fase 7 \\
-Recomendación offline & Ejecutar comparación & \texttt{evaluation/}, \texttt{recommendations/} y pruebas de runner & manifiesto y resultados v15 \\
+Privacidad de perfil & Consultar perfil compartido & cuentas, biblioteca y permisos de backend & firma de aceptación y auditoría de seguridad \\
+Recomendación offline & Ejecutar comparación & \texttt{evaluation/}, \texttt{recommendations/} y pruebas del runner & manifiesto y resultados publicados \\
 Recuperación operativa & Restaurar copia & scripts e infraestructura versionados & \texttt{backup-recovery.md} \\
 \end{tabularx}
 \end{table}
+
+Este capítulo ha fijado qué debe hacer el sistema y con qué restricciones. El capítulo
+siguiente describe cómo se ha diseñado para cumplirlo.

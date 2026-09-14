@@ -1,21 +1,106 @@
-﻿\chapter{Introducción, problema y objetivos}\label{cap:introduccion}
+\chapter{Introducción, problema y objetivos}\label{cap:introduccion}
 
-\section{Contexto y problema}
+\section{Origen y motivación}\label{sec:origen-motivacion}
 
-SavePoint es una plataforma web para catalogar videojuegos, mantener una biblioteca personal y registrar valoraciones, listas, copias, comentarios y relaciones sociales. El producto es necesario para recoger y gobernar señales, pero no constituye por sí solo la pregunta central de este Trabajo Fin de Grado. El problema científico consiste en comparar recomendadores de videojuegos bajo un procedimiento que permita saber qué datos, parámetros, candidatas y métricas produjeron cada resultado.
+Llevo tiempo usando Goodreads para llevar la cuenta de los libros que leo y de lo que me han
+parecido; Letterboxd hace lo mismo con el cine: una ficha por obra, un estado de consumo, una
+valoración con una escala consistente, listas ordenadas y un perfil que resume la actividad a
+lo largo del tiempo. Cuando empecé a pensar en el tema de este Trabajo Fin de Grado, eché en
+falta algo parecido para los videojuegos, que es donde de hecho paso más horas de ocio que
+leyendo o viendo cine. Hay intentos, como Backloggd, que calca bastante bien el patrón de
+Letterboxd para el videojuego, pero ninguno resuelve un problema que sí es propio de este medio
+y que ni Goodreads ni Letterboxd necesitan afrontar: un mismo videojuego puede tenerse a la vez
+en cartucho, en disco y en descarga, en más de una plataforma; esa distinción de propiedad
+material no tiene ficha ni equivalente en un libro o una película. El
+Capítulo~\ref{cap:estado-del-arte} desarrolla esta comparación con más detalle y muestra que
+ningún producto existente cubre ese hueco.
 
-Una lista de recomendaciones no es evidencia suficiente. Sin un corpus congelado, una población definida, una división conocida y artefactos identificables, dos ejecuciones pueden parecer comparables aunque respondan a experimentos distintos. SavePoint separa por ello la aplicación que presenta resultados de los trabajos offline que construyen y evalúan rankings. Se diseñó, implementó y validó esa separación mediante código, pruebas y evidencias versionadas.
+De esa carencia nació la idea original de SavePoint: aplicar el patrón de catalogación
+personal de Goodreads y Letterboxd al videojuego, con ficha canónica, biblioteca, valoraciones
+y perfil público, pero añadiendo lo que a esos productos no les hace falta y a este sí, un
+inventario de copias físicas y digitales por edición y plataforma, con procedencia de datos
+verificable en lugar de un catálogo mantenido a mano.
 
-\section{Objetivo y preguntas de investigación}
+Esa idea, sin embargo, no basta por sí sola para justificar un Trabajo Fin de Grado del Grado
+en Ingeniería Informática. Un catalogador de videojuegos, por bien construido que esté, es un
+producto, no una investigación. Lo que convierte el proyecto en un problema de ingeniería del
+software con sustancia propia es la pregunta que surge en cuanto ese catálogo existe y empieza
+a acumular biblioteca, valoraciones y comportamiento de usuario reales: si ya tengo una
+plataforma con datos de este tipo, ¿puedo usarla para comparar de forma rigurosa distintos
+algoritmos de recomendación de videojuegos, de manera que la comparación sea reproducible por
+un tercero y no solo una lista de resultados que hay que creerse? Esa pregunta, no el
+catalogador en sí, es el núcleo científico de este trabajo. La aplicación web es la condición
+necesaria que lo hace posible (sin un catálogo gobernado y una biblioteca con señales reales no
+hay nada que recomendar ni forma honesta de comparar cómo se recomienda), pero el objeto de
+estudio del TFG son los algoritmos, su evaluación y el protocolo que hace esa evaluación
+defendible.
 
-El objetivo general es construir una plataforma de catalogación que sirva como banco de pruebas reproducible para recomendación basada en contenido, colaborativa e híbrida. El trabajo pregunta qué señales se pueden representar de forma explicable en un catálogo de videojuegos, cómo cambia la recuperación de un ítem relevante al combinar contenido, popularidad, vecindad y diversidad, y qué conclusiones son defendibles bajo un corpus y una población sintética concretos.
+\section{Contexto y problema}\label{sec:contexto-problema}
 
-Los objetivos específicos son gobernar el catálogo y su procedencia; modelar biblioteca, privacidad y relaciones sociales; implementar baselines y las tres familias de recomendación; publicar un protocolo offline con candidatas comunes; y conservar hashes, configuraciones y artefactos que hagan auditable la comparación. La hipótesis operativa no afirma superioridad universal: bajo el protocolo publicado, una combinación de señales puede mejorar la recuperación frente a baselines simples, pero debe contrastarse sin confundir diferencia numérica con significación o validez externa.
+SavePoint es, por tanto, dos cosas a la vez. Es una plataforma web completa para catalogar
+videojuegos, mantener una biblioteca personal y registrar valoraciones, listas, copias,
+comentarios y relaciones sociales, del mismo modo que lo haría cualquier producto de
+catalogación social. Y es, sobre esa plataforma, un banco de pruebas reproducible para
+comparar recomendadores de videojuegos bajo un procedimiento que permite saber en todo momento
+qué datos, qué parámetros, qué candidatas y qué métricas produjeron cada resultado. El producto
+es necesario para recoger y gobernar las señales que la comparación necesita, pero no
+constituye por sí solo la pregunta central de este Trabajo Fin de Grado.
 
-\section{Alcance y límites}
+Una lista de recomendaciones no es evidencia suficiente de que un algoritmo funciona mejor que
+otro. Sin un corpus congelado, una población definida, una división conocida y artefactos
+identificables, dos ejecuciones pueden parecer comparables aunque en realidad respondan a
+experimentos distintos, con datos distintos o con criterios de éxito distintos. SavePoint
+separa por ello, de forma deliberada, la aplicación que presenta resultados a un usuario de los
+trabajos offline que construyen y evalúan esos rankings. Esa separación no es solo una decisión
+de arquitectura: se diseñó, implementó y validó mediante código, pruebas y evidencias
+versionadas. Es esa separación la que permite que las conclusiones de la
+Parte~\ref{part:algoritmos} de esta memoria se puedan volver a comprobar.
 
-El alcance funcional incluye catálogo, importación gobernada, biblioteca, copias físicas y digitales, valoraciones, listas, comentarios, perfiles, privacidad, módulo social, recomendaciones, panel de investigación, seguridad y copia de seguridad. El alcance experimental se limita a una publicación v15: corpus \texttt{2026.09.2}, 400 usuarios sintéticos activos, 79 evaluables y una única ejecución del test. Estos usuarios no son personas reales. Por tanto, los resultados dependen del corpus, la semilla, el split y el protocolo; no permiten generalizar automáticamente preferencias reales ni declarar un método como mejor fuera de esas condiciones.
+\section{Objetivo y preguntas de investigación}\label{sec:objetivos}
 
-\section{Estructura de la memoria}
+El objetivo general del trabajo es construir una plataforma de catalogación de videojuegos que
+sirva, al mismo tiempo, como banco de pruebas reproducible para recomendación basada en
+contenido, colaborativa e híbrida. De ahí se derivan las preguntas que el trabajo intenta
+responder: qué señales de un videojuego (género, plataforma, etiquetas curadas, calidad
+externa, popularidad) se pueden representar de forma explicable en un catálogo real; cómo
+cambia la recuperación de un ítem relevante cuando se combinan contenido, popularidad,
+vecindad entre usuarios y diversidad de la lista resultante; y qué conclusiones son
+defendibles cuando el corpus y la población de usuarios son, como se explica más abajo,
+sintéticos y no personas reales.
 
-Los capítulos siguientes exponen primero la gestión y las bases científicas. Después se describen requisitos y diseño. Los Capítulos~\ref{cap:algoritmos} y \ref{cap:experimentos} forman el núcleo: detallan señales, fórmulas, protocolo y resultados. El documento termina con implementación, verificación, límites y líneas de continuación.
+Los objetivos específicos son gobernar el catálogo y su procedencia de datos; modelar
+biblioteca, privacidad y relaciones sociales con el mismo nivel de cuidado que el catálogo;
+implementar tanto los algoritmos de referencia (\textit{baselines}) como las tres familias de
+recomendación descritas en el Capítulo~\ref{cap:estado-del-arte}; publicar un protocolo offline
+con candidatas comunes para que la comparación entre algoritmos sea justa; y conservar hashes,
+configuraciones y artefactos que hagan auditable cada resultado. La hipótesis operativa del
+trabajo no afirma la superioridad universal de ningún algoritmo: bajo el protocolo publicado,
+combinar señales de contenido, popularidad y vecindad puede mejorar la recuperación frente a
+los baselines más simples, pero esa mejora debe contrastarse sin confundir una diferencia
+numérica con significación estadística o con validez fuera del corpus y la población con los
+que se midió.
+
+\section{Alcance y límites}\label{sec:alcance-limites}
+
+El alcance funcional del producto incluye catálogo, importación gobernada de datos, biblioteca,
+copias físicas y digitales, valoraciones, listas, comentarios, perfiles, privacidad, módulo
+social, recomendaciones, un panel de investigación y las medidas de seguridad y copia de
+seguridad propias de un servicio con usuarios. El alcance experimental, en cambio, se limita a
+una publicación de evidencia concreta, identificada como v15: corpus \texttt{2026.09.2},
+cuatrocientos usuarios sintéticos activos, de los cuales setenta y nueve son evaluables, con
+una única ejecución del test. Conviene subrayar que estos usuarios sintéticos no son personas
+reales, sino perfiles generados de forma controlada para poder ejercitar el sistema de
+recomendación sin depender de una base de usuarios real que este TFG no tiene tiempo ni alcance
+para reunir. Los resultados, por tanto, dependen del corpus concreto, de la semilla aleatoria,
+de la división de datos y del protocolo empleados: no permiten generalizar automáticamente a
+preferencias de jugadores reales ni declarar un método como mejor fuera de esas condiciones.
+
+\section{Estructura de la memoria}\label{sec:estructura-memoria}
+
+Los capítulos siguientes exponen primero el estado del arte, la gestión del trabajo y sus bases
+científicas. A continuación se describen los requisitos y el diseño de la solución. Los
+Capítulos~\ref{cap:algoritmos} y~\ref{cap:experimentos} forman el núcleo experimental de la
+memoria: detallan las señales empleadas, sus fórmulas, el protocolo de evaluación y los
+resultados obtenidos. El documento termina con la implementación, la verificación, el
+despliegue, las limitaciones honestas del trabajo y las líneas de continuación que deja
+abiertas.

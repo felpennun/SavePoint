@@ -2,10 +2,9 @@
 
 Este capítulo describe cómo se ha organizado el trabajo. Empieza por los objetivos de
 gestión y por el método de desarrollo iterativo. Después detalla la metodología de ingeniería
-asistida por agentes de inteligencia artificial, que el planteamiento del trabajo pide tratar
-como una aportación observable y no como una nota al margen. Termina con la estimación de
-esfuerzo, los riesgos, las lecciones de ingeniería más relevantes y las convenciones de
-commits y de idioma.
+gobernada mediante GSD, que el planteamiento del trabajo pide tratar como una aportación
+observable y no como una nota al margen. Termina con la estimación de esfuerzo, los riesgos,
+las lecciones de ingeniería más relevantes y las convenciones de commits y de idioma.
 
 \section{Objetivos de gestión}\label{sec:met-objetivos-gestion}
 
@@ -31,11 +30,10 @@ el agente.
 
 \begin{figure}[htp]
     \centering
-    \missingfigure[figwidth=0.85\textwidth]{Diagrama del ciclo GSD: idea, hoja de ruta, discutir, contrato de interfaz, planificar, ejecutar, verificar y revisar; con los artefactos que produce cada paso en el árbol .planning/. Pendiente de dibujar.}
+    \includegraphics[width=0.72\textwidth]{figures/ciclo-gsd.pdf}
     \caption{Ciclo de un incremento en el método GSD y los artefactos que produce cada paso.}
     \label{fig:ciclo-gsd}
 \end{figure}
-% PENDIENTE: sustituir el \missingfigure por un diagrama real del ciclo GSD (figures/ciclo-gsd.pdf).
 
 En la práctica, cada incremento se abre con una discusión que fija por escrito sus decisiones
 y supuestos. Si tiene interfaz, se establece además un contrato de diseño con sus componentes
@@ -63,7 +61,9 @@ Cada incremento se descompone en \texttt{.planning/phases/} en pares de plan y r
 plan fija el alcance y los criterios de aceptación antes de implementar, mientras que el
 resumen registra lo ejecutado, las desviaciones y las evidencias al cerrar. Junto a ellos
 viven los documentos de contexto, investigación, contrato de interfaz, verificación e ítems
-diferidos de cada incremento.
+diferidos de cada incremento. Junto a este árbol normativo, el proyecto mantiene en
+\texttt{ideas-vault/} un vault de Obsidian que enlaza los mismos conceptos entre sí de forma
+navegable; el Capítulo~\ref{cap:gestion} lo describe con su propio grafo.
 
 La Tabla~\ref{tab:planning-arbol} enumera los artefactos principales del árbol y su función.
 
@@ -120,9 +120,9 @@ La planificación se dividió en seis olas. Las dos primeras cerraron la fronter
 los ratings y el protocolo. La tercera reunió la búsqueda, la API de catálogo, los usuarios
 sintéticos y las primeras primitivas del recomendador. La cuarta reservó la interfaz de
 filtros y las variantes de contenido; la quinta, la ficha y la ejecución comparativa; y la
-sexta, la página final de recomendaciones. En esta versión están cerrados los planes 02-01,
-02-02, 02-03, 02-05, 02-07, 02-08 y 02-10. Los planes 02-04, 02-06, 02-09, 02-11, 02-12 y
-02-13 permanecen abiertos o pendientes de ejecución.
+sexta, la página final de recomendaciones. De esos planes, 02-01, 02-02, 02-03, 02-05, 02-07, 02-08, 02-09 y 02-10 quedaron cerrados y
+verificados; el resto se fue incorporando en incrementos posteriores, según recoge
+\texttt{ROADMAP.md}.
 
 El orden no es accidental. El corpus y el snapshot preceden al protocolo; el protocolo
 precede a la generación de usuarios y a la implementación de variantes; y solo entonces se
@@ -149,7 +149,7 @@ pertenece al producto y no se utiliza como entrada mutable del laboratorio.
 La relevancia quedó fijada como una entrada de biblioteca con estado completado y una
 valoración de al menos siete medias estrellas
 (\texttt{rating\_half\_steps >= 7}). Para cada usuario se retiene una obra mediante
-\textit{leave-one-out}, con semilla 20260907, y se devuelve al conjunto de candidatos. Este
+\textit{leave-one-out}, con semilla 20260907; después se devuelve al conjunto de candidatos. Este
 conjunto es el corpus gobernado menos cualquier obra presente en la biblioteca, más la obra
 retenida. De este modo, todos los algoritmos predicen exactamente el mismo caso y no
 recomiendan obras ya conocidas.
@@ -163,7 +163,7 @@ generosidad al puntuar y la mezcla de estados. Sus usuarios se identifican con e
 baseline de popularidad de la aplicación ni se presentan como actividad real.
 
 El protocolo utiliza \texttt{precision@k}, \texttt{recall@k}, \texttt{nDCG@k} y
-\texttt{MAP@k}, para $k\in\{5,10,20\}$, y fija \texttt{nDCG@10} como métrica titular. La
+\texttt{MAP@k}, para $k\in\{5,10,20\}$; fija \texttt{nDCG@10} como métrica titular. La
 rejilla de ajuste contiene 18 configuraciones, se selecciona en validación y el conjunto de
 prueba solo se puede consumir una vez. El protocolo declara explícitamente que la población
 es simulada: la ejecución de referencia produjo 200 usuarios y una cohorte independiente
@@ -186,10 +186,10 @@ mezcla de rating mostrada en la ficha también quedó señalada para confirmaci�
 no debe confundirse con el término de rating del laboratorio, que procede del snapshot
 inmutable.
 
-\section{Agentes de inteligencia artificial y skills}\label{sec:met-agentes}
+\section{Agentes de GSD y skills}\label{sec:met-agentes}
 
-El proyecto se desarrolló con asistencia sistemática de agentes de inteligencia artificial.
-Conviene delimitar desde el principio el reparto de responsabilidades, que la
+El proyecto se desarrolló con asistencia sistemática de los agentes especializados que define
+GSD. Conviene delimitar desde el principio el reparto de responsabilidades, que la
 Sección~\ref{sec:met-encuadre} retoma: los agentes ejecutan, mientras que la definición del
 alcance, los criterios de aceptación, la revisión de cada entrega y la decisión final son
 del proyecto. El uso de agentes se describe aquí como una metodología de trabajo que se
@@ -340,9 +340,9 @@ recogidos en la Sección~\ref{sec:met-memoria}. Las revisiones de código encont
 de seguridad reales en trabajo ya dado por bueno. Un agente no es un evaluador independiente
 de su propia propuesta, del mismo modo que un hash prueba identidad de bytes, no veracidad ni
 calidad. Por último, el enfoque no sustituye el juicio del proyecto sobre arquitectura, alcance
-y aceptación, sino que lo enmarca. Existe un informe de uso de inteligencia artificial
-independiente y posterior que cubre la transparencia de la herramienta; esta memoria ni lo
-suple ni lo contradice.
+y aceptación, sino que lo enmarca. Existe un informe de uso de herramientas de asistencia,
+independiente y posterior, que cubre la transparencia de su empleo; esta memoria ni lo suple
+ni lo contradice.
 
 \subsection{Encuadre}\label{sec:met-encuadre}
 
@@ -359,7 +359,7 @@ diferidos, en \texttt{deferred-items.md}, recogen los hallazgos fuera de alcance
 durante la ejecución, con su motivo y su destino. Los registros de decisión de arquitectura,
 en \texttt{docs/adr/}, documentan cada decisión material con su contexto, sus alternativas,
 su decisión, su evidencia, sus consecuencias y su reversibilidad. El
-Capítulo~\ref{cap:diseno} resume los siete registros de decisión de arquitectura vigentes.
+Capítulo~\ref{cap:diseno} resume los nueve registros de decisión de arquitectura vigentes.
 
 \section{Planificación temporal}\label{sec:met-temporal}
 
@@ -431,7 +431,7 @@ mantienen bajo vigilancia.
     \hline
     Portadas por enlace directo a un tercero & Ventana de retención de treinta días asumida; ausencia o fallo de una portada cae a un marcador propio. \\
     \hline
-    El protocolo de evaluación debe congelarse antes de comparar recomendadores & El heurístico de géneros del sistema se declara explícitamente fuera de esa comparación, que queda como trabajo futuro. \\
+    El protocolo de evaluación debe congelarse antes de comparar recomendadores & El heurístico de géneros del sistema se declaró explícitamente fuera de esa comparación desde el principio; la comparación en sí se congeló y se ejecutó más tarde, como recoge la Parte~\ref{part:algoritmos}. \\
     \hline
     Errores del agente en trabajo dado por bueno & Verificación de objetivos independiente y revisión de código de todo el repositorio con contexto propio. \\
     \hline

@@ -23,11 +23,10 @@ nunca dentro de ella.
 
 \begin{figure}[htp]
     \centering
-    \missingfigure[figwidth=0.9\textwidth]{Diagrama de arquitectura: capa de presentación Next.js 16 (App Router, SSR), proxy same-origin, capa de aplicacion Django 5.2 / DRF con los modulos catalogue, library, accounts y recommendations, persistencia PostgreSQL 18 y la tuberia de ingesta fuera de linea (comandos de gestion IGDB y Wikidata). Pendiente de dibujar.}
-    \caption{Arquitectura de SavePoint.}
+    \includegraphics[width=0.8\textwidth]{figures/arquitectura.pdf}
+    \caption{Arquitectura de SavePoint: el navegador solo habla con Next.js, que reescribe las llamadas hacia Django y DRF; los comandos de ingesta y el runner de evaluación escriben en PostgreSQL fuera de la petición HTTP.}
     \label{fig:arquitectura}
 \end{figure}
-% PENDIENTE: diagrama de arquitectura real (figures/arquitectura.pdf).
 
 \section{Decisiones de arquitectura}\label{sec:dis-adr}
 
@@ -54,7 +53,7 @@ límites de dominio y las migraciones actúan como puntos de salida si una decis
     \hline
     ADR-006 & IGDB como fuente del catálogo a escala real, con portadas por enlace directo. Cobertura real y modelado de género y plataforma de primera clase, a cambio de una obligación de atribución continua y de una licencia que es un acuerdo, no una dedicación al dominio público. \\
     \hline
-    ADR-007 & Heurístico determinista de afinidad por géneros para la página de recomendaciones. Entrega el requisito como página real y explicable sin adelantar una comparación sistemática de recomendadores, que queda fuera del alcance de esta memoria. \\
+    ADR-007 & Heurístico determinista de afinidad por géneros para la página de recomendaciones. Entrega el requisito como página real y explicable, deliberadamente al margen de la comparación sistemática de recomendadores que los Capítulos~\ref{cap:algoritmos} y~\ref{cap:experimentos} presentan más adelante. \\
     \hline
 \end{tabularx}
 \caption{Registros de decisión de arquitectura vigentes.}

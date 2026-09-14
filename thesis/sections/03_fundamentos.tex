@@ -1,5 +1,52 @@
-\chapter{Estado del arte y fundamentos científicos}\label{cap:fundamentos}
+\chapter{Fundamentos de evaluación de recomendadores}\label{cap:fundamentos}
 
-Las plataformas de catálogo muestran que biblioteca, valoración y descubrimiento pueden convivir. SavePoint añade una frontera experimental reproducible. Los recomendadores basados en contenido comparan atributos con un perfil; los colaborativos aprovechan coincidencias entre usuarios; los híbridos combinan ambas fuentes \cite{ricci2022handbook,adomavicius2005toward,burke2002hybrid}. Cada familia afronta de forma distinta explicabilidad, cobertura y arranque en frío.
+El Capítulo~\ref{cap:estado-del-arte} sitúa el panorama general de los sistemas de
+recomendación y los riesgos conocidos de su evaluación. Este capítulo es deliberadamente
+breve: recoge el vocabulario concreto y las métricas que los Capítulos~\ref{cap:algoritmos}
+y~\ref{cap:experimentos} usan sin volver a introducirlas cada vez, de modo que el lector llegue
+a la Parte~\ref{part:algoritmos} con las definiciones ya asentadas.
 
-La evaluación offline exige fijar tarea, relevancia, candidatas, división y agregación. Precision, recall, nDCG y MAP miden recuperación de rankings; diversidad, novedad y cobertura completan el análisis \cite{herlocker2004evaluating,gunawardana2015evaluating}. Ninguna métrica equivale a satisfacción humana. El diseño de SavePoint adopta estas bases, pero sus pesos, umbrales y taxonomía son decisiones locales, versionadas y revisables.
+\section{La tarea de evaluación offline}\label{sec:fundamentos-tarea}
+
+Evaluar un recomendador sin usuarios reales delante exige fijar por adelantado, antes de mirar
+ningún resultado y no después, cinco decisiones: la tarea concreta que se mide (recomendar los
+siguientes $K$ ítems que a una persona le interesarán, no predecir la nota exacta que
+pondría), el criterio de relevancia que separa un acierto de un fallo, el conjunto de
+candidatas sobre el que compite cada algoritmo, la división de los datos entre lo que el modelo
+puede ver y lo que se usa para medir, y la forma de agregar el resultado por usuario en una
+única cifra por algoritmo. SavePoint fija estas cinco decisiones en un protocolo versionado
+que el Capítulo~\ref{cap:experimentos} describe con detalle; aquí interesa solo el vocabulario
+que ese protocolo emplea.
+
+\section{Métricas de recuperación de rankings}\label{sec:fundamentos-metricas}
+
+\textit{Precision at K} mide qué proporción de los $K$ ítems recomendados resultan relevantes;
+\textit{recall at K} mide qué proporción de todos los ítems relevantes que existen aparecen
+entre esos $K$. Ninguna de las dos distingue la posición dentro de la lista: acertar en el
+primer puesto cuenta igual que acertar en el último. Para corregir esa carencia se usa el
+\textit{normalized discounted cumulative gain} (nDCG), que descuenta el valor de un acierto
+cuanto más abajo aparece en la lista y lo normaliza frente al orden ideal posible, de modo que
+premia a los algoritmos que además de acertar, acierten pronto. El \textit{mean average
+precision} (MAP) promedia, para cada usuario, la precisión acumulada en cada posición donde
+hubo un acierto y después promedia ese valor entre usuarios; es sensible tanto a la cantidad
+de aciertos como a su posición, lo que lo hace más exigente que la precisión simple.
+
+Estas cuatro métricas comparten una limitación de fondo: ninguna equivale a satisfacción
+humana, porque miden coincidencia con un historial pasado, no si a la persona le va a gustar de
+verdad lo que se le recomienda. Por eso se completan con tres métricas de otra naturaleza. La
+diversidad mide cuánto se parecen entre sí los ítems dentro de una misma lista recomendada:
+penaliza a un algoritmo que acierta mucho pero siempre con variaciones del mismo juego. La
+novedad mide cuánto se aleja la recomendación de lo obvio o lo ya muy popular. La cobertura
+mide qué proporción del catálogo entero llega a aparecer alguna vez recomendada, en lugar de
+concentrarse siempre en el mismo puñado de éxitos. Un recomendador que maximiza solo precisión
+o nDCG puede hacerlo a costa de las tres, recomendando siempre lo mismo a todo el mundo; el
+Capítulo~\ref{cap:algoritmos} explica cómo SavePoint reordena sus listas para compensarlo.
+
+\section{De la métrica a la decisión de diseño}\label{sec:fundamentos-decision}
+
+Estas definiciones son el punto de partida común de la literatura sobre sistemas de
+recomendación, pero los pesos concretos, los umbrales de relevancia y la taxonomía de señales
+que se combinan con ellas son decisiones locales de este proyecto, no un estándar universal.
+SavePoint las versiona junto al código y las revisa como revisaría cualquier otra decisión de
+diseño, precisamente porque ninguna métrica basta por sí sola para declarar un algoritmo mejor
+que otro sin decir, a la vez, bajo qué corpus, qué población y qué protocolo se midió.

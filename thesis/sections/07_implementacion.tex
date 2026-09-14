@@ -164,13 +164,14 @@ def entry_weight(status, rating_half_steps):
     return STATUS_WEIGHTS.get(status or "", 0.0) + (rating_half_steps or 0) / RATING_DIVISOR
 \end{lstlisting}
 
-La frontera con el trabajo futuro es explícita. Este heurístico es un conteo de frecuencia
-sobre una tabla, sin paso de entrenamiento, sin vectores latentes y sin almacén de
-características persistido. No reclama calidad predictiva. Su cadena de limitación, incluida en
-cada respuesta, dice con palabras que no debe entrar en una comparación sistemática de
-recomendadores, que queda fuera del alcance de esta memoria. Su papel es doble: hacer que el
+La frontera de este heurístico es explícita. Es un conteo de frecuencia sobre una tabla, sin
+paso de entrenamiento, sin vectores latentes y sin almacén de características persistido. No
+reclama calidad predictiva y su cadena de limitación, incluida en cada respuesta, dice con
+palabras que no participa en la comparación sistemática de recomendadores que presentan los
+Capítulos~\ref{cap:algoritmos} y~\ref{cap:experimentos}. Su papel es doble: hacer que el
 producto se lea como un sitio de catalogación real y dejar un contrato de página y de punto
-de acceso ya cableado que un recomendador más elaborado pueda sustituir.
+de acceso ya cableado, el mismo que las familias de recomendación comparadas en esta memoria
+terminaron ocupando.
 
 \section{Frontend}\label{sec:impl-frontend}
 

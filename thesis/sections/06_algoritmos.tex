@@ -1,5 +1,13 @@
 \chapter{Algoritmos de recomendación y representación de señales}\label{cap:algoritmos}
 
+Este capítulo detalla cómo SavePoint representa una obra y a una persona usuaria y cómo
+combina esas representaciones en cada una de las tres familias de recomendación presentadas en
+el Capítulo~\ref{cap:estado-del-arte}, con las métricas y el vocabulario fijados en el
+Capítulo~\ref{cap:fundamentos}. Cada fórmula que sigue es una decisión de diseño local de este
+proyecto, no un resultado tomado de la literatura sin más: se explica su razón de ser junto a
+su formulación; el Capítulo~\ref{cap:experimentos} la somete después a comparación con datos
+reales.
+
 \section{Frontera temporal de la comparación}
 
 Este capítulo distingue dos contratos. Los resultados publicados proceden de la ejecución \texttt{evaluation-400-test-2026-09-12-v15}, con protocolo 15 y \textit{feature set} \texttt{fs-v12-curated-tags-idf}. El código vigente evolucionó después al protocolo 16 y a \texttt{fs-v13-family-weighted-tags}. La evolución permite describir la implementación actual, pero no recalcula ni reinterpreta las métricas v15. Esta distinción evita atribuir a una publicación histórica pesos o fórmulas posteriores.
@@ -47,3 +55,5 @@ Las variantes MMR reordenan un pool de tamaño \(\max(100,5K)\). En cada posici�
 \section{Limitaciones y alternativas}
 
 Las familias implementadas son interpretables y adecuadas para una población controlada, pero no agotan el espacio de recomendación. No se adoptaron microservicios, Kafka ni Kubernetes por complejidad operativa injustificada en v1; tampoco base vectorial, entrenamiento en HTTP, SQLite en producción o evaluación contra APIs vivas, porque perjudicarían reproducibilidad o integridad. Se descartaron factorización matricial, redes neuronales y recomendadores profundos por requerir más interacciones, entrenamiento e hiperparámetros de los que permite defender esta población sintética. Son decisiones de alcance, no una afirmación de inferioridad universal.
+
+Con las tres familias formuladas y sus señales definidas, el capítulo siguiente somete estos algoritmos al protocolo de evaluación offline y presenta los resultados que produjeron sobre la población sintética publicada.

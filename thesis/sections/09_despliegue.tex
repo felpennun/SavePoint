@@ -34,7 +34,14 @@ protección contra falsificación de petición en sitios cruzados que emite Djan
 del mismo origen. En Render, la cadena de arranque encadena migración, importación del
 catálogo, creación de cuentas simuladas y semilla; solo entonces cede el control al servidor
 \texttt{gunicorn}. Cada paso es idempotente y está protegido con un bloqueo consultivo. Un
-paso fallido detiene el arranque.
+paso fallido detiene el arranque, tal como resume la Figura~\ref{fig:despliegue-flujo}.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.92\textwidth]{figures/despliegue-flujo.pdf}
+    \caption{Topología de despliegue público y cadena de arranque en Render.}
+    \label{fig:despliegue-flujo}
+\end{figure}
 
 \section{Paridad con el entorno local}\label{sec:desp-paridad}
 

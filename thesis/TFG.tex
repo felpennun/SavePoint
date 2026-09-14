@@ -56,34 +56,34 @@
     \clearpage\pagenumbering{arabic}
 
     % Capítulos del trabajo
-    \part{Introducción y metodología}
+    \part{Introducción y metodología}\label{part:introduccion}
     \input{sections/01_marco_objetivos}
+    \input{sections/02_estado_del_arte}
     \input{sections/02_gestion_metodologia}
 
-    \part{Fundamentos y análisis}
+    \part{Fundamentos y análisis}\label{part:fundamentos}
     \input{sections/03_fundamentos}
     \input{sections/04_requisitos_actualizados}
     \input{sections/05_diseno_actualizado}
 
-    \part{Algoritmos y evaluación}
+    \part{Algoritmos y evaluación}\label{part:algoritmos}
     \input{sections/06_algoritmos}
     \input{sections/07_experimentos_resultados}
 
-    \part{Construcción y cierre}
+    \part{Construcción y cierre}\label{part:construccion}
     \input{sections/08_implementacion_verificacion}
+    \input{sections/09_despliegue}
     \input{sections/09_conclusiones_actualizadas}
 
     % Registro técnico detallado de las fases de ingeniería.
     \appendix
-    \part{Apéndices técnicos y registro de ingeniería}
-    \input{sections/02_estado_del_arte}
+    \part{Apéndices técnicos y registro de ingeniería}\label{part:apendices}
     \input{sections/03_planificacion_metodologia}
     \input{sections/04_analisis_requisitos}
     \input{sections/05_diseno}
     \input{sections/06_datos}
     \input{sections/07_implementacion}
     \input{sections/08_pruebas_verificacion}
-    \input{sections/09_despliegue}
 
     % Bibliografía
     \bibliographystyle{unsrtnat}

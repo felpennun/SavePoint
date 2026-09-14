@@ -1,5 +1,11 @@
 \chapter{Metodología experimental, resultados y discusión}\label{cap:experimentos}
 
+Este capítulo somete a los dieciséis algoritmos descritos en el Capítulo~\ref{cap:algoritmos} al
+protocolo de evaluación offline, con las métricas definidas en el Capítulo~\ref{cap:fundamentos},
+y presenta los resultados publicados junto con una discusión honesta de lo que permiten y de lo
+que no permiten concluir. El énfasis no está en declarar un ganador, sino en dejar trazable cada
+cifra hasta el corpus, la semilla, el reparto y la configuración exactos que la produjeron.
+
 \section{Protocolo reproducible}
 
 La evaluación publicada se ejecutó offline con el corpus congelado \texttt{2026.09.2}. La población experimental contiene 400 usuarios sintéticos activos, generados de forma determinista; 79 cumplen la elegibilidad del split de prueba. No se utilizaron usuarios reales. El protocolo v15 fija semilla, versiones, snapshots, hashes, candidatas y exclusiones antes de consumir el test. La semilla permite reproducir esta ejecución, pero no sustituye un estudio de sensibilidad con múltiples semillas.
@@ -68,10 +74,12 @@ hybrid-mmr-v1 & híbrido + diversidad & 0.13195 & 0.15913 & 0.17401 \\
 
 La diferencia numérica más visible en \(nDCG@10\) aparece entre \texttt{content-cbf-weighted-v1} y los baselines. El híbrido ponderado queda próximo a esa variante de contenido, mientras que el colaborativo aislado recupera menos positivos bajo este split. Esta observación es interna al artefacto: no prueba que contenido sea superior en una comunidad real, ni que los pesos del híbrido sean óptimos. La ejecución conserva una única muestra de 79 usuarios evaluables; por tanto, las conclusiones deben diferenciar diferencia numérica, contraste estadístico y relevancia metodológica.
 
-Para \(K=5\), \texttt{hybrid-weighted-cf-v1} publica \(nDCG=0.14305\), frente a \(0.14114\) de Weighted. Para \(K=20\), Weighted publica \(0.18987\) y el híbrido ponderado \(0.18962\). La proximidad de esas cifras ilustra por qué no es correcto proclamar un ganador. El baseline aleatorio permanece en cero en la cohorte publicada, y popularidad alcanza \(0.00340\) en \(nDCG@10\), lo que contextualiza la señal de contenido pero no mide utilidad subjetiva.
+Para \(K=5\), \texttt{hybrid-weighted-cf-v1} publica \(nDCG=0.14305\), frente a \(0.14114\) de Weighted. Para \(K=20\), Weighted publica \(0.18987\) y el híbrido ponderado \(0.18962\). La proximidad de esas cifras ilustra por qué no es correcto proclamar un ganador. El baseline aleatorio permanece en cero en la cohorte publicada; popularidad alcanza \(0.00340\) en \(nDCG@10\), lo que contextualiza la señal de contenido pero no mide utilidad subjetiva.
 
 \section{Diversidad, cobertura y amenazas de validez}
 
 MMR introduce un objetivo distinto de la recuperación puntual: reducir redundancia entre elementos ya seleccionados. Sus resultados deben leerse junto con diversidad intra-lista, novedad, cobertura del catálogo, cobertura de predicción y HHI cuando el artefacto los publica. Una mejora de diversidad no compensa automáticamente una pérdida de nDCG, ni la métrica de acierto debe ocultar concentración. SavePoint mantiene estas medidas separadas para que el compromiso sea auditable.
 
 Las amenazas principales son población sintética, un solo consumo del test, un único positivo por usuario y dependencia de metadatos externos gobernados. El corpus y el snapshot son fortalezas de reproducibilidad, pero acotan la generalización. Un estudio posterior debería incluir más semillas, sensibilidades de hiperparámetros, datos observados con consentimiento y evaluación con participantes, sin mutar el artefacto v15 ya publicado.
+
+Este capítulo cierra la parte experimental de la memoria. El siguiente describe cómo se implementó y se verificó el sistema que produjo estos resultados.

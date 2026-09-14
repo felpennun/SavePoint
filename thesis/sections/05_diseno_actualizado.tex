@@ -1,7 +1,127 @@
 \chapter{Diseño de la solución}\label{cap:diseno}
 
-SavePoint adopta un monolito modular: Django y Django REST Framework en backend, Next.js en frontend y PostgreSQL como fuente relacional. Los trabajos de recomendación y evaluación se ejecutan offline, separados de la petición HTTP; la aplicación publica snapshots y explicaciones, pero no vuelve a calcular la evidencia científica en el navegador. La sesión usa una frontera de mismo origen y controles CSRF; el backend conserva la autoridad de permisos.
+\section{Arquitectura general}\label{sec:diseno-arquitectura}
 
-La elección evita complejidad sin evidencia de necesidad. No se incorporan microservicios, Kafka, Kubernetes, base vectorial, SQLite en producción ni APIs vivas en evaluación. Tampoco se adoptan redes neuronales o entrenamiento en peticiones: la población disponible y la pregunta de investigación favorecen modelos clásicos explicables. Las ADR documentan contexto, alternativas, decisión, consecuencias, reversibilidad y evidencia.
+SavePoint es un monolito modular con dos ejecutables. El backend, en \texttt{apps/api/}, usa
+Django con soporte a largo plazo y Django REST Framework (DRF) sobre PostgreSQL, con el mapeo
+objeto-relacional (ORM) de Django como interfaz de persistencia; sus módulos se separan por
+dominio (\texttt{catalogue}, \texttt{library}, \texttt{accounts}, \texttt{recommendations},
+\texttt{evaluation}), pero comparten despliegue y base de datos. El frontend, en
+\texttt{apps/web/}, es una aplicación Next.js con React y TypeScript en modo estricto, que
+renderiza en el servidor las páginas públicas. El navegador solo llama a rutas del mismo origen
+de Next.js, que las reescribe hacia el backend. Los trabajos de recomendación y evaluación se
+ejecutan como comandos fuera de la petición HTTP: la aplicación publica sus resultados, pero no
+vuelve a calcular la evidencia científica en el navegador. La Figura~\ref{fig:arquitectura}
+representa esta arquitectura por capas. El registro de decisión ADR-001 recoge el contexto
+completo de esta elección.
 
-El diseño de datos separa obra, edición, plataforma y copia, y distingue la proyección pública de los datos privados. Los snapshots y artefactos incorporan versiones y hashes. \todo[inline]{PENDIENTE: incorporar diagramas de arquitectura, entidad-relación y flujos desde fuentes verificadas antes de defensa.}
+Esa elección no fue automática. El dominio de SavePoint (obras, ediciones, copias, valoraciones,
+biblioteca) es relacional y con mucha escritura estructurada, el tipo de problema para el que
+Django y su ORM están pensados desde el principio, con autenticación, panel de administración,
+migraciones y validación ya resueltos en el propio marco de trabajo. Frente a alternativas más
+ligeras como FastAPI con SQLAlchemy, que habrían obligado a componer esas mismas piezas a mano,
+Django ofrece esa base madura sin coste adicional. Frente a servir la interfaz con plantillas
+de Django y HTMX, que habría evitado duplicar el contrato de datos entre backend y frontend, se
+prefirió un frontend Next.js separado porque el panel experimental de recomendación necesitaba
+una interfaz más rica de lo que las plantillas del lado del servidor ofrecen con comodidad, sin
+perder por ello el renderizado en servidor que la accesibilidad y el primer pintado rápido
+piden. Una arquitectura de microservicios, por último, se descartó por su coste operativo y de
+trazabilidad en un proyecto de un único desarrollador: separar servicios solo se justifica
+cuando hay una necesidad medida que lo pida, no por anticipado.
+
+\section{Persistencia: PostgreSQL}\label{sec:diseno-postgres}
+
+PostgreSQL es la única base de datos de aplicación y de pruebas de integración, en desarrollo,
+en pruebas y en despliegue, sin sustituir nunca por una base más ligera en ningún entorno. El
+registro ADR-002 explica por qué: el modelo de datos de SavePoint depende de
+restricciones de unicidad, de transacciones y de búsqueda por similitud de texto que SQLite
+soporta de forma incompleta y que una base documental como MongoDB no ofrece con la misma
+garantía de integridad relacional. Usar SQLite en local y PostgreSQL en producción, la
+solución más barata a corto plazo, se descartó explícitamente porque introduce una asimetría
+entre entornos que un banco de pruebas reproducible no se puede permitir: una consulta que
+funciona en SQLite y falla en PostgreSQL, o viceversa, sería un defecto del propio diseño
+experimental, no del código. La imagen de PostgreSQL se fija por versión y por huella
+criptográfica en el entorno reproducible, de modo que dos personas que levanten el proyecto en
+momentos distintos ejecutan exactamente el mismo motor de base de datos.
+
+\section{Entorno reproducible: contenedores}\label{sec:diseno-docker}
+
+Todo el sistema se levanta con Docker Compose a partir de tres servicios: base de datos, API y
+frontend, cada uno construido desde su propio fichero de Docker con versiones de dependencias
+fijadas. La razón de fondo no es solo comodidad de desarrollo: un trabajo cuyo objeto de
+estudio es la reproducibilidad de una comparación de algoritmos necesita, antes que nada, que
+el propio entorno de ejecución sea reproducible. Si instalar el proyecto en una máquina
+distinta pudiera producir versiones de Python, de Node.js o de PostgreSQL ligeramente
+distintas, cualquier diferencia observada en los resultados dejaría de poder atribuirse solo al
+algoritmo. Los contenedores eliminan esa variable: el mismo \texttt{docker compose up}
+reconstruye un entorno idéntico en cualquier máquina, sin depender de lo que esa máquina tenga
+instalado de antes.
+
+\section{Despliegue público}\label{sec:diseno-despliegue}
+
+Para la demostración pública se adoptó una topología repartida entre tres proveedores
+gratuitos en lugar de un único servicio con predespliegue de contenedores, por una restricción
+de partida no negociable: coste cero, sin tarjeta de pago ni recursos de facturación
+habilitados. Vercel construye de forma nativa el frontend Next.js y reescribe del lado del
+servidor las llamadas a la API hacia Render, que construye y sirve la imagen del backend.
+Neon suministra PostgreSQL como servicio gestionado a Render. Los tres se eligieron porque cada
+uno ofrece, en su nivel gratuito, la primitiva concreta que SavePoint necesita (construcción
+nativa de Next.js, un contenedor de aplicación con arranque programable y una base de datos
+relacional gestionada) sin exigir una tarjeta para activarse, una combinación que ningún
+proveedor único cubre por sí solo en su nivel gratuito. El Capítulo~\ref{cap:despliegue}
+desarrolla esta topología, sus límites conocidos y el estado actual del despliegue; el registro
+ADR-005 recoge la decisión completa.
+
+\section{Decisiones de arquitectura registradas}\label{sec:diseno-adr}
+
+Cada decisión de diseño con consecuencias materiales queda registrada como registro de decisión
+de arquitectura (ADR), con un formato fijo de contexto, alternativas, decisión, evidencia,
+consecuencias y reversibilidad. La Tabla~\ref{tab:adr-resumen} resume el conjunto vigente; los
+capítulos correspondientes citan cada registro donde es relevante.
+
+\begin{table}[htp]
+\centering
+\begin{tabularx}{\textwidth}{ | Y | Z | }
+    \hline
+    \textbf{Registro} & \textbf{Decisión} \\
+    \hline
+    ADR-001 & Monolito modular Django/DRF con frontend Next.js separado. \\
+    \hline
+    ADR-002 & PostgreSQL como única base de datos de aplicación y de pruebas. \\
+    \hline
+    ADR-003 & Corpus curado inicial de Wikidata, bajo dominio público, con revisión de licencia por archivo de Commons. \\
+    \hline
+    ADR-004 & Sesión de Django y frontera de mismo origen entre frontend y backend. \\
+    \hline
+    ADR-005 & Despliegue público de coste cero repartido entre Vercel, Render y Neon. \\
+    \hline
+    ADR-006 & IGDB como fuente del catálogo a escala real, con portadas servidas por enlace directo. \\
+    \hline
+    ADR-007 & Heurístico determinista de afinidad por géneros como recomendador inicial explicable. \\
+    \hline
+    ADR-008 & Ratings externos gobernados por snapshot versionado, con enriquecimiento acotado desde RAWG. \\
+    \hline
+    ADR-009 & Familias de algoritmos de recomendación y su ejecución como \textit{workers} aislados. \\
+    \hline
+\end{tabularx}
+\caption{Registros de decisión de arquitectura vigentes.}
+\label{tab:adr-resumen}
+\end{table}
+
+\section{Modelo de datos}\label{sec:diseno-modelo}
+
+La Figura~\ref{fig:modelo-dominio} representa el modelo de dominio completo, agrupado por
+catálogo, biblioteca personal, cuentas e investigación. El diseño de datos separa obra,
+edición, plataforma y copia. Distingue en todo momento la
+proyección pública de los datos privados de cada persona. Toda identidad canónica es un
+identificador único universal (UUID) interno generado en la importación, con el identificador
+del proveedor de origen guardado solo como procedencia, de modo que cambiar de proveedor de
+datos nunca obliga a renumerar el catálogo. Las restricciones de integridad, como la unicidad
+de una entrada de biblioteca por persona y obra o el rango válido de una valoración, viven en
+la propia base de datos y no solo en la capa de aplicación, para que ningún cliente pueda
+saltárselas escribiendo directamente contra la API. Los snapshots y artefactos que alimentan el
+laboratorio de recomendación incorporan versión y huella criptográfica, de forma coherente con
+la exigencia de reproducibilidad que recorre todo el diseño.
+
+El Capítulo~\ref{cap:despliegue} completa este diseño con la Figura~\ref{fig:despliegue-flujo},
+que representa la topología de despliegue público y su cadena de arranque.
