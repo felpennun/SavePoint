@@ -8,13 +8,21 @@ used by ``library.services``.
 
 from __future__ import annotations
 
-from django.core.exceptions import ValidationError
-from django.db import transaction
+import uuid
 
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied
+from django.db import transaction
+from django.utils import timezone
+
+from audit.models import AuditAction, AuditResult
+from audit.services import record_audit_event
 from accounts.models import AVATAR_URL_MAX_LENGTH, BIO_MAX_LENGTH, AccountProfile, FavoriteSlot, ProfileVisibility
 from library.models import LibraryEntry
 
 VALID_VISIBILITIES = {choice.value for choice in ProfileVisibility}
+IRREVERSIBLE_DELETE_CONFIRMATION = "DELETE ACCOUNT"
 
 
 def get_or_create_profile(*, user) -> AccountProfile:  # noqa: ANN001
@@ -104,3 +112,81 @@ def replace_favorites(*, user, slots: list[dict]) -> list[FavoriteSlot]:  # noqa
         ]
 
     return created
+
+
+def anonymize_account(*, actor, target_user, operation_ref: str | uuid.UUID | None = None):  # noqa: ANN001
+    """Deactivate and anonymize an account atomically and idempotently."""
+
+    with transaction.atomic():
+        user_model = get_user_model()
+        user = user_model.objects.select_for_update().get(pk=target_user.pk)
+        profile, _ = AccountProfile.objects.select_for_update().get_or_create(user=user)
+        already_applied = profile.is_anonymized
+        if not already_applied:
+            user.username = f"anonymous-{profile.admin_uuid.hex[:24]}"
+            user.email = ""
+            user.first_name = ""
+            user.last_name = ""
+            user.is_active = False
+            user.save(update_fields=["username", "email", "first_name", "last_name", "is_active"])
+            user.groups.clear()
+            user.user_permissions.clear()
+            profile.bio = ""
+            profile.avatar_url = ""
+            profile.collection_visibility = ProfileVisibility.PRIVATE
+            profile.favorites_visibility = ProfileVisibility.PRIVATE
+            profile.is_anonymized = True
+            profile.anonymized_at = timezone.now()
+            profile.save(
+                update_fields=[
+                    "bio",
+                    "avatar_url",
+                    "collection_visibility",
+                    "favorites_visibility",
+                    "is_anonymized",
+                    "anonymized_at",
+                    "updated_at",
+                ]
+            )
+        event = record_audit_event(
+            actor=actor,
+            action=AuditAction.ACCOUNT_ANONYMIZED,
+            resource_type="account",
+            resource_id=user.pk,
+            result=AuditResult.ALREADY_APPLIED if already_applied else AuditResult.SUCCEEDED,
+            operation_ref=operation_ref,
+        )
+    return user, event
+
+
+def deactivate_and_anonymize_account(*, actor, target_user, operation_ref=None):  # noqa: ANN001
+    """Compatibility name for the normal privacy operation."""
+
+    return anonymize_account(actor=actor, target_user=target_user, operation_ref=operation_ref)
+
+
+def delete_account_irreversibly(
+    *, actor, target_user, confirmation: str, operation_ref: str | uuid.UUID | None = None
+):  # noqa: ANN001
+    """Delete only after explicit confirmation by a superuser."""
+
+    if not getattr(actor, "is_superuser", False):
+        raise PermissionDenied("Only a superuser may permanently delete an account.")
+    if confirmation != IRREVERSIBLE_DELETE_CONFIRMATION:
+        raise ValidationError("Explicit permanent-delete confirmation is required.")
+    if actor.pk == target_user.pk:
+        raise ValidationError("A superuser cannot permanently delete the active account.")
+
+    with transaction.atomic():
+        user_model = get_user_model()
+        user = user_model.objects.select_for_update().get(pk=target_user.pk)
+        event = record_audit_event(
+            actor=actor,
+            action=AuditAction.ACCOUNT_DELETED,
+            resource_type="account",
+            resource_id=user.pk,
+            result=AuditResult.SUCCEEDED,
+            operation_ref=operation_ref,
+        )
+        user.delete()
+    return event

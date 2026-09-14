@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.postgres",
     "rest_framework",
+    "audit.apps.AuditConfig",
     "accounts.apps.AccountsConfig",
     "catalogue.apps.CatalogueConfig",
     "library.apps.LibraryConfig",

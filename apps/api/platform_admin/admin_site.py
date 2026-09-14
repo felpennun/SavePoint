@@ -28,9 +28,11 @@ platform_admin_site = PlatformAdminSite(name="platform-admin")
 
 def register_platform_models(site: PlatformAdminSite = platform_admin_site) -> None:
     """Register only the reviewed ModelAdmin allowlist on this site."""
+    from accounts.admin import register_platform_admin_models
     from evaluation.admin import register_platform_admin_models as register_evaluation
 
     register_evaluation(site)
+    register_platform_admin_models(site)
 
 
 register_platform_models()

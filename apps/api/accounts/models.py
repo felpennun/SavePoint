@@ -99,6 +99,9 @@ class AccountProfile(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile"
     )
+    # Opaque technical locator used by the explicit role bootstrap command;
+    # it is not a username, email, or public identifier.
+    admin_uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     bio = models.CharField(max_length=BIO_MAX_LENGTH, blank=True, default="")
     # HTTPS-only, validated URL with no server-side fetch/proxy (avoids SSRF);
     # the client is responsible for actually rendering the image safely.
@@ -109,6 +112,8 @@ class AccountProfile(models.Model):
     favorites_visibility = models.CharField(
         max_length=8, choices=ProfileVisibility.choices, default=ProfileVisibility.PUBLIC
     )
+    is_anonymized = models.BooleanField(default=False)
+    anonymized_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
