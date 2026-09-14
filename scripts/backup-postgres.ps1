@@ -65,17 +65,25 @@ Set-Content -LiteralPath $checksumPath -Value "$dumpHash  $([IO.Path]::GetFileNa
 $migrationFiles = @(Get-ChildItem (Join-Path $repoRoot "apps/api") -Recurse -File -Filter "*.py" | Where-Object { $_.FullName -match "migrations" } | Sort-Object FullName)
 $migrationHashInput = ($migrationFiles | ForEach-Object { (Get-FileHash -Algorithm SHA256 -LiteralPath $_.FullName).Hash }) -join "`n"
 $migrationHash = if ($migrationHashInput) { $sha = [Security.Cryptography.SHA256]::Create(); try { ([BitConverter]::ToString($sha.ComputeHash([Text.Encoding]::UTF8.GetBytes($migrationHashInput))) -replace "-", "").ToLowerInvariant() } finally { $sha.Dispose() } } else { "" }
-$countQuery = "SELECT 'users=' || count(*) FROM accounts_user UNION ALL SELECT 'works=' || count(*) FROM catalogue_gamework UNION ALL SELECT 'library_entries=' || count(*) FROM library_libraryentry UNION ALL SELECT 'owned_copies=' || count(*) FROM library_ownedcopy;"
-if ($Native) { $countOutput = & psql -Atqc $countQuery } else { $countOutput = & docker compose -f $ComposeFile exec -T db psql -Atqc $countQuery -U savepoint_test -d savepoint_test }
-if ($LASTEXITCODE -ne 0) { throw "Could not collect essential database counts." }
 $essentialCounts = [ordered]@{}
-foreach ($line in @($countOutput)) {
-    $parts = ([string]$line).Split("=", 2)
-    if ($parts.Count -eq 2 -and $parts[1] -match "^\d+$") { $essentialCounts[$parts[0]] = [int64]$parts[1] }
+$essentialTables = [ordered]@{ users = "accounts_user"; works = "catalogue_gamework"; library_entries = "library_libraryentry"; owned_copies = "library_ownedcopy" }
+foreach ($table in $essentialTables.GetEnumerator()) {
+    $existsQuery = "SELECT to_regclass('public.$($table.Value)');"
+    if ($Native) { $exists = & psql -Atqc $existsQuery } else { $exists = & docker compose -f $ComposeFile exec -T db psql -Atqc $existsQuery -U savepoint_test -d savepoint_test }
+    if ($LASTEXITCODE -ne 0) { throw "Could not inspect essential database tables." }
+    if ([string]::IsNullOrWhiteSpace(($exists -join "").Trim())) {
+        $essentialCounts[$table.Key] = [int64]0
+        continue
+    }
+    $countQuery = "SELECT count(*) FROM $($table.Value);"
+    if ($Native) { $count = & psql -Atqc $countQuery } else { $count = & docker compose -f $ComposeFile exec -T db psql -Atqc $countQuery -U savepoint_test -d savepoint_test }
+    if ($LASTEXITCODE -ne 0 -or ($count -join "").Trim() -notmatch "^\d+$") { throw "Could not collect essential database counts." }
+    $essentialCounts[$table.Key] = [int64](($count -join "").Trim())
 }
 if ($essentialCounts.Count -ne 4) { throw "Essential database counts were incomplete." }
 $artifactHashes = @()
 foreach ($artifact in @($ArtifactPath)) {
+    if (-not $artifact) { continue }
     $artifactFull = [IO.Path]::GetFullPath($artifact)
     if (-not (Test-Path -LiteralPath $artifactFull -PathType Leaf)) { throw "Artifact not found: $artifact" }
     if ($artifactFull -match "(?i)(dump|log|secret|token|cookie|password)") { throw "Artifact path is not publishable." }

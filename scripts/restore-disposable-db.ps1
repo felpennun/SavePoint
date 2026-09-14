@@ -27,7 +27,7 @@ if ($LASTEXITCODE -ne 0) { throw "Manifest validation failed." }
 $manifest = Get-Content -LiteralPath $ManifestPath -Raw | ConvertFrom-Json
 $dumpPath = Join-Path $root ([string]$manifest.dump_file)
 $stamp = Get-Date -Format "yyyyMMddHHmmss"
-$dbName = "savepoint_restore_$stamp_$PID"
+$dbName = "savepoint_restore_${stamp}_$PID"
 if ($dbName -notmatch "^savepoint_restore_[a-z0-9_]+$") { throw "Disposable database name failed validation." }
 $containerDump = "/tmp/$dbName.dump"
 $created = $false
@@ -43,6 +43,19 @@ try {
     Invoke-Checked @("compose", "-f", $ComposeFile, "cp", $dumpPath, "db:$containerDump")
     Invoke-Checked @("compose", "-f", $ComposeFile, "exec", "-T", "db", "pg_restore", "--no-owner", "--no-privileges", "-U", "savepoint_test", "-d", $dbName, $containerDump)
     Invoke-Checked @("compose", "-f", $ComposeFile, "run", "--rm", "-e", "DATABASE_URL=", "-e", "POSTGRES_DB=$dbName", "api", "python", "manage.py", "migrate", "--noinput")
+    $countQuery = "SELECT 'users=' || count(*) FROM accounts_user UNION ALL SELECT 'works=' || count(*) FROM catalogue_gamework UNION ALL SELECT 'library_entries=' || count(*) FROM library_libraryentry UNION ALL SELECT 'owned_copies=' || count(*) FROM library_ownedcopy;"
+    $countOutput = & docker compose -f $ComposeFile exec -T db psql -Atqc $countQuery -U savepoint_test -d $dbName
+    if ($LASTEXITCODE -ne 0) { throw "Could not collect restored database counts." }
+    $actualCounts = @{}
+    foreach ($line in @($countOutput)) {
+        $parts = ([string]$line).Split("=", 2)
+        if ($parts.Count -eq 2 -and $parts[1] -match "^\d+$") { $actualCounts[$parts[0]] = [int64]$parts[1] }
+    }
+    foreach ($name in @("users", "works", "library_entries", "owned_copies")) {
+        if (-not $actualCounts.ContainsKey($name) -or [int64]$actualCounts[$name] -ne [int64]$manifest.essential_counts.$name) {
+            throw "Restored essential count does not match the manifest."
+        }
+    }
     Invoke-Checked @("compose", "-f", $ComposeFile, "run", "--rm", "-e", "DATABASE_URL=", "-e", "POSTGRES_DB=$dbName", "api", "python", "manage.py", "check")
     $health = Invoke-WebRequest -UseBasicParsing -Uri $ApiUrl -TimeoutSec 10
     if ($health.StatusCode -lt 200 -or $health.StatusCode -ge 500) { throw "API health smoke failed." }
