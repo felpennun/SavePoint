@@ -80,19 +80,19 @@
 - [x] **EVAL-10**: Conclusions distinguish synthetic simulation results from evidence about real users.
 - [ ] **EVAL-11**: Every run records code, environment, dataset, split, seeds, parameters, model, and metric identities.
 - [ ] **EVAL-12**: Stored artifacts allow aggregate results to be recalculated without rerunning an experiment.
-- [ ] **EVAL-13**: Research panel compares algorithms, configurations, metrics, cohorts, and runs.
-- [ ] **EVAL-14**: Research panel provides accessible tables and exports thesis-ready results and figures.
+- [x] **EVAL-13**: Research panel compares algorithms, configurations, metrics, cohorts, and runs.
+- [x] **EVAL-14**: Research panel provides accessible tables and exports thesis-ready results and figures.
 
 ### Administration, Privacy, and Security
 
 - [ ] **ADMIN-01**: Authorised administrator can manage demo users and catalogue data.
 - [ ] **ADMIN-02**: Authorised administrator can supervise imports, jobs, and experiments without directly editing the database.
-- [ ] **SEC-01**: Server validates every permission and tests access by role and ownership.
+- [x] **SEC-01**: Server validates every permission and tests access by role and ownership.
 - [x] **SEC-02**: No secret or API key is present in Git, browser bundles, logs, public images, or public artifacts.
-- [ ] **SEC-03**: Database access uses an ORM or parameterised queries and is tested against SQL injection.
-- [ ] **SEC-04**: Inputs and outputs are validated and protected against XSS, CSRF, and malicious content.
-- [ ] **SEC-05**: External URLs and requests are constrained against SSRF, unsafe redirects, and URL manipulation.
-- [ ] **SEC-06**: Application applies rate limits, secure headers, and non-sensitive production error handling.
+- [x] **SEC-03**: Database access uses an ORM or parameterised queries and is tested against SQL injection.
+- [x] **SEC-04**: Inputs and outputs are validated and protected against XSS, CSRF, and malicious content.
+- [x] **SEC-05**: External URLs and requests are constrained against SSRF, unsafe redirects, and URL manipulation.
+- [x] **SEC-06**: Application applies rate limits, secure headers, and non-sensitive production error handling.
 - [ ] **SEC-07**: Delivery pipeline scans secrets, vulnerable dependencies, and insecure code.
 - [ ] **SEC-08**: Sensitive actions create audit events without recording credentials or secrets.
 - [x] **PRIV-01**: Public projections use an explicit allowlist of fields.
@@ -105,7 +105,7 @@
 - [x] **OPS-03**: A lawful offline demo mode works without the external API or Internet access.
 - [ ] **OPS-04**: PostgreSQL and experimental artifacts have tested backup and recovery procedures.
 - [ ] **OPS-05**: System emits structured logs and observable job states without sensitive data.
-- [ ] **QUAL-01**: Project has unit, integration, and browser tests for critical workflows.
+- [x] **QUAL-01**: Project has unit, integration, and browser tests for critical workflows.
 - [ ] **QUAL-02**: A clean installation can reproduce experiments and their evidence.
 - [x] **QUAL-03**: Core workflows are responsive and verifiable against WCAG 2.2 AA.
 - [ ] **QUAL-04**: Charts and visualisations provide accessible textual or tabular alternatives.
@@ -241,21 +241,21 @@ system.
 | SOCIAL-03 | Phase 6 | Complete |
 | SOCIAL-04 | Phase 6 | Complete |
 | SOCIAL-05 | Phase 6 | Complete |
-| EVAL-13 | Phase 7 | Pending |
-| EVAL-14 | Phase 7 | Pending |
+| EVAL-13 | Phase 7 | Complete |
+| EVAL-14 | Phase 7 | Complete |
 | ADMIN-01 | Phase 7 | Pending |
 | ADMIN-02 | Phase 7 | Pending |
-| SEC-01 | Phase 7 | Pending |
-| SEC-03 | Phase 7 | Pending |
-| SEC-04 | Phase 7 | Pending |
-| SEC-05 | Phase 7 | Pending |
-| SEC-06 | Phase 7 | Pending |
+| SEC-01 | Phase 7 | Complete |
+| SEC-03 | Phase 7 | Complete |
+| SEC-04 | Phase 7 | Complete |
+| SEC-05 | Phase 7 | Complete |
+| SEC-06 | Phase 7 | Complete |
 | SEC-07 | Phase 7 | Pending |
 | SEC-08 | Phase 7 | Pending |
 | PRIV-02 | Phase 7 | Pending |
 | OPS-04 | Phase 7 | Pending |
 | OPS-05 | Phase 7 | Pending |
-| QUAL-01 | Phase 7 | Pending |
+| QUAL-01 | Phase 7 | Complete |
 | QUAL-04 | Phase 7 | Pending |
 | DOC-05 | Phase 7 | Pending |
 | DOC-06 | Phase 7 | Pending |

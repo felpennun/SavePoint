@@ -4,15 +4,15 @@ current_phase: 07
 current_phase_name: Research Panel, Hardening, and Evidence Freeze
 status: in_progress
 stopped_at: Completed 07-00-PLAN.md
-last_updated: "2026-09-13T23:35:59.371Z"
+last_updated: "2026-09-13T23:59:44.141Z"
 last_activity: 2026-09-13
 last_activity_desc: Phase 06 complete, transitioned to Phase 7
-state_head: d1c9fc1d9da04070796c1dea092c97ff8d640ede
+state_head: 27c1c59ef22d907f94e4f1f0808dc84fdf1204f4
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 66
-  completed_plans: 61
+  completed_plans: 62
   percent: 38
 total_plans_in_phase: 6
 next_phase: 07
@@ -36,7 +36,7 @@ rule that applies to every LLM and collaborator).
 ## Current Position
 
 **Phase:** 07 (Research Panel, Hardening, and Evidence Freeze) — IN PROGRESS
-**Plan:** 1 of 6
+**Plan:** 2 of 6
 **Plans in Phase:** 6
 **Status:** In progress; 07-00 complete
 
@@ -134,6 +134,7 @@ Progreso global: 2/8 fases (25%).
 | Phase 06 P07 | 12min | 2 tasks | 8 files |
 | Phase 06 P09 | 30m | 3 tasks | 6 files |
 | Phase 07 P00 | 18 min | 3 tasks | 4 files |
+| Phase 07 P01 | 26 min | 3 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -187,6 +188,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 07]: La identidad histórica v15 declarada por el artefacto es la autoridad de publicación; el protocol.json posterior solo aporta anclajes compartidos y nunca recalcula cifras.
 - [Phase 07]: Las métricas catalogue_coverage, concentration_hhi y prediction_coverage se exponen como null por cohorte con explicación porque el snapshot las declara run-level-only.
 - [Phase 07]: El entorno histórico ausente permanece como null y las exportaciones backend usan únicamente proyecciones allowlisted.
+- [Phase 07]: Research Viewer se resuelve en cada endpoint con evaluation.view_research_panel mediante has_perm; Platform Admin conserva una capability separada.
+- [Phase 07]: La API consume únicamente la publicación v15 inmutable y sus exportaciones saneadas; no recalcula rankings ni expone per_user, logs, dumps o secretos.
+- [Phase 07]: El parámetro export format queda bajo la allowlist de Django y URL_FORMAT_OVERRIDE de DRF permanece desactivado para evitar negociación no controlada.
 
 ### Pending Todos
 
@@ -262,11 +266,11 @@ Ver `.planning/quick/260909-nej-a-adir-cuatro-variantes-popscore-con-imp/`.
 
 ## Registro histórico de sesiones (prevalece el checkpoint de ejecución actual)
 
-**Stopped at:** Completed 07-00-PLAN.md
+**Stopped at:** Completed 07-01-PLAN.md
 
 **Resume (after the rate-limit reset):** `/gsd-plan-phase 2` re-spawns the planner from scratch. All inputs are committed: `02-CONTEXT.md`, `02-UI-SPEC.md` (verified 7/7), `02-RESEARCH.md`, `02-VALIDATION.md`, `02-PATTERNS.md`, `02-COVERAGE.md`. Then `gsd-plan-checker` → revision loop → present → `/gsd-execute-phase 2`. Full detail in `.planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/.continue-here.md`.
 
-Last session: 2026-09-13T23:35:58.481Z
+Last session: 2026-09-13T23:59:43.130Z
 
 ### Done this session (2026-09-06, all committed on `main`)
 
