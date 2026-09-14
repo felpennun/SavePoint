@@ -4,6 +4,19 @@ Proyecto LaTeX de la memoria del Trabajo Fin de Grado de SavePoint. Parte de la 
 oficial de TFG de la Escuela Técnica Superior de Ingeniería Informática de la Universidad de
 Sevilla.
 
+## Estado de esta revisión
+
+La versión condensada toma sus afirmaciones de las matrices verificadas de `thesis/` y
+distingue la publicación experimental v15 del contrato vigente v16. Los elementos sin
+evidencia suficiente conservan la marca `\todo{PENDIENTE: confirmar con el autor}`. Felipe
+Peña Núñez es el único autor y responsable del TFG; las herramientas asistidas forman parte
+de la metodología, nunca de la autoría.
+
+Para Prism, importar la carpeta `thesis/` completa y compilar `TFG.tex`. Antes de entregar
+deben revisarse visualmente saltos de tabla, referencias, índices, figuras y avisos de LaTeX.
+Esta sesión no dispone de navegador con Prism, por lo que esa comprobación visual sigue
+pendiente y no se declara realizada.
+
 ## Compilación
 
 ```sh

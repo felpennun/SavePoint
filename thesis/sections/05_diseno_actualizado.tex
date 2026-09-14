@@ -1,0 +1,7 @@
+\chapter{Diseño de la solución}\label{cap:diseno}
+
+SavePoint adopta un monolito modular: Django y Django REST Framework en backend, Next.js en frontend y PostgreSQL como fuente relacional. Los trabajos de recomendación y evaluación se ejecutan offline, separados de la petición HTTP; la aplicación publica snapshots y explicaciones, pero no vuelve a calcular la evidencia científica en el navegador. La sesión usa una frontera de mismo origen y controles CSRF; el backend conserva la autoridad de permisos.
+
+La elección evita complejidad sin evidencia de necesidad. No se incorporan microservicios, Kafka, Kubernetes, base vectorial, SQLite en producción ni APIs vivas en evaluación. Tampoco se adoptan redes neuronales o entrenamiento en peticiones: la población disponible y la pregunta de investigación favorecen modelos clásicos explicables. Las ADR documentan contexto, alternativas, decisión, consecuencias, reversibilidad y evidencia.
+
+El diseño de datos separa obra, edición, plataforma y copia, y distingue la proyección pública de los datos privados. Los snapshots y artefactos incorporan versiones y hashes. \todo[inline]{PENDIENTE: incorporar diagramas de arquitectura, entidad-relación y flujos desde fuentes verificadas antes de defensa.}

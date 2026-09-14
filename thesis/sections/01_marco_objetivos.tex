@@ -1,0 +1,21 @@
+\chapter{Introducción, problema y objetivos}\label{cap:introduccion}
+
+\section{Contexto y problema}
+
+SavePoint es una plataforma web para catalogar videojuegos, mantener una biblioteca personal y registrar valoraciones, listas, copias, comentarios y relaciones sociales. El producto es necesario para recoger y gobernar señales, pero no constituye por sí solo la pregunta central de este Trabajo Fin de Grado. El problema científico consiste en comparar recomendadores de videojuegos bajo un procedimiento que permita saber qué datos, parámetros, candidatas y métricas produjeron cada resultado.
+
+Una lista de recomendaciones no es evidencia suficiente. Sin un corpus congelado, una población definida, una división conocida y artefactos identificables, dos ejecuciones pueden parecer comparables aunque respondan a experimentos distintos. SavePoint separa por ello la aplicación que presenta resultados de los trabajos offline que construyen y evalúan rankings. El autor diseñó, implementó y validó esa separación mediante código, pruebas y evidencias versionadas.
+
+\section{Objetivo y preguntas de investigación}
+
+El objetivo general es construir una plataforma de catalogación que sirva como banco de pruebas reproducible para recomendación basada en contenido, colaborativa e híbrida. El trabajo pregunta qué señales se pueden representar de forma explicable en un catálogo de videojuegos, cómo cambia la recuperación de un ítem relevante al combinar contenido, popularidad, vecindad y diversidad, y qué conclusiones son defendibles bajo un corpus y una población sintética concretos.
+
+Los objetivos específicos son gobernar el catálogo y su procedencia; modelar biblioteca, privacidad y relaciones sociales; implementar baselines y las tres familias de recomendación; publicar un protocolo offline con candidatas comunes; y conservar hashes, configuraciones y artefactos que hagan auditable la comparación. La hipótesis operativa no afirma superioridad universal: bajo el protocolo publicado, una combinación de señales puede mejorar la recuperación frente a baselines simples, pero debe contrastarse sin confundir diferencia numérica con significación o validez externa.
+
+\section{Alcance y límites}
+
+El alcance funcional incluye catálogo, importación gobernada, biblioteca, copias físicas y digitales, valoraciones, listas, comentarios, perfiles, privacidad, módulo social, recomendaciones, panel de investigación, seguridad y copia de seguridad. El alcance experimental se limita a una publicación v15: corpus \texttt{2026.09.2}, 400 usuarios sintéticos activos, 79 evaluables y una única ejecución del test. Estos usuarios no son personas reales. Por tanto, los resultados dependen del corpus, la semilla, el split y el protocolo; no permiten generalizar automáticamente preferencias reales ni declarar un método como mejor fuera de esas condiciones.
+
+\section{Estructura de la memoria}
+
+Los capítulos siguientes exponen primero la gestión y las bases científicas. Después se describen requisitos y diseño. Los Capítulos~\ref{cap:algoritmos} y \ref{cap:experimentos} forman el núcleo: detallan señales, fórmulas, protocolo y resultados. El documento termina con implementación, verificación, límites y líneas de continuación.

@@ -1,0 +1,44 @@
+\chapter{Metodología experimental, resultados y discusión}\label{cap:experimentos}
+
+\section{Protocolo reproducible}
+
+La evaluación publicada se ejecutó offline con el corpus congelado \texttt{2026.09.2}. La población experimental contiene 400 usuarios sintéticos activos, generados de forma determinista; 79 cumplen la elegibilidad del split de prueba. No se utilizaron usuarios reales. El protocolo v15 fija semilla, versiones, snapshots, hashes, candidatas y exclusiones antes de consumir el test. La semilla permite reproducir esta ejecución, pero no sustituye un estudio de sensibilidad con múltiples semillas.
+
+Se aplica \emph{leave-one-out} por usuario. Una obra relevante es una entrada terminada o valorada con al menos siete medios puntos. El runner elige una obra relevante con una semilla derivada de usuario, la retira temporalmente del historial visible y la reincorpora al universo de candidatas. Todos los algoritmos reciben el mismo manifiesto de candidatas. El diseño evita \emph{leakage}: el ítem retenido no construye el perfil, mientras que su presencia entre candidatas permite medir recuperación.
+
+Se calcula \(K\in\{5,10,20\}\). Si \(R_u\) es el conjunto relevante y \(L_u^K\) los primeros \(K\) ítems, \(Precision@K=|L_u^K\cap R_u|/K\) y \(Recall@K=|L_u^K\cap R_u|/|R_u|\). nDCG descuenta un acierto situado abajo en el ranking y lo normaliza por el ranking ideal; MAP resume la precisión en cada posición relevante. Con un único positivo retenido, recall es binario y las métricas describen recuperación, no satisfacción humana. El protocolo también conserva diversidad intra-lista, novedad, coberturas y concentración cuando el artefacto permite estimarlas.
+
+\section{Resultados publicados}
+
+La Tabla~\ref{tab:resultados-ndcg10} resume \(nDCG@10\), MAP@10 y tiempo de pared de la cohorte \texttt{active\_history\_10\_to\_20} incluidos en el artefacto v15. Se muestra una tabla compacta para evitar repetir cuatro métricas por tres valores de \(K\); el anexo versionado \texttt{ALGORITHM-MATRIX.md} preserva la transcripción completa para \(K=5,10,20\).
+
+\begin{table}[htbp]
+\centering
+\caption{Resultados v15 publicados para la cohorte indicada. No son resultados con usuarios reales.}\label{tab:resultados-ndcg10}
+\small
+\begin{tabularx}{\textwidth}{@{}>{\ttfamily\raggedright\arraybackslash}p{0.34\textwidth}Yrr@{}}
+\textnormal{Algoritmo} & \textnormal{Familia} & \textnormal{nDCG@10} & \textnormal{MAP@10} \\
+\hline
+random-v1 & baseline & 0.00000 & 0.00000 \\
+popularity-v1 & baseline & 0.00340 & 0.00098 \\
+content-cbf-weighted-v1 & contenido & 0.17245 & 0.10878 \\
+content-cbf-multiplicative-v1 & contenido & 0.08558 & 0.05934 \\
+content-cbf-twostage-v1 & contenido & 0.11724 & 0.06767 \\
+content-cbf-neg-v1 & contenido & 0.11778 & 0.07368 \\
+content-cbf-weighted-pop-v1 & contenido + popularidad & 0.15181 & 0.09826 \\
+content-cbf-mmr-v1 & contenido + diversidad & 0.13888 & 0.08685 \\
+cf-user-knn-v1 & colaborativo & 0.02098 & 0.01099 \\
+hybrid-weighted-cf-v1 & híbrido & 0.16989 & 0.10758 \\
+hybrid-mmr-v1 & híbrido + diversidad & 0.15913 & 0.09741 \\
+\end{tabularx}
+\end{table}
+
+La diferencia numérica más visible en \(nDCG@10\) aparece entre \texttt{content-cbf-weighted-v1} y los baselines. El híbrido ponderado queda próximo a esa variante de contenido, mientras que el colaborativo aislado recupera menos positivos bajo este split. Esta observación es interna al artefacto: no prueba que contenido sea superior en una comunidad real, ni que los pesos del híbrido sean óptimos. La ejecución conserva una única muestra de 79 usuarios evaluables; por tanto, las conclusiones deben diferenciar diferencia numérica, contraste estadístico y relevancia metodológica.
+
+Para \(K=5\), \texttt{hybrid-weighted-cf-v1} publica \(nDCG=0.14305\), frente a \(0.14114\) de Weighted. Para \(K=20\), Weighted publica \(0.18987\) y el híbrido ponderado \(0.18962\). La proximidad de esas cifras ilustra por qué no es correcto proclamar un ganador. El baseline aleatorio permanece en cero en la cohorte publicada, y popularidad alcanza \(0.00340\) en \(nDCG@10\), lo que contextualiza la señal de contenido pero no mide utilidad subjetiva.
+
+\section{Diversidad, cobertura y amenazas de validez}
+
+MMR introduce un objetivo distinto de la recuperación puntual: reducir redundancia entre elementos ya seleccionados. Sus resultados deben leerse junto con diversidad intra-lista, novedad, cobertura del catálogo, cobertura de predicción y HHI cuando el artefacto los publica. Una mejora de diversidad no compensa automáticamente una pérdida de nDCG, ni la métrica de acierto debe ocultar concentración. SavePoint mantiene estas medidas separadas para que el compromiso sea auditable.
+
+Las amenazas principales son población sintética, un solo consumo del test, un único positivo por usuario y dependencia de metadatos externos gobernados. El corpus y el snapshot son fortalezas de reproducibilidad, pero acotan la generalización. Un estudio posterior debería incluir más semillas, sensibilidades de hiperparámetros, datos observados con consentimiento y evaluación con participantes, sin mutar el artefacto v15 ya publicado.

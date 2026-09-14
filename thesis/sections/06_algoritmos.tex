@@ -1,0 +1,49 @@
+\chapter{Algoritmos de recomendación y representación de señales}\label{cap:algoritmos}
+
+\section{Frontera temporal de la comparación}
+
+Este capítulo distingue dos contratos. Los resultados publicados proceden de la ejecución \texttt{evaluation-400-test-2026-09-12-v15}, con protocolo 15 y \textit{feature set} \texttt{fs-v12-curated-tags-idf}. El código vigente evolucionó después al protocolo 16 y a \texttt{fs-v13-family-weighted-tags}. La evolución permite describir la implementación actual, pero no recalcula ni reinterpreta las métricas v15. Esta distinción evita atribuir a una publicación histórica pesos o fórmulas posteriores.
+
+La comparación v15 contiene dieciséis variantes: \texttt{random-v1}, \texttt{popularity-v1}, diez variantes de contenido, dos variantes con MMR, \texttt{cf-user-knn-v1}, \texttt{hybrid-weighted-cf-v1} y \texttt{hybrid-mmr-v1}. El sistema también expone \texttt{tag-taste-v1} como heurística de producto; no pertenece a la comparación académica porque resuelve onboarding, no una hipótesis experimental comparable.
+
+\section{Datos, elegibilidad y perfil}
+
+Una candidata debe ser una obra gobernada del corpus, no DLC, publicada antes de la fecha de corte, con valoración externa disponible y al menos cinco valoraciones. También se excluye cualquier obra que ya aparezca en \texttt{LibraryEntry} de la persona. Estas exclusiones impiden recomendar una posesión conocida, lanzar contenido futuro o amplificar una nota con evidencia insuficiente.
+
+Cada obra se representa mediante un vector disperso de familias de facetas. En el contrato actual, los géneros y subgéneros curados forman el núcleo semántico; tema, característica, modo, franquicia y desarrollador actúan como confirmaciones opcionales; la plataforma expresa compatibilidad material. Las \emph{keywords}, perspectivas y modos crudos no se introducen directamente: su ruido y heterogeneidad se reducen previamente mediante curación editorial. Una faceta ausente se omite; no se imputa ni redistribuye su peso.
+
+Para un término \(t\) de una familia \(f\), la ponderación usa una frecuencia documental inversa suavizada:
+
+\begin{equation}\label{eq:idf}
+idf(t)=\ln\left(\frac{N_f+1}{df_t+1}\right)+1,
+\end{equation}
+
+donde \(N_f\) es el número de obras gobernadas con algún valor de la familia y \(df_t\) el número que contiene \(t\). Si \(T\) es el conjunto de valores de una obra, el peso de la coordenada es \(w(f:t)=W_f\,idf(t)/\sqrt{\sum_{q\in T}idf(q)^2}\). La normalización L2 evita que una obra gane afinidad solo por declarar más etiquetas. Los pesos \(W_f\), el suavizado y la taxonomía son decisiones de SavePoint, no parámetros universales.
+
+El perfil positivo combina obras terminadas o en curso con valoración personal suficiente. Para una entrada \(i\), \(status\_weight\) vale 3 para terminada, 2 para en curso, 1 para pendiente y 0 para abandonada. Si \(r\) es la valoración personal normalizada, la intensidad es \(r^2\); por tanto, \(entry\_weight_i=status\_weight_i+r_i^2\). El perfil se obtiene como media ponderada de los vectores normalizados de las entradas elegibles. Las valoraciones inferiores al umbral aportan evidencia negativa solo cuando una etiqueta se repite en al menos tres experiencias negativas. Esta salvaguarda evita inferir un rechazo estable a partir de una sola obra.
+
+\section{Similitud y puntuación de contenido}
+
+La similitud principal no aplica coseno ciegamente a todo el vector. Para cada familia se calcula cobertura del perfil y precisión de la candidata. Sean \(P_f\) y \(C_f\) sus valores, y \(O_f=P_f\cap C_f\). Entonces \(coverage_f=\sum_{t\in O_f}P_f[t]/\sum_{t\in P_f}P_f[t]\) y \(precision_f=|O_f|/|C_f|\). Ambas cantidades se combinan mediante \(F_{0.5}\):
+
+\begin{equation}\label{eq:fbeta}
+F_{0.5}=\frac{(1+0.5^2)\,coverage\,precision}{0.5^2\,precision+coverage}.
+\end{equation}
+
+El parámetro menor que uno prioriza que la candidata no acumule facetas irrelevantes. El núcleo combina las familias activas de género y plataforma por media ponderada. Tema, característica, modo, franquicia y desarrollador solo añaden un bono acotado cuando confirman una coincidencia; su ausencia es neutral. La similitud se limita a \([0,1]\). El coseno se reserva para la redundancia entre recomendaciones y la diversidad intra-lista, donde su interpretación geométrica es directa.
+
+La variante \texttt{content-cbf-weighted-v1} usa la suma ponderada de afinidad y calidad externa. Las variantes multiplicativas, de dos etapas y negativas modifican respectivamente la combinación con rating, el desempate dentro de una banda de similitud y la penalización por perfil negativo. Las variantes \texttt{-pop-v1} incorporan además PopScore normalizado. \texttt{recency-v1} añade recencia como señal explícita. Ninguna de estas variantes cambia el conjunto común de candidatas.
+
+La calidad externa se estabiliza con \emph{shrinkage} bayesiano. Con \(n\) valoraciones, prior del corpus \(\mu\) y \(m=25\), se usa \(rating_{bayes}=(n\,rating+m\,\mu)/(n+m)\), seguido de una confianza \(n/(n+m)\). Así, una nota extrema con pocas observaciones queda contraída hacia el corpus. PopScore se transforma con \(\log(1+x)\) y percentil de rango dentro del snapshot congelado, no con el valor bruto.
+
+\section{Colaborativo, híbrido y diversidad}
+
+\texttt{cf-user-knn-v1} compara valoraciones explícitas de usuarios mediante vecindad. La similitud se calcula sobre obras co-valoradas, exige al menos dos coincidencias y conserva vecinos positivos hasta un máximo de 20. Su predicción agrega la desviación de cada vecino respecto a su media, ponderada por similitud. Es explicable por los vecinos y las obras compartidas, pero sufre \emph{cold start}: con historial escaso o sin vecindad suficiente no puede inferir preferencia colaborativa fiable.
+
+El híbrido ponderado combina las dos fuentes como \(H(i)=0.60\,ContentWeighted(i)+0.40\,CF(i)\). Si el componente colaborativo no dispone de historial, conserva la relevancia de contenido y declara el \emph{fallback}; no penaliza artificialmente a un usuario nuevo. El peso 0.60/0.40 es una decisión local que debe evaluarse, no una regla derivada de la literatura.
+
+Las variantes MMR reordenan un pool de tamaño \(\max(100,5K)\). En cada posición seleccionan la candidata que maximiza \(\lambda\,Rel(i)-(1-\lambda)\max_{j\in S}cosine(i,j)\), con \(\lambda=0.80\). \(Rel(i)\) es la relevancia previa y \(S\) la lista ya elegida. La penalización no cambia el score base ni garantiza mejor precisión: hace visible el intercambio entre relevancia y redundancia.
+
+\section{Limitaciones y alternativas}
+
+Las familias implementadas son interpretables y adecuadas para una población controlada, pero no agotan el espacio de recomendación. No se adoptaron microservicios, Kafka ni Kubernetes por complejidad operativa injustificada en v1; tampoco base vectorial, entrenamiento en HTTP, SQLite en producción o evaluación contra APIs vivas, porque perjudicarían reproducibilidad o integridad. Se descartaron factorización matricial, redes neuronales y recomendadores profundos por requerir más interacciones, entrenamiento e hiperparámetros de los que permite defender esta población sintética. Son decisiones de alcance, no una afirmación de inferioridad universal.

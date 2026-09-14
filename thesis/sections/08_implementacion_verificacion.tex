@@ -1,0 +1,7 @@
+\chapter{Implementación, pruebas y despliegue}\label{cap:implementacion}
+
+El backend se divide en los módulos de cuentas, catálogo, biblioteca, social, recomendaciones y evaluación. El frontend implementa las vistas de catálogo, detalle, colección, perfil, listas, comentarios, recomendaciones y panel de investigación. La importación y el gobierno de datos se ejecutan como procesos explícitos; las recomendaciones online se publican mediante snapshots y los experimentos se ejecutan mediante comandos offline. Docker Compose documenta un entorno reproducible con servicios de aplicación y PostgreSQL.
+
+La verificación combina pruebas unitarias, integración de API, PostgreSQL, frontend, E2E y accesibilidad. La existencia de una suite no equivale por sí sola a una ejecución cerrada; cuando el repositorio no fija fecha, entorno, comando y conteo, la memoria no inventa ese dato. Las evidencias de seguridad, migraciones, privacidad, importación, exportación, backup y recuperación se citan desde \texttt{docs/verification/} y \texttt{docs/deployment/}. \todo[inline]{PENDIENTE: consolidar por suite los comandos, fechas, conteos y resultados que el autor vaya a presentar.}
+
+El despliegue se plantea como demostración controlada. La paridad de configuración, la copia de seguridad y la recuperación están documentadas, pero la disponibilidad pública debe comprobarse en la fecha de defensa. Esta cautela evita presentar una guía de despliegue como si fuera una prueba de disponibilidad continua.

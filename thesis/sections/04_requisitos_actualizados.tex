@@ -1,0 +1,7 @@
+\chapter{Análisis de requisitos}\label{cap:requisitos}
+
+Los actores son visitante, usuario autenticado, propietario de colección, amistad aceptada, Research Viewer, Platform Admin, importación, evaluación, copia de seguridad y recuperación. El dominio incluye usuario, perfil, obra canónica, edición, plataforma, biblioteca, valoración, copias, lista, comentario, amistad, bloqueo, mensajes y recomendaciones sociales, snapshot, ejecución, algoritmo, métrica, artefacto y procedencia.
+
+Las reglas críticas sitúan la autoridad de permisos en backend: listas y colecciones compartidas solo alcanzan amistades aceptadas; una ruta alternativa no puede exponer contenido privado; rechazar o eliminar una amistad no equivale a bloquear; el bloqueo impide interacción y oculta la relación; la recomendación social se limita a una por semana. Los snapshots de investigación son inmutables, Research Viewer y Platform Admin son capacidades distintas y la interfaz no recalcula resultados científicos.
+
+Los requisitos no funcionales incluyen reproducibilidad, accesibilidad, diseño responsive, privacidad, seguridad, procedencia, trazabilidad, integridad, disponibilidad, portabilidad, mantenibilidad, auditabilidad y rendimiento. La cadena completa de requisitos y casos de uso se mantiene en \texttt{REQUIREMENTS-TRACEABILITY.md}; los flujos extensos y el diagrama permanecen \todo{PENDIENTE: confirmar con el autor} cuando no existe captura o diagrama verificable.
