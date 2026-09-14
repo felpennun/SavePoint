@@ -178,8 +178,10 @@ function Get-MatrixText {
 
 function Assert-ContainsAll {
     param([string]$Text, [string[]]$Tokens, [string]$Context)
+    $normalizedText = [regex]::Replace($Text, '\s+', ' ')
     foreach ($token in $Tokens) {
-        Assert-Condition ($Text.IndexOf($token, [StringComparison]::OrdinalIgnoreCase) -ge 0) "$Context is missing required token: $token"
+        $normalizedToken = [regex]::Replace($token, '\s+', ' ')
+        Assert-Condition ($normalizedText.IndexOf($normalizedToken, [StringComparison]::OrdinalIgnoreCase) -ge 0) "$Context is missing required token: $token"
     }
 }
 
