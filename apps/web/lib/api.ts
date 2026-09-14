@@ -962,6 +962,8 @@ export interface ResearchQueryFilters {
   metric?: string;
 }
 
+const RESEARCH_FILTER_KEYS = ["run", "algorithm", "cohort", "metric"] as const;
+
 async function fetchResearchJson<T>(path: string, cookieHeader: string): Promise<ResearchResponse<T>> {
   try {
     const response = await fetch(new URL(path, API_BASE), {
@@ -978,7 +980,8 @@ async function fetchResearchJson<T>(path: string, cookieHeader: string): Promise
 }
 
 function appendResearchFilters(url: URL, filters: ResearchQueryFilters): void {
-  for (const [key, value] of Object.entries(filters)) {
+  for (const key of RESEARCH_FILTER_KEYS) {
+    const value = filters[key];
     if (typeof value === "string" && value) url.searchParams.set(key, value);
   }
 }

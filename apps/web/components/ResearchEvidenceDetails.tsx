@@ -15,14 +15,12 @@ export function ResearchEvidenceDetails({
   artifacts,
   labels,
   notAvailable,
-  partial,
 }: {
   run: ResearchRunSummary;
   comparison: ResearchComparison;
   artifacts: ResearchArtifacts | null;
   labels: Dictionary["research"]["evidence"];
   notAvailable: string;
-  partial: boolean;
 }) {
   const provenance = artifacts?.provenance ?? comparison.provenance;
   return (
@@ -49,7 +47,6 @@ export function ResearchEvidenceDetails({
       </div>
       <div className="sp-surface">
         <h2 className="sp-research-section-heading">{labels.provenanceHeading}</h2>
-        {partial ? <p className="sp-research-partial" role="status">{labels.partial}</p> : null}
         <dl className="sp-research-evidence-list">
           {Object.entries(provenance).map(([key, value]) => (
             <EvidenceRow key={key} label={key} value={valueOf(value, notAvailable)} />

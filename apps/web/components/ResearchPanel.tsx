@@ -67,7 +67,7 @@ export function ResearchPanelContent({
             <ResearchComparisonChart rows={comparison.rows} selectedMetricId={comparison.selected_metric_id} labels={labels.comparison} notAvailable={labels.evidence.unavailable} />
             <ResearchComparisonTable rows={comparison.rows} selectedMetricId={comparison.selected_metric_id} labels={labels.comparison} notAvailable={labels.evidence.unavailable} />
           </section>
-          <ResearchEvidenceDetails run={comparison.run} comparison={comparison} artifacts={artifacts} labels={labels.evidence} notAvailable={labels.evidence.unavailable} partial={status === "partial"} />
+          <ResearchEvidenceDetails run={comparison.run} comparison={comparison} artifacts={artifacts} labels={labels.evidence} notAvailable={labels.evidence.unavailable} />
           <ResearchExports comparison={comparison} labels={labels.downloads} />
         </>
       )}
