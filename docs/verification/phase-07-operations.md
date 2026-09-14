@@ -38,6 +38,30 @@ operadores puedan correlacionar una operación sin consultar datos sensibles.
   de `/health/`.
 - `scripts/check-secrets.ps1` sobre código, manifiestos y superficies de logs.
 
+### Resultado del restore desechable
+
+El backup semanal y la comprobaciÃ³n de su manifiesto sÃ­ pasaron. El restore
+mensual se ejecutÃ³ con:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/restore-disposable-db.ps1 -BackupRoot 'C:\Users\Felipe\AppData\Local\Temp\savepoint-ops-450e0c4f815940b2b42ce56200d1ee37' -ManifestPath 'C:\Users\Felipe\AppData\Local\Temp\savepoint-ops-450e0c4f815940b2b42ce56200d1ee37\weekly-20260914-030113-27544.manifest.json'
+```
+
+La salida verificÃ³ el manifiesto y copiÃ³ el dump al contenedor, pero la
+migraciÃ³n de la base desechable terminÃ³ con `psycopg.errors.UniqueViolation`:
+`could not create unique index "accounts_accountprofile_admin_uuid_key"`,
+`Key (admin_uuid)=(a9e04b98-472b-4078-adbb-622215d75dc8) is duplicated`, y
+`Disposable restore command failed.` (exit code 1). La base canÃ³nica no fue
+usada como destino y el script fallÃ³ cerrado antes del smoke de `/health/`.
+
+`fails_when` del gate operativo: cualquier error de Docker/credenciales, o no
+completar restore + migraciones + constraints + conteos esenciales + smoke de
+`/health/`, deja esta verificaciÃ³n sin pasar. El bloqueo actual es el dato
+duplicado que impide aplicar `accounts.0004_phase7_anonymization`; requiere
+corregir el fixture/dump o la migraciÃ³n en el trabajo propietario antes de
+repetir el restore. No se modifica aquÃ­ porque queda fuera del alcance de
+portabilidad/operaciones de este plan.
+
 ## Trazabilidad
 
 | Requisito | Evidencia |

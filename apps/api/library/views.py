@@ -442,6 +442,15 @@ class ImportCollectionApplyView(APIView):
             resource_type="collection_import",
             resource_id=serializer.validated_data["preview_sha256"][:16],
         )
+        emit_operation_event(
+            operation_ref=operation_ref,
+            actor="authenticated-user",
+            operation_type="collection_import",
+            status="running",
+            started_at=started_at,
+            resource_type="collection_import",
+            resource_id=serializer.validated_data["preview_sha256"][:16],
+        )
         report = parse_import_csv(serializer.validated_data["file"].read(), user=request.user)
         if report.preview_sha256 != serializer.validated_data["preview_sha256"]:
             emit_operation_event(
