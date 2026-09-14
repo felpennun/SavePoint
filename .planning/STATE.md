@@ -427,7 +427,7 @@ totales. Ver `.planning/phases/04-collaborative-and-hybrid-comparison/`.
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
-| 260914-gdk | Sincronizar el vault de Obsidian y cerrar issues completadas | 2026-09-14 | pending | [260914-gdk-sync-obsidian-vault-and-close-completed-](./quick/260914-gdk-sync-obsidian-vault-and-close-completed-/) |
+| 260914-gdk | Sincronizar el vault de Obsidian y cerrar issues completadas | 2026-09-14 | c24784e | [260914-gdk-sync-obsidian-vault-and-close-completed-](./quick/260914-gdk-sync-obsidian-vault-and-close-completed-/) |
 | 260909-wgm | Documentar la decisión de no implementar Item-KNN ni modelos complejos y definir hybrid-mmr-v1 como propuesta | 2026-09-09 | 1004ed9 | [260909-wgm-documentar-la-decision-de-no-implementar](./quick/260909-wgm-documentar-la-decision-de-no-implementar/) |
 | 260909-ws8 | Implementar hybrid-mmr-v1 y adoptar rating_final compartido en web y offline | 2026-09-10 | 2c12838 | [260909-ws8-implementar-hybrid-mmr-v1-en-web-y-offli](./quick/260909-ws8-implementar-hybrid-mmr-v1-en-web-y-offli/) |
 | 260910-0u7 | Verificar la importación de facetas IGDB y dejar checkpoint para la interfaz | 2026-09-10 | a3f3a14 | [260910-0u7-verificar-importacion-de-facetas-igdb-y-](./quick/260910-0u7-verificar-importacion-de-facetas-igdb-y-/) |

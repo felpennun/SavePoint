@@ -2,7 +2,7 @@
 quick_id: 260914-gdk
 status: complete
 completed: 2026-09-14
-commit: pending
+commit: c24784e
 ---
 
 # Sincronización de Obsidian y cierre de issues completadas
