@@ -2,6 +2,20 @@
 
 El backend se divide en los módulos de cuentas, catálogo, biblioteca, social, recomendaciones y evaluación. El frontend implementa las vistas de catálogo, detalle, colección, perfil, listas, comentarios, recomendaciones y panel de investigación. La importación y el gobierno de datos se ejecutan como procesos explícitos; las recomendaciones online se publican mediante snapshots y los experimentos se ejecutan mediante comandos offline. Docker Compose documenta un entorno reproducible con servicios de aplicación y PostgreSQL.
 
+La Figura~\ref{fig:inicio} documenta la portada de la demostración y la Figura~\ref{fig:recomendaciones-ui} muestra la vista de recomendaciones disponible en el proyecto. Son capturas de interfaz, no evidencia de calidad de ranking ni de resultados experimentales.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.82\textwidth]{figures/captura-home-claro}
+\caption{Portada de SavePoint en tema claro. Fuente: captura del proyecto.}\label{fig:inicio}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.82\textwidth]{figures/captura-recomendaciones}
+\caption{Vista de recomendaciones de la aplicación. Fuente: captura del proyecto.}\label{fig:recomendaciones-ui}
+\end{figure}
+
 La verificación combina pruebas unitarias, integración de API, PostgreSQL, frontend, E2E y accesibilidad. La existencia de una suite no equivale por sí sola a una ejecución cerrada; cuando el repositorio no fija fecha, entorno, comando y conteo, la memoria no inventa ese dato. Las evidencias de seguridad, migraciones, privacidad, importación, exportación, backup y recuperación se citan desde \texttt{docs/verification/} y \texttt{docs/deployment/}. \todo[inline]{PENDIENTE: consolidar por suite los comandos, fechas, conteos y resultados que el autor vaya a presentar.}
 
 El despliegue se plantea como demostración controlada. La paridad de configuración, la copia de seguridad y la recuperación están documentadas, pero la disponibilidad pública debe comprobarse en la fecha de defensa. Esta cautela evita presentar una guía de despliegue como si fuera una prueba de disponibilidad continua.

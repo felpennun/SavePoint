@@ -1,45 +1,13 @@
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
 
-SavePoint is a web application for cataloguing a personal video game collection, inspired by
-Goodreads and Letterboxd, that also serves as the academic platform for this final degree
-project. The project has a twofold goal. It gives a user an orderly way to record played and
-pending games, rate them, inventory physical and digital copies together with their
-provenance, and expose a public profile. It also builds a reproducible testbed on which to
-implement and compare content based, collaborative filtering and hybrid recommendation
-algorithms, using synthetic users, explainable results and documented data provenance.
+SavePoint is a web platform for cataloguing video games, managing a personal collection and acting as a reproducible testbed for recommender systems. The author designed and implemented the product with a catalogue, library, physical and digital copies, ratings, lists, comments, profiles, privacy, social relations, recommendations and a research dashboard. The application supports the work, while the dissertation focuses on reproducible recommendation research.
 
-This document describes the system that was built. SavePoint serves a real scale catalogue
-of more than three hundred thousand works imported from the Internet Game Database through a resumable
-importer, alongside a curated corpus of one hundred and fifty games taken from Wikidata under
-a public domain dedication that acts as a citable reference. On top of that catalogue a user
-keeps a backlog, rates games, inventories physical and digital copies together with their
-format and edition, and publishes a public profile. The interface, with light and dark
-themes and verified for accessibility, sorts and filters the catalogue by its metadata and
-offers two deterministic recommenders: a popularity baseline and a genre affinity page
-driven by each user's own recorded activity. The system starts reproducibly in a documented local environment and runs
-without any connection to external services.
+The system compares sixteen reference algorithms: baselines, content-based variants, neighbourhood collaborative filtering, and hybrid approaches with diversity re-ranking. The dissertation describes item and user representations, tag weighting, facet similarity, external quality, popularity, negative evidence, cold start, and hybrid combination. The offline protocol fixes corpus, snapshots, seeds, shared candidates, exclusions and ranking metrics at $K\in\{5,10,20\}$.
 
-Phase 2 adds the research boundary: 193,885 works belong to governed corpus version
-\texttt{2026.09.1}, including 27,014 works with an IGDB user rating, and external ratings are
-frozen in immutable snapshots. It also freezes, before any laboratory run, a protocol with
-leave-one-out splitting, synthetic users, exclusions, seeds, an 18-configuration grid and
-Precision, Recall, nDCG and MAP at $K\in\{5,10,20\}$. The protocol, metrics and first content
-primitives are implemented and tested, but the full comparison is not presented as an
-achieved result.
+The published v15 evidence uses 400 active synthetic users and 79 evaluable users, with a single test run. It supports an internal comparison under the frozen corpus and protocol, but it does not represent real users or justify automatic generalisation. The dissertation explicitly separates that publication from the later implementation contract.
 
-The work pays particular attention to two aspects. The first is evidentiary rigour: every
-architectural decision is recorded in a decision document, goal verification is carried out
-independently, each result carries an author acceptance sign off, and the figures reported
-here come from that evidence rather than from estimates. The second is the methodology of
-engineering assisted by artificial intelligence agents, governed through a specification
-driven development method, applied and evaluated across the whole project and versioned in
-the repository itself, so that the engineering process is as inspectable and reproducible by
-third parties as the product. The systematic comparison of recommenders is presented as
-future work that this reproducible testbed enables, not as an achieved result.
+The author applied an agent-assisted engineering methodology governed through GSD and conceptually organised with Obsidian. Tools were used under the author's direction, review and final decisions. Felipe Peña Núñez is the sole author and remains responsible for analysis, design, implementation and validation.
 
 \vspace{.5cm}
-
-\textbf{Keywords:} video game cataloguing, recommender systems, reproducible testbed, data
-provenance, agent assisted software engineering, specification driven development, Django,
-Next.js.
+\textbf{Keywords:} video games, recommender systems, offline evaluation, reproducibility, collaborative filtering, content-based recommendation, data provenance.
