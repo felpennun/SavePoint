@@ -1,4 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ResearchPanel } from "@/components/ResearchPanel";
@@ -157,6 +159,18 @@ describe("ResearchPanel states and equivalence", () => {
     expect(occurrences(partialMarkup, es.research.evidence.partial)).toBe(1);
   });
 
+  it("escapes hostile labels and remains usable with long text and no rows", () => {
+    const hostile = row({
+      algorithm_label: "</text><script>alert(1)</script>",
+      cohort_label: "A cohort with a deliberately long label ".repeat(12),
+    });
+    const markup = renderPanel("populated", comparison({ rows: [hostile] }));
+
+    expect(markup).toContain("&lt;/text&gt;&lt;script&gt;alert(1)&lt;/script&gt;");
+    expect(markup).not.toContain("<script>");
+    expect(markup).toContain("A cohort with a deliberately long label");
+  });
+
   it("uses localized GET filters with allowlisted options and an explicit apply", () => {
     const markup = renderPanel("populated");
 
@@ -218,5 +232,21 @@ describe("ResearchPanel states and equivalence", () => {
     expect(requestUrl).toContain("metric=metric-1");
     expect(requestUrl).not.toContain("cohort=");
     expect(requestUrl).not.toContain("unknown=");
+  });
+
+  it("keeps presentation components free of runner imports and DTO serialization", () => {
+    const componentPaths = [
+      "../components/ResearchPanel.tsx",
+      "../components/ResearchComparisonChart.tsx",
+      "../components/ResearchComparisonTable.tsx",
+      "../components/ResearchExports.tsx",
+    ];
+    const source = componentPaths
+      .map((relativePath) => readFileSync(fileURLToPath(new URL(relativePath, import.meta.url)), "utf8"))
+      .join("\n");
+
+    expect(source).not.toMatch(/from ["'][^"']*(runner|metrics)[^"']*["']/i);
+    expect(source).not.toContain("JSON.stringify");
+    expect(source).not.toMatch(/\b(re-?run|delete|eliminar)\b/i);
   });
 });
