@@ -4,10 +4,10 @@ current_phase: 07
 current_phase_name: Research Panel, Hardening, and Evidence Freeze
 status: in_progress
 stopped_at: Completed 07-03-PLAN.md
-last_updated: "2026-09-14T01:14:23.473Z"
+last_updated: "2026-09-14T01:30:26.248Z"
 last_activity: 2026-09-14
-last_activity_desc: Phase 07 Plan 03 complete
-state_head: 6beade43436a795970736f79c3677b9149335b35
+last_activity_desc: Phase 07 Plan 04 complete; next is 07-05
+state_head: d4f5282719acf2136973cf75f355c3ebd538b359
 progress:
   total_phases: 8
   completed_phases: 3
@@ -36,9 +36,9 @@ rule that applies to every LLM and collaborator).
 ## Current Position
 
 **Phase:** 07 (Research Panel, Hardening, and Evidence Freeze) — IN PROGRESS
-**Plan:** 4 of 6
+**Plan:** 5 of 6
 **Plans in Phase:** 6
-**Status:** In progress; 07-00, 07-01 y 07-02 complete
+**Status:** In progress; 07-00 through 07-04 complete, next plan 07-05
 
 ### Snapshot de ejecucion vigente (2026-09-07)
 
@@ -199,6 +199,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 07]: [Phase 07 Plan 02]: AuditEvent es allowlisted y append-only mediante trigger PostgreSQL, sin payload libre ni PII.
 - [Phase 07]: La UI del panel delega autorización, métricas, orden y serialización al backend y expone filtros GET allowlisted.
 - [Phase 07]: La imagen web fija las bibliotecas Debian y Chromium de Playwright para ejecutar la suite sin dependencias globales.
+- [Phase 07]: Phase 07-04: imports use preview SHA-256 digests and atomic idempotent apply
+- [Phase 07]: Phase 07-04: PostgreSQL backups use private manifests, 7 daily/4 weekly retention, and disposable restore only
 
 ### Pending Todos
 
@@ -276,11 +278,11 @@ Ver `.planning/quick/260909-nej-a-adir-cuatro-variantes-popscore-con-imp/`.
 
 ## Registro histórico de sesiones (prevalece el checkpoint de ejecución actual)
 
-**Stopped at:** Checkpoint 07-04: restore desechable bloqueado por UniqueViolation; implementacion y verificaciones restantes completas
+**Stopped at:** Completed 07-04-PLAN.md
 
 **Resume (after the rate-limit reset):** `/gsd-plan-phase 2` re-spawns the planner from scratch. All inputs are committed: `02-CONTEXT.md`, `02-UI-SPEC.md` (verified 7/7), `02-RESEARCH.md`, `02-VALIDATION.md`, `02-PATTERNS.md`, `02-COVERAGE.md`. Then `gsd-plan-checker` → revision loop → present → `/gsd-execute-phase 2`. Full detail in `.planning/phases/02-governed-corpus-external-ratings-evaluation-contract-and-fir/.continue-here.md`.
 
-Last session: 2026-09-14T01:14:22.480Z
+Last session: 2026-09-14T01:29:13.515Z
 
 ### Done this session (2026-09-06, all committed on `main`)
 
@@ -289,7 +291,7 @@ Last session: 2026-09-14T01:14:22.480Z
 - **Roadmap restructure** — `85e98ba`: Phase 2 enlarged (governed corpus + external ratings + evaluation contract + first advanced recommender + search/filters + UI pass); former phases 5+6 merged; 3/4/7/8 renumbered to 5/6/4/7. Requirement coverage 91/91.
 - **Phase 2 planning inputs** — `02-CONTEXT.md` `f5d65e7` (discuss-phase, D-01..D-24), `02-UI-SPEC.md` `e548a2e` (ui-phase, checker 7/7, `## UI Considerations` 45 explicit + 10 backstop), `02-RESEARCH.md` `a78510f`, `02-VALIDATION.md` `53b173f`, `02-PATTERNS.md` `df45a33`, `02-COVERAGE.md` `15006b3` (rescued from the rate-limited planner).
 
-Resume file: .planning/phases/07-research-panel-hardening-and-evidence-freeze/07-04-SUMMARY.md
+Resume file: None
 
 ## Session Continuity
 

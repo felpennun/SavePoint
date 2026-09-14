@@ -38,8 +38,8 @@
 - [x] **INV-04**: A physical copy can record conservation state and storage location.
 - [x] **INV-05**: Private notes and purchase details never appear in public projections.
 - [x] **PORT-01**: User can export their collection, ratings, and lists as versioned CSV; JSON is not part of the Phase 5 closure.
-- [ ] **PORT-02**: User can preview and validate an import before applying it (assigned to Phase 7; no Phase 5 endpoint or feature test).
-- [ ] **PORT-03**: Import reports row-level errors and applies deterministic duplicate and conflict rules (assigned to Phase 7; no Phase 5 endpoint or feature test).
+- [x] **PORT-02**: User can preview and validate an import before applying it (assigned to Phase 7; no Phase 5 endpoint or feature test).
+- [x] **PORT-03**: Import reports row-level errors and applies deterministic duplicate and conflict rules (assigned to Phase 7; no Phase 5 endpoint or feature test).
 - [x] **PORT-04**: CSV exports neutralise potentially malicious spreadsheet formulas.
 
 ### Data and Provenance
@@ -103,7 +103,7 @@
 - [x] **OPS-01**: Application can be deployed to the Internet using documented configuration.
 - [x] **OPS-02**: Project can be run locally through a reproducible documented process.
 - [x] **OPS-03**: A lawful offline demo mode works without the external API or Internet access.
-- [ ] **OPS-04**: PostgreSQL and experimental artifacts have tested backup and recovery procedures.
+- [x] **OPS-04**: PostgreSQL and experimental artifacts have tested backup and recovery procedures.
 - [x] **OPS-05**: System emits structured logs and observable job states without sensitive data.
 - [x] **QUAL-01**: Project has unit, integration, and browser tests for critical workflows.
 - [ ] **QUAL-02**: A clean installation can reproduce experiments and their evidence.

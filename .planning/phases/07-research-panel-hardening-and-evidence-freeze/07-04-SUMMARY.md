@@ -51,16 +51,22 @@ decisions:
 metrics:
   duration: "~75m"
   completed: 2026-09-14
-  status: halted
+  status: complete
 actuals:
-  tokens: 15590
+  tokens: 16068
   tasks: 3
-  commits: 5
+  commits: 7
 requirements-completed:
-  []
+  - PORT-02
+  - PORT-03
+  - OPS-04
+  - OPS-05
+  - ADMIN-02
 ---
 
 # Phase 07 Plan 04: Portabilidad y operaciones Summary
+
+Estado final: plan completado. El restore desechable completo pasa tras corregir el backfill de `admin_uuid` y el nombre de la tabla de usuarios usado por los conteos.
 
 Importaciones de colección ligadas a digest, backups PostgreSQL privados con retención verificable y observabilidad operativa saneada; el restore desechable queda en checkpoint por una inconsistencia de datos del dump al aplicar una migración existente.
 
@@ -81,6 +87,7 @@ Importaciones de colección ligadas a digest, backups PostgreSQL privados con re
 | 2 | `be8b0b5` | Correcciones de restore/backup para esquemas vacíos, conteos y nombres temporales |
 | 3 | `a3e8f51` | Observabilidad allowlisted, logger Django y pruebas de redacción |
 | 3 | `0b51ff0` | Estado `running` y evidencia del gate de restore |
+| 2 | `d4f5282` | Backfill por fila de `admin_uuid` y conteos sobre `auth_user` |
 
 ## Verification Evidence
 
@@ -114,25 +121,35 @@ Salida relevante: el manifiesto y checksum pasaron, el dump se copió al contene
 4. **Rule 1 — restore verificable:** se añadió la comparación de conteos esenciales del restore contra el manifiesto, además de la limpieza `finally` ya prevista.
 5. **Rule 3 — gate documental:** se ajustaron patrones literales del runbook para que los checks deterministas detecten explícitamente `7 diarios`, `4 semanales` y `sin secretos`.
 
+### Checkpoint resolution deviation
+
+**Rule 1 — migration/data compatibility:** the supplied correction changed `admin_uuid` to a non-unique field, backfilled each row with `uuid4` through `RunPython`, and added uniqueness afterward. Re-running the restore then exposed `accounts_user` as an incorrect essential-count table name; both backup and restore now use `auth_user`. A regenerated manifest and complete restore passed.
+
 ## Auth Gates
 
 None. No se solicitaron ni se escribieron credenciales.
 
-## Deferred Verification
+## Closure Update
+
+La migración corregida añade `admin_uuid` sin unique, rellena cada fila con `uuid4` mediante `RunPython` y crea después la constraint unique. Se regeneró el backup con `weekly-20260914-032054-26252.manifest.json`; el restore ejecutó todas las migraciones, validó constraints y conteos esenciales, ejecutó `manage.py check` sin incidencias y completó el smoke de `/health/`.
+
+## Deferred Verification (historical checkpoint; resolved)
+
+Current result: PASS. The corrected migration and regenerated dump completed the disposable restore, migrations, constraints, essential counts, `manage.py check`, and `/health/` smoke successfully.
 
 El restore mensual no puede declararse PASS hasta que el dump usado por la evidencia no contenga `admin_uuid` duplicado al aplicar la constraint de `accounts.0004_phase7_anonymization`. La entrada correspondiente quedó registrada en `.planning/WINDOWS.md` como `unrun-verify` abierta. No se espera indefinidamente ni se altera la migración ajena.
 
 ## Known Stubs
 
-None in the files created or modified by this plan. The restore result is an unrun verification gate, not a production stub.
+None in the files created or modified by this plan.
 
 ## Next Phase Readiness
 
-La implementación queda disponible para integración, pero #69 debe permanecer abierto hasta repetir con éxito el restore desechable completo. El cierre deberá usar `Closes #69` únicamente en el commit de metadatos posterior a esa verificación. `OPS-05` ya figuraba completo; el comando de requisitos no encontró `PORT-02`/`PORT-03` en la tabla operativa y no se forzó una edición manual durante el checkpoint.
+La implementación y la evidencia quedan listas para integración. El commit de metadatos de este cierre usa `Closes #69` después del restore exitoso.
 
 ## Self-Check: PASSED
 
 - SUMMARY creado en la ruta canónica.
-- Los cinco commits de este plan existen en el historial.
+- Los siete commits de este plan existen en el historial al finalizar el cierre.
 - Los endpoints, scripts, tests y documentos enumerados existen.
 - No se incluyeron cambios de los planes 07-03/07-05 ni los cambios no relacionados presentes en el árbol de trabajo.

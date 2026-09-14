@@ -62,6 +62,14 @@ corregir el fixture/dump o la migraciÃ³n en el trabajo propietario antes de
 repetir el restore. No se modifica aquÃ­ porque queda fuera del alcance de
 portabilidad/operaciones de este plan.
 
+La migraciÃ³n fue corregida para aÃ±adir `admin_uuid` sin unique, rellenarlo por
+fila con `uuid4` mediante `RunPython` y crear despuÃ©s la constraint unique. Se
+regenerÃ³ el backup y se repitiÃ³ el comando con el manifiesto
+`weekly-20260914-032054-26252.manifest.json`. El restore completo pasÃ³:
+migraciones `OK`, `manage.py check` sin incidencias y smoke de `/health/`
+exitoso. TambiÃ©n se corrigiÃ³ el conteo esencial de usuarios para usar la tabla
+real `auth_user` en backup y restore. El gate queda superado.
+
 ## Trazabilidad
 
 | Requisito | Evidencia |
