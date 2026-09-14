@@ -22,3 +22,5 @@ verified: 2026-09-14
 - Issue #31 y #54 — OPEN, correctamente no cerradas.
 - `git status` mostró inicialmente únicamente las cuatro capturas ya validadas y
   el cambio de idempotencia; no se detectaron cambios ajenos adicionales.
+
+Verificación reconfirmada después de registrar el commit `c24784e` en el resumen.
