@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
     [ValidateSet("Sources", "Recommendations", "Full")]
     [string]$Scope = "Full",
@@ -149,11 +149,11 @@ function Get-RequiredSourcePaths {
         "docs/methodology/academic-reference-register.md", "docs/methodology/protocol.json",
         "SavePoint_TFG_Overleaf_2026-09-07.zip",
         "thesis/referencias/proyect-final.pdf",
-        "thesis/referencias/TFG_Predicción_De_Erupciones_Volcánicas_Mediante_Inteligencia_Artificial.pdf",
+        "thesis/referencias/TFG_PredicciÃ³n_De_Erupciones_VolcÃ¡nicas_Mediante_Inteligencia_Artificial.pdf",
         "thesis/referencias/proyecto-front.txt", "thesis/referencias/proyecto-toc2.txt",
         "thesis/referencias/volcanes-front.txt",
         "referencias/plantilla-etsii/", "referencias/proyect-final.pdf",
-        "referencias/TFG_Predicción_De_Erupciones_Volcánicas_Mediante_Inteligencia_Artificial.pdf",
+        "referencias/TFG_PredicciÃ³n_De_Erupciones_VolcÃ¡nicas_Mediante_Inteligencia_Artificial.pdf",
         "referencias/proyecto-front.txt", "referencias/proyecto-toc2.txt",
         "referencias/volcanes-front.txt", "apps/api/evaluation/protocol.json"
     )
@@ -194,11 +194,11 @@ function Assert-TableRows {
 function Test-AuthorshipContract {
     param([string]$EvidenceText)
     Assert-ContainsAll $EvidenceText @(
-        "Felipe Peña Núñez es el único autor responsable del TFG.",
-        "análisis, diseño, implementación, revisión, validación y decisiones",
+        "Felipe PeÃ±a NÃºÃ±ez es el Ãºnico autor responsable del TFG.",
+        "anÃ¡lisis, diseÃ±o, implementaciÃ³n, revisiÃ³n, validaciÃ³n y decisiones",
         "Herramientas auxiliares, nunca coautoras, desarrolladoras ni responsables."
     ) "Authorship contract"
-    $prohibited = '(?is)(?:\bla IA\b|\bagentes\b|\bskills\b|\bmodelos\b|\bherramientas\b).{0,100}(?:\bson\b|\bfueron\b|\bactúan como\b|\bactuan como\b).{0,40}\b(?:coautores|desarrolladores|responsables)\b'
+    $prohibited = '(?is)(?:\bla IA\b|\bagentes\b|\bskills\b|\bmodelos\b|\bherramientas\b).{0,100}(?:\bson\b|\bfueron\b|\bactÃºan como\b|\bactuan como\b).{0,40}\b(?:coautores|desarrolladores|responsables)\b'
     Assert-Condition (-not [regex]::IsMatch($EvidenceText, $prohibited)) "Authorship contract assigns project responsibility to an assisted tool."
 }
 
@@ -206,9 +206,9 @@ function Test-RecommendationSemantics {
     $algorithmText = Get-MatrixText "thesis/ALGORITHM-MATRIX.md"
     $signalText = Get-MatrixText "thesis/SIGNAL-MATRIX.md"
     $evidenceText = Get-MatrixText "thesis/EVIDENCE-MATRIX.md"
-    Assert-ContainsAll $algorithmText @("evaluation-400-test-2026-09-12-v15", "feature set", "v16", "K=5", "K=10", "K=20", "población sintética", "79", "único run publicado") "Algorithm matrix"
+    Assert-ContainsAll $algorithmText @("evaluation-400-test-2026-09-12-v15", "feature set", "v16", "K=5", "K=10", "K=20", "poblaciÃ³n sintÃ©tica", "79", "Ãºnico run publicado") "Algorithm matrix"
     Assert-ContainsAll $signalText @("v15", "v16", "no se atribuyen a los resultados v15") "Signal matrix temporal boundary"
-    Assert-ContainsAll $evidenceText @("La evaluación publicada v15 usa población sintética", "Existe una única ejecución publicada", "No representa usuarios reales ni permite generalización automática", "No atribuir resultados v15 a fórmulas o pesos posteriores") "Evidence limitations"
+    Assert-ContainsAll $evidenceText @("La evaluaciÃ³n publicada v15 usa poblaciÃ³n sintÃ©tica", "Existe una Ãºnica ejecuciÃ³n publicada", "No representa usuarios reales ni permite generalizaciÃ³n automÃ¡tica", "No atribuir resultados v15 a fÃ³rmulas o pesos posteriores") "Evidence limitations"
     $algorithmIds = @([regex]::Matches($algorithmText, '(?m)^\\| `([^`]+-v1)` \\|') | ForEach-Object { $_.Groups[1].Value })
     Assert-Condition ($algorithmIds.Count -eq 16) "Algorithm matrix must reconcile exactly 16 published v15 algorithm identifiers."
     Assert-Condition (($algorithmIds | Sort-Object -Unique).Count -eq $algorithmIds.Count) "Algorithm matrix contains duplicate v15 algorithm identifiers."
@@ -216,12 +216,12 @@ function Test-RecommendationSemantics {
 
 function Test-TraceabilitySemantics {
     $text = Get-MatrixText "thesis/REQUIREMENTS-TRACEABILITY.md"
-    Assert-ContainsAll $text @("## Actores (10)", "## Requisitos de información (23)", "## Requisitos no funcionales (14)", "## Reglas de negocio (11)", "## Cadena de trazabilidad y casos de uso mínimos", $canonicalPlaceholder) "Requirements traceability matrix"
-    Assert-TableRows $text @("Usuario no autenticado", "Usuario autenticado", "Propietario de una colección", "Amigo aceptado", "Research Viewer", "Platform Admin", "Sistema de importación", "Sistema de evaluación", "Sistema de backup", "Sistema de recuperación") "Actors"
-    Assert-TableRows $text @("Usuario", "Perfil", "Juego", "Obra canónica", "Edición", "Plataforma", "Entrada de biblioteca", "Valoración", "Copia física", "Copia digital", "Lista", "Comentario", "Amistad", "Solicitud de amistad", "Bloqueo", "Mensaje social", "Recomendación social", "Snapshot", "Ejecución experimental", "Algoritmo", "Métrica", "Artefacto", "Procedencia") "Information requirements"
-    Assert-TableRows $text @("Reproducibilidad", "Accesibilidad", "Diseño responsive", "Seguridad", "Privacidad", "Legalidad", "Procedencia", "Trazabilidad", "Integridad", "Disponibilidad", "Portabilidad", "Mantenibilidad", "Auditabilidad", "Rendimiento") "Non-functional requirements"
-    Assert-ContainsAll $text @("Listas y colecciones compartidas solo para amistades aceptadas.", "No hay acceso privado por rutas alternativas.", "Rechazar solicitud no equivale a bloquear.", "Eliminar amistad no equivale a bloquear.", "Bloquear impide interacción y oculta relación.", "Recomendaciones sociales limitadas a una por semana.", "Snapshots de investigación inmutables.", "Research Viewer y Platform Admin son capacidades distintas.", "La interfaz no recalcula resultados científicos.", "Datos privados no aparecen en proyecciones públicas.", "Autoridad de permisos en backend.") "Business rules"
-    Assert-ContainsAll $text @("| requisito | caso de uso | fase | plan | código | test | evidencia | sección futura |", "CU-01", "CU-02", "CU-03", "CU-04", "CU-05") "Traceability chain"
+    Assert-ContainsAll $text @("## Actores (10)", "## Requisitos de informaciÃ³n (23)", "## Requisitos no funcionales (14)", "## Reglas de negocio (11)", "## Cadena de trazabilidad y casos de uso mÃ­nimos", $canonicalPlaceholder) "Requirements traceability matrix"
+    Assert-TableRows $text @("Usuario no autenticado", "Usuario autenticado", "Propietario de una colecciÃ³n", "Amigo aceptado", "Research Viewer", "Platform Admin", "Sistema de importaciÃ³n", "Sistema de evaluaciÃ³n", "Sistema de backup", "Sistema de recuperaciÃ³n") "Actors"
+    Assert-TableRows $text @("Usuario", "Perfil", "Juego", "Obra canÃ³nica", "EdiciÃ³n", "Plataforma", "Entrada de biblioteca", "ValoraciÃ³n", "Copia fÃ­sica", "Copia digital", "Lista", "Comentario", "Amistad", "Solicitud de amistad", "Bloqueo", "Mensaje social", "RecomendaciÃ³n social", "Snapshot", "EjecuciÃ³n experimental", "Algoritmo", "MÃ©trica", "Artefacto", "Procedencia") "Information requirements"
+    Assert-TableRows $text @("Reproducibilidad", "Accesibilidad", "DiseÃ±o responsive", "Seguridad", "Privacidad", "Legalidad", "Procedencia", "Trazabilidad", "Integridad", "Disponibilidad", "Portabilidad", "Mantenibilidad", "Auditabilidad", "Rendimiento") "Non-functional requirements"
+    Assert-ContainsAll $text @("Listas y colecciones compartidas solo para amistades aceptadas.", "No hay acceso privado por rutas alternativas.", "Rechazar solicitud no equivale a bloquear.", "Eliminar amistad no equivale a bloquear.", "Bloquear impide interacciÃ³n y oculta relaciÃ³n.", "Recomendaciones sociales limitadas a una por semana.", "Snapshots de investigaciÃ³n inmutables.", "Research Viewer y Platform Admin son capacidades distintas.", "La interfaz no recalcula resultados cientÃ­ficos.", "Datos privados no aparecen en proyecciones pÃºblicas.", "Autoridad de permisos en backend.") "Business rules"
+    Assert-ContainsAll $text @("| requisito | caso de uso | fase | plan | cÃ³digo | test | evidencia | secciÃ³n futura |", "CU-01", "CU-02", "CU-03", "CU-04", "CU-05") "Traceability chain"
 }
 
 function Test-FigureSemantics {
@@ -252,9 +252,9 @@ function Test-TextSafetyAndLanguage {
         Assert-Condition (-not [regex]::IsMatch($text, '(?m)(?:[A-Za-z]:\\\\|/Users/|/home/)')) "Inventory text contains an absolute local path."
     }
     Assert-ContainsAll $Texts[0] @("Mapa estructural", "Fuentes", "Cobertura") "Spanish structure matrix"
-    Assert-ContainsAll $Texts[1] @("Matriz de evidencia", "autor", "limitación") "Spanish evidence matrix"
-    Assert-ContainsAll $Texts[2] @("Matriz de algoritmos", "Límites de interpretación") "Spanish algorithm matrix"
-    Assert-ContainsAll $Texts[3] @("Matriz de señales", "Límites") "Spanish signal matrix"
+    Assert-ContainsAll $Texts[1] @("Matriz de evidencia", "autor", "limitaciÃ³n") "Spanish evidence matrix"
+    Assert-ContainsAll $Texts[2] @("Matriz de algoritmos", "LÃ­mites de interpretaciÃ³n") "Spanish algorithm matrix"
+    Assert-ContainsAll $Texts[3] @("Matriz de seÃ±ales", "LÃ­mites") "Spanish signal matrix"
     Assert-ContainsAll $Texts[4] @("Plan compacto de figuras", "Condiciones de cierre") "Spanish figure matrix"
     Assert-ContainsAll $Texts[5] @("Trazabilidad de requisitos", "Actores") "Spanish traceability matrix"
     $scriptText = [IO.File]::ReadAllText($PSCommandPath)
@@ -264,7 +264,7 @@ function Test-TextSafetyAndLanguage {
 function Test-VaultGate {
     $vaultPath = Join-Path $repoRoot "ideas-vault\Requisitos\Requisitos - Tesis y metodologia con agentes.md"
     $vaultText = [IO.File]::ReadAllText($vaultPath)
-    Assert-ContainsAll $vaultText @("Fase B quedó bloqueada hasta superar el gate integral de la Fase A.", "El gate integral", "no sustituye las fuentes", "v15", "v16") "Vault inventory gate"
+    Assert-ContainsAll $vaultText @("Fase B quedÃ³ bloqueada hasta superar el gate integral de la Fase A.", "El gate integral", "no sustituye las fuentes", "v15", "v16") "Vault inventory gate"
 }
 
 function Test-FullMatrixContracts {
@@ -350,7 +350,7 @@ function New-SourceEntry {
     [void](Test-SafeRelativePath $RelativePath)
     $absolutePath = Join-Path $repoRoot ($RelativePath.Replace('/', '\'))
     if (-not (Test-Path -LiteralPath $absolutePath -PathType Leaf)) {
-        return [ordered]@{ path=$RelativePath; source_alias=$SourceAlias; bytes=0; sha256=$null; hash_mode="not_applicable"; category="path_resolution"; read_status="missing"; locator="ruta solicitada ausente; consultar source_alias"; unit_kind="not_applicable"; total_units=0; read_ranges=@(); notes="Ausencia registrada de forma explícita, sin corrección silenciosa." }
+        return [ordered]@{ path=$RelativePath; source_alias=$SourceAlias; bytes=0; sha256=$null; hash_mode="not_applicable"; category="path_resolution"; read_status="missing"; locator="ruta solicitada ausente; consultar source_alias"; unit_kind="not_applicable"; total_units=0; read_ranges=@(); notes="Ausencia registrada de forma explÃ­cita, sin correcciÃ³n silenciosa." }
     }
 
     $rawBytes = [IO.File]::ReadAllBytes($absolutePath)
@@ -383,7 +383,7 @@ function New-SourceEntry {
         if ($lineCount -gt 1) { $unitKind = "line"; $totalUnits = $lineCount; $chunkSize = 500 }
     }
     $ranges = @(New-ReadRanges $totalUnits $chunkSize)
-    $locator = if ($totalUnits -gt 0) { "$unitKind 1-$totalUnits" } else { "fichero vacío comprobado" }
+    $locator = if ($totalUnits -gt 0) { "$unitKind 1-$totalUnits" } else { "fichero vacÃ­o comprobado" }
     return [ordered]@{ path=$RelativePath; source_alias=$SourceAlias; bytes=[int64]$rawBytes.Length; sha256=(Get-Sha256Hex -Bytes $hashBytes); hash_mode=$hashMode; category=(Get-Category $RelativePath); read_status="complete"; locator=$locator; unit_kind=$unitKind; total_units=[int64]$totalUnits; read_ranges=$ranges; notes="Lectura completa por unidades declaradas; el hash identifica contenido, no demuestra veracidad, calidad ni legalidad." }
 }
 
@@ -430,7 +430,7 @@ function Write-SourceManifest {
         "docs/methodology/academic-reference-register.md", "docs/methodology/protocol.json",
         "SavePoint_TFG_Overleaf_2026-09-07.zip",
         "thesis/referencias/proyect-final.pdf",
-        "thesis/referencias/TFG_Predicción_De_Erupciones_Volcánicas_Mediante_Inteligencia_Artificial.pdf",
+        "thesis/referencias/TFG_PredicciÃ³n_De_Erupciones_VolcÃ¡nicas_Mediante_Inteligencia_Artificial.pdf",
         "thesis/referencias/proyecto-front.txt", "thesis/referencias/proyecto-toc2.txt",
         "thesis/referencias/volcanes-front.txt"
     )
@@ -445,7 +445,7 @@ function Write-SourceManifest {
     $aliases = [ordered]@{
         "referencias/plantilla-etsii/" = "thesis/referencias/plantilla-etsii/"
         "referencias/proyect-final.pdf" = "thesis/referencias/proyect-final.pdf"
-        "referencias/TFG_Predicción_De_Erupciones_Volcánicas_Mediante_Inteligencia_Artificial.pdf" = "thesis/referencias/TFG_Predicción_De_Erupciones_Volcánicas_Mediante_Inteligencia_Artificial.pdf"
+        "referencias/TFG_PredicciÃ³n_De_Erupciones_VolcÃ¡nicas_Mediante_Inteligencia_Artificial.pdf" = "thesis/referencias/TFG_PredicciÃ³n_De_Erupciones_VolcÃ¡nicas_Mediante_Inteligencia_Artificial.pdf"
         "referencias/proyecto-front.txt" = "thesis/referencias/proyecto-front.txt"
         "referencias/proyecto-toc2.txt" = "thesis/referencias/proyecto-toc2.txt"
         "referencias/volcanes-front.txt" = "thesis/referencias/volcanes-front.txt"
@@ -497,7 +497,7 @@ function Test-Manifest {
     Assert-Condition ($unexpectedPaths.Count -eq 0) "Manifest contains sources outside the live required set: $($unexpectedPaths -join ', ')"
     $requiredAliases = @(
         "referencias/plantilla-etsii/", "referencias/proyect-final.pdf",
-        "referencias/TFG_Predicción_De_Erupciones_Volcánicas_Mediante_Inteligencia_Artificial.pdf",
+        "referencias/TFG_PredicciÃ³n_De_Erupciones_VolcÃ¡nicas_Mediante_Inteligencia_Artificial.pdf",
         "apps/api/evaluation/protocol.json"
     )
     foreach ($alias in $requiredAliases) {
