@@ -104,25 +104,53 @@ persona usuaria dispara, directa o indirectamente, una llamada a un proveedor ex
 
 \section{Matriz de trazabilidad}\label{sec:req-trazabilidad}
 
-La Tabla~\ref{tab:trazabilidad-resumida} muestra tres cadenas representativas, cada una
-enlazando un requisito con su implementación y con la evidencia que certifica que se cumple. La
-matriz completa, con el detalle de cada uno de los noventa y cuatro requisitos, vive en
-\texttt{.planning/REQUIREMENTS.md} y en la traza documental por fase de
-\texttt{docs/verification/}, para no convertir esta tabla de lectura en una fuente paralela que
-se pueda desincronizar del repositorio.
+La Tabla~\ref{tab:trazabilidad-familias} recorre las diecisiete familias de requisitos del
+proyecto, con cuántos de cada una están completos y verificados frente a los que quedan
+pendientes. Cada fila es, en sí misma, una entrada de trazabilidad: el código de familia enlaza
+directamente con los identificadores individuales de \texttt{.planning/REQUIREMENTS.md}; el
+estado de cada uno de ellos remite a su vez a una firma de aceptación por fase o a un plan
+concreto en \texttt{docs/verification/}. Esta tabla sustituye una anterior que solo mostraba
+tres cadenas sueltas a modo de ejemplo: era demasiado corta para representar la cobertura real
+del proyecto, así que aquí se prefiere recorrer las diecisiete familias completas y dejar el
+detalle fila a fila, con sus noventa y cuatro identificadores individuales, en
+\texttt{.planning/REQUIREMENTS.md}, que es además la fuente que se actualiza primero cuando un
+requisito cambia de estado.
 
 \begin{table}[htbp]
 \centering
-\caption{Trazabilidad resumida de requisitos de SavePoint.}\label{tab:trazabilidad-resumida}
+\caption{Trazabilidad de requisitos de SavePoint, por familia.}\label{tab:trazabilidad-familias}
 \tablecompact
-\begin{tabularx}{\textwidth}{@{}>{\ttfamily\raggedright\arraybackslash}p{0.15\textwidth}YYY@{}}
-\textnormal{Requisito} & \textnormal{Caso de uso} & \textnormal{Implementación y test} & \textnormal{Evidencia} \\
+\begin{tabularx}{\textwidth}{@{}>{\ttfamily\raggedright\arraybackslash}p{0.14\textwidth}Yrr@{}}
+\textnormal{Familia} & \textnormal{Cubre} & \textnormal{Completos} & \textnormal{Total} \\
 \hline
-Privacidad de perfil & Consultar perfil compartido & cuentas, biblioteca y permisos de backend & firma de aceptación y auditoría de seguridad \\
-Recomendación offline & Ejecutar comparación & \texttt{evaluation/}, \texttt{recommendations/} y pruebas del runner & manifiesto y resultados publicados \\
-Recuperación operativa & Restaurar copia & scripts e infraestructura versionados & \texttt{backup-recovery.md} \\
+AUTH & Autenticación y sesión & 2 & 2 \\
+PROF & Perfil personal y público & 4 & 4 \\
+CAT & Catálogo, búsqueda y filtrado & 5 & 6 \\
+LIB & Biblioteca y valoración & 4 & 4 \\
+INV & Inventario de copias & 5 & 5 \\
+DATA & Procedencia y gobierno de datos & 8 & 8 \\
+REC & Algoritmos de recomendación & 9 & 10 \\
+EVAL & Protocolo y laboratorio de evaluación & 7 & 14 \\
+SEC & Seguridad & 8 & 8 \\
+OPS & Operaciones y copia de seguridad & 5 & 5 \\
+QUAL & Calidad de producto y accesibilidad & 3 & 5 \\
+DOC & Documentación y registro & 6 & 6 \\
+AGENT & Metodología de ingeniería & 6 & 6 \\
+PORT & Portabilidad de datos & 2 & 4 \\
+PRIV & Privacidad & 2 & 2 \\
+SOCIAL & Relaciones sociales & 3 & 3 \\
+ADMIN & Administración & 2 & 2 \\
+\hline
+\textbf{Total} & & \textbf{81} & \textbf{94} \\
 \end{tabularx}
 \end{table}
+
+Las cinco familias con algún requisito pendiente (\texttt{CAT}, \texttt{REC}, \texttt{EVAL},
+\texttt{QUAL} y \texttt{PORT}) concentran ese trabajo futuro en dos bloques ya identificados en
+la Sección~\ref{sec:req-funcionales}: la ampliación del contrato de evaluación y la
+portabilidad de datos en formatos adicionales. Ningún requisito completo depende de uno
+pendiente para su propia verificación, de modo que el trabajo futuro no invalida ninguna
+evidencia ya cerrada.
 
 Este capítulo ha fijado qué debe hacer el sistema y con qué restricciones. El capítulo
 siguiente describe cómo se ha diseñado para cumplirlo.
