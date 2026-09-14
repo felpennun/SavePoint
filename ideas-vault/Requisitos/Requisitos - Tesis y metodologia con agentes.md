@@ -23,6 +23,9 @@ tags: [requisitos, tema/metodologia]
 
 ## 2026-09-14: inventario de la Fase A de la memoria
 
+La Fase B quedó bloqueada hasta superar el gate integral de la Fase A. El gate integral
+se superó el 2026-09-14 tras validar las seis matrices y el manifiesto de fuentes vivas.
+
 El inventario canónico para la memoria está en el repositorio: `thesis/SOURCE-MANIFEST.json`,
 `thesis/STRUCTURE-MAP.md`, `thesis/EVIDENCE-MATRIX.md`,
 `thesis/ALGORITHM-MATRIX.md`, `thesis/SIGNAL-MATRIX.md`,

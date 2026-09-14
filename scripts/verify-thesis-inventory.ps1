@@ -23,6 +23,15 @@ $generatedInputs = @(
     "scripts/verify-thesis-inventory.ps1",
     "ideas-vault/Requisitos/Requisitos - Tesis y metodologia con agentes.md"
 )
+$matrixPaths = @(
+    "thesis/STRUCTURE-MAP.md",
+    "thesis/EVIDENCE-MATRIX.md",
+    "thesis/ALGORITHM-MATRIX.md",
+    "thesis/SIGNAL-MATRIX.md",
+    "thesis/FIGURE-PLAN.md",
+    "thesis/REQUIREMENTS-TRACEABILITY.md"
+)
+$canonicalPlaceholder = "% PENDIENTE: confirmar con el autor"
 
 function Assert-Condition {
     param([bool]$Condition, [string]$Message)
@@ -117,6 +126,155 @@ function Assert-NonEmptyMatrix {
     $absolutePath = Join-Path $repoRoot ($RelativePath.Replace('/', '\'))
     Assert-Condition (Test-Path -LiteralPath $absolutePath -PathType Leaf) "Matrix is missing: $RelativePath"
     Assert-Condition ((Get-Item -LiteralPath $absolutePath).Length -gt 128) "Matrix is empty: $RelativePath"
+}
+
+function Get-RequiredSourcePaths {
+    $trackedScopes = @(
+        ".planning/phases", "docs/adr", "docs/verification", "docs/deployment",
+        "apps/api/evaluation", "apps/api/recommendations", "apps/api/catalogue",
+        "apps/api/library", "apps/api/accounts", "apps/api/social", "apps/web",
+        "e2e", "scripts", "infra"
+    )
+    $paths = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    foreach ($path in Get-TrackedPaths $trackedScopes) { [void]$paths.Add($path) }
+    $explicit = @(
+        "AGENTS.md", "CONVENTIONS.md", "CONTRIBUTING.md", ".planning/PROJECT.md",
+        ".planning/REQUIREMENTS.md", ".planning/ROADMAP.md", ".planning/STATE.md",
+        ".planning/quick/260914-h0g-construir-la-fase-a-de-la-nueva-memoria-/260914-h0g-PLAN.md",
+        ".planning/quick/260914-h0g-construir-la-fase-a-de-la-nueva-memoria-/260914-h0g-RESEARCH.md",
+        "docs/methodology/agent-method.md", "docs/methodology/recommendation-algorithms.md",
+        "docs/methodology/evaluation-protocol.md", "docs/methodology/evaluation-v15-appendix.md",
+        "docs/methodology/agent-ledger.jsonl", "docs/methodology/phase-07-agent-contributions.md",
+        "docs/methodology/phase-07-evidence-package.md", "docs/methodology/ai-use-disclosure.md",
+        "docs/methodology/academic-reference-register.md", "docs/methodology/protocol.json",
+        "SavePoint_TFG_Overleaf_2026-09-07.zip",
+        "thesis/referencias/proyect-final.pdf",
+        "thesis/referencias/TFG_Predicción_De_Erupciones_Volcánicas_Mediante_Inteligencia_Artificial.pdf",
+        "thesis/referencias/proyecto-front.txt", "thesis/referencias/proyecto-toc2.txt",
+        "thesis/referencias/volcanes-front.txt",
+        "referencias/plantilla-etsii/", "referencias/proyect-final.pdf",
+        "referencias/TFG_Predicción_De_Erupciones_Volcánicas_Mediante_Inteligencia_Artificial.pdf",
+        "referencias/proyecto-front.txt", "referencias/proyecto-toc2.txt",
+        "referencias/volcanes-front.txt", "apps/api/evaluation/protocol.json"
+    )
+    foreach ($path in $explicit) { [void]$paths.Add($path) }
+    $templateRoot = Join-Path $repoRoot "thesis\referencias\plantilla-etsii"
+    foreach ($file in Get-ChildItem -LiteralPath $templateRoot -File -Recurse) {
+        [void]$paths.Add($file.FullName.Substring($repoRoot.Length + 1).Replace('\', '/'))
+    }
+    foreach ($excluded in $generatedInputs) { [void]$paths.Remove($excluded) }
+    return @($paths | Sort-Object)
+}
+
+function Get-MatrixText {
+    param([string]$RelativePath)
+    $absolutePath = Join-Path $repoRoot ($RelativePath.Replace('/', '\'))
+    Assert-NonEmptyMatrix $RelativePath
+    $bytes = [IO.File]::ReadAllBytes($absolutePath)
+    $text = [Text.UTF8Encoding]::new($false, $true).GetString($bytes)
+    Assert-Condition (-not $text.Contains([char]0)) "Matrix contains a null byte: $RelativePath"
+    return $text
+}
+
+function Assert-ContainsAll {
+    param([string]$Text, [string[]]$Tokens, [string]$Context)
+    foreach ($token in $Tokens) {
+        Assert-Condition ($Text.Contains($token)) "$Context is missing required token: $token"
+    }
+}
+
+function Assert-TableRows {
+    param([string]$Text, [string[]]$RowNames, [string]$Context)
+    foreach ($name in $RowNames) {
+        $escaped = [regex]::Escape($name)
+        Assert-Condition ([regex]::IsMatch($Text, "(?m)^\\|\\s*$escaped\\s*\\|")) "$Context is missing required row: $name"
+    }
+}
+
+function Test-AuthorshipContract {
+    param([string]$EvidenceText)
+    Assert-ContainsAll $EvidenceText @(
+        "Felipe Peña Núñez es el único autor responsable del TFG.",
+        "análisis, diseño, implementación, revisión, validación y decisiones",
+        "Herramientas auxiliares, nunca coautoras, desarrolladoras ni responsables."
+    ) "Authorship contract"
+    $prohibited = '(?is)(?:\bla IA\b|\bagentes\b|\bskills\b|\bmodelos\b|\bherramientas\b).{0,100}(?:\bson\b|\bfueron\b|\bactúan como\b|\bactuan como\b).{0,40}\b(?:coautores|desarrolladores|responsables)\b'
+    Assert-Condition (-not [regex]::IsMatch($EvidenceText, $prohibited)) "Authorship contract assigns project responsibility to an assisted tool."
+}
+
+function Test-RecommendationSemantics {
+    $algorithmText = Get-MatrixText "thesis/ALGORITHM-MATRIX.md"
+    $signalText = Get-MatrixText "thesis/SIGNAL-MATRIX.md"
+    $evidenceText = Get-MatrixText "thesis/EVIDENCE-MATRIX.md"
+    Assert-ContainsAll $algorithmText @("evaluation-400-test-2026-09-12-v15", "feature set", "v16", "K=5", "K=10", "K=20", "población sintética", "79", "único run publicado") "Algorithm matrix"
+    Assert-ContainsAll $signalText @("v15", "v16", "no se atribuyen a los resultados v15") "Signal matrix temporal boundary"
+    Assert-ContainsAll $evidenceText @("La evaluación publicada v15 usa población sintética", "Existe una única ejecución publicada", "No representa usuarios reales ni permite generalización automática", "No atribuir resultados v15 a fórmulas o pesos posteriores") "Evidence limitations"
+    $algorithmIds = @([regex]::Matches($algorithmText, '(?m)^\\| `([^`]+-v1)` \\|') | ForEach-Object { $_.Groups[1].Value })
+    Assert-Condition ($algorithmIds.Count -eq 16) "Algorithm matrix must reconcile exactly 16 published v15 algorithm identifiers."
+    Assert-Condition (($algorithmIds | Sort-Object -Unique).Count -eq $algorithmIds.Count) "Algorithm matrix contains duplicate v15 algorithm identifiers."
+}
+
+function Test-TraceabilitySemantics {
+    $text = Get-MatrixText "thesis/REQUIREMENTS-TRACEABILITY.md"
+    Assert-ContainsAll $text @("## Actores (10)", "## Requisitos de información (23)", "## Requisitos no funcionales (14)", "## Reglas de negocio (11)", "## Cadena de trazabilidad y casos de uso mínimos", $canonicalPlaceholder) "Requirements traceability matrix"
+    Assert-TableRows $text @("Usuario no autenticado", "Usuario autenticado", "Propietario de una colección", "Amigo aceptado", "Research Viewer", "Platform Admin", "Sistema de importación", "Sistema de evaluación", "Sistema de backup", "Sistema de recuperación") "Actors"
+    Assert-TableRows $text @("Usuario", "Perfil", "Juego", "Obra canónica", "Edición", "Plataforma", "Entrada de biblioteca", "Valoración", "Copia física", "Copia digital", "Lista", "Comentario", "Amistad", "Solicitud de amistad", "Bloqueo", "Mensaje social", "Recomendación social", "Snapshot", "Ejecución experimental", "Algoritmo", "Métrica", "Artefacto", "Procedencia") "Information requirements"
+    Assert-TableRows $text @("Reproducibilidad", "Accesibilidad", "Diseño responsive", "Seguridad", "Privacidad", "Legalidad", "Procedencia", "Trazabilidad", "Integridad", "Disponibilidad", "Portabilidad", "Mantenibilidad", "Auditabilidad", "Rendimiento") "Non-functional requirements"
+    Assert-ContainsAll $text @("Listas y colecciones compartidas solo para amistades aceptadas.", "No hay acceso privado por rutas alternativas.", "Rechazar solicitud no equivale a bloquear.", "Eliminar amistad no equivale a bloquear.", "Bloquear impide interacción y oculta relación.", "Recomendaciones sociales limitadas a una por semana.", "Snapshots de investigación inmutables.", "Research Viewer y Platform Admin son capacidades distintas.", "La interfaz no recalcula resultados científicos.", "Datos privados no aparecen en proyecciones públicas.", "Autoridad de permisos en backend.") "Business rules"
+    Assert-ContainsAll $text @("| requisito | caso de uso | fase | plan | código | test | evidencia | sección futura |", "CU-01", "CU-02", "CU-03", "CU-04", "CU-05") "Traceability chain"
+}
+
+function Test-FigureSemantics {
+    $text = Get-MatrixText "thesis/FIGURE-PLAN.md"
+    Assert-ContainsAll $text @("caption", "label", "cita previa", "F-01", "F-15", "C-01", "C-11", "Desktop y mobile") "Figure plan"
+    $rows = @($text -split "`n" | Where-Object { $_ -match '^\\| (?:F|C)-\\d+ \\|' })
+    Assert-Condition ($rows.Count -eq 26) "Figure plan must contain exactly 26 planned figures and captures."
+    $labels = @()
+    foreach ($row in $rows) {
+        $cells = @($row.Trim().Trim('|').Split('|') | ForEach-Object { $_.Trim() })
+        Assert-Condition ($cells.Count -eq 7) "Figure plan row has an invalid column count: $row"
+        Assert-Condition ($cells[3].Length -gt 0 -and $cells[4] -match '^`fig:[^`]+`$' -and $cells[5].Length -gt 0) "Figure plan requires a caption, unique label, and prior citation: $($cells[0])"
+        $labels += $cells[4]
+    }
+    Assert-Condition (($labels | Sort-Object -Unique).Count -eq $labels.Count) "Figure plan contains duplicate labels."
+    foreach ($capture in @("C-01", "C-02", "C-03", "C-04", "C-05", "C-06", "C-07", "C-08", "C-09", "C-10")) {
+        $row = @($rows | Where-Object { $_ -match "^\\| $capture \\|" })
+        Assert-Condition ($row.Count -eq 1 -and $row[0].Contains("Desktop y mobile")) "Capture $capture must declare desktop and mobile variants."
+    }
+    $admin = @($rows | Where-Object { $_ -match '^\\| C-11 \\|' })
+    Assert-Condition ($admin.Count -eq 1 -and $admin[0].Contains("Desktop")) "Administrative capture must declare its desktop variant."
+}
+
+function Test-TextSafetyAndLanguage {
+    param([string[]]$Texts)
+    foreach ($text in $Texts) {
+        Assert-Condition (-not [regex]::IsMatch($text, '(?im)(?:api[_-]?key|password|secret|authorization)\\s*[:=]\\s*[^`\\s]{8,}')) "Inventory text contains a potential secret."
+        Assert-Condition (-not [regex]::IsMatch($text, '(?m)(?:[A-Za-z]:\\\\|/Users/|/home/)')) "Inventory text contains an absolute local path."
+    }
+    Assert-ContainsAll $Texts[0] @("Mapa estructural", "Fuentes", "Cobertura") "Spanish structure matrix"
+    Assert-ContainsAll $Texts[1] @("Matriz de evidencia", "autor", "limitación") "Spanish evidence matrix"
+    Assert-ContainsAll $Texts[2] @("Matriz de algoritmos", "Límites de interpretación") "Spanish algorithm matrix"
+    Assert-ContainsAll $Texts[3] @("Matriz de señales", "Límites") "Spanish signal matrix"
+    Assert-ContainsAll $Texts[4] @("Plan compacto de figuras", "Condiciones de cierre") "Spanish figure matrix"
+    Assert-ContainsAll $Texts[5] @("Trazabilidad de requisitos", "Actores") "Spanish traceability matrix"
+    $scriptText = [IO.File]::ReadAllText($PSCommandPath)
+    Assert-Condition ($scriptText.Contains("Thesis inventory verification passed for scope")) "PowerShell status messages must remain in English."
+}
+
+function Test-VaultGate {
+    $vaultPath = Join-Path $repoRoot "ideas-vault\Requisitos\Requisitos - Tesis y metodologia con agentes.md"
+    $vaultText = [IO.File]::ReadAllText($vaultPath)
+    Assert-ContainsAll $vaultText @("Fase B quedó bloqueada hasta superar el gate integral de la Fase A.", "El gate integral", "no sustituye las fuentes", "v15", "v16") "Vault inventory gate"
+}
+
+function Test-FullMatrixContracts {
+    $texts = @($matrixPaths | ForEach-Object { Get-MatrixText $_ })
+    Test-AuthorshipContract $texts[1]
+    Test-RecommendationSemantics
+    Test-TraceabilitySemantics
+    Test-FigureSemantics
+    Test-TextSafetyAndLanguage $texts
+    Test-VaultGate
 }
 
 function Expect-Rejection {
@@ -284,8 +442,6 @@ function Write-SourceManifest {
     }
     foreach ($excluded in $generatedInputs) { [void]$paths.Remove($excluded) }
 
-    $entries = @()
-    foreach ($path in @($paths | Sort-Object)) { $entries += New-SourceEntry $path }
     $aliases = [ordered]@{
         "referencias/plantilla-etsii/" = "thesis/referencias/plantilla-etsii/"
         "referencias/proyect-final.pdf" = "thesis/referencias/proyect-final.pdf"
@@ -295,7 +451,11 @@ function Write-SourceManifest {
         "referencias/volcanes-front.txt" = "thesis/referencias/volcanes-front.txt"
         "apps/api/evaluation/protocol.json" = "docs/methodology/protocol.json"
     }
-    foreach ($requested in $aliases.Keys) { $entries += New-SourceEntry $requested $aliases[$requested] }
+    $entries = @()
+    foreach ($path in Get-RequiredSourcePaths) {
+        $sourceAlias = if ($aliases.Contains($path)) { $aliases[$path] } else { $path }
+        $entries += New-SourceEntry $path $sourceAlias
+    }
     $archiveComparison = Compare-HistoricalArchive
     Assert-Condition ($archiveComparison.entries -eq 68) "Historical archive entry count changed from the observed 68."
     $manifest = [ordered]@{
@@ -329,6 +489,12 @@ function Test-Manifest {
             Assert-Condition ((Get-Sha256Hex -Bytes $bytes) -eq $entry.sha256) "Source hash drifted: $($entry.path)"
         }
     }
+    $expected = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    foreach ($path in Get-RequiredSourcePaths) { [void]$expected.Add($path) }
+    $missingPaths = @($expected | Where-Object { -not $seen.Contains($_) })
+    $unexpectedPaths = @($seen | Where-Object { -not $expected.Contains($_) })
+    Assert-Condition ($missingPaths.Count -eq 0) "Manifest omits live required sources: $($missingPaths -join ', ')"
+    Assert-Condition ($unexpectedPaths.Count -eq 0) "Manifest contains sources outside the live required set: $($unexpectedPaths -join ', ')"
     $requiredAliases = @(
         "referencias/plantilla-etsii/", "referencias/proyect-final.pdf",
         "referencias/TFG_Predicción_De_Erupciones_Volcánicas_Mediante_Inteligencia_Artificial.pdf",
@@ -358,10 +524,12 @@ Assert-NonEmptyMatrix "thesis/EVIDENCE-MATRIX.md"
 if ($Scope -in @("Recommendations", "Full")) {
     Assert-NonEmptyMatrix "thesis/ALGORITHM-MATRIX.md"
     Assert-NonEmptyMatrix "thesis/SIGNAL-MATRIX.md"
+    Test-RecommendationSemantics
 }
 if ($Scope -eq "Full") {
     Assert-NonEmptyMatrix "thesis/FIGURE-PLAN.md"
     Assert-NonEmptyMatrix "thesis/REQUIREMENTS-TRACEABILITY.md"
+    Test-FullMatrixContracts
     Test-ProtectedThesisFiles ([string]$manifest.baseline_commit)
 }
 
