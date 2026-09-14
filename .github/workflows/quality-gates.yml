@@ -1,0 +1,29 @@
+name: Quality gates
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  security-and-api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start the reproducible local stack
+        run: docker compose -f infra/compose.yaml up --build --wait
+      - name: Run security gates
+        shell: pwsh
+        run: ./scripts/check-security.ps1
+      - name: Validate production Django checks
+        run: docker compose -f infra/compose.yaml run --rm -e DJANGO_DEPLOY_ENV=production api python apps/api/manage.py check --deploy
+      - name: Validate migrations
+        run: docker compose -f infra/compose.yaml run --rm api python apps/api/manage.py makemigrations --check --dry-run
+      - name: Run API security tests
+        run: docker compose -f infra/compose.yaml run --rm api pytest apps/api/tests/test_phase7_admin_security.py apps/api/audit/tests/test_audit.py -q
+      - name: Stop the stack
+        if: always()
+        run: docker compose -f infra/compose.yaml down -v
+

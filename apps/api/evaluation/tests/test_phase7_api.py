@@ -8,7 +8,7 @@ from django.contrib.auth.models import Permission
 from django.core.cache import cache
 from rest_framework.test import APIClient
 
-from evaluation.access import RESEARCH_VIEW_PERMISSION
+from evaluation.access import PLATFORM_ADMIN_PERMISSION, RESEARCH_VIEW_PERMISSION
 
 
 User = get_user_model()
@@ -178,16 +178,8 @@ def test_query_and_export_inputs_fail_closed(viewer_client, url: str) -> None:  
 
 @pytest.fixture
 def platform_permission(db):  # noqa: ANN001
-    content_type, _ = ContentType.objects.get_or_create(
-        app_label="accounts",
-        model="platformcapability",
-    )
-    permission, _ = Permission.objects.get_or_create(
-        content_type=content_type,
-        codename="manage_platform",
-        defaults={"name": "Can manage the platform"},
-    )
-    return permission
+    app_label, codename = PLATFORM_ADMIN_PERMISSION.split(".", 1)
+    return Permission.objects.get(content_type__app_label=app_label, codename=codename)
 
 
 @pytest.mark.django_db

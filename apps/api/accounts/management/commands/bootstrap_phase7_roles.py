@@ -8,7 +8,6 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
 from django.core.management.base import BaseCommand, CommandError
 
-
 GROUP_PERMISSIONS = {
     "Research Viewer": ("view_research_panel", "export_research_panel"),
     "Platform Admin": ("access_platform_admin",),
@@ -18,7 +17,29 @@ GROUP_PERMISSIONS = {
 class Command(BaseCommand):
     help = "Assign Phase 7 groups only to explicitly named user UUIDs."
 
+    @staticmethod
+    def _as_list(value):  # noqa: ANN001
+        """Normalize argparse lists and direct ``call_command`` scalar kwargs."""
+        if value is None:
+            return []
+        if isinstance(value, str):
+            return [value]
+        return list(value)
+
     def add_arguments(self, parser) -> None:  # noqa: ANN001
+        parser.add_argument(
+            "--user-id",
+            action="append",
+            default=[],
+            help="Explicit account UUID(s), used with one or more --group values.",
+        )
+        parser.add_argument(
+            "--group",
+            action="append",
+            choices=tuple(GROUP_PERMISSIONS),
+            default=[],
+            help="Group(s) to assign to every --user-id.",
+        )
         parser.add_argument(
             "--research-viewer-user-id",
             action="append",
@@ -34,9 +55,16 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options) -> None:  # noqa: ANN002, ANN003
         assignments = {
-            "Research Viewer": options["research_viewer_user_id"],
-            "Platform Admin": options["platform_admin_user_id"],
+            "Research Viewer": self._as_list(options["research_viewer_user_id"]),
+            "Platform Admin": self._as_list(options["platform_admin_user_id"]),
         }
+        user_ids = self._as_list(options["user_id"])
+        groups = self._as_list(options["group"])
+        if user_ids:
+            if not groups:
+                raise CommandError("--user-id requires at least one --group.")
+            for group_name in groups:
+                assignments[group_name].extend(user_ids)
         if not any(assignments.values()):
             raise CommandError("At least one explicit user UUID is required.")
 
@@ -48,15 +76,12 @@ class Command(BaseCommand):
             for raw_id in raw_ids:
                 try:
                     user_uuid = uuid.UUID(raw_id)
+                    user = user_model.objects.get(profile__admin_uuid=user_uuid)
                 except (ValueError, AttributeError) as exc:
                     raise CommandError(f"Invalid user UUID: {raw_id}") from exc
-                try:
-                    from accounts.models import DemoAccountIdentity
-
-                    user = user_model.objects.get(demo_identity__id=user_uuid)
                 except user_model.DoesNotExist as exc:
                     raise CommandError(f"No account matches the explicit UUID: {raw_id}") from exc
-                users.append(user)
+                users.append((user, user_uuid))
 
             permission_codenames = GROUP_PERMISSIONS[group_name]
             group, _ = Group.objects.get_or_create(name=group_name)
@@ -67,7 +92,6 @@ class Command(BaseCommand):
             if permissions.count() != len(permission_codenames):
                 raise CommandError(f"Phase 7 permissions are not migrated for {group_name}.")
             group.permissions.set(permissions)
-            for user in users:
+            for user, user_uuid in users:
                 user.groups.add(group)
                 self.stdout.write(f"Provisioned {group_name} for account UUID {user_uuid}.")
-

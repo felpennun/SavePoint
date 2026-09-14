@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import uuid
+
 import pytest
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
@@ -15,6 +17,7 @@ from accounts.services import (
 from accounts.models import AccountProfile
 from audit.models import AuditEvent
 from evaluation.access import PLATFORM_ADMIN_PERMISSION, RESEARCH_VIEW_PERMISSION, can_manage_platform
+from platform_admin.admin_site import platform_admin_site
 
 
 User = get_user_model()
@@ -64,7 +67,10 @@ def test_accounts_get_no_phase7_groups_without_explicit_provisioning():
 @pytest.mark.django_db
 def test_explicit_uuid_role_bootstrap_is_idempotent_and_separate():
     user = User.objects.create_user(username="explicit-role-target", password="password")
-    explicit_uuid = AccountProfile.objects.get_or_create(user=user)[0].admin_uuid
+    profile = AccountProfile.objects.get_or_create(user=user)[0]
+    explicit_uuid = uuid.uuid4()
+    profile.admin_uuid = explicit_uuid
+    profile.save(update_fields=["admin_uuid"])
 
     call_command("bootstrap_phase7_roles", platform_admin_user_id=str(explicit_uuid))
     call_command("bootstrap_phase7_roles", user_id=str(explicit_uuid), group="Research Viewer")
@@ -146,3 +152,23 @@ def test_admin_privacy_endpoint_requires_post_and_csrf():
 
     assert get_response.status_code == 405
     assert post_response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_platform_admin_registry_is_allowlisted_and_operational_data_is_readonly():
+    registered_models = {model._meta.label for model in platform_admin_site._registry}
+    assert "auth.User" in registered_models
+    assert "accounts.AccountProfile" in registered_models
+    assert "catalogue.GameWork" in registered_models
+    assert "catalogue.IgdbImportRun" in registered_models
+    assert "recommendations.RecommendationRefreshJob" in registered_models
+    assert "audit.AuditEvent" in registered_models
+    assert all(
+        "rerun" not in model_admin.__class__.__name__.lower()
+        for model_admin in platform_admin_site._registry.values()
+    )
+
+    audit_admin = platform_admin_site._registry[AuditEvent]
+    assert audit_admin.has_add_permission(None) is False
+    assert audit_admin.has_change_permission(None) is False
+    assert audit_admin.has_delete_permission(None) is False

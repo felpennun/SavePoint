@@ -29,6 +29,12 @@ class PlatformModelAdmin(admin.ModelAdmin):
     def has_view_permission(self, request, obj=None) -> bool:  # noqa: ANN001, ARG002
         return bool(self.admin_site.has_permission(request))
 
+    def has_add_permission(self, request) -> bool:  # noqa: ANN001
+        return bool(self.admin_site.has_permission(request))
+
+    def has_change_permission(self, request, obj=None) -> bool:  # noqa: ANN001, ARG002
+        return bool(self.admin_site.has_permission(request))
+
     def has_delete_permission(self, request, obj=None) -> bool:  # noqa: ANN001, ARG002
         return False
 
