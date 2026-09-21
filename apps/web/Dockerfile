@@ -1,4 +1,4 @@
-FROM node:24.20.0-slim@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e AS dependencies
+FROM node:26.8.2-slim@sha256:f7bb8247fdb16250dbec7fd0e24f091c6f5f0a29d256f3aef5816a7a369166b2 AS dependencies
 
 ENV COREPACK_HOME=/opt/corepack
 WORKDIR /workspace
@@ -13,7 +13,7 @@ COPY --chown=node:node package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY --chown=node:node apps/web/package.json ./apps/web/package.json
 RUN pnpm install --frozen-lockfile --ignore-scripts
 
-FROM node:24.20.0-slim@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e AS runner
+FROM node:26.8.2-slim@sha256:f7bb8247fdb16250dbec7fd0e24f091c6f5f0a29d256f3aef5816a7a369166b2 AS runner
 
 ENV COREPACK_HOME=/opt/corepack \
     NODE_ENV=test \
