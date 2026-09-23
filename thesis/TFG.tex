@@ -1,8 +1,3 @@
-% Plantilla TFG LaTeX LSI por:
-%   Agustín Borrego <borrego@us.es>
-%   Inma Hernández <inmahernandez@us.es>
-% Su uso y modificación es libre.
-
 % Memoria del Trabajo Fin de Grado del proyecto SavePoint.
 % Autor: Felipe Peña Núñez. Escuela Técnica Superior de Ingeniería Informática,
 % Universidad de Sevilla. Convocatoria de octubre, curso 2025/2026.
@@ -26,9 +21,9 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Dedicatoria del trabajo. Se mantiene la página activa con texto provisional:
-% el autor la redactará antes de la entrega final (ver sections/00_agradecimientos.tex).
-\setDedication{Por redactar.}
+% Dedicatoria del trabajo.
+\setDedication{A quienes creyeron en este proyecto desde el principio y me acompañaron, con
+paciencia y confianza, hasta el final.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -56,23 +51,18 @@
     \clearpage\pagenumbering{arabic}
 
     % Capítulos del trabajo
-    \part{Introducción y metodología}\label{part:introduccion}
+    \part{Introducción y planificación}\label{part:introduccion}
     \input{sections/01_marco_objetivos}
-    \input{sections/02_estado_del_arte}
     \input{sections/02_gestion_metodologia}
 
-    \part{Fundamentos y análisis}\label{part:fundamentos}
-    \input{sections/03_fundamentos}
-    \input{sections/04_requisitos_actualizados}
+    \part{Núcleo I: Investigación y algoritmos de recomendación}\label{part:nucleo-investigacion}
+    \input{sections/02_estado_del_arte}
+    \input{sections/06_algoritmos}
+
+    \part{Núcleo II: Aplicación web}\label{part:nucleo-web}
     \input{sections/05_diseno_actualizado}
 
-    \part{Algoritmos y evaluación}\label{part:algoritmos}
-    \input{sections/06_algoritmos}
-    \input{sections/07_experimentos_resultados}
-
-    \part{Construcción y cierre}\label{part:construccion}
-    \input{sections/08_implementacion_verificacion}
-    \input{sections/09_despliegue}
+    \part{Cierre}\label{part:construccion}
     \input{sections/09_conclusiones_actualizadas}
 
     % Registro técnico detallado de las fases de ingeniería.

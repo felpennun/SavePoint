@@ -7,10 +7,9 @@ Sevilla.
 ## Estado de esta revisión
 
 La versión condensada toma sus afirmaciones de las matrices verificadas de `thesis/` y
-distingue la publicación experimental v15 del contrato vigente v16. Los elementos sin
-evidencia suficiente conservan la marca `\todo{PENDIENTE: confirmar con el autor}`. Felipe
-Peña Núñez es el único autor y responsable del TFG; las herramientas asistidas forman parte
-de la metodología, nunca de la autoría.
+distingue la publicación experimental v15 del contrato vigente v16. Felipe Peña Núñez es el
+único autor y responsable del TFG; las herramientas asistidas forman parte de la metodología,
+nunca de la autoría.
 
 Para Prism, importar la carpeta `thesis/` completa y compilar `TFG.tex`. Antes de entregar
 deben revisarse visualmente saltos de tabla, referencias, índices, figuras y avisos de LaTeX.
@@ -64,21 +63,18 @@ etc.) están en `.gitignore`. Sí se versionan las fuentes `.tex`, `.bib` y las 
 
 ## Pendientes del autor
 
-Esta es la versión inicial de la memoria. Los puntos siguientes quedan marcados en el
-documento con `\todo[inline]` y necesitan la intervención del autor antes de la entrega:
+No quedan marcadores `\todo[inline]` en el documento: el último (consolidación de la
+evidencia de verificación en `sections/05_diseno_actualizado.tex`) se cerró el 2026-09-22
+con las cifras reales del cierre de la Fase 7 (736 pruebas de backend, 70 de frontend, 56 de
+navegador, todas en verde, 14/09/2026). Sigue sin haber intervención humana pendiente marcada
+en el texto, pero antes de la entrega conviene:
 
-1. **Dedicatoria.** `\setDedication` en `TFG.tex` y el `\todo` de `sections/00_portada.tex`.
-   Ahora mismo lleva el texto provisional «Por redactar.».
-2. **Agradecimientos.** `sections/00_agradecimientos.tex`, con un `\todo` de marcador.
-3. **Diagrama de Gantt o línea de tiempo** con las fechas reales de inicio y fin de cada
-   fase, en `sections/03_planificacion_metodologia.tex` (Sección de planificación temporal).
-4. **Presupuesto.** Consolidar el registro de horas por bloque y una tarifa de referencia
-   citada para completar la Tabla `tab:presupuesto`, en
-   `sections/03_planificacion_metodologia.tex`.
-5. **Compilar en Overleaf** (motor pdfLaTeX, compilador `latexmk`) y revisar el PDF: saltos
+1. **Compilar en Overleaf** (motor pdfLaTeX, compilador `latexmk`) y revisar el PDF: saltos
    de página de las figuras, desbordes de tablas anchas, y que la bibliografía resuelve
-   todas las citas.
-6. **Repaso de cifras y fechas.** Toda cifra de la memoria procede de la evidencia del
-   repositorio; conviene un último cotejo contra `docs/verification/` y `.planning/`.
-7. **Informe de uso de IA.** Documento aparte, ya previsto, que no forma parte de esta
+   todas las citas. Esta máquina de desarrollo no tiene `latexmk` ni `pdflatex` instalados,
+   así que esta comprobación no se ha podido hacer localmente.
+2. **Repaso final de cifras y fechas.** Toda cifra de la memoria procede de la evidencia del
+   repositorio; conviene un último cotejo contra `docs/verification/` y `.planning/` antes de
+   entregar, sobre todo tras cualquier cambio posterior a esta revisión.
+3. **Informe de uso de IA.** Documento aparte, ya previsto, que no forma parte de esta
    memoria.

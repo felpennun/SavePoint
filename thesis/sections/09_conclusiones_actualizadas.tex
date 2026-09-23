@@ -15,11 +15,12 @@ privacidad de perfil y relaciones sociales gobernadas por completo en el backend
 de evaluación offline quedó congelado, versionado y probado antes de ejecutar ninguna
 comparación. Esa comparación se llevó a cabo: las tres familias de recomendación
 (basada en contenido, colaborativa e híbrida), descritas con su formulación completa en el
-Capítulo~\ref{cap:algoritmos}, se compararon bajo ese protocolo en el Capítulo~\ref{cap:experimentos}
-frente a los baselines de referencia. De los objetivos específicos, únicamente la
-exportación e importación de colección en formatos adicionales al ya soportado y la
-ampliación del contrato de evaluación con cobertura, novedad y significación estadística
-sistemáticas quedan, de forma explícita, como trabajo pendiente.
+Capítulo~\ref{cap:algoritmos}, se compararon bajo ese protocolo en la Sección~\ref{cap:experimentos}
+del mismo capítulo frente a los baselines de referencia. De los objetivos específicos, solo quedan pendientes,
+y de forma parcial, dos piezas del mismo contrato de evaluación: repetir la comparación con
+varias semillas más allá de la única ejecución ya publicada, y aplicar de forma retroactiva
+sobre esa ejecución la captura de entorno y consumo de recursos que el sistema ya sabe
+registrar para comparaciones futuras.
 
 Cada incremento del sistema se cerró con sus criterios de éxito verificados de forma
 independiente antes de darse por completo, siguiendo la disciplina descrita en el
@@ -46,15 +47,17 @@ inspeccionable y reproducible por un tercero como el sistema mismo.
 
 Las limitaciones conocidas se declaran sin ocultarlas. La evidencia experimental publicada
 procede de una única ejecución del test sobre usuarios sintéticos, setenta y nueve de ellos
-evaluables: es suficiente para comparar algoritmos entre sí bajo un protocolo común, pero no
-para generalizar a preferencias de jugadores reales ni para declarar significación estadística
-sin repetir el experimento con nuevas semillas. La cobertura de valoraciones externas del
-catálogo es parcial, como corresponde a una fuente agregada de terceros y no a un panel de
-crítica propio; esa parcialidad se propaga, de forma documentada, a cualquier señal de calidad
-externa que la use. El contrato de evaluación ampliado (cobertura, novedad y sensibilidad de
-hiperparámetros medidas de forma sistemática, no solo demostradas puntualmente) queda como
-trabajo futuro y no como resultado ya obtenido. El despliegue público, descrito en el
-Capítulo~\ref{cap:despliegue}, sirve todavía el catálogo curado inicial y no el catálogo a
+evaluables, con una sola semilla: es suficiente para comparar algoritmos entre sí bajo un
+protocolo común, con significación estadística ya calculada sobre esa muestra (bootstrap BCa,
+Friedman, Wilcoxon y corrección de Holm), pero no permite afirmar que esa significación sea
+estable frente a otra semilla o a otra población sintética sin repetir el experimento. La
+cobertura de valoraciones externas del catálogo es parcial, como corresponde a una fuente
+agregada de terceros y no a un panel de crítica propio; esa parcialidad se propaga, de forma
+documentada, a cualquier señal de calidad externa que la use. La captura de entorno de
+ejecución y consumo de recursos, ya disponible en el ejecutor paralelo para comparaciones
+futuras, no se retroproyectó sobre la ejecución v15 ya cerrada, de modo que esa ejecución
+concreta carece de ese detalle. El despliegue público, descrito en la
+Sección~\ref{cap:despliegue}, sirve todavía el catálogo curado inicial y no el catálogo a
 escala real: esa conexión se pospuso de forma deliberada al final del proyecto; la
 demostración ante el tribunal se ejecuta desde el entorno local reproducible.
 
@@ -63,16 +66,15 @@ demostración ante el tribunal se ejecuta desde el entorno local reproducible.
 El banco de pruebas que esta memoria deja construido y ya explotado habilita líneas de
 continuación concretas, no genéricas. La primera es repetir el protocolo publicado con nuevas
 semillas y con cohortes sintéticas adicionales, para separar lo que es una diferencia
-consistente entre algoritmos de lo que podría ser ruido de una única muestra. La segunda es
-completar el contrato de evaluación con las métricas de cobertura, novedad y significación
-estadística que el protocolo ya prevé pero que esta publicación no agota. La tercera es
-estudiar la sensibilidad del sistema a sus propios hiperparámetros locales (los pesos de
-familia de facetas, la mezcla híbrida, el factor de diversidad), en lugar de tratarlos como
-constantes fijadas de una vez. La cuarta, ya fuera del núcleo de recomendación, es completar
-la portabilidad de datos en los formatos todavía no soportados y conectar el despliegue
-público al catálogo a escala real. Cualquier extensión de este trabajo deberá crear su propio
-protocolo y su propio artefacto versionado, sin alterar de forma retroactiva la evidencia ya
-publicada.
+consistente entre algoritmos de lo que podría ser ruido de una única muestra; esa misma
+repetición permitiría aplicar sobre la nueva ejecución la captura de entorno y consumo de
+recursos que el ejecutor paralelo ya sabe registrar, pero que la ejecución v15 ya cerrada no
+lleva de forma retroactiva. La segunda es estudiar la sensibilidad del sistema a sus propios
+hiperparámetros locales (los pesos de familia de facetas, la mezcla híbrida, el factor de
+diversidad), en lugar de tratarlos como constantes fijadas de una vez. La tercera, ya fuera
+del núcleo de recomendación, es conectar el despliegue público al catálogo a escala real.
+Cualquier extensión de este trabajo deberá crear su propio protocolo y su propio artefacto
+versionado, sin alterar de forma retroactiva la evidencia ya publicada.
 
 \section{Cierre}\label{sec:conc-cierre}
 

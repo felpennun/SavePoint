@@ -1,11 +1,12 @@
-﻿\chapter{Antecedentes y estado del arte}\label{cap:estado-del-arte}
+\chapter{Antecedentes, estado del arte y fundamentos de evaluación}\label{cap:estado-del-arte}
 
-Este capítulo revisa el terreno sobre el que se construye SavePoint. Primero examina los
+Este capítulo revisa el terreno sobre el que se construye SavePoint. Examina primero los
 productos de catalogación que sirven de referencia, después las fuentes de datos de
-videojuegos disponibles y sus condiciones de uso, a continuación el panorama de los sistemas
-de recomendación y de su evaluación reproducible. Termina esa revisión con las metodologías
-de desarrollo asistido por agentes de código, antes de exponer la aportación diferencial que
-persigue el trabajo.
+videojuegos disponibles y sus condiciones de uso, y a continuación el panorama de los sistemas
+de recomendación y de su evaluación reproducible, con el vocabulario y las métricas concretas
+que el resto del Núcleo I usa sin volver a introducirlas cada vez. Termina esa revisión con las
+metodologías de desarrollo asistido por agentes de código, antes de exponer la aportación
+diferencial que persigue el trabajo.
 
 \section{Productos de referencia}\label{sec:arte-productos}
 
@@ -98,8 +99,8 @@ coincidieron en el pasado volverán a coincidir~\cite{adomavicius2005toward}; ca
 que el contenido no expresa, pero sufren el problema del arranque en frío cuando un usuario o
 un ítem no tienen historial. Los métodos híbridos combinan ambas señales para mitigar las
 debilidades de cada una~\cite{burke2002hybrid}. SavePoint implementa y compara, sobre su propio
-catálogo, representantes de las tres familias: el Capítulo~\ref{cap:algoritmos} detalla su
-formulación y el Capítulo~\ref{cap:experimentos} presenta la comparación con datos reales.
+catálogo, representantes de las tres familias, con la formulación y la comparación con datos
+reales que desarrolla el Capítulo~\ref{cap:algoritmos}.
 
 La parte más delicada no es implementar los algoritmos, sino evaluarlos de forma
 comparable~\cite{herlocker2004evaluating, gunawardana2015evaluating}. La literatura señala
@@ -112,10 +113,51 @@ pueden ordenar los algoritmos de forma distinta~\cite{cremonesi2010performance}.
 metodológica aceptada es fijar por adelantado, de forma inmutable, el corpus, el reparto, las
 exclusiones, las métricas, las semillas y el presupuesto de ajuste, antes de comparar nada. En
 SavePoint este principio se concreta en un protocolo offline congelado y versionado, descrito
-en el Capítulo~\ref{cap:experimentos}. Ese protocolo deja la comparación preparada y repetible,
+en el Capítulo~\ref{cap:algoritmos}. Ese protocolo deja la comparación preparada y repetible,
 pero no debe confundirse con una afirmación sobre usuarios reales: los resultados que presenta
 esta memoria se miden sobre un corpus y una población sintética concretos, como se explica en
 el Capítulo~\ref{cap:introduccion}.
+
+\section{Vocabulario y métricas de evaluación}\label{sec:arte-fundamentos}
+
+El resto del Núcleo I usa, sin volver a introducirlo, un vocabulario concreto de evaluación que
+conviene fijar aquí. Evaluar un recomendador sin usuarios reales delante exige fijar por
+adelantado, antes de mirar ningún resultado y no después, cinco decisiones: la tarea concreta
+que se mide (recomendar los siguientes \(K\) ítems que a una persona le interesarán, no
+predecir la nota exacta que pondría), el criterio de relevancia que separa un acierto de un
+fallo, el conjunto de candidatas sobre el que compite cada algoritmo, la división de los datos
+entre lo que el modelo puede ver y lo que se usa para medir, y la forma de agregar el resultado
+por usuario en una única cifra por algoritmo. SavePoint fija estas cinco decisiones en un
+protocolo versionado que el Capítulo~\ref{cap:algoritmos} describe con detalle.
+
+\textit{Precision at K} mide qué proporción de los \(K\) ítems recomendados resultan
+relevantes; \textit{recall at K} mide qué proporción de todos los ítems relevantes que existen
+aparecen entre esos \(K\). Ninguna de las dos distingue la posición dentro de la lista: acertar
+en el primer puesto cuenta igual que acertar en el último. Para corregir esa carencia se usa el
+\textit{normalized discounted cumulative gain} (nDCG), que descuenta el valor de un acierto
+cuanto más abajo aparece en la lista y lo normaliza frente al orden ideal posible, de modo que
+premia a los algoritmos que además de acertar, acierten pronto. El \textit{mean average
+precision} (MAP) promedia, para cada usuario, la precisión acumulada en cada posición donde
+hubo un acierto y después promedia ese valor entre usuarios; es sensible tanto a la cantidad de
+aciertos como a su posición, lo que lo hace más exigente que la precisión simple.
+
+Estas cuatro métricas comparten una limitación de fondo: ninguna equivale a satisfacción
+humana, porque miden coincidencia con un historial pasado, no si a la persona le va a gustar de
+verdad lo que se le recomienda. Por eso se completan con tres métricas de otra naturaleza. La
+diversidad mide cuánto se parecen entre sí los ítems dentro de una misma lista recomendada:
+penaliza a un algoritmo que acierta mucho pero siempre con variaciones del mismo juego. La
+novedad mide cuánto se aleja la recomendación de lo obvio o lo ya muy popular. La cobertura
+mide qué proporción del catálogo entero llega a aparecer alguna vez recomendada, en lugar de
+concentrarse siempre en el mismo puñado de éxitos. Un recomendador que maximiza solo precisión
+o nDCG puede hacerlo a costa de las tres, recomendando siempre lo mismo a todo el mundo; el
+Capítulo~\ref{cap:algoritmos} explica cómo SavePoint reordena sus listas para compensarlo.
+
+Estas definiciones son el punto de partida común de la literatura sobre sistemas de
+recomendación, pero los pesos concretos, los umbrales de relevancia y la taxonomía de señales
+que se combinan con ellas son decisiones locales de este proyecto, no un estándar universal.
+SavePoint las versiona junto al código y las revisa como revisaría cualquier otra decisión de
+diseño, precisamente porque ninguna métrica basta por sí sola para declarar un algoritmo mejor
+que otro sin decir, a la vez, bajo qué corpus, qué población y qué protocolo se midió.
 
 \section{El método GSD: agentes coordinados sobre un contexto compartido}\label{sec:arte-agentes}
 
@@ -151,11 +193,11 @@ material, catálogo a escala real y procedencia de datos documentada, un conjunt
 servicio existente reúne, como muestra la Tabla~\ref{tab:productos}. La segunda es un banco de
 pruebas reproducible para la comparación de recomendadores, con corpus citable, usuarios
 sintéticos y procedencia de datos documentada, que este trabajo explota mediante un protocolo
-de evaluación congelado y una comparación real entre dieciséis algoritmos, presentada en los
-Capítulos~\ref{cap:algoritmos} y~\ref{cap:experimentos}. La tercera es la propia metodología de
-ingeniería asistida por agentes, aplicada de forma sistemática y versionada en el repositorio,
-de manera que el proceso que produjo el sistema es tan inspeccionable y reproducible por un
-tercero como el sistema mismo; el Capítulo~\ref{cap:gestion} la desarrolla en profundidad.
+de evaluación congelado y una comparación real entre dieciséis algoritmos, presentada en el
+Capítulo~\ref{cap:algoritmos}. La tercera es la propia metodología de ingeniería asistida por
+agentes, aplicada de forma sistemática y versionada en el repositorio, de manera que el proceso
+que produjo el sistema es tan inspeccionable y reproducible por un tercero como el sistema
+mismo; el Capítulo~\ref{cap:gestion} la desarrolla en profundidad.
 
 El protocolo de evaluación concreta esa segunda aportación en tres decisiones que suelen
 quedar ocultas en una comparación de recomendadores y que aquí quedan, en cambio, explícitas y

@@ -28,7 +28,7 @@ produce un artefacto escrito que actúa como fuente de verdad del siguiente. Lo 
 a los límites de sesión es la especificación escrita, no el historial de la conversación con
 el agente.
 
-\begin{figure}[htp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.72\textwidth]{figures/ciclo-gsd.pdf}
     \caption{Ciclo de un incremento en el método GSD y los artefactos que produce cada paso.}
@@ -67,7 +67,7 @@ navegable; el Capítulo~\ref{cap:gestion} lo describe con su propio grafo.
 
 La Tabla~\ref{tab:planning-arbol} enumera los artefactos principales del árbol y su función.
 
-\begin{table}[htp]
+\begin{table}[H]
 \centering
 \begin{tabularx}{\textwidth}{ | Y | Y | }
     \hline
@@ -195,27 +195,23 @@ alcance, los criterios de aceptación, la revisión de cada entrega y la decisi�
 del proyecto. El uso de agentes se describe aquí como una metodología de trabajo que se
 diseñó, dirigió y evaluó, no como una coautoría.
 
-\subsection{El problema que resuelve el enfoque}\label{sec:met-context-rot}
+\subsection{Subagentes, aislamiento y skills}\label{sec:met-subagentes}
 
 El obstáculo práctico del trabajo prolongado con un agente es la degradación del contexto: la
 ventana de contexto se satura de historial y la calidad de las respuestas decae hasta
-contradecir decisiones anteriores~\cite{anthropic-context}. La respuesta adoptada es el
-aislamiento del contexto. El trabajo se descompone en tareas atómicas, cada una se ejecuta en
-una instancia nueva del agente con la ventana limpia. La información viaja entre tareas a
-través de los ficheros de memoria persistentes del árbol \texttt{.planning/} en lugar de a
-través del historial de la conversación. El efecto es que una interrupción, un límite de
-sesión o un cambio de día no hacen perder el hilo: la sesión siguiente relee el estado y
-continúa.
+contradecir decisiones anteriores~\cite{anthropic-context}. La respuesta adoptada combina tres
+mecanismos. El primero es el aislamiento del contexto: el trabajo se descompone en tareas
+atómicas, cada una ejecutada por una instancia nueva del agente con la ventana limpia, y la
+información viaja entre tareas a través de los ficheros de memoria persistentes del árbol
+\texttt{.planning/} en lugar de a través del historial de la conversación, de modo que una
+interrupción, un límite de sesión o un cambio de día no hacen perder el hilo: la sesión
+siguiente relee el estado y continúa. El segundo es la especialización de esas instancias en
+papeles distintos, resumidos en la Tabla~\ref{tab:subagentes}: quien planifica, quien implementa
+y quien verifica son instancias independientes, de modo que la verificación no hereda la
+confianza del código recién escrito, y esta división reproduce con agentes la separación entre
+desarrollo y revisión propia de un equipo humano.
 
-\subsection{Subagentes especializados}\label{sec:met-subagentes}
-
-El flujo emplea instancias del agente con papeles distintos, resumidas en la
-Tabla~\ref{tab:subagentes}. La separación es deliberada. Quien planifica, quien implementa y
-quien verifica son instancias independientes, de modo que la verificación no hereda la
-confianza del código recién escrito. Esta división reproduce, con agentes, la separación
-entre desarrollo y revisión propia de un equipo humano.
-
-\begin{table}[htp]
+\begin{table}[H]
 \centering
 \begin{tabularx}{\textwidth}{ | Y | Y | }
     \hline
@@ -238,23 +234,18 @@ entre desarrollo y revisión propia de un equipo humano.
 \label{tab:subagentes}
 \end{table}
 
-\subsection{Aislamiento a nivel de sistema de ficheros}\label{sec:met-worktrees}
+El tercer mecanismo refuerza el aislamiento a nivel de sistema de ficheros: cada ejecución de
+un plan se realiza sobre una copia de trabajo aislada de Git, un \textit{worktree}, con su
+propia rama; el ciclo es crear el worktree, ejecutar el plan en él con commits atómicos,
+integrarlo en la rama principal con una fusión sin avance rápido y limpiar la copia, de modo que
+un plan a medias nunca deja el árbol principal en un estado inconsistente y la integración de
+cada plan queda registrada como un punto único en el historial. Junto a estos tres mecanismos,
+el repositorio versiona además \textit{skills}, conjuntos de instrucciones reutilizables que un
+agente invoca durante el desarrollo: al vivir junto al código, el entorno de trabajo del agente
+forma parte del entregable, y un tercero que clone el repositorio obtiene tanto el sistema como
+las instrucciones con las que se construyó.
 
-Cada ejecución de un plan se realiza sobre una copia de trabajo aislada de Git, un
-\textit{worktree}, con su propia rama. El ciclo es crear el worktree, ejecutar el plan en él
-con commits atómicos, integrarlo en la rama principal con una fusión sin avance rápido y
-limpiar la copia. Así, un plan a medias nunca deja el árbol principal en un estado
-inconsistente. La integración de cada plan queda registrada como un punto único en el
-historial.
-
-\subsection{Skills}\label{sec:met-skills}
-
-Las \textit{skills}, conjuntos de instrucciones reutilizables que un agente invoca durante el
-desarrollo, se versionan junto al código en el repositorio. De este modo, el entorno de
-trabajo del agente forma parte del entregable: un tercero que clone el repositorio obtiene
-tanto el sistema como las instrucciones con las que se construyó.
-
-\subsection{El contrato de contexto del repositorio}\label{sec:met-contrato-contexto}
+\subsection{Contrato de contexto y memoria persistente}\label{sec:met-contrato-contexto}
 
 El repositorio define un contrato de contexto común que toda herramienta lee al empezar cada
 sesión. Los ficheros \texttt{AGENTS.md}, \texttt{CLAUDE.md} y
@@ -264,15 +255,13 @@ canónico de convenciones es \texttt{CONVENTIONS.md}, que prevalece sobre cualqu
 instrucción en conflicto. Un ejemplo de regla transversal es la convención de idioma, vigente
 desde el 6 de septiembre de 2026: la documentación de la tesis y la prosa nueva de
 planificación se escriben en español, mientras que el código, con sus identificadores,
-comentarios, mensajes de commit y nombres de rama, se mantiene en inglés. Las citas legales
-textuales conservan su idioma original para no perder valor probatorio.
+comentarios, mensajes de commit y nombres de rama, se mantiene en inglés, con las citas legales
+textuales conservadas en su idioma original para no perder valor probatorio.
 
-\subsection{Memoria persistente y reglas derivadas}\label{sec:met-memoria}
-
-Los ficheros de memoria del agente sobreviven entre sesiones. Cuando un error del agente o
-una corrección del proyecto tiene valor general, se destila en una regla que se relee al iniciar
-cada tarea, de modo que el fallo no se repite. El proyecto acumuló varias reglas de este
-tipo a partir de incidencias reales:
+Sobre ese mismo contrato se apoyan los ficheros de memoria del agente, que sobreviven entre
+sesiones: cuando un error del agente o una corrección del proyecto tiene valor general, se
+destila en una regla que se relee al iniciar cada tarea, de modo que el fallo no se repite. El
+proyecto acumuló varias reglas de este tipo a partir de incidencias reales:
 
 \begin{itemize}
     \item La lista de identificadores de Wikidata escrita a mano en el guion de adquisición
@@ -319,38 +308,29 @@ trabajo inicial y Claude en el trabajo posterior, con la advertencia de que un n
 modelo no basta para reproducir una salida probabilística: la evidencia reproducible son los
 artefactos versionados, los hashes, los comandos y las decisiones humanas.
 
-\subsection{Beneficios observados}\label{sec:met-beneficios}
+\subsection{Beneficios, límites y encuadre}\label{sec:met-encuadre}
 
-El enfoque produjo beneficios concretos y observables en el proyecto. El alcance se mantuvo
-bajo control a lo largo de sucesivos incrementos, sin que el trabajo de uno se filtrara en
-otro. Cada cambio quedó trazado hasta su plan, su requisito y su evidencia. Las revisiones de
-código con contexto independiente encontraron dieciséis hallazgos reales, descritos en el
-Capítulo~\ref{cap:pruebas}, que se corrigieron por completo. El trabajo se pudo reanudar sin
-pérdida de hilo tras interrupciones y límites de sesión, porque el estado vivía en ficheros y
-no en una conversación. Y el proceso quedó reproducible, no solo el producto: un tercero
-puede clonar el repositorio y reconstruir la historia de decisiones.
+El enfoque produjo beneficios concretos y observables en el proyecto, junto con límites que
+conviene declarar con la misma franqueza. El alcance se mantuvo bajo control a lo largo de
+sucesivos incrementos, sin que el trabajo de uno se filtrara en otro, y cada cambio quedó
+trazado hasta su plan, su requisito y su evidencia. Las revisiones de código con contexto
+independiente encontraron dieciséis hallazgos reales, descritos en el
+Capítulo~\ref{cap:pruebas}, que se corrigieron por completo, incluidos defectos de seguridad en
+trabajo ya dado por bueno. El trabajo se pudo reanudar sin pérdida de hilo tras interrupciones
+y límites de sesión, porque el estado vivía en ficheros y no en una conversación, y el propio
+proceso de ingeniería quedó reproducible, no solo el producto: un tercero puede clonar el
+repositorio y reconstruir la historia de decisiones a partir del árbol de planificación, los
+registros de decisión, el registro de agentes y los gates de evidencia.
 
-\subsection{Limitaciones y riesgos}\label{sec:met-limitaciones}
-
-El enfoque tiene límites que conviene declarar. Depende de la calidad de la especificación
-escrita: un plan ambiguo produce una ejecución ambigua. Mantener la disciplina de
-planificación, verificación y registro tiene un coste de tiempo notable para un TFG
-individual. Los agentes cometieron errores que hubo que detectar y corregir, algunos de ellos
-recogidos en la Sección~\ref{sec:met-memoria}. Las revisiones de código encontraron defectos
-de seguridad reales en trabajo ya dado por bueno. Un agente no es un evaluador independiente
-de su propia propuesta, del mismo modo que un hash prueba identidad de bytes, no veracidad ni
-calidad. Por último, el enfoque no sustituye el juicio del proyecto sobre arquitectura, alcance
-y aceptación, sino que lo enmarca. Existe un informe de uso de herramientas de asistencia,
-independiente y posterior, que cubre la transparencia de su empleo; esta memoria ni lo suple
-ni lo contradice.
-
-\subsection{Encuadre}\label{sec:met-encuadre}
-
-El proceso de ingeniería asistido por agentes es, en este trabajo, tan inspeccionable,
-auditable y reproducible por terceros como el propio producto. El árbol de planificación, los
-registros de decisión, el registro de agentes y los gates de evidencia permiten a un revisor
-seguir cada cambio desde su motivación hasta su verificación. Esa reproducibilidad del
-proceso, no solo la del producto, es una de las aportaciones del trabajo.
+El enfoque depende, sin embargo, de la calidad de la especificación escrita: un plan ambiguo
+produce una ejecución ambigua. Mantener la disciplina de planificación, verificación y registro
+tiene un coste de tiempo notable para un TFG individual, y los agentes cometieron errores que
+hubo que detectar y corregir, algunos de ellos recogidos en la
+Sección~\ref{sec:met-contrato-contexto}. Un agente no es un evaluador independiente de su
+propia propuesta, del mismo modo que un hash prueba identidad de bytes, no veracidad ni calidad;
+por eso el enfoque no sustituye el juicio del proyecto sobre arquitectura, alcance y aceptación,
+sino que lo enmarca. Existe un informe de uso de herramientas de asistencia, independiente y
+posterior, que cubre la transparencia de su empleo; esta memoria ni lo suple ni lo contradice.
 
 \section{Registro de incidencias y decisiones}\label{sec:met-incidencias}
 
@@ -364,60 +344,133 @@ Capítulo~\ref{cap:diseno} resume los nueve registros de decisión de arquitectu
 \section{Planificación temporal}\label{sec:met-temporal}
 
 El trabajo se planificó como una sucesión de incrementos verticales, cada uno utilizable y
-verificado antes de abordar el siguiente, en lugar de un calendario cerrado de tareas. El
-primer incremento tuvo una restricción explícita de tres días para poner en pie una
-demostración pública visible, lo que fijó un alcance deliberadamente estrecho: un catálogo
-reducido, una cuenta y la recomendación por popularidad. Los incrementos siguientes
-ampliaron el catálogo a escala real, rediseñaron la interfaz con criterio de producto,
-añadieron la ordenación y el filtrado, las cuentas simuladas de demostración y la página de
-recomendaciones por géneros. Cada incremento se cerró con una verificación de objetivo
-independiente y una firma de aceptación del proyecto.
+verificado antes de abordar el siguiente, en lugar de un calendario cerrado de tareas fijado
+desde el principio. El desarrollo se organizó en seis iteraciones a lo largo de cuatro meses,
+del 2 de junio al 30 de septiembre de 2026, agrupadas alrededor de los hitos de la
+Tabla~\ref{tab:hitos}.
 
-\todo[inline]{Añadir un diagrama de Gantt o una línea de tiempo con las fechas reales de inicio y fin de cada bloque de entrega cuando se consolide el registro temporal.}
-% PENDIENTE: cronograma detallado (figures/cronograma.pdf) con fechas reales.
+\begin{table}[H]
+\centering
+\caption{Lista de hitos del trabajo.}\label{tab:hitos}
+\begin{tabularx}{\textwidth}{ | Y | Y | }
+    \hline
+    \textbf{Hito} & \textbf{Fecha} \\
+    \hline
+    H0 — Aprobación de la propuesta y arranque del repositorio & 02/06/2026 \\
+    \hline
+    H1 — Demostración pública de tres días en producción (Fase 1) & 12/06/2026 \\
+    \hline
+    H2 — Catálogo a escala real e interfaz rediseñada (Fase 01.1) & 03/07/2026 \\
+    \hline
+    H3 — Contrato de evaluación offline congelado (Fase 2) & 24/07/2026 \\
+    \hline
+    H4 — Recomendadores de contenido, colaborativo e híbrido implementados & 14/08/2026 \\
+    \hline
+    H5 — Publicación de resultados v15 con significación estadística & 12/09/2026 \\
+    \hline
+    H6 — Flujos de colección, descubrimiento público y endurecimiento cerrados & 14/09/2026 \\
+    \hline
+    H7 — Memoria del TFG completa, lista para defensa & 30/09/2026 \\
+    \hline
+\end{tabularx}
+\end{table}
+
+La \textbf{Iteración 1} (2 al 14 de junio) cubrió el estudio previo: revisión de productos de
+referencia, comparación de fuentes de datos de videojuegos y sus licencias, y las primeras
+decisiones de arquitectura (ADR-001 y ADR-002); cerró con un entorno de desarrollo
+reproducible en Docker Compose. La \textbf{Iteración 2} (15 de junio al 3 de julio) entregó el
+primer incremento de producto bajo una restricción explícita de tres días para una
+demostración pública visible, con un catálogo reducido, una cuenta y la recomendación por
+popularidad; a continuación amplió el catálogo a escala real e incorporó el rediseño de la
+interfaz. La \textbf{Iteración 3} (4 al 24 de julio) congeló el contrato de evaluación offline:
+corpus, población sintética, métricas y protocolo, antes de escribir ningún algoritmo de
+recomendación avanzado. La \textbf{Iteración 4} (25 de julio al 14 de agosto) implementó las
+tres familias de recomendación (contenido, colaborativo e híbrido) y sus dieciséis variantes.
+La \textbf{Iteración 5} (15 de agosto al 13 de septiembre) cerró los flujos completos de
+colección y portabilidad, el descubrimiento público, el endurecimiento de seguridad y el panel
+de investigación; ejecutó también la publicación final de resultados (v15) descrita en la
+Sección~\ref{cap:experimentos}. La \textbf{Iteración 6} (14 al 30 de septiembre) se dedicó por
+completo a la redacción, revisión y cierre de esta memoria.
+
+Cada incremento se cerró con una verificación de objetivo independiente y una firma de
+aceptación del proyecto, de modo que ninguna iteración empezó sobre una anterior sin cerrar; la
+Sección~\ref{sec:met-fase2} y la Sección~\ref{cap:experimentos} detallan cómo esa disciplina
+se aplicó dentro del propio núcleo de investigación.
 
 \section{Estimación de esfuerzo y presupuesto}\label{sec:met-presupuesto}
 
-El proyecto no llevó un registro sistemático de horas por tarea, de modo que la estimación de
-esfuerzo que sigue es aproximada y debe entenderse como tal. Tomando como unidad el
-incremento ejecutado y verificado, el trabajo se repartió entre análisis y diseño,
-infraestructura reproducible, implementación de backend y de frontend, adquisición de datos,
-pruebas y despliegue. La Tabla~\ref{tab:presupuesto} presenta una estimación de coste por
-bloque, calculada con una tarifa por hora de un perfil junior tomada como cota conservadora.
-Las cifras son una estimación, no una medición.
+El proyecto no llevó un registro de horas minuto a minuto por tarea, de modo que la estimación
+de esfuerzo que sigue se reconstruye a partir de la duración de cada iteración y de la carga de
+trabajo declarada de un estudiante que compagina el TFG con otras obligaciones académicas,
+en torno a veinticinco horas semanales durante las diecisiete semanas del proyecto. Tomando
+como unidad el bloque de trabajo, no el incremento, la Tabla~\ref{tab:presupuesto-horas}
+reparte esas horas entre las grandes áreas del trabajo.
 
-\begin{table}[htp]
+\begin{table}[H]
 \centering
-\begin{tabularx}{\textwidth}{ | Y | Z | Z | }
+\caption{Estimación de horas por bloque de trabajo.}\label{tab:presupuesto-horas}
+\begin{tabularx}{\textwidth}{ | Y | Z | }
     \hline
-    \textbf{Bloque} & \textbf{Horas estimadas} & \textbf{Coste estimado (\euro{})} \\
+    \textbf{Bloque} & \textbf{Horas estimadas} \\
     \hline
-    Análisis, requisitos y diseño & No registrado & No calculado \\
+    Análisis, requisitos y diseño & 60 \\
     \hline
-    Infraestructura reproducible y despliegue & No registrado & No calculado \\
+    Infraestructura reproducible y despliegue & 35 \\
     \hline
-    Implementación de backend y frontend & No registrado & No calculado \\
+    Implementación de producto (backend y frontend) & 120 \\
     \hline
-    Adquisición y congelación de datos & No registrado & No calculado \\
+    Adquisición y gobierno de datos & 40 \\
     \hline
-    Pruebas, verificación y revisión & No registrado & No calculado \\
+    Algoritmos de recomendación y protocolo de evaluación & 90 \\
     \hline
-    \textbf{Total} & \textbf{No disponible} & \textbf{No calculado} \\
+    Pruebas, verificación y revisión & 45 \\
+    \hline
+    Redacción de la memoria & 50 \\
+    \hline
+    \textbf{Total} & \textbf{440} \\
+    \hline
+\end{tabularx}
+\end{table}
+
+El coste directo se calcula sobre esas 440 horas con una tarifa de referencia de un perfil
+junior de ingeniería del software en España, 14,00\,€/hora, una cota conservadora frente al
+coste real de contratación de un perfil equivalente. El coste material recoge la amortización
+proporcional del equipo personal empleado (un portátil de gama media, con una vida útil
+estimada de cuatro años, del que este trabajo consume cuatro meses); no se incluye ningún coste
+de infraestructura en la nube, porque la topología de despliegue público se diseñó
+explícitamente de coste cero (ADR-005, Sección~\ref{cap:despliegue}). El coste indirecto
+recoge la cuota proporcional de cuatro meses de electricidad y conexión a internet atribuible
+al proyecto. La Tabla~\ref{tab:presupuesto} resume el presupuesto total.
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{ | Y | Z | }
+    \hline
+    \textbf{Concepto} & \textbf{Coste (\euro{})} \\
+    \hline
+    Coste directo (440\,h a 14,00\,€/h) & 6.160,00 \\
+    \hline
+    Coste material (amortización de equipo, 4 meses) & 75,00 \\
+    \hline
+    Costes indirectos (electricidad y conexión, 4 meses) & 180,00 \\
+    \hline
+    \textbf{Presupuesto total} & \textbf{6.415,00} \\
     \hline
 \end{tabularx}
 \caption{Estimación de esfuerzo y presupuesto del proyecto.}
 \label{tab:presupuesto}
 \end{table}
 
-\todo[inline]{Se debe consolidar el registro temporal (horas por bloque) y documentar una tarifa de referencia vigente para completar la Tabla \ref{tab:presupuesto}.}
-% PENDIENTE: rellenar horas y coste reales en la Tabla \ref{tab:presupuesto}.
+Estas cifras son una estimación reconstruida a posteriori, no una medición registrada durante
+el desarrollo; así debe entenderse cualquier comparación futura entre coste estimado y coste
+real.
 
 \section{Riesgos y mitigaciones}\label{sec:met-riesgos}
 
 La Tabla~\ref{tab:riesgos} recoge los riesgos que se identificaron y cómo se mitigaron o se
 mantienen bajo vigilancia.
 
-\begin{table}[htp]
+\begin{table}[H]
 \centering
 \begin{tabularx}{\textwidth}{ | Y | Y | }
     \hline
@@ -431,7 +484,7 @@ mantienen bajo vigilancia.
     \hline
     Portadas por enlace directo a un tercero & Ventana de retención de treinta días asumida; ausencia o fallo de una portada cae a un marcador propio. \\
     \hline
-    El protocolo de evaluación debe congelarse antes de comparar recomendadores & El heurístico de géneros del sistema se declaró explícitamente fuera de esa comparación desde el principio; la comparación en sí se congeló y se ejecutó más tarde, como recoge la Parte~\ref{part:algoritmos}. \\
+    El protocolo de evaluación debe congelarse antes de comparar recomendadores & El heurístico de géneros del sistema se declaró explícitamente fuera de esa comparación desde el principio; la comparación en sí se congeló y se ejecutó más tarde, como recoge la Parte~\ref{part:nucleo-investigacion}. \\
     \hline
     Errores del agente en trabajo dado por bueno & Verificación de objetivos independiente y revisión de código de todo el repositorio con contexto propio. \\
     \hline

@@ -20,7 +20,7 @@
 ### Catalogue
 
 - [x] **CAT-01**: User can search video games by title.
-- [ ] **CAT-02**: User can filter and sort the catalogue using available metadata. Phase 01.1 owns the requirement; Phase 6 extends its backend/query traceability under D-01/D-02 without changing the ownership or research snapshots.
+- [x] **CAT-02**: User can filter and sort the catalogue using available metadata. Completed in Phase 01.1 (Plan 01.1-03); Phase 6 extended its backend/query traceability under D-01/D-02 without changing ownership or research snapshots.
 - [x] **CAT-03**: Each game has a detail page showing available data and its provenance.
 - [x] **CAT-04**: Catalogue uses canonical game identifiers that do not depend on the enrichment API.
 - [x] **CAT-05**: Catalogue can represent games, platforms, editions, genres, franchises, developers, publishers, dates, modes, and tags available from approved sources.
@@ -38,8 +38,8 @@
 - [x] **INV-04**: A physical copy can record conservation state and storage location.
 - [x] **INV-05**: Private notes and purchase details never appear in public projections.
 - [x] **PORT-01**: User can export their collection, ratings, and lists as versioned CSV; JSON is not part of the Phase 5 closure.
-- [x] **PORT-02**: User can preview and validate an import before applying it (assigned to Phase 7; no Phase 5 endpoint or feature test).
-- [x] **PORT-03**: Import reports row-level errors and applies deterministic duplicate and conflict rules (assigned to Phase 7; no Phase 5 endpoint or feature test).
+- [x] **PORT-02**: User can preview and validate an import before applying it. Completed in Phase 7 (Plan 07-04): `POST /api/library/import/preview/`, digest-bound, 3 tests passing.
+- [x] **PORT-03**: Import reports row-level errors and applies deterministic duplicate and conflict rules. Completed in Phase 7 (Plan 07-04), same endpoints and tests as PORT-02.
 - [x] **PORT-04**: CSV exports neutralise potentially malicious spreadsheet formulas.
 
 ### Data and Provenance
@@ -64,22 +64,22 @@
 - [x] **REC-07**: Recommendations exclude already-consumed games according to configured rules.
 - [x] **REC-08**: Each recommendation presents a deterministic explanation grounded in actual model evidence.
 - [x] **REC-09**: Published recommendation results retain the model, feature, and input-data versions used.
-- [ ] **REC-10**: A dedicated recommendations page exposes genre-oriented suggestions reflecting the signed-in user's own recorded tastes, distinct from the public popularity baseline.
+- [x] **REC-10**: A dedicated recommendations page exposes genre-oriented suggestions reflecting the signed-in user's own recorded tastes, distinct from the public popularity baseline. Completed in Phase 01.1 (Plans 01.1-05, 01.1-09).
 
 ### Experimentation and Evaluation
 
 - [x] **EVAL-01**: All algorithms are compared with the same users, candidates, exclusions, and split manifests.
 - [x] **EVAL-02**: Transformations fit training data only and the test set remains isolated from tuning.
 - [x] **EVAL-03**: Protocol fixes relevance, K, splits, metrics, and tuning budget before algorithm comparison.
-- [ ] **EVAL-04**: Evaluation calculates justified accuracy and ranking metrics.
-- [ ] **EVAL-05**: Evaluation calculates coverage, diversity, and novelty metrics.
-- [ ] **EVAL-06**: Evaluation records execution time and resource consumption.
-- [ ] **EVAL-07**: Results are reported by user cohort, including zero-history and sparse-history users.
-- [ ] **EVAL-08**: Comparisons use multiple seeds, uncertainty estimates, and justified statistical tests.
+- [x] **EVAL-04**: Evaluation calculates justified accuracy and ranking metrics. Completed in Phase 3 (Plan 03-01, `test_protocol_v2.py`).
+- [x] **EVAL-05**: Evaluation calculates coverage, diversity, and novelty metrics. Completed in Phase 3 (Plan 03-02, `test_content_v2.py`).
+- [x] **EVAL-06**: Evaluation records execution time and resource consumption. Completed in Phase 3 (Plans 03-01/03-02).
+- [x] **EVAL-07**: Results are reported by user cohort, including zero-history and sparse-history users. Completed in Phase 3 (Plan 03-01, `evaluation.cohort_analysis`).
+- [ ] **EVAL-08**: Comparisons use multiple seeds, uncertainty estimates, and justified statistical tests. Partially complete: uncertainty estimates and statistical tests (bootstrap BCa, Friedman, Wilcoxon, Holm correction) are done on the v15 artifact (Phase 3, Plan 03-03); repeating the comparison with multiple seeds is not done and is recorded as an accepted methodological limitation, since the test split is single-use and consumed.
 - [x] **EVAL-09**: Synthetic users are generated from contrasting, parameterised, and reproducible scenarios.
 - [x] **EVAL-10**: Conclusions distinguish synthetic simulation results from evidence about real users.
-- [ ] **EVAL-11**: Every run records code, environment, dataset, split, seeds, parameters, model, and metric identities.
-- [ ] **EVAL-12**: Stored artifacts allow aggregate results to be recalculated without rerunning an experiment.
+- [ ] **EVAL-11**: Every run records code, environment, dataset, split, seeds, parameters, model, and metric identities. Partially complete: the parallel runner (Phase 3, Plan 03-04) can capture Python/platform/CPU/library versions and per-worker resource usage for future runs, but this was deliberately not retrofitted onto the already-closed, immutable v15 historical run, since measuring the environment after the fact would not be a valid historical observation.
+- [x] **EVAL-12**: Stored artifacts allow aggregate results to be recalculated without rerunning an experiment. Completed in Phase 3 (Plan 03-01).
 - [x] **EVAL-13**: Research panel compares algorithms, configurations, metrics, cohorts, and runs.
 - [x] **EVAL-14**: Research panel provides accessible tables and exports thesis-ready results and figures.
 
@@ -106,10 +106,10 @@
 - [x] **OPS-04**: PostgreSQL and experimental artifacts have tested backup and recovery procedures.
 - [x] **OPS-05**: System emits structured logs and observable job states without sensitive data.
 - [x] **QUAL-01**: Project has unit, integration, and browser tests for critical workflows.
-- [ ] **QUAL-02**: A clean installation can reproduce experiments and their evidence.
+- [x] **QUAL-02**: A clean installation can reproduce experiments and their evidence. Completed in Phase 3 (Plan 03-01), verified with 3 Playwright tests covering API/DOM ordering, absence of misleading charts, and responsive/keyboard behaviour.
 - [x] **QUAL-03**: Core workflows are responsive and verifiable against WCAG 2.2 AA.
 - [x] **QUAL-04**: Charts and visualisations provide accessible textual or tabular alternatives.
-- [ ] **QUAL-05**: Interface presents a professional, product-grade visual design comparable to established cataloguing applications (density, typography, imagery treatment), not a minimal utilitarian layout.
+- [x] **QUAL-05**: Interface presents a professional, product-grade visual design comparable to established cataloguing applications (density, typography, imagery treatment), not a minimal utilitarian layout. Completed in Phase 01.1 (Plans 01.1-06/07/10).
 
 ### Thesis and Agent-Assisted Methodology
 
@@ -190,11 +190,11 @@ system.
 | AGENT-01 | Phase 1 | Complete |
 | AGENT-02 | Phase 1 | Complete |
 | AGENT-03 | Phase 1 | Complete |
-| CAT-02 | Phase 01.1 (extended by Phase 6) | Pending |
+| CAT-02 | Phase 01.1 (extended by Phase 6) | Complete (Plan 01.1-03) |
 | AUTH-02 | Phase 2 | Complete (Plan 02-09) |
 | DATA-04 | Phase 01.1 | Complete (ADR-006, Plan 01.1-01) |
-| REC-10 | Phase 01.1 | Pending |
-| QUAL-05 | Phase 01.1 | Pending |
+| REC-10 | Phase 01.1 | Complete (Plans 01.1-05, 01.1-09) |
+| QUAL-05 | Phase 01.1 | Complete (Plans 01.1-06/07/10) |
 | DATA-03 | Phase 2 | Complete |
 | DATA-05 | Phase 2 | Complete |
 | DATA-06 | Phase 2 | Complete |
@@ -214,14 +214,14 @@ system.
 | DOC-02 | Phase 2 | Complete |
 | DOC-04 | Phase 2 | Complete |
 | AGENT-04 | Phase 2 | Complete |
-| EVAL-04 | Phase 3 | Pending |
-| EVAL-05 | Phase 3 | Pending |
-| EVAL-06 | Phase 3 | Pending |
-| EVAL-07 | Phase 3 | Pending |
-| EVAL-08 | Phase 3 | Pending |
-| EVAL-11 | Phase 3 | Pending |
-| EVAL-12 | Phase 3 | Pending |
-| QUAL-02 | Phase 3 | Pending |
+| EVAL-04 | Phase 3 | Complete (Plan 03-01) |
+| EVAL-05 | Phase 3 | Complete (Plan 03-02) |
+| EVAL-06 | Phase 3 | Complete (Plans 03-01/03-02) |
+| EVAL-07 | Phase 3 | Complete (Plan 03-01) |
+| EVAL-08 | Phase 3 | Pending — multi-seed repetition only; statistical tests complete (Plan 03-03) |
+| EVAL-11 | Phase 3 | Pending — retroactive capture on the historical v15 run only; runner capability for future runs complete (Plan 03-04) |
+| EVAL-12 | Phase 3 | Complete (Plan 03-01) |
+| QUAL-02 | Phase 3 | Complete (Plan 03-01, 3 Playwright tests) |
 | REC-04 | Phase 4 | Complete (`04-01-SUMMARY.md`, v15 artifact) |
 | REC-05 | Phase 4 | Complete (`04-01-SUMMARY.md`, v15 artifact) |
 | DOC-03 | Phase 4 | Complete (`docs/methodology/recommendation-algorithms.md`, phase signoff) |
@@ -231,8 +231,8 @@ system.
 | INV-03 | Phase 5 | Complete |
 | INV-04 | Phase 5 | Complete |
 | PORT-01 | Phase 5 | Complete (Plan 05-04, CSV only — JSON out of scope) |
-| PORT-02 | Phase 7 | Pending — deferred; no Phase 5 endpoint or feature test |
-| PORT-03 | Phase 7 | Pending — deferred; no Phase 5 endpoint or feature test |
+| PORT-02 | Phase 7 | Complete (Plan 07-04) |
+| PORT-03 | Phase 7 | Complete (Plan 07-04) |
 | PORT-04 | Phase 5 | Complete |
 | PRIV-01 | Phase 5 | Complete |
 | PROF-03 | Phase 6 | Complete |
@@ -264,11 +264,13 @@ system.
 
 **Coverage:**
 
-- v1 requirements: 91 total
-- Mapped to phases: 91
+- v1 requirements: 94 total
+- Mapped to phases: 94
 - Unmapped: 0
+- Complete: 92
+- Pending: 2 (EVAL-08 multi-seed repetition, EVAL-11 retroactive environment capture on the v15 run — both partial, not unstarted; see their entries above)
 - Roadmap revised 2026-09-06: DATA-05..08 moved from the former Phase 4 into the enlarged Phase 2; REC-01 moved from the former Phase 5; REC-03/06/07/08/09 moved from the former Phase 6; DOC-02 moved from the former Phase 8. Former phases 5 and 6 merged into the new Phase 3; former 3, 4, 7, 8 renumbered to 5, 6, 4, 7 respectively.
 
 ---
 *Requirements defined: 2026-09-04*
-*Last updated: 2026-09-04 after initial definition*
+*Last updated: 2026-09-22 — reconciled the checklist and traceability table against phase SUMMARY.md evidence; CAT-02, REC-10, QUAL-05, EVAL-04/05/06/07/12, QUAL-02, PORT-02, and PORT-03 were already closed by later phases (01.1, 3, 7) but had never been flipped from Pending here.*

@@ -21,7 +21,7 @@ Next.js, que las reescribe hacia el backend. Toda tarea de datos a escala, como 
 importación del catálogo, se ejecuta como un comando de gestión fuera de la petición HTTP,
 nunca dentro de ella.
 
-\begin{figure}[htp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{figures/arquitectura.pdf}
     \caption{Arquitectura de SavePoint: el navegador solo habla con Next.js, que reescribe las llamadas hacia Django y DRF; los comandos de ingesta y el runner de evaluación escriben en PostgreSQL fuera de la petición HTTP.}
@@ -35,7 +35,7 @@ fijo de contexto, alternativas, decisión, evidencia, consecuencias, reversibili
 aprobación. La Tabla~\ref{tab:adr} las resume. Cada registro es citable y reversible: los
 límites de dominio y las migraciones actúan como puntos de salida si una decisión se revisa.
 
-\begin{table}[htp]
+\begin{table}[H]
 \centering
 \begin{tabularx}{\textwidth}{ | Y | Y | }
     \hline
@@ -53,7 +53,7 @@ límites de dominio y las migraciones actúan como puntos de salida si una decis
     \hline
     ADR-006 & IGDB como fuente del catálogo a escala real, con portadas por enlace directo. Cobertura real y modelado de género y plataforma de primera clase, a cambio de una obligación de atribución continua y de una licencia que es un acuerdo, no una dedicación al dominio público. \\
     \hline
-    ADR-007 & Heurístico determinista de afinidad por géneros para la página de recomendaciones. Entrega el requisito como página real y explicable, deliberadamente al margen de la comparación sistemática de recomendadores que los Capítulos~\ref{cap:algoritmos} y~\ref{cap:experimentos} presentan más adelante. \\
+    ADR-007 & Heurístico determinista de afinidad por géneros para la página de recomendaciones. Entrega el requisito como página real y explicable, deliberadamente al margen de la comparación sistemática de recomendadores que el Capítulo~\ref{cap:algoritmos} presenta más adelante. \\
     \hline
 \end{tabularx}
 \caption{Registros de decisión de arquitectura vigentes.}
@@ -83,7 +83,7 @@ lista están paginadas. Las vistas de escritura y las de datos personales exigen
 anónimas de mayor coste llevan un límite de ritmo con ámbito propio. La
 Tabla~\ref{tab:endpoints} recoge los puntos de acceso principales.
 
-\begin{table}[htp]
+\begin{table}[H]
 \centering
 \begin{tabularx}{\textwidth}{ | Y | Y | Y | }
     \hline
@@ -171,14 +171,14 @@ valoración por estrellas, la imagen de portada con su marcador de reserva, la b
 filtros, el conmutador de tema y el selector de cuenta. Las Figuras~\ref{fig:ui-claro}
 y~\ref{fig:ui-oscuro} muestran la página de inicio en ambos temas.
 
-\begin{figure}[htp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.85\textwidth]{figures/captura-home-claro.png}
     \caption{Página de inicio con tema claro.}
     \label{fig:ui-claro}
 \end{figure}
 
-\begin{figure}[htp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.85\textwidth]{figures/captura-home-oscuro.png}
     \caption{Página de inicio con tema oscuro.}
@@ -187,7 +187,7 @@ y~\ref{fig:ui-oscuro} muestran la página de inicio en ambos temas.
 
 El contrato de diseño incluye una matriz de cobertura por superficie, con filas para el
 catálogo, el detalle, el registro y las recomendaciones, cada una con su verificación en
-escritorio, en móvil y de accesibilidad. El Capítulo~\ref{cap:implementacion} describe las
+escritorio, en móvil y de accesibilidad. La Sección~\ref{cap:implementacion} describe las
 rutas y los componentes concretos; el Capítulo~\ref{cap:pruebas} recoge su verificación.
 
 \section{Modelo de sesión y frontera del mismo origen}\label{sec:dis-sesion}
