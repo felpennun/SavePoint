@@ -68,13 +68,20 @@ idf(t) = \ln\!\left(\frac{N_f + 1}{df_t + 1}\right) + 1 ,
 \end{equation}
 
 con suavizado aditivo de \(1\) para mantener un valor finito incluso para un valor observado
-en una única obra. La versión anterior, \texttt{fs-v12}, calculaba esa rareza sobre el corpus
-gobernado completo para las cinco familias por igual; el cambio se hizo porque una familia con
-cobertura baja, como característica (en torno al 13\,\% de las obras), obtenía un IDF
-artificialmente inflado frente a una familia casi universal como género, no por ser realmente
-más rara dentro de su propio dominio, sino por tener un denominador mal dimensionado para su
-propia población. La fórmula procede de la literatura; el cálculo de \(df\) sobre obras
-gobernadas y la elección del suavizado son adaptaciones reproducibles a este corpus. Franquicia
+en una única obra. La versión anterior, \texttt{fs-v12}, no separaba las familias: género,
+subgénero, tema, modo y característica compartían un único presupuesto fusionado
+(\(\mathtt{tag}=0{,}75\)) con un solo cálculo de IDF entre las cinco. Eso permitía que un
+subgénero raro pesara más que el propio género por pura rareza estadística del conjunto
+fusionado. Una primera corrección, renormalizar las cinco familias juntas sin separarlas,
+se descartó porque terminaba premiando a las obras con menos metadatos en lugar de corregir el
+sesgo. La solución adoptada en \texttt{fs-v13} fue separar cada familia en su propio cálculo de
+IDF, con su propio universo de referencia \(N_f\) y su propio peso (\(\mathtt{tag}=0{,}60\),
+que fusiona género y subgénero; \(\mathtt{theme}=0{,}20\); \(\mathtt{feature}=0{,}10\);
+\(\mathtt{mode}=0{,}05\); \(\mathtt{platform}=0{,}05\)), de modo que la rareza de un valor se
+mide siempre dentro de la población que realmente lo declara, no contra un denominador
+compartido con familias de cobertura muy distinta. La fórmula procede de la literatura; el
+cálculo de \(df\) sobre obras gobernadas, el suavizado y los pesos por familia son adaptaciones
+reproducibles a este corpus. Franquicia
 y desarrollador no usan IDF: si una obra declara \(k\) valores observados de esa familia, cada
 uno pesa \(1/\sqrt{k}\), un reparto plano que evita premiar la rareza de un estudio o de una
 saga, señales de cobertura desigual en las que una coincidencia rara diría más del catálogo que
@@ -241,7 +248,7 @@ decisión de diseño y no otra.
 \centering
 \caption{Fórmula de combinación de las diez variantes basadas en contenido.}\label{tab:variantes-contenido}
 \small
-\begin{tabularx}{\textwidth}{@{}>{\ttfamily\raggedright\arraybackslash}p{0.34\textwidth}Y@{}}
+\begin{tabularx}{\textwidth}{@{}>{\ttfamily\raggedright\arraybackslash}p{0.48\textwidth}>{\raggedleft\arraybackslash}X@{}}
 \textnormal{Algoritmo} & \textnormal{Fórmula} \\
 \hline
 content-cbf-weighted-v1 & \(S = 0{,}70\,C + 0{,}30\,R\) \\
@@ -322,7 +329,8 @@ por el que no se adoptaron en esta versión.
 \centering
 \caption{Alternativas consideradas y motivo de exclusión.}\label{tab:alternativas}
 \tablecompact
-\begin{tabularx}{\textwidth}{@{}YY@{}}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.43\textwidth}Y@{}}
 \textnormal{Alternativa} & \textnormal{Motivo de exclusión} \\
 \hline
 Factorización matricial (ALS, BPR)~\cite{koren2009matrix} & Añade entrenamiento, factores latentes e hiperparámetros; dificulta atribuir un resultado a una señal concreta sobre población sintética \\
@@ -497,14 +505,16 @@ y con menos artefactos de diseño heredados que v12 o v14, no solo con mejores c
 
 \subsection{Resultados publicados}
 
-La Tabla~\ref{tab:resultados-ndcg10} resume \(nDCG@10\), MAP@10 y tiempo de pared de la cohorte \texttt{active\_history\_10\_to\_20} incluidos en el artefacto v15. Se muestra una tabla compacta para evitar repetir cuatro métricas por tres valores de \(K\); el anexo versionado \texttt{ALGORITHM-MATRIX.md} preserva la transcripción completa para \(K=5,10,20\).
+La Tabla~\ref{tab:resultados-ndcg10} resume \(nDCG@10\), MAP@10 y tiempo de pared de la cohorte \texttt{active\_history\_10\_to\_20} incluidos en el artefacto v15. Se muestra una tabla compacta para evitar repetir cuatro métricas por tres valores de \(K\); el artefacto versionado \texttt{evaluation-400-test-2026-09-12-v15.artifact.json} y su transcripción en \texttt{docs/verification/evaluation-cohorts-400-test-2026-09-12-v15.md} preservan la transcripción completa para \(K=5,10,20\).
 
 \begin{table}[H]
 \centering
 \caption{Resultados v15 publicados para la cohorte indicada. No son resultados con usuarios reales.}\label{tab:resultados-ndcg10}
 \small
-\begin{tabularx}{\textwidth}{@{}>{\ttfamily\raggedright\arraybackslash}p{0.34\textwidth}Yrr@{}}
-\textnormal{Algoritmo} & \textnormal{Familia} & \textnormal{nDCG@10} & \textnormal{MAP@10} \\
+\renewcommand{\arraystretch}{1.2}
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\textwidth}{@{}>{\ttfamily\raggedright\arraybackslash}p{0.405\textwidth}Y>{\raggedleft\arraybackslash}p{0.115\textwidth}>{\raggedleft\arraybackslash}p{0.115\textwidth}@{}}
+\textnormal{Algoritmo} & \textnormal{Familia} & \textnormal{\footnotesize nDCG@10} & \textnormal{\footnotesize MAP@10} \\
 \hline
 random-v1 & baseline & 0.00000 & 0.00000 \\
 popularity-v1 & baseline & 0.00340 & 0.00098 \\

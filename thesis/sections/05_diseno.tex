@@ -1,10 +1,11 @@
 \chapter{Registro detallado de diseño (histórico)}\label{ap:diseno-detallado}
 
-Este capítulo describe el diseño del sistema. Presenta la arquitectura general, resume los
-siete registros de decisión de arquitectura vigentes y explica las decisiones del modelo de
-datos, el diseño de la interfaz de programación de aplicaciones (API) y el de la interfaz de
-usuario (UI). Cierra con el modelo de sesión y con la frontera de la demostración
-controlada.
+Este capítulo describe el diseño del sistema en un corte histórico anterior. Presenta la
+arquitectura general, resume los siete registros de decisión de arquitectura vigentes en aquel
+momento (dos más, ADR-008 y ADR-009, se añadieron después; el Capítulo~\ref{cap:diseno} resume
+los nueve vigentes hoy) y explica las decisiones del modelo de datos, el diseño de la interfaz
+de programación de aplicaciones (API) y el de la interfaz de usuario (UI). Cierra con el modelo
+de sesión y con la frontera de la demostración controlada.
 
 \section{Arquitectura}\label{sec:dis-arquitectura}
 
@@ -89,25 +90,25 @@ Tabla~\ref{tab:endpoints} recoge los puntos de acceso principales.
     \hline
     \textbf{Método y ruta} & \textbf{Acceso} & \textbf{Función} \\
     \hline
-    \texttt{GET /api/catalogue/games/} & Anónimo & Lista paginada con búsqueda, filtros, orden y facetas. \\
+    \path{GET /api/catalogue/games/} & Anónimo & Lista paginada con búsqueda, filtros, orden y facetas. \\
     \hline
-    \texttt{GET /api/catalogue/games/<slug>/} & Anónimo & Ficha de una obra con su jerarquía y su procedencia. \\
+    \path{GET /api/catalogue/games/<slug>/} & Anónimo & Ficha de una obra con su jerarquía y su procedencia. \\
     \hline
-    \texttt{GET /api/catalogue/sources/} & Anónimo & Dataset, licencia, hash y política de portadas. \\
+    \path{GET /api/catalogue/sources/} & Anónimo & Dataset, licencia, hash y política de portadas. \\
     \hline
-    \texttt{POST /api/accounts/login/}, \texttt{logout/} & Anónimo & Inicio y cierre de sesión con protección de origen. \\
+    \path{POST /api/accounts/login/}, \path{logout/} & Anónimo & Inicio y cierre de sesión con protección de origen. \\
     \hline
-    \texttt{POST /api/accounts/register/} & Anónimo & Registro dentro de la frontera de demostración, con límite de ritmo. \\
+    \path{POST /api/accounts/register/} & Anónimo & Registro dentro de la frontera de demostración, con límite de ritmo. \\
     \hline
-    \texttt{GET /api/accounts/profiles/<alias>/} & Anónimo & Proyección pública por lista de campos permitidos. \\
+    \path{GET /api/accounts/profiles/<alias>/} & Anónimo & Proyección pública por lista de campos permitidos. \\
     \hline
-    \texttt{GET /api/library/entries/} & Sesión & Biblioteca de la persona autenticada. \\
+    \path{GET /api/library/entries/} & Sesión & Biblioteca de la persona autenticada. \\
     \hline
-    \texttt{POST /api/library/entries/<id>/status/}, \texttt{rating/}, \texttt{copies/} & Sesión & Cambio de estado, valoración y alta de copias. \\
+    \path{POST /api/library/entries/<id>/status/}, \path{rating/}, \path{copies/} & Sesión & Cambio de estado, valoración y alta de copias. \\
     \hline
-    \texttt{GET /api/library/popularity/} & Anónimo & Baseline de popularidad sobre cuentas simuladas. \\
+    \path{GET /api/library/popularity/} & Anónimo & Baseline de popularidad sobre cuentas simuladas. \\
     \hline
-    \texttt{GET /api/recommendations/genre-taste/} & Sesión & Recomendación por afinidad de géneros de la persona autenticada. \\
+    \path{GET /api/recommendations/genre-taste/} & Sesión & Recomendación por afinidad de géneros de la persona autenticada. \\
     \hline
 \end{tabularx}
 \caption{Puntos de acceso principales de la API.}

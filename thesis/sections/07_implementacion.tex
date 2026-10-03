@@ -137,12 +137,17 @@ SORT_ORDERS = {
 
 \subsection{El heurístico de afinidad por géneros}\label{sec:impl-heuristico}
 
-La página de recomendaciones se apoya en el heurístico \texttt{rank\_genre\_taste\_v1},
-descrito en el registro ADR-007. Es una agregación en tiempo de petición, sin estado, acotada
-a la persona autenticada. Cada entrada de la biblioteca de esa persona aporta un peso de
-actividad a cada género de su obra, según la fórmula del Extracto de
-código~\ref{cod:heuristico}. La tabla de pesos por estado es una copia deliberada de la del
-baseline de popularidad; la contribución de la valoración también coincide. Las obras del
+La página de recomendaciones se apoya en el heurístico \texttt{tag-taste-v1} (identificador
+histórico \texttt{genre-taste-v1}, renombrado tras generalizarse a etiquetas curadas más allá
+del género), descrito en el registro ADR-007. Es una agregación en tiempo de petición, sin
+estado, acotada a la persona autenticada. Cada entrada de la biblioteca de esa persona aporta
+un peso de actividad a cada género de su obra, según la fórmula del Extracto de
+código~\ref{cod:heuristico}, que un refactor posterior (Plan 02-10) extrajo a un módulo
+compartido para que el propio heurístico y el perfil de contenido (Capítulo~\ref{cap:algoritmos})
+usen la misma definición de peso en lugar de copiarla. La tabla de pesos por estado es una
+copia deliberada de la del baseline de popularidad; la contribución de la valoración, en
+cambio, ya no es lineal: se normaliza a \([0,1]\) y se eleva al cuadrado, de modo que una
+valoración alta pesa más que proporcionalmente frente a una simplemente positiva. Las obras del
 catálogo no vistas y sin ser contenido descargable se ordenan por el peso sumado de los
 géneros que comparten con ese vector de gusto, con desempate por identificador canónico. Cada
 respuesta lleva una huella SHA-256 del vector de gusto y del resultado ordenado, de modo que
@@ -150,18 +155,26 @@ dos llamadas con la misma entrada producen la misma huella. Sin actividad con g�
 respuesta es una forma explícita de historial insuficiente que nunca cae al baseline de
 popularidad.
 
-\begin{lstlisting}[language=Python, caption={Peso de actividad por entrada de biblioteca en el heurístico de géneros (\texttt{apps/api/recommendations/genre\_heuristic.py}).}, label={cod:heuristico}, captionpos=b, float, floatplacement=!htp]
-ALGORITHM_ID = "genre-taste-v1"
-
+\begin{lstlisting}[language=Python, caption={Peso de actividad por entrada de biblioteca, compartido por el heurístico de géneros y el perfil de contenido (\texttt{apps/api/recommendations/\_weights.py}).}, label={cod:heuristico}, captionpos=b, float, floatplacement=!htp]
 # Igual que la tabla del baseline de popularidad, de modo que el
 # heuristico personal y el agregado publico hablan el mismo idioma de
 # "cuanto cuenta esta interaccion". Un titulo abandonado no es evidencia
 # de gusto: aporta cero.
-STATUS_WEIGHTS = {"completed": 3.0, "playing": 2.0, "pending": 1.0, "abandoned": 0.0}
-RATING_DIVISOR = 10  # rating_half_steps / 10 -> aporta entre 0.1 y 1.0
+_STATUS_WEIGHTS = {"completed": 3.0, "playing": 2.0, "pending": 1.0, "abandoned": 0.0}
 
-def entry_weight(status, rating_half_steps):
-    return STATUS_WEIGHTS.get(status or "", 0.0) + (rating_half_steps or 0) / RATING_DIVISOR
+# Las valoraciones personales son deliberadamente no lineales: una nota alta
+# es evidencia mas fuerte de gusto positivo que una simplemente positiva.
+_RATING_DIVISOR = 10
+RATING_INTENSITY_POWER = 2.0
+
+def _rating_intensity(rating_half_steps):
+    if rating_half_steps is None:
+        return 0.0
+    normalised = max(0.0, min(1.0, rating_half_steps / _RATING_DIVISOR))
+    return normalised ** RATING_INTENSITY_POWER
+
+def _entry_weight(status, rating_half_steps):
+    return _STATUS_WEIGHTS.get(status or "", 0.0) + _rating_intensity(rating_half_steps)
 \end{lstlisting}
 
 La frontera de este heurístico es explícita. Es un conteo de frecuencia sobre una tabla, sin

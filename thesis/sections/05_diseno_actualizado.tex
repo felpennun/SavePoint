@@ -139,13 +139,15 @@ trabajo futuro no invalida ninguna evidencia ya cerrada.
 \section{Diseño de la arquitectura}\label{sec:web-diseno}
 
 SavePoint es un monolito modular con dos ejecutables. El backend, en \texttt{apps/api/}, usa
-Django con soporte a largo plazo y Django REST Framework (DRF) sobre PostgreSQL, con el mapeo
-objeto-relacional (ORM) de Django como interfaz de persistencia; sus módulos se separan por
-dominio (\texttt{catalogue}, \texttt{library}, \texttt{accounts}, \texttt{recommendations},
-\texttt{evaluation}), pero comparten despliegue y base de datos. El frontend, en
-\texttt{apps/web/}, es una aplicación Next.js con React y TypeScript en modo estricto, que
-renderiza en el servidor las páginas públicas; el navegador solo llama a rutas del mismo origen
-de Next.js, que las reescribe hacia el backend. Los trabajos de recomendación y evaluación se
+Django~\cite{django} con soporte a largo plazo y Django REST Framework (DRF)~\cite{drf} sobre
+PostgreSQL~\cite{postgresql}, con el mapeo objeto-relacional (ORM) de Django como interfaz de
+persistencia; sus módulos se separan por dominio (\texttt{catalogue}, \texttt{library},
+\texttt{accounts}, \texttt{recommendations}, \texttt{evaluation}, \texttt{social},
+\texttt{audit}), pero comparten despliegue y base de datos. El frontend, en
+\texttt{apps/web/}, es una aplicación Next.js~\cite{nextjs} con React~\cite{react} y
+TypeScript en modo estricto, que renderiza en el servidor las páginas públicas; el navegador
+solo llama a rutas del mismo origen de Next.js, que las reescribe hacia el backend. Los
+trabajos de recomendación y evaluación se
 ejecutan como comandos fuera de la petición HTTP: la aplicación publica sus resultados, pero no
 vuelve a calcular la evidencia científica en el navegador. La Figura~\ref{fig:arquitectura}
 representa esta arquitectura por capas, y el registro de decisión ADR-001 recoge el contexto
@@ -175,12 +177,15 @@ integridad relacional. Usar SQLite en local y PostgreSQL en producción, la solu
 barata a corto plazo, se descartó explícitamente porque introduce una asimetría entre entornos
 que un banco de pruebas reproducible no se puede permitir: una consulta que funciona en SQLite
 y falla en PostgreSQL, o viceversa, sería un defecto del propio diseño experimental, no del
-código. Todo el sistema se levanta, en consecuencia, con Docker Compose a partir de tres
-servicios (base de datos, API y frontend), cada uno construido desde su propio fichero de
-Docker con versiones de dependencias fijadas: un trabajo cuyo objeto de estudio es la
-reproducibilidad de una comparación de algoritmos necesita, antes que nada, que el propio
-entorno de ejecución sea reproducible, y los contenedores eliminan esa variable en cualquier
-máquina que lo levante.
+código. Todo el sistema se levanta, en consecuencia, con Docker Compose a partir de los tres
+componentes de aplicación (base de datos, API y frontend), cada uno construido desde su propio
+fichero de Docker con versiones de dependencias fijadas; junto a ellos, Compose orquesta además
+un contenedor de \textit{worker} independiente por cada variante de algoritmo de recomendación
+publicada, de modo que la ejecución completa del entorno reproducible levanta más de una decena
+de contenedores adicionales de cómputo, no solo los tres de aplicación. Un trabajo cuyo objeto
+de estudio es la reproducibilidad de una comparación de algoritmos necesita, antes que nada,
+que el propio entorno de ejecución sea reproducible, y los contenedores eliminan esa variable
+en cualquier máquina que lo levante.
 
 Para la demostración pública se adoptó una topología repartida entre tres proveedores
 gratuitos en lugar de un único servicio con predespliegue de contenedores, por una restricción
@@ -240,8 +245,9 @@ de reproducibilidad que recorre todo el diseño.
 
 \section{Implementación y verificación}\label{cap:implementacion}
 
-El backend se divide en los módulos de cuentas, catálogo, biblioteca, social, recomendaciones y
-evaluación, descritos en su reparto de dominio en la sección anterior. El frontend implementa
+El backend se divide en los módulos de cuentas, catálogo, biblioteca, social, recomendaciones,
+evaluación y auditoría, descritos en su reparto de dominio en la sección anterior. El frontend
+implementa
 las vistas de catálogo, detalle, colección, perfil, listas, comentarios, recomendaciones y
 panel de investigación. La importación y el gobierno de datos se ejecutan como procesos
 explícitos fuera de la petición HTTP; las recomendaciones se publican mediante snapshots y los
@@ -357,8 +363,9 @@ un paso fallido detiene el arranque, tal como resume la Figura~\ref{fig:desplieg
     \label{fig:despliegue-flujo}
 \end{figure}
 
-Docker Compose sigue siendo el entorno reproducible canónico, con los tres servicios de base
-de datos, API y frontend construidos desde sus ficheros de Docker. La equivalencia con el
+Docker Compose sigue siendo el entorno reproducible canónico, con los tres componentes de
+aplicación (base de datos, API y frontend) y los \textit{workers} de recomendación construidos
+desde sus ficheros de Docker. La equivalencia con el
 despliegue público es funcional, de versiones, de commit y de datos, no de imagen byte a
 byte: el frontend público lo construye Vercel de forma nativa y no ejecuta la imagen de Docker
 del frontend, una diferencia de despliegue documentada, no una divergencia de comportamiento.

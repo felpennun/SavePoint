@@ -134,7 +134,8 @@ protocolo versionado que el Capítulo~\ref{cap:algoritmos} describe con detalle.
 relevantes; \textit{recall at K} mide qué proporción de todos los ítems relevantes que existen
 aparecen entre esos \(K\). Ninguna de las dos distingue la posición dentro de la lista: acertar
 en el primer puesto cuenta igual que acertar en el último. Para corregir esa carencia se usa el
-\textit{normalized discounted cumulative gain} (nDCG), que descuenta el valor de un acierto
+\textit{normalized discounted cumulative gain}~\cite{jarvelin2002cumulated} (nDCG), que
+descuenta el valor de un acierto
 cuanto más abajo aparece en la lista y lo normaliza frente al orden ideal posible, de modo que
 premia a los algoritmos que además de acertar, acierten pronto. El \textit{mean average
 precision} (MAP) promedia, para cada usuario, la precisión acumulada en cada posición donde

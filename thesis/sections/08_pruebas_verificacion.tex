@@ -1,10 +1,12 @@
-﻿\chapter{Pruebas y verificación}\label{cap:pruebas}
+\chapter{Pruebas y verificación (registro de la Fase 2)}\label{cap:pruebas}
 
-Este capítulo describe cómo se comprueba que el sistema hace lo que debe. Presenta la
-estrategia de pruebas, los gates de evidencia automáticos, la verificación independiente de
-objetivos y la revisión de código de todo el repositorio, con sus resultados en
-cifras reales tomadas de \texttt{docs/verification/} y de los informes de verificación del
-repositorio.
+Este capítulo describe cómo se comprobó que el sistema hacía lo que debía, en el corte
+histórico del cierre de la Fase 2. Presenta la estrategia de pruebas, los gates de evidencia
+automáticos, la verificación independiente de objetivos y la revisión de código de todo el
+repositorio, con sus resultados en cifras reales tomadas de \texttt{docs/verification/} y de
+los informes de verificación de aquel momento del proyecto. Las fases posteriores ampliaron
+estas suites de forma sustancial; la Sección~\ref{cap:implementacion} recoge las cifras
+finales del cierre del proyecto (736 pruebas de backend, 70 de frontend, 56 de navegador).
 
 \section{Estrategia de pruebas}\label{sec:pru-estrategia}
 
@@ -19,7 +21,8 @@ Pautas de Accesibilidad para el Contenido Web (WCAG) 2.2~\cite{wcag22}. Por últ
 prueba de humo se ejecuta contra la URL pública desplegada y rechaza un despliegue con la
 revisión equivocada, tráfico entre orígenes inesperado o peticiones fallidas.
 
-La Tabla~\ref{tab:suites} recoge los resultados de las suites sobre el sistema entregado.
+La Tabla~\ref{tab:suites} recoge los resultados de las suites al cierre de la Fase 2
+(2026-09-08), no el estado final del sistema.
 
 \begin{table}[htp]
 \centering
@@ -38,7 +41,7 @@ La Tabla~\ref{tab:suites} recoge los resultados de las suites sobre el sistema e
     Extremo a extremo y accesibilidad & Playwright y \texttt{axe} & 41 pruebas superadas; cero incidencias críticas o graves de \texttt{axe} \\
     \hline
 \end{tabularx}
-\caption{Resultados de las suites de pruebas del sistema.}
+\caption{Resultados de las suites de pruebas al cierre de la Fase 2 (2026-09-08).}
 \label{tab:suites}
 \end{table}
 
@@ -70,13 +73,15 @@ que demuestra que el enriquecimiento no muta el valor vivo del catálogo. Esta e
 prueba integridad e idempotencia; no prueba que RAWG haya mejorado la calidad de las
 recomendaciones.
 
-El protocolo congelado ya está probado como contrato, pero la comparación completa no se
-declara realizada. La Wave 3 ya generó y validó la población sintética del Plan 02-09,
-incluidos sus 200 perfiles, la cohorte cold-start y el aislamiento del baseline de
-popularidad. Todavía faltan las variantes finales y el runner del Plan 02-13. En
-consecuencia, no se incluyen en esta memoria tablas
-de Precision, Recall, nDCG o MAP como resultados comparativos ni se ordenan los algoritmos
-por una cifra que aún no ha sido producida bajo el contrato.
+En este corte de la Fase 2, el protocolo congelado ya está probado como contrato, pero la
+comparación completa todavía no se ha ejecutado. La Wave 3 ya generó y validó la población
+sintética del Plan 02-09, incluidos sus 200 perfiles, la cohorte cold-start y el aislamiento
+del baseline de popularidad. Todavía faltan las variantes finales y el runner del Plan 02-13,
+de modo que este capítulo no incluye tablas de Precision, Recall, nDCG o MAP como resultados
+comparativos ni ordena los algoritmos por una cifra que aún no se ha producido bajo el
+contrato. Esas tablas sí llegaron a producirse en fases posteriores: el
+Capítulo~\ref{cap:algoritmos} las presenta con las 16 variantes evaluadas, sus contrastes de
+significación estadística y sus amenazas a la validez.
 
 \section{Gates de evidencia}\label{sec:pru-gates}
 

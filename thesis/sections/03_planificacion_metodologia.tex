@@ -1,4 +1,4 @@
-﻿\chapter{Planificación y metodología de trabajo}\label{cap:metodologia}
+\chapter{Planificación y metodología de trabajo}\label{cap:metodologia}
 
 Este capítulo describe cómo se ha organizado el trabajo. Empieza por los objetivos de
 gestión y por el método de desarrollo iterativo. Después detalla la metodología de ingeniería
@@ -81,13 +81,13 @@ La Tabla~\ref{tab:planning-arbol} enumera los artefactos principales del árbol 
     \hline
     \texttt{STATE.md} & Estado actual, posición, decisiones acumuladas y continuidad de sesión. \\
     \hline
-    \texttt{phases/<incremento>/<plan>-PLAN.md} & Alcance y criterios de aceptación de un plan, antes de implementar. \\
+    \path{phases/<incremento>/<plan>-PLAN.md} & Alcance y criterios de aceptación de un plan, antes de implementar. \\
     \hline
-    \texttt{phases/<incremento>/<plan>-SUMMARY.md} & Lo realmente ejecutado, desviaciones y evidencias, al cerrar el plan. \\
+    \path{phases/<incremento>/<plan>-SUMMARY.md} & Lo realmente ejecutado, desviaciones y evidencias, al cerrar el plan. \\
     \hline
-    \texttt{phases/<incremento>/<incremento>-VERIFICATION.md} & Verificación independiente del objetivo del incremento. \\
+    \path{phases/<incremento>/<incremento>-VERIFICATION.md} & Verificación independiente del objetivo del incremento. \\
     \hline
-    \texttt{phases/<incremento>/deferred-items.md} & Hallazgos fuera de alcance, enrutados a trabajo posterior. \\
+    \path{phases/<incremento>/deferred-items.md} & Hallazgos fuera de alcance, enrutados a trabajo posterior. \\
     \hline
 \end{tabularx}
 \caption{Artefactos principales del árbol \texttt{.planning/}.}
@@ -292,7 +292,7 @@ salidas referenciadas por ruta relativa y hash SHA-256, las herramientas emplead
 secretos, el resultado y las limitaciones declaradas. El tipo es uno de tres:
 \texttt{proposal} para una propuesta de agente, \texttt{automated-check} para una
 comprobación determinista y \texttt{author-decision} para una decisión humana, que siempre
-identifica al actor como persona. El registro contiene veinte entradas. El gate
+identifica al actor como persona. El registro contiene veinticinco entradas. El gate
 \texttt{scripts/check-evidence.ps1} valida su esquema, sus tipos, sus actores, sus rutas, sus
 hashes y su cobertura, probando primero con entradas inválidas antes de dar por buena una
 ejecución limpia.
