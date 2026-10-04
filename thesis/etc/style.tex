@@ -52,6 +52,9 @@
 % Columnas adaptables para tablas: evitan que los textos largos desborden la página.
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
 \newcolumntype{Z}{>{\centering\arraybackslash}X}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
 \renewcommand{\tabularxcolumn}[1]{>{\small}m{#1}}
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.15}

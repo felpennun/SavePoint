@@ -16,7 +16,7 @@ Tabla~\ref{tab:stack} recoge las versiones principales.
 
 \begin{table}[htp]
 \centering
-\begin{tabularx}{\textwidth}{ | Y | Y | Y | }
+\begin{tabularx}{\textwidth}{ | L{0.24\textwidth} | C{0.18\textwidth} | Y | }
     \hline
     \textbf{Componente} & \textbf{Versión} & \textbf{Papel} \\
     \hline
@@ -103,7 +103,7 @@ para las otras dos opciones.
 
 \begin{table}[htp]
 \centering
-\begin{tabularx}{\textwidth}{ | Y | Y | Y | Y | }
+\begin{tabularx}{\textwidth}{ | L{0.15\textwidth} | Y | Y | Y | }
     \hline
     \textbf{Eje} & \textbf{IGDB (elegida)} & \textbf{RAWG} & \textbf{Wikidata escalado} \\
     \hline
@@ -157,7 +157,7 @@ durante la Fase 2, el 7 de septiembre de 2026.
 
 \begin{table}[htp]
 \centering
-\begin{tabularx}{\textwidth}{ | Y | Y | }
+\begin{tabularx}{\textwidth}{ | L{0.60\textwidth} | Y | }
     \hline
     \textbf{Campo} & \textbf{Valor} \\
     \hline
@@ -318,9 +318,10 @@ histórico \texttt{genre-taste-v1}, renombrado tras generalizarse a etiquetas cu
 del género), descrito en el registro ADR-007. Es una agregación en tiempo de petición, sin
 estado, acotada a la persona autenticada. Cada entrada de la biblioteca de esa persona aporta
 un peso de actividad a cada género de su obra, según la fórmula del Extracto de
-código~\ref{cod:heuristico}, que un refactor posterior extrajo a un módulo
-compartido para que el propio heurístico y el perfil de contenido (Sección~\ref{cap:algoritmos})
-usen la misma definición de peso en lugar de copiarla. La contribución de la valoración no es
+código~\ref{cod:heuristico}, que un refactor posterior extrajo al módulo
+\texttt{apps/api/recommendations/\_weights.py}. Así, el propio heurístico y el perfil de
+contenido (Sección~\ref{cap:algoritmos}) usan la misma definición de peso en lugar de copiarla.
+La contribución de la valoración no es
 lineal, como explica la Sección~\ref{cap:algoritmos}. Las obras del
 catálogo no vistas y sin ser contenido descargable se ordenan por el peso sumado de los
 géneros que comparten con ese vector de gusto, con desempate por identificador canónico. Cada
@@ -329,26 +330,32 @@ dos llamadas con la misma entrada producen la misma huella. Sin actividad con g�
 respuesta es una forma explícita de historial insuficiente que nunca cae al baseline de
 popularidad.
 
-\begin{lstlisting}[language=Python, caption={Peso de actividad por entrada de biblioteca, compartido por el heurístico de géneros y el perfil de contenido (\texttt{apps/api/recommendations/\_weights.py}).}, label={cod:heuristico}, captionpos=b, float, floatplacement=!htp]
-# Igual que la tabla del baseline de popularidad, de modo que el
-# heuristico personal y el agregado publico hablan el mismo idioma de
-# "cuanto cuenta esta interaccion". Un titulo abandonado no es evidencia
-# de gusto: aporta cero.
-_STATUS_WEIGHTS = {"completed": 3.0, "playing": 2.0, "pending": 1.0, "abandoned": 0.0}
+\begin{lstlisting}[language=Python, basicstyle=\small\ttfamily, caption={Cálculo del peso de actividad de una entrada de biblioteca.}, label={cod:heuristico}, captionpos=b, float, floatplacement=!htp]
+# Pesos compartidos por el heuristico y el perfil de contenido.
+# Una obra abandonada no aporta evidencia positiva.
+_STATUS_WEIGHTS = {
+    "completed": 3.0,
+    "playing": 2.0,
+    "pending": 1.0,
+    "abandoned": 0.0,
+}
 
-# Las valoraciones personales son deliberadamente no lineales: una nota alta
-# es evidencia mas fuerte de gusto positivo que una simplemente positiva.
+# La intensidad crece de forma no lineal con la valoracion.
 _RATING_DIVISOR = 10
 RATING_INTENSITY_POWER = 2.0
 
 def _rating_intensity(rating_half_steps):
     if rating_half_steps is None:
         return 0.0
-    normalised = max(0.0, min(1.0, rating_half_steps / _RATING_DIVISOR))
+    normalised = max(
+        0.0,
+        min(1.0, rating_half_steps / _RATING_DIVISOR),
+    )
     return normalised ** RATING_INTENSITY_POWER
 
 def _entry_weight(status, rating_half_steps):
-    return _STATUS_WEIGHTS.get(status or "", 0.0) + _rating_intensity(rating_half_steps)
+    status_weight = _STATUS_WEIGHTS.get(status or "", 0.0)
+    return status_weight + _rating_intensity(rating_half_steps)
 \end{lstlisting}
 
 La frontera de este heurístico es explícita. Es un conteo de frecuencia sobre una tabla, sin
@@ -373,15 +380,15 @@ colección de la persona usuaria.
 
 \begin{figure}[htp]
     \centering
-    \includegraphics[width=0.85\textwidth]{figures/captura-catalogo-recorte.png}
-    \caption{Catálogo con búsqueda y filtros por plataforma, género, año y valoración. Fuente: captura del proyecto.}
+    \includegraphics[width=0.85\textwidth]{figures/02-catalogo-oscuro.png}
+    \caption{Catálogo con tema oscuro, búsqueda y filtros por plataforma, género, año y valoración. Fuente: captura del proyecto.}
     \label{fig:catalogo}
 \end{figure}
 
 \begin{figure}[htp]
     \centering
-    \includegraphics[width=0.85\textwidth]{figures/captura-coleccion.png}
-    \caption{Colección de la persona usuaria, con el estado y la valoración de cada juego. Fuente: captura del proyecto.}
+    \includegraphics[width=0.85\textwidth]{figures/05-coleccion-oscuro.png}
+    \caption{Colección de la persona usuaria con tema oscuro, con el estado y la valoración de cada juego. Fuente: captura del proyecto.}
     \label{fig:coleccion}
 \end{figure}
 
@@ -407,14 +414,23 @@ async rewrites() {
 }
 \end{lstlisting}
 
-La Figura~\ref{fig:recomendaciones-ui} muestra la vista de recomendaciones disponible en el
-proyecto, junto a la portada ya presentada en la Figura~\ref{fig:ui-claro}; son capturas de
-interfaz, no evidencia de calidad de ranking ni de resultados experimentales.
+Las Figuras~\ref{fig:recomendaciones-estanterias}
+y~\ref{fig:recomendaciones-detallada} muestran las dos vistas de recomendaciones disponibles
+en el proyecto, junto a la portada ya presentada en la Figura~\ref{fig:ui-claro}; son capturas
+de interfaz, no evidencia de calidad de ranking ni de resultados experimentales.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.82\textwidth]{figures/captura-recomendaciones}
-\caption{Vista de recomendaciones de la aplicación. Fuente: captura del proyecto.}\label{fig:recomendaciones-ui}
+\includegraphics[width=0.82\textwidth]{figures/06-recomendaciones-estanterias-oscuro.png}
+\caption{Vista de recomendaciones organizada por estanterías, con tema oscuro. Fuente: captura del proyecto.}
+\label{fig:recomendaciones-estanterias}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.82\textwidth]{figures/07-recomendaciones-detallada-oscuro.png}
+\caption{Vista detallada de recomendaciones, con las señales de afinidad y tema oscuro. Fuente: captura del proyecto.}
+\label{fig:recomendaciones-detallada}
 \end{figure}
 
 \section{Pruebas y verificación}\label{cap:pruebas}\label{sec:pru-estrategia}
@@ -492,7 +508,7 @@ interfaz y los recomendadores se verificaron con cuatro de cuatro criterios. La 
 
 \begin{table}[htp]
 \centering
-\begin{tabularx}{\textwidth}{ | Z | Y | Z | }
+\begin{tabularx}{\textwidth}{ | C{0.12\textwidth} | Y | C{0.19\textwidth} | }
     \hline
     \textbf{Criterio} & \textbf{Enunciado} & \textbf{Veredicto} \\
     \hline
@@ -525,7 +541,7 @@ corrigieron en cinco tandas confirmadas, cada una con las pruebas ejecutadas des
 
 \begin{table}[htp]
 \centering
-\begin{tabularx}{\textwidth}{ | Y | Z | Y | }
+\begin{tabularx}{\textwidth}{ | L{0.25\textwidth} | C{0.18\textwidth} | Y | }
     \hline
     \textbf{Severidad} & \textbf{Hallazgos} & \textbf{Estado} \\
     \hline
@@ -586,7 +602,7 @@ Tabla~\ref{tab:topologia} recoge el contrato de cada superficie.
 
 \begin{table}[H]
 \centering
-\begin{tabularx}{\textwidth}{ | Y | Y | Y | }
+\begin{tabularx}{\textwidth}{ | L{0.21\textwidth} | L{0.19\textwidth} | Y | }
     \hline
     \textbf{Superficie} & \textbf{Servicio} & \textbf{Contrato} \\
     \hline
