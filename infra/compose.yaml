@@ -133,8 +133,20 @@ services:
     environment:
       SAVEPOINT_RECOMMENDATION_STATS_CACHE: "1"
     ports: !reset []
+    # A worker has no HTTP port, so it reports healthy while its own
+    # process_recommendation_jobs loop is alive (the check skips its own pid).
+    # `docker compose up --wait` (CI, quality-gates.yml) rejects services whose
+    # healthcheck is disabled, which blocked every Render auto-deploy.
     healthcheck:
-      disable: true
+      test:
+        - CMD
+        - python
+        - -c
+        - "import os,sys; sys.exit(0 if any(b'process_recommendation_jobs' in open('/proc/%s/cmdline' % p, 'rb').read() for p in os.listdir('/proc') if p.isdigit() and p != str(os.getpid())) else 1)"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     depends_on:
       api:
         condition: service_healthy
@@ -153,8 +165,20 @@ services:
       # long-lived worker so every algorithm does not repeat the same scans.
       SAVEPOINT_RECOMMENDATION_STATS_CACHE: "1"
     ports: !reset []
+    # A worker has no HTTP port, so it reports healthy while its own
+    # process_recommendation_jobs loop is alive (the check skips its own pid).
+    # `docker compose up --wait` (CI, quality-gates.yml) rejects services whose
+    # healthcheck is disabled, which blocked every Render auto-deploy.
     healthcheck:
-      disable: true
+      test:
+        - CMD
+        - python
+        - -c
+        - "import os,sys; sys.exit(0 if any(b'process_recommendation_jobs' in open('/proc/%s/cmdline' % p, 'rb').read() for p in os.listdir('/proc') if p.isdigit() and p != str(os.getpid())) else 1)"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     depends_on:
       api:
         condition: service_healthy
