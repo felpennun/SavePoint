@@ -2661,38 +2661,6 @@ a.sp-chip--active:hover {
 
 /* Collection status summary -- one small stat box per backlog state
    (Nocturne artboard 2g): the status line on top, a big mono count below. */
-.sp-summary-dl {
-  display: flex;
-  gap: var(--space-md);
-  flex-wrap: wrap;
-  margin: var(--space-lg) 0 var(--space-sm);
-}
-
-.sp-summary-dl > div {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-  flex: 1 1 7rem;
-  min-width: 7rem;
-  padding: var(--space-ctl) var(--space-md);
-  border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-control);
-  background: var(--color-surface-raised);
-}
-
-.sp-summary-dl dt {
-  margin: 0;
-}
-
-.sp-summary-dl dd {
-  margin: 0;
-  font-family: var(--font-mono);
-  font-size: var(--text-heading);
-  font-weight: 700;
-  line-height: 1;
-  color: var(--color-text-primary);
-}
-
 /* Game detail: game cover and information on the left, the game configuration
    panel on the right, and all sections stacked on mobile (01.1-UI-SPEC
    Screen Contract 3). */
@@ -5322,12 +5290,21 @@ a.sp-chip--active:hover {
 /* Desktop: the page never scrolls. The layout fills the window; the rail, the
    shelf and the table scroll inside it with the scrollbar hidden (like the friends page). */
 @media (min-width: 901px) {
+  /* The page is as tall as the window; the layout takes whatever is left, so
+     the notice row above it (collection updated...) never makes the page scroll. */
   .sp-reco-page {
+    display: flex;
+    flex-direction: column;
+    height: calc(100dvh - 4.5rem);
     padding-bottom: var(--space-lg);
   }
 
+  .sp-reco-page > .sp-notice-row {
+    flex: none;
+  }
+
   .sp-reco-layout {
-    height: calc(100dvh - 7.5rem);
+    flex: 1 1 0;
     min-height: 26rem;
   }
 
@@ -5529,6 +5506,701 @@ a.sp-chip--active:hover {
   .sp-reco-table th.sp-reco-why-col,
   .sp-reco-table td.sp-reco-why-col {
     display: none;
+  }
+}
+
+/* Collection: the left selector (states + own lists) from the "Colección con
+   listas" artboard. On wide windows it fills the margin to the left of the page,
+   up to the logo, and the filter bar and the games keep the width of the header
+   (logo to profile photo); on narrower windows it sits inside the page, left of
+   the games, and on phones it stacks above them. */
+.sp-coll-page {
+  display: grid;
+  grid-template-columns: 17rem minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-lg);
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: var(--space-lg) var(--space-lg) var(--space-3xl);
+}
+
+.sp-coll-main {
+  min-width: 0;
+}
+
+/* Mirror of the left rail on wide windows (below), hidden otherwise. */
+.sp-coll-page::after {
+  display: none;
+}
+
+.sp-coll-side {
+  position: sticky;
+  top: var(--space-md);
+  padding: var(--space-lg) var(--space-md);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface-raised);
+}
+
+.sp-coll-side-inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+/* Desktop: collection and catalogue never scroll as a page. The filter bar stays
+   on top and only the games scroll, vertically, with the scrollbar hidden (like
+   the friends page). Phones keep the normal page scroll. */
+@media (min-width: 901px) {
+  .sp-fixed-page {
+    display: flex;
+    flex-direction: column;
+    height: calc(100dvh - 4.5rem);
+    padding-bottom: var(--space-lg);
+    overflow: hidden;
+  }
+
+  .sp-fixed-page > section,
+  .sp-coll-main > section {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+  }
+
+  .sp-fixed-page > section::-webkit-scrollbar,
+  .sp-coll-main > section::-webkit-scrollbar,
+  .sp-coll-side::-webkit-scrollbar {
+    display: none;
+  }
+
+  .sp-coll-page {
+    height: calc(100dvh - 4.5rem);
+    grid-template-rows: minmax(0, 1fr);
+    padding-bottom: var(--space-lg);
+    overflow: hidden;
+  }
+
+  .sp-coll-main {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .sp-coll-side {
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+  }
+
+  .sp-coll-side-inner {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .sp-coll-side-group {
+    flex: none;
+  }
+
+  .sp-coll-side-group:last-child {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .sp-coll-side .sp-coll-side-group:last-child .sp-coll-side-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+  }
+}
+
+@media (min-width: 1500px) {
+  .sp-coll-page {
+    max-width: none;
+    grid-template-columns: minmax(0, 1fr) min(1180px, 100%) minmax(0, 1fr);
+    gap: 0;
+    padding: var(--space-lg) 0;
+  }
+
+  .sp-coll-main {
+    grid-column: 2;
+    grid-row: 1;
+    padding: 0 var(--space-lg);
+  }
+
+  /* The coloured rail runs from the window's left edge to just before the logo,
+     and from the header down to the end of the page; the selector itself stays
+     right-aligned inside it. */
+  .sp-coll-side {
+    grid-column: 1;
+    grid-row: 1;
+    position: static;
+    align-self: stretch;
+    justify-self: stretch;
+    max-height: none;
+    margin: calc(-1 * var(--space-lg)) -12px calc(-1 * var(--space-lg)) 0;
+    padding: calc(2 * var(--space-lg)) var(--space-md) var(--space-lg);
+    border: 0;
+    border-right: 1px solid var(--color-card-border);
+    border-radius: 0;
+  }
+
+  .sp-coll-side-inner {
+    width: min(15rem, 100%);
+    margin-left: auto;
+  }
+
+  /* The same coloured band on the right, from just after the profile photo to
+     the window edge, so the games sit between two matching rails. */
+  .sp-coll-page::after {
+    content: "";
+    display: block;
+    grid-column: 3;
+    grid-row: 1;
+    align-self: stretch;
+    justify-self: stretch;
+    margin: calc(-1 * var(--space-lg)) 0 calc(-1 * var(--space-lg)) -12px;
+    border-left: 1px solid var(--color-card-border);
+    background: var(--color-surface-raised);
+  }
+}
+
+.sp-coll-side-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sp-coll-side-titlerow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px 8px;
+}
+
+.sp-coll-side-title {
+  margin: 0;
+  padding: 0 10px 8px;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+}
+
+.sp-coll-side-titlerow .sp-coll-side-title {
+  padding: 0;
+}
+
+.sp-coll-side-new {
+  min-height: 0;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--color-accent-strong);
+  text-decoration: none;
+}
+
+.sp-coll-side-new:hover {
+  text-decoration: underline;
+}
+
+.sp-coll-side-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sp-coll-side-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 0;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+
+.sp-coll-side-row:hover {
+  background: var(--color-surface-overlay);
+}
+
+.sp-coll-side-row.is-on {
+  border-color: var(--color-accent-edge);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+}
+
+.sp-coll-side-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.sp-coll-side-name--stack {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.sp-coll-side-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+.sp-coll-side-ellipsis {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sp-coll-side-caption,
+.sp-coll-side-count {
+  font-family: var(--font-mono);
+  color: var(--color-text-muted);
+}
+
+.sp-coll-side-caption {
+  font-size: 0.6875rem;
+}
+
+.sp-coll-side-count {
+  flex: none;
+  font-size: 0.75rem;
+}
+
+.sp-coll-side-empty {
+  margin: 0;
+  padding: 0 10px;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.sp-coll-side-new {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.sp-coll-side-newform {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: 0 10px 10px;
+}
+
+.sp-coll-side-newform input,
+.sp-coll-side-newform select {
+  padding: 6px 10px;
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-base);
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+}
+
+.sp-coll-editor {
+  margin-bottom: var(--space-md);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-raised);
+}
+
+.sp-coll-editor > summary {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.sp-coll-editor[open] > summary {
+  border-bottom: 1px solid var(--color-card-border);
+}
+
+.sp-coll-editor-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-md);
+}
+
+.sp-coll-editor-rename {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-sm);
+}
+
+.sp-coll-editor .sp-coll-editor-rename input {
+  min-height: 2.75rem;
+}
+
+.sp-coll-editor .sp-coll-editor-rename button {
+  min-height: 2.75rem;
+  margin: 0;
+}
+
+.sp-coll-editor-rename input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 6px 10px;
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-base);
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+}
+
+.sp-coll-editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.sp-coll-editor button {
+  min-height: 2.25rem;
+  padding: 0 var(--space-md);
+  border-radius: var(--radius-control);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.sp-coll-editor button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sp-coll-editor .sp-copy-add {
+  border: 1px solid var(--color-accent-edge);
+  background: transparent;
+  color: var(--color-accent-strong);
+}
+
+.sp-coll-editor .sp-copy-remove {
+  border: 1px solid var(--color-danger);
+  background: transparent;
+  color: var(--color-danger);
+}
+
+.sp-coll-editor .sp-copy-cancel {
+  border: 1px solid var(--color-surface-border);
+  background: transparent;
+  color: var(--color-text-secondary);
+}
+
+.sp-coll-editor-error {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: 0.8125rem;
+}
+
+/* Remove-games mode: every cover gets a minus badge; the marked ones turn grey. */
+.sp-coll-card {
+  position: relative;
+}
+
+.sp-coll-card.is-selected > :not(.sp-coll-remove-toggle) {
+  opacity: 0.45;
+  filter: grayscale(1);
+}
+
+.sp-coll-remove-toggle {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  min-height: 0;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: var(--radius-card);
+  background: transparent;
+  cursor: pointer;
+}
+
+.sp-coll-card.is-selected > .sp-coll-remove-toggle {
+  border-color: var(--color-text-muted);
+}
+
+.sp-coll-remove-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--color-danger);
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.sp-coll-card.is-selected .sp-coll-remove-badge {
+  background: var(--color-text-muted);
+}
+
+@media (max-width: 900px) {
+  .sp-coll-page {
+    grid-template-columns: minmax(0, 1fr);
+    padding: var(--space-md) var(--space-md) var(--space-3xl);
+  }
+
+  .sp-coll-side {
+    position: static;
+  }
+}
+
+/* Dashed "add a game" tile at the end of a custom list's grid. */
+.sp-coll-add-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: var(--space-md);
+  border: 1px dashed var(--color-surface-border);
+  border-radius: var(--radius-card);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+  text-align: center;
+  cursor: pointer;
+}
+
+.sp-coll-add-tile:hover {
+  border-color: var(--color-accent);
+  color: var(--color-text-secondary);
+}
+
+.sp-coll-add-plus {
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--color-accent-strong);
+}
+
+.sp-coll-add-error {
+  color: var(--color-danger, #f0808a);
+}
+
+/* Friend profile, "Listas" tab: the lists on the left, the chosen list's games
+   as collection-style cards on the right. */
+/* The lists selector is a full-height column on the left of the card (vertical line,
+   same fill as the other side rails), not a boxed panel. */
+.sp-pf-body:has(.sp-pf-lists-layout) {
+  padding: 0;
+}
+
+.sp-pf-main:has(> .sp-pf-lists-layout) {
+  gap: 0;
+}
+
+.sp-pf-lists-layout {
+  display: grid;
+  grid-template-columns: 16rem minmax(0, 1fr);
+  gap: 0;
+  align-items: stretch;
+}
+
+.sp-pf-lists-side {
+  padding: 28px var(--space-md);
+  border-right: 1px solid var(--pf-line);
+  background: var(--color-surface-raised);
+}
+
+.sp-pf-lists-side .sp-coll-side-title {
+  padding-top: 0;
+}
+
+button.sp-coll-side-row {
+  width: 100%;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sp-pf-lists-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  min-width: 0;
+  padding: 28px;
+}
+
+.sp-pf-lists-main .sp-pf-games {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 900px) {
+  .sp-pf-lists-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sp-pf-lists-side {
+    border-right: 0;
+    border-bottom: 1px solid var(--pf-line);
+  }
+
+  .sp-pf-lists-main {
+    padding: var(--space-md);
+  }
+
+  .sp-pf-lists-main .sp-pf-games {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .sp-pf-lists-main .sp-pf-games {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Desktop: a friend's collection and lists tabs never scroll the page. The card
+   fills the window, the filter bar stays put and only the games scroll,
+   vertically with the scrollbar hidden (like the catalogue). */
+@media (min-width: 901px) {
+  .sp-pf-page:has(.sp-pf.is-fixed) {
+    display: flex;
+    flex-direction: column;
+    height: calc(100dvh - 4.5rem);
+    padding-bottom: var(--space-lg);
+    overflow: hidden;
+  }
+
+  .sp-pf.is-fixed,
+  .sp-pf.is-fixed .sp-pf-card,
+  .sp-pf.is-fixed .sp-pf-body,
+  .sp-pf.is-fixed .sp-pf-main {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    min-height: 0;
+  }
+
+  .sp-pf.is-fixed .sp-pf-banner {
+    flex: none;
+  }
+
+  .sp-pf.is-fixed .sp-pf-head,
+  .sp-pf.is-fixed .sp-pf-tabs {
+    flex: none;
+  }
+
+  .sp-pf.is-fixed .sp-pf-lists-layout {
+    flex: 1 1 0;
+    min-height: 0;
+  }
+
+  .sp-pf.is-fixed .sp-pf-lists-main {
+    min-height: 0;
+    height: 100%;
+  }
+
+  .sp-pf.is-fixed .sp-pf-lists-layout {
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .sp-pf.is-fixed .sp-pf-lists-side {
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+    min-height: 0;
+  }
+
+  .sp-pf.is-fixed .sp-pf-lists-side .sp-coll-side-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+  }
+
+  .sp-pf.is-fixed .sp-pf-scroll {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+  }
+
+  .sp-pf.is-fixed .sp-pf-scroll::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Every list selector scrolls vertically (scrollbar hidden) once it has many lists. */
+.sp-coll-side-group:last-child .sp-coll-side-list,
+.sp-pf-lists-side .sp-coll-side-list {
+  max-height: 14rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.sp-coll-side-group:last-child .sp-coll-side-list::-webkit-scrollbar,
+.sp-pf-lists-side .sp-coll-side-list::-webkit-scrollbar {
+  display: none;
+}
+
+/* Dark theme: the side columns of the friends page (people / notifications) and
+   the recommendations rail share the colour of the collection's side rails. */
+:root:not([data-theme="light"]) .sp-fr-left,
+:root:not([data-theme="light"]) .sp-fr-right,
+:root:not([data-theme="light"]) .sp-reco-rail {
+  background: var(--color-surface-raised);
+}
+
+/* Profile pages (a friend's "Perfil" tab and the own-profile editor, every tab): the
+   summary is no longer a boxed panel. It is a column on the right, separated by a vertical line and filled with the colour
+   of the collection's side rails, running the full height of the card. */
+.sp-pf .sp-pf-body:not(.sp-pf-body--single) {
+  gap: 0;
+  padding: 0;
+}
+
+.sp-pf .sp-pf-body:not(.sp-pf-body--single) > .sp-pf-main {
+  padding: 28px;
+}
+
+.sp-pf .sp-pf-side {
+  padding: 28px;
+  border-left: 1px solid var(--pf-line);
+  background: var(--color-surface-raised);
+}
+
+.sp-pf .sp-pf-side .sp-pf-panel {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+@media (max-width: 900px) {
+  .sp-pf .sp-pf-side {
+    border-left: 0;
+    border-top: 1px solid var(--pf-line);
   }
 }
 

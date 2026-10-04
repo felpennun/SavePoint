@@ -398,6 +398,18 @@ export const es: Dictionary = {
       one: "1",
       many: (count) => `${count}`,
     },
+    sidebar: {
+      ariaLabel: "Estados y listas",
+      status: "ESTADO",
+      lists: "MIS LISTAS",
+      newList: "+ NUEVA",
+      all: "Todos",
+      statuses: { pending: "Pendientes", playing: "Jugando", completed: "Completados", abandoned: "Abandonados" },
+      visibility: { public: "AMISTADES", private: "PRIVADA" },
+      noLists: "Todavía no tienes listas.",
+      listEmpty: "Esta lista no tiene juegos.",
+      editList: "Editar lista",
+    },
     ownedCopyCount: {
       zero: "0 copias",
       one: "1 copia",

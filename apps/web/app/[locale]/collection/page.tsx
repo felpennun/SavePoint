@@ -3,21 +3,21 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { ClearFiltersButton } from "@/components/ClearFiltersButton";
-import { CustomLists } from "@/components/CustomLists";
+import { CollectionSidebar, type SidebarRow } from "@/components/CollectionSidebar";
+import { ScrollTop } from "@/components/ScrollTop";
+import { SelectedListView } from "@/components/SelectedListView";
 import { GameCard } from "@/components/GameCard";
 import { PaginationArrow, PaginationSpacer } from "@/components/PaginationArrow";
 import { FilterDropdown } from "@/components/FilterDropdown";
 import { FilterDropdownScript } from "@/components/FilterDropdownScript";
-import { StatusPill, type BacklogStatus } from "@/components/StatusPill";
+import type { BacklogStatus } from "@/components/StatusPill";
 import { formatCount, getDictionary } from "@/i18n";
-import { fetchMyLibrary, type GameCard as GameCardData, type MyLibraryItem } from "@/lib/api";
+import { fetchMyLibrary, fetchMyLists, type GameCard as GameCardData, type MyLibraryItem } from "@/lib/api";
 
 type RawParams = Record<string, string | string[] | undefined>;
 const STATUSES: BacklogStatus[] = ["pending", "playing", "completed", "abandoned"];
-// Display order for the per-status count summary only (2026-09-12, author
-// request) -- distinct from STATUSES, which still drives the filter
-// dropdown's option order.
-const STATUS_SUMMARY_ORDER: BacklogStatus[] = ["completed", "playing", "pending", "abandoned"];
+// Order of the states in the left selector (design artboard "Colección con listas").
+const SIDEBAR_STATUS_ORDER: BacklogStatus[] = ["playing", "pending", "completed", "abandoned"];
 const SORTS = ["recently_updated", "rating_desc", "title_asc", "release_year"] as const;
 type CollSort = (typeof SORTS)[number];
 const COPY_FILTERS = ["all", "with_copy", "without_copy"] as const;
@@ -79,8 +79,11 @@ export default async function CollectionPage({
     redirect(`/${locale}/login?next=${encodeURIComponent(`/${locale}/collection`)}`);
   }
 
+  const lists = await fetchMyLists(cookieHeader);
   const rawStatus = first(sp.status);
   const activeStatus = STATUSES.includes(rawStatus as BacklogStatus) ? (rawStatus as BacklogStatus) : "all";
+  const rawList = first(sp.list);
+  const activeList = lists.find((list) => list.id === rawList) ?? null;
   const rawSort = first(sp.sort);
   const activeSort: CollSort = (SORTS as readonly string[]).includes(rawSort ?? "") ? (rawSort as CollSort) : "recently_updated";
   const rawCopy = first(sp.copy);
@@ -100,6 +103,10 @@ export default async function CollectionPage({
     items = items.filter((i) => normalizeForSearch(i.work_title).includes(needle));
   }
   if (activeStatus !== "all") items = items.filter((i) => i.status === activeStatus);
+  if (activeList) {
+    const listedIds = new Set(activeList.items.map((item) => item.work_id));
+    items = items.filter((i) => listedIds.has(i.work_id));
+  }
   if (activeCopy === "with_copy") items = items.filter((i) => i.owned_copy_count > 0);
   if (activeCopy === "without_copy") items = items.filter((i) => i.owned_copy_count === 0);
   if (activePlatinum === "platinum") items = items.filter((i) => i.is_platinum === true);
@@ -126,7 +133,16 @@ export default async function CollectionPage({
 
   const buildHref = (patch: Record<string, string | undefined>) => {
     const params = new URLSearchParams();
-    const status = patch.status !== undefined ? patch.status : activeStatus !== "all" ? activeStatus : undefined;
+    const status =
+      patch.status !== undefined
+        ? patch.status
+        : patch.list
+          ? undefined
+          : activeStatus !== "all"
+            ? activeStatus
+            : undefined;
+    const list =
+      patch.list !== undefined ? patch.list : patch.status ? undefined : activeList ? activeList.id : undefined;
     const sort = patch.sort !== undefined ? patch.sort : activeSort !== "recently_updated" ? activeSort : undefined;
     const copy = patch.copy !== undefined ? patch.copy : activeCopy !== "all" ? activeCopy : undefined;
     const platinum = patch.platinum !== undefined ? patch.platinum : activePlatinum !== "all" ? activePlatinum : undefined;
@@ -134,6 +150,7 @@ export default async function CollectionPage({
     const q = searchText || undefined;
     if (q) params.set("q", q);
     if (status) params.set("status", status);
+    if (list) params.set("list", list);
     if (sort) params.set("sort", sort);
     if (copy) params.set("copy", copy);
     if (platinum) params.set("platinum", platinum);
@@ -151,12 +168,10 @@ export default async function CollectionPage({
 
   const activeFilterCount =
     (searchText ? 1 : 0) +
-    (activeStatus !== "all" ? 1 : 0) +
     (activeSort !== "recently_updated" ? 1 : 0) +
     (activeCopy !== "all" ? 1 : 0) +
     (activePlatinum !== "all" ? 1 : 0);
 
-  const activeStatusSummary = activeStatus === "all" ? undefined : dict.status.labels[activeStatus];
   const activeSortSummary = activeSort === "recently_updated" ? undefined : sortLabels[activeSort];
   const activeCopySummary =
     activeCopy === "all" ? undefined : activeCopy === "with_copy" ? dict.collection.withCopy : dict.collection.withoutCopy;
@@ -167,11 +182,62 @@ export default async function CollectionPage({
         ? dict.collection.platinumOnly
         : dict.collection.notPlatinum;
 
+  const clearBarFiltersHref = (() => {
+    const params = new URLSearchParams();
+    if (activeStatus !== "all") params.set("status", activeStatus);
+    if (activeList) params.set("list", activeList.id);
+    const query = params.toString();
+    return `${basePath}${query ? `?${query}` : ""}`;
+  })();
+  const sidebar = dict.collection.sidebar;
+  const statusRows: SidebarRow[] = [
+    {
+      key: "all",
+      label: sidebar.all,
+      count: libraryTotal,
+      href: buildHref({ status: "", list: "" }),
+      active: activeStatus === "all" && !activeList,
+      dot: "var(--color-text-muted)",
+    },
+    ...SIDEBAR_STATUS_ORDER.map((st) => ({
+      key: st,
+      label: sidebar.statuses[st],
+      count: library.summary[st] ?? 0,
+      href: buildHref({ status: st }),
+      active: activeStatus === st && !activeList,
+      dot: `var(--color-status-${st})`,
+    })),
+  ];
+  const listRows: SidebarRow[] = lists.map((list) => ({
+    key: list.id,
+    label: list.name,
+    count: list.items.length,
+    href: buildHref({ list: list.id }),
+    active: activeList?.id === list.id,
+    caption: sidebar.visibility[list.visibility],
+  }));
+
   return (
-    <main className="sp-page">
+    <main className={libraryTotal > 0 ? "sp-coll-page" : "sp-page"}>
+      {libraryTotal > 0 ? (
+        <CollectionSidebar
+          locale={locale}
+          basePath={basePath}
+          ariaLabel={sidebar.ariaLabel}
+          statusHeading={sidebar.status}
+          statusRows={statusRows}
+          listsHeading={sidebar.lists}
+          listRows={listRows}
+          newListLabel={sidebar.newList}
+          noListsLabel={sidebar.noLists}
+        />
+      ) : null}
+      <div className={libraryTotal > 0 ? "sp-coll-main" : undefined}>
       {libraryTotal > 0 ? (
         <div className="sp-filterbar sp-surface">
           <form method="get" action={basePath} className="sp-filterbar-row sp-filterbar-row--single">
+            {activeStatus !== "all" ? <input type="hidden" name="status" value={activeStatus} /> : null}
+            {activeList ? <input type="hidden" name="list" value={activeList.id} /> : null}
             <div className="sp-search">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
                 <circle cx="11" cy="11" r="7" />
@@ -180,25 +246,6 @@ export default async function CollectionPage({
               <label htmlFor="collection-q" className="visually-hidden">{dict.catalogue.searchLabel}</label>
               <input id="collection-q" name="q" type="search" placeholder={dict.catalogue.searchLabel} defaultValue={searchText} />
             </div>
-
-            <FilterDropdown label={dict.collection.filterByStatus} summary={activeStatusSummary}>
-              <ul className="sp-facet-options">
-                <li>
-                  <label className="sp-facet-option">
-                    <input type="radio" name="status" value="" defaultChecked={activeStatus === "all"} />
-                    <span>{dict.collection.allStatuses}</span>
-                  </label>
-                </li>
-                {STATUSES.map((s) => (
-                  <li key={s}>
-                    <label className="sp-facet-option">
-                      <input type="radio" name="status" value={s} defaultChecked={activeStatus === s} />
-                      <span>{dict.status.labels[s]}</span>
-                    </label>
-                  </li>
-                ))}
-              </ul>
-            </FilterDropdown>
 
             <FilterDropdown label={dict.collection.sort.label} summary={activeSortSummary}>
               <ul className="sp-facet-options">
@@ -256,7 +303,7 @@ export default async function CollectionPage({
                 {dict.catalogue.filters.apply}
               </button>
               {activeFilterCount > 0 ? (
-                <ClearFiltersButton href={basePath} label={dict.catalogue.filters.clearAll} />
+                <ClearFiltersButton href={clearBarFiltersHref} label={dict.catalogue.filters.clearAll} />
               ) : null}
             </div>
           </form>
@@ -265,23 +312,11 @@ export default async function CollectionPage({
       ) : null}
 
       <section aria-label={dict.collection.heading}>
+      <ScrollTop watch={buildHref({ page: String(currentPage) })} />
       {libraryTotal === 0 ? (
         <p role="status" className="sp-meta">
           {formatCount(dict.collection.count, total)}
         </p>
-      ) : null}
-
-      {libraryTotal > 0 ? (
-        <dl className="sp-summary-dl" aria-label={locale === "es" ? "Resumen por estado" : "Status summary"}>
-          {STATUS_SUMMARY_ORDER.map((s) => (
-            <div key={s}>
-              <dt>
-                <StatusPill status={s} label={dict.status.labels[s]} bare />
-              </dt>
-              <dd>{formatCount(dict.collection.statusSummaryCount, library.summary[s] ?? 0)}</dd>
-            </div>
-          ))}
-        </dl>
       ) : null}
 
       {libraryTotal === 0 ? (
@@ -296,7 +331,7 @@ export default async function CollectionPage({
             {dict.collection.emptyCta}
           </Link>
         </div>
-      ) : pageItems.length === 0 ? (
+      ) : pageItems.length === 0 && !activeList ? (
         <div className="sp-empty">
           <p className="sp-lead" style={{ marginInline: "auto" }}>
             {dict.collection.statusEmptyGroup.replace(
@@ -310,7 +345,32 @@ export default async function CollectionPage({
         </div>
       ) : (
         <>
-          <ul className="sp-grid sp-collection-grid" style={{ marginTop: "var(--space-lg)" }}>
+          {activeList ? (
+            <SelectedListView
+              key={`${activeList.id}-${activeList.items.length}`}
+              locale={locale}
+              listId={activeList.id}
+              listName={activeList.name}
+              basePath={basePath}
+              excludedIds={activeList.items.map((item) => item.work_id)}
+              items={pageItems.map((item) => ({
+                itemId: activeList.items.find((entry) => entry.work_id === item.work_id)?.id ?? "",
+                workId: item.work_id,
+                game: toCardData(item),
+                score: item.display_rating ?? null,
+                status: STATUSES.includes(item.status as BacklogStatus) ? (item.status as BacklogStatus) : undefined,
+                ratingHalfSteps: item.rating_half_steps ?? null,
+                ownedCopyCount: item.owned_copy_count,
+                isPlatinum: item.is_platinum === true,
+              }))}
+              works={library.items.map((item) => ({
+                work_id: item.work_id,
+                work_title: item.work_title,
+                cover: item.cover ?? { url: null, is_placeholder: true, alt: item.work_title },
+              }))}
+            />
+          ) : (
+          <ul className="sp-grid sp-collection-grid">
             {pageItems.map((item) => (
               <GameCard
                 key={item.work_id}
@@ -324,6 +384,7 @@ export default async function CollectionPage({
               />
             ))}
           </ul>
+          )}
           {pageCount > 1 ? (
             <nav className="sp-pagination" aria-label={locale === "es" ? "Paginación" : "Pagination"}>
               {currentPage > 1 ? (
@@ -352,13 +413,7 @@ export default async function CollectionPage({
         </>
       )}
       </section>
-
-      {libraryTotal > 0 ? (
-        <CustomLists
-          locale={locale}
-          collectionItems={library.items.map((item) => ({ work_id: item.work_id, work_title: item.work_title }))}
-        />
-      ) : null}
+      </div>
     </main>
   );
 }

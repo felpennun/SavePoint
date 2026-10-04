@@ -558,6 +558,28 @@ export async function fetchMyLibrary(cookieHeader: string): Promise<MyLibraryRes
   return (await response.json()) as MyLibraryResult;
 }
 
+/** One of the signed-in user's custom lists, as the collection sidebar needs it. */
+export interface MyListSummary {
+  id: string;
+  name: string;
+  visibility: "public" | "private";
+  items: { id: string; work_id: string }[];
+}
+
+/** The signed-in user's custom lists (`GET /api/library/lists/`). A failure
+ * only hides the sidebar lists, so it resolves to an empty array. */
+export async function fetchMyLists(cookieHeader: string): Promise<MyListSummary[]> {
+  const url = new URL("/api/library/lists/", API_BASE);
+  try {
+    const response = await fetch(url, { cache: "no-store", headers: { Cookie: cookieHeader } });
+    if (!response.ok) return [];
+    const body = await response.json();
+    return Array.isArray(body?.lists) ? (body.lists as MyListSummary[]) : [];
+  } catch {
+    return [];
+  }
+}
+
 /** Per-item tag-overlap evidence from the tag-taste-v1 heuristic: a
  * tag the recommended work shares with the signed-in user's own rated /
  * status-tracked library, plus that tag's accumulated taste weight. */

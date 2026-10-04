@@ -236,35 +236,45 @@ test.describe("Phase 5: demo account — comments, lists, copy metadata, CSV exp
     await shoot(page, "game-detail-comment");
 
     // --- Custom lists + reorder (LIB-04, D-06/D-07) ---------------------
+    // Lists live in the collection sidebar: "+ NUEVA" creates one and jumps to
+    // it; the selected list's controls are folded under "Editar lista".
     await page.goto("/es/collection");
-    await expect(page.getByRole("heading", { name: "Tus listas" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "MIS LISTAS" })).toBeVisible();
     const listName = `E2E Phase 5 ${stamp}`;
-    await page.getByLabel("Nombre de la nueva lista").fill(listName);
-    await page.getByRole("button", { name: "Crear lista" }).click();
-    const listCard = page.locator(".sp-profile-list-card").filter({ hasText: listName });
-    await expect(listCard).toBeVisible();
+    await page.getByRole("button", { name: "+ NUEVA" }).click();
+    await page.getByPlaceholder("Nombre de la lista").fill(listName);
+    await page.getByRole("button", { name: "Crear", exact: true }).click();
+    await page.waitForURL(/[?&]list=/);
+    // Games are added with the dashed tile at the end of the list's grid, which
+    // opens the collection search.
+    const addToList = async (title: string) => {
+      await page.locator(".sp-coll-add-tile").click();
+      await page.locator("dialog[open] input[type=search]").fill(title);
+      await page.locator("dialog[open] .sp-pf-picker-row").filter({ hasText: title }).first().click();
+      await expect(page.locator(".sp-collection-grid > li").filter({ hasText: title }).first()).toBeVisible();
+    };
+    await addToList(gameATitle);
+    await addToList(gameBTitle);
 
-    // Add both works, in order A then B.
-    await listCard.getByLabel("Añadir juego").selectOption({ label: gameATitle });
-    await listCard.getByRole("button", { name: "Añadir" }).click();
-    await expect(listCard.locator(".sp-list-items li")).toHaveCount(1);
-    await listCard.getByLabel("Añadir juego").selectOption({ label: gameBTitle });
-    await listCard.getByRole("button", { name: "Añadir" }).click();
-    await expect(listCard.locator(".sp-list-items li")).toHaveCount(2);
+    // The folded "Editar lista" panel renames the list, removes several games
+    // (marked with a minus badge, then confirmed) and deletes the list.
+    await page.locator(".sp-coll-editor > summary").click();
+    const renamed = `${listName} renombrada`;
+    await page.getByLabel("Nombre de la lista").fill(renamed);
+    await page.getByRole("button", { name: "Cambiar nombre" }).click();
+    await expect(page.locator(".sp-coll-side-row.is-on")).toContainText(renamed);
 
-    // Confirm initial order A, B -- then move B up and confirm B, A.
-    await expect(listCard.locator(".sp-list-items li").nth(0)).toContainText(gameATitle);
-    await expect(listCard.locator(".sp-list-items li").nth(1)).toContainText(gameBTitle);
-    await listCard.locator(".sp-list-items li").nth(1).getByRole("button", { name: "Subir" }).click();
-    await expect(listCard.locator(".sp-list-items li").nth(0)).toContainText(gameBTitle);
-    await expect(listCard.locator(".sp-list-items li").nth(1)).toContainText(gameATitle);
+    await page.getByRole("button", { name: "Eliminar juegos" }).click();
+    await page.locator(".sp-coll-remove-toggle").first().click();
+    await expect(page.locator(".sp-coll-card.is-selected")).toHaveCount(1);
+    await page.getByRole("button", { name: "Confirmar borrado" }).click();
+    await page.locator("dialog[open]").getByRole("button", { name: "Quitar" }).click();
+    await expect(page.locator(".sp-coll-card")).toHaveCount(1);
 
-    // Reload: the reordered position must have actually persisted server
-    // side (expected_version + item_ids), not just local component state.
+    // Reload: the removal and the new name must have persisted server side.
     await page.reload();
-    const reloadedCard = page.locator(".sp-profile-list-card").filter({ hasText: listName });
-    await expect(reloadedCard.locator(".sp-list-items li").nth(0)).toContainText(gameBTitle);
-    await expect(reloadedCard.locator(".sp-list-items li").nth(1)).toContainText(gameATitle);
+    await expect(page.locator(".sp-coll-side-row.is-on")).toContainText(renamed);
+    await expect(page.locator(".sp-coll-card")).toHaveCount(1);
 
     const collectionViolations = await runAxeScan(page);
     assertNoCriticalOrSeriousViolations(collectionViolations, "collection page with custom list");

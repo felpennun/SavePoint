@@ -317,6 +317,18 @@ export interface Dictionary {
     statusEmptyGroup: string;
     showAll: string;
     statusSummaryCount: CountCopy;
+    sidebar: {
+      ariaLabel: string;
+      status: string;
+      lists: string;
+      newList: string;
+      all: string;
+      statuses: Record<"pending" | "playing" | "completed" | "abandoned", string>;
+      visibility: { public: string; private: string };
+      noLists: string;
+      listEmpty: string;
+      editList: string;
+    };
     ownedCopyCount: CountCopy;
     sort: {
       label: string;

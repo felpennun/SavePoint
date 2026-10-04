@@ -5,6 +5,7 @@ import { FilterBar } from "@/components/FilterBar";
 import { localizedGenreLabel } from "@/lib/genre-labels";
 import { FilterChip } from "@/components/FilterChip";
 import { GameCard } from "@/components/GameCard";
+import { ScrollTop } from "@/components/ScrollTop";
 import { PaginationArrow, PaginationSpacer } from "@/components/PaginationArrow";
 import { getDictionary } from "@/i18n";
 import { fetchCatalogueList } from "@/lib/api";
@@ -125,7 +126,7 @@ export default async function CataloguePage({
   ) as Record<string, Map<string, string>>;
 
   return (
-    <main className="sp-page">
+    <main className="sp-page sp-fixed-page">
       <FilterBar
         filters={filters}
         locale={locale}
@@ -139,6 +140,7 @@ export default async function CataloguePage({
       />
 
       <section aria-label={dict.catalogue.heading}>
+        <ScrollTop watch={`${currentQuery}-${currentPage}`} />
         {activeCount > 0 ? (
             <div className="sp-chip-row" aria-label={dict.catalogue.filters.activeLabel.many(activeCount)}>
               {REPEATED_FACET_KEYS.flatMap((key) =>

@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 
 import { CoverImage } from "@/components/CoverImage";
@@ -31,6 +32,8 @@ export function GameCard({
   evidence,
   bare = false,
   isPlatinum = false,
+  itemClassName,
+  overlay,
 }: {
   game: GameCardData;
   locale: string;
@@ -51,6 +54,10 @@ export function GameCard({
    * fetches this itself; the caller decides whether the current context
    * (owner's own collection) is allowed to show it at all. */
   isPlatinum?: boolean;
+  /** Extra class for the list item that wraps the card. */
+  itemClassName?: string;
+  /** Extra control laid over the card (e.g. the collection list's "remove" toggle). */
+  overlay?: ReactNode;
 }) {
   const dict = getDictionary(locale);
   const { width, height } = coverVariant === "shelf" ? { width: 164, height: 246 } : { width: 200, height: 300 };
@@ -88,7 +95,7 @@ export function GameCard({
   }
 
   return (
-    <li>
+    <li className={itemClassName}>
       <Link href={`/${locale}/games/${game.slug}`} className="sp-card">
         <div className="sp-cover">
           {cover}
@@ -127,6 +134,7 @@ export function GameCard({
           ) : null}
         </div>
       </Link>
+      {overlay}
     </li>
   );
 }

@@ -6,6 +6,8 @@ import { useEffect, useMemo, useState } from "react";
 
 import { FilterDropdown } from "@/components/FilterDropdown";
 import { FilterDropdownScript } from "@/components/FilterDropdownScript";
+import { FriendLists } from "@/components/FriendLists";
+import { ScrollTop } from "@/components/ScrollTop";
 
 import { CoverImage } from "@/components/CoverImage";
 import { GameCard } from "@/components/GameCard";
@@ -368,7 +370,7 @@ export function FriendProfile({
   }
 
   return (
-    <div className="sp-pf">
+    <div className={`sp-pf sp-pf--friend${tab === "collection" || tab === "lists" || tab === "comments" ? " is-fixed" : ""}`}>
       <div className="sp-pf-card">
         <div
           className="sp-pf-banner"
@@ -581,6 +583,8 @@ export function FriendProfile({
                       </div>
                     </form>
                   </div>
+                  <div className="sp-pf-scroll">
+                    <ScrollTop watch={`${currentPage}-${applied.q}-${applied.status}-${applied.sort}-${applied.platinum}`} />
                   {filteredCollection.length === 0 ? (
                     <p className="sp-meta" role="status">
                       {copy.noMatches}
@@ -627,6 +631,7 @@ export function FriendProfile({
                       )}
                     </nav>
                   ) : null}
+                  </div>
                 </>
               )
             ) : null}
@@ -635,32 +640,11 @@ export function FriendProfile({
               profile.lists.length === 0 ? (
                 <Unavailable title={copy.unavailable.lists[0]} body={copy.unavailable.lists[1](name)} />
               ) : (
-                <div className="sp-pf-lists">
-                  {profile.lists.map((list) => (
-                    <section key={list.slug} className="sp-pf-list">
-                      <div className="sp-pf-list-head">
-                        <Link href={`/${locale}/profiles/${encodeURIComponent(profile.alias)}/lists/${encodeURIComponent(list.slug)}`}>
-                          {list.name}
-                        </Link>
-                        <span className="sp-pf-tab-count">{copy.listItems(list.count)}</span>
-                      </div>
-                      {list.items.length === 0 ? (
-                        <p className="sp-meta">{copy.emptyList}</p>
-                      ) : (
-                        <ul className="sp-pf-list-covers">
-                          {list.items.map((item) => (
-                            <li key={item.work_slug}>
-                              <Link href={`/${locale}/games/${item.work_slug}`} title={item.title}>
-                                <CoverImage src={item.cover.url} alt="" title={item.title} missingLabel="" width={56} height={75} />
-                                <span className="visually-hidden">{item.title}</span>
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </section>
-                  ))}
-                </div>
+                <FriendLists
+                  locale={locale}
+                  lists={profile.lists}
+                  collection={profile.collection_visible ? profile.collection : []}
+                />
               )
             ) : null}
 
@@ -668,7 +652,7 @@ export function FriendProfile({
               profile.comments.length === 0 ? (
                 <Unavailable title={copy.unavailable.comments[0]} body={copy.unavailable.comments[1](name)} />
               ) : (
-                <ul className="sp-pf-comments">
+                <ul className="sp-pf-comments sp-pf-scroll">
                   {profile.comments.map((comment, index) => (
                     <li key={`${comment.work_slug}-${index}`}>
                       <Link href={`/${locale}/games/${comment.work_slug}`} className="sp-pf-comment-cover" tabIndex={-1} aria-hidden="true">
