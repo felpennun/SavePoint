@@ -371,7 +371,7 @@ terminaron ocupando.
 
 El frontend usa el enrutador de aplicación de Next.js, con un segmento de idioma en la raíz de
 la ruta. Las rutas del sistema son la página de inicio, el catálogo, el detalle de un
-juego, la colección, las amistades, el perfil de un amigo, las fuentes, el acceso, el registro y las
+juego, la colección, las amistades, el perfil propio, el perfil de un amigo, las fuentes, el acceso, el registro y las
 recomendaciones. Los componentes reutilizables son los que fija el contrato de diseño de la
 Sección~\ref{sec:dis-ui}, además del armazón de la aplicación con su barra de navegación. Las páginas de solo lectura se renderizan en el servidor; los controles de biblioteca
 son componentes de cliente que llaman a la API del mismo origen. Las
@@ -433,6 +433,44 @@ de interfaz, no evidencia de calidad de ranking ni de resultados experimentales.
 \label{fig:recomendaciones-detallada}
 \end{figure}
 
+El módulo social y de personalización se apoya en tres pantallas. La página de amistades
+(Figura~\ref{fig:amistades}) reúne en tres columnas la búsqueda por nombre de usuario exacto
+y la lista de amistades, el perfil de la persona elegida, con sus favoritos y un resumen de
+su colección, y las notificaciones de solicitudes y de recomendaciones, que pueden aceptarse,
+rechazarse o responderse. La página de perfil propio (Figura~\ref{fig:perfil}) organiza los
+ajustes en cinco pestañas: cuenta, privacidad, preferencias, conexiones y seguridad. La
+primera permite editar el nombre completo, la biografía, la foto, la portada y los favoritos,
+y cambiar una única vez el nombre de usuario. El acceso (Figura~\ref{fig:acceso})
+y el registro (Figura~\ref{fig:registro}) son los únicos formularios abiertos a visitantes.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/09-amistades-oscuro.png}
+\caption{Página de amistades con tema oscuro: amistades, perfil de la persona elegida y notificaciones. Fuente: captura del proyecto.}
+\label{fig:amistades}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/10-perfil-oscuro.png}
+\caption{Perfil propio, pestaña de cuenta, con tema oscuro. Fuente: captura del proyecto.}
+\label{fig:perfil}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/06-iniciar-sesion-oscuro.png}
+\caption{Página de acceso con tema oscuro. Fuente: captura del proyecto.}
+\label{fig:acceso}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/07-registro-oscuro.png}
+\caption{Página de registro con tema oscuro. Fuente: captura del proyecto.}
+\label{fig:registro}
+\end{figure}
+
 \section{Pruebas y verificación}\label{cap:pruebas}\label{sec:pru-estrategia}
 
 La verificación combina pruebas de backend contra PostgreSQL real (unitarias e integración en
@@ -442,7 +480,7 @@ accesibilidad mediante \texttt{axe}, sin un conteo aislado solo de accesibilidad
 evidencia de la Fase 7, ejecutado el 14 de septiembre de 2026 y registrado en
 \texttt{docs/verification/phase-07-launch-gate.md} y en \texttt{07-VERIFICATION.md}, deja como
 última regresión completa 736 pruebas de backend, 70 de frontend y 56 de navegador, las tres
-en verde y sin omitidas. Las evidencias de seguridad, migraciones, privacidad, importación y
+en verde y sin omitidas. Tras los cambios posteriores de interfaz y del módulo social, el 4 de octubre de 2026 se repitieron las suites de backend y de frontend: 773 pruebas de backend y 66 de frontend, todas en verde. El recorrido de navegador no se repitió después de esos cambios. Las evidencias de seguridad, migraciones, privacidad, importación y
 exportación se citan desde \texttt{docs/verification/}.
 
 La estrategia combina cuatro niveles. Las pruebas unitarias y de integración del backend se

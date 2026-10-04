@@ -14,6 +14,19 @@ Alcance: todo lo hecho en la sesión de diseño/producto (zips de `design/`) com
 Estado del repositorio: ~185 entradas en `git status`, nada confirmado en commit. Migraciones nuevas sin aplicar en
 ningún entorno remoto: `accounts/0005`, `accounts/0006`, `social/0003`, `library/0007`.
 
+## 0. Estado tras la versión actualizada de la memoria (commit 111da1c)
+
+La memoria que se subió después de este informe ya incorpora el punto 4.2 (figuras sustituidas):
+
+- Hecho: capturas nuevas de Inicio claro/oscuro, catálogo con filtros, colección, y las dos vistas de recomendaciones
+  (`fig:recomendaciones-estanterias`, `fig:recomendaciones-detallada`); capturas antiguas sin uso eliminadas.
+- **Sigue pendiente todo el bloque social y de personalización**: la memoria solo menciona amistades y perfil de un
+  amigo en una frase (sección 6.4), sin requisitos nuevos, sin entidades nuevas, sin endpoints nuevos y sin capturas.
+- Siguen pendientes los puntos 3.1.1-3.1.6: requisitos y casos de uso, modelo de dominio, tabla de endpoints,
+  privacidad/seguridad de imágenes y borrado de cuenta, cifras de verificación (736/70/56) y la discrepancia
+  `content-cbf-mmr-pop-v1` (memoria) frente a `-v2` (aplicación).
+- Detalle menor: la sección 5.x sigue citando "el selector de cuenta" en la barra; ahora es un menú de cuenta con foto.
+
 ## 1. Qué cubre hoy la memoria (y por tanto qué es nuevo)
 
 La memoria describe un módulo social mínimo y estático (fases 5-6, cierre del 14/09/2026):

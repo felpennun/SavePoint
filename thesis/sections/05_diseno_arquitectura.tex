@@ -149,6 +149,14 @@ Tabla~\ref{tab:endpoints} recoge los puntos de acceso principales.
     \hline
     \path{GET /api/accounts/profiles/<alias>/} & Sesión & Perfil de un amigo aceptado, por lista de campos permitidos. \\
     \hline
+    \path{GET/PUT/DELETE /api/accounts/me/avatar/} y \path{cover/} & Sesión & Foto de perfil y portada de la persona autenticada. \\
+    \hline
+    \path{POST /api/accounts/me/username/}, \path{password/} y \path{delete/} & Sesión & Cambio único del nombre de usuario, cambio de contraseña y eliminación de la cuenta. \\
+    \hline
+    \path{GET /api/social/notifications/} y \path{POST /api/social/messages/<id>/respond/} & Sesión & Notificaciones y respuesta a una recomendación recibida. \\
+    \hline
+    \path{GET /api/library/export/collection.xlsx} & Sesión & Exportación de la colección a Excel, además del CSV. \\
+    \hline
     \path{GET /api/library/entries/} & Sesión & Biblioteca de la persona autenticada. \\
     \hline
     \path{POST /api/library/entries/<id>/status/}, \path{rating/}, \path{copies/} & Sesión & Cambio de estado, valoración y alta de copias. \\
@@ -165,7 +173,7 @@ Tabla~\ref{tab:endpoints} recoge los puntos de acceso principales.
 La proyección de un perfil que ve un amigo se construye con una lista explícita de campos permitidos,
 escrita a mano, en lugar de una serialización automática por introspección del modelo. Así,
 exponer un campo privado nuevo requiere una decisión explícita, que es el modo de fallo
-opuesto al de ocultarlo por olvido.
+opuesto al de ocultarlo por olvido. Las imágenes de perfil y de portada se recortan y comprimen en el navegador, se limitan a 512~KiB, se validan en el servidor por su firma de formato y no por la extensión declarada, y solo se sirven a su titular y a sus amigos aceptados. La eliminación de la cuenta exige la contraseña y deja un evento de auditoría sin actor, porque el registro de auditoría es de solo anexado.
 
 La autenticación sigue el diseño del registro ADR-004. Django emite y valida la sesión. El
 navegador solo llama a rutas del mismo origen de Next.js, que las reescribe hacia el backend
@@ -190,7 +198,7 @@ sistema de tokens de variables CSS, con juegos completos para tema claro y tema 
 selección se aplica en el servidor mediante una cookie para evitar el destello al cargar. Los
 componentes reutilizables incluyen la tarjeta de juego, las píldoras de estado y de nota, la
 valoración por estrellas, la imagen de portada con su marcador de reserva, la barra de
-filtros, el conmutador de tema y el selector de cuenta. Las Figuras~\ref{fig:ui-claro}
+filtros, el conmutador de tema y el menú de cuenta. Las Figuras~\ref{fig:ui-claro}
 y~\ref{fig:ui-oscuro} muestran la página de inicio en ambos temas.
 
 \begin{figure}[H]

@@ -65,7 +65,7 @@ en propiedad (\texttt{OwnedCopy}) representan cada ejemplar, físico o digital, 
 su publicación y su edición.
 
 En las cuentas, el proyecto usa directamente el modelo de usuario de Django
-(\texttt{User}), al que se asocian la biblioteca personal y las relaciones de amistad. Las solicitudes (\texttt{FriendshipRequest}), las amistades aceptadas (\texttt{Friendship}) y los bloqueos (\texttt{Block}) son entidades que referencian a dos usuarios.
+(\texttt{User}), al que se asocian la biblioteca personal y las relaciones de amistad. Las solicitudes (\texttt{FriendshipRequest}), las amistades aceptadas (\texttt{Friendship}) y los bloqueos (\texttt{Block}) son entidades que referencian a dos usuarios. El perfil editable (\texttt{AccountProfile}) guarda el nombre completo, la biografía, la foto, la portada y los ajustes de privacidad, y las notificaciones (\texttt{SocialNotice}) avisan de las solicitudes aceptadas y de las recomendaciones añadidas a pendientes.
 
 La Tabla~\ref{tab:req-informacion} enlaza cada área del modelo con los requisitos de
 información que satisface.
@@ -103,15 +103,20 @@ aceptación.
 
 \begin{table}[htp]
 \centering
+\tablecompact
 \begin{tabularx}{\textwidth}{ | L{0.18\textwidth} | Y | C{0.22\textwidth} | }
     \hline
     \textbf{Código} & \textbf{Requisito funcional} & \textbf{Estado} \\
     \hline
     AUTH-01 & Iniciar y cerrar sesión en una cuenta controlada. & Completo \\
     \hline
+    PROF-01 & Editar el perfil (nombre, foto, portada, favoritos) y su visibilidad. & Completo \\
+    \hline
     SOCIAL-03 & Buscar a otra persona por su alias exacto y gestionar solicitudes de amistad, amistades y bloqueos. & Completo \\
     \hline
-    SOCIAL-04 & Consultar la colección, las listas y los comentarios de un amigo aceptado; quien no es amigo no ve nada de la cuenta. & Completo \\
+    SOCIAL-04 & Consultar la colección, las listas y los comentarios de un amigo aceptado; quien no es amigo solo ve el nombre de usuario. & Completo \\
+    \hline
+    SOCIAL-05 & Recomendar juegos a un amigo y responder a las recibidas. & Completo \\
     \hline
     CAT-01 & Buscar videojuegos por título. & Completo \\
     \hline
@@ -197,6 +202,10 @@ funcional que satisface.
     \hline
     CU-13 & Comentar un juego, con el comentario visible solo para los amigos & Persona usuaria & LIB-03, SOCIAL-04 \\
     \hline
+    CU-14 & Editar el perfil y la privacidad de la cuenta & Persona usuaria & PROF-01 \\
+    \hline
+    CU-15 & Responder a una recomendación recibida de un amigo & Persona usuaria & SOCIAL-05 \\
+    \hline
 \end{tabularx}
 \caption{Casos de uso del sistema.}
 \label{tab:casos-uso}
@@ -265,6 +274,8 @@ comportamiento del sistema.
     RN-8 & Ninguna cuenta es pública: solo su titular y sus amigos aceptados acceden a su colección, sus listas y sus comentarios, y una persona sin sesión no ve ninguna cuenta. \\
     \hline
     RN-9 & El acceso a IGDB queda confinado a un comando de gestión fuera de línea; ninguna petición de usuario llama a un proveedor externo. \\
+    \hline
+    RN-10 & El nombre de usuario puede cambiarse una sola vez, y la visibilidad de la colección, los favoritos y las listas admite solo dos niveles: privada o visible para las amistades. \\
     \hline
 \end{tabularx}
 \caption{Reglas de negocio.}
