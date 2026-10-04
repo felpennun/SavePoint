@@ -210,20 +210,16 @@ export function LibraryControls({
   useEffect(() => {
     if (!isAuthenticated) return;
     let cancelled = false;
-    Promise.all([
-      fetch(`/api/library/entries/${workId}/status/`, { credentials: "same-origin" }).then((r) => r.json()),
-      fetch(`/api/library/entries/${workId}/rating/`, { credentials: "same-origin" }).then((r) => r.json()),
-      fetch(`/api/library/entries/${workId}/copies/`, { credentials: "same-origin" }).then((r) => r.json()),
-      // is_platinum has no bespoke endpoint of its own -- it rides the
-      // combined configuration/ GET alongside status/rating/copies, which
-      // are still fetched individually above for backward compatibility.
-      fetch(`/api/library/entries/${workId}/configuration/`, { credentials: "same-origin" }).then((r) => r.json()),
-    ])
-      .then(([statusBody, ratingBody, copiesBody, configurationBody]) => {
+    // One request: the combined configuration/ GET already carries the status,
+    // the rating, is_platinum and the copies (it used to be four round trips,
+    // and the form stayed on "loading" until the slowest one came back).
+    fetch(`/api/library/entries/${workId}/configuration/`, { credentials: "same-origin" })
+      .then((r) => r.json())
+      .then((configurationBody) => {
         if (cancelled) return;
-        setStatus(statusBody.status ?? "");
-        setRating(ratingBody.rating_half_steps ?? 0);
-        if (Array.isArray(copiesBody.copies)) setCopies(copiesBody.copies);
+        setStatus(configurationBody.status ?? "");
+        setRating(configurationBody.rating_half_steps ?? 0);
+        if (Array.isArray(configurationBody.copies)) setCopies(configurationBody.copies);
         setIsPlatinum(Boolean(configurationBody.is_platinum));
       })
       .finally(() => {

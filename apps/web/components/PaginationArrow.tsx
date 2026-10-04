@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { HoverPrefetchLink } from "@/components/HoverPrefetchLink";
 
 /** Empty slot with the arrow's footprint, so the page number stays centred
  * on the first and last pages where one arrow is missing. */
@@ -22,7 +22,7 @@ export function PaginationArrow({
   label: string;
 }) {
   return (
-    <Link href={href} className="sp-pagination-arrow" aria-label={label}>
+    <HoverPrefetchLink eager href={href} className="sp-pagination-arrow" aria-label={label}>
       <svg
         width="20"
         height="20"
@@ -37,6 +37,6 @@ export function PaginationArrow({
       >
         <path d="M9 5l7 7-7 7" />
       </svg>
-    </Link>
+    </HoverPrefetchLink>
   );
 }

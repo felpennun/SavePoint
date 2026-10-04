@@ -50,8 +50,8 @@ páginas de Vercel responden 200 en 0,2-0,8 s.
 
 ## Límites
 
-- Las recomendaciones personalizadas con vectores no están disponibles en el despliegue público (sin vectores); la
-  web local con el corpus completo sí las tiene.
+- Las recomendaciones personalizadas se calculan en el propio Render con un único worker (ver la sección final);
+  son más lentas que en local, donde hay un worker por algoritmo y el corpus completo.
 - Las facetas `facets=lite` se guardan 6 h en la caché de proceso de la API.
 - Pendiente de ajustar: el texto de la memoria que dice que el despliegue público usa el corpus curado de 150 juegos.
 - La contraseña del rol `neondb_owner` pasó por el historial de la sesión: conviene rotarla y actualizar
@@ -74,3 +74,16 @@ Relacionado: [[2026-10-04 - Revision de seguridad]].
   precalentado de las facetas al arrancar la API. El arranque en frío de Render (apagado tras ~15 min sin tráfico) se
   mitiga con un ping externo gratuito cada 5-10 min a `/health/`; no se hace con GitHub Actions porque el repositorio
   es privado y se agotarían los minutos gratuitos.
+
+## Velocidad de navegación y desplegable (2026-10-05, noche)
+
+- **Región de Vercel:** las funciones de Next.js se ejecutaban en Washington (`iad1`) mientras que Render y Neon están
+  en Frankfurt, así que cada página de servidor cruzaba el Atlántico por cada llamada a la API. `vercel.json` fija
+  `"regions": ["fra1"]`.
+- **Precarga:** `HoverPrefetchLink` carga la página destino completa al pasar el ratón, enfocar o tocar una tarjeta,
+  las flechas de paginación, las etiquetas de filtro y las filas del selector de la colección.
+- **Pantalla de carga:** `app/[locale]/loading.tsx` da respuesta inmediata al navegar mientras el servidor renderiza.
+- **Ficha de juego:** `LibraryControls` hacía cuatro peticiones al abrir (estado, nota, copias y configuración); la
+  configuración ya lo devuelve todo, así que ahora es una.
+- **Desplegable del perfil:** la insignia de platino (`z-index: 1`) se pintaba por encima del menú de cuenta porque la
+  cabecera no formaba su propio nivel; `.sp-navbar` tiene ahora `z-index: 60`.

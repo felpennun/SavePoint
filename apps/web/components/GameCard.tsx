@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import Link from "next/link";
+import { HoverPrefetchLink } from "@/components/HoverPrefetchLink";
 
 import { CoverImage } from "@/components/CoverImage";
 import { PlatinumBadge } from "@/components/PlatinumBadge";
@@ -85,18 +85,18 @@ export function GameCard({
   if (bare) {
     return (
       <li>
-        <Link href={`/${locale}/games/${game.slug}`} className="sp-tile">
+        <HoverPrefetchLink href={`/${locale}/games/${game.slug}`} className="sp-tile">
           <div className="sp-cover">{cover}</div>
           <p className="sp-tile-title">{game.title}</p>
           {game.year != null ? <p className="sp-tile-meta">{game.year}</p> : null}
-        </Link>
+        </HoverPrefetchLink>
       </li>
     );
   }
 
   return (
     <li className={itemClassName}>
-      <Link href={`/${locale}/games/${game.slug}`} className="sp-card">
+      <HoverPrefetchLink href={`/${locale}/games/${game.slug}`} className="sp-card">
         <div className="sp-cover">
           {cover}
           {isPlatinum ? <PlatinumBadge label={dict.card.platinum.label} /> : null}
@@ -133,7 +133,7 @@ export function GameCard({
             </div>
           ) : null}
         </div>
-      </Link>
+      </HoverPrefetchLink>
       {overlay}
     </li>
   );

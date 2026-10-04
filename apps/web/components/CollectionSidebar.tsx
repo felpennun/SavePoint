@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { HoverPrefetchLink } from "@/components/HoverPrefetchLink";
 
 import { SidebarNewList } from "@/components/SidebarNewList";
 
@@ -49,13 +49,13 @@ export function CollectionSidebar({
         <ul className="sp-coll-side-list">
           {statusRows.map((row) => (
             <li key={row.key}>
-              <Link href={row.href} className={`sp-coll-side-row${row.active ? " is-on" : ""}`} aria-current={row.active ? "true" : undefined}>
+              <HoverPrefetchLink eager href={row.href} className={`sp-coll-side-row${row.active ? " is-on" : ""}`} aria-current={row.active ? "true" : undefined}>
                 <span className="sp-coll-side-name">
                   <span className="sp-coll-side-dot" aria-hidden="true" style={{ background: row.dot }} />
                   {row.label}
                 </span>
                 <span className="sp-coll-side-count">{row.count}</span>
-              </Link>
+              </HoverPrefetchLink>
             </li>
           ))}
         </ul>
@@ -69,13 +69,13 @@ export function CollectionSidebar({
           <ul className="sp-coll-side-list">
             {listRows.map((row) => (
               <li key={row.key}>
-                <Link href={row.href} className={`sp-coll-side-row${row.active ? " is-on" : ""}`} aria-current={row.active ? "true" : undefined}>
+                <HoverPrefetchLink eager href={row.href} className={`sp-coll-side-row${row.active ? " is-on" : ""}`} aria-current={row.active ? "true" : undefined}>
                   <span className="sp-coll-side-name sp-coll-side-name--stack">
                     <span className="sp-coll-side-ellipsis">{row.label}</span>
                     {row.caption ? <span className="sp-coll-side-caption">{row.caption}</span> : null}
                   </span>
                   <span className="sp-coll-side-count">{row.count}</span>
-                </Link>
+                </HoverPrefetchLink>
               </li>
             ))}
           </ul>

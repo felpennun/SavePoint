@@ -6204,6 +6204,32 @@ button.sp-coll-side-row {
   }
 }
 
+.sp-route-loading-heading {
+  height: 2rem;
+  width: min(22rem, 60%);
+  border-radius: var(--radius-md, 8px);
+  margin-bottom: var(--space-lg, 24px);
+}
+
+.sp-route-loading-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: var(--space-md, 16px);
+}
+
+.sp-route-loading-card {
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-lg, 12px);
+}
+
+/* The header is its own stacking level above the page content, so the account
+   menu (and the mobile menu) always paint over the platinum ribbons of the
+   covers, the filter panels and every other positioned element below. */
+.sp-navbar {
+  position: relative;
+  z-index: 60;
+}
+
 /* Phase 2 product polish utilities. Skeleton consumers supply the final
    geometry and aria-hidden="true"; one status region belongs to the parent. */
 .sp-skeleton {
