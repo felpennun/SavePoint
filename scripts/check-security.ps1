@@ -10,9 +10,12 @@ $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 $failure = $false
 
+# Windows PowerShell on Windows, PowerShell 7 (pwsh) on the Linux CI runner.
+$shell = if (Get-Command powershell -ErrorAction SilentlyContinue) { "powershell" } else { "pwsh" }
+
 function Invoke-Gate {
     param([string]$Path, [string[]]$Arguments)
-    & powershell -ExecutionPolicy Bypass -File (Join-Path $root $Path) @Arguments
+    & $shell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root $Path) @Arguments
     if ($LASTEXITCODE -ne 0) {
         $script:failure = $true
         Write-Error "Security gate failed: $Path"
