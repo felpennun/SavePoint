@@ -41,7 +41,7 @@ from library.models import LibraryEntry
 LIST_CACHE_TTL_SECONDS = 120
 # Public, short-lived: browsers and any CDN in front may reuse these answers for
 # a minute and serve a slightly older copy while they revalidate.
-PUBLIC_CACHE_CONTROL = "public, max-age=60, stale-while-revalidate=300"
+PUBLIC_CACHE_CONTROL = "public, max-age=60, s-maxage=120, stale-while-revalidate=300"
 
 
 def _public_cache(response: Response) -> Response:

@@ -44,6 +44,10 @@ export default function LoginPage() {
     event.preventDefault();
     setPending(true);
     setError(null);
+    // Once the sign-in succeeded the page is about to be replaced: keep the
+    // button in its "signing in" state until then instead of flashing back to
+    // "Log in" while the browser is still loading the next page.
+    let redirecting = false;
     try {
       await fetch("/api/accounts/csrf/", { credentials: "same-origin" });
       const csrfToken = document.cookie
@@ -73,11 +77,12 @@ export default function LoginPage() {
       // `next` when we sent an explicit, already-locale-prefixed value.
       // A full page load, not a client-side navigation: the session changed, so
       // the header, the cached pages and any per-user state must start fresh.
+      redirecting = true;
       window.location.assign(requestedNext ? body.next : `/${locale}`);
     } catch {
       setError(copy.generic);
     } finally {
-      setPending(false);
+      if (!redirecting) setPending(false);
     }
   }
 

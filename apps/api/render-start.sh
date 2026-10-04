@@ -34,6 +34,19 @@ if [ "${RECOMMENDATION_WORKER:-1}" = "1" ]; then
   ) &
 fi
 
+# Warm-up: the first catalogue request after a start computes the filter facets
+# (about two seconds) and keeps them in this process's cache for hours. Ask for
+# them once the server is listening so the first visitor does not pay for it.
+(
+  for _ in 1 2 3 4 5 6 7 8 9 10 11 12; do
+    sleep 5
+    # The Host and X-Forwarded-Proto headers make the request look like one that
+    # came through Render's proxy, so host validation and the HTTPS redirect pass.
+    python -c "import os,urllib.request; urllib.request.urlopen(urllib.request.Request('http://127.0.0.1:${PORT:-10000}/api/catalogue/games/?facets=lite', headers={'Host': os.environ.get('RENDER_EXTERNAL_HOSTNAME', 'localhost'), 'X-Forwarded-Proto': 'https'}), timeout=60).read()" \
+      >/dev/null 2>&1 && break
+  done
+) &
+
 # Production WSGI server. The Django development server is explicitly
 # unsupported for production (no timeouts, no worker recycling, autoreload
 # loop) and was flagged in the 2026-09-06 repo review (H-03). gunicorn is a

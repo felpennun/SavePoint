@@ -58,3 +58,19 @@ páginas de Vercel responden 200 en 0,2-0,8 s.
   `DATABASE_URL` en Render.
 
 Relacionado: [[2026-10-04 - Revision de seguridad]].
+
+## Despliegue completo y fluidez (2026-10-05, tarde)
+
+- **Recomendaciones:** se cargaron también los vectores `fs-v13` (32.550) y las instantáneas de nota (30.623) y
+  popularidad (169.547) de 2026.09.2: 359 MB en Neon. Render no tenía ningún proceso que ejecutara la cola de
+  trabajos (los trabajos se quedaban en `queued`); `render-start.sh` lanza ahora un worker supervisado que procesa
+  todos los tipos de trabajo y gunicorn pasa a 1 proceso con 4 hilos para que quepan en 512 MB.
+- **Cuentas de demostración públicas:** `demo_user` (copia de la cuenta local `felipe` con todos sus datos),
+  `demo_user2`, `demo_user3` y `demo_user4` (vacías), todas con la clave de demostración acordada con el autor. Script
+  de copia: `scripts/public-corpus/clone_account_to_public.sh`.
+- **Login y registro:** el botón volvía a "Entrar" mientras el navegador cargaba la portada, lo que parecía que no
+  había pasado nada; ahora se queda en "Entrando…" hasta que cambia la página.
+- **Fluidez:** `s-maxage=120` en las respuestas públicas del catálogo (la caché del borde de Vercel las reutiliza) y
+  precalentado de las facetas al arrancar la API. El arranque en frío de Render (apagado tras ~15 min sin tráfico) se
+  mitiga con un ping externo gratuito cada 5-10 min a `/health/`; no se hace con GitHub Actions porque el repositorio
+  es privado y se agotarían los minutos gratuitos.

@@ -32,6 +32,8 @@ def test_the_lite_catalogue_answer_is_public_cacheable_and_stable() -> None:
     second = client.get("/api/catalogue/games/?facets=lite&q=zelda")
     assert first.status_code == second.status_code == 200
     assert "max-age=60" in first["Cache-Control"] and first["Cache-Control"].startswith("public")
+    # the shared (CDN) copy may live a little longer than the browser one
+    assert "s-maxage=120" in first["Cache-Control"]
     assert first.json() == second.json()
 
 

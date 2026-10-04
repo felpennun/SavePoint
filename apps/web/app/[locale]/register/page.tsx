@@ -48,6 +48,9 @@ export default function RegisterPage() {
     }
 
     setPending(true);
+    // Keep the button busy once the account exists: the full page load that
+    // follows can take a few seconds and must not look like nothing happened.
+    let redirecting = false;
     try {
       await fetch("/api/accounts/csrf/", { credentials: "same-origin" });
       const csrfToken = document.cookie
@@ -64,6 +67,7 @@ export default function RegisterPage() {
 
       if (response.ok) {
         // Full page load: the new session must replace everything cached.
+        redirecting = true;
         window.location.assign(`/${locale}`);
         return;
       }
@@ -95,7 +99,7 @@ export default function RegisterPage() {
     } catch {
       setError(t.errorGeneric);
     } finally {
-      setPending(false);
+      if (!redirecting) setPending(false);
     }
   }
 
