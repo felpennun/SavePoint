@@ -3,6 +3,8 @@ calls at request time (CAT-06/OPS-03)."""
 
 from __future__ import annotations
 
+import hashlib
+
 from django.core.cache import cache
 from django.db.models import Max, Min
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -34,6 +36,17 @@ from catalogue.serializers import (
     _display_title,
 )
 from library.models import LibraryEntry
+
+
+LIST_CACHE_TTL_SECONDS = 120
+# Public, short-lived: browsers and any CDN in front may reuse these answers for
+# a minute and serve a slightly older copy while they revalidate.
+PUBLIC_CACHE_CONTROL = "public, max-age=60, stale-while-revalidate=300"
+
+
+def _public_cache(response: Response) -> Response:
+    response["Cache-Control"] = PUBLIC_CACHE_CONTROL
+    return response
 
 
 def _card_context(works: list[GameWork]) -> dict:
@@ -101,21 +114,33 @@ class GameListView(APIView):
         # ``facets=lite`` is what the web page sends: only the filter options the
         # filter bar shows, cached; the full facet set stays the default.
         lite_facets = request.query_params.get("facets") == "lite"
+        # The answer only depends on the validated query, never on who asks, so
+        # the lite (web) variant is kept for a couple of minutes: the first visit
+        # to a given filter pays for the count, the next ones are instant.
+        cache_key = None
+        if lite_facets:
+            signature = "|".join(f"{k}={v}" for k, v in sorted(request.query_params.items()))
+            cache_key = "catalogue:list:" + hashlib.sha256(signature.encode("utf-8")).hexdigest()
+            cached = cache.get(cache_key)
+            if cached is not None:
+                return _public_cache(Response(cached))
         result = search_games(cq.q, page=page, page_size=DEFAULT_PAGE_SIZE, cq=cq, lite_facets=lite_facets)
         results = list(result["results"])
-        return Response(
-            {
-                "results": GameCardSerializer(
-                    results, many=True, context=_card_context(results)
-                ).data,
-                "count": result["count"],
-                "page": result["page"],
-                "page_size": result["page_size"],
-                "has_next": result["has_next"],
-                "sort": result["sort"],
-                "facets": result["facets"],
-            }
-        )
+        payload = {
+            "results": GameCardSerializer(
+                results, many=True, context=_card_context(results)
+            ).data,
+            "count": result["count"],
+            "page": result["page"],
+            "page_size": result["page_size"],
+            "has_next": result["has_next"],
+            "sort": result["sort"],
+            "facets": result["facets"],
+        }
+        if cache_key is not None:
+            cache.set(cache_key, payload, LIST_CACHE_TTL_SECONDS)
+            return _public_cache(Response(payload))
+        return Response(payload)
 
 
 class GameDetailView(APIView):
@@ -142,7 +167,7 @@ class GameDetailView(APIView):
         locale = request.query_params.get("locale")
         if locale not in {"es", "en"}:
             locale = "en"
-        return Response(GameDetailSerializer(work, context={"locale": locale}).data)
+        return _public_cache(Response(GameDetailSerializer(work, context={"locale": locale}).data))
 
 
 class NewReleasesView(APIView):

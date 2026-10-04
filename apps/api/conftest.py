@@ -31,3 +31,14 @@ def postgres_connection() -> Iterator[psycopg.Connection[tuple[object, ...]]]:
     ) as connection:
         yield connection
 
+
+
+@pytest.fixture(autouse=True)
+def _clear_process_cache() -> Iterator[None]:
+    """The catalogue caches its facets and list answers in the process cache;
+    start and end every test with an empty one so tests cannot see each other."""
+    from django.core.cache import cache
+
+    cache.clear()
+    yield
+    cache.clear()

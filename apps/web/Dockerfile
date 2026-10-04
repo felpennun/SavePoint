@@ -67,5 +67,9 @@ RUN apt-get update \
 RUN mkdir -p /ms-playwright \
     && pnpm --dir apps/web exec playwright install chromium \
     && chmod -R a+rX /ms-playwright
+# compose mounts an anonymous volume on apps/web/.next; Docker creates the
+# mount point root-owned unless it already exists in the image, which made
+# `next build` fail with EACCES for the node user on Linux (CI).
+RUN mkdir -p /workspace/apps/web/.next     && chown node:node /workspace/apps/web/.next
 USER node
 CMD ["pnpm", "--dir", "apps/web", "test", "--run"]

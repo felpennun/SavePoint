@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 
 import "../globals.css";
 import { AppShell } from "@/components/AppShell";
+import { RouterCacheGuard } from "@/components/RouterCacheGuard";
 import { SUPPORTED_LOCALES, type Locale } from "@/middleware";
 import { fetchAccountMe } from "@/lib/api";
 
@@ -64,6 +65,7 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} data-theme={theme} className={`${inter.variable} ${jetBrainsMono.variable}`}>
       <body>
+        <RouterCacheGuard />
         <AppShell
           locale={locale}
           isAuthenticated={isAuthenticated}

@@ -409,6 +409,7 @@ def _ordered_matching_work_ids(normalized_query: str) -> list[str]:
 
 
 LITE_FACETS_CACHE_KEY = "catalogue:facets:lite"
+FULL_FACETS_CACHE_KEY = "catalogue:facets:full"
 LITE_FACETS_TTL_SECONDS = 6 * 3600
 
 
@@ -592,7 +593,12 @@ def search_games(
             facets = _facets(governed_works(), lite=True)
             cache.set(LITE_FACETS_CACHE_KEY, facets, LITE_FACETS_TTL_SECONDS)
     else:
-        facets = _facets(governed_works())
+        # The full set (developers alone is ~40k rows) never depends on the
+        # request either, so it is computed once per few hours too.
+        facets = cache.get(FULL_FACETS_CACHE_KEY)
+        if facets is None:
+            facets = _facets(governed_works())
+            cache.set(FULL_FACETS_CACHE_KEY, facets, LITE_FACETS_TTL_SECONDS)
 
     filtered = _apply_filters(scoped, cq)
 

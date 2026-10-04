@@ -17,6 +17,14 @@ const nextConfig: NextConfig = {
   // image host is allowed (threat T-01.1-12: approved CDN only).
   images: {
     remotePatterns: [{ protocol: "https", hostname: "images.igdb.com" }],
+    // Covers never change: keep the optimised copies for a week (default is 60 s).
+    minimumCacheTTL: 604800,
+  },
+  // Client-side navigation cache: pages already visited are reused for 30 s
+  // (dynamic) / 3 min (static) so back/forward and repeated clicks are instant.
+  // Writes drop it again (components/RouterCacheGuard.tsx).
+  experimental: {
+    staleTimes: { dynamic: 30, static: 180 },
   },
   // Two fixes needed together for the Django proxy, both about the same
   // trailing-slash mismatch: (1) skipTrailingSlashRedirect stops Next's own

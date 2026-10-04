@@ -2,7 +2,7 @@
 
 from pathlib import Path
 import os
-from urllib.parse import unquote, urlparse
+from urllib.parse import unquote, urlparse, parse_qsl
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "config.middleware.RejectNulBytesMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -103,7 +104,7 @@ def _postgres_database() -> dict[str, object]:
         raise RuntimeError("DATABASE_URL must use the PostgreSQL scheme")
     if not all((parsed.hostname, parsed.path.removeprefix("/"), parsed.username)):
         raise RuntimeError("DATABASE_URL is missing required PostgreSQL connection fields")
-    return {
+    config: dict[str, object] = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": unquote(parsed.path.removeprefix("/")),
         "USER": unquote(parsed.username or ""),
@@ -112,6 +113,15 @@ def _postgres_database() -> dict[str, object]:
         "PORT": parsed.port or 5432,
         "CONN_MAX_AGE": 60,
     }
+    # Honour ?sslmode= from the URL (it used to be dropped) and never fall back
+    # to a plaintext connection in production: libpq's default ("prefer") would
+    # accept a downgrade.
+    sslmode = dict(parse_qsl(parsed.query)).get("sslmode")
+    if not sslmode and os.environ.get("DJANGO_DEPLOY_ENV") == "production":
+        sslmode = "require"
+    if sslmode:
+        config["OPTIONS"] = {"sslmode": sslmode}
+    return config
 
 
 DATABASES = {"default": _postgres_database()}
@@ -151,7 +161,15 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
     ],
+    # JSON only: DRF's browsable API (an HTML console with a CSRF token) is not
+    # something to serve to anyone who sends `Accept: text/html`.
+    "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
+    # Signed-in users only (see config/throttles.py); views that set their own
+    # throttle_classes keep their scoped limits instead.
+    "DEFAULT_THROTTLE_CLASSES": ["config.throttles.AuthenticatedUserThrottle"],
     "DEFAULT_THROTTLE_RATES": {
+        "user_default": "300/min",
+        "profile_image": "20/min",
         "registration": "5/hour",
         "login": "10/min",
         "public_profile": "30/min",

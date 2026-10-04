@@ -23,6 +23,9 @@ jobs:
         run: docker compose -f infra/compose.yaml run --rm api python apps/api/manage.py makemigrations --check --dry-run
       - name: Run API security tests
         run: docker compose -f infra/compose.yaml run --rm api pytest apps/api/tests/test_phase7_admin_security.py apps/api/audit/tests/test_audit.py -q
+      - name: Show container logs when a step failed
+        if: failure()
+        run: docker compose -f infra/compose.yaml logs --no-color --tail 80 web api
       - name: Stop the stack
         if: always()
         run: docker compose -f infra/compose.yaml down -v

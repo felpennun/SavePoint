@@ -27,6 +27,8 @@ from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
+from accounts.models import PROFILE_IMAGE_MAX_BYTES
+from config.throttles import AuthenticatedUserThrottle, ProfileImageWriteThrottle
 from accounts.serializers import (
     AccountProfileSerializer,
     ReplaceFavoritesRequestSerializer,
@@ -274,6 +276,8 @@ class _MyProfileImageView(APIView):
 
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
+    throttle_classes = [AuthenticatedUserThrottle, ProfileImageWriteThrottle]
+    throttle_scope = "profile_image"
     kind = ""
 
     def get(self, request: Request) -> HttpResponse:
@@ -290,6 +294,9 @@ class _MyProfileImageView(APIView):
         upload = request.FILES.get("file")
         if upload is None:
             return Response({"detail": "A file is required."}, status=400)
+        # Refuse an oversized body before reading it into memory.
+        if upload.size > PROFILE_IMAGE_MAX_BYTES:
+            return Response({"detail": "The image is too large."}, status=400)
         try:
             profile = set_profile_image(user=request.user, kind=self.kind, data=upload.read())
         except DjangoValidationError as exc:
