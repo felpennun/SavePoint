@@ -20,19 +20,15 @@ else
   echo "DEMO_ACCOUNTS is not set: skipping the demo account bootstrap and seed."
 fi
 
-# Recommendations are computed by a background queue worker (the local stack
-# runs one container per algorithm). Render Free has no worker service, so one
-# supervised process runs every job type (signals first, then each section) next
-# to the web server; it is restarted if it ever exits (for instance when the
-# free instance runs short of memory). Set RECOMMENDATION_WORKER=0 to disable it.
-if [ "${RECOMMENDATION_WORKER:-1}" = "1" ]; then
-  (
-    while true; do
-      python manage.py process_recommendation_jobs --loop --poll-seconds 3 || true
-      sleep 5
-    done
-  ) &
-fi
+# Recommendations are computed by a queue worker (the local stack runs one
+# container per algorithm and polls the database every few seconds). Polling
+# would keep Neon's serverless compute awake around the clock and burn its free
+# hours, so here the API starts a short-lived worker only when a refresh is
+# queued (recommendations/ondemand.py): it drains the queue and exits.
+export RECOMMENDATION_ONDEMAND_WORKER=1
+# Finish whatever an earlier instance left in the queue; the database is awake
+# anyway after the migration above, and the process ends when the queue is empty.
+python manage.py process_recommendation_jobs --ondemand &
 
 # Warm-up: the first catalogue request after a start computes the filter facets
 # (about two seconds) and keeps them in this process's cache for hours. Ask for
@@ -51,8 +47,8 @@ fi
 # unsupported for production (no timeouts, no worker recycling, autoreload
 # loop) and was flagged in the 2026-09-06 repo review (H-03). gunicorn is a
 # pinned, approved dependency (docs/verification/dependency-legitimacy.md).
-# One process with four threads leaves room for the recommendation worker in
-# Render Free's 512 MB; the request timeout keeps a stuck request from wedging
+# One process with four threads leaves room for the on-demand recommendation
+# worker in Render Free's 512 MB; the request timeout keeps a stuck request from wedging
 # the single instance.
 exec gunicorn config.wsgi:application \
   --bind "0.0.0.0:${PORT:-10000}" \

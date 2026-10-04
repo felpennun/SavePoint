@@ -63,8 +63,9 @@ Relacionado: [[2026-10-04 - Revision de seguridad]].
 
 - **Recomendaciones:** se cargaron también los vectores `fs-v13` (32.550) y las instantáneas de nota (30.623) y
   popularidad (169.547) de 2026.09.2: 359 MB en Neon. Render no tenía ningún proceso que ejecutara la cola de
-  trabajos (los trabajos se quedaban en `queued`); `render-start.sh` lanza ahora un worker supervisado que procesa
-  todos los tipos de trabajo y gunicorn pasa a 1 proceso con 4 hilos para que quepan en 512 MB.
+  trabajos (los trabajos se quedaban en `queued`); `render-start.sh` activa un worker **bajo demanda**: la API lanza un proceso corto que
+  vacía la cola y termina (`recommendations/ondemand.py`), sin consultar Neon en segundo plano; así el ping a Render no
+  consume horas de cómputo de Neon. Gunicorn pasa a 1 proceso con 4 hilos para que quepa en 512 MB.
 - **Cuentas de demostración públicas:** `demo_user` (copia de la cuenta local `felipe` con todos sus datos),
   `demo_user2`, `demo_user3` y `demo_user4` (vacías), todas con la clave de demostración acordada con el autor. Script
   de copia: `scripts/public-corpus/clone_account_to_public.sh`.

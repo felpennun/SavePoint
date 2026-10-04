@@ -30,6 +30,7 @@ from recommendations.service import (
 from recommendations.content.variants import ALGORITHM_REGISTRY
 from recommendations.published import PUBLISHED_CONTENT_ALGORITHM_IDS
 from recommendations.genre_heuristic import rank_genre_taste_v1
+from recommendations.ondemand import request_worker
 from recommendations.published import SECTION_ALGORITHM_IDS, configuration_fingerprint
 
 # Allowlist echoed back verbatim so a future change to the service DTO can
@@ -292,6 +293,10 @@ class RecommendationSnapshotView(APIView):
         else:
             status = "stale"
 
+        if has_live_refresh:
+            # The page polls while a refresh is pending: if nothing is running
+            # (for instance the instance restarted mid-job), start a worker.
+            request_worker(rate_limited=True)
         response = Response(
             {
                 "status": status,

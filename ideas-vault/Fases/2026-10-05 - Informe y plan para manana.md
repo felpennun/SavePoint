@@ -10,26 +10,31 @@ Documento de trabajo para revisar con el autor. Recoge lo que quedó hecho, lo q
 lista de tareas de mañana con una propuesta de enfoque para cada una. No contiene credenciales. Detalles técnicos del
 despliegue: [[2026-10-05 - Corpus publico en Neon]]. Revisión de seguridad previa: [[2026-10-04 - Revision de seguridad]].
 
-## 0. Lo primero que hay que decidir mañana (bloqueante)
+## 0. Worker bajo demanda: RESUELTO esta noche (antes era el bloqueante)
 
-**El worker de recomendaciones de Render mantiene despierta la base de datos de Neon.** `render-start.sh` lanza
-`process_recommendation_jobs --loop --poll-seconds 3`: consulta la base cada 3 s. Mientras Render esté despierto, Neon
-no se duerme nunca. Hoy no es grave porque Render se apaga solo tras ~15 min sin tráfico, pero **en cuanto activemos el
-ping a Render (sección 4) la base quedaría encendida 24 h**. Según recuerdo, el plan gratuito de Neon da unas 100
-horas-CU al mes, que a 0,25 CU son ~400 h de cómputo, menos que las ~730 h de un mes (a verificar en la consola de Neon
-antes de decidir). Agotado el cupo, Neon suspende el proyecto y **la web pública deja de funcionar**.
+**Problema detectado:** el worker de recomendaciones de Render consultaba Neon cada 3 s (`--loop --poll-seconds 3`),
+lo que mantiene despierta la base de datos mientras Render lo esté. Con el ping activado, Neon quedaría encendido 24 h
+y agotaría las horas de cómputo del plan gratuito (según recuerdo ~100 horas-CU/mes, unas 400 h a 0,25 CU, frente a
+~730 h de un mes; a verificar en la consola), tras lo cual la web dejaría de funcionar.
 
-Esto contradice el objetivo del autor: "pingear solo a Render para no gastar las llamadas de Neon".
+**Solución aplicada (opción A):** `apps/api/recommendations/ondemand.py`. Ya no hay ningún proceso que pregunte.
+Cuando la API encola un refresco de recomendaciones, lanza un proceso corto (`process_recommendation_jobs
+--ondemand`) que vacía la cola y termina; la base solo se consulta cuando alguien actúa.
 
-Propuesta (la recomendada es A):
+- **Candado de fichero:** el lanzador toma el candado y se lo pasa al proceso hijo por un descriptor heredado
+  (`RECOMMENDATION_WORKER_LOCK_FD`); así nunca hay dos workers a la vez y no hay hueco entre decidir y tomar el candado
+  (se detectó y cerró esa carrera durante las pruebas). Si el candado está tomado, el lanzador no hace nada y el worker
+  en marcha vuelve a mirar la cola antes de terminar.
+- **Autorreparación:** si la página de recomendaciones consulta mientras hay un refresco pendiente y no corre ningún
+  worker (por ejemplo, reinicio a mitad de un trabajo), pide uno (como mucho cada 30 s). Al arrancar Render se vacía
+  una vez lo que hubiera quedado en la cola.
+- **Interruptor:** solo funciona con `RECOMMENDATION_ONDEMAND_WORKER=1` (lo fija `render-start.sh`). En local y en
+  los tests no se lanza nada; la pila local sigue con sus workers por algoritmo.
+- **Pruebas:** 9 pruebas nuevas (`tests/test_ondemand_worker.py`) y 788 de backend en verde; comprobado además con
+  procesos reales: un segundo intento inmediato no lanza otro worker y, al terminar el primero, se lanza uno nuevo.
 
-| Opción | Cómo | Pros | Contras |
-|---|---|---|---|
-| **A. Worker bajo demanda** | Quitar el bucle. Cuando la API encola un trabajo, lanza un subproceso `process_recommendation_jobs` (sin `--loop`, con un candado para que haya uno solo) que procesa la cola y termina. | La base solo se consulta cuando alguien actúa. Las recomendaciones tardan lo mismo. | Hay que escribir y probar el lanzador (unas 30 líneas más test). |
-| B. Bucle con espera larga | `--poll-seconds` de varios minutos. | Cambio de una línea. | Una recomendación podría tardar minutos en empezar; la base sigue despertándose con cada consulta. |
-| C. Sin worker en la nube | Recomendaciones solo en local. | Sin coste. | La web pública pierde recomendaciones personalizadas. |
-
-Hasta resolverlo: **no activar el ping** (sección 4).
+**Efecto para el ping (sección 4):** ya se puede activar sin consumir horas de Neon, siempre que apunte a `/health/`.
+Pendiente de comprobar en producción tras el despliegue: que Neon pasa a suspendido a los pocos minutos de inactividad.
 
 ## 1. Estado actual del despliegue
 
@@ -107,7 +112,7 @@ Regenerar la vista previa PDF (está desactualizada desde el último reemplazo d
 Lista de candidatos para abrir la discusión de cómo y cuánto añadir (el autor no quiere secciones muy grandes):
 
 - Desplegar el corpus gobernado completo: Neon de pago (Launch) o PostgreSQL propio; coste frente a beneficio.
-- Workers de recomendación independientes por algoritmo y bajo demanda (ver sección 0).
+- Workers de recomendación independientes por algoritmo (hoy, en la nube, un único proceso bajo demanda; ver sección 0).
 - Caché compartida (Redis) si hubiera más de una instancia; hoy no hace falta (una sola instancia, caché en memoria).
 - Caché en el borde de Vercel moviendo las lecturas públicas a rutas de Next.js con `revalidate` (el `s-maxage` por
   `rewrite` no se cachea en Vercel: probado, `MISS` repetido).
@@ -143,7 +148,7 @@ Qué ocurre cuando alguien entra: con Render despierto, la primera petición que
 precalentado de facetas solo se ejecuta cuando Render **arranca**; las facetas viven 6 h en memoria, así que el primer
 visitante después de ese plazo paga unos 2 s. Aceptable; si molestara, se puede añadir una renovación al primer acceso.
 
-Condición previa: **resolver la sección 0** antes de activar el ping.
+Condición previa (resuelta, sección 0): el worker bajo demanda ya no consulta la base de datos en segundo plano.
 
 ## 5. Revisión completa del repositorio antes de hacerlo público
 
@@ -234,7 +239,7 @@ Pregunta del autor: ¿puedo hacer yo la visita y aplicar las correcciones princi
 
 ## 9. Orden sugerido para mañana
 
-1. Decidir la opción de la sección 0 (worker bajo demanda) e implementarla; después activar el ping de la sección 4.
+1. Activar el ping de la sección 4 (el worker bajo demanda ya está hecho) y comprobar que Neon se suspende.
 2. Correcciones del profesor (primero, porque condicionan la memoria).
 3. Sección de despliegue y diferencias local/desplegado (sección 2) y trabajo futuro (sección 3, tras la discusión).
 4. Revisión visual autónoma y correcciones, empezando por móvil (secciones 6-7).

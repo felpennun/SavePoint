@@ -16,6 +16,7 @@ from library.models import LibraryEntry, OwnedCopy
 from recommendations.content import signal_cache
 from recommendations.content.features import FEATURE_SET_VERSION
 from recommendations.cancellation import RecommendationComputationCancelled
+from recommendations.ondemand import request_worker
 from recommendations.genre_heuristic import rank_genre_taste_v1
 from recommendations.models import (
     RecommendationJobStatus,
@@ -112,6 +113,9 @@ def enqueue_latest_refresh(user_id: int) -> list[RecommendationRefreshJob]:
                 ]
             )
         jobs.append(job)
+    # With the on-demand worker enabled (public deployment) this is what starts
+    # the process that computes the new jobs; otherwise it does nothing.
+    transaction.on_commit(request_worker)
     return jobs
 
 
