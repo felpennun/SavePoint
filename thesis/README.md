@@ -50,10 +50,8 @@ docker run --rm -v "$PWD":/w -w /w texlive/texlive:latest latexmk -pdf TFG.tex
 
 - `TFG.tex`: fichero maestro con los datos de portada y el orden de capítulos.
 - `etc/pkgs.tex`, `etc/style.tex`: paquetes y estilos de la plantilla, sin cambios de fondo.
-- `sections/`: portada, material preliminar y los diez capítulos.
+- `sections/`: portada, material preliminar y los ocho capítulos.
 - `figures/`: figuras y capturas de la aplicación.
-- `tables/`: tablas nativas incluidas con `\input`.
-- `code/`: extractos de código incluidos con `\lstinputlisting` (heredados de la plantilla).
 - `bibliografia.bib`: referencias en formato BibTeX.
 
 ## Artefactos que no se versionan
@@ -64,7 +62,7 @@ etc.) están en `.gitignore`. Sí se versionan las fuentes `.tex`, `.bib` y las 
 ## Pendientes del autor
 
 No quedan marcadores `\todo[inline]` en el documento: el último (consolidación de la
-evidencia de verificación en `sections/05_diseno_actualizado.tex`) se cerró el 2026-09-22
+evidencia de verificación, hoy en `sections/06_implementacion.tex`) se cerró el 2026-09-22
 con las cifras reales del cierre de la Fase 7 (736 pruebas de backend, 70 de frontend, 56 de
 navegador, todas en verde, 14/09/2026). Sigue sin haber intervención humana pendiente marcada
 en el texto, pero antes de la entrega conviene:

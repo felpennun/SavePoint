@@ -1,92 +1,30 @@
-\chapter{Antecedentes, estado del arte y fundamentos de evaluación}\label{cap:estado-del-arte}
+\chapter{Estado del arte y fundamentos de evaluación}\label{cap:estado-del-arte}
 
-Este capítulo revisa el terreno sobre el que se construye SavePoint. Examina primero los
-productos de catalogación que sirven de referencia, después las fuentes de datos de
-videojuegos disponibles y sus condiciones de uso, y a continuación el panorama de los sistemas
-de recomendación y de su evaluación reproducible, con el vocabulario y las métricas concretas
-que el resto del Núcleo I usa sin volver a introducirlas cada vez. Termina esa revisión con las
-metodologías de desarrollo asistido por agentes de código, antes de exponer la aportación
-diferencial que persigue el trabajo.
+Este capítulo revisa el terreno técnico sobre el que se construye SavePoint. Examina primero
+las fuentes de datos de videojuegos disponibles y sus condiciones de uso, después el panorama
+de los sistemas de recomendación y de su evaluación reproducible, con el vocabulario y las
+métricas concretas que el resto de la memoria usa sin volver a introducirlas, y termina con las
+metodologías de desarrollo asistido por agentes de código. Los productos de referencia con los
+que se compara SavePoint se presentan en la Sección~\ref{sec:contexto-problema}.
 
-\section{Productos de referencia}\label{sec:arte-productos}
-
-El modelo de catalogación social nació fuera del videojuego. Goodreads, centrado en los libros,
-comparte con Letterboxd, dedicado al cine, un patrón que SavePoint adopta: una ficha canónica por obra,
-independiente de la edición concreta que posea cada persona; un estado de consumo personal,
-como leído, viendo o pendiente; una valoración con una escala consistente; listas ordenadas;
-un perfil público que resume la actividad~\cite{goodreads,letterboxd}. Ninguno de los dos representa la propiedad
-material con detalle, porque un libro o una película no plantean el problema de inventario
-que sí plantea una consola con juegos en cartucho, disco y descarga.
-
-En el ámbito del videojuego, Backloggd traslada casi literalmente el modelo de Letterboxd~\cite{backloggd},
-con buen tratamiento del backlog y del perfil, pero sin inventario de copias ni ambición de
-recomendación. OpenCritic agrega puntuaciones de prensa y es una referencia de densidad
-visual y de tratamiento de la nota, más que un catalogador personal. Steam ofrece una
-biblioteca personal rica, aunque acoplada a su tienda y limitada a lo comprado en ella. La
-web de IGDB expone un catálogo amplio y bien modelado, orientado a la consulta y no a la
-gestión de una colección. La Tabla~\ref{tab:productos} resume la comparación.
-
-\begin{table}[htp]
-\centering
-\begin{tabularx}{\textwidth}{ | Y | Z | Z | Z | Z | }
-    \hline
-    \textbf{Producto} & \textbf{Ficha canónica} & \textbf{Backlog y perfil} & \textbf{Inventario de copias} & \textbf{Recomendación} \\
-    \hline
-    Goodreads & Sí & Sí & No & Sí \\
-    \hline
-    Letterboxd & Sí & Sí & No & Parcial \\
-    \hline
-    Backloggd & Sí & Sí & No & No \\
-    \hline
-    OpenCritic & Sí & No & No & No \\
-    \hline
-    Steam & Parcial & Parcial & Solo digital de su tienda & Sí \\
-    \hline
-    IGDB.com & Sí & No & No & No \\
-    \hline
-    \textbf{SavePoint} & Sí & Sí & Sí & Sí \\
-    \hline
-\end{tabularx}
-\caption{Comparación de SavePoint con los productos de referencia.}
-\label{tab:productos}
-\end{table}
-
-El hueco que SavePoint ocupa se ve en la última columna de la
-Tabla~\ref{tab:productos}: ningún producto reúne un inventario detallado de propiedad
-material con un catálogo a escala real y un banco de pruebas de recomendación abierto y
-reproducible.
-
-\section{Fuentes de datos de videojuegos y sus términos}\label{sec:arte-datos}
+\section{Fuentes de datos de videojuegos}\label{sec:arte-datos}
 
 Tres fuentes públicas cubren la mayor parte del catálogo de videojuegos: Wikidata, IGDB y
 RAWG. Difieren sobre todo en su licencia y en sus condiciones de reutilización, que son
-determinantes para un trabajo que debe citar fuentes defendibles.
+determinantes para un trabajo que debe citar fuentes defendibles. Wikidata publica sus datos
+estructurados bajo la dedicación al dominio público \textit{Creative Commons Zero} (CC0), la
+licencia más limpia de las tres, aunque el modelado de género y plataforma para videojuegos es
+desigual y depende de la edición voluntaria~\cite{wikidata-licensing}. Sus archivos
+multimedia viven en Wikimedia Commons y no comparten esa licencia: cada imagen lleva su propia
+condición, que puede exigir crédito, de modo que su reutilización requiere una revisión por
+archivo~\cite{commons-reuse}. IGDB, propiedad de Twitch, ofrece una API de versión 4 con una
+entidad de plataforma de primera clase y se sirve bajo el \textit{Twitch Developer Services
+Agreement} (DSA)~\cite{igdb-api, twitch-dsa}. RAWG ofrece una cobertura comparable, con
+metadatos de tienda, pero su nivel gratuito es más restrictivo en cuota y en atribución~\cite{rawg-api}.
+La Tabla~\ref{tab:data04}, en la Sección~\ref{cap:datos}, compara las tres fuentes y recoge la
+elección de Wikidata para el corpus curado inicial y de IGDB para el catálogo a escala real.
 
-Wikidata publica sus datos estructurados bajo la dedicación al dominio público
-\textit{Creative Commons Zero} (CC0), la licencia más limpia de las tres, sin obligación de
-atribución~\cite{wikidata-licensing}. Los archivos multimedia asociados viven en Wikimedia
-Commons y no comparten esa licencia: cada imagen lleva su propia condición, que puede exigir
-crédito a la dirección del proyecto y a la licencia concreta, de modo que su reutilización requiere una revisión
-por archivo~\cite{commons-reuse}. La contrapartida de Wikidata es la cobertura: el modelado
-de género y plataforma para videojuegos es desigual y depende de la edición voluntaria.
-
-IGDB, propiedad de Twitch, ofrece una API de versión 4 con una entidad de plataforma de
-primera clase, veintitrés géneros y arte de portada, servida bajo el \textit{Twitch
-Developer Services Agreement} (DSA)~\cite{igdb-api, twitch-dsa}. La documentación indica que
-la API es gratuita para proyectos comerciales y no comerciales, aunque las integraciones
-monetizadas pueden requerir una asociación comercial. También fija un límite de cuatro
-peticiones por segundo. La misma documentación recomienda almacenar y servir los datos desde
-la propia aplicación, permite conservarlos y solicita una atribución estática y visible.
-
-RAWG ofrece una cobertura comparable, con metadatos de tienda, pero su nivel gratuito impone
-un techo de veinte mil peticiones al mes y exige atribución con un enlace de vuelta en cada
-página que use los datos. Los términos también contemplan determinados usos comerciales
-dentro de ese límite y con restricciones de audiencia, mientras que los proyectos que lo
-superan deben acogerse a condiciones comerciales específicas~\cite{rawg-api}.
-El Capítulo~\ref{cap:datos} desarrolla la comparación que llevó a elegir Wikidata para el
-corpus curado inicial e IGDB para el catálogo a escala real.
-
-\section{Sistemas de recomendación y evaluación reproducible}\label{sec:arte-recomendacion}
+\section{Sistemas de recomendación y su evaluación}\label{sec:arte-recomendacion}\label{sec:arte-fundamentos}
 
 Los sistemas de recomendación se agrupan de forma clásica en tres familias~\cite{ricci2022handbook,
 aggarwal2016recommender}. Los métodos basados en contenido describen cada ítem con un vector
@@ -100,7 +38,7 @@ que el contenido no expresa, pero sufren el problema del arranque en frío cuand
 un ítem no tienen historial. Los métodos híbridos combinan ambas señales para mitigar las
 debilidades de cada una~\cite{burke2002hybrid}. SavePoint implementa y compara, sobre su propio
 catálogo, representantes de las tres familias, con la formulación y la comparación con datos
-reales que desarrolla el Capítulo~\ref{cap:algoritmos}.
+reales que desarrollan la Sección~\ref{cap:algoritmos} y el Capítulo~\ref{cap:resultados}.
 
 La parte más delicada no es implementar los algoritmos, sino evaluarlos de forma
 comparable~\cite{herlocker2004evaluating, gunawardana2015evaluating}. La literatura señala
@@ -113,14 +51,12 @@ pueden ordenar los algoritmos de forma distinta~\cite{cremonesi2010performance}.
 metodológica aceptada es fijar por adelantado, de forma inmutable, el corpus, el reparto, las
 exclusiones, las métricas, las semillas y el presupuesto de ajuste, antes de comparar nada. En
 SavePoint este principio se concreta en un protocolo offline congelado y versionado, descrito
-en el Capítulo~\ref{cap:algoritmos}. Ese protocolo deja la comparación preparada y repetible,
+en el Capítulo~\ref{cap:resultados}. Ese protocolo deja la comparación preparada y repetible,
 pero no debe confundirse con una afirmación sobre usuarios reales: los resultados que presenta
 esta memoria se miden sobre un corpus y una población sintética concretos, como se explica en
 el Capítulo~\ref{cap:introduccion}.
 
-\section{Vocabulario y métricas de evaluación}\label{sec:arte-fundamentos}
-
-El resto del Núcleo I usa, sin volver a introducirlo, un vocabulario concreto de evaluación que
+El resto de la memoria usa, sin volver a introducirlo, un vocabulario concreto de evaluación que
 conviene fijar aquí. Evaluar un recomendador sin usuarios reales delante exige fijar por
 adelantado, antes de mirar ningún resultado y no después, cinco decisiones: la tarea concreta
 que se mide (recomendar los siguientes \(K\) ítems que a una persona le interesarán, no
@@ -128,7 +64,7 @@ predecir la nota exacta que pondría), el criterio de relevancia que separa un a
 fallo, el conjunto de candidatas sobre el que compite cada algoritmo, la división de los datos
 entre lo que el modelo puede ver y lo que se usa para medir, y la forma de agregar el resultado
 por usuario en una única cifra por algoritmo. SavePoint fija estas cinco decisiones en un
-protocolo versionado que el Capítulo~\ref{cap:algoritmos} describe con detalle.
+protocolo versionado que el Capítulo~\ref{cap:resultados} describe con detalle.
 
 \textit{Precision at K} mide qué proporción de los \(K\) ítems recomendados resultan
 relevantes; \textit{recall at K} mide qué proporción de todos los ítems relevantes que existen
@@ -150,15 +86,8 @@ penaliza a un algoritmo que acierta mucho pero siempre con variaciones del mismo
 novedad mide cuánto se aleja la recomendación de lo obvio o lo ya muy popular. La cobertura
 mide qué proporción del catálogo entero llega a aparecer alguna vez recomendada, en lugar de
 concentrarse siempre en el mismo puñado de éxitos. Un recomendador que maximiza solo precisión
-o nDCG puede hacerlo a costa de las tres, recomendando siempre lo mismo a todo el mundo; el
-Capítulo~\ref{cap:algoritmos} explica cómo SavePoint reordena sus listas para compensarlo.
-
-Estas definiciones son el punto de partida común de la literatura sobre sistemas de
-recomendación, pero los pesos concretos, los umbrales de relevancia y la taxonomía de señales
-que se combinan con ellas son decisiones locales de este proyecto, no un estándar universal.
-SavePoint las versiona junto al código y las revisa como revisaría cualquier otra decisión de
-diseño, precisamente porque ninguna métrica basta por sí sola para declarar un algoritmo mejor
-que otro sin decir, a la vez, bajo qué corpus, qué población y qué protocolo se midió.
+o nDCG puede hacerlo a costa de las tres, recomendando siempre lo mismo a todo el mundo; la
+Sección~\ref{cap:algoritmos} explica cómo SavePoint reordena sus listas para compensarlo.
 
 \section{El método GSD: agentes coordinados sobre un contexto compartido}\label{sec:arte-agentes}
 
@@ -174,37 +103,10 @@ atómica, ejecutar cada tarea con el contexto limpio y hacer que la información
 continuar viaje entre tareas a través de ficheros versionados en el propio repositorio, nunca a
 través del historial de una conversación.
 
-Sobre ese principio, GSD organiza el desarrollo en incrementos que recorren un ciclo ordenado
-de discusión, planificación, ejecución y verificación, donde cada paso produce un artefacto
-escrito que actúa como fuente de verdad del siguiente~\cite{gsd}. Lo interesante del método no
+Sobre ese principio, GSD organiza el desarrollo en incrementos que recorren un ciclo ordenado~\cite{gsd}. Lo interesante del método no
 es tanto ese ciclo, habitual en cualquier proceso de ingeniería disciplinado, como la forma en
 que lo instrumenta: cada incremento se apoya en un árbol de ficheros compartido que agentes con
-roles distintos (planificador, ejecutor, verificador, revisor) leen y escriben de forma
-coordinada, cada uno acotado a su función y sin heredar el razonamiento de los demás. La
-separación entre quien planifica, quien implementa y quien verifica se hace así deliberada, de
-modo que la verificación no hereda la confianza del código recién escrito. El
+roles distintos leen y escriben de forma coordinada, cada uno acotado a su función
+y sin heredar el razonamiento de los demás. El
 Capítulo~\ref{cap:gestion} describe con detalle cómo se aplicó este enfoque a SavePoint, qué
 mecanismos concretos lo instrumentan y qué evidencia dejó.
-
-\section{Aportación diferencial del trabajo}\label{sec:arte-aportacion}
-
-De la revisión anterior se desprenden las tres aportaciones que persigue el trabajo. La
-primera es un producto de catalogación de videojuegos que combina inventario de propiedad
-material, catálogo a escala real y procedencia de datos documentada, un conjunto que ningún
-servicio existente reúne, como muestra la Tabla~\ref{tab:productos}. La segunda es un banco de
-pruebas reproducible para la comparación de recomendadores, con corpus citable, usuarios
-sintéticos y procedencia de datos documentada, que este trabajo explota mediante un protocolo
-de evaluación congelado y una comparación real entre dieciséis algoritmos, presentada en el
-Capítulo~\ref{cap:algoritmos}. La tercera es la propia metodología de ingeniería asistida por
-agentes, aplicada de forma sistemática y versionada en el repositorio, de manera que el proceso
-que produjo el sistema es tan inspeccionable y reproducible por un tercero como el sistema
-mismo; el Capítulo~\ref{cap:gestion} la desarrolla en profundidad.
-
-El protocolo de evaluación concreta esa segunda aportación en tres decisiones que suelen
-quedar ocultas en una comparación de recomendadores y que aquí quedan, en cambio, explícitas y
-verificables. Primero, separa el número que se muestra en el producto de las valoraciones
-externas que alimentan el laboratorio. Segundo, fija la población, la relevancia, los
-candidatos, las exclusiones, las semillas y las métricas antes de ejecutar ninguna prueba de
-laboratorio. Tercero, obliga a que cada variante tenga nombre, versión, huella del input y una
-explicación basada en contribuciones almacenadas, en lugar de generar una explicación
-narrativa después de observar el resultado.

@@ -1,0 +1,64 @@
+\chapter{Conclusiones y continuidad}\label{cap:conclusiones}
+
+Este capítulo cierra la memoria. Valora el grado de cumplimiento de los objetivos fijados en
+el Capítulo~\ref{cap:introduccion}, resume las aportaciones del trabajo, declara sus
+limitaciones sin suavizarlas y esboza las líneas de continuidad que el sistema deja abiertas.
+
+\section{Grado de cumplimiento de los objetivos}\label{sec:conc-objetivos}
+
+El objetivo general, construir una plataforma de catalogación que funcionara también como
+banco de pruebas reproducible de recomendación, se cumple en su totalidad. El catálogo tiene
+identidad canónica propia, procedencia por obra y licencia documentada, a escala real sobre
+el catálogo importado de IGDB. Una persona usuaria puede mantener su lista de pendientes,
+valorar juegos e inventariar copias físicas y digitales con su formato y su edición, con
+privacidad de perfil y relaciones sociales gobernadas por completo en el backend. El protocolo
+de evaluación offline quedó congelado, versionado y probado antes de ejecutar ninguna
+comparación. Esa comparación se llevó a cabo: las tres familias de recomendación
+(basada en contenido, colaborativa e híbrida), descritas con su formulación completa en el
+Sección~\ref{cap:algoritmos}, se compararon bajo ese protocolo en el
+Capítulo~\ref{cap:resultados} frente a los baselines de referencia. De los objetivos específicos solo quedan pendientes, de forma parcial, dos piezas del
+contrato de evaluación, que recoge la Sección~\ref{sec:conc-limitaciones}. Cada incremento del
+sistema se cerró con sus criterios de éxito verificados de forma independiente, según la
+disciplina descrita en el Capítulo~\ref{cap:gestion}.
+
+\section{Limitaciones y trabajo futuro}\label{sec:conc-limitaciones}\label{sec:conc-trabajo-futuro}
+
+Las limitaciones conocidas se declaran sin ocultarlas. La evidencia experimental publicada
+procede de una única ejecución del test sobre usuarios sintéticos, setenta y nueve de ellos
+evaluables, con una sola semilla: es suficiente para comparar algoritmos entre sí bajo un
+protocolo común, con significación estadística ya calculada sobre esa muestra (bootstrap BCa,
+Friedman, Wilcoxon y corrección de Holm), pero no permite afirmar que esa significación sea
+estable frente a otra semilla o a otra población sintética sin repetir el experimento. La
+cobertura de valoraciones externas del catálogo es parcial, como corresponde a una fuente
+agregada de terceros y no a un panel de crítica propio; esa parcialidad se propaga, de forma
+documentada, a cualquier señal de calidad externa que la use. La captura de entorno de
+ejecución y consumo de recursos, ya disponible en el ejecutor paralelo para comparaciones
+futuras, no se retroproyectó sobre la ejecución v15 ya cerrada, de modo que esa ejecución
+concreta carece de ese detalle. El despliegue público, descrito en la
+Sección~\ref{cap:despliegue}, sirve todavía el catálogo curado inicial y no el catálogo a
+escala real: esa conexión se pospuso de forma deliberada al final del proyecto; la
+demostración ante el tribunal se ejecuta desde el entorno local reproducible.
+
+El banco de pruebas que esta memoria deja construido y ya explotado habilita líneas de
+continuación concretas, no genéricas. La primera es repetir el protocolo publicado con nuevas
+semillas y con cohortes sintéticas adicionales, para separar lo que es una diferencia
+consistente entre algoritmos de lo que podría ser ruido de una única muestra, y aplicar sobre la nueva ejecución la captura de entorno y consumo de recursos que el
+ejecutor paralelo ya sabe registrar. La segunda es estudiar la sensibilidad del sistema a sus propios
+hiperparámetros locales (los pesos de familia de facetas, la mezcla híbrida, el factor de
+diversidad), en lugar de tratarlos como constantes fijadas de una vez. La tercera, ya fuera
+del núcleo de recomendación, es conectar el despliegue público al catálogo a escala real.
+Cualquier extensión de este trabajo deberá crear su propio protocolo y su propio artefacto
+versionado, sin alterar de forma retroactiva la evidencia ya publicada.
+
+\section{Aportaciones y valoración final}\label{sec:conc-aportaciones}\label{sec:conc-cierre}
+
+Las tres aportaciones anunciadas en la Sección~\ref{sec:contexto-problema} quedan entregadas.
+El producto está construido, verificado y documentado. El banco de pruebas está explotado: un
+corpus citable, una población sintética documentada y un protocolo offline congelado sostienen
+una comparación real entre dieciséis algoritmos, con sus artefactos, semillas y
+configuraciones conservados para que un tercero pueda reproducir cada cifra publicada. Y la
+metodología de ingeniería que gobernó el proyecto, versionada en el repositorio con su árbol
+de planificación, sus registros de decisión y su registro de agentes, permite reconstruir el
+rastro completo de decisiones. Así, el trabajo entrega las dos mitades de la idea de la que
+parte SavePoint: un producto de catalogación y un banco de pruebas de recomendadores cuyos
+resultados se pueden volver a obtener a partir de los mismos artefactos versionados.
