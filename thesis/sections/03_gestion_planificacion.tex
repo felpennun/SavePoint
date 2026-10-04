@@ -308,9 +308,13 @@ la Sección~\ref{sec:exp-protocolo}.
 
 El trabajo se planificó como una sucesión de incrementos verticales, cada uno utilizable y
 verificado antes de abordar el siguiente, en lugar de un calendario cerrado de tareas fijado
-desde el principio. El desarrollo se organizó en seis iteraciones a lo largo de cuatro meses,
-del 2 de junio al 30 de septiembre de 2026, agrupadas alrededor de los hitos de la
-Tabla~\ref{tab:hitos}.
+desde el principio. El desarrollo se organizó en seis iteraciones a lo largo de dos meses,
+desde principios de agosto hasta el 4 de octubre de 2026, agrupadas alrededor de los hitos de la
+Tabla~\ref{tab:hitos}. El estudio previo y las primeras pruebas de desarrollo comenzaron
+aproximadamente un mes antes del arranque sistemático del repositorio de producto: el
+repositorio se creó el 24 de agosto y el desarrollo con registros de decisión y planes por
+fase comenzó el 4 de septiembre. La fecha de inicio del estudio previo es aproximada; las
+posteriores proceden del historial del repositorio y de las firmas de cada fase.
 
 \begin{table}[H]
 \centering
@@ -319,21 +323,21 @@ Tabla~\ref{tab:hitos}.
     \hline
     \textbf{Hito} & \textbf{Fecha} \\
     \hline
-    H0 — Aprobación de la propuesta y arranque del repositorio & 02/06/2026 \\
+    H0 — Inicio del estudio previo y de las primeras pruebas de desarrollo & 04/08/2026 (aprox.) \\
     \hline
-    H1 — Demostración pública de tres días en producción (Fase 1) & 12/06/2026 \\
+    H1 — Demostración pública de tres días en producción (Fase 1) & 05/09/2026 \\
     \hline
-    H2 — Catálogo a escala real e interfaz rediseñada (Fase 01.1) & 03/07/2026 \\
+    H2 — Catálogo a escala real e interfaz rediseñada (Fase 01.1) & 06/09/2026 \\
     \hline
-    H3 — Contrato de evaluación offline congelado (Fase 2) & 24/07/2026 \\
+    H3 — Contrato de evaluación offline congelado (Fase 2) & 08/09/2026 \\
     \hline
-    H4 — Recomendadores de contenido, colaborativo e híbrido implementados & 14/08/2026 \\
+    H4 — Recomendadores de contenido, colaborativo e híbrido implementados & 12/09/2026 \\
     \hline
     H5 — Publicación de resultados v15 con significación estadística & 12/09/2026 \\
     \hline
     H6 — Flujos de colección, relaciones de amistad y endurecimiento cerrados & 14/09/2026 \\
     \hline
-    H7 — Memoria del TFG completa, lista para defensa & 30/09/2026 \\
+    H7 — Memoria del TFG y despliegue completos, listos para defensa & 04/10/2026 \\
     \hline
 \end{tabularx}
 \end{table}
@@ -347,28 +351,32 @@ La Figura~\ref{fig:calendario} sitúa las iteraciones y los hitos en el calendar
     \label{fig:calendario}
 \end{figure}
 
-La \textbf{Iteración 1} (2 al 14 de junio) cubrió el estudio previo: revisión de productos de
-referencia, comparación de fuentes de datos de videojuegos y sus licencias, y las primeras
-decisiones de arquitectura (ADR-001 y ADR-002); cerró con un entorno de desarrollo
-reproducible en Docker Compose. La \textbf{Iteración 2} (15 de junio al 3 de julio) entregó el
-primer incremento de producto bajo una restricción explícita de tres días para una
-demostración pública visible, con un catálogo reducido, una cuenta y la recomendación por
-popularidad; a continuación amplió el catálogo a escala real e incorporó el rediseño de la
-interfaz. La \textbf{Iteración 3} (4 al 24 de julio) congeló el contrato de evaluación offline:
-corpus, población sintética, métricas y protocolo, antes de escribir ningún algoritmo de
-recomendación avanzado. La \textbf{Iteración 4} (25 de julio al 14 de agosto) implementó las
-tres familias de recomendación (contenido, colaborativo e híbrido) y sus dieciséis variantes.
-La \textbf{Iteración 5} (15 de agosto al 13 de septiembre) cerró los flujos completos de
-colección y portabilidad, las relaciones de amistad y el endurecimiento de seguridad; ejecutó también la publicación final de resultados (v15) descrita en el
-Capítulo~\ref{cap:resultados}. La \textbf{Iteración 6} (14 al 30 de septiembre) se dedicó por
-completo a la redacción, revisión y cierre de esta memoria.
+La \textbf{Iteración 1} (de principios de agosto al 3 de septiembre, con inicio aproximado) cubrió el
+estudio previo y las primeras pruebas de desarrollo: revisión de productos de referencia,
+comparación de fuentes de datos de videojuegos y sus licencias, y pruebas de desarrollo
+previas al arranque del repositorio de producto. La \textbf{Iteración 2} (4 al 6 de septiembre)
+formalizó las primeras decisiones de arquitectura (ADR-001 y ADR-002) con un entorno de
+desarrollo reproducible en Docker Compose, y entregó el primer incremento de producto bajo una
+restricción explícita de tres días para una demostración pública visible, con un catálogo
+reducido, una cuenta y la recomendación por popularidad; a continuación amplió el catálogo a
+escala real e incorporó el rediseño de la interfaz. La \textbf{Iteración 3} (7 y 8 de
+septiembre) congeló el contrato de evaluación offline: corpus, población sintética, métricas y
+protocolo, antes de escribir ningún algoritmo de recomendación avanzado. La
+\textbf{Iteración 4} (9 al 12 de septiembre) implementó las tres familias de recomendación
+(contenido, colaborativo e híbrido) y sus dieciséis variantes, y ejecutó la publicación final de
+resultados (v15) descrita en el Capítulo~\ref{cap:resultados}. La \textbf{Iteración 5} (13 y 14
+de septiembre) cerró los flujos completos de colección y portabilidad, las relaciones de
+amistad y el endurecimiento de seguridad. La \textbf{Iteración 6} (15 de septiembre al 4 de
+octubre) se dedicó a la redacción, revisión y cierre de esta memoria y del despliegue, junto con
+los ajustes finales de la interfaz y del módulo social.
 
 \section{Estimación de esfuerzo y presupuesto}\label{sec:met-presupuesto}
 
 El proyecto no llevó un registro de horas minuto a minuto por tarea, de modo que la estimación
 de esfuerzo que sigue se reconstruye a partir de la duración de cada iteración y de la carga de
 trabajo declarada de un estudiante que compagina el TFG con otras obligaciones académicas,
-en torno a veinticinco horas semanales durante las diecisiete semanas del proyecto. Tomando
+en torno a veinticinco horas semanales durante las nueve semanas transcurridas desde el inicio
+del estudio previo hasta el cierre de la memoria, unas doscientas veinticinco horas en total. Tomando
 como unidad el bloque de trabajo, no el incremento, la Tabla~\ref{tab:presupuesto-horas}
 reparte esas horas entre las grandes áreas del trabajo.
 
@@ -379,33 +387,33 @@ reparte esas horas entre las grandes áreas del trabajo.
     \hline
     \textbf{Bloque} & \textbf{Horas estimadas} \\
     \hline
-    Análisis, requisitos y diseño & 60 \\
+    Análisis, requisitos y diseño & 30 \\
     \hline
-    Infraestructura reproducible y despliegue & 35 \\
+    Infraestructura reproducible y despliegue & 18 \\
     \hline
-    Implementación de producto (backend y frontend) & 120 \\
+    Implementación de producto (backend y frontend) & 62 \\
     \hline
-    Adquisición y gobierno de datos & 40 \\
+    Adquisición y gobierno de datos & 20 \\
     \hline
-    Algoritmos de recomendación y protocolo de evaluación & 90 \\
+    Algoritmos de recomendación y protocolo de evaluación & 46 \\
     \hline
-    Pruebas, verificación y revisión & 45 \\
+    Pruebas, verificación y revisión & 23 \\
     \hline
-    Redacción de la memoria & 50 \\
+    Redacción de la memoria & 26 \\
     \hline
-    \textbf{Total} & \textbf{440} \\
+    \textbf{Total} & \textbf{225} \\
     \hline
 \end{tabularx}
 \end{table}
 
-El coste directo se calcula sobre esas 440 horas con una tarifa de referencia de un perfil
+El coste directo se calcula sobre esas 225 horas con una tarifa de referencia de un perfil
 junior de ingeniería del software en España, 14,00\,€/hora, una cota conservadora frente al
 coste real de contratación de un perfil equivalente. El coste material recoge la amortización
 proporcional del equipo personal empleado (un portátil de gama media, con una vida útil
-estimada de cuatro años, del que este trabajo consume cuatro meses); no se incluye ningún coste
+estimada de cuatro años, del que este trabajo consume dos meses); no se incluye ningún coste
 de infraestructura en la nube, porque la topología de despliegue público se diseñó
 explícitamente de coste cero (ADR-005, Sección~\ref{cap:despliegue}). El coste indirecto
-recoge la cuota proporcional de cuatro meses de electricidad y conexión a internet atribuible
+recoge la cuota proporcional de dos meses de electricidad y conexión a internet atribuible
 al proyecto. La Tabla~\ref{tab:presupuesto} resume el presupuesto total.
 
 \begin{table}[H]
@@ -414,13 +422,13 @@ al proyecto. La Tabla~\ref{tab:presupuesto} resume el presupuesto total.
     \hline
     \textbf{Concepto} & \textbf{Coste (\euro{})} \\
     \hline
-    Coste directo (440\,h a 14,00\,€/h) & 6.160,00 \\
+    Coste directo (225\,h a 14,00\,€/h) & 3.150,00 \\
     \hline
-    Coste material (amortización de equipo, 4 meses) & 75,00 \\
+    Coste material (amortización de equipo, 2 meses) & 37,50 \\
     \hline
-    Costes indirectos (electricidad y conexión, 4 meses) & 180,00 \\
+    Costes indirectos (electricidad y conexión, 2 meses) & 90,00 \\
     \hline
-    \textbf{Presupuesto total} & \textbf{6.415,00} \\
+    \textbf{Presupuesto total} & \textbf{3.277,50} \\
     \hline
 \end{tabularx}
 \caption{Estimación de esfuerzo y presupuesto del proyecto.}
