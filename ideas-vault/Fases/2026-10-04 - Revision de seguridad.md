@@ -107,7 +107,10 @@ la caché del proceso vacía entre una y otra, porque la caché del catálogo po
 
 ## 6. Pendiente
 
-- Confirmar que el CI queda en verde con los dos arreglos y que Render redespliega (aplicará las migraciones nuevas).
+- ~~Confirmar que el CI queda en verde y que Render redespliega~~ Hecho: CI en verde, Render sirve `ae946bd`
+  (fallaba además por `DEMO_ACCOUNTS`, corregido en `render-start.sh`) y Neon lleva ya el subconjunto del corpus
+  gobernado: ver [[2026-10-05 - Corpus publico en Neon]].
+- Rotar la contraseña de `neondb_owner` (pasó por el historial de la sesión de despliegue) y actualizar `DATABASE_URL`.
 - Subir `next` a 16.3.6 y `urllib3` a 2.8.0.
 - Revisar las contraseñas de demostración si coinciden con el despliegue público (#10) y usar un rol de base de datos sin
   privilegios de superusuario en producción (#13).
