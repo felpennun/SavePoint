@@ -87,3 +87,5 @@ Relacionado: [[2026-10-04 - Revision de seguridad]].
   configuración ya lo devuelve todo, así que ahora es una.
 - **Desplegable del perfil:** la insignia de platino (`z-index: 1`) se pintaba por encima del menú de cuenta porque la
   cabecera no formaba su propio nivel; `.sp-navbar` tiene ahora `z-index: 60`.
+- **Ficha de juego en la API:** la respuesta de `/api/catalogue/games/<slug>/` se guarda 5 minutos por slug e idioma en
+  la caché de la API (una docena de consultas menos por visita repetida); los 404 no se guardan.

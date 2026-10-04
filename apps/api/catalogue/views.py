@@ -39,6 +39,7 @@ from library.models import LibraryEntry
 
 
 LIST_CACHE_TTL_SECONDS = 120
+DETAIL_CACHE_TTL_SECONDS = 300
 # Public, short-lived: browsers and any CDN in front may reuse these answers for
 # a minute and serve a slightly older copy while they revalidate.
 PUBLIC_CACHE_CONTROL = "public, max-age=60, s-maxage=120, stale-while-revalidate=300"
@@ -147,6 +148,16 @@ class GameDetailView(APIView):
     """GET /api/catalogue/games/<slug>/"""
 
     def get(self, request: Request, slug: str) -> Response:
+        locale = request.query_params.get("locale")
+        if locale not in {"es", "en"}:
+            locale = "en"
+        # The detail answer depends only on the slug and the locale (never on
+        # who asks), and building it takes a dozen queries, so it is kept for a
+        # few minutes. Misses (404) are never cached.
+        cache_key = "catalogue:detail:" + hashlib.sha256(f"{slug}|{locale}".encode("utf-8")).hexdigest()
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return _public_cache(Response(cached))
         try:
             work = (
                 GameWork.objects.select_related()
@@ -164,10 +175,9 @@ class GameDetailView(APIView):
         except GameWork.DoesNotExist:
             # Generic 404 -- never confirm/deny via a distinguishing message.
             return Response({"detail": "Not found."}, status=404)
-        locale = request.query_params.get("locale")
-        if locale not in {"es", "en"}:
-            locale = "en"
-        return _public_cache(Response(GameDetailSerializer(work, context={"locale": locale}).data))
+        payload = GameDetailSerializer(work, context={"locale": locale}).data
+        cache.set(cache_key, payload, DETAIL_CACHE_TTL_SECONDS)
+        return _public_cache(Response(payload))
 
 
 class NewReleasesView(APIView):
