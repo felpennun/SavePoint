@@ -60,3 +60,20 @@ dos pendientes genuinos, ambos parciales dentro del mismo contrato de evaluació
 de entorno/recursos que el ejecutor paralelo ya sabe registrar para ejecuciones futuras). Los
 capítulos `05_diseno_actualizado.tex` y `09_conclusiones_actualizadas.tex` se corrigieron en
 consecuencia.
+
+## 2026-10-03: reestructuración del índice según la corrección del tutor
+
+El tutor pidió dos cambios: seguir el orden Introducción → Estado del arte → Gestión,
+metodología y planificación → Análisis → Diseño y arquitectura → Implementación y resultados →
+Conclusiones, fusionando los epígrafes de un solo párrafo; y dejar de partir la memoria en dos
+partes (plataforma web frente a estudio de recomendadores), buscando un punto intermedio en el
+que ambas pesan lo mismo.
+
+La memoria (`thesis/TFG.tex`) pasa a ocho capítulos sin `\part` ni apéndices:
+`01_marco_objetivos`, `02_estado_del_arte`, `03_gestion_planificacion`, `04_analisis`,
+`05_diseno_arquitectura`, `06_implementacion`, `07_resultados` y `08_conclusiones`. El
+contenido se movió de forma literal; los antiguos apéndices de requisitos, diseño e
+implementación quedan absorbidos en los capítulos 4–6, el diseño de algoritmos y del
+laboratorio vive en el capítulo 5 y la evaluación en el 7. Se conservan las etiquetas antiguas
+como alias para no romper referencias. Compila con TinyTeX sin errores, sin referencias
+indefinidas y sin cajas desbordadas relevantes (93 páginas).
