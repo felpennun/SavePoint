@@ -59,12 +59,6 @@ def _validate_copy_metadata(
     return normalized_currency
 
 
-class CommentAlreadyExists(Exception):
-    """Raised when the caller already has a comment for this work (D-04:
-    at most one comment per user/work) -- the view maps this to HTTP 409
-    without ever touching the database again."""
-
-
 class StaleListVersion(Exception):
     """Raised when a reorder's ``expected_version`` no longer matches the
     list's persisted version -- the view maps this to HTTP 409. Always
@@ -330,7 +324,7 @@ def clear_library_configuration(*, user, work: GameWork) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Comments (D-04/D-05, LIB-03): one comment per user/work, author-owned.
+# Comments (LIB-03): several per user/work, author-owned.
 # ---------------------------------------------------------------------------
 
 
@@ -365,12 +359,11 @@ def list_visible_comments(*, work: GameWork, viewer):  # noqa: ANN001
 def create_comment(
     *, user, work: GameWork, text: str | None = None, visibility: str | None = None
 ) -> GameComment:
-    """Create the caller's single comment for this work.
+    """Create a comment by the caller on this work.
 
     Rejects (without any mutation) a work outside the caller's own
-    collection, a missing/blank text, an invalid visibility, and -- via
-    ``CommentAlreadyExists`` -- a second comment for the same user/work
-    (D-04: exactly one comment per user/work, never a silent duplicate)."""
+    collection, a missing/blank text and an invalid visibility. A user may
+    write any number of comments on the same work."""
     if text is None or not text.strip():
         raise ValidationError("text is required.")
     resolved_visibility = visibility if visibility is not None else ContentVisibility.PUBLIC
@@ -378,8 +371,6 @@ def create_comment(
         raise ValidationError("visibility must be 'public' or 'private'.")
     if not LibraryEntry.objects.filter(user=user, work=work).exists():
         raise ValidationError("work is not in your collection.")
-    if GameComment.objects.filter(user=user, work=work).exists():
-        raise CommentAlreadyExists()
 
     with transaction.atomic():
         comment = GameComment.objects.create(
@@ -430,7 +421,11 @@ def delete_comment(*, user, comment_id: str) -> bool:
 def create_list(*, user, name: str | None = None, visibility: str | None = None) -> CustomList:
     if name is None or not name.strip():
         raise ValidationError("name is required.")
-    resolved_visibility = visibility if visibility is not None else ContentVisibility.PUBLIC
+    if visibility is None:
+        # New lists start with the visibility the owner chose in their profile.
+        profile = getattr(user, "profile", None)
+        visibility = profile.default_list_visibility if profile is not None else ContentVisibility.PUBLIC
+    resolved_visibility = visibility
     if resolved_visibility not in VALID_VISIBILITIES:
         raise ValidationError("visibility must be 'public' or 'private'.")
 

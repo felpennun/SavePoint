@@ -135,7 +135,8 @@ test.describe("demo account login journey (AUTH-01, D-02/D-03, LIB-01)", () => {
     // page no longer renders a visible <h1> (2026-09-12: the navbar title
     // is enough); "Catálogo" survives as the results section's accessible
     // name, exposed as an ARIA region landmark.
-    await page.waitForURL(/\/es\/catalogue$/);
+    await page.waitForURL(/\/es$/);
+    await page.goto("/es/catalogue");
     await expect(page.getByRole("region", { name: "Catálogo" })).toBeVisible();
 
     // GameCard renders title and year/platform as separate paragraphs
@@ -157,16 +158,16 @@ test.describe("demo account login journey (AUTH-01, D-02/D-03, LIB-01)", () => {
     // real pointer click lands on the label via HTML's own label-forwarding
     // even though the input itself is pointer-events: none, so this clicks
     // the visible label text, the same target a sighted user would use.
-    await page.getByText("Jugando", { exact: true }).click();
+    await page.getByLabel("Estado").selectOption("playing");
     await page.getByRole("button", { name: "Guardar configuración" }).click();
-    await expect(page.getByTestId("configuration-feedback")).toHaveText("Configuración guardada");
+    await expect(page.getByTestId("status-feedback")).toHaveText("Configuración guardada");
 
     // D-14/reload contract: reloading re-reads the persisted PostgreSQL
     // value, never trusting only the client-side selection that was just
     // made -- this is the core assertion this whole tracer plan exists to
     // prove end-to-end.
     await page.reload();
-    await expect(page.getByRole("radio", { name: "Jugando" })).toBeChecked();
+    await expect(page.getByLabel("Estado")).toHaveValue("playing");
 
     // Plan 01-09 acceptance criteria: save a 3.5-star rating (7 half-steps)
     // and two owned copies, then confirm both survive a reload. Copy count
@@ -174,7 +175,7 @@ test.describe("demo account login journey (AUTH-01, D-02/D-03, LIB-01)", () => {
     // against the persistent dev database (not an isolated per-run test
     // DB), so a fixed "exactly N copies" assertion would break on any
     // second run against the same environment.
-    const copyListLocator = page.locator("main").getByText(/^(Física|Digital)$/);
+    const copyListLocator = page.locator(".sp-copy-item");
     const copyCountBefore = await copyListLocator.count();
 
     // The rating control is five stars, each split into a left/right half
@@ -183,16 +184,19 @@ test.describe("demo account login journey (AUTH-01, D-02/D-03, LIB-01)", () => {
     if ((await ratingButton.getAttribute("aria-pressed")) !== "true") {
       await ratingButton.click();
     }
-    // Adding a copy only touches local state -- both are persisted by the
-    // same single save below, alongside the rating.
-    await page.getByRole("button", { name: "Añadir otra copia" }).click();
-    await page.getByRole("button", { name: "Añadir otra copia" }).click();
+    // A copy is added through the dialog; saving it persists the whole
+    // configuration (including the rating) in one request.
+    for (let added = 0; added < 2; added++) {
+      await page.getByRole("button", { name: "Añadir copia" }).click();
+      await page.getByRole("button", { name: "Guardar copia" }).click();
+      await expect(page.getByTestId("status-feedback")).toHaveText("Configuración guardada");
+    }
     await page.getByRole("button", { name: "Guardar configuración" }).click();
-    await expect(page.getByTestId("configuration-feedback")).toHaveText("Configuración guardada");
+    await expect(page.getByTestId("status-feedback")).toHaveText("Configuración guardada");
 
     await page.reload();
     await expect(page.getByRole("button", { name: "3.5 de 5 estrellas" })).toHaveAttribute("aria-pressed", "true");
-    await expect(page.locator("main").getByText(/^(Física|Digital)$/)).toHaveCount(copyCountBefore + 2);
+    await expect(page.locator(".sp-copy-item")).toHaveCount(copyCountBefore + 2);
   });
 
   test("logout invalidates the session and protected pages redirect to login", async ({ page, context }) => {
@@ -202,7 +206,7 @@ test.describe("demo account login journey (AUTH-01, D-02/D-03, LIB-01)", () => {
     await page.getByLabel("Usuario").fill(username);
     await page.getByLabel("Contraseña").fill(password);
     await page.getByRole("button", { name: "Entrar" }).click();
-    await page.waitForURL(/\/es\/catalogue$/);
+    await page.waitForURL(/\/es$/);
 
     // Logout goes through the same CSRF-protected endpoint the UI itself
     // uses -- no separate/fabricated logout path.
@@ -243,7 +247,7 @@ test.describe("controlled-account journey + authenticated recommendations (D-01.
 
     const [registerResponse] = await Promise.all([
       page.waitForResponse((r) => r.url().includes("/api/accounts/register/")),
-      page.getByRole("button", { name: "Crear cuenta simulada" }).click(),
+      page.getByRole("button", { name: "Crear cuenta" }).click(),
     ]);
     const status = registerResponse.status();
     expect([201, 429]).toContain(status);
@@ -266,8 +270,8 @@ test.describe("controlled-account journey + authenticated recommendations (D-01.
     // server layout re-read the new sessionid cookie and render the
     // authenticated chrome (what a real visitor sees on their next
     // server-rendered navigation).
-    await page.waitForURL(/\/es\/catalogue$/);
-    await page.reload();
+    await page.waitForURL(/\/es$/);
+    await page.goto("/es/catalogue");
     await expect(page.getByRole("region", { name: "Catálogo" })).toBeVisible();
 
     // AUTH-02: the account is visibly simulated and the authenticated-only
@@ -307,7 +311,7 @@ test.describe("controlled-account journey + authenticated recommendations (D-01.
       await page.getByLabel("Usuario").fill(username);
       await page.getByLabel("Contraseña").fill(password);
       await page.getByRole("button", { name: "Entrar" }).click();
-      await page.waitForURL(/\/es\/catalogue$/);
+      await page.waitForURL(/\/es$/);
 
       for (const [viewportName, size] of [
         ["desktop", { width: 1280, height: 800 }],

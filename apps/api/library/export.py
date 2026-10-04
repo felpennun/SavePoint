@@ -148,16 +148,15 @@ def _copy_rows(user) -> list[tuple[tuple, dict]]:  # noqa: ANN001
 
 
 def _comment_rows(user) -> list[tuple[tuple, dict]]:  # noqa: ANN001
-    """One row per comment (LIB-03). ``UniqueConstraint(user, work)`` means
-    ``work_slug`` alone is already unique per user; the work's UUID is kept
-    as a tie-break only for consistency with the other sections."""
+    """One row per comment (LIB-03). A user may write several comments per
+    work, so the comment's own UUID is the final tie-break."""
     rows = []
     for comment in GameComment.objects.filter(user=user).select_related("work"):
         row = _base_row("comment")
         row["work_slug"] = comment.work.canonical_slug
         row["work_title"] = _work_title(comment.work)
         row["comment"] = comment.text
-        rows.append(((comment.work.canonical_slug, str(comment.work_id)), row))
+        rows.append(((comment.work.canonical_slug, str(comment.work_id), str(comment.id)), row))
     return rows
 
 

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 
 import { CoverImage } from "@/components/CoverImage";
 import { StatusPill, type BacklogStatus } from "@/components/StatusPill";
-import { buildProfileNavigation } from "@/app/[locale]/profiles/[alias]/page";
+import { buildProfileNavigation } from "@/lib/profile-navigation";
 import { fetchSharedList, type FriendCollectionItem } from "@/lib/api";
 
 const STATUSES: BacklogStatus[] = ["pending", "playing", "completed", "abandoned"];

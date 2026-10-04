@@ -51,7 +51,7 @@ export const es: Dictionary = {
     filters: {
       heading: "Filtros",
       platform: "Plataforma",
-      tag: "Etiquetas",
+      tag: "Género",
       year: "Año",
       minRating: "Valoración",
       anyOption: "Cualquiera",
@@ -77,7 +77,7 @@ export const es: Dictionary = {
       searchInList: "Filtrar esta lista",
     },
     chip: {
-      tag: "Etiqueta: {value}",
+      tag: "Género: {value}",
       platform: "Plataforma: {value}",
     },
   },
@@ -147,8 +147,9 @@ export const es: Dictionary = {
     contentHeading: "Recomendado para ti",
     contentSections: {
       weighted: {
-        heading: "Afinidad por contenido",
-        description: "Combina similitud de contenido, tus valoraciones y señales de calidad y popularidad.",
+        heading: "Para ti",
+        description:
+          "Juegos parecidos a los que ya has valorado, con más peso para los mejor puntuados. Combina lo que tienes en común con tus favoritos (70 %) y la nota del juego (30 %).",
       },
       multiplicative: {
         heading: "Afinidad equilibrada",
@@ -179,16 +180,18 @@ export const es: Dictionary = {
         description: "Refuerza tus preferencias y la actividad del catálogo, manteniendo la penalización de similitud negativa.",
       },
       recency: {
-        heading: "Novedades afines a ti",
-        description: "Usa las mismas señales personalizadas y añade la novedad de la fecha de lanzamiento.",
+        heading: "Lo último para ti",
+        description:
+          "Lanzamientos recientes que encajan con tus gustos. Da más peso a la fecha de salida (40 %) y el resto se reparte entre afinidad, nota y popularidad.",
       },
       mmr: {
         heading: "Afinidad diversa por contenido",
         description: "Parte de Weighted y reduce la repetición entre juegos demasiado parecidos.",
       },
       mmrPop: {
-        heading: "Afinidad diversa con popularidad",
-        description: "Parte de Weighted-Pop y equilibra relevancia, PopScore y variedad.",
+        heading: "Sorpréndeme",
+        description:
+          "Una selección variada: parte de lo que te gusta (parecido a lo tuyo 35 %, nota del juego 20 % y popularidad 25 %) y reserva un 20 % a la variedad, para que los juegos no se parezcan demasiado entre sí.",
       },
       collaborative: {
         heading: "Coincidencia con usuarios similares",
@@ -374,9 +377,9 @@ export const es: Dictionary = {
     emptyBody: "Explora el catálogo para añadir juegos.",
     emptyCta: "Explorar el catálogo",
     count: {
-      zero: "0 juegos en tu colección",
-      one: "1 juego en tu colección",
-      many: (count) => `${count} juegos en tu colección`,
+      zero: "0 juegos",
+      one: "1 juego",
+      many: (count) => `${count} juegos`,
     },
     filterByStatus: "Estado",
     allStatuses: "Todos",
@@ -410,26 +413,24 @@ export const es: Dictionary = {
   },
   account: {
     switcher: {
-      label: "Cuenta simulada",
+      label: "Mi cuenta",
+      editProfile: "Editar perfil",
       change: "Cambiar de cuenta",
-      current: "Sesión de {alias} (simulada)",
+      current: "Sesión de {alias}",
     },
-    banner: "Cuenta simulada — esta es una demo controlada, no una cuenta de usuario real.",
     list: {
-      heading: "Elige una cuenta simulada",
-      intro: "Cada cuenta tiene su propia colección y valoraciones precargadas.",
+      heading: "Tu cuenta",
     },
   },
   register: {
-    heading: "Crear una cuenta simulada",
-    intro:
-      "Crea una cuenta funcional dentro de la demo controlada. No es una cuenta pública de producción.",
+    heading: "Crear una cuenta",
+    intro: "Crea tu cuenta para guardar tu colección, tus valoraciones y tus recomendaciones.",
     username: "Usuario",
     password: "Contraseña",
     passwordHint:
       "Al menos 8 caracteres. Evita contraseñas habituales, que sean solo números o que se parezcan a tu usuario. Se admite cualquier carácter, incluidos espacios y símbolos.",
     confirmPassword: "Confirmar contraseña",
-    submit: "Crear cuenta simulada",
+    submit: "Crear cuenta",
     pending: "Creando…",
     haveAccount: "¿Ya tienes una cuenta? Inicia sesión",
     errorDuplicate: "Ese usuario ya existe. Prueba con otro.",
@@ -451,7 +452,7 @@ export const es: Dictionary = {
     },
     loggedOut: {
       secondaryCta: "Explorar el catálogo",
-      registerCta: "Crear una cuenta simulada",
+      registerCta: "Crear una cuenta",
     },
   },
   theme: {

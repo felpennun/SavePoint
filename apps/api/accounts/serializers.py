@@ -17,8 +17,10 @@ from rest_framework import serializers
 
 from evaluation.access import can_manage_platform, can_view_research
 from accounts.models import (
+    AVATAR_PRESET_COUNT,
     AVATAR_URL_MAX_LENGTH,
     BIO_MAX_LENGTH,
+    DISPLAY_NAME_MAX_LENGTH,
     MAX_FAVORITE_SLOT,
     MIN_FAVORITE_SLOT,
     AccountProfile,
@@ -199,6 +201,11 @@ class AccountProfileSerializer(serializers.Serializer):
     avatar_url = serializers.CharField(max_length=AVATAR_URL_MAX_LENGTH, allow_blank=True, required=False)
     collection_visibility = serializers.ChoiceField(choices=_VISIBILITY_CHOICES, required=False)
     favorites_visibility = serializers.ChoiceField(choices=_VISIBILITY_CHOICES, required=False)
+    default_list_visibility = serializers.ChoiceField(choices=_VISIBILITY_CHOICES, required=False)
+    display_name = serializers.CharField(max_length=DISPLAY_NAME_MAX_LENGTH, allow_blank=True, required=False)
+    avatar_preset = serializers.IntegerField(
+        min_value=0, max_value=AVATAR_PRESET_COUNT - 1, allow_null=True, required=False
+    )
 
     def validate_avatar_url(self, value: str) -> str:
         if value == "":
@@ -213,11 +220,44 @@ def serialize_account_profile(profile: AccountProfile) -> dict:
     """Owner-facing profile read DTO -- never includes ``username`` (D-01)
     or any internal identifier, matching the public-projection allowlist
     discipline even though this response is private to the owner."""
+    version = int(profile.updated_at.timestamp())
     return {
         "bio": _escape_text(profile.bio),
         "avatar_url": _escape_text(profile.avatar_url),
         "collection_visibility": profile.collection_visibility,
         "favorites_visibility": profile.favorites_visibility,
+        "default_list_visibility": profile.default_list_visibility,
+        "display_name": _escape_text(profile.display_name),
+        "avatar_preset": profile.avatar_preset,
+        "avatar_image_url": f"/api/accounts/me/avatar/?v={version}" if profile.avatar_image else "",
+        "cover_image_url": f"/api/accounts/me/cover/?v={version}" if profile.cover_image else "",
+        "alias": _escape_text(profile.user.username),
+        "username_changed": profile.username_changed_at is not None,
+        "member_since": profile.user.date_joined.isoformat(),
+        "summary": build_profile_summary(profile.user),
+    }
+
+
+def build_profile_summary(user) -> dict:  # noqa: ANN001
+    """Counts the owner sees under "how your friends see you": games by
+    status, lists and accepted friendships. Owner-only, never user-supplied."""
+    from django.db.models import Count, Q
+
+    from library.models import CustomList, LibraryEntry
+    from social.models import Friendship
+
+    totals = LibraryEntry.objects.filter(user=user).aggregate(
+        games=Count("id"),
+        completed=Count("id", filter=Q(current_status="completed")),
+        playing=Count("id", filter=Q(current_status="playing")),
+    )
+    friends = Friendship.objects.filter(Q(pair__low_user=user) | Q(pair__high_user=user)).count()
+    return {
+        "games": totals["games"],
+        "completed": totals["completed"],
+        "playing": totals["playing"],
+        "lists": CustomList.objects.filter(user=user).count(),
+        "friends": friends,
     }
 
 

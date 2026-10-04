@@ -110,6 +110,29 @@ def test_algorithm_registry_has_the_named_positive_and_negative_variants() -> No
     ]
 
 
+def test_mmr_pop_v2_is_product_only_and_has_the_retuned_effective_weights() -> None:
+    from recommendations.content.variants import PRODUCT_VARIANT_REGISTRY, RANKABLE_VARIANT_REGISTRY
+
+    assert "content-cbf-mmr-pop-v2" not in ALGORITHM_REGISTRY
+    assert "content-cbf-weighted-pop-v2" not in ALGORITHM_REGISTRY
+    assert set(PRODUCT_VARIANT_REGISTRY) <= set(RANKABLE_VARIANT_REGISTRY)
+    mmr = PRODUCT_VARIANT_REGISTRY["content-cbf-mmr-pop-v2"]
+    base = RANKABLE_VARIANT_REGISTRY[mmr.params["base_algorithm_id"]]
+    lam = mmr.params["lambda"]
+    effective = {
+        "content": lam * base.params["w_content"],
+        "rating": lam * base.params["w_rating"],
+        "popscore": lam * base.params["w_popscore"],
+        "variety": 1 - lam,
+    }
+    assert {key: round(value, 4) for key, value in effective.items()} == {
+        "content": 0.35,
+        "rating": 0.20,
+        "popscore": 0.25,
+        "variety": 0.20,
+    }
+
+
 def test_recency_variant_adds_recency_to_the_other_candidate_signals() -> None:
     spec = ALGORITHM_REGISTRY["recency-v1"]
     score = combine(

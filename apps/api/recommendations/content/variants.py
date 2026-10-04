@@ -131,3 +131,42 @@ ALGORITHM_REGISTRY: dict[str, VariantSpec] = {
         version="v1",
     ),
 }
+
+# Variants that exist only in the product (the web page), never in the offline
+# comparison: ALGORITHM_REGISTRY is the frozen set the evaluation lab and the
+# thesis document, so retuning a published section adds a new id here instead
+# of editing a v1 entry or widening the lab.
+#
+# mmr-pop-v2 keeps lambda 0.80 and rebalances the relevance blend it re-ranks
+# (content 0.4375 / rating 0.25 / PopScore 0.3125). Its effective weights are
+# therefore content 0.35, rating 0.20, PopScore 0.25 and variety 0.20.
+PRODUCT_VARIANT_REGISTRY: dict[str, VariantSpec] = {
+    "content-cbf-weighted-pop-v2": VariantSpec(
+        algorithm_id="content-cbf-weighted-pop-v2",
+        feature_set_version=FEATURE_SET_VERSION,
+        combine_mode="weighted_sum",
+        params={
+            "w_content": 0.4375,
+            "w_rating": 0.25,
+            "w_popscore": 0.3125,
+            "popscore_missing_floor": 0.0,
+        },
+        version="v2",
+    ),
+    "content-cbf-mmr-pop-v2": VariantSpec(
+        algorithm_id="content-cbf-mmr-pop-v2",
+        feature_set_version=FEATURE_SET_VERSION,
+        combine_mode="mmr",
+        params={
+            "base_algorithm_id": "content-cbf-weighted-pop-v2",
+            "lambda": 0.80,
+        },
+        version="v2",
+    ),
+}
+
+# Every variant the ranker can score (lab + product-only).
+RANKABLE_VARIANT_REGISTRY: dict[str, VariantSpec] = {
+    **ALGORITHM_REGISTRY,
+    **PRODUCT_VARIANT_REGISTRY,
+}

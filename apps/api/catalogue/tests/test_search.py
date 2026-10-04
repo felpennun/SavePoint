@@ -789,3 +789,26 @@ def test_cat05_invalid_bounds_fail_before_orm_and_unknown_slugs_are_ignored() ->
     )
     assert response.status_code == 200
     assert response.json()["count"] == 1
+
+
+@pytest.mark.django_db
+def test_filter_options_stay_available_when_the_search_returns_nothing() -> None:
+    rpg = _genre("Role-playing (RPG)", 12)
+    _work("Only game", year=2004, platforms=("PlayStation 5",), genres=(rpg,))
+
+    client = APIClient()
+    body = client.get("/api/catalogue/games/?q=zzzzqq&year_to=2006").json()
+
+    assert body["count"] == 0
+    assert [p["slug"] for p in body["facets"]["platforms"]] == ["playstation-5"]
+    assert [g["slug"] for g in body["facets"]["tags"]] == ["role-playing-rpg"]
+
+
+@pytest.mark.django_db
+def test_early_years_down_to_1950_are_valid_filters() -> None:
+    _work("Old game", year=1952)
+
+    client = APIClient()
+    ok = client.get("/api/catalogue/games/?year_from=1950&year_to=1955").json()
+    assert ok["count"] == 1
+    assert client.get("/api/catalogue/games/?year_from=1949").status_code == 400

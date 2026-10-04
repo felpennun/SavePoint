@@ -26,7 +26,7 @@ from recommendations.models import (
 )
 from recommendations.service import active_corpus_version, build_candidate_manifest, recommend_for_user
 from recommendations.published import (
-    CONTENT_ALGORITHM_IDS,
+    RANKABLE_CONTENT_ALGORITHM_IDS,
     GENRE_ALGORITHM_ID,
     PUBLISHED_RESULT_LIMIT,
     SECTION_ALGORITHM_IDS,
@@ -141,7 +141,7 @@ def build_recommendation_section(
             should_continue=should_continue,
         )
         return {"algorithm_id": algorithm_id, "candidate_count": len(manifest.candidate_ids)}
-    if algorithm_id in CONTENT_ALGORITHM_IDS:
+    if algorithm_id in RANKABLE_CONTENT_ALGORITHM_IDS:
         frozen = evaluation_protocol.load(allow_consumed_test=True)
         prepared = None
         if algorithm_id in SIGNAL_DEPENDENT_ALGORITHM_IDS:
@@ -270,12 +270,15 @@ def _publish_if_complete(
         "content": {
             section.algorithm_id: section.result_payload
             for section in section_jobs
-            if section.algorithm_id in CONTENT_ALGORITHM_IDS
+            if section.algorithm_id in RANKABLE_CONTENT_ALGORITHM_IDS
         },
         "tags": next(
-            section.result_payload
-            for section in section_jobs
-            if section.algorithm_id == GENRE_ALGORITHM_ID
+            (
+                section.result_payload
+                for section in section_jobs
+                if section.algorithm_id == GENRE_ALGORITHM_ID
+            ),
+            None,
         ),
     }
     snapshot, created = RecommendationSnapshot.objects.get_or_create(

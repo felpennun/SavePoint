@@ -85,6 +85,11 @@ class ProfileVisibility(models.TextChoices):
 
 BIO_MAX_LENGTH = 500
 AVATAR_URL_MAX_LENGTH = 500
+DISPLAY_NAME_MAX_LENGTH = 40
+AVATAR_PRESET_COUNT = 5
+# Profile photo and cover are cropped and compressed in the browser before
+# upload, so this ceiling is generous; it only guards the database row.
+PROFILE_IMAGE_MAX_BYTES = 512 * 1024
 
 
 class AccountProfile(models.Model):
@@ -106,6 +111,22 @@ class AccountProfile(models.Model):
     # HTTPS-only, validated URL with no server-side fetch/proxy (avoids SSRF);
     # the client is responsible for actually rendering the image safely.
     avatar_url = models.URLField(max_length=AVATAR_URL_MAX_LENGTH, blank=True, default="")
+    # Free-form name shown next to the immutable alias (``User.username``).
+    display_name = models.CharField(max_length=DISPLAY_NAME_MAX_LENGTH, blank=True, default="")
+    # One of the built-in SavePoint avatars (0..AVATAR_PRESET_COUNT-1).
+    avatar_preset = models.PositiveSmallIntegerField(null=True, blank=True)
+    # Uploaded images, already cropped client-side; served only through the
+    # owner-scoped /me/avatar/ and /me/cover/ endpoints.
+    avatar_image = models.BinaryField(null=True, blank=True, editable=False)
+    avatar_image_type = models.CharField(max_length=16, blank=True, default="")
+    cover_image = models.BinaryField(null=True, blank=True, editable=False)
+    cover_image_type = models.CharField(max_length=16, blank=True, default="")
+    # Set when the owner renames their account; a rename is allowed only once.
+    username_changed_at = models.DateTimeField(null=True, blank=True)
+    # Visibility given to custom lists the owner creates from now on.
+    default_list_visibility = models.CharField(
+        max_length=8, choices=ProfileVisibility.choices, default=ProfileVisibility.PUBLIC
+    )
     collection_visibility = models.CharField(
         max_length=8, choices=ProfileVisibility.choices, default=ProfileVisibility.PUBLIC
     )
@@ -126,6 +147,14 @@ class AccountProfile(models.Model):
             models.CheckConstraint(
                 condition=models.Q(favorites_visibility__in=[choice.value for choice in ProfileVisibility]),
                 name="accounts_profile_favorites_visibility_valid",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(default_list_visibility__in=[choice.value for choice in ProfileVisibility]),
+                name="accounts_profile_default_list_visibility_valid",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(avatar_preset__isnull=True) | models.Q(avatar_preset__lt=AVATAR_PRESET_COUNT),
+                name="accounts_profile_avatar_preset_valid",
             ),
         ]
 

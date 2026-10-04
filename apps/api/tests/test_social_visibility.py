@@ -292,4 +292,5 @@ def test_comment_projection_ignores_identity_fields_and_keeps_hostile_text_plain
     assert not {"owner_id", "author_id", "sender_id", "recipient_id"}.intersection(created.json())
     listed = _client(owner).get(f"/api/library/entries/{work.id}/comments/").json()
     assert listed["comments"][0]["text"] == payload["text"]
-    assert set(listed["comments"][0]) == {"author_alias", "text", "date"}
+    assert listed["comments"][0]["is_own"] is True
+    assert not {"owner_id", "author_id", "sender_id", "recipient_id"}.intersection(listed["comments"][0])

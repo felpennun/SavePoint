@@ -329,13 +329,12 @@ export interface Dictionary {
   account: {
     switcher: {
       label: string;
+      editProfile: string;
       change: string;
       current: string;
     };
-    banner: string;
     list: {
       heading: string;
-      intro: string;
     };
   };
   register: {

@@ -28,7 +28,7 @@ from recommendations.service import (
     recommend_for_user,
 )
 from recommendations.content.variants import ALGORITHM_REGISTRY
-from recommendations.published import CONTENT_ALGORITHM_IDS
+from recommendations.published import PUBLISHED_CONTENT_ALGORITHM_IDS
 from recommendations.genre_heuristic import rank_genre_taste_v1
 from recommendations.published import SECTION_ALGORITHM_IDS, configuration_fingerprint
 
@@ -223,7 +223,7 @@ class ContentRecsView(APIView):
         algorithm_id = request.query_params.get(
             "algorithm_id", "content-cbf-weighted-v1"
         )
-        if algorithm_id not in CONTENT_ALGORITHM_IDS:
+        if algorithm_id not in PUBLISHED_CONTENT_ALGORITHM_IDS:
             return Response({"detail": "unknown algorithm_id"}, status=400)
 
         try:

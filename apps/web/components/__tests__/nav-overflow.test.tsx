@@ -46,11 +46,11 @@ describe.each(["es", "en"])("responsive navbar accessibility (%s)", (locale) => 
     expect(await button.locator("span").count()).toBe(0);
   });
 
-  it("account trigger is icon-only but still identifies as a simulated-account menu", async () => {
+  it("account trigger is icon-only but still identifies as an account menu", async () => {
     await page.setContent(renderToStaticMarkup(<AccountSwitcher locale={locale} labels={accountLabels} />));
     const button = page.getByRole("button", { name: dict.account.switcher.label, exact: true });
     expect(await button.count()).toBe(1);
-    expect(await button.getAttribute("aria-label")).toMatch(/simulada|simulated/i);
+    expect(await button.getAttribute("aria-label")).toMatch(/mi cuenta|my account/i);
     expect(await button.getAttribute("aria-haspopup")).toBe("menu");
     expect(await button.getAttribute("aria-expanded")).toBe("false");
     // No visible label or caret: just the avatar icon.

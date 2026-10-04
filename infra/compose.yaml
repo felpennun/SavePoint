@@ -120,7 +120,7 @@ services:
   recommendation-worker-signals:
     # content-signals-v1 (2026-09-11): computes the shared rating_term/
     # facet_similarity signals once per (user, revision, configuration) and
-    # persists them to RecommendationSignalCache, so the 13 dependent workers
+    # persists them to RecommendationSignalCache, so the dependent workers
     # below (recommendations/published.py SIGNAL_DEPENDENT_ALGORITHM_IDS)
     # read them instead of each repeating the same O(candidates) loop in its
     # own container. _claim_next_job never lets a dependent job run before
@@ -160,75 +160,15 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-  recommendation-worker-multiplicative:
-    extends:
-      service: recommendation-worker-weighted
-    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id content-cbf-multiplicative-v1
-
-  recommendation-worker-twostage:
-    extends:
-      service: recommendation-worker-weighted
-    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id content-cbf-twostage-v1
-
-  recommendation-worker-negative:
-    extends:
-      service: recommendation-worker-weighted
-    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id content-cbf-neg-v1
-
   recommendation-worker-recency:
     extends:
       service: recommendation-worker-weighted
     command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id recency-v1
 
-  recommendation-worker-tags:
-    extends:
-      service: recommendation-worker-weighted
-    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id tag-taste-v1
-
-  recommendation-worker-weighted-pop:
-    extends:
-      service: recommendation-worker-weighted
-    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id content-cbf-weighted-pop-v1
-
-  recommendation-worker-multiplicative-pop:
-    extends:
-      service: recommendation-worker-weighted
-    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id content-cbf-multiplicative-pop-v1
-
-  recommendation-worker-twostage-pop:
-    extends:
-      service: recommendation-worker-weighted
-    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id content-cbf-twostage-pop-v1
-
-  recommendation-worker-negative-pop:
-    extends:
-      service: recommendation-worker-weighted
-    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id content-cbf-neg-pop-v1
-
-  recommendation-worker-mmr:
-    extends:
-      service: recommendation-worker-weighted
-    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id content-cbf-mmr-v1
-
   recommendation-worker-mmr-pop:
     extends:
       service: recommendation-worker-weighted
-    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id content-cbf-mmr-pop-v1
-
-  recommendation-worker-collaborative:
-    extends:
-      service: recommendation-worker-weighted
-    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id cf-user-knn-v1
-
-  recommendation-worker-hybrid:
-    extends:
-      service: recommendation-worker-weighted
-    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id hybrid-weighted-cf-v1
-
-  recommendation-worker-hybrid-mmr:
-    extends:
-      service: recommendation-worker-weighted
-    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id hybrid-mmr-v1
+    command: python manage.py process_recommendation_jobs --loop --poll-seconds 2 --algorithm-id content-cbf-mmr-pop-v2
 
   web:
     build:

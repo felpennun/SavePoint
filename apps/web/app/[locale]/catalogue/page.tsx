@@ -2,9 +2,10 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 
 import { FilterBar } from "@/components/FilterBar";
+import { localizedGenreLabel } from "@/lib/genre-labels";
 import { FilterChip } from "@/components/FilterChip";
 import { GameCard } from "@/components/GameCard";
-import { PaginationArrow } from "@/components/PaginationArrow";
+import { PaginationArrow, PaginationSpacer } from "@/components/PaginationArrow";
 import { getDictionary } from "@/i18n";
 import { fetchCatalogueList } from "@/lib/api";
 import {
@@ -84,7 +85,15 @@ export default async function CataloguePage({
       sort: filters.sort,
     }, cookieHeader);
   } catch {
-    failed = true;
+    // A rejected filter (for example an out-of-range year) must not take the
+    // toolbar down with it: load the plain catalogue for its filter options and
+    // show "no games match" for the rejected combination instead.
+    try {
+      const base = await fetchCatalogueList({ page: 1 }, cookieHeader);
+      result = { ...base, results: [], count: 0, has_next: false };
+    } catch {
+      failed = true;
+    }
   }
 
   const platformOptions: FilterOption[] = sortPlatformOptions(
@@ -93,9 +102,9 @@ export default async function CataloguePage({
   const facetOptions: CatalogueFacetOptions = result
     ? {
         platforms: platformOptions,
-        tags: result.facets.tags.map((facet) => ({ value: facet.slug, label: facet.name })),
+        tags: result.facets.tags.map((facet) => ({ value: facet.slug, label: localizedGenreLabel(facet.slug, facet.name, locale) })).sort((a, b) => a.label.localeCompare(b.label, locale)),
         editions: result.facets.editions.map((facet) => ({ value: facet.slug, label: facet.name })),
-        genres: result.facets.genres.map((facet) => ({ value: facet.slug, label: facet.name })),
+        genres: result.facets.genres.map((facet) => ({ value: facet.slug, label: localizedGenreLabel(facet.slug, facet.name, locale) })).sort((a, b) => a.label.localeCompare(b.label, locale)),
         franchises: result.facets.franchises.map((facet) => ({ value: facet.slug, label: facet.name })),
         developers: result.facets.developers.map((facet) => ({ value: facet.slug, label: facet.name })),
         publishers: result.facets.publishers.map((facet) => ({ value: facet.slug, label: facet.name })),
@@ -106,8 +115,8 @@ export default async function CataloguePage({
   const visibleFilters = result ? restrictSelectedFilters(filters, facetOptions) : filters;
   const activeCount = countActiveFilters(visibleFilters);
   const facetLabels: Record<string, string> = locale === "en"
-    ? { platform: "Platform", tag: "Tag", edition: "Edition", genre: "Genre", franchise: "Franchise", developer: "Developer", publisher: "Publisher", mode: "Mode" }
-    : { platform: "Plataforma", tag: "Etiqueta", edition: "Edición", genre: "Género", franchise: "Franquicia", developer: "Desarrollador", publisher: "Editorial", mode: "Modo" };
+    ? { platform: "Platform", tag: "Genre", edition: "Edition", genre: "Genre", franchise: "Franchise", developer: "Developer", publisher: "Publisher", mode: "Mode" }
+    : { platform: "Plataforma", tag: "Género", edition: "Edición", genre: "Género", franchise: "Franquicia", developer: "Desarrollador", publisher: "Editorial", mode: "Modo" };
   const facetValueLabels = Object.fromEntries(
     REPEATED_FACET_KEYS.map((key) => {
       const optionKey = `${key}s` as keyof CatalogueFacetOptions;
@@ -124,7 +133,7 @@ export default async function CataloguePage({
         activeCount={activeCount}
         facets={facetOptions}
         currentQuery={currentQuery}
-        yearMin={yearRange?.min ?? 1958}
+        yearMin={yearRange?.min ?? 1950}
         yearMax={yearRange?.max ?? currentYear + 2}
         optionsUnavailable={failed}
       />
@@ -207,7 +216,9 @@ export default async function CataloguePage({
                     direction="prev"
                     label={locale === "es" ? "Anterior" : "Previous"}
                   />
-                ) : null}
+                ) : (
+                  <PaginationSpacer />
+                )}
                 <span aria-current="page" className="sp-pagination-current">
                   {currentPage}
                 </span>
@@ -217,7 +228,9 @@ export default async function CataloguePage({
                     direction="next"
                     label={locale === "es" ? "Siguiente" : "Next"}
                   />
-                ) : null}
+                ) : (
+                  <PaginationSpacer />
+                )}
               </nav>
             </>
           )}

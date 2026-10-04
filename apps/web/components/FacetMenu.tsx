@@ -1,15 +1,8 @@
-import { formatCount, getDictionary } from "@/i18n";
+import { getDictionary } from "@/i18n";
 import { FilterDropdown } from "@/components/FilterDropdown";
 import { type FilterOption, type RepeatedFacetKey, removeHref } from "@/lib/catalogue-filters";
 
 type FacetName = RepeatedFacetKey;
-
-function withoutFacet(currentQuery: string, name: FacetName): string {
-  const params = new URLSearchParams(currentQuery.startsWith("?") ? currentQuery.slice(1) : currentQuery);
-  params.delete(name);
-  const query = params.toString();
-  return query ? `?${query}` : "";
-}
 
 /**
  * A repeated-GET-parameter checkbox list, rendered as one popover in the
@@ -23,7 +16,6 @@ export function FacetMenu({
   options,
   selected,
   locale,
-  currentQuery,
   unavailable = false,
 }: {
   name: FacetName;
@@ -31,13 +23,11 @@ export function FacetMenu({
   options: FilterOption[];
   selected: string[];
   locale: string;
-  currentQuery: string;
   unavailable?: boolean;
 }) {
   const dict = getDictionary(locale);
   const isUnavailable = unavailable || options.length === 0;
-  const selectedCountLabel = formatCount(dict.catalogue.facet.selectedCount, selected.length);
-  const clearHref = withoutFacet(currentQuery, name);
+  const selectedCountLabel = selected.length > 0 ? String(selected.length) : undefined;
 
   return (
     <FilterDropdown label={label} summary={selectedCountLabel} unavailable={isUnavailable} className="sp-facet">
@@ -46,32 +36,22 @@ export function FacetMenu({
           {dict.catalogue.filters.unavailable}
         </p>
       ) : (
-        <>
-          <ul className="sp-facet-options">
-            {options.map((option) => (
-              <li key={option.value}>
-                <label className="sp-facet-option">
-                  <input
-                    type="checkbox"
-                    name={name}
-                    value={option.value}
-                    defaultChecked={selected.includes(option.value)}
-                    disabled={isUnavailable}
-                  />
-                  <span>{option.label}</span>
-                </label>
-              </li>
-            ))}
-          </ul>
-          <div className="sp-filterbar-actions">
-            <button type="submit" className="sp-btn-primary">
-              {dict.catalogue.filters.apply}
-            </button>
-            <a href={clearHref} className="sp-link">
-              {dict.catalogue.facet.clear}
-            </a>
-          </div>
-        </>
+        <ul className="sp-facet-options">
+          {options.map((option) => (
+            <li key={option.value}>
+              <label className="sp-facet-option">
+                <input
+                  type="checkbox"
+                  name={name}
+                  value={option.value}
+                  defaultChecked={selected.includes(option.value)}
+                  disabled={isUnavailable}
+                />
+                <span>{option.label}</span>
+              </label>
+            </li>
+          ))}
+        </ul>
       )}
     </FilterDropdown>
   );

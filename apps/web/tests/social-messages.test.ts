@@ -2,7 +2,6 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { SocialInbox } from "@/components/SocialInbox";
 import { AccountSwitcher, buildAccountTriggerLabel, buildMessagesHref } from "@/components/AccountSwitcher";
 import {
   fetchSocialInbox,
@@ -15,6 +14,7 @@ import {
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
+  usePathname: () => "/es",
 }));
 
 const message: SocialMessage = {
@@ -70,32 +70,18 @@ describe("private social messages contract", () => {
     expect(result).toEqual({ kind: "cooldown", retryAfterSeconds: 86400 });
   });
 
-  it("renders sender, game, cover placeholder, optional text and date without exposing private IDs", () => {
-    const markup = renderToStaticMarkup(createElement(SocialInbox, {
-      locale: "es",
-      initialMessages: [message],
-      friends: [{ alias: "alice", relationship: "friend" }],
-      catalogue: [{ id: message.work.id, slug: "signal-drift", title: message.work.title, year: null, platform_summary: "", cover: message.work.cover }],
-    }));
-
-    expect(markup).toContain("alice");
-    expect(markup).toContain("Signal Drift");
-    expect(markup).toContain("Te gustaría este juego.");
-    expect(markup).toContain('aria-live="polite"');
-    expect(markup).not.toContain(message.id);
-  });
-
   it("names the account messages entry, unread state and exact private route accessibly", () => {
-    expect(buildMessagesHref("es")).toBe("/es/messages");
-    expect(buildAccountTriggerLabel("Cuenta simulada", "Mensajes de amigos", 2)).toContain("2 mensajes sin leer");
+    expect(buildMessagesHref("es")).toBe("/es/friends");
+    expect(buildAccountTriggerLabel("Mi cuenta", "Mensajes de amigos", 2)).toContain("2 mensajes sin leer");
     const markup = renderToStaticMarkup(createElement(AccountSwitcher, {
       locale: "es",
       labels: {
-        label: "Cuenta simulada",
+        label: "Mi cuenta",
+        editProfile: "Editar perfil",
         change: "Cambiar de cuenta",
-        current: "Sesión de {alias} (simulada)",
+        current: "Sesión de {alias}",
         logout: "Cerrar sesión",
-        listHeading: "Elige una cuenta simulada",
+        listHeading: "Tu cuenta",
         messagesLabel: "Mensajes de amigos",
         unreadLabel: (count: number) => `${count} mensajes sin leer`,
         noUnreadLabel: "Sin mensajes pendientes",

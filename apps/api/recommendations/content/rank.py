@@ -37,7 +37,7 @@ from recommendations.content.features import (
 from recommendations.content.profile import ProfileInputs, build_profile_inputs
 from recommendations.content.recency import recency_score
 from recommendations.content.similarity import facet_similarity
-from recommendations.content.variants import ALGORITHM_REGISTRY, VariantSpec
+from recommendations.content.variants import RANKABLE_VARIANT_REGISTRY, VariantSpec
 from recommendations.models import WorkFeatureVector
 
 
@@ -71,9 +71,9 @@ def _base_spec(spec: VariantSpec) -> VariantSpec:
     if spec.combine_mode != "mmr":
         return spec
     base_algorithm_id = spec.params.get("base_algorithm_id")
-    if not isinstance(base_algorithm_id, str) or base_algorithm_id not in ALGORITHM_REGISTRY:
+    if not isinstance(base_algorithm_id, str) or base_algorithm_id not in RANKABLE_VARIANT_REGISTRY:
         raise ValueError(f"Invalid MMR base algorithm for {spec.algorithm_id}")
-    return ALGORITHM_REGISTRY[base_algorithm_id]
+    return RANKABLE_VARIANT_REGISTRY[base_algorithm_id]
 
 
 def _ensure_current(should_continue: Callable[[], bool] | None) -> None:
@@ -401,7 +401,7 @@ def rank_content_v1(
 ) -> dict:
     """Rank governed unseen works for the authenticated owner."""
 
-    spec = ALGORITHM_REGISTRY[algorithm_id]
+    spec = RANKABLE_VARIANT_REGISTRY[algorithm_id]
     base_spec = _base_spec(spec)
     _ensure_current(should_continue)
     limit = _clamp_limit(limit, _limit_cap or _MAX_LIMIT)

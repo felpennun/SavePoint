@@ -48,7 +48,7 @@ export const en: Dictionary = {
     filters: {
       heading: "Filters",
       platform: "Platform",
-      tag: "Tags",
+      tag: "Genre",
       year: "Year",
       minRating: "Rating",
       anyOption: "Any",
@@ -74,7 +74,7 @@ export const en: Dictionary = {
       searchInList: "Filter this list",
     },
     chip: {
-      tag: "Tag: {value}",
+      tag: "Genre: {value}",
       platform: "Platform: {value}",
     },
   },
@@ -144,8 +144,9 @@ export const en: Dictionary = {
     contentHeading: "Recommended for you",
     contentSections: {
       weighted: {
-        heading: "Content match",
-        description: "Combines content similarity, your ratings, and quality and popularity signals.",
+        heading: "For you",
+        description:
+          "Games similar to the ones you have already rated, giving more weight to the best rated. It combines what you share with your favorites (70%) and the game's score (30%).",
       },
       multiplicative: {
         heading: "Balanced content match",
@@ -176,16 +177,18 @@ export const en: Dictionary = {
         description: "Boosts your preferences and catalogue activity while retaining the negative-similarity penalty.",
       },
       recency: {
-        heading: "Recent matches for you",
-        description: "Uses the same personalised signals and adds release-date recency.",
+        heading: "Latest for you",
+        description:
+          "Recent releases that fit your taste. Release date weighs the most (40%) and the rest is split between affinity, score and popularity.",
       },
       mmr: {
         heading: "Diverse content matches",
         description: "Starts from Weighted and reduces repetition between very similar games.",
       },
       mmrPop: {
-        heading: "Diverse matches with popularity",
-        description: "Starts from Weighted-Pop and balances relevance, PopScore, and variety.",
+        heading: "Surprise me",
+        description:
+          "A varied selection: it starts from what you like (similar to yours 35%, game score 20% and popularity 25%) and reserves 20% for variety, so the games do not look too much alike.",
       },
       collaborative: {
         heading: "Matches from similar users",
@@ -371,9 +374,9 @@ export const en: Dictionary = {
     emptyBody: "Browse the catalogue to add games.",
     emptyCta: "Browse the catalogue",
     count: {
-      zero: "0 games in your collection",
-      one: "1 game in your collection",
-      many: (count) => `${count} games in your collection`,
+      zero: "0 games",
+      one: "1 game",
+      many: (count) => `${count} games`,
     },
     filterByStatus: "Status",
     allStatuses: "All",
@@ -407,26 +410,24 @@ export const en: Dictionary = {
   },
   account: {
     switcher: {
-      label: "Simulated account",
+      label: "My account",
+      editProfile: "Edit profile",
       change: "Switch account",
-      current: "Signed in as {alias} (simulated)",
+      current: "Signed in as {alias}",
     },
-    banner: "Simulated account — this is a controlled demo, not a real user account.",
     list: {
-      heading: "Choose a simulated account",
-      intro: "Each account has its own preloaded collection and ratings.",
+      heading: "Your account",
     },
   },
   register: {
-    heading: "Create a simulated account",
-    intro:
-      "This creates a working account inside the controlled demo. It is not a public production account.",
+    heading: "Create an account",
+    intro: "Create your account to keep your collection, your ratings and your recommendations.",
     username: "Username",
     password: "Password",
     passwordHint:
       "At least 8 characters. Avoid common passwords, all-numeric passwords, or ones close to your username. Any character is allowed, including spaces and symbols.",
     confirmPassword: "Confirm password",
-    submit: "Create simulated account",
+    submit: "Create account",
     pending: "Creating…",
     haveAccount: "Already have an account? Log in",
     errorDuplicate: "That username is taken. Try another.",
@@ -448,7 +449,7 @@ export const en: Dictionary = {
     },
     loggedOut: {
       secondaryCta: "Browse the catalogue",
-      registerCta: "Create a simulated account",
+      registerCta: "Create an account",
     },
   },
   theme: {

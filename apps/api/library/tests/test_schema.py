@@ -92,7 +92,8 @@ def test_game_comment_constraints_are_enforced() -> None:
             "('library_unique_comment_per_user_work', 'library_comment_visibility_valid')"
         )
         found = {row[0] for row in cursor.fetchall()}
-    assert found == {"library_unique_comment_per_user_work", "library_comment_visibility_valid"}
+    # several comments per user and work are allowed, so only the visibility check remains
+    assert found == {"library_comment_visibility_valid"}
 
 
 def test_game_comment_foreign_keys_are_protective_or_cascade() -> None:

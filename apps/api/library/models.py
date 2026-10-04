@@ -172,8 +172,8 @@ COMMENT_TEXT_MAX_LENGTH = 2000
 
 
 class GameComment(models.Model):
-    """One comment per user/work (D-04/D-05): only the author can create,
-    edit, or delete it; the author always retains access regardless of
+    """A comment by a user on a work; a user may write several per work. Only
+    the author can edit or delete it; the author always retains access regardless of
     visibility, while a public/private third-party projection is resolved
     server-side (never on the client)."""
 
@@ -190,10 +190,6 @@ class GameComment(models.Model):
     class Meta:
         ordering = ("created_at", "id")
         constraints = [
-            models.UniqueConstraint(
-                fields=("user", "work"),
-                name="library_unique_comment_per_user_work",
-            ),
             models.CheckConstraint(
                 condition=models.Q(visibility__in=[choice.value for choice in ContentVisibility]),
                 name="library_comment_visibility_valid",

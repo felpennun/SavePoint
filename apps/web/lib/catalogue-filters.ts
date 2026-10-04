@@ -160,13 +160,13 @@ function validDateBound(raw: string | undefined, currentYear: number): string | 
   const yearMatch = /^(\d{4})$/.exec(value);
   if (yearMatch) {
     const year = Number(yearMatch[1]);
-    return year >= 1958 && year <= currentYear + 2 ? value : undefined;
+    return year >= 1950 && year <= currentYear + 2 ? value : undefined;
   }
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return undefined;
   const parsed = new Date(`${value}T00:00:00Z`);
   if (Number.isNaN(parsed.valueOf()) || parsed.toISOString().slice(0, 10) !== value) return undefined;
   const year = Number(value.slice(0, 4));
-  return year >= 1958 && year <= currentYear + 2 ? value : undefined;
+  return year >= 1950 && year <= currentYear + 2 ? value : undefined;
 }
 
 function firstValue(value: string | string[] | undefined): string | undefined {

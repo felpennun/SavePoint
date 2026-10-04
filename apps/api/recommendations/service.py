@@ -20,9 +20,9 @@ from evaluation import protocol as evaluation_protocol
 from library.models import LibraryEntry
 from recommendations.collaborative import rank_collaborative_user_knn_v1
 from recommendations.content.rank import rank_content_v1
-from recommendations.content.variants import ALGORITHM_REGISTRY
+from recommendations.content.variants import RANKABLE_VARIANT_REGISTRY
 from recommendations.hybrid import rank_hybrid_mmr_v1, rank_hybrid_weighted_cf_v1
-from recommendations.published import CONTENT_ALGORITHM_IDS
+from recommendations.published import RANKABLE_CONTENT_ALGORITHM_IDS
 
 
 PROTOCOL_VERSION = 16
@@ -143,7 +143,7 @@ def recommend_for_user(
     never receive it.
     """
 
-    if algorithm_id not in CONTENT_ALGORITHM_IDS:
+    if algorithm_id not in RANKABLE_CONTENT_ALGORITHM_IDS:
         raise RecommendationServiceError("unknown algorithm_id")
     frozen = protocol or evaluation_protocol.load()
     evaluation_protocol.require_version(frozen, PROTOCOL_VERSION)
@@ -161,7 +161,7 @@ def recommend_for_user(
         from recommendations.cancellation import RecommendationComputationCancelled
 
         raise RecommendationComputationCancelled
-    if algorithm_id in ALGORITHM_REGISTRY:
+    if algorithm_id in RANKABLE_VARIANT_REGISTRY:
         payload = rank_content_v1(
             user,
             algorithm_id,

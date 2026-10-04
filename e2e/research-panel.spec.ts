@@ -39,7 +39,7 @@ async function login(
   await page.getByLabel(/Usuario|Username/).fill(credentials.username);
   await page.getByLabel(/Contrase|Password/).fill(credentials.password);
   await Promise.all([
-    page.waitForURL(new RegExp(`/${locale}/catalogue$`)),
+    page.waitForURL(new RegExp(`/${locale}$`)),
     page.getByRole("button", { name: /Entrar|Log in/ }).click(),
   ]);
   await expect(page.getByRole("region", { name: /Catálogo|Catalogue/ })).toBeVisible();

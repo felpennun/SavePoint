@@ -210,7 +210,7 @@ async function loginResearchViewer(page: Page, locale: "es" | "en") {
   await page.getByLabel(locale === "es" ? "Usuario" : "Username").fill(username);
   await page.getByLabel(locale === "es" ? /Contrase/ : "Password").fill(password);
   await Promise.all([
-    page.waitForURL(new RegExp(`/${locale}/catalogue$`)),
+    page.waitForURL(new RegExp(`/${locale}$`)),
     page.getByRole("button", { name: locale === "es" ? "Entrar" : "Log in" }).click(),
   ]);
   await expect(page.getByRole("region", { name: locale === "es" ? "Catálogo" : "Catalogue" })).toBeVisible();
@@ -312,7 +312,7 @@ async function assertNoPageOverflow(page: Page, label: string) {
 test.describe("Phase 02-06 home and detail product contracts", () => {
   test.use({ viewport: { width: 320, height: 800 } });
 
-  test("home has one clean axe pass per theme and keeps shelf overflow internal", async ({ page }) => {
+  test("home has one clean axe pass per theme and no horizontal overflow", async ({ page }) => {
     await page.goto("/es");
 
     for (const theme of ["dark", "light"] as const) {
@@ -322,18 +322,11 @@ test.describe("Phase 02-06 home and detail product contracts", () => {
       await assertNoPageOverflow(page, `home (${theme})`);
     }
 
-    const newReleases = page.getByRole("heading", { name: "Novedades" });
-    if (await newReleases.count()) {
-      await expect(newReleases).toBeVisible();
-      await expect(page.locator(".sp-shelf-track").first()).toBeVisible();
-    } else {
-      await expect(page.locator("text=Novedades")).toHaveCount(0);
-    }
-
-    const shelves = page.locator(".sp-shelf-track");
-    for (let index = 0; index < await shelves.count(); index += 1) {
-      await expect(shelves.nth(index)).toHaveCSS("overflow-x", /auto|scroll/);
-    }
+    // The home page (artboard 3c): a headline, the example card, three feature
+    // rows and the band of figures.
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(page.locator(".sp-home-feature")).toHaveCount(3);
+    await expect(page.locator(".sp-home-stats > div")).toHaveCount(4);
   });
 
   test("detail follows P3 order, supports synopsis expansion, and stays within the viewport", async ({ page }) => {
@@ -422,21 +415,21 @@ for (const [viewportName, viewport] of Object.entries(VIEWPORTS)) {
       await catalogueSearch.focus();
       await expect(catalogueSearch).toBeFocused();
 
-      // Apply a genre facet via the repeated-parameter GET form; the filtered
+      // Apply a tag facet via the repeated-parameter GET form; the filtered
       // view must be a shareable URL that still reflects the filter after a
       // full reload.
-      const genreFacet = page.locator("details.sp-facet").filter({ hasText: "Género" }).first();
-      await genreFacet.locator("summary").click();
-      const genreCheckboxes = genreFacet.locator('input[type="checkbox"]');
-      expect(await genreCheckboxes.count()).toBeGreaterThanOrEqual(2);
-      const chosenGenres = [
-        await genreCheckboxes.nth(0).getAttribute("value"),
-        await genreCheckboxes.nth(1).getAttribute("value"),
+      const tagFacet = page.locator("details.sp-facet").filter({ hasText: "Género" }).first();
+      await tagFacet.locator("summary").click();
+      const tagCheckboxes = tagFacet.locator('input[type="checkbox"]');
+      expect(await tagCheckboxes.count()).toBeGreaterThanOrEqual(2);
+      const chosenTags = [
+        await tagCheckboxes.nth(0).getAttribute("value"),
+        await tagCheckboxes.nth(1).getAttribute("value"),
       ];
-      expect(chosenGenres[0]).not.toBeNull();
-      expect(chosenGenres[1]).not.toBeNull();
-      await genreCheckboxes.nth(0).check();
-      await genreCheckboxes.nth(1).check();
+      expect(chosenTags[0]).not.toBeNull();
+      expect(chosenTags[1]).not.toBeNull();
+      await tagCheckboxes.nth(0).check();
+      await tagCheckboxes.nth(1).check();
 
       const platformFacet = page.locator("details.sp-facet").filter({ hasText: "Plataforma" }).first();
       await platformFacet.locator("summary").click();
@@ -447,14 +440,14 @@ for (const [viewportName, viewport] of Object.entries(VIEWPORTS)) {
       const applyFilters = page.locator('.sp-filterbar > form > .sp-filterbar-actions button[type="submit"]');
       await expect(applyFilters).toBeVisible();
       await applyFilters.click();
-      await page.waitForURL(/[?&]genre=/);
+      await page.waitForURL(/[?&]tag=/);
       await page.reload();
-      expect(page.url()).toMatch(/[?&]genre=/);
+      expect(page.url()).toMatch(/[?&]tag=/);
       const query = new URL(page.url()).searchParams;
-      expect(query.getAll("genre")).toEqual(chosenGenres);
+      expect(query.getAll("tag")).toEqual(chosenTags);
       expect(query.getAll("platform")).toEqual([chosenPlatform]);
-      for (const chosenGenre of chosenGenres) {
-        await expect(page.locator(`input[name="genre"][value="${chosenGenre}"]`)).toBeChecked();
+      for (const chosenTag of chosenTags) {
+        await expect(page.locator(`input[name="tag"][value="${chosenTag}"]`)).toBeChecked();
       }
       await expect(page.locator(`input[name="platform"][value="${chosenPlatform}"]`)).toBeChecked();
       await expect(page.locator(".sp-chip-row")).toBeVisible();
@@ -500,7 +493,7 @@ for (const [viewportName, viewport] of Object.entries(VIEWPORTS)) {
     test("registration: labelled fields, client-side validation, axe, screenshot", async ({ page }) => {
       test.setTimeout(90_000);
       await page.goto("/es/register");
-      await expect(page.getByRole("heading", { level: 1, name: "Crear una cuenta simulada" })).toBeVisible();
+      await expect(page.getByRole("heading", { level: 1, name: "Crear una cuenta" })).toBeVisible();
 
       // Every field has a visible, associated label.
       await expect(page.getByLabel("Usuario")).toBeVisible();
@@ -512,7 +505,7 @@ for (const [viewportName, viewport] of Object.entries(VIEWPORTS)) {
       await page.getByLabel("Usuario").fill("e2e-validation-only");
       await page.getByLabel("Contraseña", { exact: true }).fill("Abc12345!x");
       await page.getByLabel("Confirmar contraseña").fill("different99!");
-      await page.getByRole("button", { name: "Crear cuenta simulada" }).click();
+      await page.getByRole("button", { name: "Crear cuenta" }).click();
       const err = page.getByTestId("register-error");
       await expect(err).toBeVisible();
       await expect(err).toHaveText(/no coinciden/i);
@@ -558,7 +551,7 @@ test.describe("keyboard-only journey (accessibility acceptance checklist)", () =
     await page.keyboard.press("Tab");
     await page.keyboard.type(password);
     await Promise.all([
-      page.waitForURL(/\/es\/catalogue$/),
+      page.waitForURL(/\/es$/),
       page.keyboard.press("Enter"),
     ]);
     await expect(page.getByRole("region", { name: "Catálogo" })).toBeVisible();
@@ -587,11 +580,10 @@ test.describe("keyboard-only journey (accessibility acceptance checklist)", () =
     ]);
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 
-    // Status: native radios, arrow-key/space operable.
-    const playingRadio = page.getByRole("radio", { name: "Jugando" });
-    await playingRadio.focus();
-    await page.keyboard.press("Space");
-    await expect(playingRadio).toBeChecked();
+    // Status: a native dropdown, keyboard operable.
+    const statusSelect = page.getByLabel("Estado");
+    await statusSelect.selectOption("playing");
+    await expect(statusSelect).toHaveValue("playing");
     const saveStatus = page.getByRole("button", { name: "Guardar configuración" });
     await expect(saveStatus).toBeVisible();
     await saveStatus.focus();

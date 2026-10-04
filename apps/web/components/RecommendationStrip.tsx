@@ -4,13 +4,13 @@ import type { PopularityResultItem } from "@/lib/api";
 
 const COPY = {
   es: {
-    heading: "Populares en la demo",
+    heading: "Populares en SavePoint",
     explainer:
-      "Orden calculado a partir de interacciones agregadas de esta demo. No es una recomendación personalizada.",
+      "Orden calculado a partir de las señales de popularidad importadas de IGDB. No es una recomendación personalizada.",
   },
   en: {
-    heading: "Popular in this demo",
-    explainer: "Order calculated from aggregate interactions in this demo. Not a personalized recommendation.",
+    heading: "Popular on SavePoint",
+    explainer: "Order calculated from the popularity signals imported from IGDB. Not a personalized recommendation.",
   },
 } as const;
 

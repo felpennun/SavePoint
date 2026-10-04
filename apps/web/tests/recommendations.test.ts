@@ -8,8 +8,12 @@ import {
 } from "@/lib/api";
 import { CONTENT_RECOMMENDATION_SECTIONS } from "@/lib/recommendation-sections";
 
-it("publishes a dedicated localized hybrid MMR shelf", () => {
-  expect(CONTENT_RECOMMENDATION_SECTIONS).toContainEqual(["hybrid-mmr-v1", "hybridMmr"]);
+it("publishes only the three content shelves chosen for users", () => {
+  expect(CONTENT_RECOMMENDATION_SECTIONS.map(([algorithmId]) => algorithmId)).toEqual([
+    "content-cbf-weighted-v1",
+    "content-cbf-mmr-pop-v2",
+    "recency-v1",
+  ]);
 });
 
 function makeItem(

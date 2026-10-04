@@ -3,18 +3,33 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import { ContentRecommendationShelf } from "@/components/ContentRecommendationShelf";
-import { OwnedGamesDlcShelf } from "@/components/OwnedGamesDlcShelf";
-import { RecommendationShelf } from "@/components/RecommendationShelf";
+import { RecommendationDetailView, type DetailSection } from "@/components/RecommendationDetailView";
 import { getDictionary } from "@/i18n";
 import {
-  primaryTagRecommendationShelf,
-  type OwnedDlcResult,
   type RecommendationSnapshotResult,
 } from "@/lib/api";
 import { CONTENT_RECOMMENDATION_SECTIONS } from "@/lib/recommendation-sections";
 
 const SNAPSHOT_CACHE_PREFIX = "savepoint:recommendation-snapshot:";
+// The chosen view ("shelves" or "detail") and algorithm are remembered in this browser.
+const VIEW_STORAGE_KEY = "savepoint:recommendation-view";
+const ALGORITHM_STORAGE_KEY = "savepoint:recommendation-algorithm";
+
+function readStored(key: string): string | null {
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function writeStored(key: string, value: string): void {
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // The choice only lasts for this visit when storage is unavailable.
+  }
+}
 
 function cacheKey(username: string): string {
   return `${SNAPSHOT_CACHE_PREFIX}${encodeURIComponent(username)}`;
@@ -42,11 +57,6 @@ async function fetchSnapshot(): Promise<RecommendationSnapshotResult | null> {
   return response.ok ? (response.json() as Promise<RecommendationSnapshotResult>) : null;
 }
 
-async function fetchOwnedDlc(): Promise<OwnedDlcResult> {
-  const response = await fetch("/api/catalogue/owned-dlc/", { cache: "no-store" });
-  return response.ok ? (response.json() as Promise<OwnedDlcResult>) : { groups: [] };
-}
-
 async function fetchUsername(): Promise<string | null> {
   const response = await fetch("/api/accounts/me/", { cache: "no-store" });
   if (!response.ok) return null;
@@ -63,9 +73,15 @@ export function RecommendationsClient({ locale }: { locale: string }) {
   const dict = getDictionary(locale);
   const r = dict.recommendations;
   const [snapshot, setSnapshot] = useState<RecommendationSnapshotResult | null>(null);
-  const [dlc, setDlc] = useState<OwnedDlcResult>({ groups: [] });
   const [loaded, setLoaded] = useState(false);
   const [loadFailed, setLoadFailed] = useState(false);
+  const [view, setView] = useState<"shelves" | "detail">("shelves");
+  const [selectedAlgorithm, setSelectedAlgorithm] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (readStored(VIEW_STORAGE_KEY) === "detail") setView("detail");
+    setSelectedAlgorithm(readStored(ALGORITHM_STORAGE_KEY));
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -80,7 +96,6 @@ export function RecommendationsClient({ locale }: { locale: string }) {
     const start = async () => {
       const usernameRequest = fetchUsername();
       const snapshotRequest = fetchSnapshot();
-      const dlcRequest = fetchOwnedDlc();
       const username = await usernameRequest;
       if (cancelled) return;
       if (username === null) {
@@ -92,9 +107,8 @@ export function RecommendationsClient({ locale }: { locale: string }) {
       const cached = readCachedSnapshot(username);
       if (cached) setSnapshot(cached);
 
-      const [freshSnapshot, freshDlc] = await Promise.all([snapshotRequest, dlcRequest]);
+      const freshSnapshot = await snapshotRequest;
       if (cancelled) return;
-      setDlc(freshDlc);
       setLoaded(true);
       if (freshSnapshot === null) {
         if (!cached) setLoadFailed(true);
@@ -121,21 +135,50 @@ export function RecommendationsClient({ locale }: { locale: string }) {
     };
   }, []);
 
-  const tagData = snapshot?.sections?.tags ?? null;
   const contentData = snapshot?.sections?.content ?? {};
-  const tagShelf = tagData && !tagData.insufficient_history
-    ? primaryTagRecommendationShelf(tagData)
-    : null;
   const hasContentRecommendations = Object.values(contentData).some(
     (result) => result.results.length > 0,
   );
-  const hasRecommendations = hasContentRecommendations || tagShelf !== null || dlc.groups.length > 0;
+  const hasRecommendations = hasContentRecommendations;
   const isRefreshing = snapshot?.status === "building" || snapshot?.status === "stale";
   const needsCollectionChange = snapshot?.status === "needs_refresh";
 
+  const language: "es" | "en" = locale === "en" ? "en" : "es";
+  const detailSections: DetailSection[] = CONTENT_RECOMMENDATION_SECTIONS.flatMap(([algorithmId, copyKey]) => {
+    const section = contentData[algorithmId];
+    if (!section || section.results.length === 0) return [];
+    const sectionCopy = r.contentSections[copyKey];
+    return [{ algorithmId, heading: sectionCopy.heading, description: sectionCopy.description, items: section.results }];
+  });
+  const detailVisible = view === "detail" && detailSections.length > 0;
+  const activeAlgorithm =
+    detailSections.find((section) => section.algorithmId === selectedAlgorithm)?.algorithmId ??
+    detailSections[0]?.algorithmId ??
+    "";
+  const viewLabel =
+    language === "es"
+      ? detailVisible
+        ? "Cambiar a la vista de estanterías"
+        : "Cambiar a la vista detallada"
+      : detailVisible
+        ? "Switch to the shelves view"
+        : "Switch to the detailed view";
+
+  function toggleView() {
+    const next = detailVisible ? "shelves" : "detail";
+    setView(next);
+    writeStored(VIEW_STORAGE_KEY, next);
+  }
+
+  function selectAlgorithm(algorithmId: string) {
+    setSelectedAlgorithm(algorithmId);
+    writeStored(ALGORITHM_STORAGE_KEY, algorithmId);
+  }
+
   return (
-    <main className="sp-page">
-      <h1 className="sp-h1">{r.nav}</h1>
+    <main className="sp-page sp-reco-page">
+      {/* No visible title: the page keeps its heading for screen readers only. */}
+      <h1 className="sp-h1 visually-hidden">{r.nav}</h1>
       {isRefreshing || needsCollectionChange ? (
         <div className="sp-notice-row">
           {isRefreshing ? (
@@ -161,38 +204,19 @@ export function RecommendationsClient({ locale }: { locale: string }) {
           <p className="sp-lead" style={{ marginInline: "auto" }}>{r.error}</p>
           <Link href={`/${locale}/recommendations`} className="sp-btn-primary">{dict.common.retry}</Link>
         </div>
-      ) : hasRecommendations ? (
-        <div className="sp-recommendation-shelves">
-          {CONTENT_RECOMMENDATION_SECTIONS.map(([algorithmId, copyKey]) => {
-            const section = contentData[algorithmId];
-            if (!section) return null;
-            const copy = r.contentSections[copyKey];
-            return (
-              <ContentRecommendationShelf
-                key={algorithmId}
-                items={section.results}
-                locale={locale}
-                heading={copy.heading}
-                description={copy.description}
-                sectionId={`${algorithmId}-heading`}
-                algorithmId={algorithmId}
-              />
-            );
-          })}
-          {tagShelf ? (
-            <RecommendationShelf
-              shelf={tagShelf}
-              locale={locale}
-              description={r.tagDescription}
-            />
-          ) : null}
-          <OwnedGamesDlcShelf
-            groups={dlc.groups}
-            locale={locale}
-            labels={r.dlc}
-            status={dlc.groups.length > 0 ? "populated" : "empty"}
-          />
-        </div>
+      ) : hasRecommendations && detailSections.length > 0 ? (
+        <RecommendationDetailView
+          sections={detailSections}
+          selectedId={activeAlgorithm}
+          onSelect={selectAlgorithm}
+          locale={language}
+          mode={detailVisible ? "detail" : "shelf"}
+          onToggleMode={toggleView}
+          toggleLabel={viewLabel}
+          toggleText={
+            language === "es" ? (detailVisible ? "Estanterías" : "Vista detallada") : detailVisible ? "Shelves" : "Detailed view"
+          }
+        />
       ) : (
         <div className="sp-empty">
           <p className="sp-h2" style={{ margin: 0 }}>

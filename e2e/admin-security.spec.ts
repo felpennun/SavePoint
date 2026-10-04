@@ -18,7 +18,7 @@ async function login(
   await page.getByLabel("Username").fill(username);
   await page.getByLabel("Password").fill(password);
   await Promise.all([
-    page.waitForURL(/\/en\/catalogue$/),
+    page.waitForURL(/\/en$/),
     page.getByRole("button", { name: "Log in" }).click(),
   ]);
   await expect(page.getByRole("region", { name: "Catalogue" })).toBeVisible();

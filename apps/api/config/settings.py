@@ -155,6 +155,7 @@ REST_FRAMEWORK = {
         "registration": "5/hour",
         "login": "10/min",
         "public_profile": "30/min",
+        "username_check": "60/min",
         "recommendations": "30/min",
         "popularity": "60/min",
         # Generous enough for real catalogue browsing/typing; caps a scripted

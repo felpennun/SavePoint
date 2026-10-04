@@ -214,6 +214,8 @@ export async function fetchCatalogueList(
   if (params.date_to) url.searchParams.set("date_to", params.date_to);
   if (params.min_rating) url.searchParams.set("min_rating", params.min_rating);
   if (params.sort) url.searchParams.set("sort", params.sort);
+  // Only the filter options the page shows (the API caches this lighter set).
+  url.searchParams.set("facets", "lite");
 
   const response = await fetch(url, {
     cache: "no-store",
@@ -701,6 +703,22 @@ export async function getContentRecommendations(
   }
 }
 
+export interface CatalogueStats {
+  games: number;
+  rated: number;
+  platforms: number;
+  first_year: number | null;
+  last_year: number | null;
+}
+
+/** Aggregate figures for the home page. The API already caches them for an
+ * hour, so the web layer does not keep a second (on-disk) copy. */
+export async function fetchCatalogueStats(): Promise<CatalogueStats | null> {
+  const response = await fetch(new URL("/api/catalogue/stats/", API_BASE), { cache: "no-store" });
+  if (!response.ok) return null;
+  return (await response.json()) as CatalogueStats;
+}
+
 export async function getNewReleases(): Promise<GameCard[]> {
   const url = new URL("/api/catalogue/new-releases/", API_BASE);
   const response = await fetch(url, { cache: "no-store" });
@@ -708,15 +726,6 @@ export async function getNewReleases(): Promise<GameCard[]> {
     throw new Error(`Failed to load new releases (status ${response.status})`);
   }
   return (await response.json()) as GameCard[];
-}
-
-export async function getOwnedDlc(cookieHeader: string): Promise<OwnedDlcResult> {
-  const url = new URL("/api/catalogue/owned-dlc/", API_BASE);
-  const response = await fetch(url, { cache: "no-store", headers: { Cookie: cookieHeader } });
-  if (!response.ok) {
-    throw new Error(`Failed to load owned DLC (status ${response.status})`);
-  }
-  return (await response.json()) as OwnedDlcResult;
 }
 
 /** The allowlisted DTO of the authenticated tag-taste recommender
@@ -825,7 +834,7 @@ export interface AccountMe {
 }
 
 /**
- * The signed-in simulated account's own identity. The endpoint is wired
+ * The signed-in account's own identity. The endpoint is wired
  * by Plan 04/08; until then this resolves to `null` and callers degrade
  * to an alias-free greeting.
  */

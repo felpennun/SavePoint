@@ -2,9 +2,10 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { ClearFiltersButton } from "@/components/ClearFiltersButton";
 import { CustomLists } from "@/components/CustomLists";
 import { GameCard } from "@/components/GameCard";
-import { PaginationArrow } from "@/components/PaginationArrow";
+import { PaginationArrow, PaginationSpacer } from "@/components/PaginationArrow";
 import { FilterDropdown } from "@/components/FilterDropdown";
 import { FilterDropdownScript } from "@/components/FilterDropdownScript";
 import { StatusPill, type BacklogStatus } from "@/components/StatusPill";
@@ -89,8 +90,15 @@ export default async function CollectionPage({
     ? (rawPlatinum as PlatinumFilter)
     : "all";
   const currentPage = Math.max(1, Number(first(sp.page)) || 1);
+  const searchText = (first(sp.q) ?? "").trim().slice(0, 100);
+  const normalizeForSearch = (value: string) =>
+    value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
   let items = [...library.items];
+  if (searchText) {
+    const needle = normalizeForSearch(searchText);
+    items = items.filter((i) => normalizeForSearch(i.work_title).includes(needle));
+  }
   if (activeStatus !== "all") items = items.filter((i) => i.status === activeStatus);
   if (activeCopy === "with_copy") items = items.filter((i) => i.owned_copy_count > 0);
   if (activeCopy === "without_copy") items = items.filter((i) => i.owned_copy_count === 0);
@@ -123,6 +131,8 @@ export default async function CollectionPage({
     const copy = patch.copy !== undefined ? patch.copy : activeCopy !== "all" ? activeCopy : undefined;
     const platinum = patch.platinum !== undefined ? patch.platinum : activePlatinum !== "all" ? activePlatinum : undefined;
     const page = patch.page;
+    const q = searchText || undefined;
+    if (q) params.set("q", q);
     if (status) params.set("status", status);
     if (sort) params.set("sort", sort);
     if (copy) params.set("copy", copy);
@@ -139,6 +149,13 @@ export default async function CollectionPage({
     release_year: dict.collection.sort.releaseYear,
   };
 
+  const activeFilterCount =
+    (searchText ? 1 : 0) +
+    (activeStatus !== "all" ? 1 : 0) +
+    (activeSort !== "recently_updated" ? 1 : 0) +
+    (activeCopy !== "all" ? 1 : 0) +
+    (activePlatinum !== "all" ? 1 : 0);
+
   const activeStatusSummary = activeStatus === "all" ? undefined : dict.status.labels[activeStatus];
   const activeSortSummary = activeSort === "recently_updated" ? undefined : sortLabels[activeSort];
   const activeCopySummary =
@@ -154,60 +171,93 @@ export default async function CollectionPage({
     <main className="sp-page">
       {libraryTotal > 0 ? (
         <div className="sp-filterbar sp-surface">
-          <form method="get" action={basePath} className="sp-filterbar-row">
+          <form method="get" action={basePath} className="sp-filterbar-row sp-filterbar-row--single">
+            <div className="sp-search">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" />
+                <path d="M16.5 16.5 21 21" />
+              </svg>
+              <label htmlFor="collection-q" className="visually-hidden">{dict.catalogue.searchLabel}</label>
+              <input id="collection-q" name="q" type="search" placeholder={dict.catalogue.searchLabel} defaultValue={searchText} />
+            </div>
+
             <FilterDropdown label={dict.collection.filterByStatus} summary={activeStatusSummary}>
-              <div className="sp-field">
-                <label htmlFor="status">{dict.collection.filterByStatus}</label>
-                <select id="status" name="status" defaultValue={activeStatus === "all" ? "" : activeStatus}>
-                  <option value="">{dict.collection.allStatuses}</option>
-                  {STATUSES.map((s) => (
-                    <option key={s} value={s}>
-                      {dict.status.labels[s]}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <ul className="sp-facet-options">
+                <li>
+                  <label className="sp-facet-option">
+                    <input type="radio" name="status" value="" defaultChecked={activeStatus === "all"} />
+                    <span>{dict.collection.allStatuses}</span>
+                  </label>
+                </li>
+                {STATUSES.map((s) => (
+                  <li key={s}>
+                    <label className="sp-facet-option">
+                      <input type="radio" name="status" value={s} defaultChecked={activeStatus === s} />
+                      <span>{dict.status.labels[s]}</span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
             </FilterDropdown>
 
             <FilterDropdown label={dict.collection.sort.label} summary={activeSortSummary}>
-              <div className="sp-field">
-                <label htmlFor="sort">{dict.collection.sort.label}</label>
-                <select id="sort" name="sort" defaultValue={activeSort}>
-                  {SORTS.map((s) => (
-                    <option key={s} value={s}>
-                      {sortLabels[s]}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <ul className="sp-facet-options">
+                {SORTS.map((s) => (
+                  <li key={s}>
+                    <label className="sp-facet-option">
+                      <input type="radio" name="sort" value={s} defaultChecked={activeSort === s} />
+                      <span>{sortLabels[s]}</span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
             </FilterDropdown>
 
             <FilterDropdown label={dict.collection.filterByCopy} summary={activeCopySummary}>
-              <div className="sp-field">
-                <label htmlFor="copy">{dict.collection.filterByCopy}</label>
-                <select id="copy" name="copy" defaultValue={activeCopy}>
-                  <option value="all">{dict.collection.allCopyStates}</option>
-                  <option value="with_copy">{dict.collection.withCopy}</option>
-                  <option value="without_copy">{dict.collection.withoutCopy}</option>
-                </select>
-              </div>
+              <ul className="sp-facet-options">
+                {[
+                  ["all", dict.collection.allCopyStates],
+                  ["with_copy", dict.collection.withCopy],
+                  ["without_copy", dict.collection.withoutCopy],
+                ].map(([value, text]) => (
+                  <li key={value}>
+                    <label className="sp-facet-option">
+                      <input type="radio" name="copy" value={value} defaultChecked={activeCopy === value} />
+                      <span>{text}</span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
             </FilterDropdown>
 
             <FilterDropdown label={dict.collection.filterByPlatinum} summary={activePlatinumSummary}>
-              <div className="sp-field">
-                <label htmlFor="platinum">{dict.collection.filterByPlatinum}</label>
-                <select id="platinum" name="platinum" defaultValue={activePlatinum}>
-                  <option value="all">{dict.collection.allPlatinumStates}</option>
-                  <option value="platinum">{dict.collection.platinumOnly}</option>
-                  <option value="not_platinum">{dict.collection.notPlatinum}</option>
-                </select>
-              </div>
+              <ul className="sp-facet-options">
+                {[
+                  ["all", dict.collection.allPlatinumStates],
+                  ["platinum", dict.collection.platinumOnly],
+                  ["not_platinum", dict.collection.notPlatinum],
+                ].map(([value, text]) => (
+                  <li key={value}>
+                    <label className="sp-facet-option">
+                      <input type="radio" name="platinum" value={value} defaultChecked={activePlatinum === value} />
+                      <span>{text}</span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
             </FilterDropdown>
+
+            <p role="status" className="sp-meta sp-filterbar-total">
+              {formatCount(dict.collection.count, total)}
+            </p>
 
             <div className="sp-filterbar-actions">
               <button type="submit" className="sp-btn-primary">
                 {dict.catalogue.filters.apply}
               </button>
+              {activeFilterCount > 0 ? (
+                <ClearFiltersButton href={basePath} label={dict.catalogue.filters.clearAll} />
+              ) : null}
             </div>
           </form>
           <FilterDropdownScript />
@@ -215,14 +265,10 @@ export default async function CollectionPage({
       ) : null}
 
       <section aria-label={dict.collection.heading}>
-      <p role="status" className="sp-meta">
-        {formatCount(dict.collection.count, total)}
-      </p>
-
-      {libraryTotal > 0 ? (
-        <a href="/api/library/export/collection.csv" className="sp-link" download>
-          {locale === "es" ? "Exportar colección a CSV" : "Export collection to CSV"}
-        </a>
+      {libraryTotal === 0 ? (
+        <p role="status" className="sp-meta">
+          {formatCount(dict.collection.count, total)}
+        </p>
       ) : null}
 
       {libraryTotal > 0 ? (
@@ -286,7 +332,9 @@ export default async function CollectionPage({
                   direction="prev"
                   label={locale === "es" ? "Anterior" : "Previous"}
                 />
-              ) : null}
+              ) : (
+                <PaginationSpacer />
+              )}
               <span aria-current="page" className="sp-pagination-current">
                 {currentPage}
               </span>
@@ -296,7 +344,9 @@ export default async function CollectionPage({
                   direction="next"
                   label={locale === "es" ? "Siguiente" : "Next"}
                 />
-              ) : null}
+              ) : (
+                <PaginationSpacer />
+              )}
             </nav>
           ) : null}
         </>

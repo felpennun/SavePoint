@@ -91,12 +91,10 @@ function readDemoCredentials(env: Record<string, string | undefined>): { usernam
  * saves -- the minimum needed for that work to become eligible for
  * comments/favorites/lists (all require a LibraryEntry to exist first). */
 async function addCurrentGameToCollection(page: Page): Promise<void> {
-  // The radio input itself is visually hidden (pointer-events: none,
-  // .sp-choice CSS pattern) -- click its wrapping label, not the input.
-  await page.locator("label.sp-choice", { hasText: "Jugando" }).click();
-  await expect(page.getByRole("radio", { name: "Jugando" })).toBeChecked();
+  await page.getByLabel("Estado").selectOption("playing");
+  await expect(page.getByLabel("Estado")).toHaveValue("playing");
   await page.getByRole("button", { name: "Guardar configuración" }).click();
-  await expect(page.getByTestId("configuration-feedback")).toHaveText("Configuración guardada");
+  await expect(page.getByTestId("status-feedback")).toHaveText("Configuración guardada");
 }
 
 test.beforeEach(async ({ page }) => {
@@ -104,7 +102,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe("Phase 5: fresh account -> profile editor -> favorites (D-00, PROF-01, D-02)", () => {
-  test("real registration, then edit bio/avatar/privacy and set a favorite", async ({ page }) => {
+  test("real registration, then edit the profile page (bio, favorite, privacy)", async ({ page }) => {
     const stamp = `${Date.now().toString(36)}${Math.floor(Math.random() * 1e6).toString(36)}`;
     const freshUsername = `e2e-phase5-${stamp}`;
     const freshPassword = `Phase5-${Math.random().toString(36).slice(2, 12)}-Qx`;
@@ -115,7 +113,7 @@ test.describe("Phase 5: fresh account -> profile editor -> favorites (D-00, PROF
     await page.getByLabel("Confirmar contraseña").fill(freshPassword);
     const [registerResponse] = await Promise.all([
       page.waitForResponse((r) => r.url().includes("/api/accounts/register/")),
-      page.getByRole("button", { name: "Crear cuenta simulada" }).click(),
+      page.getByRole("button", { name: "Crear cuenta" }).click(),
     ]);
     const status = registerResponse.status();
     expect([201, 429]).toContain(status);
@@ -126,7 +124,8 @@ test.describe("Phase 5: fresh account -> profile editor -> favorites (D-00, PROF
       });
       return;
     }
-    await page.waitForURL(/\/es\/catalogue$/);
+    await page.waitForURL(/\/es$/);
+    await page.goto("/es/catalogue");
 
     // Add one game to the fresh, empty collection so it is eligible to
     // become a favorite.
@@ -135,38 +134,43 @@ test.describe("Phase 5: fresh account -> profile editor -> favorites (D-00, PROF
     const gameTitle = stripYearSuffix((await page.getByRole("heading", { level: 1 }).first().textContent())?.trim() ?? "");
     await addCurrentGameToCollection(page);
 
-    // Own profile: the ProfileSettings editor renders only for the owner.
-    await page.goto(`/es/profiles/${freshUsername}`);
-    await expect(page.getByRole("heading", { name: "Editar perfil" })).toBeVisible();
+    // Own profile page, reached from the account menu ("Editar perfil").
+    await page.getByRole("button", { name: /Mi cuenta/ }).click();
+    await page.getByRole("menuitem", { name: "Editar perfil" }).click();
+    await page.waitForURL(/\/es\/profile$/);
+    await expect(page.getByRole("tab", { name: "Cuenta" })).toBeVisible();
 
     const bioText = `Cuenta de evidencia E2E creada ${stamp}.`;
     await page.getByLabel("Biografía").fill(bioText);
-    await page.getByLabel(/Avatar/).fill("https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Example.jpg/64px-Example.jpg");
-    await page.getByLabel("Visibilidad de la colección").selectOption("public");
-    await page.getByLabel("Visibilidad de los favoritos").selectOption("public");
-    await page.getByRole("button", { name: "Guardar perfil" }).click();
-    await expect(page.getByTestId("profile-feedback")).toHaveText("Perfil guardado");
+
+    // Favorites: the one collected game is selectable in the first slot.
+    await page.locator(".sp-pf-fav").first().click();
+    await page.locator(".sp-pf-picker-row", { hasText: gameTitle }).click();
+
+    await page.getByRole("tab", { name: "Privacidad" }).click();
+    await page.getByRole("radiogroup", { name: "Colección" }).getByRole("radio", { name: "Amistades" }).click();
+    await page.getByRole("radiogroup", { name: "Favoritos" }).getByRole("radio", { name: "Amistades" }).click();
+    await page.getByRole("button", { name: "Guardar cambios" }).click();
+    await expect(page.getByTestId("profile-feedback")).toHaveText("Cambios guardados");
 
     // Persistence: reload and the same values must come back from the API,
     // not just from local component state.
     await page.reload();
     await expect(page.getByLabel("Biografía")).toHaveValue(bioText);
+    await expect(page.locator(".sp-pf-fav.is-filled")).toHaveCount(1);
 
-    // Favorites: the one collected game is selectable in slot 1.
-    await page.getByLabel("Favorito 1").selectOption({ label: gameTitle });
-    await page.getByRole("button", { name: "Guardar favoritos" }).click();
-    await expect(page.getByTestId("favorites-feedback")).toHaveText("Favoritos guardados");
-    await page.reload();
-    await expect(page.getByLabel("Favorito 1")).toHaveValue(await page.getByLabel("Favorito 1").locator("option", { hasText: gameTitle }).getAttribute("value") ?? "");
+    const editorViolations = await runAxeScan(page);
+    assertNoCriticalOrSeriousViolations(editorViolations, "profile page (edit profile)");
+    await shoot(page, "profile-owner-editor");
 
-    // The public-shaped section below the editor (what every visitor,
-    // including the owner, sees) must reflect the same saved data.
+    // The profile view every visitor (including the owner) sees must reflect
+    // the same saved data.
+    await page.goto(`/es/profiles/${freshUsername}`);
     await expect(page.locator(".sp-lead", { hasText: bioText })).toBeVisible();
     await expect(page.locator(".sp-favorites-list")).toContainText(gameTitle);
 
     const violations = await runAxeScan(page);
-    assertNoCriticalOrSeriousViolations(violations, "own profile with editor + favorites");
-    await shoot(page, "profile-owner-editor");
+    assertNoCriticalOrSeriousViolations(violations, "own profile view with favorites");
   });
 });
 
@@ -185,7 +189,8 @@ test.describe("Phase 5: demo account — comments, lists, copy metadata, CSV exp
     await page.getByLabel("Usuario").fill(username);
     await page.getByLabel("Contraseña").fill(password);
     await page.getByRole("button", { name: "Entrar" }).click();
-    await page.waitForURL(/\/es\/catalogue$/);
+    await page.waitForURL(/\/es$/);
+    await page.goto("/es/catalogue");
 
     // Two distinct catalogue works, both added to the collection so they
     // are eligible for comments/lists/copies.
@@ -285,15 +290,18 @@ test.describe("Phase 5: demo account — comments, lists, copy metadata, CSV exp
     // own delete/edit actions (comment delete, list delete, list item
     // remove/reorder) -- an unscoped selector here would also match and
     // click the "Eliminar" button on this work's own comment.
-    const copyRemoveButtons = page.locator(".sp-library-controls .sp-copy-remove");
-    while ((await copyRemoveButtons.count()) > 0) {
-      await copyRemoveButtons.first().click();
+    // Copies are listed by name; opening one shows a dialog with "Eliminar",
+    // which asks for confirmation and then saves.
+    const copyItems = page.locator(".sp-library-controls .sp-copy-item");
+    while ((await copyItems.count()) > 0) {
+      await copyItems.first().click();
+      await page.locator(".sp-copy-dialog .sp-copy-remove").click();
+      await page.locator(".sp-library-controls dialog.sp-confirm-dialog .sp-comment-confirm-delete").click();
+      await expect(page.getByTestId("status-feedback")).toHaveText("Configuración guardada");
     }
-    await page.getByRole("button", { name: "Guardar configuración" }).click();
-    await expect(page.getByTestId("configuration-feedback")).toHaveText("Configuración guardada");
     await expect(page.locator('[id^="copy-release-"]')).toHaveCount(0);
 
-    await page.getByRole("button", { name: "Añadir otra copia" }).click();
+    await page.getByRole("button", { name: "Añadir copia" }).click();
     await expect(page.locator('[id^="copy-format-"]')).toHaveCount(1);
     await page.locator('[id^="copy-format-"]').selectOption("physical");
     await page.locator('[id^="copy-purchase-date-"]').fill("2024-06-15");
@@ -302,10 +310,11 @@ test.describe("Phase 5: demo account — comments, lists, copy metadata, CSV exp
     await page.locator('[id^="copy-store-"]').fill("E2E Store");
     await page.locator('[id^="copy-conservation-"]').selectOption("good");
     await page.locator('[id^="copy-storage-location-"]').fill("Estantería E2E");
-    await page.getByRole("button", { name: "Guardar configuración" }).click();
-    await expect(page.getByTestId("configuration-feedback")).toHaveText("Configuración guardada");
+    await page.getByRole("button", { name: "Guardar copia" }).click();
+    await expect(page.getByTestId("status-feedback")).toHaveText("Configuración guardada");
 
     await page.reload();
+    await page.locator(".sp-library-controls .sp-copy-item").first().click();
     await expect(page.locator('[id^="copy-price-"]')).toHaveValue(/39\.99|39,99/);
     await expect(page.locator('[id^="copy-currency-"]')).toHaveValue("EUR");
     await expect(page.locator('[id^="copy-conservation-"]')).toHaveValue("good");
@@ -321,8 +330,8 @@ test.describe("Phase 5: demo account — comments, lists, copy metadata, CSV exp
     // Restore to physical so the saved row is left in a consistent state
     // for anyone re-running this suite against the same demo account.
     await page.locator('[id^="copy-format-"]').selectOption("physical");
-    await page.getByRole("button", { name: "Guardar configuración" }).click();
-    await expect(page.getByTestId("configuration-feedback")).toHaveText("Configuración guardada");
+    await page.getByRole("button", { name: "Guardar copia" }).click();
+    await expect(page.getByTestId("status-feedback")).toHaveText("Configuración guardada");
 
     // --- CSV export (PORT-01/PORT-04) -----------------------------------
     // Ground truth via page.request, sharing the browser context's own
@@ -362,10 +371,14 @@ test.describe("Phase 5: demo account — comments, lists, copy metadata, CSV exp
     const secondExport = await page.request.get("/api/library/export/collection.csv");
     expect(await secondExport.text()).toBe(csvBody);
 
-    // The export link on the collection page itself points at the same
-    // endpoint (a real visible affordance, not only a direct API call).
-    await page.goto("/es/collection");
-    const exportLink = page.getByRole("link", { name: /Exportar colección/ });
-    await expect(exportLink).toHaveAttribute("href", "/api/library/export/collection.csv");
+    // The export links live on the profile page (Security tab), not on the
+    // collection page.
+    await page.goto("/es/profile");
+    await page.getByRole("tab", { name: "Seguridad" }).click();
+    await expect(page.getByRole("link", { name: "Excel" })).toHaveAttribute(
+      "href",
+      "/api/library/export/collection.xlsx?lang=es",
+    );
+    await expect(page.getByRole("link", { name: "CSV" })).toHaveAttribute("href", "/api/library/export/collection.csv");
   });
 });

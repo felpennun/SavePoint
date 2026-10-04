@@ -3,7 +3,9 @@ calls at request time (CAT-06/OPS-03)."""
 
 from __future__ import annotations
 
-from rest_framework.permissions import IsAuthenticated
+from django.core.cache import cache
+from django.db.models import Max, Min
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle, SimpleRateThrottle
@@ -12,6 +14,7 @@ from rest_framework.views import APIView
 from catalogue.models import (
     AssetAttribution,
     GameWork,
+    Platform,
     RelatedContent,
     SourceRecord,
 )
@@ -95,7 +98,10 @@ class GameListView(APIView):
             page = _parse_page(request.query_params.get("page"))
         except FilterValidationError as exc:
             return Response({"detail": str(exc), "code": exc.code}, status=400)
-        result = search_games(cq.q, page=page, page_size=DEFAULT_PAGE_SIZE, cq=cq)
+        # ``facets=lite`` is what the web page sends: only the filter options the
+        # filter bar shows, cached; the full facet set stays the default.
+        lite_facets = request.query_params.get("facets") == "lite"
+        result = search_games(cq.q, page=page, page_size=DEFAULT_PAGE_SIZE, cq=cq, lite_facets=lite_facets)
         results = list(result["results"])
         return Response(
             {
@@ -221,6 +227,41 @@ class OwnedGamesDlcView(APIView):
             )
 
         return Response({"groups": list(groups.values())})
+
+
+CATALOGUE_STATS_CACHE_KEY = "catalogue:home-stats"
+CATALOGUE_STATS_TTL_SECONDS = 3600
+
+
+class CatalogueStatsView(APIView):
+    """GET /api/catalogue/stats/ -- the figures shown on the home page: size of the
+    governed catalogue, games with an IGDB score, platforms and the release years
+    covered. Aggregates only (no per-user data), cached for an hour."""
+
+    permission_classes = [AllowAny]
+    authentication_classes: list = []
+
+    def get(self, request: Request) -> Response:
+        stats = cache.get(CATALOGUE_STATS_CACHE_KEY)
+        if stats is None:
+            from catalogue.corpus import governed_works
+            from catalogue.search import ALLOWLIST_SLUGS
+
+            works = governed_works()
+            years = works.aggregate(first=Min("first_release_date"), last=Max("first_release_date"))
+            stats = {
+                "games": works.count(),
+                "rated": works.filter(total_rating__isnull=False).count(),
+                # The platforms the catalogue filter offers: the allow-listed ones
+                # with at least one release in the governed catalogue.
+                "platforms": Platform.objects.filter(slug__in=ALLOWLIST_SLUGS, releases__work__in=works)
+                .distinct()
+                .count(),
+                "first_year": years["first"].year if years["first"] else None,
+                "last_year": years["last"].year if years["last"] else None,
+            }
+            cache.set(CATALOGUE_STATS_CACHE_KEY, stats, CATALOGUE_STATS_TTL_SECONDS)
+        return Response(stats)
 
 
 class SourcesView(APIView):

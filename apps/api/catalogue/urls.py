@@ -2,6 +2,7 @@ from django.urls import path
 
 from catalogue.views import (
     GameDetailView,
+    CatalogueStatsView,
     GameListView,
     NewReleasesView,
     OwnedGamesDlcView,
@@ -16,4 +17,5 @@ urlpatterns = [
     path("new-releases/", NewReleasesView.as_view(), name="new-releases"),
     path("owned-dlc/", OwnedGamesDlcView.as_view(), name="owned-dlc"),
     path("sources/", SourcesView.as_view(), name="sources"),
+    path("stats/", CatalogueStatsView.as_view(), name="stats"),
 ]

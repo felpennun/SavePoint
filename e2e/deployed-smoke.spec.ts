@@ -80,7 +80,7 @@ test.describe("deployed public demo smoke (OPS-01, T-07-02)", () => {
     await page.getByLabel("Usuario").fill(username);
     await page.getByLabel("Contraseña").fill(password);
     await Promise.all([
-      page.waitForURL(/\/es\/catalogue$/),
+      page.waitForURL(/\/es$/),
       page.getByRole("button", { name: "Entrar" }).click(),
     ]);
     expect(new URL(page.url()).origin).toBe(expectedOrigin);

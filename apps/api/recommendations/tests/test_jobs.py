@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import pytest
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 
@@ -174,7 +175,7 @@ def test_workers_publish_bundle_only_after_every_section_succeeds(transactional_
     assert not jobs_for_user.exclude(status=RecommendationJobStatus.SUCCEEDED).exists()
     assert state.active_snapshot is not None
     assert state.active_snapshot.collection_revision == state.collection_revision == 1
-    assert set(state.active_snapshot.payload["content"]) == set(SECTION_ALGORITHM_IDS[:-1])
+    assert set(state.active_snapshot.payload["content"]) == set(SECTION_ALGORITHM_IDS)
 
 
 def test_worker_claims_only_its_named_section(transactional_db, monkeypatch) -> None:  # noqa: ANN001
@@ -196,7 +197,7 @@ def test_worker_claims_only_its_named_section(transactional_db, monkeypatch) -> 
     assert RecommendationRefreshJob.objects.filter(user=user, status=RecommendationJobStatus.QUEUED).count() == len(SECTION_ALGORITHM_IDS) - 1
 
 
-def test_hybrid_mmr_worker_claims_only_its_named_section(transactional_db, monkeypatch) -> None:  # noqa: ANN001
+def test_mmr_pop_worker_claims_only_its_named_section(transactional_db, monkeypatch) -> None:  # noqa: ANN001
     user = _user()
     _entry(user, _work())
     processed = []
@@ -209,14 +210,32 @@ def test_hybrid_mmr_worker_claims_only_its_named_section(transactional_db, monke
     assert jobs.process_one_job(SIGNAL_ALGORITHM_ID) is True
     processed.clear()
 
-    assert jobs.process_one_job("hybrid-mmr-v1") is True
-    assert processed == ["hybrid-mmr-v1"]
+    assert jobs.process_one_job("content-cbf-mmr-pop-v2") is True
+    assert processed == ["content-cbf-mmr-pop-v2"]
     assert RecommendationRefreshJob.objects.get(
-        user=user, algorithm_id="hybrid-mmr-v1"
+        user=user, algorithm_id="content-cbf-mmr-pop-v2"
     ).status == RecommendationJobStatus.SUCCEEDED
     assert RecommendationRefreshJob.objects.filter(
         user=user, status=RecommendationJobStatus.QUEUED
     ).count() == len(SECTION_ALGORITHM_IDS) - 1
+
+
+def test_only_the_three_chosen_content_variants_are_published() -> None:
+    assert SECTION_ALGORITHM_IDS == (
+        "content-cbf-weighted-v1",
+        "content-cbf-mmr-pop-v2",
+        "recency-v1",
+    )
+    # Variants that stay in the offline lab (and the retired tag shelf) have no product worker.
+    for algorithm_id in (
+        "hybrid-mmr-v1",
+        "hybrid-weighted-cf-v1",
+        "cf-user-knn-v1",
+        "content-cbf-mmr-v1",
+        "tag-taste-v1",
+    ):
+        with pytest.raises(ValueError):
+            jobs.process_one_job(algorithm_id)
 
 
 def test_new_collection_revision_obsoletes_every_prior_section(transactional_db) -> None:  # noqa: ANN001
@@ -285,15 +304,10 @@ def test_content_job_is_not_claimable_before_its_signals_job_succeeds(transactio
     # No signals row for this (user, revision, configuration) yet: the claim
     # query withholds every dependent job -- a --loop worker just polls again.
     assert jobs.process_one_job("content-cbf-weighted-v1") is False
-    assert jobs.process_one_job("hybrid-mmr-v1") is False
+    assert jobs.process_one_job("content-cbf-mmr-pop-v2") is False
     assert RecommendationRefreshJob.objects.get(
         user=user, algorithm_id="content-cbf-weighted-v1"
     ).status == RecommendationJobStatus.QUEUED
-
-    # cf-user-knn-v1 and tag-taste-v1 never call rank_content_v1, so they are
-    # not dependents and remain claimable even before the signals job runs.
-    assert jobs.process_one_job("cf-user-knn-v1") is True
-    assert jobs.process_one_job("tag-taste-v1") is True
 
     assert jobs.process_one_job(SIGNAL_ALGORITHM_ID) is True
 

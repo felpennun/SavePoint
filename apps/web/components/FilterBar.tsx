@@ -1,5 +1,6 @@
 import { getDictionary } from "@/i18n";
 import { FacetMenu } from "@/components/FacetMenu";
+import { ClearFiltersButton } from "@/components/ClearFiltersButton";
 import { FilterDropdown } from "@/components/FilterDropdown";
 import { FilterDropdownScript } from "@/components/FilterDropdownScript";
 import {
@@ -10,19 +11,15 @@ import {
   type RepeatedFacetKey,
 } from "@/lib/catalogue-filters";
 
+// Design decision (2026-10): the catalogue offers platform, tags, year and minimum
+// rating only; edition, genre, franchise, developer, publisher and mode were retired.
 const FACET_ORDER: Array<{
   name: RepeatedFacetKey;
   optionKey: keyof CatalogueFacetOptions;
   label: { es: string; en: string };
 }> = [
   { name: "platform", optionKey: "platforms", label: { es: "Plataforma", en: "Platform" } },
-  { name: "tag", optionKey: "tags", label: { es: "Etiquetas", en: "Tags" } },
-  { name: "edition", optionKey: "editions", label: { es: "Edición", en: "Edition" } },
-  { name: "genre", optionKey: "genres", label: { es: "Género", en: "Genre" } },
-  { name: "franchise", optionKey: "franchises", label: { es: "Franquicia", en: "Franchise" } },
-  { name: "developer", optionKey: "developers", label: { es: "Desarrollador", en: "Developer" } },
-  { name: "publisher", optionKey: "publishers", label: { es: "Editorial", en: "Publisher" } },
-  { name: "mode", optionKey: "modes", label: { es: "Modo", en: "Mode" } },
+  { name: "tag", optionKey: "tags", label: { es: "Género", en: "Genre" } },
 ];
 
 /**
@@ -39,7 +36,7 @@ export function FilterBar({
   platformOptions,
   tagOptions,
   currentQuery,
-  yearMin = 1958,
+  yearMin = 1950,
   yearMax,
   optionsUnavailable = false,
 }: {
@@ -88,7 +85,6 @@ export function FilterBar({
             options={optionLists[optionKey] ?? []}
             selected={filters[name] ?? []}
             locale={locale}
-            currentQuery={currentQuery}
             unavailable={unavailable}
           />
         ))}
@@ -113,8 +109,7 @@ export function FilterBar({
 
         <div className="sp-filterbar-actions">
           <button type="submit" className="sp-btn-primary">{f.apply}</button>
-          {activeCount > 0 ? <a href={basePath} className="sp-link">{f.clearAll}</a> : null}
-          {activeCount > 0 ? <span className="sp-filterbar-count">{f.activeLabel.many(activeCount)}</span> : null}
+          {activeCount > 0 ? <ClearFiltersButton href={basePath} label={f.clearAll} /> : null}
         </div>
 
         {unavailable ? <p className="sp-muted sp-filterbar-note">{f.unavailable}</p> : null}

@@ -35,16 +35,12 @@ export function OwnedGamesDlcShelf({
   if (status === "error" || status === "empty" || groups.every((group) => group.dlc.length === 0)) return null;
 
   return (
-    <section className="sp-shelf" aria-labelledby="owned-dlc-heading">
-      <h2 id="owned-dlc-heading" className="sp-h2">
-        {labels.heading}
-      </h2>
-      <p className="sp-muted">{labels.intro}</p>
+    <section className="sp-shelf" aria-label={labels.heading}>
       {groups.map((group) => {
         if (group.dlc.length === 0) return null;
         return (
           <div key={group.base_game.slug} className="sp-shelf-dlc-group">
-            <h3 className="sp-h2">{labels.baseGameLabel.replace("{game}", group.base_game.title)}</h3>
+            <h2 className="sp-h2">{labels.baseGameLabel.replace("{game}", group.base_game.title)}</h2>
             <ul className="sp-shelf-track sp-shelf-track--dense">
               {group.dlc.map((item) => (
                 <GameCard

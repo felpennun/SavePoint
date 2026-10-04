@@ -89,7 +89,7 @@ def test_owner_can_create_read_edit_and_delete_their_own_comment(work, user_a) -
 
 
 @pytest.mark.django_db
-def test_second_comment_for_the_same_work_returns_conflict_without_duplicating(work, user_a) -> None:  # noqa: ANN001
+def test_a_user_can_write_several_comments_on_the_same_work(work, user_a) -> None:  # noqa: ANN001
     _collect(user_a, work)
     client = _client_for(user_a)
     client.post(f"/api/library/entries/{work.id}/comments/", {"text": "First.", "visibility": "public"}, format="json")
@@ -97,9 +97,11 @@ def test_second_comment_for_the_same_work_returns_conflict_without_duplicating(w
     second = client.post(
         f"/api/library/entries/{work.id}/comments/", {"text": "Second.", "visibility": "public"}, format="json"
     )
-    assert second.status_code == 409
-    assert GameComment.objects.filter(user=user_a, work=work).count() == 1
-    assert GameComment.objects.get(user=user_a, work=work).text == "First."
+    assert second.status_code == 201
+    assert list(GameComment.objects.filter(user=user_a, work=work).values_list("text", flat=True)) == [
+        "First.",
+        "Second.",
+    ]
 
 
 # ---------------------------------------------------------------------------
@@ -163,7 +165,9 @@ def test_author_sees_own_private_comment_via_the_by_work_listing(work, user_a) -
     comments = response.json()["comments"]
     assert len(comments) == 1
     assert comments[0]["text"] == "Private thoughts."
-    assert set(comments[0]) == {"author_alias", "text", "date"}
+    assert comments[0]["is_own"] is True
+    assert comments[0]["id"]
+    assert comments[0]["author"] == user_a.username
 
 
 @pytest.mark.django_db

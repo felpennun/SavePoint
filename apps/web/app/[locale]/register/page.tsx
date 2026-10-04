@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 
 import { getDictionary } from "@/i18n";
 
@@ -23,7 +23,6 @@ const MISMATCH = {
  */
 export default function RegisterPage() {
   const routeParams = useParams<{ locale: string }>();
-  const router = useRouter();
   const locale = routeParams.locale === "en" ? "en" : "es";
   const dict = getDictionary(locale);
   const t = dict.register;
@@ -64,7 +63,8 @@ export default function RegisterPage() {
       });
 
       if (response.ok) {
-        router.push(`/${locale}/catalogue`);
+        // Full page load: the new session must replace everything cached.
+        window.location.assign(`/${locale}`);
         return;
       }
       setPassword("");

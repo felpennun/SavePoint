@@ -2,37 +2,36 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 
 const COPY = {
   es: {
     heading: "Iniciar sesión",
-    intro: "Inicia sesión en una cuenta simulada de la demo.",
+    intro: "Inicia sesión en tu cuenta.",
     username: "Usuario",
     password: "Contraseña",
     submit: "Entrar",
     pending: "Entrando…",
     invalid: "El nombre de usuario o la contraseña no son correctos. Comprueba los datos e inténtalo de nuevo.",
     generic: "No se pudo iniciar sesión. Inténtalo de nuevo.",
-    noAccount: "¿No tienes cuenta? Crear una cuenta simulada",
+    noAccount: "¿No tienes cuenta? Crear una cuenta",
   },
   en: {
     heading: "Log in",
-    intro: "Sign in to a simulated demo account.",
+    intro: "Sign in to your account.",
     username: "Username",
     password: "Password",
     submit: "Log in",
     pending: "Logging in…",
     invalid: "The username or password is incorrect. Check the details and try again.",
     generic: "We couldn't log you in. Try again.",
-    noAccount: "No account yet? Create a simulated account",
+    noAccount: "No account yet? Create an account",
   },
 } as const;
 
 export default function LoginPage() {
   const params = useParams<{ locale: string }>();
   const searchParams = useSearchParams();
-  const router = useRouter();
   const locale = params.locale === "en" ? "en" : "es";
   const copy = COPY[locale];
 
@@ -72,7 +71,9 @@ export default function LoginPage() {
       const body = (await response.json()) as { next: string };
       // Django's LoginView is locale-unaware; only trust its returned
       // `next` when we sent an explicit, already-locale-prefixed value.
-      router.push(requestedNext ? body.next : `/${locale}/catalogue`);
+      // A full page load, not a client-side navigation: the session changed, so
+      // the header, the cached pages and any per-user state must start fresh.
+      window.location.assign(requestedNext ? body.next : `/${locale}`);
     } catch {
       setError(copy.generic);
     } finally {

@@ -6,7 +6,7 @@ import {
   fetchSharedList,
   type ProtectedPublicProfile,
 } from "@/lib/api";
-import { buildProfileNavigation } from "@/app/[locale]/profiles/[alias]/page";
+import { buildProfileNavigation, parseProfileTab } from "@/lib/profile-navigation";
 
 const protectedProfile: ProtectedPublicProfile = {
   kind: "protected",
@@ -76,9 +76,16 @@ describe("protected profile SSR contract", () => {
   it("builds an accessible local navigation with one current route", () => {
     expect(buildProfileNavigation("es", "alice", "profile")).toEqual([
       { href: "/es/profiles/alice", label: "Perfil", current: true },
-      { href: "/es/profiles/alice#collection", label: "Colección", current: false },
-      { href: "/es/profiles/alice#lists", label: "Listas", current: false },
+      { href: "/es/profiles/alice?tab=collection", label: "Colección", current: false },
+      { href: "/es/profiles/alice?tab=lists", label: "Listas", current: false },
     ]);
     expect(buildProfileNavigation("en", "alice", "list")[2]).toMatchObject({ current: true });
+  });
+
+  it("opens the requested profile tab and falls back to the first one", () => {
+    expect(parseProfileTab("lists")).toBe("lists");
+    expect(parseProfileTab(["comments", "lists"])).toBe("comments");
+    expect(parseProfileTab("security")).toBe("profile");
+    expect(parseProfileTab(undefined)).toBe("profile");
   });
 });

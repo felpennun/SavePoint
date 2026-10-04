@@ -27,7 +27,7 @@ from recommendations.content.features import (
     TAG_IDF_SMOOTHING,
 )
 from recommendations.collaborative import ALGORITHM_ID as COLLABORATIVE_ALGORITHM_ID
-from recommendations.content.variants import ALGORITHM_REGISTRY
+from recommendations.content.variants import ALGORITHM_REGISTRY, PRODUCT_VARIANT_REGISTRY
 from recommendations.content.similarity import SIMILARITY_RULE_VERSION
 from recommendations.hybrid import (
     ALGORITHM_ID as HYBRID_ALGORITHM_ID,
@@ -51,7 +51,22 @@ PHASE4_ALGORITHM_IDS = (
     HYBRID_MMR_ALGORITHM_ID,
 )
 CONTENT_ALGORITHM_IDS = (*BASE_CONTENT_ALGORITHM_IDS, *PHASE4_ALGORITHM_IDS)
-SECTION_ALGORITHM_IDS = (*CONTENT_ALGORITHM_IDS, GENRE_ALGORITHM_ID)
+# The offline lab (CONTENT_ALGORITHM_IDS) stays frozen; retuned product
+# sections (PRODUCT_VARIANT_REGISTRY) are rankable and publishable but are not
+# compared offline.
+PRODUCT_ONLY_ALGORITHM_IDS = tuple(PRODUCT_VARIANT_REGISTRY)
+RANKABLE_CONTENT_ALGORITHM_IDS = (*CONTENT_ALGORITHM_IDS, *PRODUCT_ONLY_ALGORITHM_IDS)
+# Design decision (2026-10): the offline lab still compares every id in
+# CONTENT_ALGORITHM_IDS, but users only see these three content variants (the
+# per-tag "because you play X" shelf was retired as well). Showing
+# sixteen near-identical shelves adds noise, and every published variant costs a
+# long-lived worker. The remaining variants live in the evaluation lab only.
+PUBLISHED_CONTENT_ALGORITHM_IDS = (
+    "content-cbf-weighted-v1",
+    "content-cbf-mmr-pop-v2",
+    "recency-v1",
+)
+SECTION_ALGORITHM_IDS = PUBLISHED_CONTENT_ALGORITHM_IDS
 PUBLISHED_RESULT_LIMIT = 20
 
 # The signals job (D-TBD, 2026-09-11) is not itself a published section -- it
@@ -64,10 +79,10 @@ PUBLISHED_RESULT_LIMIT = 20
 # same dependency. cf-user-knn-v1 and tag-taste-v1 never call rank_content_v1
 # and are therefore not dependents.
 SIGNAL_ALGORITHM_ID = "content-signals-v1"
-SIGNAL_DEPENDENT_ALGORITHM_IDS = (
-    *BASE_CONTENT_ALGORITHM_IDS,
-    HYBRID_ALGORITHM_ID,
-    HYBRID_MMR_ALGORITHM_ID,
+SIGNAL_DEPENDENT_ALGORITHM_IDS = tuple(
+    algorithm_id
+    for algorithm_id in PUBLISHED_CONTENT_ALGORITHM_IDS
+    if algorithm_id in BASE_CONTENT_ALGORITHM_IDS or algorithm_id in PRODUCT_ONLY_ALGORITHM_IDS
 )
 
 
@@ -111,7 +126,7 @@ def configuration_fingerprint() -> str:
                 "params": spec.params,
                 "version": spec.version,
             }
-            for algorithm_id, spec in ALGORITHM_REGISTRY.items()
+            for algorithm_id, spec in {**ALGORITHM_REGISTRY, **PRODUCT_VARIANT_REGISTRY}.items()
         },
         "phase4_algorithms": {
             COLLABORATIVE_ALGORITHM_ID: {
@@ -136,6 +151,7 @@ def configuration_fingerprint() -> str:
                 "presentation_limit": HYBRID_MMR_LIMIT,
             },
         },
+        "published_sections": list(SECTION_ALGORITHM_IDS),
         "tag_algorithm_id": TAG_ALGORITHM_ID,
         "tag_order": "taste_score_desc_catalogue_rating_desc_slug_asc",
     }

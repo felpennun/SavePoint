@@ -15,19 +15,8 @@ import { expect, test, type Page } from "@playwright/test";
 
 const CONTENT_ALGORITHM_IDS = [
   "content-cbf-weighted-v1",
-  "content-cbf-multiplicative-v1",
-  "content-cbf-twostage-v1",
-  "content-cbf-neg-v1",
-  "content-cbf-weighted-pop-v1",
-  "content-cbf-multiplicative-pop-v1",
-  "content-cbf-twostage-pop-v1",
-  "content-cbf-neg-pop-v1",
+  "content-cbf-mmr-pop-v2",
   "recency-v1",
-  "content-cbf-mmr-v1",
-  "content-cbf-mmr-pop-v1",
-  "cf-user-knn-v1",
-  "hybrid-weighted-cf-v1",
-  "hybrid-mmr-v1",
 ] as const;
 
 // Methodology/evaluation vocabulary that belongs in the thesis, never on
@@ -64,7 +53,7 @@ async function login(page: Page, username: string, password: string): Promise<vo
   await page.getByLabel("Usuario").fill(username);
   await page.getByLabel("Contraseña").fill(password);
   await page.getByRole("button", { name: "Entrar" }).click();
-  await page.waitForURL(/\/es\/catalogue$/);
+  await page.waitForURL(/\/es$/);
 }
 
 /** Poll the same endpoint the client polls, until the async refresh job
@@ -115,9 +104,10 @@ test.describe("recommendations page reflects the real backend ranking (QUAL-02)"
         ).toBeGreaterThanOrEqual(apiResults[i].score);
       }
 
-      const section = page.locator(`section[aria-labelledby="${algorithmId}-heading"]`);
+      // The page shows one algorithm at a time: pick it in the rail first.
+      await page.locator(".sp-reco-rail-item").nth(renderedSections.indexOf(algorithmId)).click();
+      const section = page.locator("section.sp-reco-detail");
       await expect(section, `missing rendered shelf for ${algorithmId}`).toBeVisible();
-      await expect(section.locator(".sp-algo-id")).toHaveText(algorithmId);
 
       const hrefs = await section.locator("ol.sp-shelf-track li a").evaluateAll((links) =>
         links.map((link) => (link as HTMLAnchorElement).getAttribute("href")),

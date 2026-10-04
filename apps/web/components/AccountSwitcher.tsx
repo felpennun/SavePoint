@@ -2,12 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
+import { presetGradient } from "@/lib/avatar-presets";
 import { getSocialUnreadCount } from "@/lib/client-api";
 
 export function buildMessagesHref(locale: string): string {
-  return `/${locale}/messages`;
+  return `/${locale}/friends`;
 }
 
 export function buildAccountTriggerLabel(
@@ -22,14 +23,12 @@ export function buildAccountTriggerLabel(
 }
 
 /**
- * AccountSwitcher (01.1-UI-SPEC, AUTH-02). Occupies the navbar right-end
- * account slot when the visitor is authenticated. The accessible trigger
- * name always includes "simulated"/"simulada", including icon-only mobile.
- * Panel = role="menu", focus-trapped,
- * Escape-closes, focus-returns -- reuses the MobileMenu focus-management
- * pattern. Lists the way to pick another simulated account plus Log out.
- * The preloaded-account list itself is wired by Plan 04/08; until then
- * "Switch account" links to the existing /{locale}/login entry point.
+ * AccountSwitcher (01.1-UI-SPEC). Occupies the navbar right-end account slot
+ * when the visitor is authenticated. The accessible trigger name always
+ * includes the account label, including icon-only mobile. Panel = role="menu",
+ * focus-trapped, Escape-closes, focus-returns -- reuses the MobileMenu
+ * focus-management pattern. "Switch account" links to the existing
+ * /{locale}/login entry point; Log out ends the session.
  */
 export function AccountSwitcher({
   locale,
@@ -38,6 +37,7 @@ export function AccountSwitcher({
   locale: string;
   labels: {
     label: string;
+    editProfile: string;
     change: string;
     current: string;
     logout: string;
@@ -51,23 +51,75 @@ export function AccountSwitcher({
   const [open, setOpen] = useState(false);
   const [alias, setAlias] = useState<string | null>(null);
   const [unreadCount, setUnreadCount] = useState<number | null>(null);
+  // The account photo shown in the trigger: an image, a built-in gradient, or
+  // nothing (the generic person icon).
+  const [photo, setPhoto] = useState<{ src: string; gradient?: string } | null>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
+  const pathname = usePathname();
 
   // Best-effort alias resolution; the trigger degrades gracefully to the
-  // bare "Simulated account" label if the endpoint is absent (Plan 04/08).
+  // bare account label if the endpoint is absent.
   useEffect(() => {
     let cancelled = false;
     fetch("/api/accounts/me/", { credentials: "same-origin" })
       .then((r) => (r.ok ? r.json() : null))
       .then((body) => {
-        if (!cancelled && body && typeof body.username === "string") setAlias(body.username);
+        if (cancelled) return;
+        setAlias(body && typeof body.username === "string" ? body.username : null);
       })
       .catch(() => {});
     return () => {
       cancelled = true;
     };
+  }, [pathname]);
+
+  // Load the account photo; the profile page asks for a refresh when it changes.
+  useEffect(() => {
+    let cancelled = false;
+    const loadPhoto = () => {
+      fetch("/api/accounts/me/profile/", { credentials: "same-origin" })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((body) => {
+          if (cancelled) return;
+          if (!body) {
+            setPhoto(null);
+            return;
+          }
+          const src: string = body.avatar_image_url || (String(body.avatar_url || "").startsWith("https://") ? body.avatar_url : "");
+          const gradient = presetGradient(body.avatar_preset);
+          setPhoto(src || gradient ? { src, gradient } : null);
+        })
+        .catch(() => {});
+    };
+    loadPhoto();
+    window.addEventListener("savepoint:profile-updated", loadPhoto);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("savepoint:profile-updated", loadPhoto);
+    };
+  }, [pathname]);
+
+  // Close the menu when the user clicks or taps anywhere outside of it.
+  useEffect(() => {
+    if (!open) return;
+    function onPointerDown(event: PointerEvent) {
+      const target = event.target as Node | null;
+      if (target && (panelRef.current?.contains(target) || triggerRef.current?.contains(target))) return;
+      setOpen(false);
+    }
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [open]);
+
+  // The profile page renames the account without a full reload.
+  useEffect(() => {
+    const onRenamed = (event: Event) => {
+      const next = (event as CustomEvent<{ username?: unknown }>).detail?.username;
+      if (typeof next === "string") setAlias(next);
+    };
+    window.addEventListener("savepoint:username-changed", onRenamed);
+    return () => window.removeEventListener("savepoint:username-changed", onRenamed);
   }, []);
 
   useEffect(() => {
@@ -133,8 +185,9 @@ export function AccountSwitcher({
       /* fall through to a hard navigation regardless */
     }
     setOpen(false);
-    router.push(`/${locale}`);
-    router.refresh();
+    // Full page load: after logging out nothing of the previous account (header,
+    // photo, cached pages) may remain on screen.
+    window.location.assign(`/${locale}`);
   }
 
   const triggerText = alias ? `${labels.label}: ${alias}` : labels.label;
@@ -142,11 +195,6 @@ export function AccountSwitcher({
   const triggerLabel = labels.messagesLabel
     ? buildAccountTriggerLabel(triggerText, messagesLabel, unreadCount, labels.unreadLabel, labels.noUnreadLabel)
     : triggerText;
-  const unreadText = unreadCount === null
-    ? (labels.unreadLoadingLabel ?? (locale === "es" ? "Comprobando mensajes pendientes" : "Checking pending messages"))
-    : unreadCount > 0
-      ? (labels.unreadLabel?.(unreadCount) ?? buildAccountTriggerLabel("", "", unreadCount).replace(/^; : /, ""))
-      : (labels.noUnreadLabel ?? (locale === "es" ? "Sin mensajes pendientes" : "No pending messages"));
 
   return (
     <div style={{ position: "relative" }}>
@@ -160,16 +208,23 @@ export function AccountSwitcher({
         aria-controls="account-menu"
         onClick={() => setOpen((v) => !v)}
       >
-        <svg className="sp-account-avatar" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
-          <circle cx="12" cy="8" r="4" />
-          <path d="M4 21v-1a7 7 0 0 1 14 0v1" />
-        </svg>
-        {labels.messagesLabel && unreadCount !== null && unreadCount > 0 ? (
-          <span
+        {photo?.src ? (
+          // eslint-disable-next-line @next/next/no-img-element -- own profile photo (own endpoint or the https URL the user set)
+          <img
+            className="sp-account-avatar sp-account-photo"
+            src={photo.src}
+            alt=""
             aria-hidden="true"
-            style={{ position: "absolute", top: 0, right: 0, width: "0.55rem", height: "0.55rem", borderRadius: "999px", background: "var(--color-danger)", border: "2px solid var(--color-surface-overlay)" }}
+            onError={() => setPhoto(photo.gradient ? { src: "", gradient: photo.gradient } : null)}
           />
-        ) : null}
+        ) : photo?.gradient ? (
+          <span className="sp-account-avatar sp-account-photo" style={{ backgroundImage: photo.gradient }} aria-hidden="true" />
+        ) : (
+          <svg className="sp-account-avatar" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 21v-1a7 7 0 0 1 14 0v1" />
+          </svg>
+        )}
       </button>
       {open ? (
         <div
@@ -177,32 +232,16 @@ export function AccountSwitcher({
           id="account-menu"
           role="menu"
           aria-label={labels.listHeading}
-          className="sp-surface"
-          style={{
-            position: "absolute",
-            right: 0,
-            top: "calc(100% + 4px)",
-            zIndex: 40,
-            minWidth: "16rem",
-            display: "flex",
-            flexDirection: "column",
-            gap: "var(--space-sm)",
-          }}
+          className="sp-account-menu"
         >
-          {alias ? (
-            <p className="sp-muted" style={{ margin: 0 }}>
-              {labels.current.replace("{alias}", alias)}
-            </p>
-          ) : null}
-          <Link href={`/${locale}/login`} role="menuitem" onClick={() => setOpen(false)}>
+          {alias ? <p className="sp-account-menu-head">{labels.current.replace("{alias}", alias)}</p> : null}
+          <Link href={`/${locale}/profile`} role="menuitem" className="sp-account-menu-item" onClick={() => setOpen(false)}>
+            {labels.editProfile}
+          </Link>
+          <Link href={`/${locale}/login`} role="menuitem" className="sp-account-menu-item" onClick={() => setOpen(false)}>
             {labels.change}
           </Link>
-          {labels.messagesLabel ? (
-            <Link href={buildMessagesHref(locale)} role="menuitem" onClick={() => setOpen(false)}>
-              {messagesLabel} <span className="sp-muted">({unreadText})</span>
-            </Link>
-          ) : null}
-          <button type="button" role="menuitem" className="sp-link" style={{ textAlign: "left" }} onClick={logout}>
+          <button type="button" role="menuitem" className="sp-account-menu-item is-separated" onClick={logout}>
             {labels.logout}
           </button>
         </div>

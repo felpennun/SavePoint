@@ -12,13 +12,15 @@ here too.
 
 from __future__ import annotations
 
-from django.contrib.auth import authenticate, get_user_model, login, logout
+from django.contrib.auth import authenticate, get_user_model, login, logout, update_session_auth_hash
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import IntegrityError, transaction
+from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
+from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -33,7 +35,17 @@ from accounts.serializers import (
     serialize_capabilities,
     serialize_favorite_slots,
 )
-from accounts.services import get_or_create_profile, replace_favorites, update_profile
+from accounts.services import (
+    change_password,
+    change_username,
+    check_username,
+    clear_profile_image,
+    delete_own_account,
+    get_or_create_profile,
+    replace_favorites,
+    set_profile_image,
+    update_profile,
+)
 
 User = get_user_model()
 
@@ -254,6 +266,159 @@ class MyProfileView(APIView):
             return Response({"detail": str(exc.message if hasattr(exc, "message") else exc)}, status=400)
 
         return Response(serialize_account_profile(profile))
+
+
+class _MyProfileImageView(APIView):
+    """GET/PUT/DELETE of one of the owner's own profile images. Owner-only by
+    construction: the profile is always ``request.user``'s."""
+
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+    kind = ""
+
+    def get(self, request: Request) -> HttpResponse:
+        profile = get_or_create_profile(user=request.user)
+        data = getattr(profile, f"{self.kind}_image")
+        if not data:
+            return Response({"detail": "Not found."}, status=404)
+        response = HttpResponse(bytes(data), content_type=getattr(profile, f"{self.kind}_image_type"))
+        response["Cache-Control"] = "private, max-age=3600"
+        response["X-Content-Type-Options"] = "nosniff"
+        return response
+
+    def put(self, request: Request) -> Response:
+        upload = request.FILES.get("file")
+        if upload is None:
+            return Response({"detail": "A file is required."}, status=400)
+        try:
+            profile = set_profile_image(user=request.user, kind=self.kind, data=upload.read())
+        except DjangoValidationError as exc:
+            return Response({"detail": str(exc.message if hasattr(exc, "message") else exc)}, status=400)
+        return Response(serialize_account_profile(profile))
+
+    def delete(self, request: Request) -> Response:
+        profile = clear_profile_image(user=request.user, kind=self.kind)
+        return Response(serialize_account_profile(profile))
+
+
+class FriendAvatarView(APIView):
+    """GET /api/accounts/profiles/<alias>/avatar/ -- an uploaded profile photo,
+    served only to its owner and to accepted friends; every other caller gets
+    the same 404 as for a missing photo."""
+
+    permission_classes = [IsAuthenticated]
+    kind = "avatar"
+
+    def get(self, request: Request, alias: str) -> HttpResponse:
+        from social.services import relationship_status
+
+        owner = User.objects.filter(username=alias, is_active=True).first()
+        if owner is None or relationship_status(viewer=request.user, target=owner) not in {"friend", "self"}:
+            return Response({"detail": "Not found."}, status=404)
+        profile = getattr(owner, "profile", None)
+        data = getattr(profile, f"{self.kind}_image", None) if profile is not None else None
+        if not data:
+            return Response({"detail": "Not found."}, status=404)
+        response = HttpResponse(bytes(data), content_type=getattr(profile, f"{self.kind}_image_type"))
+        response["Cache-Control"] = "private, max-age=3600"
+        response["X-Content-Type-Options"] = "nosniff"
+        return response
+
+
+class FriendCoverView(FriendAvatarView):
+    """GET /api/accounts/profiles/<alias>/cover/ -- the uploaded cover banner,
+    with the same friend-only access as the photo."""
+
+    kind = "cover"
+
+
+class MyAvatarView(_MyProfileImageView):
+    """GET/PUT/DELETE /api/accounts/me/avatar/ -- the owner's uploaded photo."""
+
+    kind = "avatar"
+
+
+class MyCoverView(_MyProfileImageView):
+    """GET/PUT/DELETE /api/accounts/me/cover/ -- the owner's uploaded cover."""
+
+    kind = "cover"
+
+
+class MyPasswordView(APIView):
+    """POST /api/accounts/me/password/ -- change the owner's password. The
+    current password is re-checked, and the attempt is throttled like login
+    so the endpoint cannot be used to guess it."""
+
+    permission_classes = [IsAuthenticated]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "login"
+
+    def post(self, request: Request) -> Response:
+        current = request.data.get("current_password")
+        new = request.data.get("new_password")
+        if not isinstance(current, str) or not isinstance(new, str) or not current or not new:
+            return Response({"detail": "Both passwords are required."}, status=400)
+        try:
+            change_password(user=request.user, current_password=current, new_password=new)
+        except DjangoValidationError as exc:
+            messages = getattr(exc, "messages", None) or [str(exc)]
+            return Response({"detail": messages[0], "errors": messages}, status=400)
+        update_session_auth_hash(request, request.user)
+        return Response({"detail": "Password changed."})
+
+
+class UsernameAvailabilityView(APIView):
+    """GET /api/accounts/me/username/availability/?username=<name> -- whether
+    the signed-in user could take that username (``ok``, ``same``, ``invalid``
+    or ``taken``). Throttled, since it answers "does this account exist"."""
+
+    permission_classes = [IsAuthenticated]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "username_check"
+
+    def get(self, request: Request) -> Response:
+        candidate = request.query_params.get("username", "")
+        return Response({"status": check_username(user=request.user, candidate=candidate)})
+
+
+class MyUsernameView(APIView):
+    """POST /api/accounts/me/username/ -- rename the signed-in account (once)."""
+
+    permission_classes = [IsAuthenticated]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "username_check"
+
+    def post(self, request: Request) -> Response:
+        new_username = request.data.get("username")
+        if not isinstance(new_username, str) or not new_username.strip():
+            return Response({"detail": "A username is required.", "code": "invalid"}, status=400)
+        try:
+            change_username(user=request.user, new_username=new_username)
+        except DjangoValidationError as exc:
+            code = getattr(exc, "code", None) or "invalid"
+            status = 409 if code in {"taken", "already_changed"} else 400
+            return Response({"detail": str(exc.message if hasattr(exc, "message") else exc), "code": code}, status=status)
+        return Response(serialize_account_profile(get_or_create_profile(user=request.user)))
+
+
+class MyAccountDeleteView(APIView):
+    """POST /api/accounts/me/delete/ -- permanently delete the caller's own
+    account after re-checking their password, then end the session."""
+
+    permission_classes = [IsAuthenticated]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "login"
+
+    def post(self, request: Request) -> Response:
+        password = request.data.get("password")
+        if not isinstance(password, str) or not password:
+            return Response({"detail": "The password is required."}, status=400)
+        try:
+            delete_own_account(user=request.user, password=password)
+        except DjangoValidationError as exc:
+            return Response({"detail": str(exc.message if hasattr(exc, "message") else exc)}, status=400)
+        logout(request)
+        return Response(status=204)
 
 
 class MyFavoritesView(APIView):

@@ -6,12 +6,13 @@ import { CoverImage } from "@/components/CoverImage";
 import { GameComments } from "@/components/GameComments";
 import { LibraryControls } from "@/components/LibraryControls";
 import { OwnedGamesDlcShelf } from "@/components/OwnedGamesDlcShelf";
+import { localizedGenreLabel } from "@/lib/genre-labels";
 import { RatingBreakdownLine } from "@/components/RatingBreakdownLine";
 import { RecordGameVisit } from "@/components/RecordGameVisit";
 import { ScorePill } from "@/components/ScorePill";
 import { Synopsis } from "@/components/Synopsis";
 import { getDictionary } from "@/i18n";
-import { fetchGameDetail, getOwnedDlc, type OwnedDlcGroup } from "@/lib/api";
+import { fetchGameDetail, type OwnedDlcGroup } from "@/lib/api";
 
 /** Game detail follows the P3 product order while retaining the existing
  * cover/content/configure layout: metadata first, then controls and related
@@ -30,22 +31,24 @@ export default async function GameDetailPage({
 
   const cookieStore = await cookies();
   const isAuthenticated = cookieStore.has("sessionid");
-  const cookieHeader = cookieStore
-    .getAll()
-    .map((cookie) => `${cookie.name}=${cookie.value}`)
-    .join("; ");
 
-  let ownedDlcGroups: OwnedDlcGroup[] = [];
-  let ownedDlcStatus: "populated" | "empty" | "error" = "empty";
-  if (isAuthenticated) {
-    try {
-      const result = await getOwnedDlc(cookieHeader);
-      ownedDlcGroups = result.groups.filter((group) => group.base_game.slug === game.slug);
-      ownedDlcStatus = ownedDlcGroups.length > 0 ? "populated" : "empty";
-    } catch {
-      ownedDlcStatus = "error";
-    }
-  }
+  // The game's DLC and expansions come with the game itself, so the shelf is
+  // the same for everyone: signed in or not, with or without a configuration.
+  const dlcGroups: OwnedDlcGroup[] =
+    game.related_content.length > 0
+      ? [
+          {
+            base_game: { slug: game.slug, title: game.title },
+            dlc: game.related_content.map((related) => ({
+              work_id: related.id,
+              slug: related.slug,
+              title: related.title,
+              cover: related.cover,
+              relation: related.relation,
+            })),
+          },
+        ]
+      : [];
 
   const platforms = Array.from(
     new Set(game.releases.map((release) => release.platform).filter((platform): platform is string => Boolean(platform))),
@@ -139,7 +142,7 @@ export default async function GameDetailPage({
                       href={`/${locale}/catalogue?tag=${encodeURIComponent(tag.slug)}`}
                       className="sp-chip"
                     >
-                      {tag.name}
+                      {localizedGenreLabel(tag.slug, tag.name, locale)}
                     </Link>
                   ))}
                 </div>
@@ -175,46 +178,11 @@ export default async function GameDetailPage({
           </div>
 
           <OwnedGamesDlcShelf
-            groups={ownedDlcGroups}
+            groups={dlcGroups}
             locale={locale}
-            status={ownedDlcStatus}
+            status={dlcGroups.length > 0 ? "populated" : "empty"}
             labels={dict.recommendations.dlc}
           />
-
-          {game.related_content.length > 0 ? (
-            <section aria-label={dict.detail.relatedContent}>
-              <h2 className="sp-h2">{dict.detail.relatedContent}</h2>
-              <ul className="sp-related-list">
-                {game.related_content.map((related) => (
-                  <li key={related.id}>
-                    <Link href={`/${locale}/games/${related.slug}`} className="sp-related-card">
-                      <div className="sp-related-cover">
-                        {related.cover.is_placeholder ? (
-                          <div className="sp-cover-placeholder" data-testid="cover-placeholder">
-                            <span>{related.title}</span>
-                          </div>
-                        ) : (
-                          <CoverImage
-                            src={related.cover.url}
-                            alt={related.cover.alt}
-                            title={related.title}
-                            missingLabel={dict.common.coverMissing}
-                            width={72}
-                            height={96}
-                          />
-                        )}
-                      </div>
-                      <span>
-                        <strong>{related.title}</strong>
-                        <small>{related.relation === "dlc" ? dict.detail.dlc : dict.detail.expansion}</small>
-                        <small>{[related.year, related.platform_summary].filter(Boolean).join(" · ")}</small>
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ) : null}
 
             {game.provenance ? (
             <section aria-label={dict.provenance.heading} className="sp-provenance">

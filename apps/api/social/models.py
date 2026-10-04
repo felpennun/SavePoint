@@ -137,6 +137,10 @@ class SocialMessage(models.Model):
     read_at = models.DateTimeField(null=True, blank=True)
     hidden_at = models.DateTimeField(null=True, blank=True)
     hidden_reason = models.CharField(max_length=24, blank=True, default="")
+    # What the recipient did with the recommendation: "" (nothing yet),
+    # "added" (put the game in their backlog) or "dismissed".
+    response = models.CharField(max_length=12, blank=True, default="")
+    responded_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ("-created_at", "id")
@@ -154,3 +158,40 @@ class SocialMessage(models.Model):
             models.Index(fields=("receiver", "read_at"), name="social_message_unread"),
             models.Index(fields=("sender", "receiver", "created_at"), name="social_msg_cooldown_idx"),
         ]
+
+
+class SocialNoticeKind(models.TextChoices):
+    ACCEPTED = "accepted", "Friend request accepted"
+    REC_ADDED = "rec_added", "Recommendation added to backlog"
+
+
+class SocialNotice(models.Model):
+    """A short informational notification for one user: someone accepted their
+    friend request, or added a game they recommended to their backlog."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    recipient = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="social_notices"
+    )
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="social_notices_caused"
+    )
+    kind = models.CharField(max_length=16, choices=SocialNoticeKind.choices)
+    work = models.ForeignKey(
+        GameWork, on_delete=models.SET_NULL, null=True, blank=True, related_name="social_notices"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    read_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ("-created_at", "id")
+        constraints = [
+            models.CheckConstraint(
+                condition=~models.Q(recipient=models.F("actor")), name="social_notice_no_self"
+            ),
+            models.CheckConstraint(
+                condition=models.Q(kind__in=[choice.value for choice in SocialNoticeKind]),
+                name="social_notice_kind_valid",
+            ),
+        ]
+        indexes = [models.Index(fields=("recipient", "read_at"), name="social_notice_unread")]

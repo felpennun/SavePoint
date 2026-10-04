@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 
 import { AccountSwitcher } from "@/components/AccountSwitcher";
 import { BrandLockup } from "@/components/BrandLockup";
-import { DemoAccountBanner } from "@/components/DemoAccountBanner";
+import { FriendsNavDot } from "@/components/FriendsNavDot";
 import { LoginIconButton } from "@/components/LoginIconButton";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { ShelfWheelScroll } from "@/components/ShelfWheelScroll";
@@ -62,6 +62,7 @@ export function TopNavigation({ items, locale }: { items: NavItem[]; locale: str
               }}
             >
               {item.label}
+              {item.href.endsWith("/friends") ? <FriendsNavDot locale={locale} /> : null}
             </Link>
           </li>
         ))}
@@ -90,7 +91,7 @@ export function NavSearch({ locale, label }: { locale: string; label: string }) 
   );
 }
 
-export function MobileMenu({ items, dict }: { items: NavItem[]; dict: Dictionary }) {
+export function MobileMenu({ items, dict, locale }: { items: NavItem[]; dict: Dictionary; locale: string }) {
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -165,6 +166,7 @@ export function MobileMenu({ items, dict }: { items: NavItem[]; dict: Dictionary
                   onClick={() => setOpen(false)}
                 >
                   {item.label}
+                  {item.href.endsWith("/friends") ? <FriendsNavDot locale={locale} /> : null}
                 </Link>
               </li>
             ))}
@@ -214,24 +216,24 @@ export function AppShell({
                 locale={locale}
                 labels={{
                   label: dict.account.switcher.label,
+                  editProfile: dict.account.switcher.editProfile,
                   change: dict.account.switcher.change,
                   current: dict.account.switcher.current,
                   logout: dict.nav.logout,
                   listHeading: dict.account.list.heading,
-                  messagesLabel: locale === "es" ? "Mensajes de amigos" : "Messages from friends",
-                  unreadLabel: (count: number) => locale === "es" ? `${count} mensajes sin leer` : `${count} unread messages`,
-                  noUnreadLabel: locale === "es" ? "Sin mensajes pendientes" : "No pending messages",
-                  unreadLoadingLabel: locale === "es" ? "Comprobando mensajes pendientes" : "Checking pending messages",
+                  messagesLabel: locale === "es" ? "Notificaciones" : "Notifications",
+                  unreadLabel: (count: number) => locale === "es" ? `${count} sin leer` : `${count} unread`,
+                  noUnreadLabel: locale === "es" ? "Nada pendiente" : "Nothing pending",
+                  unreadLoadingLabel: locale === "es" ? "Comprobando notificaciones" : "Checking notifications",
                 }}
               />
             ) : (
               <LoginIconButton locale={locale} label={dict.nav.loginAria} />
             )}
-            <MobileMenu items={items} dict={dict} />
+            <MobileMenu items={items} dict={dict} locale={locale} />
           </div>
         </div>
       </header>
-      {isAuthenticated ? <DemoAccountBanner text={dict.account.banner} /> : null}
       <div id="main-content" tabIndex={-1}>
         {children}
       </div>

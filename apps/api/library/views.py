@@ -25,6 +25,7 @@ from catalogue.ratings import display_rating, savepoint_rating_stats
 from catalogue.serializers import _cover, _platform_summary
 from library import services
 from library.export import EXPORT_FILENAME, render_collection_csv
+from library.export_xlsx import EXPORT_XLSX_FILENAMES, XLSX_CONTENT_TYPE, normalize_lang, render_collection_xlsx
 from library.portability import apply_import, parse_import_csv
 from config.observability import emit_operation_event
 from library.models import BacklogStatus, CustomList, CustomListItem, GameComment, LibraryEntry, OwnedCopy, StatusTransition
@@ -193,7 +194,7 @@ class SetStatusView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request: Request, work_id: str) -> Response:
-        work = get_object_or_404(GameWork, id=work_id, is_dlc=False)
+        work = get_object_or_404(GameWork, id=work_id)
         entry = LibraryEntry.objects.filter(user=request.user, work=work).first()
         return Response({"status": entry.current_status if entry else None})
 
@@ -202,8 +203,7 @@ class SetStatusView(APIView):
         if new_status not in VALID_STATUSES:
             return Response({"detail": "Invalid status."}, status=400)
 
-        # D-11: DLC/expansions are never independently actionable.
-        work = get_object_or_404(GameWork, id=work_id, is_dlc=False)
+        work = get_object_or_404(GameWork, id=work_id)
 
         with transaction.atomic():
             entry, _ = LibraryEntry.objects.select_for_update().get_or_create(
@@ -237,7 +237,7 @@ class SetRatingView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request: Request, work_id: str) -> Response:
-        work = get_object_or_404(GameWork, id=work_id, is_dlc=False)
+        work = get_object_or_404(GameWork, id=work_id)
         entry = LibraryEntry.objects.filter(user=request.user, work=work).first()
         return Response({"rating_half_steps": entry.rating_half_steps if entry else None})
 
@@ -246,7 +246,7 @@ class SetRatingView(APIView):
         if not serializer.is_valid():
             return Response({"detail": "Invalid rating.", "errors": serializer.errors}, status=400)
 
-        work = get_object_or_404(GameWork, id=work_id, is_dlc=False)
+        work = get_object_or_404(GameWork, id=work_id)
         entry = services.set_rating(
             user=request.user, work=work, rating_half_steps=serializer.validated_data["rating_half_steps"]
         )
@@ -259,7 +259,7 @@ class OwnedCopiesView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request: Request, work_id: str) -> Response:
-        work = get_object_or_404(GameWork, id=work_id, is_dlc=False)
+        work = get_object_or_404(GameWork, id=work_id)
         copies = OwnedCopy.objects.filter(user=request.user, work=work)
         return Response({"copies": [serialize_copy(copy) for copy in copies]})
 
@@ -268,7 +268,7 @@ class OwnedCopiesView(APIView):
         if not serializer.is_valid():
             return Response({"detail": "Invalid copy request.", "errors": serializer.errors}, status=400)
 
-        work = get_object_or_404(GameWork, id=work_id, is_dlc=False)
+        work = get_object_or_404(GameWork, id=work_id)
         data = serializer.validated_data
         try:
             copy, created = services.create_owned_copy(
@@ -300,7 +300,7 @@ class LibraryConfigurationView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request: Request, work_id: str) -> Response:
-        work = get_object_or_404(GameWork, id=work_id, is_dlc=False)
+        work = get_object_or_404(GameWork, id=work_id)
         entry = LibraryEntry.objects.filter(user=request.user, work=work).first()
         return Response(
             {
@@ -318,7 +318,7 @@ class LibraryConfigurationView(APIView):
         serializer = LibraryConfigurationSerializer(data=request.data)
         if not serializer.is_valid():
             return Response({"detail": "Invalid library configuration.", "errors": serializer.errors}, status=400)
-        work = get_object_or_404(GameWork, id=work_id, is_dlc=False)
+        work = get_object_or_404(GameWork, id=work_id)
         try:
             entry = services.save_library_configuration(work=work, user=request.user, **serializer.validated_data)
         except ValidationError as exc:
@@ -342,7 +342,7 @@ class OwnedCopyDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
     def delete(self, request: Request, work_id: str, copy_id: str) -> Response:
-        work = get_object_or_404(GameWork, id=work_id, is_dlc=False)
+        work = get_object_or_404(GameWork, id=work_id)
         if not services.delete_owned_copy(user=request.user, work=work, copy_id=copy_id):
             return Response({"detail": "Copy not found."}, status=404)
         return Response(status=204)
@@ -354,7 +354,7 @@ class ClearLibraryConfigurationView(APIView):
     permission_classes = [IsAuthenticated]
 
     def delete(self, request: Request, work_id: str) -> Response:
-        work = get_object_or_404(GameWork, id=work_id, is_dlc=False)
+        work = get_object_or_404(GameWork, id=work_id)
         services.clear_library_configuration(user=request.user, work=work)
         return Response(status=204)
 
@@ -390,6 +390,25 @@ class ExportCollectionView(APIView):
         content = render_collection_csv(request.user)
         response = HttpResponse(content, content_type="text/csv; charset=utf-8")
         response["Content-Disposition"] = f'attachment; filename="{EXPORT_FILENAME}"'
+        response["Content-Length"] = str(len(content))
+        return response
+
+
+class ExportCollectionXlsxView(APIView):
+    """GET /api/library/export/collection.xlsx -- the owner's collection as a spreadsheet.
+
+    Owner-scoped by construction (``render_collection_xlsx`` only reads
+    ``request.user``'s own library entries). It is a flat, human-readable sheet in
+    the interface language (``?lang=es|en``), separate from the versioned CSV
+    portability contract above."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request) -> HttpResponse:
+        lang = normalize_lang(request.query_params.get("lang"))
+        content = render_collection_xlsx(request.user, lang)
+        response = HttpResponse(content, content_type=XLSX_CONTENT_TYPE)
+        response["Content-Disposition"] = f'attachment; filename="{EXPORT_XLSX_FILENAMES[lang]}"'
         response["Content-Length"] = str(len(content))
         return response
 
@@ -499,9 +518,8 @@ class WorkCommentsView(APIView):
 
     GET is public: every ``public`` comment for this work, plus the
     caller's own comment regardless of visibility when authenticated. POST
-    requires authentication and creates the caller's single comment for
-    this work -- a second attempt returns 409 without touching the
-    existing row."""
+    requires authentication and creates a comment by the caller on
+    this work; a user may write several."""
 
     permission_classes = [AllowAny]
 
@@ -511,23 +529,32 @@ class WorkCommentsView(APIView):
         return [AllowAny()]
 
     def get(self, request: Request, work_id: str) -> Response:
-        work = get_object_or_404(GameWork, id=work_id, is_dlc=False)
+        work = get_object_or_404(GameWork, id=work_id)
         viewer = request.user if request.user.is_authenticated else None
         if viewer is None:
             return Response({"comments": []})
         comments = services.list_visible_comments(work=work, viewer=viewer)
-        return Response({"comments": [serialize_shared_comment(comment) for comment in comments]})
+        # The caller's own comments carry their id (so they can be deleted) and
+        # `is_own`; other authors' comments stay on the minimal shared allowlist.
+        return Response(
+            {
+                "comments": [
+                    serialize_comment(comment, viewer=viewer)
+                    if comment.user_id == viewer.pk
+                    else serialize_shared_comment(comment)
+                    for comment in comments
+                ]
+            }
+        )
 
     def post(self, request: Request, work_id: str) -> Response:
         serializer = CommentInputSerializer(data=request.data)
         if not serializer.is_valid():
             return Response({"detail": "Invalid comment.", "errors": serializer.errors}, status=400)
 
-        work = get_object_or_404(GameWork, id=work_id, is_dlc=False)
+        work = get_object_or_404(GameWork, id=work_id)
         try:
             comment = services.create_comment(user=request.user, work=work, **serializer.validated_data)
-        except services.CommentAlreadyExists:
-            return Response({"detail": "You already have a comment for this work."}, status=409)
         except ValidationError as exc:
             return Response({"detail": _service_error_detail(exc)}, status=400)
 

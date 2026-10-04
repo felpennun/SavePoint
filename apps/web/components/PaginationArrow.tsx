@@ -1,5 +1,11 @@
 import Link from "next/link";
 
+/** Empty slot with the arrow's footprint, so the page number stays centred
+ * on the first and last pages where one arrow is missing. */
+export function PaginationSpacer() {
+  return <span className="sp-pagination-spacer" aria-hidden="true" />;
+}
+
 /**
  * A chevron pagination control (2026-09-12 redesign, replaces the
  * "Anterior"/"Siguiente" text links shared by the catalogue and the

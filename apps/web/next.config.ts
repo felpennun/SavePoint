@@ -86,6 +86,11 @@ const nextConfig: NextConfig = {
         source: "/api/library/export/collection.csv",
         destination: `${API_PROXY_TARGET}/api/library/export/collection.csv`,
       },
+      // Same rule for the spreadsheet export of the collection (Excel).
+      {
+        source: "/api/library/export/collection.xlsx",
+        destination: `${API_PROXY_TARGET}/api/library/export/collection.xlsx`,
+      },
       { source: "/api/:path*", destination: `${API_PROXY_TARGET}/api/:path*/` },
       // Same-origin deployment evidence endpoint. The browser smoke never
       // needs (or learns) the API service's separate provider hostname.

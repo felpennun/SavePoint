@@ -29,7 +29,8 @@ describe("game detail social comments contract", () => {
     expect(commentsSource).toContain("text: string;");
     expect(commentsSource).toContain("created_at: string;");
     expect(commentsSource).toContain("is_own: boolean;");
-    expect(commentsSource).toContain("comments.filter((comment) => !comment.is_own)");
+    // Only the author gets a delete control: the trash button is rendered for the own comment alone.
+    expect(commentsSource).toContain("comment.is_own ? (");
     expect(commentsSource).not.toMatch(/owner_id|user_id|email|ownership|dangerouslySetInnerHTML/);
   });
 

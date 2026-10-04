@@ -17,8 +17,10 @@ from social.serializers import (
     serialize_account,
     serialize_friendship_request,
     serialize_pair,
+    serialize_notification,
     serialize_social_message,
 )
+from social.profiles import build_friend_card, build_friend_profile
 
 
 def _validation_detail(exc: ValidationError) -> str:
@@ -95,6 +97,9 @@ class FriendshipRequestActionView(APIView):
                 return Response({"relationship": "friend", "alias": serialize_pair(pair, viewer=request.user)["alias"]})
             if resolved_action == "reject":
                 services.reject_friendship_request(receiver=request.user, request_id=request_id)
+                return Response({"relationship": "none"})
+            if resolved_action == "cancel":
+                services.cancel_friendship_request(sender=request.user, request_id=request_id)
                 return Response({"relationship": "none"})
         except services.SocialNotFound:
             return Response({"detail": "Not found."}, status=404)
@@ -205,6 +210,92 @@ class RecommendationCollectionView(APIView):
             "work__assets"
         ).get(pk=message.pk)
         return Response({"message": serialize_social_message(message)}, status=201)
+
+
+class FriendCardView(APIView):
+    """GET /api/social/friends/<alias>/ -- the friends page's profile card: the
+    full card for an accepted friend, or the basic one (alias, avatar, the
+    relationship and the pending request) for anyone else."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request, alias: str) -> Response:
+        try:
+            target = services._resolve_active_user(alias)
+        except services.SocialNotFound:
+            return Response({"detail": "Not found."}, status=404)
+        card = build_friend_card(viewer=request.user, target=target)
+        if card is None:
+            return Response({"detail": "Not found."}, status=404)
+        return Response(card)
+
+
+class FriendProfileView(APIView):
+    """GET /api/social/friends/<alias>/profile/ -- the detailed, read-only profile
+    page of an accepted friend (or of the caller), with the collection, lists
+    and comments that the owner shares."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request, alias: str) -> Response:
+        try:
+            target = services._resolve_active_user(alias)
+        except services.SocialNotFound:
+            return Response({"detail": "Not found."}, status=404)
+        profile = build_friend_profile(viewer=request.user, target=target)
+        if profile is None:
+            return Response({"detail": "Not found."}, status=404)
+        return Response(profile)
+
+
+class NotificationCollectionView(APIView):
+    """GET /api/social/notifications/ -- requests, recommendations and notices."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request) -> Response:
+        items = services.notifications_for(user=request.user)
+        return Response(
+            {
+                "notifications": [serialize_notification(item) for item in items],
+                "unread": services.unread_count_for(recipient=request.user),
+            }
+        )
+
+
+class NotificationReadAllView(APIView):
+    permission_classes = [IsAuthenticated]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "social_mutation"
+
+    def post(self, request: Request) -> Response:
+        services.mark_all_read(recipient=request.user)
+        return Response({"unread": services.unread_count_for(recipient=request.user)})
+
+
+class RecommendationRespondView(APIView):
+    """POST /api/social/messages/<id>/respond/ -- add the recommended game to the
+    backlog (``added``) or dismiss it (``dismissed``)."""
+
+    permission_classes = [IsAuthenticated]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "social_mutation"
+
+    def post(self, request: Request, message_id: str) -> Response:
+        response_value = request.data.get("response")
+        if not isinstance(response_value, str):
+            return Response({"detail": "Invalid response."}, status=400)
+        try:
+            message = services.respond_to_recommendation(
+                recipient=request.user, message_id=message_id, response=response_value
+            )
+        except services.SocialConflict as exc:
+            return Response({"detail": str(exc)}, status=409)
+        except ValidationError as exc:
+            return Response({"detail": _validation_detail(exc)}, status=400)
+        if message is None:
+            return Response({"detail": "Not found."}, status=404)
+        return Response({"message": serialize_social_message(message), "response": message.response})
 
 
 class SocialMessageCollectionView(APIView):

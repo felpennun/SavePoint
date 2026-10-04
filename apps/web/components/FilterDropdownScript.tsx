@@ -1,45 +1,56 @@
+"use client";
+
+import { useEffect } from "react";
+
+const OPEN_SELECTOR = "details.sp-dropdown[open]";
+
 /**
- * One shared, idempotent enhancement for every `.sp-dropdown` on the page
- * (FilterDropdown, FacetMenu): clicking outside an open dropdown closes it,
- * Escape closes the focused one, and opening one closes any other that was
- * already open. All three are progressive enhancements -- every dropdown is
- * a plain <details>/<summary> and stays fully usable (just permanently
- * expandable one at a time via native toggling) with JavaScript off.
+ * One shared enhancement for every `.sp-dropdown` on the page (FilterDropdown,
+ * FacetMenu): clicking anywhere outside an open dropdown closes it, Escape
+ * closes the focused one, and opening one closes any other that was already
+ * open. Every dropdown is a plain <details>/<summary>, so without JavaScript
+ * each still opens and closes on its own.
  *
- * Rendered once per filter toolbar (catalogue's FilterBar, the collection
- * page's own controls form). The init guard makes a second render on the
- * same page a no-op rather than a duplicate set of listeners.
+ * It is a client effect (not an inline <script>): inline scripts do not run
+ * when the page is reached through client-side navigation, which left the
+ * panels stuck open. Mount it once next to the dropdowns; a second mount just
+ * adds a second, harmless set of listeners that is removed on unmount.
  */
 export function FilterDropdownScript() {
-  return (
-    <script
-      dangerouslySetInnerHTML={{
-        __html: `(() => {
-          if (window.__spFilterDropdownInit) return;
-          window.__spFilterDropdownInit = true;
-          const openDropdowns = () => document.querySelectorAll("details.sp-dropdown[open]");
-          document.addEventListener("click", (event) => {
-            openDropdowns().forEach((d) => {
-              if (!d.contains(event.target)) d.removeAttribute("open");
-            });
-          });
-          document.addEventListener("toggle", (event) => {
-            const el = event.target;
-            if (!(el && el.matches && el.matches("details.sp-dropdown") && el.open)) return;
-            openDropdowns().forEach((d) => {
-              if (d !== el) d.removeAttribute("open");
-            });
-          }, true);
-          document.addEventListener("keydown", (event) => {
-            if (event.key !== "Escape") return;
-            const open = document.querySelector("details.sp-dropdown[open]");
-            if (!open) return;
-            open.removeAttribute("open");
-            const trigger = open.querySelector("summary");
-            if (trigger) trigger.focus();
-          });
-        })();`,
-      }}
-    />
-  );
+  useEffect(() => {
+    const closeAll = (except?: Element | null) => {
+      document.querySelectorAll(OPEN_SELECTOR).forEach((details) => {
+        if (details !== except) details.removeAttribute("open");
+      });
+    };
+
+    const onPointerDown = (event: Event) => {
+      const target = event.target as Node | null;
+      document.querySelectorAll(OPEN_SELECTOR).forEach((details) => {
+        if (!target || !details.contains(target)) details.removeAttribute("open");
+      });
+    };
+    const onToggle = (event: Event) => {
+      const element = event.target as HTMLDetailsElement | null;
+      if (element?.matches?.("details.sp-dropdown") && element.open) closeAll(element);
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      const open = document.querySelector(OPEN_SELECTOR);
+      if (!open) return;
+      open.removeAttribute("open");
+      open.querySelector("summary")?.focus();
+    };
+
+    document.addEventListener("pointerdown", onPointerDown, true);
+    document.addEventListener("toggle", onToggle, true);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown, true);
+      document.removeEventListener("toggle", onToggle, true);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, []);
+
+  return null;
 }

@@ -46,10 +46,14 @@ class RecommendationInputSerializer(serializers.Serializer):
 
 def serialize_account(user, *, relationship: str) -> dict:
     profile = getattr(user, "profile", None)
+    # Name and bio are only for accepted friends (and the user themself): a
+    # stranger found by exact alias gets the alias and avatar, nothing else.
+    visible = relationship in {"friend", "self"}
     return {
         "alias": str(user.username),
         "avatar_url": str(profile.avatar_url) if profile is not None else "",
-        "bio": str(profile.bio) if profile is not None else "",
+        "bio": str(profile.bio) if profile is not None and visible else "",
+        "display_name": str(profile.display_name) if profile is not None and visible else "",
         "relationship": relationship,
     }
 
@@ -66,7 +70,32 @@ def serialize_friendship_request(friendship_request: FriendshipRequest) -> dict:
 
 def serialize_pair(pair: RelationshipPair, *, viewer) -> dict:  # noqa: ANN001
     other = pair.high_user if pair.low_user_id == viewer.pk else pair.low_user
-    return {"alias": str(other.username), "relationship": "friend"}
+    profile = getattr(other, "profile", None)
+    return {
+        "alias": str(other.username),
+        "display_name": str(profile.display_name) if profile is not None else "",
+        "has_avatar_image": bool(profile is not None and profile.avatar_image),
+        "relationship": "friend",
+    }
+
+
+def serialize_notification(item: dict) -> dict:
+    """Notification DTO: the ids needed to act on it, never raw model rows."""
+    result = {
+        "id": item["id"],
+        "kind": item["kind"],
+        "actor": item["actor"],
+        "work": item["work"],
+        "note": item["note"],
+        "state": item["state"],
+        "read": item["read"],
+        "date": item["date"].isoformat(),
+    }
+    if "request_id" in item:
+        result["request_id"] = item["request_id"]
+    if "message_id" in item:
+        result["message_id"] = item["message_id"]
+    return result
 
 
 def serialize_social_message(message: SocialMessage) -> dict:
@@ -84,4 +113,5 @@ def serialize_social_message(message: SocialMessage) -> dict:
         "text": str(message.message),
         "date": message.created_at.isoformat(),
         "read": message.read_at is not None,
+        "response": message.response,
     }

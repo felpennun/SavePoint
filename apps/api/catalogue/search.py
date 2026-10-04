@@ -25,6 +25,7 @@ from dataclasses import dataclass
 from datetime import date
 
 from django.contrib.postgres.search import TrigramSimilarity
+from django.core.cache import cache
 from django.db.models import (
     Case,
     Count,
@@ -64,7 +65,7 @@ TRIGRAM_SIMILARITY_THRESHOLD = 0.3
 TRIGRAM_CANDIDATE_CAP = 200
 DEFAULT_PAGE_SIZE = 25
 
-YEAR_MIN = 1958
+YEAR_MIN = 1950
 RATING_MIN = 0.0
 RATING_MAX = 100.0
 # Relevance is a stepped discovery ordering, not a visibility filter. A larger
@@ -407,6 +408,10 @@ def _ordered_matching_work_ids(normalized_query: str) -> list[str]:
     return ordered
 
 
+LITE_FACETS_CACHE_KEY = "catalogue:facets:lite"
+LITE_FACETS_TTL_SECONDS = 6 * 3600
+
+
 def _relation_facets(scoped: QuerySet[GameWork], model, relation: str) -> list[dict]:
     rows = (
         model.objects.filter(**{f"{relation}__in": scoped})
@@ -441,8 +446,12 @@ def _edition_facets(scoped: QuerySet[GameWork]) -> list[dict]:
     return [deduped[key] for key in sorted(deduped, key=lambda value: (deduped[value]["name"], value))]
 
 
-def _facets(scoped: QuerySet[GameWork]) -> dict:
+def _facets(scoped: QuerySet[GameWork], *, lite: bool = False) -> dict:
     """Facet options + counts over the text-scoped governed set.
+
+    ``lite`` skips the heavy dimensions the filter bar no longer offers
+    (franchises, developers, publishers, modes, editions): developers alone is
+    ~40k rows, which made every catalogue response megabytes large and slow.
 
     Facets are deliberately calculated before the requested page (and before
     the optional facet filters) so a copied GET URL always describes the same
@@ -460,10 +469,10 @@ def _facets(scoped: QuerySet[GameWork]) -> dict:
     ]
     tags = _relation_facets(scoped, CuratedLabel, "works")
     genres = _relation_facets(scoped, Genre, "works")
-    franchises = _relation_facets(scoped, Franchise, "works")
-    developers = _relation_facets(scoped, Developer, "works")
-    publishers = _relation_facets(scoped, Publisher, "works")
-    modes = _relation_facets(scoped, GameMode, "works")
+    franchises = [] if lite else _relation_facets(scoped, Franchise, "works")
+    developers = [] if lite else _relation_facets(scoped, Developer, "works")
+    publishers = [] if lite else _relation_facets(scoped, Publisher, "works")
+    modes = [] if lite else _relation_facets(scoped, GameMode, "works")
     dates = [
         {"value": str(row["year"]), "label": str(row["year"]), "count": row["count"]}
         for row in scoped.filter(first_release_date__isnull=False)
@@ -475,7 +484,7 @@ def _facets(scoped: QuerySet[GameWork]) -> dict:
     span = scoped.aggregate(min=Min("first_release_date"), max=Max("first_release_date"))
     return {
         "platforms": platforms,
-        "editions": _edition_facets(scoped),
+        "editions": [] if lite else _edition_facets(scoped),
         "genres": genres,
         "franchises": franchises,
         "developers": developers,
@@ -541,6 +550,7 @@ def search_games(
     page_size: int = DEFAULT_PAGE_SIZE,
     *,
     cq: CatalogueQuery | None = None,
+    lite_facets: bool = False,
 ) -> dict:
     """Return a paginated, deterministically-ordered result set plus facets.
 
@@ -571,7 +581,18 @@ def search_games(
         ordered_ids = _ordered_matching_work_ids(normalize_title(stripped))
         scoped = scoped.filter(id__in=ordered_ids)
 
-    facets = _facets(scoped)
+    # Filter options describe the whole governed catalogue, not the current text
+    # search or filters, so every filter stays available even when the current
+    # search returns nothing.
+    # The lite variant is also cached for hours: it describes the whole
+    # governed catalogue and the web page asks for it on every visit.
+    if lite_facets:
+        facets = cache.get(LITE_FACETS_CACHE_KEY)
+        if facets is None:
+            facets = _facets(governed_works(), lite=True)
+            cache.set(LITE_FACETS_CACHE_KEY, facets, LITE_FACETS_TTL_SECONDS)
+    else:
+        facets = _facets(governed_works())
 
     filtered = _apply_filters(scoped, cq)
 

@@ -238,10 +238,11 @@ def test_invalid_status_rejected(work, user_a) -> None:  # noqa: ANN001
 
 
 @pytest.mark.django_db
-def test_dlc_work_is_not_independently_actionable(dlc_work, user_a) -> None:  # noqa: ANN001
+def test_dlc_work_can_be_configured_like_any_other_game(dlc_work, user_a) -> None:  # noqa: ANN001
     client = _client_for(user_a)
     response = client.post(f"/api/library/entries/{dlc_work.id}/status/", {"status": "playing"}, format="json")
-    assert response.status_code == 404
+    assert response.status_code in (200, 201)
+    assert LibraryEntry.objects.filter(user=user_a, work=dlc_work, current_status="playing").exists()
 
 
 @pytest.mark.django_db(transaction=True)
