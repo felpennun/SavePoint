@@ -82,7 +82,8 @@ Relacionado: [[2026-10-04 - Revision de seguridad]].
   `"regions": ["fra1"]`.
 - **Precarga:** `HoverPrefetchLink` carga la página destino completa al pasar el ratón, enfocar o tocar una tarjeta,
   las flechas de paginación, las etiquetas de filtro y las filas del selector de la colección.
-- **Pantalla de carga:** `app/[locale]/loading.tsx` da respuesta inmediata al navegar mientras el servidor renderiza.
+- **Pantalla de carga:** se probó una pantalla de esqueleto (`app/[locale]/loading.tsx`) y se retiró a petición del
+  autor: quitaba dinamismo y la velocidad ya es buena sin ella.
 - **Ficha de juego:** `LibraryControls` hacía cuatro peticiones al abrir (estado, nota, copias y configuración); la
   configuración ya lo devuelve todo, así que ahora es una.
 - **Desplegable del perfil:** la insignia de platino (`z-index: 1`) se pintaba por encima del menú de cuenta porque la
