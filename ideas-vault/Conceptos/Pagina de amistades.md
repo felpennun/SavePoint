@@ -41,3 +41,10 @@ visibilidad. La pestana Coleccion lleva la misma barra de filtros que la colecci
 ## Fuentes
 
 `apps/web/components/FriendsApp.tsx`, `apps/api/social/` (`profiles.py`, `services.py`, `views.py`).
+
+## Perfil de una amistad: colección y listas (2026-10-04)
+
+- La pestaña **Listas** tiene un selector a la izquierda (nombre y número de juegos de cada lista visible) y, a la derecha, los juegos de la lista elegida con las mismas tarjetas de la colección (año, plataformas, estado, valoración y platino cuando la colección es visible), buscador y paginación de 8 juegos (`FriendLists`). El nombre de la lista enlaza a su página compartible.
+- En escritorio (más de 900 px), las pestañas **Colección** y **Listas** no desplazan la página: la tarjeta del perfil ocupa la ventana, la barra de filtros queda fija y solo los juegos hacen scroll vertical con la barra oculta, como en el catálogo (`.sp-pf.is-fixed`, `.sp-pf-scroll`; la parte superior (banner, cabecera y pestañas) mantiene el mismo tamaño que en Perfil). Perfil y Comentarios mantienen el scroll normal.
+- La pestaña **Comentarios** también va en modo fijo (sin scroll de página, los comentarios hacen scroll vertical con la barra oculta). Los selectores de listas (el de la colección propia y el de la pestaña Listas) hacen scroll vertical por su cuenta cuando hay muchas listas; en la colección propia, ESTADO queda fijo y solo se desplaza MIS LISTAS.
+- En la pestaña **Perfil** el resumen ya no es un bloque: es una columna a la derecha, separada por una línea vertical y rellena con el color de los laterales de la colección, a toda la altura de la tarjeta del perfil (`.sp-pf--friend`; el editor del perfil propio no cambia).
