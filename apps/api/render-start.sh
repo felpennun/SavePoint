@@ -6,8 +6,19 @@ set -eu
 python manage.py migrate --noinput
 python manage.py import_catalogue
 python manage.py load_localized_summaries
-python manage.py bootstrap_demo_accounts
-python manage.py seed_demo
+
+# The simulated demo accounts are optional: the product no longer needs them
+# (people register their own accounts), and the seed contract only exists when
+# DEMO_ACCOUNTS is set in the service environment. Without it the old script
+# aborted here -- after migrate -- so every deploy since 2026-09-06 failed and
+# Render kept serving the previous revision. With it set, both steps stay
+# fail-closed exactly as before.
+if [ -n "${DEMO_ACCOUNTS:-}" ]; then
+  python manage.py bootstrap_demo_accounts
+  python manage.py seed_demo
+else
+  echo "DEMO_ACCOUNTS is not set: skipping the demo account bootstrap and seed."
+fi
 
 # Production WSGI server. The Django development server is explicitly
 # unsupported for production (no timeouts, no worker recycling, autoreload
