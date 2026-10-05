@@ -109,6 +109,15 @@ Limitaciones a dejar por escrito:
 3. Las recomendaciones en la web desplegada son más lentas (un worker, CPU compartida con la API, 512 MB).
 4. Los datos de la web desplegada son los de una demostración: cuentas sin verificación de correo, claves de demo.
 
+**Aplicado en la memoria (2026-10-05, bloque 1):** `06_implementacion.tex` (sección Despliegue): fila nueva de
+recomendaciones en la tabla de topología, estado actualizado del despliegue (interfaz rediseñada + subconjunto),
+Tabla 6.12 local/público, criterio y tamaño del subconjunto, worker bajo demanda y las cuatro limitaciones; y
+`08_conclusiones.tex` (limitación y trabajo futuro del despliegue). Figura `despliegue-flujo.pdf` actualizada (generador
+`scripts/thesis-figures/generate_diagrams.py`: cadena con `load_localized_summaries` y fila con proceso bajo demanda,
+precalentado de facetas y `/health/`); recuento de pruebas ya estaba hecho (788/66). Lo escrito de
+las 4 limitaciones y de la medición de recomendación (4-6 min) sale de este informe; la cifra "4 workers en local" y
+"3,77 GB" no se han vuelto a medir (Docker apagado).
+
 Cosas que **no** hay que olvidar al reescribir: cambiar "150 juegos" por las cifras nuevas, la afirmación de que el
 rediseño no está desplegado (ya lo está), el recuento de pruebas (779 de backend y 66 de web) y el commit desplegado.
 Regenerar la vista previa PDF (está desactualizada desde el último reemplazo de figuras).

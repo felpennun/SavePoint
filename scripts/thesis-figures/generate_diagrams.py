@@ -279,7 +279,7 @@ def diagram_casos_uso():
 def diagram_despliegue_flujo():
     fig, ax = plt.subplots(figsize=(9.6, 5.8))
     ax.set_xlim(0, 14.8)
-    ax.set_ylim(0, 8.9)
+    ax.set_ylim(-0.2, 8.9)
     ax.axis("off")
 
     # Row 1: the public topology, left to right.
@@ -299,7 +299,7 @@ def diagram_despliegue_flujo():
                                           linewidth=1.0, edgecolor="#9aa3b8", facecolor="#f7f8fb", zorder=0))
     ax.text(0.6, 5.45, "Cadena de arranque de la API en Render",
             fontsize=8.6, fontweight="bold", color=MUTED)
-    steps = ["migrate", "import\ncatalogue", "gunicorn\n(health OK)"]
+    steps = ["migrate", "import_catalogue\nload_localized_summaries", "gunicorn\n(escucha)"]
     sx, sw, gap = 1.6, 3.2, 1.3
     boxes = []
     for st in steps:
@@ -309,8 +309,19 @@ def diagram_despliegue_flujo():
         arrow(ax, right(boxes[i]), left(boxes[i + 1]))
     arrow(ax, bottom(b_render), (b_render[0] + b_render[2] / 2, 5.9))
 
-    b_health = box(ax, (10.5, 0.3), 3.4, 1.1, "/health/ devuelve\nel commit desplegado", fontsize=8.6)
-    arrow(ax, bottom(boxes[-1]), top(b_health))
+    # Row 3: what hangs from the running server (none of it keeps Neon awake).
+    y3, h3 = -0.1, 1.5
+    b_worker = box(ax, (0.3, y3), 4.6, h3,
+                   "Proceso de recomendaciones\nlanzado por la API al encolar\nun refresco; vacía la cola y termina",
+                   fontsize=8.2, fill=ACCENT_FILL)
+    b_warm = box(ax, (5.4, y3), 4.0, h3,
+                 "Precalentado de facetas\ntras empezar a escuchar\n(una sola vez)", fontsize=8.2)
+    b_health = box(ax, (9.9, y3), 4.6, h3,
+                   "/health/ devuelve el commit\ndesplegado; no consulta\nla base de datos", fontsize=8.2)
+    gun = boxes[-1]
+    arrow(ax, bottom(gun), top(b_health))
+    arrow(ax, (gun[0] + 0.9, gun[1]), top(b_warm))
+    arrow(ax, (gun[0] + 0.3, gun[1]), top(b_worker), dashed=True)
 
     save(fig, "despliegue-flujo")
 

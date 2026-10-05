@@ -792,6 +792,8 @@ Tabla~\ref{tab:topologia} recoge el contrato de cada superficie.
     \hline
     Base de datos & Neon Free & Proyecto \texttt{autumn-breeze-06234770}, rama \texttt{production}; suministra PostgreSQL a Render. \\
     \hline
+    Cálculo & Proceso de Render & Un único proceso corto que la API lanza bajo demanda, vacía la cola de trabajos de recomendación y termina. \\
+    \hline
 \end{tabularx}
 \caption{Topología pública aprobada, de coste cero.}
 \label{tab:topologia}
@@ -799,14 +801,16 @@ Tabla~\ref{tab:topologia} recoge el contrato de cada superficie.
 
 El navegador solo ve el origen HTTPS de Vercel, que reenvía las rutas de la API como describe
 la Sección~\ref{sec:dis-sesion}. En Render, la cadena de arranque encadena migración e importación del
-catálogo; solo entonces cede el control al servidor
+catálogo y de los resúmenes localizados; solo entonces cede el control al servidor
 \texttt{gunicorn}, con cada paso idempotente y protegido con un bloqueo consultivo, de modo que
-un paso fallido detiene el arranque, tal como resume la Figura~\ref{fig:despliegue-flujo}.
+un paso fallido detiene el arranque, tal como resume la Figura~\ref{fig:despliegue-flujo}. Una vez que el servidor
+escucha, se lanza una sola vez un precalentado de las facetas del catálogo y, solo cuando hay un refresco de
+recomendaciones en cola, el proceso bajo demanda descrito más abajo.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.92\textwidth]{figures/despliegue-flujo.pdf}
-    \caption{Topología de despliegue público y cadena de arranque en Render, en la que cada paso es idempotente y un paso fallido detiene el arranque. Docker Compose local (base de datos, API y frontend) construye las mismas imágenes sin depender de estos tres servicios.}
+    \caption{Topología de despliegue público, cadena de arranque en Render y procesos que cuelgan del servidor en marcha. Cada paso del arranque es idempotente y un paso fallido lo detiene. Docker Compose local (base de datos, API y frontend) construye las mismas imágenes sin depender de estos tres servicios.}
     \label{fig:despliegue-flujo}
 \end{figure}
 
@@ -822,18 +826,56 @@ un visitante puede encontrar un arranque en frío de cerca de un minuto; las cuo
 los tres proveedores pueden suspender un servicio, y el nivel gratuito no promete copias de
 seguridad ni restauración.
 
-La demostración pública está en vivo desde el 5 de septiembre de 2026, con la prueba de humo en
-verde contra la revisión desplegada. En ese despliegue sirve la interfaz anterior al rediseño
-contra el corpus curado de ciento cincuenta juegos de Wikidata: el rediseño de la interfaz y el
-catálogo a escala real no están en el despliegue público, sino integrados en la rama principal
-y ejecutados en el entorno local de Docker Compose. El frontend rediseñado llegó a construirse
-en Vercel, pero la base de datos desplegada todavía contiene solo el corpus curado, de modo que
-la vista de catálogo da error contra ese despliegue; se revisó esta situación y se decidió
-dejar el despliegue público actual como está por ahora, con la demostración ante el tribunal
-ejecutándose desde el entorno local reproducible. Conectar el despliegue a datos reales de
-internet (cargar el catálogo de IGDB en una base de datos desplegada, aplicar las migraciones
-nuevas y ajustar la configuración de hosts y de proxies) queda pospuesto al final del proyecto:
-es una decisión registrada, no un defecto pendiente.
+La demostración pública está en vivo desde el 5 de septiembre de 2026. En su primera versión servía la interfaz
+anterior al rediseño contra el corpus curado de ciento cincuenta juegos de Wikidata. Desde el 5 de octubre de 2026 sirve
+la interfaz rediseñada y un subconjunto del catálogo a escala real cargado en Neon, con las recomendaciones calculadas
+por un proceso bajo demanda. No es el mismo catálogo que el del entorno local, y la
+Tabla~\ref{tab:local-publico} recoge la diferencia.
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{ | L{0.26\textwidth} | Y | Y | }
+    \hline
+    \textbf{Aspecto} & \textbf{Entorno local (Docker)} & \textbf{Despliegue público} \\
+    \hline
+    Corpus gobernado visible en el catálogo & 190.479 obras & 32.550 juegos (el 17\,\%), más 10.714 DLC relacionados \\
+    \hline
+    Criterio del corpus & Corpus completo gobernado de la versión 2026.09.2 & Juegos con valoración de IGDB o con PopScore mayor que cero \\
+    \hline
+    Vectores de características & Uno por obra gobernada, varias versiones & Uno por juego publicado, solo la versión vigente \texttt{fs-v13} \\
+    \hline
+    Procesos de recomendación & Cuatro en paralelo (señales, ponderado, recencia y MMR con popularidad) & Uno, lanzado bajo demanda, que procesa todos los trabajos \\
+    \hline
+    Evaluación offline & Sí; de aquí salen los artefactos de esta memoria & No; se ejecuta solo en local \\
+    \hline
+    Tamaño de la base de datos & 3,77\,GB & 359\,MB (límite de Neon gratuito: 1\,GiB) \\
+    \hline
+    Disponibilidad & Mientras se ejecute Docker & La API duerme tras unos quince minutos sin tráfico \\
+    \hline
+\end{tabularx}
+\caption{Diferencias entre el entorno local y el despliegue público, a 5 de octubre de 2026.}
+\label{tab:local-publico}
+\end{table}
+
+El subconjunto público se eligió con un criterio explícito y reproducible: juegos con valoración de IGDB o con PopScore
+mayor que cero, junto con los DLC relacionados con ellos. Ocupa 359\,MB de la gigabyte que ofrece Neon en el nivel
+gratuito, y los guiones que lo exportan y lo cargan están en \texttt{scripts/public-corpus/}. El corpus gobernado completo,
+con los índices de las tablas que usa la API, no cabe en ese límite.
+
+El nivel gratuito de Neon contabiliza horas de cómputo mientras la base está despierta, por lo que un proceso que
+consultara la cola de recomendaciones cada pocos segundos la mantendría encendida las veinticuatro horas del día y
+agotaría la cuota del mes. Por eso el despliegue no tiene ningún proceso permanente: cuando la API encola un refresco,
+lanza un proceso corto que vacía la cola y termina, protegido por un candado de fichero para que nunca haya dos a la vez,
+y la base solo se consulta cuando alguien actúa. Se comprobó en producción con una cuenta desechable: la primera
+recomendación de una cuenta nueva estuvo lista entre cuatro y seis minutos después, y tras nueve minutos sin ninguna
+petición Neon registró su suspensión.
+
+Esta diferencia es una limitación del trabajo, no un detalle de despliegue. Los resultados de la evaluación offline del
+Capítulo~\ref{cap:resultados} se calcularon sobre el corpus completo local, de modo que la web desplegada es una
+demostración funcional del producto y no el entorno donde se midió. Las recomendaciones allí son además más lentas, porque
+un único proceso comparte CPU y 512\,MB con la API. Los datos son de demostración: las cuentas no verifican el correo y
+las claves son de demostración. Ampliar el despliegue al corpus gobernado completo exigiría una base de datos de mayor
+capacidad, de pago, y queda fuera del coste cero que fijó el diseño.
 
 Este capítulo ha descrito la construcción, la verificación y el despliegue del sistema. El
 capítulo siguiente presenta la evaluación experimental de los algoritmos de recomendación que

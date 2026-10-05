@@ -37,9 +37,9 @@ futuras, no se retroproyectó sobre la ejecución v15 ya cerrada, de modo que es
 concreta carece de ese detalle. Tampoco se ha evaluado todavía el conjunto de características
 \texttt{fs-v13}, posterior a esa ejecución: las cifras publicadas corresponden a \texttt{fs-v12}
 (Sección~\ref{cap:algoritmos}). El despliegue público, descrito en la
-Sección~\ref{cap:despliegue}, sirve todavía el catálogo curado inicial y no el catálogo a
-escala real: esa conexión se pospuso de forma deliberada al final del proyecto; la
-demostración ante el tribunal se ejecuta desde el entorno local reproducible.
+Sección~\ref{cap:despliegue}, sirve un subconjunto del catálogo a escala real (32.550 de las 190.479 obras
+gobernadas, el 17\,\%) y no el corpus completo, que no cabe en el nivel gratuito de la base de datos; la evaluación
+offline se midió en el entorno local, no en el desplegado.
 
 El banco de pruebas que esta memoria deja construido y ya explotado habilita líneas de
 continuación concretas, no genéricas. La primera es repetir el protocolo publicado con nuevas
@@ -48,7 +48,8 @@ consistente entre algoritmos de lo que podría ser ruido de una única muestra, 
 ejecutor paralelo ya sabe registrar. La segunda es estudiar la sensibilidad del sistema a sus propios
 hiperparámetros locales (los pesos de familia de facetas, la mezcla híbrida, el factor de
 diversidad), en lugar de tratarlos como constantes fijadas de una vez. La tercera, ya fuera
-del núcleo de recomendación, es conectar el despliegue público al catálogo a escala real.
+del núcleo de recomendación, es ampliar el despliegue público al corpus gobernado completo, con una base de datos de
+mayor capacidad.
 Cualquier extensión de este trabajo deberá crear su propio protocolo y su propio artefacto
 versionado, sin alterar de forma retroactiva la evidencia ya publicada.
 
