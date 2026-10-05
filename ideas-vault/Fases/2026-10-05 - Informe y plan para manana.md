@@ -37,8 +37,10 @@ Cuando la API encola un refresco de recomendaciones, lanza un proceso corto (`pr
 **Comprobado en producción (commit `b6dd90c`, 2026-10-05 01:49-01:56):** cuenta desechable nueva, 4 juegos valorados:
 el worker arrancó solo, calculó las señales en 2 min 46 s (la primera carga de vectores desde Neon) y las 3 secciones en
 ~1 min cada una; recomendación lista a los ~6 min; cuenta borrada después. Nota: durante las señales la API muestra
-"en cola" porque ese trabajo previo no cuenta como sección. Comprobación de que Neon se suspende tras ~7 min sin tráfico:
-ver el resultado anotado debajo.
+"en cola" porque ese trabajo previo no cuenta como sección. Comprobación de que Neon se suspende sin tráfico: **confirmada**
+(2026-10-05, 02:13-02:22 local). Un primer intento quedó invalidado porque mis propias capturas consultaban la API
+durante la espera; en el segundo, con 9 minutos sin ninguna petición, Neon registró `suspend_compute` a las 00:22:16Z.
+Con el ping solo a `/health/` (sin base de datos) y el worker bajo demanda, la base se duerme sola entre visitas.
 
 ## 1. Estado actual del despliegue
 
