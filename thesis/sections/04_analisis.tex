@@ -21,7 +21,7 @@ preparada, que es una cuenta normal con sus datos y no un actor distinto.
     \hline
     \textbf{Actor} & \textbf{Descripción} \\
     \hline
-    Visitante & Persona no autenticada que consulta el catálogo, la ficha de un juego y la recomendación por popularidad, y que puede registrarse. \\
+    Visitante & Persona no autenticada que consulta el catálogo, la ficha de un juego y la recomendación por popularidad y que puede registrarse. \\
     \hline
     Persona usuaria & Titular de una cuenta registrada que inicia sesión y gestiona su lista de pendientes, valora juegos, inventaría copias y se relaciona con sus amigos. \\
     \hline
@@ -41,7 +41,7 @@ implementan los modelos, está en la Sección~\ref{sec:dis-modelo-datos}.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.95\textwidth]{figures/modelo-dominio.pdf}
-    \caption{Modelo de dominio de SavePoint, agrupado por catálogo, biblioteca personal, cuentas y amistades, y laboratorio de evaluación. Cada flecha parte de la entidad que contiene la clave foránea y apunta a la entidad que referencia; la flecha de doble punta indica una relación de muchos a muchos y la discontinua, una referencia opcional. De las copias en propiedad solo se dibujan sus referencias a la versión de lanzamiento y a la edición; \texttt{IgdbImportRun} y \texttt{AssetAttribution} se omiten de la figura y se describen en el texto.}
+    \caption[Modelo de dominio de SavePoint]{Modelo de dominio de SavePoint, agrupado por catálogo, biblioteca personal, cuentas y amistades y laboratorio de evaluación. Cada flecha parte de la entidad que contiene la clave foránea y apunta a la entidad que referencia; la flecha de doble punta indica una relación de muchos a muchos y la discontinua, una referencia opcional. De las copias en propiedad solo se dibujan sus referencias a la versión de lanzamiento y a la edición; \texttt{IgdbImportRun} y \texttt{AssetAttribution} se omiten de la figura y se describen en el texto.}
     \label{fig:modelo-dominio}
 \end{figure}
 
@@ -66,7 +66,7 @@ en propiedad (\texttt{OwnedCopy}) representan cada ejemplar, físico o digital, 
 su publicación y su edición.
 
 En las cuentas, el proyecto usa directamente el modelo de usuario de Django
-(\texttt{User}), al que se asocian la biblioteca personal y las relaciones de amistad. Las solicitudes (\texttt{FriendshipRequest}), las amistades aceptadas (\texttt{Friendship}) y los bloqueos (\texttt{Block}) son entidades que referencian a dos usuarios. El perfil editable (\texttt{AccountProfile}) guarda el nombre completo, la biografía, la foto, la portada y los ajustes de privacidad, y las notificaciones (\texttt{SocialNotice}) avisan de las solicitudes aceptadas y de las recomendaciones añadidas a pendientes.
+(\texttt{User}), al que se asocian la biblioteca personal y las relaciones de amistad. Las solicitudes (\texttt{FriendshipRequest}), las amistades aceptadas (\texttt{Friendship}) y los bloqueos (\texttt{Block}) son entidades que referencian a dos usuarios. El perfil editable (\texttt{AccountProfile}) guarda el nombre completo, la biografía, la foto, la portada y los ajustes de privacidad y las notificaciones (\texttt{SocialNotice}) avisan de las solicitudes aceptadas y de las recomendaciones añadidas a pendientes.
 
 La Tabla~\ref{tab:req-informacion} enlaza cada área del modelo con los requisitos de
 información que satisface.
@@ -105,7 +105,7 @@ aceptación.
 \begin{table}[htp]
 \centering
 \tablecompact
-\begin{tabularx}{\textwidth}{ | L{0.18\textwidth} | Y | C{0.22\textwidth} | }
+\begin{tabularx}{\textwidth}{ | L{0.15\textwidth} | Y | C{0.14\textwidth} | }
     \hline
     \textbf{Código} & \textbf{Requisito funcional} & \textbf{Estado} \\
     \hline
@@ -133,6 +133,8 @@ aceptación.
     \hline
     LIB-02 & Valorar un juego con una escala consistente. & Completo \\
     \hline
+    LIB-03 & Comentar un juego, con el comentario visible solo para los amigos. & Completo \\
+    \hline
     INV-01 & Registrar varias copias de la misma obra. & Completo \\
     \hline
     INV-02 & Registrar formato, plataforma y edición de cada copia. & Completo \\
@@ -141,7 +143,7 @@ aceptación.
     \hline
     DATA-01 & Conjunto de datos estable, citable y legalmente adecuado. & Completo \\
     \hline
-    DATA-02 & El conjunto registra versión, licencia, URL de origen, fecha y hash. & Completo \\
+    DATA-02 & El conjunto registra versión, licencia, dirección web (URL) de origen, fecha y hash. & Completo \\
     \hline
     DATA-04 & API de enriquecimiento elegida mediante comparación documentada. & Completo \\
     \hline
@@ -149,9 +151,9 @@ aceptación.
     \hline
     REC-10 & Página de recomendaciones por géneros según la actividad propia. & Completo \\
     \hline
-    REC-03 a REC-09 & Recomendadores basados en contenido, colaborativos e híbridos, con explicaciones y arranque en frío. & Completo (Fases 2-4) \\
+    REC-03 a REC-09 & Recomendadores basados en contenido, colaborativos e híbridos, con explicaciones y arranque en frío. & Completo \\
     \hline
-    PORT-01 a PORT-04 & Exportación e importación de colección, valoraciones y listas. & Completo (Fases 5 y 7) \\
+    PORT-01 a PORT-04 & Exportación e importación de colección, valoraciones y listas. & Completo \\
     \hline
 \end{tabularx}
 \caption{Requisitos funcionales considerados en el análisis del sistema.}
@@ -159,7 +161,9 @@ aceptación.
 \end{table}
 
 La Figura~\ref{fig:casos-uso} presenta el diagrama de casos de uso del sistema tal como se
-analizó al inicio del proyecto.
+analizó al inicio del proyecto. Las funciones incorporadas después, como las listas, los favoritos, la
+importación y exportación de la colección y las tres variantes de recomendación publicadas, no añaden actores y
+amplían los casos de uso aquí descritos.
 
 \begin{figure}[htp]
     \centering
@@ -214,22 +218,11 @@ funcional que satisface.
 
 \section{Requisitos de la evaluación de recomendadores}\label{sec:req-estudio}
 
-La planificación posterior a la primera demostración añadió requisitos que no se pueden
-validar únicamente recorriendo la interfaz. DATA-03 y DATA-06 exigen una frontera de corpus
-gobernada, reversible y versionada, con checksum, diccionario, informe de calidad y muestra
-determinista. DATA-05, DATA-07 y DATA-08 exigen importar valoraciones con procedencia, reconciliar
-fuentes externas sin emparejamiento difuso y conservar una versión inmutable por cada versión del corpus.
-
-EVAL-01, EVAL-02 y EVAL-03 fijan la comparación sobre la misma partición, los mismos
-candidatos y las mismas exclusiones. EVAL-09 y EVAL-10 añaden usuarios sintéticos
-parametrizados y obligan a separar la evidencia simulada de cualquier afirmación sobre
-usuarios reales. DOC-04 exige que el protocolo, las métricas, las semillas, las versiones y
-las amenazas a la validez queden escritos antes del resultado.
-
-En recomendación, REC-01 exige un método de referencia aleatorio reproducible y REC-03 vectores de
-contenido dispersos, perfil de usuario y similitud. REC-06 a REC-09 describen el arranque en frío,
-las exclusiones, la explicación por contribuciones y el DTO versionado de las variantes
-comparadas.
+La planificación posterior a la primera demostración añadió requisitos que no se pueden validar únicamente
+recorriendo la interfaz, porque se verifican contra artefactos versionados y pruebas automáticas y no contra
+pantallas. La Tabla~\ref{tab:req-estudio} los agrupa por área, desde la frontera de corpus gobernada y versionada
+hasta el arranque en frío y la comparación de todas las variantes sobre la misma partición, los mismos candidatos y
+las mismas exclusiones.
 
 \begin{table}[H]
 \centering
@@ -252,7 +245,7 @@ comparadas.
     \hline
     Algoritmos & Vectores de contenido dispersos, perfil de usuario y similitud. & REC-03 \\
     \hline
-    Algoritmos & Arranque en frío, exclusiones, explicación por contribuciones y DTO versionado de las variantes comparadas. & REC-06 a REC-09 \\
+    Algoritmos & Arranque en frío, exclusiones, explicación por contribuciones y objeto de transferencia de datos (DTO) versionado de las variantes comparadas. & REC-06 a REC-09 \\
     \hline
 \end{tabularx}
 \caption{Requisitos de la evaluación de recomendadores.}
@@ -300,11 +293,11 @@ comportamiento del sistema.
     \hline
     RN-7 & Registrar de nuevo una copia con la misma clave de idempotencia devuelve la copia existente en lugar de crear un duplicado. \\
     \hline
-    RN-8 & Ninguna cuenta es pública: solo su titular y sus amigos aceptados acceden a su colección, sus listas y sus comentarios, y una persona sin sesión no ve ninguna cuenta. \\
+    RN-8 & Ninguna cuenta es pública: solo su titular y sus amigos aceptados acceden a su colección, sus listas y sus comentarios y una persona sin sesión no ve ninguna cuenta. \\
     \hline
     RN-9 & El acceso a IGDB queda confinado a un comando de gestión fuera de línea; ninguna petición de usuario llama a un proveedor externo. \\
     \hline
-    RN-10 & El nombre de usuario puede cambiarse una sola vez, y la visibilidad de la colección, los favoritos y las listas admite solo dos niveles: privada o visible para las amistades. \\
+    RN-10 & El nombre de usuario puede cambiarse una sola vez y la visibilidad de la colección, los favoritos y las listas admite solo dos niveles: privada o visible para las amistades. \\
     \hline
 \end{tabularx}
 \caption{Reglas de negocio.}
@@ -315,7 +308,7 @@ comportamiento del sistema.
 
 De los ochenta y ocho requisitos identificados en el análisis, ochenta y seis están
 completos, con evidencia verificable en \texttt{docs/verification/} o en las firmas de
-aceptación por fase. Entre ellos están las tres familias de recomendación y su protocolo de evaluación
+aceptación por incremento. Entre ellos están las tres familias de recomendación y su protocolo de evaluación
 sin conexión, que desarrollan la Sección~\ref{cap:algoritmos} y el Capítulo~\ref{cap:resultados}.
 Los dos requisitos pendientes son parciales y pertenecen al mismo contrato de evaluación:
 repetir la comparación de algoritmos con varias semillas y retroproyectar sobre la ejecución
@@ -326,7 +319,7 @@ La Tabla~\ref{tab:trazabilidad-familias} recorre las dieciséis familias de requ
 proyecto, con cuántos de cada una están completos y verificados frente a los que quedan
 pendientes. Cada fila es, en sí misma, una entrada de trazabilidad: el código de familia enlaza
 directamente con los identificadores individuales de \texttt{.planning/REQUIREMENTS.md}; el
-estado de cada uno de ellos remite a su vez a una firma de aceptación por fase o a un plan
+estado de cada uno de ellos remite a su vez a una firma de aceptación por incremento o a un plan
 concreto en \texttt{docs/verification/}.
 
 \begin{table}[H]
@@ -361,8 +354,8 @@ Los dos pendientes pertenecen a la familia \texttt{EVAL}; ningún requisito comp
 de ellos para su propia verificación, de modo que ese trabajo futuro no invalida ninguna
 evidencia ya cerrada.
 
-La Tabla~\ref{tab:trazabilidad} enlaza cada requisito entregado con la evidencia que lo
-respalda. La columna de evidencia remite a documentos del repositorio: firmas de aceptación
+La Tabla~\ref{tab:trazabilidad} enlaza una selección de requisitos de cada familia con la evidencia que los
+respalda; la matriz completa vive en \texttt{.planning/REQUIREMENTS.md}. La columna de evidencia remite a documentos del repositorio: firmas de aceptación
 en \texttt{docs/verification/}, registros de decisión en \texttt{docs/adr/} e informes de
 verificación en \texttt{.planning/phases/}.
 

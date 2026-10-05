@@ -20,15 +20,15 @@ persistencia; sus módulos se separan por dominio (\texttt{catalogue}, \texttt{l
 TypeScript en modo estricto, que renderiza en el servidor (SSR) las páginas de solo lectura; el navegador
 solo habla con Next.js, que reenvía las llamadas al backend (Sección~\ref{sec:dis-sesion}). Los
 trabajos de recomendación y evaluación se
-ejecutan como comandos fuera de la petición HTTP: la aplicación publica sus resultados, pero no
+ejecutan como comandos fuera de la petición del protocolo de transferencia de hipertexto (HTTP): la aplicación publica sus resultados, pero no
 vuelve a calcular los resultados de la evaluación en el navegador. La Figura~\ref{fig:arquitectura}
-representa esta arquitectura por capas, y el registro de decisión ADR-001 recoge el contexto
+representa esta arquitectura por capas y el registro de decisión ADR-001 recoge el contexto
 completo de esta elección.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{figures/arquitectura.pdf}
-    \caption{Arquitectura de SavePoint: el navegador solo habla con Next.js, que reescribe las llamadas hacia Django y DRF; los comandos de ingesta y el ejecutor de evaluación escriben en PostgreSQL fuera de la petición HTTP.}
+    \caption[Arquitectura de SavePoint]{Arquitectura de SavePoint: el navegador solo habla con Next.js, que reescribe las llamadas hacia Django y DRF; los comandos de ingesta y el ejecutor de evaluación escriben en PostgreSQL fuera de la petición HTTP.}
     \label{fig:arquitectura}
 \end{figure}
 
@@ -59,10 +59,9 @@ y falla en PostgreSQL, o viceversa, sería un defecto del propio diseño experim
 código. Todo el sistema se levanta, en consecuencia, con Docker Compose a partir de los tres
 componentes de aplicación (base de datos, API y frontend), cada uno construido desde su propio
 fichero de Docker con versiones de dependencias fijadas; junto a ellos, Compose orquesta además un contenedor de \textit{worker} independiente por cada
-variante de recomendación que la web publica (Sección~\ref{sec:alg-publicadas}), y no por las
-dieciséis que compara el laboratorio. Un trabajo cuyo objeto
+variante de recomendación publicada (Sección~\ref{sec:alg-publicadas}). Un trabajo cuyo objeto
 de estudio es la reproducibilidad de una comparación de algoritmos necesita, antes que nada,
-que el propio entorno de ejecución sea reproducible, y los contenedores eliminan esa variable
+que el propio entorno de ejecución sea reproducible y los contenedores eliminan esa variable
 en cualquier máquina que lo levante.
 
 Para el despliegue público se adoptó una topología repartida entre tres proveedores
@@ -75,7 +74,7 @@ decisión completa.
 \section{Decisiones de arquitectura}\label{sec:dis-adr}
 
 Cada decisión de diseño con consecuencias materiales queda registrada en \texttt{docs/adr/}
-como registro de decisión de arquitectura (ADR), con un formato fijo de contexto, alternativas,
+como ADR, con un formato fijo de contexto, alternativas,
 decisión, evidencia, consecuencias, reversibilidad y aprobación. La
 Tabla~\ref{tab:adr-resumen} resume el conjunto vigente; las secciones correspondientes citan
 cada registro donde es relevante. Cada registro es citable y reversible: los límites de dominio
@@ -107,7 +106,7 @@ y las migraciones actúan como puntos de salida si una decisión se revisa.
     \hline
 \end{tabularx}
 \caption{Registros de decisión de arquitectura vigentes.}
-\label{tab:adr-resumen}\label{tab:adr}
+\label{tab:adr-resumen}
 \end{table}
 
 \section{Modelo de datos, API y sesión}\label{sec:dis-modelo-datos}\label{sec:dis-api}\label{sec:dis-sesion}\label{sec:dis-frontera}
@@ -152,7 +151,7 @@ de versionado del corpus, los subgéneros y las cuentas de demostración.
 \begin{figure}[p]
     \centering
     \includegraphics[width=\textwidth]{figures/modelo-datos-biblioteca.pdf}
-    \caption{Diagrama de entidades de la biblioteca personal y de las cuentas. \texttt{User}, \texttt{GameWork}, \texttt{GameRelease} y \texttt{Edition} se repiten con sus atributos mínimos como referencia.}
+    \caption[Diagrama de entidades de la biblioteca personal y de las cuentas]{Diagrama de entidades de la biblioteca personal y de las cuentas. \texttt{User}, \texttt{GameWork}, \texttt{GameRelease} y \texttt{Edition} se repiten con sus atributos mínimos como referencia.}
     \label{fig:datos-biblioteca}
 \end{figure}
 
@@ -163,14 +162,15 @@ de versionado del corpus, los subgéneros y las cuentas de demostración.
     \label{fig:datos-social}
 \end{figure}
 
-La API es de estilo REST, servida por DRF bajo el prefijo \texttt{/api/}. Las respuestas de
+La API es de estilo de transferencia de estado representacional (REST), servida por DRF bajo el prefijo \texttt{/api/}. Las respuestas de
 lista están paginadas. Las vistas de escritura y las de datos personales exigen sesión. Las
 anónimas de mayor coste llevan un límite de ritmo con ámbito propio. La
 Tabla~\ref{tab:endpoints} recoge los puntos de acceso principales.
 
 \begin{table}[htbp]
 \centering
-\begin{tabularx}{\textwidth}{ | L{0.39\textwidth} | C{0.14\textwidth} | Y | }
+\tablecompact
+\begin{tabularx}{\textwidth}{ | L{0.39\textwidth} | C{0.12\textwidth} | Y | }
     \hline
     \textbf{Método y ruta} & \textbf{Acceso} & \textbf{Función} \\
     \hline
@@ -192,7 +192,7 @@ Tabla~\ref{tab:endpoints} recoge los puntos de acceso principales.
     \hline
     \path{GET /api/social/notifications/} y \path{POST /api/social/messages/<id>/respond/} & Sesión & Notificaciones y respuesta a una recomendación recibida. \\
     \hline
-    \path{GET /api/library/export/collection.xlsx} & Sesión & Exportación de la colección a Excel, además del CSV. \\
+    \path{GET /api/library/export/collection.xlsx} & Sesión & Exportación de la colección a Excel, además de en valores separados por comas (CSV). \\
     \hline
     \path{GET /api/library/entries/} & Sesión & Biblioteca de la persona autenticada. \\
     \hline
@@ -202,6 +202,12 @@ Tabla~\ref{tab:endpoints} recoge los puntos de acceso principales.
     \hline
     \path{GET /api/recommendations/genre-taste/} & Sesión & Recomendación por afinidad de géneros de la persona autenticada. \\
     \hline
+    \path{GET /api/recommendations/content/} y \path{snapshot/} & Sesión & Recomendaciones de una de las tres variantes publicadas y último conjunto completo de la persona, sin esperar al refresco. \\
+    \hline
+    \path{GET/POST /api/social/requests/} y \path{friendships/} & Sesión & Solicitudes de amistad, amistades y bloqueos. \\
+    \hline
+    \path{POST /api/library/import/preview/} y \path{apply/} & Sesión & Previsualización y aplicación de la importación de una colección. \\
+    \hline
 \end{tabularx}
 \caption{Puntos de acceso principales de la API.}
 \label{tab:endpoints}
@@ -210,7 +216,7 @@ Tabla~\ref{tab:endpoints} recoge los puntos de acceso principales.
 La proyección de un perfil que ve un amigo se construye con una lista explícita de campos permitidos,
 escrita a mano, en lugar de una serialización automática por introspección del modelo. Así,
 exponer un campo privado nuevo requiere una decisión explícita, que es el modo de fallo
-opuesto al de ocultarlo por olvido. Las imágenes de perfil y de portada se recortan y comprimen en el navegador, se limitan a 512~KiB, se validan en el servidor por su firma de formato y no por la extensión declarada, y solo se sirven a su titular y a sus amigos aceptados. La eliminación de la cuenta exige la contraseña y deja un evento de auditoría sin actor, porque el registro de auditoría es de solo anexado.
+opuesto al de ocultarlo por olvido. Las imágenes de perfil y de portada se recortan y comprimen en el navegador, se limitan a 512~KiB, se validan en el servidor por su firma de formato y no por la extensión declarada y solo se sirven a su titular y a sus amigos aceptados. La eliminación de la cuenta exige la contraseña y deja un evento de auditoría sin actor, porque el registro de auditoría es de solo anexado.
 
 La autenticación sigue el diseño del registro ADR-004. Django emite y valida la sesión. El
 navegador solo llama a rutas del mismo origen de Next.js, que las reescribe hacia el backend
@@ -223,7 +229,7 @@ servidor. No hay ningún testigo de tipo \textit{bearer} accesible al código Ja
 navegador.
 
 El diseño mantiene dos fronteras explícitas. Ninguna cuenta es pública, de modo que solo los
-amigos aceptados acceden a su contenido, y el acceso a IGDB está confinado a un comando de
+amigos aceptados acceden a su contenido y el acceso a IGDB está confinado a un comando de
 gestión fuera de línea, sin que ninguna petición de usuario llame a un proveedor externo
 (RN-8 y RN-9 de la Tabla~\ref{tab:reglas-negocio}).
 
@@ -231,7 +237,7 @@ gestión fuera de línea, sin que ninguna petición de usuario llame a un provee
 
 El diseño de la interfaz se fijó en un contrato de diseño, \texttt{01.1-UI-SPEC.md},
 aprobado antes de implementar y validado por un subagente comprobador. El contrato define un
-sistema de tokens de variables CSS, con juegos completos para tema claro y tema oscuro, cuya
+sistema de tokens de diseño en variables de hojas de estilo en cascada (CSS), con juegos completos para tema claro y tema oscuro, cuya
 selección se aplica en el servidor mediante una cookie para evitar el destello al cargar. Los
 componentes reutilizables incluyen la tarjeta de juego, las píldoras de estado y de nota, la
 valoración por estrellas, la imagen de portada con su marcador de reserva, la barra de
@@ -283,7 +289,7 @@ Los resultados publicados proceden de la ejecución \texttt{evaluation-400-test-
 que su propio artefacto registra con el protocolo 15 y el conjunto de características
 \texttt{fs-v12-curated-tags-idf}. Conviene no confundir las dos numeraciones, que son
 independientes: el \emph{protocolo} de evaluación (v12, v14 y v15 son los tres que se ejecutaron
-hasta el final, Sección~\ref{sec:exp-evolucion}) define cómo se mide, y el \emph{conjunto de
+hasta el final, Sección~\ref{sec:exp-evolucion}) define cómo se mide y el \emph{conjunto de
 características} (\texttt{fs-v12}, \texttt{fs-v13}) define cómo se representa cada obra, de modo
 que v12 y \texttt{fs-v12} no designan lo mismo. Después de esa ejecución, la revisión de los pesos
 reales sobre el corpus llevó a \texttt{fs-v13-family-weighted-tags}, que corrige el reparto de
@@ -291,7 +297,7 @@ peso entre familias de etiquetas (descrito más abajo) y con el que el código v
 bajo el protocolo 16. Todavía no se ha ejecutado ni publicado una evaluación completa con
 \texttt{fs-v13}. Por eso este apartado describe la implementación vigente (\texttt{fs-v13}),
 mientras que todas las cifras del Capítulo~\ref{cap:resultados} corresponden a \texttt{fs-v12};
-la Tabla~\ref{tab:pesos-familia} recoge los pesos de ambas versiones, y ninguna métrica
+la Tabla~\ref{tab:pesos-familia} recoge los pesos de ambas versiones y ninguna métrica
 publicada de v15 se recalcula ni se reinterpreta.
 
 \subsection{Representación de una obra y del perfil de la persona usuaria}\label{sec:alg-representacion}
@@ -323,11 +329,11 @@ omite sin más; el sistema nunca imputa ni redistribuye su peso a otra familia, 
 premiaría la escasez de metadatos en lugar de ser neutral ante ella.
 
 Dentro de cada familia, el peso de un valor concreto (por ejemplo, el género \texttt{rpg} o el
-tema \texttt{cyberpunk}) se calcula con una frecuencia documental inversa suavizada, de modo
+tema \texttt{cyberpunk}) se calcula con una frecuencia inversa de documento (IDF) suavizada, de modo
 que un valor raro dentro de su propia familia pese más que uno común. El fundamento es la
 ponderación estadística de términos y la representación vectorial dispersa de Salton y
 Buckley~\cite{salton1988term}: los rasgos que aparecen en casi todos los documentos
-discriminan poco, y los infrecuentes discriminan mucho. Desde la revisión \texttt{fs-v13}, cada
+discriminan poco y los infrecuentes discriminan mucho. Desde la revisión \texttt{fs-v13}, cada
 familia calcula su rareza sobre su propio universo de referencia, no sobre el corpus gobernado
 completo: si \(N_f\) es el número de obras gobernadas con algún valor de la familia \(f\) y
 \(df_t\) el número de esas obras que contienen el valor \(t\),
@@ -375,11 +381,11 @@ descartó por ese mismo motivo.
 
 \begin{table}[H]
 \centering
-\caption{Peso fijo \(W_f\) de cada familia de faceta en el vector de contenido, en
+\caption[Peso fijo de cada familia de faceta en el vector de contenido]{Peso fijo \(W_f\) de cada familia de faceta en el vector de contenido, en
 \texttt{fs-v12} (versión con la que se calcularon los resultados del
 Capítulo~\ref{cap:resultados}) y en \texttt{fs-v13} (implementación vigente). En
 \texttt{fs-v12}, \texttt{tag} reunía género, subgénero, tema, característica y modo en un único
-peso; en \texttt{fs-v13} agrupa solo género y subgénero. El guion indica que la familia no
+peso; en \texttt{fs-v13} agrupa solo género y subgénero. El valor \enquote{n/d} indica que la familia no
 existía por separado. Los valores son una decisión de diseño de SavePoint, no una constante de
 la literatura.}\label{tab:pesos-familia}
 \begin{tabularx}{\textwidth}{@{}Yrr@{}}
@@ -387,9 +393,9 @@ la literatura.}\label{tab:pesos-familia}
 \hline
 Etiqueta (\texttt{tag}) & 0,75 & 0,60 \\
 Plataforma (\texttt{platform}) & 0,25 & 0,05 \\
-Tema (\texttt{theme}) & -- & 0,20 \\
-Característica (\texttt{feature}) & -- & 0,10 \\
-Modo (\texttt{mode}) & -- & 0,05 \\
+Tema (\texttt{theme}) & n/d & 0,20 \\
+Característica (\texttt{feature}) & n/d & 0,10 \\
+Modo (\texttt{mode}) & n/d & 0,05 \\
 Franquicia (\texttt{franchise}) & 0,02 & 0,02 \\
 Desarrollador (\texttt{developer}) & 0,015 & 0,015 \\
 \end{tabularx}
@@ -400,14 +406,14 @@ entradas de biblioteca terminadas o en curso con valoración personal de al meno
 puntos sobre diez; una entrada con valoración inferior a ese umbral no se añade al perfil
 positivo, sino que alimenta un perfil de evidencia negativa aparte. Cada entrada \(i\) aporta
 un peso de actividad \(entry\_weight_i = status\_weight_i + r_i^2\), donde \(status\_weight\)
-vale 3 para una obra terminada, 2 para una obra en curso, 1 para pendiente y 0 para abandonada,
+vale 3 para una obra terminada, 2 para una obra en curso, 1 para pendiente y 0 para abandonada
 y \(r_i\) es la valoración personal normalizada a \([0,1]\). Elevar la valoración al cuadrado
 hace que una nota alta cuente como evidencia bastante más intensa que una simplemente
 positiva. Esta forma de modular la contribución de cada ítem del historial es la aplicación
 directa del principio de perfil ponderado por interés de la familia basada en
 contenido~\cite{pazzani2007content}; los valores 3, 2, 1 y 0 y el exponente cuadrático son
 decisión local. El perfil es la media ponderada de los vectores normalizados de las entradas
-elegibles, y no se vuelve a normalizar globalmente después; conserva así la intensidad relativa
+elegibles y no se vuelve a normalizar globalmente después; conserva así la intensidad relativa
 acumulada de la biblioteca. Cuando una etiqueta se repite en al menos tres entradas de baja
 valoración, se activa como evidencia negativa. Ese umbral de tres es deliberado: una
 penalización sin umbral convertiría una única experiencia mal valorada en un rechazo estable,
@@ -421,7 +427,7 @@ persona; esa limitación queda declarada así en la respuesta.
 La similitud entre el perfil de una persona y una obra candidata no aplica el coseno
 ciegamente sobre todo el vector. Para cada familia se calculan por separado la cobertura del
 perfil y la precisión de la candidata: si \(P_f\) y \(C_f\) son los valores de perfil y
-candidata en la familia \(f\), y \(O_f = P_f \cap C_f\) su solapamiento,
+candidata en la familia \(f\) y \(O_f = P_f \cap C_f\) su solapamiento,
 
 \[
 cobertura_f = \frac{\sum_{t \in O_f} P_f[t]}{\sum_{t \in P_f} P_f[t]}, \qquad
@@ -431,16 +437,16 @@ precision_f = \frac{|O_f|}{|C_f|} ,
 y ambas cantidades se combinan con una media \(F_\beta\) con \(\beta = 0{,}5\),
 
 \begin{equation}\label{eq:fbeta}
-F_{0{,}5} = \frac{(1+0{,}5^2)\;cobertura \cdot precision}{0{,}5^2 \cdot precision + cobertura} ,
+F_{0{,}5} = \frac{(1+0{,}5^2)\;cobertura \cdot precision}{0{,}5^2 \cdot precision + cobertura} .
 \end{equation}
 
 La media \(F_\beta\) como forma canónica de equilibrar precisión y cobertura con un único
 parámetro procede de van Rijsbergen~\cite{vanrijsbergen1979information}; el valor
-\(\beta = 0{,}5\) es la decisión local, y da más peso a la precisión de la candidata que a la
+\(\beta = 0{,}5\) es la decisión local y da más peso a la precisión de la candidata que a la
 cobertura del perfil, de modo que una obra que declara muchos valores de una familia no gana
 automáticamente por enumerar más. Se consideraron dos alternativas y se descartaron por
 motivos concretos: una media aritmética simple favorece a las candidatas con más metadatos
-declarados, y el coseno puro sobre el vector completo, aunque más habitual, resulta menos
+declarados y el coseno puro sobre el vector completo, aunque más habitual, resulta menos
 separable a la hora de explicar por qué se recomienda una obra y más vulnerable a las
 candidatas con muchas facetas.
 
@@ -493,7 +499,7 @@ El valor \(m=25\), el exponente cuadrático sobre la nota normalizada y el facto
 \(n/(n+m)\) son, de nuevo, decisiones locales: el cuadrado separa mejor a las candidatas de
 calidad alta y el factor de confianza penaliza de forma explícita el volumen de evidencia, no
 solo la nota media. Usar la valoración en bruto se descartó por el sesgo evidente de las notas
-extremas con poca evidencia, y volver a multiplicar por el volumen de votos también, porque ese
+extremas con poca evidencia y volver a multiplicar por el volumen de votos también, porque ese
 volumen ya participa una vez dentro de la propia contracción. Cuando una candidata no tiene
 valoración externa propia observada, el sistema recurre a la mediana de valoración de sus
 etiquetas curadas y marca el resultado como una aproximación, sin presentarlo como una
@@ -518,14 +524,15 @@ en otra fecha.
 
 Con la afinidad de contenido \(C\), la calidad \(R\), la popularidad \(P\), la evidencia
 negativa \(N\) y la recencia \(X\) ya definidas, la Tabla~\ref{tab:variantes-contenido} recoge
-la fórmula exacta de las diez variantes basadas en contenido. Todas comparten el mismo conjunto
+la fórmula exacta de las diez variantes basadas en contenido y de la de recencia, incluidas las dos con
+reordenación por relevancia marginal máxima (\textit{maximal marginal relevance}, MMR). Todas comparten el mismo conjunto
 de candidatas, el mismo vector de características y el mismo perfil de usuario; lo único que cambia
 entre ellas es cómo combinan sus señales, precisamente para que la comparación aísle esa
 decisión de diseño y no otra.
 
 \begin{table}[H]
 \centering
-\caption{Fórmula de combinación de las diez variantes basadas en contenido.}\label{tab:variantes-contenido}
+\caption{Fórmula de combinación de las diez variantes basadas en contenido y de la de recencia.}\label{tab:variantes-contenido}
 \small
 \begin{tabularx}{\textwidth}{@{}>{\ttfamily\raggedright\arraybackslash}p{0.48\textwidth}>{\raggedleft\arraybackslash}X@{}}
 \textnormal{Algoritmo} & \textnormal{Fórmula} \\
@@ -543,7 +550,7 @@ content-cbf-mmr-v1 / -pop-v1 & MMR sobre Weighted / Weighted-Pop \\
 \end{tabularx}
 \end{table}
 
-La existencia de estas diez variantes no responde a un afán de acumular algoritmos, sino al
+La existencia de estas variantes no responde a un afán de acumular algoritmos, sino al
 diseño experimental: cada una aísla una única decisión de combinación manteniendo constantes
 las candidatas, las características y las versiones inmutables, de modo que una diferencia de resultado se pueda
 atribuir a esa decisión concreta. \texttt{content-cbf-weighted-v1} actúa como referencia del
@@ -573,7 +580,7 @@ arranque en frío: con historial escaso, o sin vecindad suficiente, no puede inf
 preferencia colaborativa fiable. Se descartó implementar en su lugar un colaborativo por
 vecindad de ítems porque exige construir una matriz ítem-ítem y descansa sobre otra hipótesis
 de generalización, mientras que la vecindad de usuarios resulta más legible con la valoración
-explícito disponible en este corpus.
+explícita disponible en este corpus.
 
 El híbrido responde al argumento de Burke~\cite{burke2002hybrid}: combinar fuentes
 complementarias permite aprovechar las ventajas de cada una y compensar sus debilidades. Su
@@ -583,14 +590,14 @@ de contenido y declara la alternativa de respaldo en lugar de penalizar artifici
 nueva. El reparto 0,60/0,40 es en sí mismo una decisión local sujeta a evaluación, no una regla
 tomada de la literatura.
 
-Las dos variantes con reordenación por diversidad aplican \emph{maximal marginal relevance}
-tal como lo formularon Carbonell y Goldstein~\cite{carbonell1998mmr}: recorren un conjunto de
+Las dos variantes con reordenación por diversidad aplican la MMR
+tal como la formularon Carbonell y Goldstein~\cite{carbonell1998mmr}: recorren un conjunto de
 tamaño \(\max(100, 5K)\) y en cada posición eligen la candidata que maximiza
 \(\lambda\,Rel(i) - (1-\lambda)\max_{j \in S} cosine(i,j)\), con \(Rel(i)\) la relevancia ya
 calculada y \(S\) la lista parcial ya elegida. El valor \(\lambda = 0{,}80\) y el tamaño del
 conjunto son decisiones locales. La motivación de fondo es la advertencia de McNee, Riedl y
 Konstan~\cite{mcnee2006accurate} y el marco de medición de Vargas y
-Castells~\cite{vargas2011rank}: la exactitud no agota la utilidad de una recomendación, y
+Castells~\cite{vargas2011rank}: la exactitud no agota la utilidad de una recomendación y
 diversidad, novedad y cobertura deben medirse aparte en lugar de quedar escondidas dentro de la
 puntuación. Por eso la diversificación se implementó como una capa de reordenación explícita y
 no como un término más dentro de los pesos de afinidad, ni como una optimización multiobjetivo
@@ -606,17 +613,17 @@ calidad externa ordena dentro de un mismo nivel de afinidad. La segunda añade p
 reordenación por diversidad, para que la lista no repita variaciones del mismo juego. La
 tercera favorece los títulos recientes y actúa como variante de descubrimiento. La selección es
 una decisión de diseño de producto: ofrecer a la persona usuaria dieciséis listas con resultados
-muy parecidos entre sí no aporta valor y empeora la experiencia, y mantener un proceso trabajador
+muy parecidos entre sí no aporta valor y empeora la experiencia y mantener un proceso trabajador
 activo por cada variante supone un coste de recursos que no se justifica. Las demás variantes
 se conservan en el laboratorio de evaluación, donde cumplen su función, que es compararlas bajo
-un mismo protocolo, y no afectan a esta selección: el Capítulo~\ref{cap:resultados} evalúa las
+un mismo protocolo y no afectan a esta selección: el Capítulo~\ref{cap:resultados} evalúa las
 dieciséis.
 
 \subsection{Alternativas descartadas y su justificación}\label{sec:alg-alternativas}
 
 Las familias implementadas son interpretables y adecuadas para una población controlada, pero
 no agotan el espacio de recomendación. La Tabla~\ref{tab:alternativas} recoge las alternativas
-que se consideraron de forma explícita, con su respaldo en la literatura cuando lo tienen, y el motivo
+que se consideraron de forma explícita, con su respaldo en la literatura cuando lo tienen y el motivo
 por el que no se adoptaron en esta versión.
 
 \begin{table}[H]
@@ -627,10 +634,10 @@ por el que no se adoptaron en esta versión.
 \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.43\textwidth}Y@{}}
 \textnormal{Alternativa} & \textnormal{Motivo de exclusión} \\
 \hline
-Factorización matricial (ALS, BPR)~\cite{koren2009matrix} & Añade entrenamiento, factores latentes e hiperparámetros; dificulta atribuir un resultado a una señal concreta sobre población sintética \\
+Factorización matricial (mínimos cuadrados alternados y ranking personalizado bayesiano)~\cite{koren2009matrix} & Añade entrenamiento, factores latentes e hiperparámetros; dificulta atribuir un resultado a una señal concreta sobre población sintética \\
 Redes neuronales, representaciones vectoriales o modelos de lenguaje & Coste, opacidad y requisitos de datos no justificados por el objetivo del trabajo \\
 Modelos de grafos o secuenciales & El historial disponible no sostiene una hipótesis temporal que justifique esa complejidad \\
-Colaborativo por vecindad de ítems & Exige matriz ítem-ítem y otra hipótesis de generalización; KNN de usuarios es más legible con valoración explícita \\
+Colaborativo por vecindad de ítems & Exige matriz ítem-ítem y otra hipótesis de generalización; la vecindad de usuarios es más legible con valoración explícita \\
 Coseno puro como similitud principal & Menos separable en las explicaciones y más vulnerable a candidatas con muchas facetas \\
 Media aritmética en lugar de \(F_{0{,}5}\) & Favorece a las candidatas que declaran más metadatos \\
 Valoración externa en bruto & Sesgo de las notas extremas con poca evidencia; la contracción bayesiana lo corrige \\
@@ -644,7 +651,7 @@ Estas exclusiones son decisiones de alcance y de validez, no afirmaciones de que
 descartados sean universalmente peores. La factorización matricial, en particular, es una
 alternativa reconocida y competitiva en recomendación colaborativa~\cite{koren2009matrix}; no
 se incorpora porque el objetivo de este trabajo exige comparar señales legibles sobre una
-población controlada, y un modelo de factores latentes introduciría entrenamiento y grados de
+población controlada y un modelo de factores latentes introduciría entrenamiento y grados de
 libertad que harían mucho más difícil atribuir una diferencia de resultado a una señal
 concreta. Cualquiera de ellas podría evaluarse en una extensión del trabajo, pero exigiría una
 variante versionada, nuevos controles de datos y una comparación bajo el mismo protocolo.
@@ -669,9 +676,9 @@ usuario y por $k$. La Figura~\ref{fig:pipeline-evaluacion} resume esa tubería.
 La aplicación \texttt{evaluation} separa cuatro responsabilidades. El cargador del
 protocolo valida las claves, el tamaño de la rejilla y el consumo único de la prueba. El módulo
 de particiones selecciona la obra relevante retenida y comprueba que entrenamiento, validación y prueba
-sean conjuntos disjuntos y completos. El módulo de métricas calcula P@K, R@K, nDCG@K y MAP@K
-con fórmulas escritas y probadas en el proyecto. Por último, el ejecutor orquesta los algoritmos
-y escribe un artefacto JSON con sus huellas y resultados.
+sean conjuntos disjuntos y completos. El módulo de métricas calcula la precisión y la exhaustividad (P@K y R@K), la ganancia acumulada descontada
+normalizada (nDCG@K) y la precisión media (MAP@K) con fórmulas escritas y probadas en el proyecto. Por último, el ejecutor orquesta los algoritmos
+y escribe un artefacto en notación de objetos de JavaScript (JSON) con sus huellas y resultados.
 
 Todas las variantes comparten el conjunto de candidatos, la semántica de exclusión y el DTO
 versionado; el modelo de contenido que usan es el descrito en la

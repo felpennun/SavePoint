@@ -2,7 +2,7 @@
 
 \section{Motivación, contexto y problema}\label{sec:origen-motivacion}\label{sec:contexto-problema}\label{sec:arte-productos}\label{sec:arte-aportacion}
 
-Goodreads y Letterboxd son dos servicios web de catalogación social: el primero, para libros,
+Goodreads y Letterboxd son dos servicios web de catalogación social: el primero, para libros
 y el segundo, para cine~\cite{goodreads,letterboxd}. Ambos comparten un patrón: una ficha canónica
 por obra, independiente de la edición concreta que posea cada persona; un estado de consumo
 personal, como pendiente, en curso o terminado; una valoración con una escala consistente;
@@ -15,7 +15,7 @@ Letterboxd~\cite{backloggd}, con buen tratamiento del backlog, pero sin inventar
 copias ni ambición de recomendación. OpenCritic agrega puntuaciones de prensa~\cite{opencritic} y es una
 referencia de densidad visual y de tratamiento de la nota, más que un catalogador personal.
 Steam ofrece una biblioteca personal rica, aunque acoplada a su tienda y limitada a lo
-comprado en ella. La web de IGDB expone un catálogo amplio y bien modelado, orientado a la
+comprado en ella. La web de \textit{Internet Game Database} (IGDB) expone un catálogo amplio y bien modelado, orientado a la
 consulta y no a la gestión de una colección. La Tabla~\ref{tab:productos} resume la comparación.
 
 \begin{table}[htp]
@@ -47,12 +47,12 @@ El hueco que SavePoint ocupa se ve en la última columna de la
 Tabla~\ref{tab:productos}: ningún producto reúne un inventario detallado de propiedad
 material con un catálogo a escala real y un banco de pruebas de recomendación abierto y
 reproducible. Es un problema propio del videojuego: un mismo título puede poseerse a la vez en
-cartucho, en disco y en descarga, y en más de una plataforma, una distinción que no tiene ficha
+cartucho, en disco y en descarga y en más de una plataforma, una distinción que no tiene ficha
 ni equivalente en un libro o una película.
 
 SavePoint se propone cubrir ese hueco. Aplica al videojuego el patrón de catalogación personal
 de Goodreads y Letterboxd, con ficha canónica de cada obra, biblioteca, valoraciones y relaciones
-de amistad, y añade lo que esos productos no necesitan y este medio sí: un inventario de copias
+de amistad y añade lo que esos productos no necesitan y este medio sí: un inventario de copias
 físicas y digitales por edición y plataforma, con procedencia de datos verificable en lugar de
 un catálogo mantenido a mano. De ello se desprenden tres aportaciones. La primera es un
 producto de catalogación de videojuegos que combina inventario de propiedad material, catálogo
@@ -71,9 +71,9 @@ la verificación y el despliegue de una plataforma web completa para catalogar v
 mantener una biblioteca personal y registrar valoraciones, listas, copias, comentarios y
 relaciones sociales. El módulo de recomendación y su evaluación forman parte de esa
 plataforma y tienen el mismo peso que el resto: sin un catálogo gobernado y una biblioteca con
-señales reales no hay nada que recomendar, y sin una evaluación reproducible no hay forma
+señales reales no hay nada que recomendar; sin una evaluación reproducible no hay forma
 honesta de saber si lo recomendado funciona. La plataforma recoge y gobierna las señales que
-los algoritmos consumen, y el laboratorio compara esos algoritmos sobre los mismos datos.
+los algoritmos consumen; el laboratorio compara esos algoritmos sobre los mismos datos.
 
 Una lista de recomendaciones no es evidencia suficiente de que un algoritmo funciona mejor que
 otro. Sin un corpus congelado, una población definida, una división conocida y artefactos
@@ -118,7 +118,7 @@ Sección~\ref{sec:alg-publicadas}. El alcance de la evaluación, en cambio, se l
 una publicación de evidencia concreta, identificada como v15 y descrita en el
 Capítulo~\ref{cap:resultados}, con una única ejecución de la prueba. Conviene subrayar que estos usuarios sintéticos no son personas
 reales, sino perfiles generados de forma controlada para poder ejercitar el sistema de
-recomendación sin depender de una base de usuarios real que este TFG no tiene tiempo ni alcance
+recomendación sin depender de una base de usuarios real que este Trabajo Fin de Grado (TFG) no tiene tiempo ni alcance
 para reunir. Los resultados, por tanto, dependen del corpus concreto, de la semilla aleatoria,
 de la división de datos y del protocolo empleados: no permiten generalizar automáticamente a
 preferencias de jugadores reales ni declarar un método como mejor fuera de esas condiciones.
@@ -127,8 +127,9 @@ preferencias de jugadores reales ni declarar un método como mejor fuera de esas
 
 La memoria sigue el recorrido natural de un proyecto de ingeniería del software, tratando la
 plataforma y el estudio de recomendadores en un único hilo. El
-Capítulo~\ref{cap:estado-del-arte} revisa las fuentes de datos, los sistemas de
-recomendación y su evaluación, y el método de trabajo. El Capítulo~\ref{cap:gestion} describe la
+Capítulo~\ref{cap:estado-del-arte} revisa las fuentes de datos de videojuegos, las familias de sistemas de
+recomendación y el método de trabajo; las métricas y el protocolo de evaluación se presentan en el
+Capítulo~\ref{cap:resultados}. El Capítulo~\ref{cap:gestion} describe la
 gestión, la metodología y la planificación del trabajo, con su calendario, su presupuesto y sus
 riesgos. El Capítulo~\ref{cap:analisis} recoge el análisis del problema: actores, requisitos de
 la plataforma y de la evaluación de recomendadores, reglas de negocio y trazabilidad. El

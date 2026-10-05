@@ -9,14 +9,14 @@ Sección~\ref{sec:contexto-problema}.
 \section{Fuentes de datos de videojuegos}\label{sec:arte-datos}
 
 Tres fuentes públicas cubren la mayor parte del catálogo de videojuegos: Wikidata, IGDB y
-RAWG. Difieren sobre todo en su licencia y en sus condiciones de reutilización, que son
+\textit{RAWG Video Games Database} (RAWG). Difieren sobre todo en su licencia y en sus condiciones de reutilización, que son
 determinantes para un trabajo que debe citar fuentes defendibles. Wikidata publica sus datos
 estructurados bajo la dedicación al dominio público \textit{Creative Commons Zero} (CC0), la
 licencia más limpia de las tres, aunque el modelado de género y plataforma para videojuegos es
 desigual y depende de la edición voluntaria~\cite{wikidata-licensing}. Sus archivos
 multimedia viven en Wikimedia Commons y no comparten esa licencia: cada imagen lleva su propia
 condición, que puede exigir crédito, de modo que su reutilización requiere una revisión por
-archivo~\cite{commons-reuse}. IGDB, propiedad de Twitch, ofrece una API de versión 4 con una
+archivo~\cite{commons-reuse}. IGDB, propiedad de Twitch, ofrece una interfaz de programación de aplicaciones (API) de versión 4 con una
 entidad de plataforma de primera clase y se sirve bajo el \textit{Twitch Developer Services
 Agreement} (DSA)~\cite{igdb-api, twitch-dsa}. RAWG ofrece una cobertura comparable, con
 metadatos de tienda, pero su nivel gratuito es más restrictivo en cuota y en atribución~\cite{rawg-api}.
@@ -39,13 +39,13 @@ debilidades de cada una~\cite{burke2002hybrid}. SavePoint implementa y compara, 
 catálogo, representantes de las tres familias, con la formulación y la comparación con datos
 reales que desarrollan la Sección~\ref{cap:algoritmos} y el Capítulo~\ref{cap:resultados}.
 
-\section{El método GSD: agentes coordinados sobre un contexto compartido}\label{sec:arte-agentes}
+\section{El método \textit{Get Stuff Done}: agentes coordinados sobre un contexto compartido}\label{sec:arte-agentes}
 
 \textit{Get Stuff Done} (GSD) es un método de trabajo que organiza el desarrollo en agentes
 especializados coordinados a través de un contexto compartido y versionado, en lugar de a
 través de una conversación continua entre una persona y una única herramienta. La observación
 de partida es sencilla: una tarea larga tiende a perder coherencia entre lo decidido al
-principio y lo decidido al final, sobre todo cuando se turnan varios agentes para avanzarla, y
+principio y lo decidido al final, sobre todo cuando se turnan varios agentes para avanzarla y
 esa pérdida de coherencia es tanto más probable cuanto más depende de que alguien recuerde el
 historial completo de lo hecho hasta el momento~\cite{anthropic-context}. GSD responde a esa
 observación con un principio de diseño simple: aislar cada incremento de trabajo en una tarea

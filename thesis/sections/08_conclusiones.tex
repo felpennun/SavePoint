@@ -45,7 +45,7 @@ futuras, no se retroproyectó sobre la ejecución v15 ya cerrada, de modo que es
 concreta carece de ese detalle. Tampoco se ha evaluado todavía el conjunto de características
 \texttt{fs-v13}, posterior a esa ejecución: las cifras publicadas corresponden a \texttt{fs-v12}
 (Sección~\ref{cap:algoritmos}). La rejilla de ajuste de hiperparámetros que el protocolo declaró para la partición de
-validación no se ejecutó, y el protocolo cambió de versión después de ver resultados de prueba, de modo que el consumo
+validación no se ejecutó y el protocolo cambió de versión después de ver resultados de prueba, de modo que el consumo
 único de esa partición rige dentro de cada versión y no entre ellas (Sección~\ref{sec:exp-reparto}). El despliegue público, descrito en la
 Sección~\ref{cap:despliegue}, sirve un subconjunto del catálogo a escala real (32.550 de las 190.479 obras
 gobernadas, el 17\,\%) y no el corpus completo, que no cabe en el nivel gratuito de la base de datos; la evaluación
@@ -54,22 +54,22 @@ offline se midió en el entorno local, no en el desplegado.
 El banco de pruebas que esta memoria deja construido y ya explotado habilita líneas de
 continuación concretas, no genéricas. La primera es repetir el protocolo publicado con nuevas
 semillas y con cohortes sintéticas adicionales, para separar lo que es una diferencia
-consistente entre algoritmos de lo que podría ser ruido de una única muestra, y aplicar sobre la nueva ejecución la captura de entorno y consumo de recursos que el
+consistente entre algoritmos de lo que podría ser ruido de una única muestra y aplicar sobre la nueva ejecución la captura de entorno y consumo de recursos que el
 ejecutor paralelo ya sabe registrar. La segunda es estudiar la sensibilidad del sistema a sus propios
 hiperparámetros locales (los pesos de familia de facetas, la mezcla híbrida, el factor de
 diversidad), en lugar de tratarlos como constantes fijadas de una vez.
 
 Fuera del núcleo de recomendación, el producto deja cinco líneas abiertas. La primera es contrastar los algoritmos
-con personas reales: la comparación publicada usa solo usuarios sintéticos, y una prueba con un grupo pequeño que
+con personas reales: la comparación publicada usa solo usuarios sintéticos y una prueba con un grupo pequeño que
 usara la aplicación y valorara las recomendaciones daría una primera señal de hasta qué punto las conclusiones se
 trasladan, algo que esta memoria no puede ofrecer. La segunda es completar la gestión de cuentas con verificación
-de correo, recuperación de contraseña y una política de contraseñas común al registro y al cambio; hoy no existen,
+de correo, recuperación de contraseña y una política de contraseñas común al registro y al cambio; hoy no existen
 y por eso las cuentas del despliegue público son de demostración. La tercera es escalar el despliegue: ampliarlo al
 corpus gobernado completo con una base de datos de mayor capacidad, dedicar un proceso de recomendación a cada
-algoritmo, como ya hace el entorno local, y servir las lecturas públicas del catálogo desde la caché en el borde de
+algoritmo, como ya hace el entorno local y servir las lecturas públicas del catálogo desde la caché en el borde de
 Vercel. La cuarta es importar la colección desde una cuenta de Steam, para que quien ya tiene una biblioteca grande
 no tenga que registrarla juego a juego; exigiría reconciliar los títulos de Steam con las obras canónicas del
-catálogo, un problema de identidad semejante al que ya hubo que resolver entre Wikidata e IGDB, y respetar los
+catálogo, un problema de identidad semejante al que ya hubo que resolver entre Wikidata e IGDB y respetar los
 términos de uso de la API de Steam y la privacidad del perfil. La quinta es una importación diaria del catálogo que
 lo mantenga actualizado; como la evaluación depende de un corpus congelado, cada importación debería producir una
 nueva versión del corpus, sin alterar las que ya usan los artefactos publicados.
@@ -92,20 +92,20 @@ resultados se pueden volver a obtener a partir de los mismos artefactos versiona
 
 \section{Valoración personal}\label{sec:conc-valoracion-personal}
 
-Este trabajo me ha enseñado que construir una aplicación y comprobar de verdad que funciona bien son cosas distintas, y
+Este trabajo me ha enseñado que construir una aplicación y comprobar de verdad que funciona bien son cosas distintas y
 que la segunda es la más difícil. De la parte web, la que más se ve, me llevo sobre todo la experiencia de hacer un
 producto completo y usable: un catálogo con cientos de miles de juegos, una biblioteca personal con sus listas,
 valoraciones y copias, un perfil con privacidad y un apartado de amistades. Después de una primera versión funcional,
-rediseñé la interfaz a partir de maquetas y la adapté al móvil, y comprobé que los detalles que parecen menores, como
+rediseñé la interfaz a partir de maquetas y la adapté al móvil y comprobé que los detalles que parecen menores, como
 que un menú no se pise con el logo o que un botón se pueda pulsar con el dedo, son los que deciden si una aplicación se
 siente terminada. También me llevo haberla puesto en internet con herramientas gratuitas, con las limitaciones que eso
 conlleva y que dejo explicadas en la memoria.
 
 Lo que más me costó fue medir si las recomendaciones eran buenas sin engañarme: las primeras pruebas no sirvieron para
-sacar conclusiones, hubo que repetirlas y corregir errores, y solo así llegué a resultados en los que puedo confiar. De
+sacar conclusiones, hubo que repetirlas y corregir errores y solo así llegué a resultados en los que puedo confiar. De
 ahí me quedo con una idea que me parece lo más valioso del trabajo: es mejor decir con claridad lo que no se ha podido
 comprobar que presentar resultados que parezcan más sólidos de lo que son.
 
 Con más tiempo habría probado la aplicación con personas reales desde el principio, en lugar de depender solo de usuarios
-simulados. Aun así, estoy satisfecho con el resultado: una aplicación que se puede abrir y usar, y unas pruebas que otra
+simulados. Aun así, estoy satisfecho con el resultado: una aplicación que se puede abrir y usar y unas pruebas que otra
 persona puede repetir para comprobar mis cifras, que era lo que me propuse al empezar.

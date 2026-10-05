@@ -7,9 +7,8 @@ código representativos, todos referenciados en el texto.
 
 \section{Entorno reproducible y dependencias}\label{sec:impl-entorno}\label{sec:datos-dependencias}
 
-El entorno de desarrollo y de pruebas se orquesta con Docker Compose, con tres servicios de
-aplicación (base de datos, backend y frontend), además de los \textit{workers} de las variantes
-de recomendación que publica la web (Sección~\ref{sec:alg-publicadas}). Las dependencias se fijan a versión exacta, con
+El entorno de desarrollo y de pruebas se orquesta con Docker Compose, tal como describe la
+Sección~\ref{sec:dis-arquitectura}. Las dependencias se fijan a versión exacta, con
 \texttt{uv} para Python y \texttt{pnpm} para Node. Sus ficheros de bloqueo se congelan en las
 construcciones. Las imágenes base se fijan por resumen criptográfico. La
 Tabla~\ref{tab:stack} recoge las versiones principales.
@@ -42,7 +41,7 @@ Tabla~\ref{tab:stack} recoge las versiones principales.
     \hline
 \end{tabularx}
 \caption{Versiones principales del entorno reproducible.}
-\label{tab:stack}\label{tab:stack-resumen}
+\label{tab:stack}
 \end{table}
 
 Toda dependencia directa nueva o cambio de versión pasa por un gate: aprobación humana
@@ -79,7 +78,7 @@ laboratorio.
 El corpus curado son ciento cincuenta juegos de datos estructurados de Wikidata,
 publicados bajo la dedicación al dominio público \textit{Creative Commons Zero}
 (CC0)~\cite{wikidata-licensing}. La adquisición se hace fuera de línea con un guion que
-lanza una consulta filtrada por clase contra el punto de acceso SPARQL de Wikidata, resuelve
+lanza una consulta filtrada por clase contra el punto de acceso del lenguaje de consulta SPARQL de Wikidata, resuelve
 las subconsultas de plataforma de forma dinámica y valida la estructura y la cobertura por
 época del resultado. El guion escribe el fichero \texttt{data/raw/wikidata-games.json} con su
 huella SHA-256, más los manifiestos de catálogo y de recursos. El registro de decisión
@@ -153,7 +152,7 @@ presente y de reserva; y un manifiesto de revisión muestreada determinista de t
 registros, tomando uno de cada mil cuarenta y uno por orden de identificador, con datos
 suficientes para una comprobación humana puntual. La Tabla~\ref{tab:freeze} recoge los
 valores medidos en la carga de la base de datos de desarrollo persistente y actualizados
-durante la Fase 2, el 7 de septiembre de 2026.
+durante el gobierno del corpus, el 7 de septiembre de 2026.
 
 \begin{table}[htp]
 \centering
@@ -194,7 +193,7 @@ pasadas. La versión inmutable reutilizable de la base cargada, de noventa y tre
 versiona en el repositorio por decisión de ADR-006; se conserva fuera de él como vía de
 restauración rápida.
 
-La Fase 2 añadió una frontera de evaluación sobre este catálogo. El comando
+El laboratorio de evaluación añadió una frontera sobre este catálogo. El comando
 \texttt{govern\_corpus} aplica las reglas D-03 de forma reversible: conserva las obras
 fuente, pero marca como gobernadas las que son obras principales, tienen fecha de lanzamiento,
 al menos un género y al menos una plataforma de la lista permitida de 39 plataformas. La valoración no es un criterio de
@@ -203,9 +202,9 @@ exclusión. La ejecución documentada el 7 de septiembre dejó 193.885 obras gob
 determinista se conservan en \texttt{docs/verification/corpus-governance-freeze.md}. La
 Tabla~\ref{tab:freeze} y las cifras de este párrafo corresponden a esa versión. El 9 de septiembre se
 congeló la versión \texttt{2026.09.2}, con corte temporal en esa fecha: el catálogo visible no contiene
-obras posteriores al corte, sin fecha ni contenido descargable, y deja \textbf{190.479 obras
+obras posteriores al corte, sin fecha ni contenido descargable y deja \textbf{190.479 obras
 gobernadas}. Es la versión con la que trabajan el laboratorio de evaluación y los resultados del
-Capítulo~\ref{cap:resultados}, y su evidencia está en
+Capítulo~\ref{cap:resultados} y su evidencia está en
 \texttt{docs/verification/corpus-governance-2026.09.2.json}.
 
 \subsection{Valoraciones externas y aislamiento de la evaluación}\label{sec:datos-ratings}
@@ -263,7 +262,7 @@ sobre el catálogo real.
 El protocolo se carga desde \texttt{docs/methodology/protocol.json}. Los módulos de la
 aplicación \texttt{evaluation} que describe la Sección~\ref{sec:dis-laboratorio} se
 implementan con funciones deliberadamente pequeñas y explícitas.
-\texttt{evaluation/protocol.py} rechaza una rejilla con más de 24 configuraciones y distingue
+\texttt{evaluation/protocol.py} rechaza una rejilla con más de 31 configuraciones y distingue
 un protocolo todavía no consumido de una prueba ya ejecutada. \texttt{evaluation/metrics.py} no
 delega la definición de P@K, R@K, nDCG@K o MAP@K en una librería externa.
 \texttt{evaluation/splits.py} deriva la semilla del protocolo y del usuario, para que el orden
@@ -310,18 +309,16 @@ servida por su proceso trabajador. Además, el método de referencia \texttt{ran
 comparación. Selecciona con
 \texttt{random.Random(seed)} sobre los candidatos gobernados que no aparecen en la biblioteca
 de la persona usuaria. Ordenar previamente los identificadores y guardar una huella de la
-semilla, los candidatos y el resultado hace que la misma entrada produzca exactamente el
+semilla, los candidatos y el resultado hace que la misma entrada produzca exactamente la
 misma clasificación.
 
 El modelo de contenido que usan los algoritmos, descrito en la
 Sección~\ref{cap:algoritmos}, se apoya en \texttt{WorkFeatureVector}, una caché versionada y
 no un modelo entrenado, que \texttt{rebuild\_feature\_vectors} rellena de forma idempotente. El
-perfil de usuario se construye con los pesos de actividad descritos a continuación, y la
+perfil de usuario se construye con los pesos de actividad descritos a continuación y la
 valoración se mantiene fuera del vector para poder estudiarla como una señal independiente.
 
 \begin{samepage}
-La interfaz de recomendaciones solo muestra las tres variantes del laboratorio publicadas:
-\texttt{content-cbf-weighted-v1}, \texttt{content-cbf-mmr-pop-v1} y \texttt{recency-v1}.
 Cada entrada de biblioteca aporta un peso de actividad a las etiquetas curadas de su obra,
 según la fórmula del Extracto de código~\ref{cod:heuristico}. Un refactor posterior extrajo ese
 cálculo al módulo \texttt{apps/api/recommendations/\_weights.py}, para que las variantes de
@@ -369,20 +366,20 @@ recomendaciones. Los componentes reutilizables son los que fija el contrato de d
 Sección~\ref{sec:dis-ui}, además del armazón de la aplicación con su barra de navegación. Las páginas de solo lectura se renderizan en el servidor; los controles de biblioteca
 son componentes de cliente que llaman a la API del mismo origen. Las
 Figuras~\ref{fig:catalogo} y~\ref{fig:coleccion} muestran el catálogo con sus filtros y la
-colección de la persona usuaria.
+colección de la persona usuaria; todas las capturas de esta sección son del propio proyecto.
 \end{samepage}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\textwidth]{figures/02-catalogo-oscuro.png}
-    \caption{Catálogo con tema oscuro, búsqueda y filtros por plataforma, género, año y valoración. Fuente: captura del proyecto.}
+    \caption{Catálogo con tema oscuro, búsqueda y filtros por plataforma, género, año y valoración.}
     \label{fig:catalogo}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\textwidth]{figures/05-coleccion-oscuro.png}
-    \caption{Colección de la persona usuaria con tema oscuro, con el estado y la valoración de cada juego. Fuente: captura del proyecto.}
+    \caption{Colección de la persona usuaria con tema oscuro, con el estado y la valoración de cada juego.}
     \label{fig:coleccion}
 \end{figure}
 
@@ -416,52 +413,52 @@ de interfaz, no evidencia de calidad de clasificación ni de resultados experime
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.82\textwidth]{figures/06-recomendaciones-estanterias-oscuro.png}
-\caption{Vista de recomendaciones organizada por estanterías, con tema oscuro. Fuente: captura del proyecto.}
+\caption{Vista de recomendaciones organizada por estanterías, con tema oscuro.}
 \label{fig:recomendaciones-estanterias}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.82\textwidth]{figures/07-recomendaciones-detallada-oscuro.png}
-\caption{Vista detallada de recomendaciones, con las señales de afinidad y tema oscuro. Fuente: captura del proyecto.}
+\caption{Vista detallada de recomendaciones, con las señales de afinidad y tema oscuro.}
 \label{fig:recomendaciones-detallada}
 \end{figure}
 
 El módulo social y de personalización se apoya en tres pantallas. La página de amistades
 (Figura~\ref{fig:amistades}) reúne en tres columnas la búsqueda por nombre de usuario exacto
 y la lista de amistades, el perfil de la persona elegida, con sus favoritos y un resumen de
-su colección, y las notificaciones de solicitudes y de recomendaciones, que pueden aceptarse,
+su colección y las notificaciones de solicitudes y de recomendaciones, que pueden aceptarse,
 rechazarse o responderse. La página de perfil propio (Figura~\ref{fig:perfil}) organiza los
 ajustes en cinco pestañas: cuenta, privacidad, preferencias, conexiones y seguridad. La
-primera permite editar el nombre completo, la biografía, la foto, la portada y los favoritos,
+primera permite editar el nombre completo, la biografía, la foto, la portada y los favoritos
 y cambiar una única vez el nombre de usuario. El acceso (Figura~\ref{fig:acceso})
 y el registro (Figura~\ref{fig:registro}) son los únicos formularios abiertos a visitantes.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.85\textwidth]{figures/09-amistades-oscuro.png}
-\caption{Página de amistades con tema oscuro: amistades, perfil de la persona elegida y notificaciones. Fuente: captura del proyecto.}
+\caption{Página de amistades con tema oscuro: amistades, perfil de la persona elegida y notificaciones.}
 \label{fig:amistades}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.85\textwidth]{figures/10-perfil-oscuro.png}
-\caption{Perfil propio, pestaña de cuenta, con tema oscuro. Fuente: captura del proyecto.}
+\caption{Perfil propio, pestaña de cuenta, con tema oscuro.}
 \label{fig:perfil}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.85\textwidth]{figures/06-iniciar-sesion-oscuro.png}
-\caption{Página de acceso con tema oscuro. Fuente: captura del proyecto.}
+\caption{Página de acceso con tema oscuro.}
 \label{fig:acceso}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.85\textwidth]{figures/07-registro-oscuro.png}
-\caption{Página de registro con tema oscuro. Fuente: captura del proyecto.}
+\caption{Página de registro con tema oscuro.}
 \label{fig:registro}
 \end{figure}
 
@@ -471,7 +468,7 @@ La verificación combina pruebas de backend contra PostgreSQL real (unitarias e 
 una única suite \texttt{pytest}, sin separarlas en conteos independientes), pruebas de
 frontend con Vitest y un recorrido de navegador con Playwright que integra los casos de
 accesibilidad mediante \texttt{axe}, sin un conteo aislado solo de accesibilidad. El cierre de
-evidencia de la Fase 7, ejecutado el 14 de septiembre de 2026 y registrado en
+evidencia final, ejecutado el 14 de septiembre de 2026 y registrado en
 \texttt{docs/verification/phase-07-launch-gate.md} y en \texttt{07-VERIFICATION.md}, deja como
 última regresión completa 736 pruebas de backend, 70 de frontend y 56 de navegador, las tres
 en verde y sin omitidas. Tras los cambios posteriores de interfaz, del módulo social y del despliegue, el 5 de octubre de 2026 se repitieron las suites de backend y de frontend: 788 pruebas de backend y 66 de frontend, todas en verde y sin omitidas (Tabla~\ref{tab:pru-resultados}). El recorrido de navegador no se repitió después de esos cambios. Las evidencias de seguridad, migraciones, privacidad, importación y
@@ -542,10 +539,10 @@ informe de la propia ejecución del 5 de octubre de 2026, no de una estimación.
 \label{tab:pru-areas}
 \end{table}
 
-La Tabla~\ref{tab:pru-trazabilidad} relaciona cada caso de uso de la Tabla~\ref{tab:casos-uso}, y por tanto
-cada requisito funcional, con los ficheros de prueba que lo verifican y con el número de pruebas de cada uno; los
+La Tabla~\ref{tab:pru-trazabilidad} relaciona cada caso de uso de la Tabla~\ref{tab:casos-uso} con los requisitos que cubre, los ficheros de
+prueba que los verifican y el número de pruebas de cada uno; los
 requisitos de datos y de evaluación, que verifican las suites de las áreas \texttt{catalogue} y
-\texttt{evaluation}, se tratan en la Sección~\ref{sec:pru-fase2}.
+\texttt{evaluation}, se tratan en la Sección~\ref{sec:pru-datos}.
 
 \begin{table}[htp]
 \centering
@@ -588,7 +585,7 @@ requisitos de datos y de evaluación, que verifican las suites de las áreas \te
 \end{table}
 
 Como ejemplo de caso de prueba concreto, la Tabla~\ref{tab:pru-cp1} describe la comprobación de que reintentar el
-alta de una copia no crea un duplicado, y la Tabla~\ref{tab:pru-cp2} la de que una persona sin permiso no puede
+alta de una copia no crea un duplicado y la Tabla~\ref{tab:pru-cp2} la de que una persona sin permiso no puede
 distinguir una colección privada de una que no existe. Ambas son pruebas automatizadas del repositorio y pasan en la
 ejecución final de la Tabla~\ref{tab:pru-resultados}.
 
@@ -629,7 +626,7 @@ ejecución final de la Tabla~\ref{tab:pru-resultados}.
     \hline
     Pasos & Como visitante y como persona sin amistad: 1) pedir la lista del propietario; 2) pedir su colección; 3) pedir la colección de un alias inexistente. \\
     \hline
-    Resultado esperado & Las tres peticiones responden 404, y la respuesta de la lista y de la colección del propietario es idéntica a la del alias inexistente. \\
+    Resultado esperado & Las tres peticiones responden 404 y la respuesta de la lista y de la colección del propietario es idéntica a la del alias inexistente. \\
     \hline
     Prueba automatizada & \path{tests/test_social_visibility.py}, \texttt{test\_\allowbreak{}anonymous\_\allowbreak{}and\_\allowbreak{}non\_\allowbreak{}friend\_\allowbreak{}get\_\allowbreak{}same\_\allowbreak{}404\_\allowbreak{}for\_\allowbreak{}direct\_\allowbreak{}collection\_\allowbreak{}and\_\allowbreak{}list}. \\
     \hline
@@ -640,7 +637,7 @@ ejecución final de la Tabla~\ref{tab:pru-resultados}.
 \label{tab:pru-cp2}
 \end{table}
 
-\subsection{Verificación de los datos y del laboratorio}\label{sec:pru-fase2}
+\subsection{Verificación de los datos y del laboratorio}\label{sec:pru-datos}
 
 La verificación de los datos y del laboratorio se dividió en dos grupos. El primero comprobó que los datos y
 sus contratos eran correctos: 70 pruebas del catálogo cubrieron la importación de campos de
@@ -670,9 +667,9 @@ Las tablas de precisión, recall, nDCG y MAP de la comparación completa, con la
 
 Además de las pruebas, el repositorio tiene gates deterministas que protegen la evidencia. El
 gate \texttt{check-secrets.ps1} escanea el árbol de Git, los paquetes de construcción, las
-capas de las imágenes y los registros capturados en busca de cadenas con forma de credencial,
+capas de las imágenes y los registros capturados en busca de cadenas con forma de credencial
 y se autoverifica primero contra señuelos sintéticos. El gate \texttt{check-evidence.ps1}
-valida el registro de agentes descrito en la Sección~\ref{sec:met-ledger}, y el gate
+valida el registro de agentes descrito en la Sección~\ref{sec:met-ledger} y el gate
 \texttt{check-dependencies.ps1} comprueba la lista permitida de dependencias de la
 Sección~\ref{sec:impl-entorno}. Los gates \texttt{verify-igdb-*.ps1} comprueban el contenido del
 registro de decisión de IGDB, la evidencia del sondeo y la ejecución de importación sobre una
@@ -706,7 +703,7 @@ interfaz y los recomendadores se verificaron con cuatro de cuatro criterios. La 
 \end{table}
 
 El criterio SC3, la calidad visual de producto, se cerró con la aprobación final. Empezó
-como aprobación anticipada condicional, mientras se estaba desconectado. Quedó
+como aprobación anticipada condicional, concedida sin acceso directo al entorno. Quedó
 confirmada sin condiciones tras una revisión remota de dieciocho capturas del entorno local
 que cubrían las cuatro superficies principales en escritorio y en móvil, ambos temas y una
 segunda cuenta con colección vacía como prueba visual de independencia.
@@ -752,7 +749,7 @@ Django, que su documentación desaconseja explícitamente. Los tres se corrigier
 con un campo de esquema nuevo y una migración, el tercero con la incorporación del servidor
 \texttt{gunicorn}.
 
-La revisión también dejó constancia de las áreas sanas: ausencia de inyección de SQL, con
+La revisión también dejó constancia de las áreas sanas: ausencia de inyección de lenguaje de consulta estructurado (SQL), con
 todo el uso del ORM parametrizado; validación minuciosa de las consultas del catálogo;
 acotación de propiedad en todas las vistas de datos personales; escrituras transaccionales
 con bloqueo de fila y restricciones de unicidad como guarda real de carreras; higiene de
@@ -799,7 +796,7 @@ Tabla~\ref{tab:topologia} recoge el contrato de cada superficie.
 \label{tab:topologia}
 \end{table}
 
-El navegador solo ve el origen HTTPS de Vercel, que reenvía las rutas de la API como describe
+El navegador solo ve el origen seguro (HTTPS, la variante cifrada de HTTP) de Vercel, que reenvía las rutas de la API como describe
 la Sección~\ref{sec:dis-sesion}. En Render, la cadena de arranque encadena migración e importación del
 catálogo y de los resúmenes localizados; solo entonces cede el control al servidor
 \texttt{gunicorn}, con cada paso idempotente y protegido con un bloqueo consultivo, de modo que
@@ -810,26 +807,27 @@ recomendaciones en cola, el proceso bajo demanda descrito más abajo.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.92\textwidth]{figures/despliegue-flujo.pdf}
-    \caption{Topología de despliegue público, cadena de arranque en Render y procesos que cuelgan del servidor en marcha. Cada paso del arranque es idempotente y un paso fallido lo detiene. Docker Compose local (base de datos, API y frontend) construye las mismas imágenes sin depender de estos tres servicios.}
+    \caption[Topología de despliegue público y cadena de arranque]{Topología de despliegue público, cadena de arranque en Render y procesos que cuelgan del servidor en marcha. Cada paso del arranque es idempotente y un paso fallido lo detiene. Docker Compose local (base de datos, API y frontend) construye las mismas imágenes sin depender de estos tres servicios.}
     \label{fig:despliegue-flujo}
 \end{figure}
 
 Docker Compose sigue siendo el entorno reproducible canónico
 (Sección~\ref{sec:impl-entorno}). La equivalencia con el
-despliegue público es funcional, de versiones, de commit y de datos, no de imagen byte a
-byte: el frontend público lo construye Vercel de forma nativa y no ejecuta la imagen de Docker
-del frontend, una diferencia de despliegue documentada, no una divergencia de comportamiento.
+despliegue público es funcional, de versiones y de commit, no de imagen byte a
+byte ni de datos. El frontend público lo construye Vercel de forma nativa y no ejecuta la imagen de Docker
+del frontend, una diferencia de despliegue documentada, no una divergencia de comportamiento; el corpus público
+es un subconjunto del local, como recoge la Tabla~\ref{tab:local-publico}.
 Si cualquier servicio gratuito duerme, cambia sus términos o desaparece, el entorno local sigue
 disponible sin conexión. Los límites conocidos del nivel gratuito se declaran de forma
 explícita: el servicio de la API en Render duerme tras quince minutos sin tráfico, de modo que
 un visitante puede encontrar un arranque en frío de cerca de un minuto; las cuotas mensuales de
-los tres proveedores pueden suspender un servicio, y el nivel gratuito no promete copias de
+los tres proveedores pueden suspender un servicio y el nivel gratuito no promete copias de
 seguridad ni restauración.
 
 La demostración pública está en vivo desde el 5 de septiembre de 2026. En su primera versión servía la interfaz
 anterior al rediseño contra el corpus curado de ciento cincuenta juegos de Wikidata. Desde el 5 de octubre de 2026 sirve
 la interfaz rediseñada y un subconjunto del catálogo a escala real cargado en Neon, con las recomendaciones calculadas
-por un proceso bajo demanda. No es el mismo catálogo que el del entorno local, y la
+por un proceso bajo demanda. No es el mismo catálogo que el del entorno local y la
 Tabla~\ref{tab:local-publico} recoge la diferencia.
 
 \begin{table}[H]
@@ -844,7 +842,7 @@ Tabla~\ref{tab:local-publico} recoge la diferencia.
     \hline
     Vectores de características & Uno por obra gobernada, varias versiones & Uno por juego publicado, solo la versión vigente \texttt{fs-v13} \\
     \hline
-    Procesos de recomendación & Cuatro en paralelo (señales, ponderado, recencia y MMR con popularidad) & Uno, lanzado bajo demanda, que procesa todos los trabajos \\
+    Procesos de recomendación & Tres en paralelo, uno por cada variante publicada & Uno, lanzado bajo demanda, que procesa los trabajos de las tres variantes \\
     \hline
     Evaluación offline & Sí; de aquí salen los artefactos de esta memoria & No; se ejecuta solo en local \\
     \hline
@@ -859,23 +857,23 @@ Tabla~\ref{tab:local-publico} recoge la diferencia.
 
 El subconjunto público se eligió con un criterio explícito y reproducible: juegos con valoración de IGDB o con PopScore
 mayor que cero, junto con los DLC relacionados con ellos. Ocupa 359\,MB de la gigabyte que ofrece Neon en el nivel
-gratuito, y los guiones que lo exportan y lo cargan están en \texttt{scripts/public-corpus/}. El corpus gobernado completo,
+gratuito y los guiones que lo exportan y lo cargan están en \texttt{scripts/public-corpus/}. El corpus gobernado completo,
 con los índices de las tablas que usa la API, no cabe en ese límite.
 
 El nivel gratuito de Neon contabiliza horas de cómputo mientras la base está despierta, por lo que un proceso que
 consultara la cola de recomendaciones cada pocos segundos la mantendría encendida las veinticuatro horas del día y
 agotaría la cuota del mes. Por eso el despliegue no tiene ningún proceso permanente: cuando la API encola un refresco,
-lanza un proceso corto que vacía la cola y termina, protegido por un candado de fichero para que nunca haya dos a la vez,
+lanza un proceso corto que vacía la cola y termina, protegido por un candado de fichero para que nunca haya dos a la vez
 y la base solo se consulta cuando alguien actúa. Se comprobó en producción con una cuenta desechable: la primera
-recomendación de una cuenta nueva estuvo lista entre cuatro y seis minutos después, y tras nueve minutos sin ninguna
+recomendación de una cuenta nueva estuvo lista entre cuatro y seis minutos después y tras nueve minutos sin ninguna
 petición Neon registró su suspensión.
 
 Esta diferencia es una limitación del trabajo, no un detalle de despliegue. Los resultados de la evaluación offline del
 Capítulo~\ref{cap:resultados} se calcularon sobre el corpus completo local, de modo que la web desplegada es una
 demostración funcional del producto y no el entorno donde se midió. Las recomendaciones allí son además más lentas, porque
-un único proceso comparte CPU y 512\,MB con la API. Los datos son de demostración: las cuentas no verifican el correo y
+un único proceso comparte procesador y 512\,MB con la API. Los datos son de demostración: las cuentas no verifican el correo y
 las claves son de demostración. Ampliar el despliegue al corpus gobernado completo exigiría una base de datos de mayor
-capacidad, de pago, y queda fuera del coste cero que fijó el diseño.
+capacidad, de pago y queda fuera del coste cero que fijó el diseño.
 
 Este capítulo ha descrito la construcción, la verificación y el despliegue del sistema. El
 capítulo siguiente presenta la evaluación experimental de los algoritmos de recomendación que

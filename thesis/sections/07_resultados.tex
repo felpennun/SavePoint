@@ -29,7 +29,7 @@ Evaluar un recomendador sin usuarios reales exige fijar por adelantado cinco dec
 tarea concreta que se mide (recomendar los siguientes \(K\) ítems que a una persona le
 interesarán, no predecir la nota exacta que pondría), el criterio de relevancia que separa un
 acierto de un fallo, el conjunto de candidatas sobre el que compite cada algoritmo, la división
-de los datos entre lo que el modelo puede ver y lo que se usa para medir, y la forma de agregar
+de los datos entre lo que el modelo puede ver y lo que se usa para medir y la forma de agregar
 el resultado por usuario en una única cifra por algoritmo. SavePoint fija estas decisiones en
 un protocolo versionado antes de ejecutar la comparación.
 
@@ -37,9 +37,9 @@ La precisión en \(K\) mide qué proporción de los \(K\) ítems recomendados re
 la exhaustividad en \(K\) mide qué proporción de todos los ítems relevantes aparecen entre
 esos \(K\). Ninguna de las dos distingue la posición dentro de la lista: acertar en el primer
 puesto cuenta igual que acertar en el último. Para corregir esa carencia se usa la ganancia
-acumulada descontada normalizada (nDCG)~\cite{jarvelin2002cumulated}, que descuenta el valor
+acumulada descontada normalizada~\cite{jarvelin2002cumulated}, que descuenta el valor
 de un acierto cuanto más abajo aparece y lo normaliza frente al orden ideal posible. La
-precisión media (MAP) promedia, para cada usuario, la precisión acumulada en cada posición
+precisión media promedia, para cada usuario, la precisión acumulada en cada posición
 donde hubo un acierto y después promedia ese valor entre usuarios; es sensible tanto a la
 cantidad de aciertos como a su posición.
 
@@ -57,9 +57,9 @@ Sección~\ref{cap:algoritmos} explica cómo SavePoint reordena sus listas para c
 La evaluación publicada se ejecutó offline con el corpus congelado \texttt{2026.09.2} (190.479 obras
 gobernadas, Sección~\ref{sec:datos-congelacion}) y el conjunto de
 características \texttt{fs-v12-curated-tags-idf} (Sección~\ref{cap:algoritmos} y
-Tabla~\ref{tab:pesos-familia}); la revisión posterior \texttt{fs-v13} no se ha evaluado. La población experimental contiene 400 usuarios sintéticos activos, generados de forma determinista; 79 cumplen la elegibilidad del split de prueba. La población se reparte en dos cohortes: \texttt{active\_history\_10\_to\_20}, con los 390 usuarios que tienen una biblioteca de entre 10 y 20 entradas, y \texttt{no\_history}, con los 10 de arranque en frío, que no tienen ítems relevantes y no se evalúan; los 79 usuarios evaluables pertenecen todos a la primera. Los perfiles se generan a partir de arquetipos (monogénero severo y generoso, omnívoro medio, completista de saga, explorador de novedades, coleccionista de pendientes, jugador ocasional con arranque en frío y veterano de biblioteca grande) que varían el número de géneros preferidos, el tamaño de la biblioteca, la generosidad al puntuar y la mezcla de estados, y llevan el marcador \texttt{synthetic-eval-user} para no contaminar el baseline de popularidad de la aplicación. No se utilizaron usuarios reales. El protocolo v15 fija semilla, versiones, snapshots, hashes, candidatas y exclusiones antes de consumir el test. La semilla permite reproducir esta ejecución, pero no sustituye un estudio de sensibilidad con múltiples semillas.
+Tabla~\ref{tab:pesos-familia}); la revisión posterior \texttt{fs-v13} no se ha evaluado. La población experimental contiene 400 usuarios de prueba sintéticos, generados de forma determinista; 79 cumplen la elegibilidad del split de prueba. La población se reparte en dos cohortes: \texttt{active\_history\_10\_to\_20}, con los 390 usuarios que tienen una biblioteca de entre 10 y 20 entradas y \texttt{no\_history}, con los 10 de arranque en frío, que no tienen ítems relevantes y no se evalúan; los 79 usuarios evaluables pertenecen todos a la primera. Los perfiles se generan a partir de nueve arquetipos: dos sin historial (diez usuarios), tres de perfil inicial (cien), tres de usuario normal (doscientos cuarenta) y uno intensivo veterano (cincuenta). Los arquetipos con historial tienen bibliotecas de entre 10 y 20 entradas y varían el número de géneros preferidos, la generosidad al puntuar y la mezcla de estados; llevan el marcador \texttt{synthetic-eval-user} para no contaminar el baseline de popularidad de la aplicación. El protocolo v15 fija semilla, versiones, snapshots, hashes, candidatas y exclusiones antes de consumir el test. La semilla permite reproducir esta ejecución, pero no sustituye un estudio de sensibilidad con múltiples semillas.
 
-El protocolo vigente, v15, usa \emph{leave-fraction-out} por usuario, no
+El protocolo publicado, v15, usa \emph{leave-fraction-out} por usuario, no
 \emph{leave-one-out}: retiene varios ítems relevantes por persona en lugar de uno solo. Una
 obra relevante es una entrada terminada o valorada con al menos siete medios puntos, con un
 piso adicional de calidad externa (valoración agregada de origen de al menos 70 puntos) sobre
@@ -130,11 +130,9 @@ recoge entre las amenazas a la validez (Sección~\ref{sec:exp-amenazas}).
 
 \section{Evolución del protocolo: tres intentos, no uno}\label{sec:exp-evolucion}\label{sec:exp-v15-fidelidad}
 
-Los números v12, v14 y v15 de esta sección designan versiones del \emph{protocolo} de evaluación, no
-del conjunto de características: la ejecución v15 se calculó con el conjunto \texttt{fs-v12}
-(Sección~\ref{cap:algoritmos}), que es una numeración distinta.
-
-El protocolo se versiona con un número entero que sube cada vez que un cambio impide comparar sus resultados con los
+Los números de versión de esta sección designan el \emph{protocolo} de evaluación, no el conjunto de
+características (v15 se calculó con \texttt{fs-v12}, Sección~\ref{cap:algoritmos}). El protocolo se versiona con un
+número entero que sube cada vez que un cambio impide comparar sus resultados con los
 de las versiones anteriores. La Tabla~\ref{tab:exp-versiones} resume las versiones, reconstruidas a partir del
 historial del repositorio y de los documentos de verificación. Hasta v14 el esquema de partición fue siempre
 \emph{leave-one-out}, con un único ítem retenido por usuario; lo que cambió fue la señal de calidad, la regla de
@@ -150,7 +148,7 @@ son los de v12, v14 y v15.
     \hline
     \textbf{Versión} & \textbf{Fecha (2026)} & \textbf{Qué cambió} \\
     \hline
-    v1--v2 & 7--8 sep. & Congelación inicial del contrato: \emph{leave-one-out} por usuario, \(K \in \{5, 10, 20\}\) y \(nDCG@10\) como métrica titular. La versión v2 limita las candidatas a obras con valoración. Primera ejecución de prueba, con la población inicial de la Fase 2 (26 de 40 usuarios de prueba evaluables). \\
+    v1--v2 & 7--8 sep. & Congelación inicial del contrato: \emph{leave-one-out} por usuario, \(K \in \{5, 10, 20\}\) y \(nDCG@10\) como métrica titular. La versión v2 limita las candidatas a obras con valoración. Primera ejecución de prueba, con la población inicial (26 de 40 usuarios de prueba evaluables). \\
     \hline
     v3--v6 & 9 sep. & Similitud de contenido por facetas y señal de calidad con confianza, calibradas en varias iteraciones; v6 es la versión que congeló el documento del protocolo. \\
     \hline
@@ -171,14 +169,7 @@ son los de v12, v14 y v15.
 \label{tab:exp-versiones}
 \end{table}
 
-El protocolo v15 descrito arriba no fue el primero que se congeló y se ejecutó hasta el final
-contra la partición de prueba. Lo precedieron dos intentos completos, v12 y v14, cada uno
-ejecutado una sola vez sobre la misma partición de prueba, con sus propios resultados publicados y
-conservados sin alterar. Repasarlos aquí no es un ejercicio de transparencia añadido: la forma
-concreta del protocolo v15 (retención por fracción sobre una etiqueta propia de cada usuario,
-piso de calidad externa, población con mínimo garantizado) es la respuesta directa a dos
-problemas reales que esos dos intentos anteriores dejaron medidos, no una elección de diseño
-arbitraria.
+Los resultados de v15 no fueron el primer cálculo ejecutado hasta el final contra la partición de prueba: lo precedieron v12 y v14, cada uno consumido una sola vez, con sus resultados conservados sin alterar. La forma concreta de v15 (retención por fracción sobre una etiqueta propia de cada usuario, piso de calidad externa, población con mínimo garantizado) responde a dos problemas reales que esos intentos dejaron medidos, no a una elección de diseño arbitraria.
 
 \textbf{El protocolo v12 (10 de septiembre de 2026)} fue el primer cálculo congelado hasta el final. Su
 resultado no fue una comparación entre algoritmos, sino un hallazgo metodológico: el
@@ -218,7 +209,7 @@ ganador defendible: \texttt{hybrid-weighted-cf-v1} (\(nDCG@10=0{,}1526\)) y
 a \texttt{recency-v1}, con catorce de las ciento veinte comparaciones por pares significativas
 tras Holm, frente a cero en v12 (\(\chi^2=105{,}28\), \(p=1{,}29\times10^{-15}\), \(n=79\)). La
 diversidad intra-lista y la concentración de recomendaciones mejoraron en la misma medida: el
-índice de concentración de Herfindahl-Hirschman pasó de un rango de 0,55 a 0,71 en v12, propio
+índice de concentración de Herfindahl-Hirschman (HHI) pasó de un rango de 0,55 a 0,71 en v12, propio
 de un catálogo minúsculo de recomendaciones repetidas, a un rango de 0,005 a 0,03, consecuencia
 directa de que el contenido ya no colapsaba a la misma alternativa de respaldo que los métodos de referencia. Aun
 así, v14 seguía reteniendo un único ítem por usuario mediante retención de uno: cada
@@ -240,43 +231,9 @@ reescribe los resultados de v12 o v14, los sustituye como publicación vigente p
 corregido, de forma medida y documentada, los problemas que los dos intentos anteriores dejaron
 al descubierto.
 
-Conviene defender por qué v15 se acerca más a una prueba realista de lo que los algoritmos
-hacen, no simplemente a un protocolo ajustado para producir números más altos. La
-justificación no es que v15 favorezca a ningún algoritmo concreto, sino que corrige tres
-formas en las que v12 y v14 se apartaban de cómo se evalúa la recuperación en la literatura y
-de cómo el propio sistema puntúa.
+Conviene defender que v15 se acerca más a una prueba realista de lo que los algoritmos hacen, no que se ajusta para producir números más altos, porque corrige tres formas en las que v12 y v14 se apartaban de la literatura y del propio sistema. La primera es de encuadre: retirar y recuperar un subconjunto de valoraciones, en lugar de un único ítem, es la generalización natural del esquema \emph{All-but-N}, nombrado así desde Breese, Heckerman y Kadie~\cite{breese1998empirical} y sistematizado por Herlocker et al.~\cite{herlocker2004evaluating}, del que el \emph{leave-one-out} de los protocolos v6 a v14 (Tabla~\ref{tab:exp-versiones}) es el caso \(N=1\); v15 solo calcula \(N\) por usuario, en proporción al tamaño de su grupo de obras con la etiqueta dominante. La segunda es de fidelidad a la señal que el sistema usa: \texttt{facet\_similarity()}, el código de puntuación de los dieciséis algoritmos, combina cada familia de faceta como una suma ponderada, nunca como un único rasgo ganador, de modo que el 21{,}3\,\% de los casos verificados antes de congelar el protocolo en los que la etiqueta retirada deja de ser la primera del perfil recalculado no invalida la prueba: el perfil sigue apoyándose en ella con menos peso~\cite{pazzani2007content} y exigir lo contrario habría excluido usuarios que el sistema sí atiende. La tercera es de inclusión: el usuario para el que el mecanismo por fracción no se puede construir cae al \emph{leave-one-out} simple en lugar de quedar fuera, lo que evita quedarse solo con los usuarios más fáciles de evaluar y llamar a eso representativo.
 
-La primera es de encuadre metodológico. Retirar y comprobar la recuperación de un subconjunto
-de valoraciones del historial de un usuario, en lugar de un único ítem, no es una invención de
-este proyecto: es la generalización natural del esquema \emph{All-but-N}, ya nombrado así en
-la literatura desde Breese, Heckerman y Kadie~\cite{breese1998empirical} y sistematizado por
-Herlocker et al.~\cite{herlocker2004evaluating}, donde el \emph{leave-one-out} que usaban los
-protocolos v6 a v14 (Tabla~\ref{tab:exp-versiones}) es simplemente el caso particular \(N=1\). v15 no sale de ese marco: solo
-deja de fijar \(N\) de forma global y lo calcula por usuario, en proporción al tamaño de su
-propio grupo de obras con esa etiqueta.
-
-La segunda es de fidelidad a la señal que el sistema realmente usa. \texttt{facet\_similarity()},
-el código de puntuación que usan los dieciséis algoritmos tanto en la aplicación como en el
-laboratorio, combina cada familia de faceta como una suma ponderada, nunca como una decisión
-de un único rasgo ganador. Que la etiqueta retirada deje de ser la primera del perfil recalculado
-del usuario, en el 21{,}3\,\% de los casos verificados antes de congelar el protocolo, no
-convierte la prueba en menos válida: un perfil de contenido sigue apoyándose en esa etiqueta,
-con menos peso relativo, exactamente igual que se apoyaría en cualquier otra bajo el mismo
-mecanismo de puntuación~\cite{pazzani2007content}. Exigir que la etiqueta se mantuviera siempre
-en primer lugar habría sido, de hecho, la elección menos fiel al propio sistema, porque
-habría excluido usuarios reales para el algoritmo aunque no lo fueran para la prueba.
-
-La tercera es de inclusión. Un usuario para el que el mecanismo por fracción no se puede
-construir cae al \emph{leave-one-out} simple de los protocolos anteriores en lugar de quedar
-fuera, lo que evita el sesgo de selección contrario, el de quedarse solo con los usuarios más
-fáciles de evaluar y llamar a eso representativo.
-
-Ninguno de los tres argumentos convierte v15 en evidencia sobre jugadores reales: sigue siendo
-una evaluación sobre una población sintética y un corpus concretos, como recuerda la
-Sección~\ref{sec:exp-amenazas}. Lo que sí establecen es que, dentro de esa simulación, v15
-mide la pregunta que se propone medir (¿recupera el sistema contenido afín al gusto que la
-propia biblioteca del usuario ya demuestra?) con más fidelidad al mecanismo de puntuación real
-y con menos artefactos de diseño heredados que v12 o v14, no solo con mejores cifras.
+Ninguno de los tres argumentos convierte v15 en evidencia sobre jugadores reales, como recuerda la Sección~\ref{sec:exp-amenazas}. Lo que establecen es que, dentro de la simulación, v15 mide la pregunta que se propone medir (¿recupera el sistema contenido afín al gusto que la propia biblioteca del usuario ya demuestra?) con más fidelidad al mecanismo de puntuación real y con menos artefactos de diseño heredados que v12 o v14, no solo con mejores cifras.
 
 \section{Resultados publicados}\label{sec:exp-resultados}\label{sec:exp-exito}
 
@@ -284,11 +241,11 @@ La Tabla~\ref{tab:resultados-ndcg10} resume \(nDCG@10\), MAP@10 y el tiempo de p
 
 \begin{table}[H]
 \centering
-\caption{Resultados v15 publicados (conjunto de características \texttt{fs-v12}) para los 79 usuarios evaluables de la cohorte \texttt{active\_history\_10\_to\_20}, con el tiempo de pared de cada algoritmo en segundos. No son resultados con usuarios reales.}\label{tab:resultados-ndcg10}
+\caption[Resultados v15 publicados para los 79 usuarios evaluables]{Resultados v15 publicados (conjunto de características \texttt{fs-v12}) para los 79 usuarios evaluables de la cohorte \texttt{active\_history\_10\_to\_20}, con el tiempo de pared de cada algoritmo en segundos. No son resultados con usuarios reales.}\label{tab:resultados-ndcg10}
 \small
 \renewcommand{\arraystretch}{1.2}
 \setlength{\tabcolsep}{3pt}
-\begin{tabularx}{\textwidth}{@{}>{\ttfamily\footnotesize\raggedright\arraybackslash}p{0.37\textwidth}Y>{\raggedleft\arraybackslash}p{0.095\textwidth}>{\raggedleft\arraybackslash}p{0.095\textwidth}>{\raggedleft\arraybackslash}p{0.12\textwidth}@{}}
+\begin{tabularx}{\textwidth}{@{}>{\ttfamily\footnotesize\raggedright\arraybackslash}p{0.385\textwidth}Y>{\raggedleft\arraybackslash}p{0.105\textwidth}>{\raggedleft\arraybackslash}p{0.105\textwidth}>{\raggedleft\arraybackslash}p{0.105\textwidth}@{}}
 \textnormal{Algoritmo} & \textnormal{Familia} & \textnormal{\footnotesize nDCG@10} & \textnormal{\footnotesize MAP@10} & \textnormal{\footnotesize Tiempo (s)} \\
 \hline
 random-v1 & referencia & 0,00000 & 0,00000 & 25,1 \\
@@ -455,7 +412,7 @@ anteriores, es que el colaborativo puro (\texttt{cf-user-knn-v1}) resulta signif
 peor que ocho de las diez variantes de contenido, una diferenciación que la potencia
 estadística de protocolos previos no alcanzaba a establecer con esta claridad. Esa lectura
 tiene un matiz importante: esta prueba mide específicamente la recuperación de obras de la
-etiqueta de contenido dominante del perfil de cada usuario, y \texttt{cf-user-knn-v1} no usa
+etiqueta de contenido dominante del perfil de cada usuario y \texttt{cf-user-knn-v1} no usa
 etiquetas en absoluto, sino similitud de patrones de valoración entre usuarios. La diferencia
 es real y significativa, pero mide precisamente el terreno que la señal colaborativa no
 modela; no es evidencia de que el filtrado colaborativo sea inferior en una tarea distinta,
@@ -465,7 +422,7 @@ dos en solitario.
 
 \section{Diversidad, cobertura y amenazas a la validez}\label{sec:exp-amenazas}
 
-MMR introduce un objetivo distinto de la recuperación puntual: reducir redundancia entre elementos ya seleccionados. Sus resultados deben leerse junto con diversidad intra-lista, novedad, cobertura del catálogo, cobertura de predicción y HHI cuando el artefacto los publica. Una mejora de diversidad no compensa automáticamente una pérdida de nDCG, ni la métrica de acierto debe ocultar concentración. SavePoint mantiene estas medidas separadas para que el compromiso sea auditable.
+MMR introduce un objetivo distinto de la recuperación puntual: reducir redundancia entre elementos ya seleccionados. Sus resultados deben leerse junto con diversidad intra-lista, novedad, cobertura del catálogo, cobertura de predicción y HHI cuando el artefacto los publica. Una mejora de diversidad no compensa automáticamente una pérdida de nDCG, ni la métrica de acierto debe ocultar concentración. SavePoint mantiene estas medidas separadas para que el compromiso sea auditable. Con \(K=10\), la diversidad intra-lista de \texttt{content-cbf-weighted-v1} es 0,531 y sube a 0,652 en \texttt{content-cbf-mmr-v1}, mientras que su \(nDCG@10\) baja de 0,1725 a 0,1389; en el híbrido, de 0,532 a 0,655 de diversidad y de 0,1699 a 0,1591 de \(nDCG@10\). La cobertura es baja en todos los algoritmos: la mejor variante de contenido recomienda 241 de las 13.618 obras candidatas (el 1,77\,\%) entre los 79 usuarios y la popularidad solo 11 (el 0,08\,\%), con un HHI de 0,0988 frente a 0,0132 de la variante de contenido y de 0,0765 del colaborativo, que también concentra. La cobertura de predicción es completa (1,00) en los dieciséis algoritmos.
 
 Las amenazas principales son población sintética, un solo consumo de la prueba y dependencia de
 metadatos externos gobernados. El corpus y la versión inmutable son fortalezas de reproducibilidad,

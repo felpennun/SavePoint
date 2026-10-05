@@ -56,15 +56,13 @@ retomar el trabajo entre sesiones, se usaron de verdad durante el proyecto.
 
 La cadena de artefactos que produce cada paso vive en el árbol \texttt{.planning/} del repositorio, que actúa como
 la memoria de trabajo compartida entre el autor y los agentes. \texttt{PROJECT.md} recoge el
-encuadre general del proyecto y las decisiones de producto que no cambian de una fase a otra.
+encuadre general del proyecto y las decisiones de producto que no cambian de un incremento a otro.
 \texttt{REQUIREMENTS.md} mantiene el catálogo de requisitos con su identificador, su estado y
-la fase que lo cierra, de forma que un requisito se puede seguir desde que se declara hasta que
-queda marcado como completo. \texttt{ROADMAP.md} descompone el proyecto en fases con sus planes
-y su progreso. Las fases son las unidades de trabajo del \textit{roadmap}: están numeradas en
-orden (con decimales, como la 01.1, cuando se insertó una posterior) y la memoria las cita por
-ese número, por ejemplo la Fase~2 para el laboratorio de evaluación. \texttt{STATE.md} conserva un resumen del punto en el que se encuentra el
+el incremento que lo cierra, de forma que un requisito se puede seguir desde que se declara hasta que
+queda marcado como completo. \texttt{ROADMAP.md} descompone el proyecto en incrementos con sus planes
+y su progreso, numerados en orden y con decimales (como el 01.1) cuando se inserta uno posterior. \texttt{STATE.md} conserva un resumen del punto en el que se encuentra el
 trabajo, con referencia al último commit relevante, pensado para que una sesión nueva, humana o
-de agente, pueda retomar el hilo sin releer todo el historial. Cada fase añade además, dentro de
+de agente, pueda retomar el hilo sin releer todo el historial. Cada incremento añade además, dentro de
 \texttt{.planning/phases/}, un par de documentos por plan: un \texttt{PLAN.md} que describe qué
 se va a hacer y cómo se va a verificar y un \texttt{SUMMARY.md} que el agente ejecutor redacta
 al terminar, con lo que se hizo, las desviaciones respecto al plan original y la evidencia que
@@ -118,7 +116,7 @@ hasta la prueba y la firma que la verifican.
 
 Además del registro de agentes, el proyecto conserva dos registros de decisión. Los ítems
 diferidos, en \texttt{deferred-items.md}, recogen los hallazgos fuera de alcance descubiertos
-durante la ejecución, con su motivo y su destino. Los registros de decisión de arquitectura,
+durante la ejecución, con su motivo y su destino. Los registros de decisión de arquitectura (ADR),
 en \texttt{docs/adr/}, documentan cada decisión material con su contexto, sus alternativas,
 su decisión, su evidencia, sus consecuencias y su reversibilidad. El
 Capítulo~\ref{cap:diseno} resume los nueve registros de decisión de arquitectura vigentes.
@@ -128,7 +126,7 @@ explorar cómo se relacionan las ideas entre sí. Para eso, el proyecto mantiene
 \textit{vault} de Obsidian, \texttt{ideas-vault/}, una colección de notas en Markdown
 enlazadas entre sí mediante referencias internas que Obsidian representa como un grafo
 navegable. Cada nota recoge un concepto (una decisión de diseño, un requisito, un algoritmo,
-una fase); sus enlaces señalan de qué otras notas depende o a cuáles afecta, de modo que
+un incremento); sus enlaces señalan de qué otras notas depende o a cuáles afecta, de modo que
 retomar un concepto después de semanas sin tocarlo no exige reconstruir el contexto desde
 cero: basta con abrir su nota y seguir sus enlaces. La Figura~\ref{fig:obsidian-vault} muestra
 el grafo real del vault de SavePoint en el momento de escribir esta memoria, generado a partir
@@ -137,7 +135,7 @@ de los enlaces existentes entre sus notas, no como una ilustración esquemática
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.92\textwidth]{figures/obsidian-vault-graph.pdf}
-    \caption{Grafo del vault de Obsidian de SavePoint (\texttt{ideas-vault/}), coloreado por
+    \caption[Grafo del vault de Obsidian de SavePoint]{Grafo del vault de Obsidian de SavePoint (\texttt{ideas-vault/}), coloreado por
     categoría de nota. Se muestra la componente conexa principal, ciento veintitrés notas de
     las ciento cincuenta que contiene el vault; el resto enlaza solo entre sí en subgrafos
     pequeños y aislados. Los nodos de mayor tamaño, como \texttt{00 - Indice} o los mapas de
@@ -148,7 +146,7 @@ de los enlaces existentes entre sus notas, no como una ilustración esquemática
 El vault y el árbol \texttt{.planning/} cumplen papeles distintos y deliberadamente no
 redundantes. El árbol de planificación es normativo: fija alcance, criterios de aceptación y
 evidencia; de él depende que un plan se dé o no por cerrado. El vault es descriptivo: enlaza
-conceptos con las fuentes canónicas que los sustentan (un ADR, un requisito, una fase) para que
+conceptos con las fuentes canónicas que los sustentan (un ADR, un requisito, un incremento) para que
 se puedan explorar sus relaciones de forma visual, pero nunca sustituye a las pruebas, a los
 hashes ni a los artefactos versionados que certifican una decisión. Esta separación se aplicó
 también a la propia redacción de esta memoria: antes de escribir varios de los capítulos que
@@ -166,9 +164,8 @@ del proyecto. El uso de agentes se describe aquí como una metodología de traba
 diseñó, dirigió y evaluó, no como una coautoría.
 
 El método de la Sección~\ref{sec:arte-agentes} se instrumenta en SavePoint con tres mecanismos.
-El primero es el aislamiento del contexto: el trabajo se descompone en tareas atómicas, cada
-una ejecutada por una instancia nueva del agente con la ventana limpia, y la información
-viaja entre tareas por los ficheros persistentes del árbol \texttt{.planning/}
+El primero es ese aislamiento del contexto: cada tarea atómica la ejecuta una instancia nueva del
+agente y la información viaja por los ficheros persistentes del árbol \texttt{.planning/}
 (Sección~\ref{sec:met-planning}), de modo que una interrupción, un límite de sesión o un
 cambio de día no hacen perder el hilo. El segundo es la especialización de esas instancias en
 los papeles de la Tabla~\ref{tab:subagentes}: quien planifica, quien implementa y quien
@@ -206,7 +203,7 @@ en paralelo sin pisarse los cambios. El ciclo de un ejecutor es siempre el mismo
 \textit{commits} dentro de esa copia aislada, al terminar se integra el resultado en la rama
 principal mediante una fusión sin avance rápido (\texttt{merge --no-ff}), que conserva visible
 en el historial el conjunto de cambios de ese plan como una unidad; por último, se limpia el
-\textit{worktree}. Cuando varios planes de una misma fase declaran el mismo requisito, la
+\textit{worktree}. Cuando varios planes de un mismo incremento declaran el mismo requisito, la
 orquestación añade además una comprobación de que todos esos planes tienen ya su
 \texttt{SUMMARY.md} antes de marcar el requisito como cerrado, para que ningún requisito quede
 completo mientras una de sus partes sigue pendiente en otro plan.
@@ -257,7 +254,7 @@ proyecto acumuló varias reglas de este tipo a partir de incidencias reales:
 El componente más distintivo del proceso es el registro de agentes,
 \texttt{docs/methodology/agent-ledger.jsonl}, un fichero de solo anexado con un objeto por
 línea. Cada entrada lleva una marca de tiempo, un tipo, el actor, el objetivo, las entradas y
-salidas referenciadas por ruta relativa y hash SHA-256, las herramientas empleadas sin sus
+salidas referenciadas por ruta relativa y hash SHA-256 (del inglés \textit{secure hash algorithm}), las herramientas empleadas sin sus
 secretos, el resultado y las limitaciones declaradas. El tipo es uno de tres:
 \texttt{proposal} para una propuesta de agente, \texttt{automated-check} para una
 comprobación determinista y \texttt{author-decision} para una decisión humana, que siempre
@@ -277,16 +274,16 @@ trabajo inicial y en el posterior, con la advertencia de que un nombre de
 modelo no basta para reproducir una salida probabilística: la evidencia reproducible son los
 artefactos versionados, los hashes, los comandos y las decisiones humanas.
 Los mensajes de commit siguen el estilo de \textit{Conventional Commits} y se escriben en
-inglés. 
+inglés.
 
 \section{Planificación del laboratorio de evaluación}\label{sec:met-fase2}
 
-La Fase 2 se planificó como el puente entre la demostración de producto y la evaluación
+El laboratorio de evaluación se planificó como el puente entre la demostración de producto y la evaluación
 reproducible. Su objetivo no era añadir una pantalla aislada, sino fijar las condiciones que
 permiten afirmar algo sobre un recomendador: qué obras entran en el corpus, qué significan
 las valoraciones, qué usuarios se simulan, cómo se construyen los candidatos y con qué
 métricas se comparan las listas. Las decisiones metodológicas se tomaron antes de cualquier
-ejecución de laboratorio y se conservaron en el directorio de planes de la fase.
+ejecución de laboratorio y se conservaron en el directorio de planes del incremento.
 
 El orden no es accidental. El corpus y la versión inmutable preceden al protocolo; el protocolo
 precede a la generación de usuarios y a la implementación de variantes; y solo entonces se
@@ -298,7 +295,7 @@ Las decisiones que bloquean una comparación posterior quedaron congeladas en
 \texttt{docs/methodology/protocol.json} y en \texttt{docs/methodology/evaluation-protocol.md}:
 el corpus, el significado de las valoraciones, la población sintética, la relevancia, el
 conjunto de candidatas y las métricas. Esta sección solo recoge cómo se planificó esa
-congelación; el contenido de cada decisión se describe donde se aplica. El corpus y los
+congelación; el contenido de cada decisión se describe donde se aplica. El corpus y las
 valoraciones, en la Sección~\ref{cap:datos}; el diseño del laboratorio, en la
 Sección~\ref{sec:dis-laboratorio}; y el protocolo con el que se publicaron los resultados, en
 la Sección~\ref{sec:exp-protocolo}.
@@ -308,12 +305,12 @@ la Sección~\ref{sec:exp-protocolo}.
 El trabajo se planificó como una sucesión de incrementos verticales, cada uno utilizable y
 verificado antes de abordar el siguiente, en lugar de un calendario cerrado de tareas fijado
 desde el principio. El desarrollo se organizó en seis iteraciones a lo largo de dos meses,
-desde principios de agosto hasta el 4 de octubre de 2026, agrupadas alrededor de los hitos de la
+desde principios de agosto hasta el 6 de octubre de 2026, agrupadas alrededor de los hitos de la
 Tabla~\ref{tab:hitos}. El estudio previo y las primeras pruebas de desarrollo comenzaron
 aproximadamente un mes antes del arranque sistemático del repositorio de producto: el
 repositorio se creó el 24 de agosto y el desarrollo con registros de decisión y planes por
-fase comenzó el 4 de septiembre. La fecha de inicio del estudio previo es aproximada; las
-posteriores proceden del historial del repositorio y de las firmas de cada fase.
+incremento comenzó el 4 de septiembre. La fecha de inicio del estudio previo es aproximada; las
+posteriores proceden del historial del repositorio y de las firmas de cada incremento.
 
 \begin{table}[H]
 \centering
@@ -322,21 +319,21 @@ posteriores proceden del historial del repositorio y de las firmas de cada fase.
     \hline
     \textbf{Hito} & \textbf{Fecha} \\
     \hline
-    H0 — Inicio del estudio previo y de las primeras pruebas de desarrollo & 04/08/2026 (aprox.) \\
+    H0: Inicio del estudio previo y de las primeras pruebas de desarrollo & 04/08/2026 \\
     \hline
-    H1 — Demostración pública de tres días en producción (Fase 1) & 05/09/2026 \\
+    H1: Demostración pública de tres días en producción & 05/09/2026 \\
     \hline
-    H2 — Catálogo a escala real e interfaz rediseñada (Fase 01.1) & 06/09/2026 \\
+    H2: Catálogo a escala real e interfaz rediseñada & 06/09/2026 \\
     \hline
-    H3 — Contrato de evaluación sin conexión congelado (Fase 2) & 08/09/2026 \\
+    H3: Contrato de evaluación sin conexión congelado & 08/09/2026 \\
     \hline
-    H4 — Recomendadores de contenido, colaborativo e híbrido implementados & 12/09/2026 \\
+    H4: Recomendadores de contenido, colaborativo e híbrido implementados & 12/09/2026 \\
     \hline
-    H5 — Publicación de resultados v15 con significación estadística & 12/09/2026 \\
+    H5: Publicación de resultados v15 con significación estadística & 12/09/2026 \\
     \hline
-    H6 — Flujos de colección, relaciones de amistad y endurecimiento cerrados & 14/09/2026 \\
+    H6: Flujos de colección, relaciones de amistad y endurecimiento cerrados & 14/09/2026 \\
     \hline
-    H7 — Memoria del TFG y despliegue completos, listos para defensa & 04/10/2026 \\
+    H7: Memoria del TFG y despliegue completos, listos para defensa & 06/10/2026 \\
     \hline
 \end{tabularx}
 \end{table}
@@ -352,20 +349,20 @@ La Figura~\ref{fig:calendario} sitúa las iteraciones y los hitos en el calendar
 
 La \textbf{Iteración 1} (de principios de agosto al 3 de septiembre, con inicio aproximado) cubrió el
 estudio previo y las primeras pruebas de desarrollo: revisión de productos de referencia,
-comparación de fuentes de datos de videojuegos y sus licencias, y pruebas de desarrollo
+comparación de fuentes de datos de videojuegos y sus licencias y pruebas de desarrollo
 previas al arranque del repositorio de producto. La \textbf{Iteración 2} (4 al 6 de septiembre)
 formalizó las primeras decisiones de arquitectura (ADR-001 y ADR-002) con un entorno de
-desarrollo reproducible en Docker Compose, y entregó el primer incremento de producto bajo una
+desarrollo reproducible en Docker Compose y entregó el primer incremento de producto bajo una
 restricción explícita de tres días para una demostración pública visible, con un catálogo
 reducido, una cuenta y la recomendación por popularidad; a continuación amplió el catálogo a
 escala real e incorporó el rediseño de la interfaz. La \textbf{Iteración 3} (7 y 8 de
 septiembre) congeló el contrato de evaluación sin conexión: corpus, población sintética, métricas y
 protocolo, antes de escribir ningún algoritmo de recomendación avanzado. La
 \textbf{Iteración 4} (9 al 12 de septiembre) implementó las tres familias de recomendación
-(contenido, colaborativo e híbrido) y sus dieciséis variantes, y ejecutó la publicación final de
+(contenido, colaborativo e híbrido) y sus dieciséis variantes y ejecutó la publicación final de
 resultados (v15) descrita en el Capítulo~\ref{cap:resultados}. La \textbf{Iteración 5} (13 y 14
 de septiembre) cerró los flujos completos de colección y portabilidad, las relaciones de
-amistad y el endurecimiento de seguridad. La \textbf{Iteración 6} (15 de septiembre al 4 de
+amistad y el endurecimiento de seguridad. La \textbf{Iteración 6} (15 de septiembre al 6 de
 octubre) se dedicó a la redacción, revisión y cierre de esta memoria y del despliegue, junto con
 los ajustes finales de la interfaz y del módulo social.
 
@@ -408,7 +405,7 @@ reparte esas horas entre las grandes áreas del trabajo.
 El coste directo se calcula sobre esas 310 horas con una tarifa de referencia de un perfil
 junior de ingeniería del software en España, 14,00\,€/hora, una cota conservadora frente al
 coste real de contratación de un perfil equivalente. El coste material recoge la amortización
-proporcional del PC de torre empleado, valorado en 1.000,00\,€ y con una vida útil estimada de
+proporcional del ordenador de torre empleado, valorado en 1.000,00\,€ y con una vida útil estimada de
 cuatro años, del que este trabajo consume dos meses. Se añade una suscripción a agentes de IA,
 estimada en 30,00\,€, empleada como apoyo al desarrollo bajo dirección y revisión humanas. No
 se incluye ningún coste de infraestructura en la nube, porque la topología de despliegue público
@@ -424,7 +421,7 @@ atribuible al proyecto. La Tabla~\ref{tab:presupuesto} resume el presupuesto tot
     \hline
     Coste directo (310\,h a 14,00\,€/h) & 4.340,00 \\
     \hline
-    Coste material (amortización de PC de torre, 2 meses) & 41,67 \\
+    Coste material (amortización de ordenador de torre, 2 meses) & 41,67 \\
     \hline
     Suscripción a agentes de IA & 30,00 \\
     \hline
@@ -464,7 +461,7 @@ mantienen bajo vigilancia.
     \hline
     Errores del agente en trabajo dado por bueno & Verificación de objetivos independiente y revisión de código de todo el repositorio con contexto propio. \\
     \hline
-    Despliegue no conectado a datos reales & Decisión registrada del proyecto de posponer esa conexión al final del proyecto; el entorno local reproducible es la vía de demostración. \\
+    Catálogo parcial en el despliegue público & El corpus gobernado completo no cabe en el nivel gratuito de la base de datos; se publica un subconjunto con criterio explícito y el entorno local reproducible es donde se mide la evaluación (Sección~\ref{cap:despliegue}). \\
     \hline
 \end{tabularx}
 \caption{Riesgos identificados y sus mitigaciones.}
@@ -489,19 +486,19 @@ quedaron registradas en los resúmenes de plan.
 
 El enfoque produjo beneficios concretos y observables en el proyecto, junto con límites que
 conviene declarar con la misma franqueza. El alcance se mantuvo bajo control a lo largo de
-sucesivos incrementos, sin que el trabajo de uno se filtrara en otro, y cada cambio quedó
+sucesivos incrementos, sin que el trabajo de uno se filtrara en otro y cada cambio quedó
 trazado hasta su plan, su requisito y su evidencia. Las revisiones de código con contexto
 independiente encontraron dieciséis hallazgos reales, descritos en la
 Sección~\ref{cap:pruebas}, que se corrigieron por completo, incluidos defectos de seguridad en
 trabajo ya dado por bueno. El trabajo se pudo reanudar sin pérdida de hilo tras interrupciones
-y límites de sesión, porque el estado vivía en ficheros y no en una conversación, y el propio
+y límites de sesión, porque el estado vivía en ficheros y no en una conversación y el propio
 proceso de ingeniería quedó reproducible, no solo el producto: un tercero puede clonar el
 repositorio y reconstruir la historia de decisiones a partir del árbol de planificación, los
 registros de decisión, el registro de agentes y los gates de evidencia.
 
 El enfoque depende, sin embargo, de la calidad de la especificación escrita: un plan ambiguo
 produce una ejecución ambigua. Mantener la disciplina de planificación, verificación y registro
-tiene un coste de tiempo notable para un TFG individual, y los agentes cometieron errores que
+tiene un coste de tiempo notable para un TFG individual; los agentes cometieron errores que
 hubo que detectar y corregir, algunos de ellos recogidos en la
 Sección~\ref{sec:met-contrato-contexto}. Un agente no es un evaluador independiente de su
 propia propuesta, del mismo modo que un hash prueba identidad de bytes, no veracidad ni calidad;

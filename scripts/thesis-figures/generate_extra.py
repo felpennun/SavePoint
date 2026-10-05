@@ -91,12 +91,12 @@ def diagram_calendario():
         ("Iteración 3", "Contrato de evaluación", d(2026, 9, 7), d(2026, 9, 8)),
         ("Iteración 4", "Recomendadores y resultados", d(2026, 9, 9), d(2026, 9, 12)),
         ("Iteración 5", "Flujos, amistades y endurecimiento", d(2026, 9, 13), d(2026, 9, 14)),
-        ("Iteración 6", "Memoria y despliegue final", d(2026, 9, 15), d(2026, 10, 4)),
+        ("Iteración 6", "Memoria y despliegue final", d(2026, 9, 15), d(2026, 10, 6)),
     ]
     # (label, day, vertical stagger of the label)
     miles = [("H0", d(2026, 8, 4), 0.0), ("H1", d(2026, 9, 5), 0.0), ("H2", d(2026, 9, 6), 0.3),
              ("H3", d(2026, 9, 8), 0.0), ("H4 y H5", d(2026, 9, 12), 0.3), ("H6", d(2026, 9, 14), 0.0),
-             ("H7", d(2026, 10, 4), 0.0)]
+             ("H7", d(2026, 10, 6), 0.0)]
 
     fig, ax = plt.subplots(figsize=(9.8, 4.2))
     n = len(iters)
@@ -117,7 +117,7 @@ def diagram_calendario():
         ax.text(x, ym + 0.32 + stagger, lab, ha="center", va="bottom", fontsize=8.2,
                 fontweight="bold", color=MUTED)
     ax.set_ylim(0.4, n + 1.0)
-    ax.set_xlim(mdates.date2num(d(2026, 8, 1)), mdates.date2num(d(2026, 10, 7)))
+    ax.set_xlim(mdates.date2num(d(2026, 8, 1)), mdates.date2num(d(2026, 10, 9)))
     ax.xaxis_date()
     ax.xaxis.set_major_locator(mdates.MonthLocator())
     months = {8: "ago", 9: "sep", 10: "oct"}
