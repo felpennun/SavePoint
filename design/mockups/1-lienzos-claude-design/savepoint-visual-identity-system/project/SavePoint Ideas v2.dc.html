@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="_ds/nocturne-be8fbbbe-d9ac-4bff-bce3-0f30f4da3b29/styles.css">
+<script src="_ds/nocturne-be8fbbbe-d9ac-4bff-bce3-0f30f4da3b29/_ds_bundle.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #161826; }
+  a { color: var(--color-accent-300); text-decoration: underline; }
+  a:hover { color: var(--color-accent-200); }
+</style>
+</helmet>
+
+<section style="display:flex;flex-direction:column;gap:48px;padding:56px 64px 96px;background:var(--color-bg);font-family:'Inter',system-ui,sans-serif;color:var(--color-text)">
+
+  <div style="display:flex;flex-direction:column;gap:10px;max-width:900px">
+    <div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;letter-spacing:.08em;color:var(--color-accent-300)">TURNO 2 · COLECCIÓN, PERFIL Y AMISTADES</div>
+    <h1 style="margin:0;font-size:40px;font-weight:500;line-height:1.15;letter-spacing:-.01em">Tres puntos clave y tres pantallas nuevas</h1>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px"><span style="padding:3px 9px;border-radius:4px;border:1px solid var(--color-neutral-700);color:var(--color-neutral-300)">YA EN EL REPO: /collection · /friends · /messages · /profiles/[alias] · /lists/[listSlug] · ProfileSettings · SocialHub</span></div>
+    <p style="margin:0;font-size:16px;line-height:1.55;color:var(--color-neutral-300);max-width:72ch;text-wrap:pretty">Continúa el <a href="SavePoint Ideas.dc.html">turno 1</a>. Primero los tres principios que ordenan todo lo demás (<a href="#2a">2a</a>), después la colección con listas propias (<a href="#2b">2b</a>), el perfil con ajustes (<a href="#2c">2c</a>), amistades (<a href="#2d">2d</a>) y un tablero de funciones nuevas (<a href="#2e">2e</a>).</p>
+  </div>
+
+  <!-- ── 2a TRES PUNTOS CLAVE ───────────────────────────── -->
+  <div id="2a" style="display:flex;flex-direction:column;gap:16px;width:1240px;flex:0 0 auto">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;font-weight:700;color:var(--color-bg);background:var(--color-accent);border-radius:4px;padding:3px 8px">2a</span>
+      <h2 style="margin:0;font-size:24px;font-weight:500">Tres puntos clave</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px">
+      <div style="display:flex;flex-direction:column;gap:14px;padding:28px;border-radius:8px;background:radial-gradient(120% 120% at 0% 0%,var(--color-section) 0%,var(--color-neutral-900) 62%);border:1px solid var(--color-accent-800)">
+        <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:44px;font-weight:500;color:var(--color-accent-300);line-height:1">01</span>
+        <h3 style="margin:0;font-size:22px;font-weight:500">Todo es una partida guardada</h3>
+        <p style="margin:0;font-size:15px;line-height:1.55;color:var(--color-neutral-300);text-wrap:pretty">Cada juego guarda dónde lo dejaste: estado, nota, fecha, lista. La interfaz habla de ranuras, sesiones y progreso, no de «items» ni «registros». La esquina recortada del isotipo marca lo que es tuyo.</p>
+        <div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--color-accent-300);padding-top:12px;border-top:1px solid var(--color-accent-900)">→ COLECCIÓN · INICIO · DIARIO</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;padding:28px;border-radius:8px;background:var(--color-neutral-900);border:1px solid var(--color-neutral-800)">
+        <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:44px;font-weight:500;color:var(--color-accent-300);line-height:1">02</span>
+        <h3 style="margin:0;font-size:22px;font-weight:500">Cada recomendación enseña su porqué</h3>
+        <p style="margin:0;font-size:15px;line-height:1.55;color:var(--color-neutral-300);text-wrap:pretty">Ninguna sugerencia aparece sin la etiqueta que suma y la que resta. Esto aplica también a lo social: «a Marta también le gustó» es evidencia, igual que «comparte metroidvania».</p>
+        <div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--color-accent-300);padding-top:12px;border-top:1px solid var(--color-neutral-800)">→ RECOMENDACIONES · AMISTADES</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;padding:28px;border-radius:8px;background:var(--color-neutral-900);border:1px solid var(--color-neutral-800)">
+        <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:44px;font-weight:500;color:var(--color-accent-300);line-height:1">03</span>
+        <h3 style="margin:0;font-size:22px;font-weight:500">Privado por defecto, social por elección</h3>
+        <p style="margin:0;font-size:15px;line-height:1.55;color:var(--color-neutral-300);text-wrap:pretty">La colección es tuya hasta que decides compartirla. Cada lista, el perfil y la actividad tienen su propio interruptor de visibilidad: privada, amistades o pública. Nada se publica sin que lo veas.</p>
+        <div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--color-accent-300);padding-top:12px;border-top:1px solid var(--color-neutral-800)">→ PERFIL · LISTAS · AJUSTES</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2b COLECCIÓN CON LISTAS ───────────────────────── -->
+  <div id="2b" style="display:flex;flex-direction:column;gap:16px;width:1240px;flex:0 0 auto">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;font-weight:700;color:var(--color-bg);background:var(--color-accent);border-radius:4px;padding:3px 8px">2b</span>
+      <h2 style="margin:0;font-size:24px;font-weight:500">Colección con listas</h2>
+      <span style="font-size:14px;color:var(--color-neutral-400)">Estados fijos arriba, listas propias debajo; un juego puede estar en varias listas</span>
+    </div>
+
+    <div style="background:var(--color-bg);border:1px solid var(--color-neutral-800);border-radius:8px;overflow:hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:var(--color-neutral-900);border-bottom:1px solid var(--color-neutral-800)">
+        <div style="display:flex;align-items:center;gap:28px">
+          <div style="display:flex;align-items:center;gap:9px">
+            <svg width="20" height="20" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M6 12a6 6 0 0 1 6-6h20l10 10v20a6 6 0 0 1-6 6H12a6 6 0 0 1-6-6V12Z" stroke="var(--color-accent-400)" stroke-width="2.5"></path><path d="M24 15l8 9-8 9-8-9 8-9Z" fill="var(--color-accent-400)"></path></svg>
+            <span style="font-size:15px;font-weight:600">SavePoint</span>
+          </div>
+          <div style="display:flex;gap:22px;font-size:14px;color:var(--color-neutral-400)">
+            <span>Inicio</span><span>Catálogo</span><span style="color:var(--color-text);font-weight:600;border-bottom:2px solid var(--color-accent);padding-bottom:3px">Colección</span><span>Recomendaciones</span><span>Amistades</span>
+          </div>
+        </div>
+        <span style="width:28px;height:28px;border-radius:999px;background:var(--color-accent-800);color:var(--color-accent-200);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px">AL</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:272px minmax(0,1fr);min-height:680px">
+        <!-- sidebar -->
+        <div style="display:flex;flex-direction:column;gap:20px;padding:24px 16px;border-right:1px solid var(--color-neutral-800);background:var(--color-neutral-900)">
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.08em;color:var(--color-neutral-400);padding:0 10px 8px">ESTADO</div>
+            <sc-for list="{{ statuses }}" as="s" hint-placeholder-count="5">
+              <div onClick="{{ s.select }}" style="{{ s.rowStyle }}">
+                <span style="display:flex;align-items:center;gap:10px"><span style="{{ s.dotStyle }}"></span>{{ s.label }}</span>
+                <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--color-neutral-400)">{{ s.count }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:0 10px 8px">
+              <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.08em;color:var(--color-neutral-400)">MIS LISTAS</span>
+              <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--color-accent-300);cursor:pointer">+ NUEVA</span>
+            </div>
+            <sc-for list="{{ lists }}" as="l" hint-placeholder-count="5">
+              <div onClick="{{ l.select }}" style="{{ l.rowStyle }}">
+                <span style="display:flex;flex-direction:column;gap:2px;min-width:0">
+                  <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ l.name }}</span>
+                  <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;color:var(--color-neutral-400)">{{ l.visibility }}</span>
+                </span>
+                <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--color-neutral-400)">{{ l.count }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- main -->
+        <div style="display:flex;flex-direction:column;gap:24px;padding:28px 28px 36px;min-width:0">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap">
+            <div style="display:flex;flex-direction:column;gap:6px;max-width:62ch">
+              <div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;letter-spacing:.08em;color:var(--color-accent-300)">{{ current.kicker }}</div>
+              <h3 style="margin:0;font-size:30px;font-weight:500;letter-spacing:-.01em">{{ current.name }}</h3>
+              <p style="margin:0;font-size:14px;line-height:1.5;color:var(--color-neutral-300)">{{ current.desc }}</p>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <div style="display:flex;border:1px solid var(--color-neutral-800);border-radius:8px;overflow:hidden">
+                <span onClick="{{ setGrid }}" style="{{ gridBtnStyle }}">Portadas</span>
+                <span onClick="{{ setRows }}" style="{{ rowsBtnStyle }}">Filas</span>
+              </div>
+              <span style="font-size:13px;color:var(--color-accent-300);border:1px solid var(--color-accent-700);border-radius:8px;padding:7px 12px">Compartir lista</span>
+            </div>
+          </div>
+
+          <sc-if value="{{ isGrid }}" hint-placeholder-val="{{ true }}">
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px">
+              <sc-for list="{{ games }}" as="g" hint-placeholder-count="8">
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <div style="position:relative;aspect-ratio:3/4;border-radius:6px;background:linear-gradient(160deg,#2a2840,#181a26);border:1px solid var(--color-neutral-800);display:flex;align-items:flex-end;padding:10px;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%)">
+                    <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10px;color:var(--color-neutral-400);line-height:1.25">{{ g.upper }}</span>
+                    <span style="{{ g.badgeStyle }}">{{ g.statusShort }}</span>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:2px">
+                    <span style="font-size:14px;font-weight:500;line-height:1.3">{{ g.title }}</span>
+                    <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;color:var(--color-neutral-400)">{{ g.meta }}</span>
+                  </div>
+                </div>
+              </sc-for>
+              <div style="aspect-ratio:3/4;border-radius:6px;border:1px dashed var(--color-neutral-700);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--color-neutral-400);font-size:13px;text-align:center;padding:12px">
+                <span style="font-size:22px;color:var(--color-accent-300)">+</span>Añadir juego<br>a esta lista
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ isRows }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column">
+              <div style="display:grid;grid-template-columns:24px 44px minmax(0,1fr) 140px 120px 90px;gap:16px;align-items:center;padding:0 0 10px;border-bottom:1px solid var(--color-neutral-800);font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.06em;color:var(--color-neutral-400)">
+                <span>⋮⋮</span><span></span><span>JUEGO</span><span>ESTADO</span><span>TU NOTA /10</span><span style="text-align:right">AÑADIDO</span>
+              </div>
+              <sc-for list="{{ games }}" as="g" hint-placeholder-count="6">
+                <div style="display:grid;grid-template-columns:24px 44px minmax(0,1fr) 140px 120px 90px;gap:16px;align-items:center;padding:10px 0;border-bottom:1px solid var(--color-neutral-900)">
+                  <span style="color:var(--color-neutral-600);cursor:grab">⋮⋮</span>
+                  <div style="aspect-ratio:3/4;border-radius:4px;background:linear-gradient(160deg,#2a2840,#181a26);border:1px solid var(--color-neutral-800)"></div>
+                  <div style="display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font-size:15px;font-weight:500">{{ g.title }}</span><span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;color:var(--color-neutral-400)">{{ g.meta }}</span></div>
+                  <span style="{{ g.pillStyle }}">{{ g.status }}</span>
+                  <span style="font-size:14px;color:var(--color-accent-300);font-family:'JetBrains Mono',ui-monospace,monospace">{{ g.stars }}</span>
+                  <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--color-neutral-400);text-align:right">{{ g.added }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+    <p style="margin:0;font-size:14px;line-height:1.55;color:var(--color-neutral-300);max-width:82ch;text-wrap:pretty">Cómo encajan las listas: los cuatro estados siguen siendo exclusivos (un juego tiene un solo estado), mientras que las listas son etiquetas del usuario (un juego puede estar en varias). Cada lista tiene nombre, descripción, orden manual (arrastrar en vista Filas) y visibilidad propia. Las tarjetas muestran el estado en la esquina para que una lista mixta se lea de un vistazo. Haz clic en la barra lateral para cambiar de lista.<br><span style="color:var(--color-neutral-400)">Respecto al repo: las listas ya existen como datos (<span style="font-family:'JetBrains Mono',ui-monospace,monospace">/profiles/[alias]/lists/[listSlug]</span>) pero solo se ven en el perfil público como tarjetas con un <span style="font-family:'JetBrains Mono',ui-monospace,monospace">&lt;ol&gt;</span>. La propuesta las trae a /collection como vista principal, junto a los estados.</span></p>
+  </div>
+
+  <!-- ── 2c PERFIL Y AJUSTES ───────────────────────────── -->
+  <div id="2c" style="display:flex;flex-direction:column;gap:16px;width:1240px;flex:0 0 auto">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;font-weight:700;color:var(--color-bg);background:var(--color-accent);border-radius:4px;padding:3px 8px">2c</span>
+      <h2 style="margin:0;font-size:24px;font-weight:500">Perfil y ajustes</h2>
+      <span style="font-size:14px;color:var(--color-neutral-400)">Vista pública arriba, ajustes en pestañas debajo</span>
+    </div>
+
+    <div style="background:var(--color-bg);border:1px solid var(--color-neutral-800);border-radius:8px;overflow:hidden">
+      <!-- header banner -->
+      <div style="position:relative;height:180px;background:radial-gradient(70% 140% at 20% 0%,var(--color-section) 0%,var(--color-neutral-900) 70%);border-bottom:1px solid var(--color-neutral-800)">
+        <div style="position:absolute;right:20px;top:16px;font-size:13px;color:var(--color-neutral-200);border:1px solid var(--color-neutral-700);border-radius:8px;padding:7px 12px;background:rgba(22,24,38,.6)">Cambiar portada</div>
+        <div style="position:absolute;right:24px;bottom:16px;display:flex;gap:6px">
+          <span style="width:46px;aspect-ratio:3/4;border-radius:3px;background:linear-gradient(160deg,#35305a,#1b1d29);border:1px solid var(--color-accent-800)"></span>
+          <span style="width:46px;aspect-ratio:3/4;border-radius:3px;background:linear-gradient(160deg,#2c2f44,#1b1d29);border:1px solid var(--color-neutral-700)"></span>
+          <span style="width:46px;aspect-ratio:3/4;border-radius:3px;background:linear-gradient(160deg,#2a2840,#1b1d29);border:1px solid var(--color-neutral-700)"></span>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:32px;padding:0 28px 28px">
+        <div style="display:flex;gap:20px;align-items:flex-end;margin-top:-48px">
+          <div style="position:relative;width:112px;height:112px;flex:0 0 auto">
+            <div style="width:112px;height:112px;border-radius:999px;background:linear-gradient(150deg,var(--color-accent-700),var(--color-neutral-800));border:3px solid var(--color-bg);display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:500;color:var(--color-accent-100)">AL</div>
+            <div style="position:absolute;right:2px;bottom:4px;width:34px;height:34px;border-radius:999px;background:var(--color-neutral-900);border:1px solid var(--color-accent-600);display:flex;align-items:center;justify-content:center" title="Cambiar foto">
+              <svg width="16" height="16" viewBox="0 0 256 256" fill="var(--color-accent-200)" aria-hidden="true"><path d="M208 56h-27.72l-13.63-20.44A8 8 0 0 0 160 32H96a8 8 0 0 0-6.65 3.56L75.71 56H48a24 24 0 0 0-24 24v112a24 24 0 0 0 24 24h160a24 24 0 0 0 24-24V80a24 24 0 0 0-24-24Zm8 136a8 8 0 0 1-8 8H48a8 8 0 0 1-8-8V80a8 8 0 0 1 8-8h32a8 8 0 0 0 6.66-3.56L100.28 48h55.43l13.63 20.44A8 8 0 0 0 176 72h32a8 8 0 0 1 8 8ZM128 88a44 44 0 1 0 44 44 44.05 44.05 0 0 0-44-44Zm0 72a28 28 0 1 1 28-28 28 28 0 0 1-28 28Z"></path></svg>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;padding-bottom:6px">
+            <h3 style="margin:0;font-size:28px;font-weight:500;letter-spacing:-.01em">Alejandro López</h3>
+            <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:var(--color-neutral-400)">@alejandro · miembro desde mar 2026 · 110 juegos</span>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;align-items:flex-end;gap:8px;padding-top:16px">
+          <span style="font-size:13px;color:var(--color-neutral-200);border:1px solid var(--color-neutral-700);border-radius:8px;padding:7px 12px">Ver como público</span>
+          <span style="font-size:13px;color:var(--color-accent-200);border:1px solid var(--color-accent);border-radius:8px;padding:7px 12px">Guardar cambios</span>
+        </div>
+      </div>
+
+      <!-- tabs -->
+      <div style="display:flex;gap:4px;padding:0 28px;border-bottom:1px solid var(--color-neutral-800)">
+        <sc-for list="{{ profileTabs }}" as="t" hint-placeholder-count="5">
+          <span onClick="{{ t.select }}" style="{{ t.style }}">{{ t.label }}</span>
+        </sc-for>
+      </div>
+
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:32px;padding:28px">
+        <div style="display:flex;flex-direction:column;gap:20px;min-width:0">
+          <sc-if value="{{ tabCuenta }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:20px">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--color-neutral-300)">Nombre visible<span style="padding:10px 12px;border-radius:8px;background:var(--color-neutral-900);border:1px solid var(--color-neutral-700);color:var(--color-text);font-size:14px">Alejandro López</span></label>
+                <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--color-neutral-300)"><span>Alias <span style="color:var(--color-neutral-400)">(URL de tu perfil)</span></span><span style="padding:10px 12px;border-radius:8px;background:var(--color-neutral-900);border:1px solid var(--color-neutral-700);color:var(--color-text);font-size:14px;font-family:'JetBrains Mono',ui-monospace,monospace">/es/profiles/alejandro</span></label>
+              </div>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--color-neutral-300)"><span>Biografía <span style="color:var(--color-neutral-400)">(opcional)</span></span><span style="padding:10px 12px;border-radius:8px;background:var(--color-neutral-900);border:1px solid var(--color-accent);color:var(--color-text);font-size:14px;line-height:1.5;min-height:56px">Metroidvanias, puzles y cualquier cosa con un mapa que se rellena.</span><span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;color:var(--color-neutral-400);align-self:flex-end">64 / 160</span></label>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <span style="font-size:13px;color:var(--color-neutral-300)">Tus 5 favoritos <span style="color:var(--color-neutral-400)">· solo juegos de tu colección</span></span>
+                <div style="display:flex;gap:12px">
+                  <div style="width:84px;aspect-ratio:3/4;border-radius:4px;background:linear-gradient(160deg,#35305a,#1b1d29);border:1px solid var(--color-accent-700);display:flex;align-items:flex-end;padding:6px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:9px;color:var(--color-neutral-300)">HOLLOW KNIGHT</div>
+                  <div style="width:84px;aspect-ratio:3/4;border-radius:4px;background:linear-gradient(160deg,#2c2f44,#1b1d29);border:1px solid var(--color-neutral-700);display:flex;align-items:flex-end;padding:6px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:9px;color:var(--color-neutral-300)">OUTER WILDS</div>
+                  <div style="width:84px;aspect-ratio:3/4;border-radius:4px;background:linear-gradient(160deg,#2a2840,#1b1d29);border:1px solid var(--color-neutral-700);display:flex;align-items:flex-end;padding:6px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:9px;color:var(--color-neutral-300)">CELESTE</div>
+                  <div style="width:84px;aspect-ratio:3/4;border-radius:4px;border:1px dashed var(--color-neutral-700);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--color-accent-300)">+</div>
+                  <div style="width:84px;aspect-ratio:3/4;border-radius:4px;border:1px dashed var(--color-neutral-700);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--color-accent-300)">+</div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ tabPrivacidad }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column">
+              <sc-for list="{{ privacyRows }}" as="p" hint-placeholder-count="4">
+                <div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center;padding:16px 0;border-bottom:1px solid var(--color-neutral-800)">
+                  <div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:15px;font-weight:500">{{ p.label }}</span><span style="font-size:13px;color:var(--color-neutral-400)">{{ p.hint }}</span></div>
+                  <div style="display:flex;border:1px solid var(--color-neutral-700);border-radius:8px;overflow:hidden;font-size:13px">
+                    <sc-for list="{{ p.opts }}" as="o" hint-placeholder-count="3">
+                      <span onClick="{{ o.select }}" style="{{ o.style }}">{{ o.label }}</span>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ tabPreferencias }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column">
+              <sc-for list="{{ prefRows }}" as="p" hint-placeholder-count="5">
+                <div onClick="{{ p.toggle }}" style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center;padding:16px 0;border-bottom:1px solid var(--color-neutral-800);cursor:pointer">
+                  <div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:15px;font-weight:500">{{ p.label }}</span><span style="font-size:13px;color:var(--color-neutral-400)">{{ p.hint }}</span></div>
+                  <span style="{{ p.trackStyle }}"><span style="{{ p.knobStyle }}"></span></span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ tabConexiones }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <sc-for list="{{ connections }}" as="c" hint-placeholder-count="3">
+                <div style="display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:16px;align-items:center;padding:14px 16px;border-radius:8px;background:var(--color-neutral-900);border:1px solid var(--color-neutral-800)">
+                  <span style="width:44px;height:44px;border-radius:8px;background:var(--color-neutral-800);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--color-neutral-200)">{{ c.short }}</span>
+                  <div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:15px;font-weight:500">{{ c.name }}</span><span style="font-size:13px;color:var(--color-neutral-400)">{{ c.status }}</span></div>
+                  <span style="{{ c.btnStyle }}">{{ c.action }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ tabSeguridad }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center;padding:16px 0;border-bottom:1px solid var(--color-neutral-800)"><div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:15px;font-weight:500">Correo</span><span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:var(--color-neutral-400)">alejandro@…mail.com · verificado</span></div><span style="font-size:13px;color:var(--color-neutral-200);border:1px solid var(--color-neutral-700);border-radius:8px;padding:7px 12px">Cambiar</span></div>
+              <div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center;padding:16px 0;border-bottom:1px solid var(--color-neutral-800)"><div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:15px;font-weight:500">Contraseña</span><span style="font-size:13px;color:var(--color-neutral-400)">Último cambio hace 4 meses</span></div><span style="font-size:13px;color:var(--color-neutral-200);border:1px solid var(--color-neutral-700);border-radius:8px;padding:7px 12px">Cambiar</span></div>
+              <div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center;padding:16px 0;border-bottom:1px solid var(--color-neutral-800)"><div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:15px;font-weight:500">Exportar mis datos</span><span style="font-size:13px;color:var(--color-neutral-400)">Colección, listas y valoraciones en JSON o CSV</span></div><span style="font-size:13px;color:var(--color-accent-200);border:1px solid var(--color-accent-700);border-radius:8px;padding:7px 12px">Exportar</span></div>
+              <div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center;padding:16px;border-radius:8px;border:1px solid #5c2f35;background:#24171b"><div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:15px;font-weight:500;color:#f4a6ad">Eliminar cuenta</span><span style="font-size:13px;color:var(--color-neutral-300)">Se borran tu colección, listas y amistades. No se puede deshacer.</span></div><span style="font-size:13px;color:#f4a6ad;border:1px solid #7a3a42;border-radius:8px;padding:7px 12px">Eliminar…</span></div>
+            </div>
+          </sc-if>
+        </div>
+
+        <!-- right: photo + preview -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;flex-direction:column;gap:14px;padding:20px;border-radius:8px;background:var(--color-neutral-900);border:1px solid var(--color-neutral-800)">
+            <div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.08em;color:var(--color-accent-300)">FOTO DE PERFIL</div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px 12px;border-radius:8px;border:1px dashed var(--color-accent-700);background:var(--color-bg);text-align:center">
+              <svg width="28" height="28" viewBox="0 0 256 256" fill="var(--color-accent-300)" aria-hidden="true"><path d="M240 136v64a16 16 0 0 1-16 16H32a16 16 0 0 1-16-16v-64a16 16 0 0 1 16-16h48a8 8 0 0 1 0 16H32v64h192v-64h-48a8 8 0 0 1 0-16h48a16 16 0 0 1 16 16ZM85.66 77.66 120 43.31V128a8 8 0 0 0 16 0V43.31l34.34 34.35a8 8 0 0 0 11.32-11.32l-48-48a8 8 0 0 0-11.32 0l-48 48a8 8 0 0 0 11.32 11.32Z"></path></svg>
+              <span style="font-size:14px">Arrastra una imagen o <span style="color:var(--color-accent-300);text-decoration:underline">elige archivo</span></span>
+              <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;color:var(--color-neutral-400)">JPG, PNG o WEBP · máx. 2 MB · recorte circular</span>
+            </div>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--color-neutral-300)">O pega una URL https<span style="padding:8px 10px;border-radius:8px;background:var(--color-bg);border:1px solid var(--color-neutral-700);color:var(--color-neutral-400);font-size:13px;font-family:'JetBrains Mono',ui-monospace,monospace">https://…</span></label>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:13px;color:var(--color-neutral-300)">O usa un avatar de SavePoint</span>
+              <div style="display:flex;gap:8px">
+                <span style="width:40px;height:40px;border-radius:999px;background:linear-gradient(150deg,var(--color-accent-700),var(--color-neutral-800));border:2px solid var(--color-accent)"></span>
+                <span style="width:40px;height:40px;border-radius:999px;background:linear-gradient(150deg,#3f5f86,var(--color-neutral-800));border:1px solid var(--color-neutral-700)"></span>
+                <span style="width:40px;height:40px;border-radius:999px;background:linear-gradient(150deg,#3d6a52,var(--color-neutral-800));border:1px solid var(--color-neutral-700)"></span>
+                <span style="width:40px;height:40px;border-radius:999px;background:linear-gradient(150deg,#7a5a2d,var(--color-neutral-800));border:1px solid var(--color-neutral-700)"></span>
+                <span style="width:40px;height:40px;border-radius:999px;background:linear-gradient(150deg,#6b3540,var(--color-neutral-800));border:1px solid var(--color-neutral-700)"></span>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px;padding:20px;border-radius:8px;background:var(--color-neutral-900);border:1px solid var(--color-neutral-800)">
+            <div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.08em;color:var(--color-accent-300)">ASÍ TE VEN TUS AMISTADES</div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center">
+              <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:20px;font-weight:500">58</span><span style="font-size:11px;color:var(--color-neutral-400)">Completados</span></div>
+              <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:20px;font-weight:500">6</span><span style="font-size:11px;color:var(--color-neutral-400)">Jugando</span></div>
+              <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:20px;font-weight:500">5</span><span style="font-size:11px;color:var(--color-neutral-400)">Listas</span></div>
+              <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:20px;font-weight:500">14</span><span style="font-size:11px;color:var(--color-neutral-400)">Amistades</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="margin:0;font-size:14px;line-height:1.55;color:var(--color-neutral-300);max-width:82ch;text-wrap:pretty">Cinco pestañas: Cuenta (foto, nombre, bio, destacados), Privacidad (privada / amistades / pública por bloque), Preferencias (idioma, tema, spoilers, notificaciones), Conexiones (Steam, IGDB, Discord) y Seguridad. La foto se cambia desde el botón de cámara del avatar o el panel lateral; ambos abren el mismo recorte. Las pestañas y los interruptores funcionan.<br><span style="color:var(--color-neutral-400)">Respecto al repo: hoy <span style="font-family:'JetBrains Mono',ui-monospace,monospace">ProfileSettings</span> tiene bio, avatar por URL, 5 favoritos y visibilidad pública/privada de colección y favoritos, todo dentro de la página pública. La propuesta lo saca a pestañas, añade subida de archivo (la URL queda como alternativa) y un tercer nivel «Amistades», que el backend ya distingue con el perfil <span style="font-family:'JetBrains Mono',ui-monospace,monospace">basic</span>/<span style="font-family:'JetBrains Mono',ui-monospace,monospace">protected</span>.</span></p>
+  </div>
+
+  <!-- ── 2d AMISTADES ──────────────────────────────────── -->
+  <div id="2d" style="display:flex;flex-direction:column;gap:16px;width:1240px;flex:0 0 auto">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;font-weight:700;color:var(--color-bg);background:var(--color-accent);border-radius:4px;padding:3px 8px">2d</span>
+      <h2 style="margin:0;font-size:24px;font-weight:500">Amistades</h2>
+      <span style="font-size:14px;color:var(--color-neutral-400)">Buscar, agregar y, solo con amistad aceptada, ver su perfil y enviarle recomendaciones</span>
+    </div>
+
+    <div style="background:var(--color-bg);border:1px solid var(--color-neutral-800);border-radius:8px;overflow:hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:var(--color-neutral-900);border-bottom:1px solid var(--color-neutral-800)">
+        <div style="display:flex;align-items:center;gap:28px">
+          <div style="display:flex;align-items:center;gap:9px">
+            <svg width="20" height="20" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M6 12a6 6 0 0 1 6-6h20l10 10v20a6 6 0 0 1-6 6H12a6 6 0 0 1-6-6V12Z" stroke="var(--color-accent-400)" stroke-width="2.5"></path><path d="M24 15l8 9-8 9-8-9 8-9Z" fill="var(--color-accent-400)"></path></svg>
+            <span style="font-size:15px;font-weight:600">SavePoint</span>
+          </div>
+          <div style="display:flex;gap:22px;font-size:14px;color:var(--color-neutral-400)">
+            <span>Inicio</span><span>Catálogo</span><span>Colección</span><span>Recomendaciones</span><span style="color:var(--color-text);font-weight:600;border-bottom:2px solid var(--color-accent);padding-bottom:3px">Amistades</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <span style="position:relative;display:flex">
+            <svg width="20" height="20" viewBox="0 0 256 256" fill="var(--color-neutral-200)" aria-hidden="true"><path d="M221.8 175.94C216.25 166.38 208 139.33 208 104a80 80 0 1 0-160 0c0 35.34-8.26 62.38-13.81 71.94A16 16 0 0 0 48 200h40.81a40 40 0 0 0 78.38 0H208a16 16 0 0 0 13.8-24.06ZM128 216a24 24 0 0 1-22.62-16h45.24A24 24 0 0 1 128 216Zm-80-32c7.7-13.24 16-43.92 16-80a64 64 0 1 1 128 0c0 36.05 8.28 66.73 16 80Z"></path></svg>
+            <span style="{{ bellBadgeStyle }}">{{ unread }}</span>
+          </span>
+          <span style="width:28px;height:28px;border-radius:999px;background:var(--color-accent-800);color:var(--color-accent-200);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px">AL</span>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:288px minmax(0,1fr) 336px;min-height:720px">
+        <!-- left: search + friends -->
+        <div style="display:flex;flex-direction:column;gap:22px;padding:20px 16px;border-right:1px solid var(--color-neutral-800);background:var(--color-neutral-900)">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.08em;color:var(--color-neutral-400)">BUSCAR PERSONA</span>
+            <div style="display:flex;align-items:center;gap:8px;border:1px solid var(--color-accent-700);border-radius:8px;padding:0 12px;background:var(--color-bg)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-neutral-400)" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M16.5 16.5 21 21"></path></svg>
+              <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:14px;color:var(--color-neutral-400)">@</span>
+              <input value="{{ query }}" onChange="{{ onQuery }}" placeholder="alias exacto" style="flex:1;min-width:0;background:transparent;border:0;outline:none;color:var(--color-text);font-size:14px;padding:10px 0;font-family:'JetBrains Mono',ui-monospace,monospace">
+            </div>
+            <span style="font-size:12px;color:var(--color-neutral-400)">Prueba: javiruiz, nerea.p, martagil</span>
+          </div>
+
+          <sc-if value="{{ hasResult }}" hint-placeholder-val="{{ true }}">
+            <div onClick="{{ result.open }}" style="display:flex;flex-direction:column;gap:12px;padding:14px;border-radius:8px;background:var(--color-bg);border:1px solid var(--color-accent-800);cursor:pointer">
+              <div style="display:flex;align-items:center;gap:10px">
+                <span style="{{ result.avatarStyle }}">{{ result.initials }}</span>
+                <div style="display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font-size:15px;font-weight:500">{{ result.name }}</span><span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--color-neutral-400)">@{{ result.alias }}</span></div>
+              </div>
+              <span onClick="{{ result.action }}" style="{{ result.btnStyle }}">{{ result.btnLabel }}</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{ noResult }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:4px;padding:14px;border-radius:8px;border:1px dashed var(--color-neutral-700)">
+              <span style="font-size:14px">Nadie con ese alias exacto.</span>
+              <span style="font-size:12px;color:var(--color-neutral-400)">Comprueba el alias completo e inténtalo de nuevo.</span>
+            </div>
+          </sc-if>
+
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.08em;color:var(--color-neutral-400);padding:0 10px 8px">AMISTADES · {{ friendCount }}</span>
+            <sc-for list="{{ friendList }}" as="p" hint-placeholder-count="3">
+              <div onClick="{{ p.select }}" style="{{ p.rowStyle }}">
+                <span style="{{ p.avatarStyle }}">{{ p.initials }}</span>
+                <span style="display:flex;flex-direction:column;gap:2px;min-width:0;flex:1"><span style="font-size:14px;font-weight:500">{{ p.name }}</span><span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;color:var(--color-neutral-400)">@{{ p.alias }}</span></span>
+              </div>
+            </sc-for>
+          </div>
+
+          <sc-if value="{{ hasSent }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:2px">
+              <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.08em;color:var(--color-neutral-400);padding:0 10px 8px">ENVIADAS · {{ sentCount }}</span>
+              <sc-for list="{{ sentList }}" as="p" hint-placeholder-count="1">
+                <div onClick="{{ p.select }}" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer">
+                  <span style="{{ p.avatarStyle }}">{{ p.initials }}</span>
+                  <span style="display:flex;flex-direction:column;gap:2px;min-width:0;flex:1"><span style="font-size:14px;color:var(--color-neutral-300)">{{ p.name }}</span><span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;color:var(--color-neutral-400)">@{{ p.alias }}</span></span>
+                  <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10px;color:#e0a24a;border:1px solid #57411d;background:#332612;border-radius:4px;padding:2px 6px">PENDIENTE</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+
+        <!-- center: profile -->
+        <div style="display:flex;flex-direction:column;gap:24px;padding:28px;min-width:0">
+          <sc-if value="{{ isFriend }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:24px">
+              <div style="display:flex;gap:18px;align-items:center;padding:24px;border-radius:8px;background:radial-gradient(90% 160% at 0% 0%,var(--color-section) 0%,var(--color-neutral-900) 70%);border:1px solid var(--color-accent-800);flex-wrap:wrap">
+                <span style="{{ prof.avatarBig }}">{{ prof.initials }}</span>
+                <div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:220px">
+                  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><h3 style="margin:0;font-size:26px;font-weight:500;letter-spacing:-.01em">{{ prof.name }}</h3><span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;color:#5cc08d;border:1px solid #245036;background:#16301f;border-radius:4px;padding:2px 7px">AMISTAD</span></div>
+                  <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:var(--color-neutral-300)">/es/profiles/{{ prof.alias }}</span>
+                  <span style="font-size:14px;line-height:1.5;color:var(--color-neutral-200)">{{ prof.bio }}</span>
+                </div>
+                <div style="display:flex;gap:8px">
+                  <span onClick="{{ toggleRec }}" style="{{ recBtnStyle }}">Recomendarle un juego</span>
+                  <span style="font-size:13px;color:var(--color-neutral-200);border:1px solid var(--color-neutral-700);border-radius:8px;padding:8px 12px;cursor:pointer">Mensaje</span>
+                </div>
+              </div>
+
+              <sc-if value="{{ showRec }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:16px;padding:20px;border-radius:8px;background:var(--color-neutral-900);border:1px solid var(--color-accent-700)">
+                  <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:16px;font-weight:500">Recomendar a {{ prof.first }}</span><span onClick="{{ toggleRec }}" style="font-size:14px;color:var(--color-neutral-400);cursor:pointer;padding:4px 8px">✕</span></div>
+                  <div style="display:flex;flex-direction:column;gap:8px">
+                    <span style="font-size:13px;color:var(--color-neutral-300)">Elige un juego de tu colección</span>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px">
+                      <sc-for list="{{ recGames }}" as="g" hint-placeholder-count="6">
+                        <span onClick="{{ g.select }}" style="{{ g.style }}">{{ g.title }}</span>
+                      </sc-for>
+                    </div>
+                    <sc-if value="{{ alreadyHas }}" hint-placeholder-val="{{ false }}">
+                      <span style="font-size:12px;color:#e0a24a">{{ prof.first }} ya tiene este juego en su colección.</span>
+                    </sc-if>
+                  </div>
+                  <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--color-neutral-300)"><span>Nota <span style="color:var(--color-neutral-400)">(opcional)</span></span>
+                    <textarea value="{{ recNote }}" onChange="{{ onRecNote }}" rows="2" placeholder="Por qué crees que le va a gustar" style="resize:vertical;padding:10px 12px;border-radius:8px;background:var(--color-bg);border:1px solid var(--color-neutral-700);color:var(--color-text);font-size:14px;line-height:1.5;font-family:'Inter',system-ui,sans-serif;outline:none"></textarea>
+                  </label>
+                  <div style="display:flex;justify-content:flex-end"><span onClick="{{ sendRec }}" style="{{ sendBtnStyle }}">Enviar recomendación</span></div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ sentConfirm }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:12px 16px;border-radius:8px;background:#16301f;border:1px solid #245036;font-size:14px;color:#9fdcbb">✓ Enviaste <strong style="font-weight:600">{{ lastSent }}</strong> a {{ prof.first }}. Le llegará como notificación.</div>
+              </sc-if>
+
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between"><h4 style="margin:0;font-size:18px;font-weight:500">Favoritos</h4><span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--color-neutral-400)">5 DE 5</span></div>
+                <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px">
+                  <sc-for list="{{ prof.favs }}" as="f" hint-placeholder-count="5">
+                    <div style="display:flex;flex-direction:column;gap:8px">
+                      <div style="position:relative;aspect-ratio:3/4;border-radius:6px;background:linear-gradient(160deg,#2f2b49,#181a26);border:1px solid var(--color-neutral-800);display:flex;align-items:flex-end;padding:10px;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%)">
+                        <span style="position:absolute;top:8px;left:10px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:var(--color-accent-300)">{{ f.rank }}</span>
+                        <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10px;color:var(--color-neutral-400);line-height:1.25">{{ f.upper }}</span>
+                      </div>
+                      <span style="font-size:14px;font-weight:500;line-height:1.3">{{ f.title }}</span>
+                      <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;color:var(--color-neutral-400)">{{ f.meta }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <sc-for list="{{ prof.summary }}" as="c" hint-placeholder-count="3">
+                  <span style="font-size:13px;color:var(--color-neutral-200);border:1px solid var(--color-neutral-800);border-radius:999px;padding:5px 12px">{{ c }}</span>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isLocked }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:24px">
+              <div style="display:flex;gap:18px;align-items:center;padding:24px;border-radius:8px;background:var(--color-neutral-900);border:1px solid var(--color-neutral-800)">
+                <span style="{{ prof.avatarBig }}">{{ prof.initials }}</span>
+                <div style="display:flex;flex-direction:column;gap:6px"><h3 style="margin:0;font-size:26px;font-weight:500;letter-spacing:-.01em">{{ prof.name }}</h3><span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:var(--color-neutral-400)">@{{ prof.alias }} · perfil básico</span></div>
+              </div>
+              <div style="position:relative;min-height:340px">
+                <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px;opacity:.35;filter:blur(3px)">
+                  <div style="aspect-ratio:3/4;border-radius:6px;background:linear-gradient(160deg,#2f2b49,#181a26)"></div>
+                  <div style="aspect-ratio:3/4;border-radius:6px;background:linear-gradient(160deg,#2a2c3b,#181a26)"></div>
+                  <div style="aspect-ratio:3/4;border-radius:6px;background:linear-gradient(160deg,#2b2741,#181a26)"></div>
+                  <div style="aspect-ratio:3/4;border-radius:6px;background:linear-gradient(160deg,#262838,#181a26)"></div>
+                  <div style="aspect-ratio:3/4;border-radius:6px;background:linear-gradient(160deg,#2a2840,#181a26)"></div>
+                </div>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:24px">
+                  <span style="width:48px;height:48px;border-radius:999px;background:var(--color-neutral-900);border:1px solid var(--color-neutral-700);display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 256 256" fill="var(--color-accent-300)" aria-hidden="true"><path d="M208 80h-32V56a48 48 0 0 0-96 0v24H48a16 16 0 0 0-16 16v112a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V96a16 16 0 0 0-16-16ZM96 56a32 32 0 0 1 64 0v24H96Zm112 152H48V96h160v112Z"></path></svg></span>
+                  <span style="font-size:20px;font-weight:500">{{ lockTitle }}</span>
+                  <span style="font-size:14px;line-height:1.55;color:var(--color-neutral-300);max-width:46ch">{{ lockBody }}</span>
+                  <span onClick="{{ lockAction }}" style="{{ lockBtnStyle }}">{{ lockBtnLabel }}</span>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+
+        <!-- right: notifications -->
+        <div style="display:flex;flex-direction:column;gap:14px;padding:20px 16px;border-left:1px solid var(--color-neutral-800);background:var(--color-neutral-900)">
+          <div style="display:flex;align-items:baseline;justify-content:space-between"><h3 style="margin:0;font-size:18px;font-weight:500">Notificaciones</h3><span onClick="{{ markAll }}" style="font-size:12px;color:var(--color-accent-300);cursor:pointer">Marcar como leídas</span></div>
+          <div style="display:flex;gap:4px;font-size:13px">
+            <sc-for list="{{ notifTabs }}" as="t" hint-placeholder-count="3">
+              <span onClick="{{ t.select }}" style="{{ t.style }}">{{ t.label }}</span>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <sc-for list="{{ notifs }}" as="n" hint-placeholder-count="4">
+              <div style="{{ n.cardStyle }}">
+                <div style="display:flex;gap:10px;align-items:flex-start">
+                  <span style="{{ n.avatarStyle }}">{{ n.initials }}</span>
+                  <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:0">
+                    <span style="font-size:13px;line-height:1.45;color:var(--color-neutral-200)"><strong style="font-weight:600;color:var(--color-text)">{{ n.name }}</strong> {{ n.text }} <strong style="font-weight:600;color:var(--color-text)">{{ n.game }}</strong></span>
+                    <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;color:var(--color-neutral-400)">{{ n.when }}</span>
+                  </div>
+                  <span style="{{ n.dotStyle }}"></span>
+                </div>
+                <sc-if value="{{ n.hasNote }}" hint-placeholder-val="{{ false }}">
+                  <span style="font-size:13px;line-height:1.5;color:var(--color-neutral-300);padding-left:10px;border-left:2px solid var(--color-accent-800)">{{ n.note }}</span>
+                </sc-if>
+                <sc-if value="{{ n.hasActions }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;gap:6px">
+                    <span onClick="{{ n.primary }}" style="font-size:12px;color:var(--color-accent-200);border:1px solid var(--color-accent-700);border-radius:6px;padding:5px 10px;cursor:pointer">{{ n.primaryLabel }}</span>
+                    <span onClick="{{ n.secondary }}" style="font-size:12px;color:var(--color-neutral-300);border:1px solid var(--color-neutral-700);border-radius:6px;padding:5px 10px;cursor:pointer">{{ n.secondaryLabel }}</span>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ n.hasDone }}" hint-placeholder-val="{{ false }}">
+                  <span style="{{ n.doneStyle }}">{{ n.doneLabel }}</span>
+                </sc-if>
+              </div>
+            </sc-for>
+            <sc-if value="{{ notifEmpty }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size:13px;color:var(--color-neutral-400);padding:12px 4px">Nada nuevo por aquí.</span>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="margin:0;font-size:14px;line-height:1.55;color:var(--color-neutral-300);max-width:82ch;text-wrap:pretty">Flujo: buscas por alias exacto → envías la solicitud → hasta que se acepte solo ves alias y avatar (perfil <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px">basic</span>). Con la amistad aceptada se abre su perfil con los 5 favoritos y aparece «Recomendarle un juego», que elige de tu colección y avisa si ya lo tiene. Las recomendaciones recibidas, solicitudes y aceptaciones llegan a Notificaciones, con acciones directas. Todo es interactivo: busca «javiruiz», acepta a Nerea desde Notificaciones o recomienda algo a Marta.</p>
+  </div>
+
+  <!-- ── 2e NUEVAS IDEAS ───────────────────────────────── -->
+  <div id="2e" style="display:flex;flex-direction:column;gap:20px;width:1240px;flex:0 0 auto">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;font-weight:700;color:var(--color-bg);background:var(--color-accent);border-radius:4px;padding:3px 8px">2e</span>
+      <h2 style="margin:0;font-size:24px;font-weight:500">Nuevas ideas de funciones</h2>
+      <span style="font-size:14px;color:var(--color-neutral-400)">Complementan las doce del turno 1; agrupadas por punto clave</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px">
+      <sc-for list="{{ ideaGroups }}" as="grp" hint-placeholder-count="3">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;letter-spacing:.06em;color:var(--color-accent-300);padding-bottom:8px;border-bottom:1px solid var(--color-neutral-800)">{{ grp.title }}</div>
+          <sc-for list="{{ grp.items }}" as="it" hint-placeholder-count="3">
+            <div style="display:flex;flex-direction:column;gap:8px;padding:18px;border-radius:8px;background:var(--color-neutral-900);border:1px solid var(--color-neutral-800)">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <h3 style="margin:0;font-size:16px;font-weight:600">{{ it.name }}</h3>
+                <span style="{{ it.costStyle }}">{{ it.cost }}</span>
+              </div>
+              <p style="margin:0;font-size:14px;line-height:1.5;color:var(--color-neutral-300);text-wrap:pretty">{{ it.desc }}</p>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const MONO = "'JetBrains Mono',ui-monospace,monospace";
+const STATUS = {
+  playing: { label: "Jugando", short: "JUG", c: "#78aee0", bg: "#1b2634", b: "#2c405c" },
+  backlog: { label: "Pendiente", short: "PEND", c: "#e0a24a", bg: "#332612", b: "#57411d" },
+  done: { label: "Completado", short: "OK", c: "#5cc08d", bg: "#16301f", b: "#245036" },
+  dropped: { label: "Abandonado", short: "ABAND", c: "#b4b6c4", bg: "#262833", b: "#3a3d4c" },
+};
+const ALL_GAMES = [
+  ["Hollow Knight", 2017, "PC, Switch", "done", 5, "12 mar", ["all","done","deck","replay"]],
+  ["Outer Wilds", 2019, "PC", "playing", 5, "02 abr", ["all","playing","coop","replay"]],
+  ["Tunic", 2022, "PC, Xbox", "backlog", 0, "18 may", ["all","backlog","deck","weekend"]],
+  ["Celeste", 2018, "PC, Switch", "done", 4, "21 ene", ["all","done","deck","weekend"]],
+  ["Disco Elysium", 2019, "PC", "backlog", 0, "30 jun", ["all","backlog","replay"]],
+  ["It Takes Two", 2021, "PS5", "playing", 4, "14 ago", ["all","playing","coop"]],
+  ["Hades", 2020, "PC, Switch", "done", 5, "09 feb", ["all","done","deck","weekend"]],
+  ["Death Stranding", 2019, "PS4", "dropped", 2, "11 nov", ["all","dropped"]],
+  ["Unpacking", 2021, "PC", "done", 4, "05 sep", ["all","done","weekend","coop"]],
+  ["Ender Lilies", 2021, "Switch", "backlog", 0, "22 jul", ["all","backlog","deck"]],
+];
+const LIST_META = {
+  all: { kicker: "COLECCIÓN · 110 JUEGOS", name: "Todos", desc: "Todo lo que has guardado, en cualquier estado." },
+  playing: { kicker: "ESTADO", name: "Jugando", desc: "Partidas abiertas ahora mismo." },
+  backlog: { kicker: "ESTADO", name: "Pendientes", desc: "Lo que tienes y aún no has empezado." },
+  done: { kicker: "ESTADO", name: "Completados", desc: "Partidas cerradas." },
+  dropped: { kicker: "ESTADO", name: "Abandonados", desc: "Lo que dejaste a medias, sin culpa." },
+  deck: { kicker: "LISTA · PÚBLICA", name: "Para el Steam Deck", desc: "Juegos que funcionan bien en portátil y se juegan en sesiones cortas." },
+  weekend: { kicker: "LISTA · AMISTADES", name: "Un fin de semana", desc: "Menos de 15 horas. Para cuando quieres terminar algo." },
+  coop: { kicker: "LISTA · AMISTADES", name: "Cooperativo con Marta", desc: "Pendientes y jugados a dos mandos." },
+  replay: { kicker: "LISTA · PRIVADA", name: "Rejugar en 2027", desc: "Los que merecen una segunda partida." },
+};
+const PEOPLE = [
+  { id: "marta", alias: "martagil", name: "Marta Gil", initials: "MG", hue: "#5c4f9e", bio: "Exploración, puzles y cualquier juego con un buen mapa.", favs: [["Outer Wilds", 2019], ["Disco Elysium", 2019], ["Return of the Obra Dinn", 2018], ["Celeste", 2018], ["Tunic", 2022]], owned: ["Outer Wilds", "Celeste", "Tunic", "Hades"], summary: ["72 completados", "3 jugando", "21 pendientes"] },
+  { id: "david", alias: "dsanz", name: "David Sanz", initials: "DS", hue: "#3f5f86", bio: "Roguelikes y estrategia. Siempre una partida más.", favs: [["Balatro", 2024], ["Hades", 2020], ["Slay the Spire", 2019], ["Into the Breach", 2018], ["FTL", 2012]], owned: ["Hades"], summary: ["41 completados", "5 jugando", "18 pendientes"] },
+  { id: "lucia", alias: "lumo", name: "Lucía Moreno", initials: "LM", hue: "#6b3540", bio: "Metroidvanias y plataformas exigentes.", favs: [["Hollow Knight", 2017], ["Ender Lilies", 2021], ["Metroid Dread", 2021], ["Celeste", 2018], ["Blasphemous", 2019]], owned: ["Hollow Knight", "Celeste"], summary: ["55 completados", "2 jugando", "30 pendientes"] },
+  { id: "javier", alias: "javiruiz", name: "Javier Ruiz", initials: "JR", hue: "#3d6a52", bio: "Narrativos y walking sims.", favs: [["What Remains of Edith Finch", 2017], ["Firewatch", 2016], ["Inside", 2016], ["Gris", 2018], ["Journey", 2012]], owned: [], summary: ["38 completados", "1 jugando", "12 pendientes"] },
+  { id: "nerea", alias: "nerea.p", name: "Nerea P.", initials: "NP", hue: "#7a5a2d", bio: "Cozy games y gestión.", favs: [["Stardew Valley", 2016], ["Unpacking", 2021], ["A Short Hike", 2019], ["Spiritfarer", 2020], ["Dorfromantik", 2022]], owned: ["Unpacking"], summary: ["64 completados", "4 jugando", "9 pendientes"] },
+  { id: "pablo", alias: "portega", name: "Pablo Ortega", initials: "PO", hue: "#4a5470", bio: "", favs: [["Elden Ring", 2022], ["Sekiro", 2019], ["Bloodborne", 2015], ["Dark Souls", 2011], ["Lies of P", 2023]], owned: [], summary: ["29 completados"] },
+];
+const PBY = Object.fromEntries(PEOPLE.map(p => [p.id, p]));
+const MY_GAMES = ["Hollow Knight", "Outer Wilds", "Celeste", "Hades", "Unpacking", "Disco Elysium"];
+const NOTIFS = [
+  { id: 1, type: "request", from: "nerea", when: "hace 1 h", read: false },
+  { id: 2, type: "rec", from: "marta", game: "Disco Elysium", note: "Tú que le diste un 10 a Outer Wilds, este te va a encantar.", when: "hace 3 h", read: false },
+  { id: 3, type: "rec", from: "lucia", game: "Ender Lilies", note: "", when: "ayer", read: false },
+  { id: 4, type: "accepted", from: "david", when: "hace 2 días", read: true },
+  { id: 5, type: "recAdded", from: "marta", game: "Hades", when: "hace 4 días", read: true },
+];
+const COST = { BAJO: ["#5cc08d", "#16301f", "#245036"], MEDIO: ["#e0a24a", "#332612", "#57411d"], ALTO: ["#f0808a", "#361d21", "#5c2f35"] };
+
+class Component extends DCLogic {
+  state = { list: "deck", view: "grid", tab: "cuenta", query: "javiruiz", selPerson: "marta", showRec: false, recGame: null, recNote: "", lastSent: null, notifTab: "all", notifs: NOTIFS,
+    rels: { marta: "friend", david: "friend", lucia: "friend", javier: "none", nerea: "received", pablo: "sent" },
+    privacy: { perfil: 1, coleccion: 1, actividad: 1, listas: 2 },
+    prefs: { spoilers: true, notif: true, tema: true, recs: false, email: false } };
+
+  pick(k, v) { this.setState({ [k]: v }); }
+  setRel(id, rel) { this.setState(s => ({ rels: { ...s.rels, [id]: rel } })); }
+  updNotif(id, patch) { this.setState(s => ({ notifs: s.notifs.map(n => n.id === id ? { ...n, ...patch } : n) })); }
+  acceptFrom(id) { this.setState(s => ({ rels: { ...s.rels, [id]: "friend" }, notifs: s.notifs.map(n => n.type === "request" && n.from === id ? { ...n, state: "accepted", read: true } : n) })); }
+
+  renderVals() {
+    const st = this.state;
+    const rowBase = (active) => ({ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: "8px 10px", borderRadius: 8, fontSize: 14, cursor: "pointer",
+      background: active ? "var(--color-accent-900)" : "transparent", color: active ? "var(--color-accent-100)" : "var(--color-neutral-200)",
+      border: "1px solid " + (active ? "var(--color-accent-800)" : "transparent") });
+
+    const statuses = [["all", "Todos", 110, "var(--color-neutral-400)"], ["playing", "Jugando", 6, STATUS.playing.c], ["backlog", "Pendientes", 34, STATUS.backlog.c], ["done", "Completados", 58, STATUS.done.c], ["dropped", "Abandonados", 12, STATUS.dropped.c]]
+      .map(([id, label, count, c]) => ({ label, count, select: () => this.pick("list", id), rowStyle: rowBase(st.list === id),
+        dotStyle: { width: 8, height: 8, borderRadius: 2, background: c } }));
+    const lists = [["deck", "Para el Steam Deck", "PÚBLICA", 18], ["weekend", "Un fin de semana", "AMISTADES", 12], ["coop", "Cooperativo con Marta", "AMISTADES", 7], ["replay", "Rejugar en 2027", "PRIVADA", 9]]
+      .map(([id, name, visibility, count]) => ({ name, visibility, count, select: () => this.pick("list", id), rowStyle: rowBase(st.list === id) }));
+
+    const games = ALL_GAMES.filter(g => g[6].includes(st.list)).map(([title, year, plat, s, stars, added]) => {
+      const S = STATUS[s];
+      return { title, upper: title.toUpperCase(), meta: year + " · " + plat, status: S.label, statusShort: S.short, added,
+        stars: stars ? (stars * 2 - (stars === 4 ? 1 : 0)) + "/10" : "—",
+        badgeStyle: { position: "absolute", top: 8, left: 8, fontFamily: MONO, fontSize: 10, fontWeight: 700, padding: "2px 6px", borderRadius: 3, color: S.c, background: S.bg, border: "1px solid " + S.b },
+        pillStyle: { justifySelf: "start", fontFamily: MONO, fontSize: 12, padding: "2px 8px", borderRadius: 4, color: S.c, background: S.bg, border: "1px solid " + S.b } };
+    });
+    const segBtn = (on) => ({ padding: "7px 12px", fontSize: 13, cursor: "pointer", background: on ? "var(--color-neutral-800)" : "transparent", color: on ? "var(--color-text)" : "var(--color-neutral-400)" });
+
+    const profileTabs = [["cuenta", "Cuenta"], ["privacidad", "Privacidad"], ["preferencias", "Preferencias"], ["conexiones", "Conexiones"], ["seguridad", "Seguridad"]]
+      .map(([id, label]) => ({ label, select: () => this.pick("tab", id), style: { padding: "12px 14px", fontSize: 14, cursor: "pointer", marginBottom: -1,
+        color: st.tab === id ? "var(--color-text)" : "var(--color-neutral-400)", fontWeight: st.tab === id ? 600 : 400,
+        borderBottom: "2px solid " + (st.tab === id ? "var(--color-accent)" : "transparent") } }));
+
+    const visOpts = ["Privada", "Amistades", "Pública"];
+    const privacyRows = [["perfil", "Perfil", "Nombre, foto, bio y destacados"], ["coleccion", "Colección", "Estados y valoraciones de cada juego"], ["actividad", "Actividad", "Lo que aparece en el feed de tus amistades"], ["listas", "Listas nuevas", "Visibilidad por defecto; cada lista puede cambiarla"]]
+      .map(([k, label, hint]) => ({ label, hint, opts: visOpts.map((o, i) => ({ label: o,
+        select: () => this.setState(s => ({ privacy: { ...s.privacy, [k]: i } })),
+        style: { padding: "7px 12px", cursor: "pointer", background: st.privacy[k] === i ? "var(--color-accent-900)" : "transparent", color: st.privacy[k] === i ? "var(--color-accent-100)" : "var(--color-neutral-400)" } })) }));
+
+    const prefRows = [["spoilers", "Ocultar spoilers", "Las notas marcadas se difuminan hasta que las abres"], ["notif", "Notificaciones de amistades", "Solicitudes y juegos completados por tus amistades"], ["tema", "Tema oscuro", "Sigue el sistema si está desactivado"], ["recs", "Recomendaciones sociales", "Usar la actividad de tus amistades como señal"], ["email", "Resumen semanal por correo", "Un correo los lunes con tu backlog y novedades"]]
+      .map(([k, label, hint]) => { const on = st.prefs[k]; return { label, hint,
+        toggle: () => this.setState(s => ({ prefs: { ...s.prefs, [k]: !s.prefs[k] } })),
+        trackStyle: { position: "relative", width: 40, height: 22, borderRadius: 999, background: on ? "var(--color-accent-800)" : "var(--color-neutral-800)", border: "1px solid " + (on ? "var(--color-accent)" : "var(--color-neutral-700)"), display: "block" },
+        knobStyle: { position: "absolute", top: 2, left: on ? 20 : 2, width: 16, height: 16, borderRadius: 999, background: on ? "var(--color-accent-200)" : "var(--color-neutral-400)", transition: "left .15s" } }; });
+
+    const connections = [["ST", "Steam", "Conectado · 214 juegos importados", "Sincronizar", true], ["DC", "Discord", "Muestra lo que juegas en tu estado", "Conectar", false], ["CSV", "Importar archivo", "Backloggd, HowLongToBeat o CSV propio", "Subir archivo", false]]
+      .map(([short, name, status, action, on]) => ({ short, name, status, action,
+        btnStyle: { fontSize: 13, borderRadius: 8, padding: "7px 12px", color: on ? "var(--color-neutral-200)" : "var(--color-accent-200)", border: "1px solid " + (on ? "var(--color-neutral-700)" : "var(--color-accent-700)") } }));
+
+    const avatar = (p, size) => ({ width: size, height: size, borderRadius: 999, flex: "0 0 auto", background: "linear-gradient(150deg, " + p.hue + ", var(--color-neutral-800))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: size > 40 ? 18 : 12, fontWeight: 500, color: "var(--color-text)" });
+    const btn = (on, extra) => ({ fontSize: 13, borderRadius: 8, padding: "8px 12px", cursor: on ? "pointer" : "default", textAlign: "center", color: on ? "var(--color-accent-200)" : "var(--color-neutral-300)", border: "1px solid " + (on ? "var(--color-accent)" : "var(--color-neutral-700)"), ...extra });
+    const rels = st.rels;
+    const open = id => () => this.setState({ selPerson: id, showRec: false, lastSent: null, recGame: null });
+    const q = st.query.trim().replace(/^@/, "").toLowerCase();
+    const match = q ? PEOPLE.find(p => p.alias === q) : null;
+    const relAct = { none: ["Enviar solicitud", true], sent: ["Solicitud enviada", false], received: ["Aceptar solicitud", true], friend: ["Ver perfil", true] };
+    let result = null;
+    if (match) { const r = rels[match.id]; const [label, on] = relAct[r];
+      result = { name: match.name, alias: match.alias, initials: match.initials, avatarStyle: avatar(match, 40), open: open(match.id), btnLabel: label, btnStyle: btn(on, { display: "block" }),
+        action: () => { if (r === "none") this.setRel(match.id, "sent"); if (r === "received") this.acceptFrom(match.id); } }; }
+    const friends = PEOPLE.filter(p => rels[p.id] === "friend");
+    const friendList = friends.map(p => ({ name: p.name, alias: p.alias, initials: p.initials, select: open(p.id), avatarStyle: avatar(p, 34),
+      rowStyle: { display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", borderRadius: 8, cursor: "pointer", background: st.selPerson === p.id ? "var(--color-accent-900)" : "transparent", border: "1px solid " + (st.selPerson === p.id ? "var(--color-accent-800)" : "transparent") } }));
+    const sentList = PEOPLE.filter(p => rels[p.id] === "sent").map(p => ({ name: p.name, alias: p.alias, initials: p.initials, select: open(p.id), avatarStyle: avatar(p, 34) }));
+
+    const pp = PBY[st.selPerson]; const rel = rels[pp.id]; const first = pp.name.split(" ")[0];
+    const prof = { name: pp.name, alias: pp.alias, initials: pp.initials, first, bio: pp.bio || "Sin biografía.", avatarBig: avatar(pp, 64), summary: pp.summary,
+      favs: pp.favs.map(([t, y], i) => ({ rank: "0" + (i + 1), title: t, upper: t.toUpperCase(), meta: String(y) })) };
+    const lock = {
+      none: [first ? "Agrega a " + first + " para ver su perfil" : "", "Sus favoritos, su colección y sus listas solo son visibles para sus amistades. Mientras tanto ves su alias y su avatar.", "Enviar solicitud", () => this.setRel(pp.id, "sent")],
+      sent: ["Solicitud enviada", "Cuando " + first + " la acepte verás sus favoritos y podréis enviaros recomendaciones.", "Cancelar solicitud", () => this.setRel(pp.id, "none")],
+      received: [first + " quiere añadirte", "Acepta la solicitud para ver su perfil y que vea el tuyo.", "Aceptar solicitud", () => this.acceptFrom(pp.id)],
+      friend: ["", "", "", () => {}] }[rel];
+    const recGames = MY_GAMES.map(t => ({ title: t, select: () => this.setState({ recGame: t }),
+      style: { fontSize: 13, padding: "6px 12px", borderRadius: 999, cursor: "pointer", color: st.recGame === t ? "var(--color-accent-100)" : "var(--color-neutral-200)", background: st.recGame === t ? "var(--color-accent-900)" : "transparent", border: "1px solid " + (st.recGame === t ? "var(--color-accent)" : "var(--color-neutral-700)") } }));
+
+    const typeText = { request: "quiere añadirte como amistad", rec: "te recomienda", accepted: "aceptó tu solicitud de amistad", recAdded: "añadió a pendientes tu recomendación:" };
+    const doneMap = { accepted: ["✓ AHORA SOIS AMISTADES", "#5cc08d"], rejected: ["SOLICITUD RECHAZADA", "var(--color-neutral-400)"], added: ["✓ AÑADIDO A PENDIENTES", "#5cc08d"], dismissed: ["RECOMENDACIÓN DESCARTADA", "var(--color-neutral-400)"] };
+    const inTab = n => st.notifTab === "all" || (st.notifTab === "rec" && (n.type === "rec" || n.type === "recAdded")) || (st.notifTab === "req" && (n.type === "request" || n.type === "accepted"));
+    const notifs = st.notifs.filter(inTab).map(n => { const p = PBY[n.from]; const actionable = (n.type === "request" || n.type === "rec") && !n.state; const done = doneMap[n.state];
+      return { name: p.name, initials: p.initials, text: typeText[n.type], game: n.game || "", when: n.when, note: n.note, hasNote: !!n.note,
+        avatarStyle: avatar(p, 32), hasActions: actionable, hasDone: !!done, doneLabel: done ? done[0] : "",
+        doneStyle: { fontFamily: MONO, fontSize: 11, color: done ? done[1] : "inherit" },
+        primaryLabel: n.type === "request" ? "Aceptar" : "Añadir a pendientes", secondaryLabel: n.type === "request" ? "Rechazar" : "Descartar",
+        primary: () => n.type === "request" ? this.acceptFrom(n.from) : this.updNotif(n.id, { state: "added", read: true }),
+        secondary: () => { if (n.type === "request") { this.setRel(n.from, "none"); this.updNotif(n.id, { state: "rejected", read: true }); } else this.updNotif(n.id, { state: "dismissed", read: true }); },
+        dotStyle: { width: 8, height: 8, borderRadius: 999, marginTop: 5, flex: "0 0 auto", background: n.read ? "transparent" : "var(--color-accent)" },
+        cardStyle: { display: "flex", flexDirection: "column", gap: 10, padding: 12, borderRadius: 8, background: n.read ? "transparent" : "var(--color-bg)", border: "1px solid " + (n.read ? "var(--color-neutral-800)" : "var(--color-accent-800)") } }; });
+    const cnt = f => st.notifs.filter(f).length;
+    const notifTabs = [["all", "Todas"], ["rec", "Recomendaciones"], ["req", "Solicitudes"]].map(([id, label]) => ({ label, select: () => this.setState({ notifTab: id }),
+      style: { padding: "6px 10px", borderRadius: 6, cursor: "pointer", background: st.notifTab === id ? "var(--color-neutral-800)" : "transparent", color: st.notifTab === id ? "var(--color-text)" : "var(--color-neutral-400)" } }));
+    const unread = cnt(n => !n.read);
+    const friendVals = { query: st.query, onQuery: e => this.setState({ query: e.target.value }), hasResult: !!result, noResult: !!q && !result, result: result || {},
+      friendList, friendCount: friends.length, sentList, sentCount: sentList.length, hasSent: sentList.length > 0,
+      isFriend: rel === "friend", isLocked: rel !== "friend", prof,
+      lockTitle: lock[0], lockBody: lock[1], lockBtnLabel: lock[2], lockAction: lock[3], lockBtnStyle: btn(true, {}),
+      showRec: st.showRec, toggleRec: () => this.setState(s => ({ showRec: !s.showRec, lastSent: null })), recBtnStyle: btn(true, {}),
+      recGames, alreadyHas: !!st.recGame && pp.owned.includes(st.recGame), recNote: st.recNote, onRecNote: e => this.setState({ recNote: e.target.value }),
+      sendRec: () => { if (st.recGame) this.setState({ lastSent: st.recGame, showRec: false, recGame: null, recNote: "" }); },
+      sendBtnStyle: btn(!!st.recGame, { opacity: st.recGame ? 1 : 0.45 }), sentConfirm: !!st.lastSent && rel === "friend", lastSent: st.lastSent,
+      notifs, notifTabs, notifEmpty: notifs.length === 0, unread, markAll: () => this.setState(s => ({ notifs: s.notifs.map(n => ({ ...n, read: true })) })),
+      bellBadgeStyle: { position: "absolute", top: -6, right: -8, minWidth: 16, height: 16, borderRadius: 999, background: "var(--color-accent)", color: "var(--color-bg)", fontFamily: MONO, fontSize: 10, fontWeight: 700, display: unread ? "flex" : "none", alignItems: "center", justifyContent: "center", padding: "0 4px" } };
+
+    const mk = (name, cost, desc) => { const [c, bg, b] = COST[cost]; return { name, cost, desc, costStyle: { fontFamily: MONO, fontSize: 11, color: c, background: bg, border: "1px solid " + b, borderRadius: 4, padding: "2px 7px", flex: "0 0 auto" } }; };
+    const ideaGroups = [
+      { title: "01 · PARTIDA GUARDADA", items: [
+        mk("Nota de punto de guardado", "BAJO", "Al pausar un juego, una línea: «Voy por el tercer jefe, falta la llave azul». Aparece al reanudar."),
+        mk("Rachas de cierre", "BAJO", "Contador de juegos completados seguidos sin abrir uno nuevo. Premia vaciar el backlog, no acumular."),
+        mk("Cápsula del tiempo", "MEDIO", "Al cumplir un año en tu colección, SavePoint te recuerda qué pensabas de un juego cuando lo añadiste.") ] },
+      { title: "02 · RECOMENDACIÓN CON EVIDENCIA", items: [
+        mk("Afinidad entre amistades", "MEDIO", "La misma heurística de etiquetas aplicada a dos colecciones. Un número y las etiquetas que lo explican."),
+        mk("Partida a dos", "MEDIO", "Elige una amistad y SavePoint busca cooperativos que ambos tenéis pendientes."),
+        mk("Por qué no", "BAJO", "En la ficha de un juego, explicar por qué no te lo recomendamos: qué etiqueta lo penaliza.") ] },
+      { title: "03 · PRIVADO POR DEFECTO", items: [
+        mk("Visibilidad por lista", "BAJO", "Privada, amistades o pública en cada lista, con un icono visible en la barra lateral de la colección."),
+        mk("Modo invisible", "BAJO", "Un interruptor temporal que pausa la actividad en el feed sin cambiar la privacidad del perfil."),
+        mk("Notas con spoiler", "MEDIO", "Marcar una nota como spoiler la difumina para quien no ha completado el juego.") ] },
+    ];
+
+    return { statuses, lists, games, current: LIST_META[st.list],
+      isGrid: st.view === "grid", isRows: st.view === "rows",
+      setGrid: () => this.pick("view", "grid"), setRows: () => this.pick("view", "rows"),
+      gridBtnStyle: segBtn(st.view === "grid"), rowsBtnStyle: segBtn(st.view === "rows"),
+      profileTabs, tabCuenta: st.tab === "cuenta", tabPrivacidad: st.tab === "privacidad", tabPreferencias: st.tab === "preferencias", tabConexiones: st.tab === "conexiones", tabSeguridad: st.tab === "seguridad",
+      privacyRows, prefRows, connections, ...friendVals, ideaGroups };
+  }
+}
+</script>
+</body>
+</html>

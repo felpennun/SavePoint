@@ -172,6 +172,7 @@ partida (archivos versionados, 7,5 MB de datos fuera de dependencias):
 | Documentos | `docs/` (99 ficheros, 5 MB), `data/` (100 MB en disco; versionado: semillas, manifiestos, localización) | Revisar qué necesita la app para arrancar (`data/raw/wikidata-games.json`, `data/manifests/*` los usa `import_catalogue`). |
 | Tesis | `thesis/` | ¿Se publica con el repositorio? Decisión del autor. |
 | Otros | `tmp/`, `skills-lock.json`, `.design-import/`, carpeta rara `"ideas-vault` (9 entradas con comillas en el nombre) | Revisar. |
+| Mockups | `design/mockups/` (15 MB, 53 ficheros, añadido el 2026-10-05): lienzos de Claude Design (`*.dc.html`), 24 renders PNG de la primera pasada (`.design-import`, que sigue ignorado por git) y logos/banners | Se conservan; el zip original sigue en `design/brand/`. |
 
 Esenciales para correr la app: `apps/api`, `apps/web`, `infra/`, `data/` (lo mínimo que usa `import_catalogue`,
 `load_localized_summaries` y la semilla), `scripts/` (lo que use el CI y el despliegue), `.github/workflows/`,

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="_ds/nocturne-be8fbbbe-d9ac-4bff-bce3-0f30f4da3b29/styles.css">
+<script src="_ds/nocturne-be8fbbbe-d9ac-4bff-bce3-0f30f4da3b29/_ds_bundle.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #161826; }
+  a { color: var(--color-accent-300); text-decoration: underline; }
+  a:hover { color: var(--color-accent-200); }
+</style>
+</helmet>
+
+<section style="display:flex;flex-direction:column;gap:40px;padding:56px 64px 96px;background:var(--color-bg);font-family:'Inter',system-ui,sans-serif;color:var(--color-text)">
+
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:32px;flex-wrap:wrap;max-width:1200px">
+    <div style="display:flex;flex-direction:column;gap:10px;max-width:760px">
+      <div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;letter-spacing:.08em;color:var(--color-accent-300)">TURNO 3 · PÁGINA DE INICIO</div>
+      <h1 style="margin:0;font-size:40px;font-weight:500;line-height:1.15;letter-spacing:-.01em">Tres inicios estándar, públicos y con pocas portadas</h1>
+      <p style="margin:0;font-size:16px;line-height:1.55;color:var(--color-neutral-300);text-wrap:pretty">Funcionan sin sesión. Con sesión iniciada solo cambia el hero (una línea para continuar tu partida); lo social se queda en Amistades. Cada opción indica cuántas portadas usa.</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;border:1px solid var(--color-neutral-800);background:var(--color-neutral-900)">
+      <span style="font-size:14px;color:var(--color-neutral-300)">Vista</span>
+      <div style="display:flex;border:1px solid var(--color-neutral-700);border-radius:8px;overflow:hidden;font-size:13px">
+        <span onClick="{{ setOut }}" style="{{ outStyle }}">Sin sesión</span>
+        <span onClick="{{ setIn }}" style="{{ inStyle }}">Con sesión</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:56px;align-items:flex-start">
+
+    <!-- ── 3a EDITORIAL ─────────────────────────────── -->
+    <div id="3a" style="display:flex;flex-direction:column;gap:16px;width:1200px;flex:0 0 auto">
+      <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap">
+        <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;font-weight:700;color:var(--color-bg);background:var(--color-accent);border-radius:4px;padding:3px 8px">3a</span>
+        <h2 style="margin:0;font-size:24px;font-weight:500">Editorial</h2>
+        <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--color-neutral-300);border:1px solid var(--color-neutral-700);border-radius:4px;padding:2px 8px">6 PORTADAS PEQUEÑAS</span>
+        <span style="font-size:14px;color:var(--color-neutral-400)">Hero con titular, búsqueda y tres pasos; una sola tira de portadas</span>
+      </div>
+      <div style="background:var(--color-bg);border:1px solid var(--color-neutral-800);border-radius:8px;overflow:hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 28px;border-bottom:1px solid var(--color-neutral-800)">
+          <div style="display:flex;align-items:center;gap:28px">
+            <div style="display:flex;align-items:center;gap:9px"><svg width="20" height="20" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M6 12a6 6 0 0 1 6-6h20l10 10v20a6 6 0 0 1-6 6H12a6 6 0 0 1-6-6V12Z" stroke="var(--color-accent-400)" stroke-width="2.5"></path><path d="M24 15l8 9-8 9-8-9 8-9Z" fill="var(--color-accent-400)"></path></svg><span style="font-size:15px;font-weight:600">SavePoint</span></div>
+            <div style="display:flex;gap:22px;font-size:14px;color:var(--color-neutral-400)"><span style="color:var(--color-text);font-weight:600">Inicio</span><span>Catálogo</span><span>Recomendaciones</span><span>Fuentes</span></div>
+          </div>
+          <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;align-items:center;gap:10px;font-size:14px"><span style="color:var(--color-neutral-200);padding:7px 10px">Iniciar sesión</span><span style="color:var(--color-accent-200);border:1px solid var(--color-accent);border-radius:8px;padding:7px 14px">Crear cuenta</span></div>
+          </sc-if>
+          <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:16px;font-size:14px;color:var(--color-neutral-300)"><span>Mi colección</span><span style="width:28px;height:28px;border-radius:999px;background:var(--color-accent-800);color:var(--color-accent-200);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px">AL</span></div>
+          </sc-if>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:26px;padding:72px 56px 56px;background:radial-gradient(55% 110% at 0% 0%,var(--color-section) 0%,var(--color-bg) 72%)">
+          <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:12px;align-self:flex-start;padding:8px 14px;border-radius:8px;border:1px solid var(--color-accent-800);background:var(--color-neutral-900);font-size:14px"><span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;color:var(--color-accent-300)">CONTINUAR</span><span><strong style="font-weight:600">Hollow Knight</strong> <span style="color:var(--color-neutral-300)">· hace 3 días</span></span><span style="color:var(--color-accent-200)">→</span></div>
+          </sc-if>
+          <h3 style="margin:0;font-size:60px;font-weight:500;letter-spacing:-.025em;line-height:1.02;max-width:15ch">Guarda dónde lo dejaste. Decide qué jugar después.</h3>
+          <p style="margin:0;font-size:18px;line-height:1.5;color:var(--color-neutral-200);max-width:54ch">Un catálogo de 4 980 juegos con datos de IGDB, tu backlog en cuatro estados y recomendaciones que explican por qué.</p>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;width:100%;max-width:640px">
+            <div style="flex:1;min-width:280px;display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:8px;border:1px solid var(--color-accent-700);background:var(--color-neutral-900)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-neutral-400)" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M16.5 16.5 21 21"></path></svg>
+              <span style="font-size:15px;color:var(--color-neutral-400)">Busca un juego, una saga o una etiqueta</span>
+            </div>
+            <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}"><span style="font-size:15px;color:var(--color-accent-200);border:1px solid var(--color-accent);border-radius:8px;padding:12px 18px">Empieza tu colección</span></sc-if>
+            <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}"><span style="font-size:15px;color:var(--color-accent-200);border:1px solid var(--color-accent);border-radius:8px;padding:12px 18px">Ver recomendaciones</span></sc-if>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--color-neutral-800);border-bottom:1px solid var(--color-neutral-800)">
+          <sc-for list="{{ steps }}" as="s" hint-placeholder-count="3">
+            <div style="display:flex;flex-direction:column;gap:10px;padding:28px 32px;border-right:1px solid var(--color-neutral-800)">
+              <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:var(--color-accent-300)">{{ s.n }}</span>
+              <span style="font-size:19px;font-weight:500">{{ s.title }}</span>
+              <span style="font-size:14px;line-height:1.55;color:var(--color-neutral-300)">{{ s.body }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px;padding:36px 56px 40px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between"><h4 style="margin:0;font-size:20px;font-weight:500">Mejor valorados del catálogo</h4><span style="font-size:14px;color:var(--color-accent-300)">Ver catálogo →</span></div>
+          <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px">
+            <sc-for list="{{ covers }}" as="c" hint-placeholder-count="6">
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="aspect-ratio:3/4;border-radius:6px;background:linear-gradient(160deg,#2c2a44,#181a26);border:1px solid var(--color-neutral-800);display:flex;align-items:flex-end;padding:8px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:9px;color:var(--color-neutral-400)">{{ c.upper }}</div>
+                <div style="display:flex;justify-content:space-between;gap:8px"><span style="font-size:13px;font-weight:500;line-height:1.3">{{ c.title }}</span><span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:#5cc08d">{{ c.score }}</span></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;padding:18px 56px;border-top:1px solid var(--color-neutral-800);font-size:13px;color:var(--color-neutral-400)">
+          <span>Datos de juegos: IGDB · Metodología en <span style="color:var(--color-accent-300)">Fuentes</span></span><span>ES / en</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 3b BÚSQUEDA PRIMERO ──────────────────────── -->
+    <div id="3b" style="display:flex;flex-direction:column;gap:16px;width:1200px;flex:0 0 auto">
+      <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap">
+        <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;font-weight:700;color:var(--color-bg);background:var(--color-accent);border-radius:4px;padding:3px 8px">3b</span>
+        <h2 style="margin:0;font-size:24px;font-weight:500">Búsqueda primero</h2>
+        <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--color-neutral-300);border:1px solid var(--color-neutral-700);border-radius:4px;padding:2px 8px">0 PORTADAS</span>
+        <span style="font-size:14px;color:var(--color-neutral-400)">El inicio como puerta al catálogo: buscar, explorar por etiqueta, ranking en texto</span>
+      </div>
+      <div style="background:var(--color-bg);border:1px solid var(--color-neutral-800);border-radius:8px;overflow:hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 28px;border-bottom:1px solid var(--color-neutral-800)">
+          <div style="display:flex;align-items:center;gap:28px">
+            <div style="display:flex;align-items:center;gap:9px"><svg width="20" height="20" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M6 12a6 6 0 0 1 6-6h20l10 10v20a6 6 0 0 1-6 6H12a6 6 0 0 1-6-6V12Z" stroke="var(--color-accent-400)" stroke-width="2.5"></path><path d="M24 15l8 9-8 9-8-9 8-9Z" fill="var(--color-accent-400)"></path></svg><span style="font-size:15px;font-weight:600">SavePoint</span></div>
+            <div style="display:flex;gap:22px;font-size:14px;color:var(--color-neutral-400)"><span style="color:var(--color-text);font-weight:600">Inicio</span><span>Catálogo</span><span>Recomendaciones</span><span>Fuentes</span></div>
+          </div>
+          <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;align-items:center;gap:10px;font-size:14px"><span style="color:var(--color-neutral-200);padding:7px 10px">Iniciar sesión</span><span style="color:var(--color-accent-200);border:1px solid var(--color-accent);border-radius:8px;padding:7px 14px">Crear cuenta</span></div>
+          </sc-if>
+          <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:16px;font-size:14px;color:var(--color-neutral-300)"><span>Mi colección</span><span style="width:28px;height:28px;border-radius:999px;background:var(--color-accent-800);color:var(--color-accent-200);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px">AL</span></div>
+          </sc-if>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:20px;padding:64px 56px 40px">
+          <h3 style="margin:0;font-size:44px;font-weight:500;letter-spacing:-.02em;line-height:1.08;max-width:22ch">{{ heroTitleB }}</h3>
+          <div style="display:flex;align-items:center;gap:12px;max-width:760px;padding:16px 18px;border-radius:8px;border:1px solid var(--color-accent);background:var(--color-neutral-900);box-shadow:0 0 0 4px var(--color-accent-900)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-300)" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M16.5 16.5 21 21"></path></svg>
+            <span style="font-size:17px;color:var(--color-neutral-400);flex:1">Hollow Knight, «metroidvania», 2019…</span>
+            <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--color-neutral-400);border:1px solid var(--color-neutral-700);border-radius:4px;padding:2px 6px">⌘K</span>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:13px">
+            <span style="color:var(--color-neutral-400);padding:6px 0">Plataforma:</span>
+            <span style="color:var(--color-neutral-200);border:1px solid var(--color-neutral-700);border-radius:999px;padding:6px 12px">PC</span>
+            <span style="color:var(--color-neutral-200);border:1px solid var(--color-neutral-700);border-radius:999px;padding:6px 12px">Switch</span>
+            <span style="color:var(--color-neutral-200);border:1px solid var(--color-neutral-700);border-radius:999px;padding:6px 12px">PlayStation</span>
+            <span style="color:var(--color-neutral-200);border:1px solid var(--color-neutral-700);border-radius:999px;padding:6px 12px">Xbox</span>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;padding:16px 56px 48px">
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid var(--color-neutral-800)"><h4 style="margin:0;font-size:18px;font-weight:500">Explorar por etiqueta</h4><span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--color-neutral-400)">JUEGOS</span></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;column-gap:32px">
+              <sc-for list="{{ tags }}" as="t" hint-placeholder-count="10">
+                <div style="display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--color-neutral-900)"><span style="font-size:15px">{{ t.name }}</span><span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--color-neutral-400)">{{ t.count }}</span></div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid var(--color-neutral-800)"><h4 style="margin:0;font-size:18px;font-weight:500">Top 10 por valoración</h4><span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--color-neutral-400)">IGDB</span></div>
+            <div style="display:flex;flex-direction:column">
+              <sc-for list="{{ top }}" as="g" hint-placeholder-count="10">
+                <div style="display:grid;grid-template-columns:32px minmax(0,1fr) auto auto;gap:14px;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--color-neutral-900)">
+                  <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--color-neutral-400)">{{ g.rank }}</span>
+                  <span style="font-size:15px">{{ g.title }}</span>
+                  <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--color-neutral-400)">{{ g.year }}</span>
+                  <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#5cc08d;width:24px;text-align:right">{{ g.score }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;padding:24px 56px;background:var(--color-section);border-top:1px solid var(--color-accent-800)">
+            <span style="font-size:17px;color:var(--color-accent-100)">Crea una cuenta para guardar juegos en tu colección y recibir recomendaciones.</span>
+            <span style="font-size:14px;color:var(--color-accent-100);border:1px solid var(--color-accent-300);border-radius:8px;padding:9px 16px">Crear cuenta</span>
+          </div>
+        </sc-if>
+        <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;padding:24px 56px;background:var(--color-section);border-top:1px solid var(--color-accent-800)">
+            <span style="font-size:17px;color:var(--color-accent-100)">Continuar <strong style="font-weight:600">Hollow Knight</strong> · 34 pendientes en tu colección</span>
+            <span style="font-size:14px;color:var(--color-accent-100);border:1px solid var(--color-accent-300);border-radius:8px;padding:9px 16px">Ir a mi colección</span>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+
+    <!-- ── 3c PRODUCTO ──────────────────────────────── -->
+    <div id="3c" style="display:flex;flex-direction:column;gap:16px;width:1200px;flex:0 0 auto">
+      <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap">
+        <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;font-weight:700;color:var(--color-bg);background:var(--color-accent);border-radius:4px;padding:3px 8px">3c</span>
+        <h2 style="margin:0;font-size:24px;font-weight:500">Cómo funciona</h2>
+        <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--color-neutral-300);border:1px solid var(--color-neutral-700);border-radius:4px;padding:2px 8px">1 PORTADA</span>
+        <span style="font-size:14px;color:var(--color-neutral-400)">Página de producto: hero dividido, tres filas de función y franja de cifras</span>
+      </div>
+      <div style="background:var(--color-bg);border:1px solid var(--color-neutral-800);border-radius:8px;overflow:hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 28px;border-bottom:1px solid var(--color-neutral-800)">
+          <div style="display:flex;align-items:center;gap:28px">
+            <div style="display:flex;align-items:center;gap:9px"><svg width="20" height="20" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M6 12a6 6 0 0 1 6-6h20l10 10v20a6 6 0 0 1-6 6H12a6 6 0 0 1-6-6V12Z" stroke="var(--color-accent-400)" stroke-width="2.5"></path><path d="M24 15l8 9-8 9-8-9 8-9Z" fill="var(--color-accent-400)"></path></svg><span style="font-size:15px;font-weight:600">SavePoint</span></div>
+            <div style="display:flex;gap:22px;font-size:14px;color:var(--color-neutral-400)"><span style="color:var(--color-text);font-weight:600">Inicio</span><span>Catálogo</span><span>Recomendaciones</span><span>Fuentes</span></div>
+          </div>
+          <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;align-items:center;gap:10px;font-size:14px"><span style="color:var(--color-neutral-200);padding:7px 10px">Iniciar sesión</span><span style="color:var(--color-accent-200);border:1px solid var(--color-accent);border-radius:8px;padding:7px 14px">Crear cuenta</span></div>
+          </sc-if>
+          <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:16px;font-size:14px;color:var(--color-neutral-300)"><span>Mi colección</span><span style="width:28px;height:28px;border-radius:999px;background:var(--color-accent-800);color:var(--color-accent-200);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px">AL</span></div>
+          </sc-if>
+        </div>
+
+        <div style="display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:48px;align-items:center;padding:64px 56px">
+          <div style="display:flex;flex-direction:column;gap:22px">
+            <h3 style="margin:0;font-size:52px;font-weight:500;letter-spacing:-.025em;line-height:1.04">Tu backlog, con memoria.</h3>
+            <p style="margin:0;font-size:17px;line-height:1.55;color:var(--color-neutral-200);max-width:46ch">Marca cada juego como pendiente, jugando, completado o abandonado, deja una nota de dónde ibas y recibe sugerencias basadas en lo que ya valoraste.</p>
+            <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;gap:10px;flex-wrap:wrap"><span style="font-size:15px;color:var(--color-accent-200);border:1px solid var(--color-accent);border-radius:8px;padding:11px 18px">Crear cuenta gratis</span><span style="font-size:15px;color:var(--color-neutral-200);border:1px solid var(--color-neutral-700);border-radius:8px;padding:11px 18px">Explorar el catálogo</span></div>
+            </sc-if>
+            <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:10px;flex-wrap:wrap"><span style="font-size:15px;color:var(--color-accent-200);border:1px solid var(--color-accent);border-radius:8px;padding:11px 18px">Continuar Hollow Knight</span><span style="font-size:15px;color:var(--color-neutral-200);border:1px solid var(--color-neutral-700);border-radius:8px;padding:11px 18px">Ir a mi colección</span></div>
+            </sc-if>
+          </div>
+          <div style="display:grid;grid-template-columns:120px minmax(0,1fr);gap:20px;align-items:center;padding:20px;border-radius:8px;background:var(--color-neutral-900);border:1px solid var(--color-accent-800);box-shadow:var(--shadow-lg)">
+            <div style="aspect-ratio:3/4;border-radius:6px;background:linear-gradient(160deg,#36305e,#181a26);border:1px solid var(--color-accent-700);display:flex;align-items:flex-end;padding:8px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:9px;color:var(--color-neutral-300);clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%)">HOLLOW KNIGHT</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:18px;font-weight:600">Hollow Knight</span><span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;color:#78aee0;background:#1b2634;border:1px solid #2c405c;border-radius:4px;padding:2px 7px">JUGANDO</span></div>
+              <span style="font-size:14px;line-height:1.5;color:var(--color-neutral-200);padding-left:10px;border-left:2px solid var(--color-accent-700)">Voy por Ciudad Lágrimas. Falta la llave simple.</span>
+              <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--color-neutral-400)">TU NOTA 10/10 · PC, SWITCH</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;border-top:1px solid var(--color-neutral-800)">
+          <sc-for list="{{ features }}" as="f" hint-placeholder-count="3">
+            <div style="display:grid;grid-template-columns:80px minmax(0,320px) minmax(0,1fr);gap:32px;align-items:baseline;padding:28px 56px;border-bottom:1px solid var(--color-neutral-800)">
+              <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:var(--color-accent-300)">{{ f.n }}</span>
+              <span style="font-size:22px;font-weight:500">{{ f.title }}</span>
+              <span style="font-size:15px;line-height:1.55;color:var(--color-neutral-300);max-width:60ch">{{ f.body }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:36px 56px;background:var(--color-section)">
+          <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+            <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:40px;font-weight:500;letter-spacing:-.02em;line-height:1">{{ s.value }}</span><span style="font-size:14px;color:var(--color-accent-100)">{{ s.label }}</span></div>
+          </sc-for>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;padding:18px 56px;font-size:13px;color:var(--color-neutral-400)">
+          <span>Datos de juegos: IGDB · Metodología en <span style="color:var(--color-accent-300)">Fuentes</span></span><span>ES / en</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;loggedIn&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Vista&quot;}}">
+class Component extends DCLogic {
+  state = { session: null };
+  renderVals() {
+    const inSes = this.state.session ?? (this.props.loggedIn ?? false);
+    const seg = on => ({ padding: "7px 12px", cursor: "pointer", background: on ? "var(--color-accent-900)" : "transparent", color: on ? "var(--color-accent-100)" : "var(--color-neutral-400)" });
+    const covers = [["Hollow Knight", 90], ["Outer Wilds", 88], ["Hades", 93], ["Celeste", 92], ["Disco Elysium", 91], ["Tunic", 87]]
+      .map(([title, score]) => ({ title, score, upper: title.toUpperCase() }));
+    const top = [["Hades", 2020, 93], ["Celeste", 2018, 92], ["Disco Elysium", 2019, 91], ["Hollow Knight", 2017, 90], ["Return of the Obra Dinn", 2018, 89], ["Outer Wilds", 2019, 88], ["Slay the Spire", 2019, 88], ["Tunic", 2022, 87], ["Inside", 2016, 87], ["Into the Breach", 2018, 86]]
+      .map(([title, year, score], i) => ({ rank: String(i + 1).padStart(2, "0"), title, year, score }));
+    const tags = [["Metroidvania", 142], ["Roguelike", 318], ["Narrativo", 604], ["Puzle", 489], ["Exploración", 377], ["Plataformas", 712], ["Estrategia", 455], ["Cooperativo", 290], ["Soulslike", 96], ["Gestión", 233]]
+      .map(([name, count]) => ({ name, count }));
+    return {
+      loggedIn: inSes, loggedOut: !inSes,
+      setIn: () => this.setState({ session: true }), setOut: () => this.setState({ session: false }),
+      inStyle: seg(inSes), outStyle: seg(!inSes),
+      heroTitleB: inSes ? "¿Qué buscas hoy, Alejandro?" : "Encuentra tu próximo juego entre 4 980.",
+      steps: [
+        { n: "01", title: "Guarda", body: "Añade juegos del catálogo a tu colección con uno de cuatro estados." },
+        { n: "02", title: "Anota", body: "Deja una nota de dónde ibas y una valoración del 1 al 10 al terminar." },
+        { n: "03", title: "Descubre", body: "Recibe recomendaciones por etiquetas, cada una con su explicación." },
+      ],
+      covers, top, tags,
+      features: [
+        { n: "01", title: "Colección y listas", body: "Cuatro estados fijos y listas propias como «Para el Steam Deck». Cada lista puede ser privada o pública." },
+        { n: "02", title: "Recomendaciones explicables", body: "Nueve heurísticas deterministas sobre etiquetas de IGDB. Cada sugerencia muestra qué etiqueta suma y cuál resta." },
+        { n: "03", title: "Datos con procedencia", body: "Toda la información del catálogo indica de dónde viene y cuándo se actualizó, en la página Fuentes." },
+      ],
+      stats: [
+        { value: "4 980", label: "juegos en el catálogo" },
+        { value: "9", label: "algoritmos de recomendación" },
+        { value: "4", label: "estados de backlog" },
+        { value: "ES / EN", label: "idiomas" },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>
