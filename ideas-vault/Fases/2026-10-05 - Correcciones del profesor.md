@@ -45,6 +45,15 @@ correcciones (12 ficheros cambian: bibliografía y secciones 00 a 08). Aquí se 
    193.885 de §6.2.2. Se añadió una frase junto a las figuras que las ata a `2026.09.2` y a §6.2.2. Las capturas no
    se tocan: son correctas.
 
+4. **Pruebas y verificación (§6.5): faltaba una tabla de resultados finales, la relación requisitos-pruebas o algún caso
+   de prueba concreto.** Se añadió la subsección "Resultados finales y trazabilidad" con: tabla de resultado final por
+   suite (backend 788/788 en 146 s y frontend 66/66, ejecutados el 2026-10-05; navegador 56/56 del 14-09, no repetido
+   desde el rediseño), reparto del backend por área (informe JUnit de esa ejecución: catalogue 156, evaluation 154,
+   library 140, accounts 134, recommendations 119, tests 82, audit 3), tabla de trazabilidad de los 15 casos de uso
+   (y sus requisitos) con el fichero de pruebas y su número, y dos casos de prueba concretos (CP-1 reintento idempotente
+   del alta de copia; CP-2 una colección ajena no revela su existencia) con su prueba automatizada real. Se actualizó
+   la frase de recuentos (antes 773 backend del 4-10). Cifras verificadas ejecutando la suite con Docker.
+
 ## Pendientes
 
 Las demás correcciones del profesor, a medida que el autor las vaya indicando.

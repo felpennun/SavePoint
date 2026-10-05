@@ -474,7 +474,7 @@ accesibilidad mediante \texttt{axe}, sin un conteo aislado solo de accesibilidad
 evidencia de la Fase 7, ejecutado el 14 de septiembre de 2026 y registrado en
 \texttt{docs/verification/phase-07-launch-gate.md} y en \texttt{07-VERIFICATION.md}, deja como
 última regresión completa 736 pruebas de backend, 70 de frontend y 56 de navegador, las tres
-en verde y sin omitidas. Tras los cambios posteriores de interfaz y del módulo social, el 4 de octubre de 2026 se repitieron las suites de backend y de frontend: 773 pruebas de backend y 66 de frontend, todas en verde. El recorrido de navegador no se repitió después de esos cambios. Las evidencias de seguridad, migraciones, privacidad, importación y
+en verde y sin omitidas. Tras los cambios posteriores de interfaz, del módulo social y del despliegue, el 5 de octubre de 2026 se repitieron las suites de backend y de frontend: 788 pruebas de backend y 66 de frontend, todas en verde y sin omitidas (Tabla~\ref{tab:pru-resultados}). El recorrido de navegador no se repitió después de esos cambios. Las evidencias de seguridad, migraciones, privacidad, importación y
 exportación se citan desde \texttt{docs/verification/}.
 
 La estrategia combina cuatro niveles. Las pruebas unitarias y de integración del backend se
@@ -491,6 +491,154 @@ revisión equivocada, tráfico entre orígenes inesperado o peticiones fallidas.
 Las comprobaciones de \texttt{axe} cubren el catálogo, el detalle, el registro, las
 recomendaciones, la página de inicio, el acceso y las fuentes, en escritorio a 1280 por 800
 píxeles y en móvil a 375 por 812 píxeles.
+
+\subsection{Resultados finales y trazabilidad}\label{sec:pru-resultados}\label{sec:pru-trazabilidad}
+
+La Tabla~\ref{tab:pru-resultados} recoge el resultado final de cada suite y la
+Tabla~\ref{tab:pru-areas} reparte las pruebas de backend por área del código. Los recuentos salen del
+informe de la propia ejecución del 5 de octubre de 2026, no de una estimación.
+
+\begin{table}[htp]
+\centering
+\begin{tabularx}{\textwidth}{ | L{0.20\textwidth} | L{0.22\textwidth} | C{0.10\textwidth} | Y | C{0.17\textwidth} | }
+    \hline
+    \textbf{Suite} & \textbf{Herramienta} & \textbf{Pruebas} & \textbf{Resultado} & \textbf{Fecha} \\
+    \hline
+    Backend & \texttt{pytest} sobre PostgreSQL 18.6 & 788 & 788 correctas, 0 fallidas, 0 omitidas (146 s) & 5-10-2026 \\
+    \hline
+    Frontend & Vitest (12 ficheros) & 66 & 66 correctas, 0 fallidas & 5-10-2026 \\
+    \hline
+    Navegador & Playwright con \texttt{axe} & 56 & 56 correctas, 0 omitidas & 14-09-2026 \\
+    \hline
+\end{tabularx}
+\caption{Resultado final de cada suite de pruebas. El recorrido de navegador no se ha repetido desde el rediseño de la interfaz.}
+\label{tab:pru-resultados}
+\end{table}
+
+\begin{table}[htp]
+\centering
+\begin{tabularx}{\textwidth}{ | L{0.24\textwidth} | C{0.12\textwidth} | Y | }
+    \hline
+    \textbf{Área} & \textbf{Pruebas} & \textbf{Qué cubre} \\
+    \hline
+    Catálogo (\texttt{catalogue}) & 156 & Importación del catálogo, búsqueda, ficha con procedencia, versiones inmutables de valoraciones y popularidad. \\
+    \hline
+    Evaluación (\texttt{evaluation}) & 154 & Protocolo, particiones, métricas, ejecutor, población sintética y API del panel de investigación. \\
+    \hline
+    Biblioteca (\texttt{library}) & 140 & Estado, valoración, copias, listas, comentarios, popularidad y exportación. \\
+    \hline
+    Cuentas (\texttt{accounts}) & 134 & Registro, sesión, perfil, privacidad y cuentas de demostración. \\
+    \hline
+    Recomendaciones (\texttt{recommendations}) & 119 & Vectores, perfil de gusto, similitud, familias de algoritmos y recomendador por géneros. \\
+    \hline
+    Transversales (\texttt{tests}) & 82 & Amistades, visibilidad, mensajes, administración, seguridad y endurecimiento. \\
+    \hline
+    Auditoría (\texttt{audit}) & 3 & Registro de auditoría de solo anexado. \\
+    \hline
+    \textbf{Total} & \textbf{788} & \\
+    \hline
+\end{tabularx}
+\caption{Pruebas de backend por área.}
+\label{tab:pru-areas}
+\end{table}
+
+La Tabla~\ref{tab:pru-trazabilidad} relaciona cada caso de uso de la Tabla~\ref{tab:casos-uso}, y por tanto
+cada requisito funcional, con los ficheros de prueba que lo verifican y con el número de pruebas de cada uno; los
+requisitos de datos y de evaluación, que verifican las suites de las áreas \texttt{catalogue} y
+\texttt{evaluation}, se tratan en la Sección~\ref{sec:pru-fase2}.
+
+\begin{table}[htp]
+\centering
+\small
+\begin{tabularx}{\textwidth}{ | C{0.17\textwidth} | C{0.13\textwidth} | Y | C{0.12\textwidth} | }
+    \hline
+    \textbf{Requisito} & \textbf{Caso de uso} & \textbf{Fichero de pruebas} & \textbf{Pruebas} \\
+    \hline
+    CAT-01 & CU-1 & \path{catalogue/tests/test_search.py} & 49 \\
+    \hline
+    CAT-02 & CU-3 & \path{catalogue/tests/test_search.py}, \path{lib/__tests__/catalogue-filters.test.ts} & 49, 11 \\
+    \hline
+    CAT-03 & CU-2 & \path{catalogue/tests/test_detail.py}, \path{catalogue/tests/test_sources.py} & 6, 2 \\
+    \hline
+    REC-02 & CU-4 & \path{library/tests/test_popularity.py} & 12 \\
+    \hline
+    AUTH-01 & CU-5, CU-6 & \path{accounts/tests/test_registration.py}, \path{accounts/tests/test_auth.py} & 17, 10 \\
+    \hline
+    LIB-01 & CU-7 & \path{library/tests/test_entry.py} & 18 \\
+    \hline
+    LIB-02 & CU-8 & \path{library/tests/test_rating.py} & 19 \\
+    \hline
+    INV-01, INV-02 & CU-9 & \path{library/tests/test_copies.py} & 25 \\
+    \hline
+    REC-10 & CU-10 & \path{recommendations/tests/test_genre_heuristic.py} & 29 \\
+    \hline
+    SOCIAL-03 & CU-11 & \path{tests/test_social.py} & 10 \\
+    \hline
+    SOCIAL-04 & CU-12 & \path{tests/test_social_visibility.py} & 12 \\
+    \hline
+    LIB-03, SOCIAL-04 & CU-13 & \path{library/tests/test_comments.py} & 8 \\
+    \hline
+    PROF-01 & CU-14 & \path{accounts/tests/test_profile.py}, \path{accounts/tests/test_profile_page.py} & 19, 13 \\
+    \hline
+    SOCIAL-05 & CU-15 & \path{tests/test_social_messages.py} & 6 \\
+    \hline
+\end{tabularx}
+\caption{Relación entre requisitos, casos de uso y pruebas automatizadas del backend, salvo la fila de filtros, que incluye también una prueba del frontend.}
+\label{tab:pru-trazabilidad}
+\end{table}
+
+Como ejemplo de caso de prueba concreto, la Tabla~\ref{tab:pru-cp1} describe la comprobación de que reintentar el
+alta de una copia no crea un duplicado, y la Tabla~\ref{tab:pru-cp2} la de que una persona sin permiso no puede
+distinguir una colección privada de una que no existe. Ambas son pruebas automatizadas del repositorio y pasan en la
+ejecución final de la Tabla~\ref{tab:pru-resultados}.
+
+\begin{table}[htp]
+\centering
+\small
+\begin{tabularx}{\textwidth}{ | L{0.22\textwidth} | Y | }
+    \hline
+    \textbf{Caso} & \textbf{CP-1: reintento idempotente del alta de una copia (INV-02)} \\
+    \hline
+    Objetivo & Un reenvío de la misma petición, por ejemplo por un doble clic o un fallo de red, no debe crear una copia duplicada. \\
+    \hline
+    Precondiciones & Una persona usuaria y una obra con una publicación. \\
+    \hline
+    Pasos & 1) Crear una copia física con la clave de idempotencia \texttt{replay-key}. 2) Repetir la misma operación con la misma clave. \\
+    \hline
+    Resultado esperado & La primera operación crea la copia; la segunda devuelve la misma copia sin crear otra; la persona tiene una sola copia. \\
+    \hline
+    Prueba automatizada & \path{library/tests/test_copies.py}, \texttt{test\_\allowbreak{}replaying\_\allowbreak{}idempotency\_\allowbreak{}key\_\allowbreak{}returns\_\allowbreak{}same\_\allowbreak{}copy\_\allowbreak{}not\_\allowbreak{}a\_\allowbreak{}duplicate}; la unicidad también se exige en la base de datos (\path{library/tests/test_schema.py}). \\
+    \hline
+    Resultado & Superada. \\
+    \hline
+\end{tabularx}
+\caption{Caso de prueba CP-1.}
+\label{tab:pru-cp1}
+\end{table}
+
+\begin{table}[htp]
+\centering
+\small
+\begin{tabularx}{\textwidth}{ | L{0.22\textwidth} | Y | }
+    \hline
+    \textbf{Caso} & \textbf{CP-2: una colección ajena no revela su existencia (SOCIAL-04)} \\
+    \hline
+    Objetivo & Quien no es amistad del propietario, o no ha iniciado sesión, no debe poder distinguir una colección o una lista privadas de las de un usuario que no existe. \\
+    \hline
+    Precondiciones & Un propietario con una colección y una lista pública, una persona autenticada que no es su amistad y un visitante anónimo. \\
+    \hline
+    Pasos & Como visitante y como persona sin amistad: 1) pedir la lista del propietario; 2) pedir su colección; 3) pedir la colección de un alias inexistente. \\
+    \hline
+    Resultado esperado & Las tres peticiones responden 404, y la respuesta de la lista y de la colección del propietario es idéntica a la del alias inexistente. \\
+    \hline
+    Prueba automatizada & \path{tests/test_social_visibility.py}, \texttt{test\_\allowbreak{}anonymous\_\allowbreak{}and\_\allowbreak{}non\_\allowbreak{}friend\_\allowbreak{}get\_\allowbreak{}same\_\allowbreak{}404\_\allowbreak{}for\_\allowbreak{}direct\_\allowbreak{}collection\_\allowbreak{}and\_\allowbreak{}list}. \\
+    \hline
+    Resultado & Superada. \\
+    \hline
+\end{tabularx}
+\caption{Caso de prueba CP-2.}
+\label{tab:pru-cp2}
+\end{table}
 
 \subsection{Verificación de los datos y del laboratorio}\label{sec:pru-fase2}
 
