@@ -1,0 +1,1532 @@
+diff --git a/scripts/thesis-figures/generate_extra.py b/scripts/thesis-figures/generate_extra.py
+index a684ecb..6d50b37 100644
+--- a/scripts/thesis-figures/generate_extra.py
++++ b/scripts/thesis-figures/generate_extra.py
+@@ -91,12 +91,12 @@ def diagram_calendario():
+         ("Iteración 3", "Contrato de evaluación", d(2026, 9, 7), d(2026, 9, 8)),
+         ("Iteración 4", "Recomendadores y resultados", d(2026, 9, 9), d(2026, 9, 12)),
+         ("Iteración 5", "Flujos, amistades y endurecimiento", d(2026, 9, 13), d(2026, 9, 14)),
+-        ("Iteración 6", "Memoria y despliegue final", d(2026, 9, 15), d(2026, 10, 4)),
++        ("Iteración 6", "Memoria y despliegue final", d(2026, 9, 15), d(2026, 10, 6)),
+     ]
+     # (label, day, vertical stagger of the label)
+     miles = [("H0", d(2026, 8, 4), 0.0), ("H1", d(2026, 9, 5), 0.0), ("H2", d(2026, 9, 6), 0.3),
+              ("H3", d(2026, 9, 8), 0.0), ("H4 y H5", d(2026, 9, 12), 0.3), ("H6", d(2026, 9, 14), 0.0),
+-             ("H7", d(2026, 10, 4), 0.0)]
++             ("H7", d(2026, 10, 6), 0.0)]
+ 
+     fig, ax = plt.subplots(figsize=(9.8, 4.2))
+     n = len(iters)
+@@ -117,7 +117,7 @@ def diagram_calendario():
+         ax.text(x, ym + 0.32 + stagger, lab, ha="center", va="bottom", fontsize=8.2,
+                 fontweight="bold", color=MUTED)
+     ax.set_ylim(0.4, n + 1.0)
+-    ax.set_xlim(mdates.date2num(d(2026, 8, 1)), mdates.date2num(d(2026, 10, 7)))
++    ax.set_xlim(mdates.date2num(d(2026, 8, 1)), mdates.date2num(d(2026, 10, 9)))
+     ax.xaxis_date()
+     ax.xaxis.set_major_locator(mdates.MonthLocator())
+     months = {8: "ago", 9: "sep", 10: "oct"}
+diff --git a/thesis/sections/00_abstract.tex b/thesis/sections/00_abstract.tex
+index 77faf80..c67761c 100644
+--- a/thesis/sections/00_abstract.tex
++++ b/thesis/sections/00_abstract.tex
+@@ -1,11 +1,11 @@
+ \chapter*{Abstract}
+ \addcontentsline{toc}{chapter}{Abstract}
+ 
+-SavePoint grew out of applying to video games the personal cataloguing pattern of platforms such as Goodreads or Letterboxd, adding an inventory of physical and digital ownership that those products never had to solve; on that basis, the project turns the platform into a reproducible testbed for recommender systems. The platform includes a catalogue, library, physical and digital copies, ratings, lists, comments, profiles, privacy, social relations and recommendations. The application and the reproducible evaluation of the recommenders are the two complementary halves of the work: the former collects and governs the data the latter needs.
++SavePoint grew out of applying to video games the personal cataloguing pattern of platforms such as Goodreads or Letterboxd, adding an inventory of physical and digital ownership that those products never had to solve; on that basis, the project turns the platform into a reproducible testbed for recommender systems. The web application offers a catalogue of more than one hundred and ninety thousand governed works sourced from the Internet Game Database, a personal library, physical and digital copies, lists, comments, profiles with privacy settings, friendships and recommendations, with an accessible interface in Spanish and English that adapts to desktop and mobile. It is verified with more than eight hundred automated tests and has been deployed publicly on free services, although with a subset of the catalogue. The application and the reproducible evaluation of the recommenders are the two complementary halves of the work: the former collects and governs the data the latter needs.
+ 
+-The system compares sixteen reference algorithms: baselines, content-based variants, neighbourhood collaborative filtering, and hybrid approaches with diversity re-ranking. This report describes item and user representations, tag weighting, facet similarity, external quality, popularity, negative evidence, cold start, and hybrid combination. The offline protocol fixes corpus, snapshots, seeds, shared candidates, exclusions and ranking metrics at $K\in\{5,10,20\}$.
++The system compares sixteen recommendation algorithms: two reference baselines, content-based variants, neighbourhood collaborative filtering, and hybrid approaches with diversity re-ranking. This report describes their formulas, item and user representations, and hybrid combination. The offline protocol fixes corpus, versioned snapshots, seeds, shared candidates, exclusions and ranking metrics at $K\in\{5,10,20\}$.
+ 
+-The published v15 evidence uses 400 active synthetic users and 79 evaluable users, with a single test run. It supports an internal comparison under the frozen corpus and protocol, but it does not represent real users or justify automatic generalisation. This report explicitly separates that publication from the later implementation contract.
++The published evidence, version 15 of the protocol, uses 400 simulated test users, 79 of them evaluable, with a single test run. In it, content-based and hybrid variants outperform the reference algorithms with statistical significance: the best content-based variant returns at least one of the held-out games within the first ten positions for 49\,\% of the evaluable users, against 3\,\% for popularity recommendation. The evidence supports an internal comparison under the frozen corpus and protocol, but it does not represent real users or justify automatic generalisation. This report explicitly separates that publication from the later implementation contract.
+ 
+ An agent-assisted engineering methodology governed through the Get Stuff Done method and conceptually organised with Obsidian was applied throughout the project. The tools were used under human direction and review, while final decisions and responsibility for analysis, design, implementation and validation remained with Felipe Peña Núñez.
+ 
+diff --git a/thesis/sections/00_acronimos.tex b/thesis/sections/00_acronimos.tex
+index f41857a..3c16a98 100644
+--- a/thesis/sections/00_acronimos.tex
++++ b/thesis/sections/00_acronimos.tex
+@@ -10,6 +10,7 @@ resumen y en el \textit{abstract} se han escrito las formas largas, sin siglas.
+     \item[API] Interfaz de programación de aplicaciones (del inglés \textit{application programming interface}).
+     \item[CC0] Dedicación al dominio público \textit{Creative Commons Zero}.
+     \item[CSRF] Falsificación de petición en sitios cruzados (del inglés \textit{cross-site request forgery}).
++    \item[CSS] Hojas de estilo en cascada (del inglés \textit{cascading style sheets}).
+     \item[CSV] Valores separados por comas (del inglés \textit{comma-separated values}).
+     \item[DLC] Contenido descargable (del inglés \textit{downloadable content}).
+     \item[DRF] \textit{Django REST Framework}.
+@@ -17,6 +18,7 @@ resumen y en el \textit{abstract} se han escrito las formas largas, sin siglas.
+     \item[DTO] Objeto de transferencia de datos (del inglés \textit{data transfer object}).
+     \item[E2E] De extremo a extremo (del inglés \textit{end to end}).
+     \item[GSD] \textit{Get Stuff Done}, método de desarrollo dirigido por especificación para agentes.
++    \item[HHI] Índice de Herfindahl-Hirschman (del inglés \textit{Herfindahl-Hirschman index}).
+     \item[HTTP] Protocolo de transferencia de hipertexto (del inglés \textit{hypertext transfer protocol}).
+     \item[IDF] Frecuencia inversa de documento (del inglés \textit{inverse document frequency}).
+     \item[IGDB] \textit{Internet Game Database}.
+@@ -28,8 +30,11 @@ resumen y en el \textit{abstract} se han escrito las formas largas, sin siglas.
+     \item[ORM] Mapeo objeto-relacional (del inglés \textit{object-relational mapping}).
+     \item[RAWG] Base de datos de videojuegos usada como fuente de contraste (\textit{RAWG Video Games Database}).
+     \item[REST] Transferencia de estado representacional (del inglés \textit{representational state transfer}).
++    \item[SHA] Algoritmo de resumen seguro (del inglés \textit{secure hash algorithm}).
++    \item[SQL] Lenguaje de consulta estructurado (del inglés \textit{structured query language}).
+     \item[SSR] Renderizado en el servidor (del inglés \textit{server-side rendering}).
+     \item[TFG] Trabajo Fin de Grado.
++    \item[URL] Localizador uniforme de recursos (del inglés \textit{uniform resource locator}).
+     \item[UUID] Identificador único universal (del inglés \textit{universally unique identifier}).
+     \item[WCAG] Pautas de accesibilidad para el contenido web (del inglés \textit{web content accessibility guidelines}).
+ \end{description}
+diff --git a/thesis/sections/00_resumen.tex b/thesis/sections/00_resumen.tex
+index 3b88d46..583840f 100644
+--- a/thesis/sections/00_resumen.tex
++++ b/thesis/sections/00_resumen.tex
+@@ -1,11 +1,11 @@
+ \chapter*{Resumen}
+ \addcontentsline{toc}{chapter}{Resumen}
+ 
+-SavePoint nace de aplicar al videojuego el patrón de catalogación personal de plataformas como Goodreads o Letterboxd, con un inventario de propiedad física y digital que esos productos no necesitan resolver; sobre esa base, el trabajo convierte la plataforma en un banco de pruebas reproducible para sistemas de recomendación. Se ha diseñado e implementado el producto con catálogo, biblioteca, copias físicas y digitales, valoraciones, listas, comentarios, perfiles, privacidad, relaciones sociales y recomendaciones. La aplicación y la evaluación reproducible de los recomendadores son las dos partes complementarias del trabajo: la primera recoge y gobierna los datos que la segunda necesita.
++SavePoint nace de aplicar al videojuego el patrón de catalogación personal de plataformas como Goodreads o Letterboxd, con un inventario de propiedad física y digital que esos productos no necesitan resolver; sobre esa base, el trabajo convierte la plataforma en un banco de pruebas reproducible para sistemas de recomendación. La aplicación web ofrece un catálogo de más de ciento noventa mil obras gobernadas procedentes de Internet Game Database, una biblioteca personal, copias físicas y digitales, listas, comentarios, perfiles con privacidad, amistades y recomendaciones, con una interfaz accesible en español e inglés que se adapta a escritorio y móvil. Está verificada con más de ochocientas pruebas automáticas y se ha desplegado de forma pública con servicios gratuitos, aunque con un subconjunto del catálogo. La aplicación y la evaluación reproducible de los recomendadores son las dos partes complementarias del trabajo: la primera recoge y gobierna los datos que la segunda necesita.
+ 
+-El sistema compara dieciséis algoritmos de referencia: baselines, variantes basadas en contenido, filtrado colaborativo por vecinos e híbridos con reordenación por diversidad. Se describen la representación de obras y perfiles, la ponderación de etiquetas, la similitud por facetas, la calidad externa, la popularidad, la evidencia negativa, el arranque en frío y la combinación híbrida. El protocolo offline fija corpus, snapshots, semillas, candidatas comunes, exclusiones y métricas para $K\in\{5,10,20\}$.
++El sistema compara dieciséis algoritmos de recomendación: dos de referencia, variantes basadas en contenido, filtrado colaborativo por vecinos e híbridos con reordenación por diversidad. Se describen sus fórmulas, la representación de obras y perfiles y la combinación híbrida. El protocolo de evaluación sin conexión fija corpus, instantáneas versionadas, semillas, candidatas comunes, exclusiones y métricas para $K\in\{5,10,20\}$.
+ 
+-La evidencia publicada v15 utiliza 400 usuarios sintéticos activos y 79 usuarios evaluables, con una sola ejecución del test. Los resultados permiten comparar internamente algoritmos bajo el corpus y protocolo congelados, pero no representan usuarios reales ni justifican generalizaciones automáticas. La memoria diferencia los resultados publicados en v15 de la implementación actual, que siguió evolucionando después.
++La evidencia publicada, la versión 15 del protocolo, utiliza 400 usuarios de prueba simulados, de los que 79 son evaluables, con una sola ejecución del test. En ella, las variantes basadas en contenido y los híbridos superan con significación estadística a los algoritmos de referencia: la mejor variante de contenido devuelve al menos uno de los juegos retenidos entre las diez primeras posiciones para el 49\,\% de los usuarios evaluables, frente al 3\,\% de la recomendación por popularidad. Los resultados permiten comparar internamente algoritmos bajo el corpus y protocolo congelados, pero no representan usuarios reales ni justifican generalizaciones automáticas. La memoria diferencia los resultados publicados de la implementación actual, que siguió evolucionando después.
+ 
+ Se ha aplicado una metodología de ingeniería asistida por agentes, gobernada mediante el método Get Stuff Done y organizada conceptualmente con Obsidian. Las herramientas se emplearon bajo dirección y revisión humana, manteniéndose la decisión final y la responsabilidad sobre el análisis, el diseño, la implementación y la validación en la dirección del proyecto. La trazabilidad entre requisitos, código, pruebas, decisiones y artefactos versionados constituye una aportación metodológica del trabajo.
+ 
+diff --git a/thesis/sections/01_marco_objetivos.tex b/thesis/sections/01_marco_objetivos.tex
+index db97a6e..8efb87c 100644
+--- a/thesis/sections/01_marco_objetivos.tex
++++ b/thesis/sections/01_marco_objetivos.tex
+@@ -2,7 +2,7 @@
+ 
+ \section{Motivación, contexto y problema}\label{sec:origen-motivacion}\label{sec:contexto-problema}\label{sec:arte-productos}\label{sec:arte-aportacion}
+ 
+-Goodreads y Letterboxd son dos servicios web de catalogación social: el primero, para libros,
++Goodreads y Letterboxd son dos servicios web de catalogación social: el primero, para libros
+ y el segundo, para cine~\cite{goodreads,letterboxd}. Ambos comparten un patrón: una ficha canónica
+ por obra, independiente de la edición concreta que posea cada persona; un estado de consumo
+ personal, como pendiente, en curso o terminado; una valoración con una escala consistente;
+@@ -15,7 +15,7 @@ Letterboxd~\cite{backloggd}, con buen tratamiento del backlog, pero sin inventar
+ copias ni ambición de recomendación. OpenCritic agrega puntuaciones de prensa~\cite{opencritic} y es una
+ referencia de densidad visual y de tratamiento de la nota, más que un catalogador personal.
+ Steam ofrece una biblioteca personal rica, aunque acoplada a su tienda y limitada a lo
+-comprado en ella. La web de IGDB expone un catálogo amplio y bien modelado, orientado a la
++comprado en ella. La web de \textit{Internet Game Database} (IGDB) expone un catálogo amplio y bien modelado, orientado a la
+ consulta y no a la gestión de una colección. La Tabla~\ref{tab:productos} resume la comparación.
+ 
+ \begin{table}[htp]
+@@ -47,12 +47,12 @@ El hueco que SavePoint ocupa se ve en la última columna de la
+ Tabla~\ref{tab:productos}: ningún producto reúne un inventario detallado de propiedad
+ material con un catálogo a escala real y un banco de pruebas de recomendación abierto y
+ reproducible. Es un problema propio del videojuego: un mismo título puede poseerse a la vez en
+-cartucho, en disco y en descarga, y en más de una plataforma, una distinción que no tiene ficha
++cartucho, en disco y en descarga y en más de una plataforma, una distinción que no tiene ficha
+ ni equivalente en un libro o una película.
+ 
+ SavePoint se propone cubrir ese hueco. Aplica al videojuego el patrón de catalogación personal
+ de Goodreads y Letterboxd, con ficha canónica de cada obra, biblioteca, valoraciones y relaciones
+-de amistad, y añade lo que esos productos no necesitan y este medio sí: un inventario de copias
++de amistad y añade lo que esos productos no necesitan y este medio sí: un inventario de copias
+ físicas y digitales por edición y plataforma, con procedencia de datos verificable en lugar de
+ un catálogo mantenido a mano. De ello se desprenden tres aportaciones. La primera es un
+ producto de catalogación de videojuegos que combina inventario de propiedad material, catálogo
+@@ -71,9 +71,9 @@ la verificación y el despliegue de una plataforma web completa para catalogar v
+ mantener una biblioteca personal y registrar valoraciones, listas, copias, comentarios y
+ relaciones sociales. El módulo de recomendación y su evaluación forman parte de esa
+ plataforma y tienen el mismo peso que el resto: sin un catálogo gobernado y una biblioteca con
+-señales reales no hay nada que recomendar, y sin una evaluación reproducible no hay forma
++señales reales no hay nada que recomendar; sin una evaluación reproducible no hay forma
+ honesta de saber si lo recomendado funciona. La plataforma recoge y gobierna las señales que
+-los algoritmos consumen, y el laboratorio compara esos algoritmos sobre los mismos datos.
++los algoritmos consumen; el laboratorio compara esos algoritmos sobre los mismos datos.
+ 
+ Una lista de recomendaciones no es evidencia suficiente de que un algoritmo funciona mejor que
+ otro. Sin un corpus congelado, una población definida, una división conocida y artefactos
+@@ -118,7 +118,7 @@ Sección~\ref{sec:alg-publicadas}. El alcance de la evaluación, en cambio, se l
+ una publicación de evidencia concreta, identificada como v15 y descrita en el
+ Capítulo~\ref{cap:resultados}, con una única ejecución de la prueba. Conviene subrayar que estos usuarios sintéticos no son personas
+ reales, sino perfiles generados de forma controlada para poder ejercitar el sistema de
+-recomendación sin depender de una base de usuarios real que este TFG no tiene tiempo ni alcance
++recomendación sin depender de una base de usuarios real que este Trabajo Fin de Grado (TFG) no tiene tiempo ni alcance
+ para reunir. Los resultados, por tanto, dependen del corpus concreto, de la semilla aleatoria,
+ de la división de datos y del protocolo empleados: no permiten generalizar automáticamente a
+ preferencias de jugadores reales ni declarar un método como mejor fuera de esas condiciones.
+@@ -127,8 +127,9 @@ preferencias de jugadores reales ni declarar un método como mejor fuera de esas
+ 
+ La memoria sigue el recorrido natural de un proyecto de ingeniería del software, tratando la
+ plataforma y el estudio de recomendadores en un único hilo. El
+-Capítulo~\ref{cap:estado-del-arte} revisa las fuentes de datos, los sistemas de
+-recomendación y su evaluación, y el método de trabajo. El Capítulo~\ref{cap:gestion} describe la
++Capítulo~\ref{cap:estado-del-arte} revisa las fuentes de datos de videojuegos, las familias de sistemas de
++recomendación y el método de trabajo; las métricas y el protocolo de evaluación se presentan en el
++Capítulo~\ref{cap:resultados}. El Capítulo~\ref{cap:gestion} describe la
+ gestión, la metodología y la planificación del trabajo, con su calendario, su presupuesto y sus
+ riesgos. El Capítulo~\ref{cap:analisis} recoge el análisis del problema: actores, requisitos de
+ la plataforma y de la evaluación de recomendadores, reglas de negocio y trazabilidad. El
+diff --git a/thesis/sections/02_estado_del_arte.tex b/thesis/sections/02_estado_del_arte.tex
+index e46533d..41c6749 100644
+--- a/thesis/sections/02_estado_del_arte.tex
++++ b/thesis/sections/02_estado_del_arte.tex
+@@ -9,14 +9,14 @@ Sección~\ref{sec:contexto-problema}.
+ \section{Fuentes de datos de videojuegos}\label{sec:arte-datos}
+ 
+ Tres fuentes públicas cubren la mayor parte del catálogo de videojuegos: Wikidata, IGDB y
+-RAWG. Difieren sobre todo en su licencia y en sus condiciones de reutilización, que son
++\textit{RAWG Video Games Database} (RAWG). Difieren sobre todo en su licencia y en sus condiciones de reutilización, que son
+ determinantes para un trabajo que debe citar fuentes defendibles. Wikidata publica sus datos
+ estructurados bajo la dedicación al dominio público \textit{Creative Commons Zero} (CC0), la
+ licencia más limpia de las tres, aunque el modelado de género y plataforma para videojuegos es
+ desigual y depende de la edición voluntaria~\cite{wikidata-licensing}. Sus archivos
+ multimedia viven en Wikimedia Commons y no comparten esa licencia: cada imagen lleva su propia
+ condición, que puede exigir crédito, de modo que su reutilización requiere una revisión por
+-archivo~\cite{commons-reuse}. IGDB, propiedad de Twitch, ofrece una API de versión 4 con una
++archivo~\cite{commons-reuse}. IGDB, propiedad de Twitch, ofrece una interfaz de programación de aplicaciones (API) de versión 4 con una
+ entidad de plataforma de primera clase y se sirve bajo el \textit{Twitch Developer Services
+ Agreement} (DSA)~\cite{igdb-api, twitch-dsa}. RAWG ofrece una cobertura comparable, con
+ metadatos de tienda, pero su nivel gratuito es más restrictivo en cuota y en atribución~\cite{rawg-api}.
+@@ -39,13 +39,13 @@ debilidades de cada una~\cite{burke2002hybrid}. SavePoint implementa y compara,
+ catálogo, representantes de las tres familias, con la formulación y la comparación con datos
+ reales que desarrollan la Sección~\ref{cap:algoritmos} y el Capítulo~\ref{cap:resultados}.
+ 
+-\section{El método GSD: agentes coordinados sobre un contexto compartido}\label{sec:arte-agentes}
++\section{El método \textit{Get Stuff Done}: agentes coordinados sobre un contexto compartido}\label{sec:arte-agentes}
+ 
+ \textit{Get Stuff Done} (GSD) es un método de trabajo que organiza el desarrollo en agentes
+ especializados coordinados a través de un contexto compartido y versionado, en lugar de a
+ través de una conversación continua entre una persona y una única herramienta. La observación
+ de partida es sencilla: una tarea larga tiende a perder coherencia entre lo decidido al
+-principio y lo decidido al final, sobre todo cuando se turnan varios agentes para avanzarla, y
++principio y lo decidido al final, sobre todo cuando se turnan varios agentes para avanzarla y
+ esa pérdida de coherencia es tanto más probable cuanto más depende de que alguien recuerde el
+ historial completo de lo hecho hasta el momento~\cite{anthropic-context}. GSD responde a esa
+ observación con un principio de diseño simple: aislar cada incremento de trabajo en una tarea
+diff --git a/thesis/sections/03_gestion_planificacion.tex b/thesis/sections/03_gestion_planificacion.tex
+index edfcaf1..08289d2 100644
+--- a/thesis/sections/03_gestion_planificacion.tex
++++ b/thesis/sections/03_gestion_planificacion.tex
+@@ -56,15 +56,13 @@ retomar el trabajo entre sesiones, se usaron de verdad durante el proyecto.
+ 
+ La cadena de artefactos que produce cada paso vive en el árbol \texttt{.planning/} del repositorio, que actúa como
+ la memoria de trabajo compartida entre el autor y los agentes. \texttt{PROJECT.md} recoge el
+-encuadre general del proyecto y las decisiones de producto que no cambian de una fase a otra.
++encuadre general del proyecto y las decisiones de producto que no cambian de un incremento a otro.
+ \texttt{REQUIREMENTS.md} mantiene el catálogo de requisitos con su identificador, su estado y
+-la fase que lo cierra, de forma que un requisito se puede seguir desde que se declara hasta que
+-queda marcado como completo. \texttt{ROADMAP.md} descompone el proyecto en fases con sus planes
+-y su progreso. Las fases son las unidades de trabajo del \textit{roadmap}: están numeradas en
+-orden (con decimales, como la 01.1, cuando se insertó una posterior) y la memoria las cita por
+-ese número, por ejemplo la Fase~2 para el laboratorio de evaluación. \texttt{STATE.md} conserva un resumen del punto en el que se encuentra el
++el incremento que lo cierra, de forma que un requisito se puede seguir desde que se declara hasta que
++queda marcado como completo. \texttt{ROADMAP.md} descompone el proyecto en incrementos con sus planes
++y su progreso, numerados en orden y con decimales (como el 01.1) cuando se inserta uno posterior. \texttt{STATE.md} conserva un resumen del punto en el que se encuentra el
+ trabajo, con referencia al último commit relevante, pensado para que una sesión nueva, humana o
+-de agente, pueda retomar el hilo sin releer todo el historial. Cada fase añade además, dentro de
++de agente, pueda retomar el hilo sin releer todo el historial. Cada incremento añade además, dentro de
+ \texttt{.planning/phases/}, un par de documentos por plan: un \texttt{PLAN.md} que describe qué
+ se va a hacer y cómo se va a verificar y un \texttt{SUMMARY.md} que el agente ejecutor redacta
+ al terminar, con lo que se hizo, las desviaciones respecto al plan original y la evidencia que
+@@ -118,7 +116,7 @@ hasta la prueba y la firma que la verifican.
+ 
+ Además del registro de agentes, el proyecto conserva dos registros de decisión. Los ítems
+ diferidos, en \texttt{deferred-items.md}, recogen los hallazgos fuera de alcance descubiertos
+-durante la ejecución, con su motivo y su destino. Los registros de decisión de arquitectura,
++durante la ejecución, con su motivo y su destino. Los registros de decisión de arquitectura (ADR),
+ en \texttt{docs/adr/}, documentan cada decisión material con su contexto, sus alternativas,
+ su decisión, su evidencia, sus consecuencias y su reversibilidad. El
+ Capítulo~\ref{cap:diseno} resume los nueve registros de decisión de arquitectura vigentes.
+@@ -128,7 +126,7 @@ explorar cómo se relacionan las ideas entre sí. Para eso, el proyecto mantiene
+ \textit{vault} de Obsidian, \texttt{ideas-vault/}, una colección de notas en Markdown
+ enlazadas entre sí mediante referencias internas que Obsidian representa como un grafo
+ navegable. Cada nota recoge un concepto (una decisión de diseño, un requisito, un algoritmo,
+-una fase); sus enlaces señalan de qué otras notas depende o a cuáles afecta, de modo que
++un incremento); sus enlaces señalan de qué otras notas depende o a cuáles afecta, de modo que
+ retomar un concepto después de semanas sin tocarlo no exige reconstruir el contexto desde
+ cero: basta con abrir su nota y seguir sus enlaces. La Figura~\ref{fig:obsidian-vault} muestra
+ el grafo real del vault de SavePoint en el momento de escribir esta memoria, generado a partir
+@@ -137,7 +135,7 @@ de los enlaces existentes entre sus notas, no como una ilustración esquemática
+ \begin{figure}[H]
+     \centering
+     \includegraphics[width=0.92\textwidth]{figures/obsidian-vault-graph.pdf}
+-    \caption{Grafo del vault de Obsidian de SavePoint (\texttt{ideas-vault/}), coloreado por
++    \caption[Grafo del vault de Obsidian de SavePoint]{Grafo del vault de Obsidian de SavePoint (\texttt{ideas-vault/}), coloreado por
+     categoría de nota. Se muestra la componente conexa principal, ciento veintitrés notas de
+     las ciento cincuenta que contiene el vault; el resto enlaza solo entre sí en subgrafos
+     pequeños y aislados. Los nodos de mayor tamaño, como \texttt{00 - Indice} o los mapas de
+@@ -148,7 +146,7 @@ de los enlaces existentes entre sus notas, no como una ilustración esquemática
+ El vault y el árbol \texttt{.planning/} cumplen papeles distintos y deliberadamente no
+ redundantes. El árbol de planificación es normativo: fija alcance, criterios de aceptación y
+ evidencia; de él depende que un plan se dé o no por cerrado. El vault es descriptivo: enlaza
+-conceptos con las fuentes canónicas que los sustentan (un ADR, un requisito, una fase) para que
++conceptos con las fuentes canónicas que los sustentan (un ADR, un requisito, un incremento) para que
+ se puedan explorar sus relaciones de forma visual, pero nunca sustituye a las pruebas, a los
+ hashes ni a los artefactos versionados que certifican una decisión. Esta separación se aplicó
+ también a la propia redacción de esta memoria: antes de escribir varios de los capítulos que
+@@ -166,9 +164,8 @@ del proyecto. El uso de agentes se describe aquí como una metodología de traba
+ diseñó, dirigió y evaluó, no como una coautoría.
+ 
+ El método de la Sección~\ref{sec:arte-agentes} se instrumenta en SavePoint con tres mecanismos.
+-El primero es el aislamiento del contexto: el trabajo se descompone en tareas atómicas, cada
+-una ejecutada por una instancia nueva del agente con la ventana limpia, y la información
+-viaja entre tareas por los ficheros persistentes del árbol \texttt{.planning/}
++El primero es ese aislamiento del contexto: cada tarea atómica la ejecuta una instancia nueva del
++agente y la información viaja por los ficheros persistentes del árbol \texttt{.planning/}
+ (Sección~\ref{sec:met-planning}), de modo que una interrupción, un límite de sesión o un
+ cambio de día no hacen perder el hilo. El segundo es la especialización de esas instancias en
+ los papeles de la Tabla~\ref{tab:subagentes}: quien planifica, quien implementa y quien
+@@ -206,7 +203,7 @@ en paralelo sin pisarse los cambios. El ciclo de un ejecutor es siempre el mismo
+ \textit{commits} dentro de esa copia aislada, al terminar se integra el resultado en la rama
+ principal mediante una fusión sin avance rápido (\texttt{merge --no-ff}), que conserva visible
+ en el historial el conjunto de cambios de ese plan como una unidad; por último, se limpia el
+-\textit{worktree}. Cuando varios planes de una misma fase declaran el mismo requisito, la
++\textit{worktree}. Cuando varios planes de un mismo incremento declaran el mismo requisito, la
+ orquestación añade además una comprobación de que todos esos planes tienen ya su
+ \texttt{SUMMARY.md} antes de marcar el requisito como cerrado, para que ningún requisito quede
+ completo mientras una de sus partes sigue pendiente en otro plan.
+@@ -257,7 +254,7 @@ proyecto acumuló varias reglas de este tipo a partir de incidencias reales:
+ El componente más distintivo del proceso es el registro de agentes,
+ \texttt{docs/methodology/agent-ledger.jsonl}, un fichero de solo anexado con un objeto por
+ línea. Cada entrada lleva una marca de tiempo, un tipo, el actor, el objetivo, las entradas y
+-salidas referenciadas por ruta relativa y hash SHA-256, las herramientas empleadas sin sus
++salidas referenciadas por ruta relativa y hash SHA-256 (del inglés \textit{secure hash algorithm}), las herramientas empleadas sin sus
+ secretos, el resultado y las limitaciones declaradas. El tipo es uno de tres:
+ \texttt{proposal} para una propuesta de agente, \texttt{automated-check} para una
+ comprobación determinista y \texttt{author-decision} para una decisión humana, que siempre
+@@ -277,16 +274,16 @@ trabajo inicial y en el posterior, con la advertencia de que un nombre de
+ modelo no basta para reproducir una salida probabilística: la evidencia reproducible son los
+ artefactos versionados, los hashes, los comandos y las decisiones humanas.
+ Los mensajes de commit siguen el estilo de \textit{Conventional Commits} y se escriben en
+-inglés. 
++inglés.
+ 
+ \section{Planificación del laboratorio de evaluación}\label{sec:met-fase2}
+ 
+-La Fase 2 se planificó como el puente entre la demostración de producto y la evaluación
++El laboratorio de evaluación se planificó como el puente entre la demostración de producto y la evaluación
+ reproducible. Su objetivo no era añadir una pantalla aislada, sino fijar las condiciones que
+ permiten afirmar algo sobre un recomendador: qué obras entran en el corpus, qué significan
+ las valoraciones, qué usuarios se simulan, cómo se construyen los candidatos y con qué
+ métricas se comparan las listas. Las decisiones metodológicas se tomaron antes de cualquier
+-ejecución de laboratorio y se conservaron en el directorio de planes de la fase.
++ejecución de laboratorio y se conservaron en el directorio de planes del incremento.
+ 
+ El orden no es accidental. El corpus y la versión inmutable preceden al protocolo; el protocolo
+ precede a la generación de usuarios y a la implementación de variantes; y solo entonces se
+@@ -298,7 +295,7 @@ Las decisiones que bloquean una comparación posterior quedaron congeladas en
+ \texttt{docs/methodology/protocol.json} y en \texttt{docs/methodology/evaluation-protocol.md}:
+ el corpus, el significado de las valoraciones, la población sintética, la relevancia, el
+ conjunto de candidatas y las métricas. Esta sección solo recoge cómo se planificó esa
+-congelación; el contenido de cada decisión se describe donde se aplica. El corpus y los
++congelación; el contenido de cada decisión se describe donde se aplica. El corpus y las
+ valoraciones, en la Sección~\ref{cap:datos}; el diseño del laboratorio, en la
+ Sección~\ref{sec:dis-laboratorio}; y el protocolo con el que se publicaron los resultados, en
+ la Sección~\ref{sec:exp-protocolo}.
+@@ -308,12 +305,12 @@ la Sección~\ref{sec:exp-protocolo}.
+ El trabajo se planificó como una sucesión de incrementos verticales, cada uno utilizable y
+ verificado antes de abordar el siguiente, en lugar de un calendario cerrado de tareas fijado
+ desde el principio. El desarrollo se organizó en seis iteraciones a lo largo de dos meses,
+-desde principios de agosto hasta el 4 de octubre de 2026, agrupadas alrededor de los hitos de la
++desde principios de agosto hasta el 6 de octubre de 2026, agrupadas alrededor de los hitos de la
+ Tabla~\ref{tab:hitos}. El estudio previo y las primeras pruebas de desarrollo comenzaron
+ aproximadamente un mes antes del arranque sistemático del repositorio de producto: el
+ repositorio se creó el 24 de agosto y el desarrollo con registros de decisión y planes por
+-fase comenzó el 4 de septiembre. La fecha de inicio del estudio previo es aproximada; las
+-posteriores proceden del historial del repositorio y de las firmas de cada fase.
++incremento comenzó el 4 de septiembre. La fecha de inicio del estudio previo es aproximada; las
++posteriores proceden del historial del repositorio y de las firmas de cada incremento.
+ 
+ \begin{table}[H]
+ \centering
+@@ -322,21 +319,21 @@ posteriores proceden del historial del repositorio y de las firmas de cada fase.
+     \hline
+     \textbf{Hito} & \textbf{Fecha} \\
+     \hline
+-    H0 — Inicio del estudio previo y de las primeras pruebas de desarrollo & 04/08/2026 (aprox.) \\
++    H0: Inicio del estudio previo y de las primeras pruebas de desarrollo & 04/08/2026 (aprox.) \\
+     \hline
+-    H1 — Demostración pública de tres días en producción (Fase 1) & 05/09/2026 \\
++    H1: Demostración pública de tres días en producción & 05/09/2026 \\
+     \hline
+-    H2 — Catálogo a escala real e interfaz rediseñada (Fase 01.1) & 06/09/2026 \\
++    H2: Catálogo a escala real e interfaz rediseñada & 06/09/2026 \\
+     \hline
+-    H3 — Contrato de evaluación sin conexión congelado (Fase 2) & 08/09/2026 \\
++    H3: Contrato de evaluación sin conexión congelado & 08/09/2026 \\
+     \hline
+-    H4 — Recomendadores de contenido, colaborativo e híbrido implementados & 12/09/2026 \\
++    H4: Recomendadores de contenido, colaborativo e híbrido implementados & 12/09/2026 \\
+     \hline
+-    H5 — Publicación de resultados v15 con significación estadística & 12/09/2026 \\
++    H5: Publicación de resultados v15 con significación estadística & 12/09/2026 \\
+     \hline
+-    H6 — Flujos de colección, relaciones de amistad y endurecimiento cerrados & 14/09/2026 \\
++    H6: Flujos de colección, relaciones de amistad y endurecimiento cerrados & 14/09/2026 \\
+     \hline
+-    H7 — Memoria del TFG y despliegue completos, listos para defensa & 04/10/2026 \\
++    H7: Memoria del TFG y despliegue completos, listos para defensa & 06/10/2026 \\
+     \hline
+ \end{tabularx}
+ \end{table}
+@@ -352,20 +349,20 @@ La Figura~\ref{fig:calendario} sitúa las iteraciones y los hitos en el calendar
+ 
+ La \textbf{Iteración 1} (de principios de agosto al 3 de septiembre, con inicio aproximado) cubrió el
+ estudio previo y las primeras pruebas de desarrollo: revisión de productos de referencia,
+-comparación de fuentes de datos de videojuegos y sus licencias, y pruebas de desarrollo
++comparación de fuentes de datos de videojuegos y sus licencias y pruebas de desarrollo
+ previas al arranque del repositorio de producto. La \textbf{Iteración 2} (4 al 6 de septiembre)
+ formalizó las primeras decisiones de arquitectura (ADR-001 y ADR-002) con un entorno de
+-desarrollo reproducible en Docker Compose, y entregó el primer incremento de producto bajo una
++desarrollo reproducible en Docker Compose y entregó el primer incremento de producto bajo una
+ restricción explícita de tres días para una demostración pública visible, con un catálogo
+ reducido, una cuenta y la recomendación por popularidad; a continuación amplió el catálogo a
+ escala real e incorporó el rediseño de la interfaz. La \textbf{Iteración 3} (7 y 8 de
+ septiembre) congeló el contrato de evaluación sin conexión: corpus, población sintética, métricas y
+ protocolo, antes de escribir ningún algoritmo de recomendación avanzado. La
+ \textbf{Iteración 4} (9 al 12 de septiembre) implementó las tres familias de recomendación
+-(contenido, colaborativo e híbrido) y sus dieciséis variantes, y ejecutó la publicación final de
++(contenido, colaborativo e híbrido) y sus dieciséis variantes y ejecutó la publicación final de
+ resultados (v15) descrita en el Capítulo~\ref{cap:resultados}. La \textbf{Iteración 5} (13 y 14
+ de septiembre) cerró los flujos completos de colección y portabilidad, las relaciones de
+-amistad y el endurecimiento de seguridad. La \textbf{Iteración 6} (15 de septiembre al 4 de
++amistad y el endurecimiento de seguridad. La \textbf{Iteración 6} (15 de septiembre al 6 de
+ octubre) se dedicó a la redacción, revisión y cierre de esta memoria y del despliegue, junto con
+ los ajustes finales de la interfaz y del módulo social.
+ 
+@@ -408,7 +405,7 @@ reparte esas horas entre las grandes áreas del trabajo.
+ El coste directo se calcula sobre esas 310 horas con una tarifa de referencia de un perfil
+ junior de ingeniería del software en España, 14,00\,€/hora, una cota conservadora frente al
+ coste real de contratación de un perfil equivalente. El coste material recoge la amortización
+-proporcional del PC de torre empleado, valorado en 1.000,00\,€ y con una vida útil estimada de
++proporcional del ordenador de torre empleado, valorado en 1.000,00\,€ y con una vida útil estimada de
+ cuatro años, del que este trabajo consume dos meses. Se añade una suscripción a agentes de IA,
+ estimada en 30,00\,€, empleada como apoyo al desarrollo bajo dirección y revisión humanas. No
+ se incluye ningún coste de infraestructura en la nube, porque la topología de despliegue público
+@@ -424,7 +421,7 @@ atribuible al proyecto. La Tabla~\ref{tab:presupuesto} resume el presupuesto tot
+     \hline
+     Coste directo (310\,h a 14,00\,€/h) & 4.340,00 \\
+     \hline
+-    Coste material (amortización de PC de torre, 2 meses) & 41,67 \\
++    Coste material (amortización de ordenador de torre, 2 meses) & 41,67 \\
+     \hline
+     Suscripción a agentes de IA & 30,00 \\
+     \hline
+@@ -464,7 +461,7 @@ mantienen bajo vigilancia.
+     \hline
+     Errores del agente en trabajo dado por bueno & Verificación de objetivos independiente y revisión de código de todo el repositorio con contexto propio. \\
+     \hline
+-    Despliegue no conectado a datos reales & Decisión registrada del proyecto de posponer esa conexión al final del proyecto; el entorno local reproducible es la vía de demostración. \\
++    Catálogo parcial en el despliegue público & El corpus gobernado completo no cabe en el nivel gratuito de la base de datos; se publica un subconjunto con criterio explícito y el entorno local reproducible es donde se mide la evaluación (Sección~\ref{cap:despliegue}). \\
+     \hline
+ \end{tabularx}
+ \caption{Riesgos identificados y sus mitigaciones.}
+@@ -489,19 +486,19 @@ quedaron registradas en los resúmenes de plan.
+ 
+ El enfoque produjo beneficios concretos y observables en el proyecto, junto con límites que
+ conviene declarar con la misma franqueza. El alcance se mantuvo bajo control a lo largo de
+-sucesivos incrementos, sin que el trabajo de uno se filtrara en otro, y cada cambio quedó
++sucesivos incrementos, sin que el trabajo de uno se filtrara en otro y cada cambio quedó
+ trazado hasta su plan, su requisito y su evidencia. Las revisiones de código con contexto
+ independiente encontraron dieciséis hallazgos reales, descritos en la
+ Sección~\ref{cap:pruebas}, que se corrigieron por completo, incluidos defectos de seguridad en
+ trabajo ya dado por bueno. El trabajo se pudo reanudar sin pérdida de hilo tras interrupciones
+-y límites de sesión, porque el estado vivía en ficheros y no en una conversación, y el propio
++y límites de sesión, porque el estado vivía en ficheros y no en una conversación y el propio
+ proceso de ingeniería quedó reproducible, no solo el producto: un tercero puede clonar el
+ repositorio y reconstruir la historia de decisiones a partir del árbol de planificación, los
+ registros de decisión, el registro de agentes y los gates de evidencia.
+ 
+ El enfoque depende, sin embargo, de la calidad de la especificación escrita: un plan ambiguo
+ produce una ejecución ambigua. Mantener la disciplina de planificación, verificación y registro
+-tiene un coste de tiempo notable para un TFG individual, y los agentes cometieron errores que
++tiene un coste de tiempo notable para un TFG individual; los agentes cometieron errores que
+ hubo que detectar y corregir, algunos de ellos recogidos en la
+ Sección~\ref{sec:met-contrato-contexto}. Un agente no es un evaluador independiente de su
+ propia propuesta, del mismo modo que un hash prueba identidad de bytes, no veracidad ni calidad;
+diff --git a/thesis/sections/04_analisis.tex b/thesis/sections/04_analisis.tex
+index 48f9516..e4ba28f 100644
+--- a/thesis/sections/04_analisis.tex
++++ b/thesis/sections/04_analisis.tex
+@@ -21,7 +21,7 @@ preparada, que es una cuenta normal con sus datos y no un actor distinto.
+     \hline
+     \textbf{Actor} & \textbf{Descripción} \\
+     \hline
+-    Visitante & Persona no autenticada que consulta el catálogo, la ficha de un juego y la recomendación por popularidad, y que puede registrarse. \\
++    Visitante & Persona no autenticada que consulta el catálogo, la ficha de un juego y la recomendación por popularidad y que puede registrarse. \\
+     \hline
+     Persona usuaria & Titular de una cuenta registrada que inicia sesión y gestiona su lista de pendientes, valora juegos, inventaría copias y se relaciona con sus amigos. \\
+     \hline
+@@ -41,7 +41,7 @@ implementan los modelos, está en la Sección~\ref{sec:dis-modelo-datos}.
+ \begin{figure}[H]
+     \centering
+     \includegraphics[width=0.95\textwidth]{figures/modelo-dominio.pdf}
+-    \caption{Modelo de dominio de SavePoint, agrupado por catálogo, biblioteca personal, cuentas y amistades, y laboratorio de evaluación. Cada flecha parte de la entidad que contiene la clave foránea y apunta a la entidad que referencia; la flecha de doble punta indica una relación de muchos a muchos y la discontinua, una referencia opcional. De las copias en propiedad solo se dibujan sus referencias a la versión de lanzamiento y a la edición; \texttt{IgdbImportRun} y \texttt{AssetAttribution} se omiten de la figura y se describen en el texto.}
++    \caption[Modelo de dominio de SavePoint]{Modelo de dominio de SavePoint, agrupado por catálogo, biblioteca personal, cuentas y amistades y laboratorio de evaluación. Cada flecha parte de la entidad que contiene la clave foránea y apunta a la entidad que referencia; la flecha de doble punta indica una relación de muchos a muchos y la discontinua, una referencia opcional. De las copias en propiedad solo se dibujan sus referencias a la versión de lanzamiento y a la edición; \texttt{IgdbImportRun} y \texttt{AssetAttribution} se omiten de la figura y se describen en el texto.}
+     \label{fig:modelo-dominio}
+ \end{figure}
+ 
+@@ -66,7 +66,7 @@ en propiedad (\texttt{OwnedCopy}) representan cada ejemplar, físico o digital,
+ su publicación y su edición.
+ 
+ En las cuentas, el proyecto usa directamente el modelo de usuario de Django
+-(\texttt{User}), al que se asocian la biblioteca personal y las relaciones de amistad. Las solicitudes (\texttt{FriendshipRequest}), las amistades aceptadas (\texttt{Friendship}) y los bloqueos (\texttt{Block}) son entidades que referencian a dos usuarios. El perfil editable (\texttt{AccountProfile}) guarda el nombre completo, la biografía, la foto, la portada y los ajustes de privacidad, y las notificaciones (\texttt{SocialNotice}) avisan de las solicitudes aceptadas y de las recomendaciones añadidas a pendientes.
++(\texttt{User}), al que se asocian la biblioteca personal y las relaciones de amistad. Las solicitudes (\texttt{FriendshipRequest}), las amistades aceptadas (\texttt{Friendship}) y los bloqueos (\texttt{Block}) son entidades que referencian a dos usuarios. El perfil editable (\texttt{AccountProfile}) guarda el nombre completo, la biografía, la foto, la portada y los ajustes de privacidad y las notificaciones (\texttt{SocialNotice}) avisan de las solicitudes aceptadas y de las recomendaciones añadidas a pendientes.
+ 
+ La Tabla~\ref{tab:req-informacion} enlaza cada área del modelo con los requisitos de
+ información que satisface.
+@@ -105,7 +105,7 @@ aceptación.
+ \begin{table}[htp]
+ \centering
+ \tablecompact
+-\begin{tabularx}{\textwidth}{ | L{0.18\textwidth} | Y | C{0.22\textwidth} | }
++\begin{tabularx}{\textwidth}{ | L{0.15\textwidth} | Y | C{0.14\textwidth} | }
+     \hline
+     \textbf{Código} & \textbf{Requisito funcional} & \textbf{Estado} \\
+     \hline
+@@ -133,6 +133,8 @@ aceptación.
+     \hline
+     LIB-02 & Valorar un juego con una escala consistente. & Completo \\
+     \hline
++    LIB-03 & Comentar un juego, con el comentario visible solo para los amigos. & Completo \\
++    \hline
+     INV-01 & Registrar varias copias de la misma obra. & Completo \\
+     \hline
+     INV-02 & Registrar formato, plataforma y edición de cada copia. & Completo \\
+@@ -141,7 +143,7 @@ aceptación.
+     \hline
+     DATA-01 & Conjunto de datos estable, citable y legalmente adecuado. & Completo \\
+     \hline
+-    DATA-02 & El conjunto registra versión, licencia, URL de origen, fecha y hash. & Completo \\
++    DATA-02 & El conjunto registra versión, licencia, dirección web (URL) de origen, fecha y hash. & Completo \\
+     \hline
+     DATA-04 & API de enriquecimiento elegida mediante comparación documentada. & Completo \\
+     \hline
+@@ -149,9 +151,9 @@ aceptación.
+     \hline
+     REC-10 & Página de recomendaciones por géneros según la actividad propia. & Completo \\
+     \hline
+-    REC-03 a REC-09 & Recomendadores basados en contenido, colaborativos e híbridos, con explicaciones y arranque en frío. & Completo (Fases 2-4) \\
++    REC-03 a REC-09 & Recomendadores basados en contenido, colaborativos e híbridos, con explicaciones y arranque en frío. & Completo \\
+     \hline
+-    PORT-01 a PORT-04 & Exportación e importación de colección, valoraciones y listas. & Completo (Fases 5 y 7) \\
++    PORT-01 a PORT-04 & Exportación e importación de colección, valoraciones y listas. & Completo \\
+     \hline
+ \end{tabularx}
+ \caption{Requisitos funcionales considerados en el análisis del sistema.}
+@@ -159,7 +161,9 @@ aceptación.
+ \end{table}
+ 
+ La Figura~\ref{fig:casos-uso} presenta el diagrama de casos de uso del sistema tal como se
+-analizó al inicio del proyecto.
++analizó al inicio del proyecto. Las funciones incorporadas después, como las listas, los favoritos, la
++importación y exportación de la colección y las tres variantes de recomendación publicadas, no añaden actores y
++amplían los casos de uso aquí descritos.
+ 
+ \begin{figure}[htp]
+     \centering
+@@ -214,22 +218,11 @@ funcional que satisface.
+ 
+ \section{Requisitos de la evaluación de recomendadores}\label{sec:req-estudio}
+ 
+-La planificación posterior a la primera demostración añadió requisitos que no se pueden
+-validar únicamente recorriendo la interfaz. DATA-03 y DATA-06 exigen una frontera de corpus
+-gobernada, reversible y versionada, con checksum, diccionario, informe de calidad y muestra
+-determinista. DATA-05, DATA-07 y DATA-08 exigen importar valoraciones con procedencia, reconciliar
+-fuentes externas sin emparejamiento difuso y conservar una versión inmutable por cada versión del corpus.
+-
+-EVAL-01, EVAL-02 y EVAL-03 fijan la comparación sobre la misma partición, los mismos
+-candidatos y las mismas exclusiones. EVAL-09 y EVAL-10 añaden usuarios sintéticos
+-parametrizados y obligan a separar la evidencia simulada de cualquier afirmación sobre
+-usuarios reales. DOC-04 exige que el protocolo, las métricas, las semillas, las versiones y
+-las amenazas a la validez queden escritos antes del resultado.
+-
+-En recomendación, REC-01 exige un método de referencia aleatorio reproducible y REC-03 vectores de
+-contenido dispersos, perfil de usuario y similitud. REC-06 a REC-09 describen el arranque en frío,
+-las exclusiones, la explicación por contribuciones y el DTO versionado de las variantes
+-comparadas.
++La planificación posterior a la primera demostración añadió requisitos que no se pueden validar únicamente
++recorriendo la interfaz, porque se verifican contra artefactos versionados y pruebas automáticas y no contra
++pantallas. La Tabla~\ref{tab:req-estudio} los agrupa por área, desde la frontera de corpus gobernada y versionada
++hasta el arranque en frío y la comparación de todas las variantes sobre la misma partición, los mismos candidatos y
++las mismas exclusiones.
+ 
+ \begin{table}[H]
+ \centering
+@@ -252,7 +245,7 @@ comparadas.
+     \hline
+     Algoritmos & Vectores de contenido dispersos, perfil de usuario y similitud. & REC-03 \\
+     \hline
+-    Algoritmos & Arranque en frío, exclusiones, explicación por contribuciones y DTO versionado de las variantes comparadas. & REC-06 a REC-09 \\
++    Algoritmos & Arranque en frío, exclusiones, explicación por contribuciones y objeto de transferencia de datos (DTO) versionado de las variantes comparadas. & REC-06 a REC-09 \\
+     \hline
+ \end{tabularx}
+ \caption{Requisitos de la evaluación de recomendadores.}
+@@ -300,11 +293,11 @@ comportamiento del sistema.
+     \hline
+     RN-7 & Registrar de nuevo una copia con la misma clave de idempotencia devuelve la copia existente en lugar de crear un duplicado. \\
+     \hline
+-    RN-8 & Ninguna cuenta es pública: solo su titular y sus amigos aceptados acceden a su colección, sus listas y sus comentarios, y una persona sin sesión no ve ninguna cuenta. \\
++    RN-8 & Ninguna cuenta es pública: solo su titular y sus amigos aceptados acceden a su colección, sus listas y sus comentarios y una persona sin sesión no ve ninguna cuenta. \\
+     \hline
+     RN-9 & El acceso a IGDB queda confinado a un comando de gestión fuera de línea; ninguna petición de usuario llama a un proveedor externo. \\
+     \hline
+-    RN-10 & El nombre de usuario puede cambiarse una sola vez, y la visibilidad de la colección, los favoritos y las listas admite solo dos niveles: privada o visible para las amistades. \\
++    RN-10 & El nombre de usuario puede cambiarse una sola vez y la visibilidad de la colección, los favoritos y las listas admite solo dos niveles: privada o visible para las amistades. \\
+     \hline
+ \end{tabularx}
+ \caption{Reglas de negocio.}
+@@ -315,7 +308,7 @@ comportamiento del sistema.
+ 
+ De los ochenta y ocho requisitos identificados en el análisis, ochenta y seis están
+ completos, con evidencia verificable en \texttt{docs/verification/} o en las firmas de
+-aceptación por fase. Entre ellos están las tres familias de recomendación y su protocolo de evaluación
++aceptación por incremento. Entre ellos están las tres familias de recomendación y su protocolo de evaluación
+ sin conexión, que desarrollan la Sección~\ref{cap:algoritmos} y el Capítulo~\ref{cap:resultados}.
+ Los dos requisitos pendientes son parciales y pertenecen al mismo contrato de evaluación:
+ repetir la comparación de algoritmos con varias semillas y retroproyectar sobre la ejecución
+@@ -326,7 +319,7 @@ La Tabla~\ref{tab:trazabilidad-familias} recorre las dieciséis familias de requ
+ proyecto, con cuántos de cada una están completos y verificados frente a los que quedan
+ pendientes. Cada fila es, en sí misma, una entrada de trazabilidad: el código de familia enlaza
+ directamente con los identificadores individuales de \texttt{.planning/REQUIREMENTS.md}; el
+-estado de cada uno de ellos remite a su vez a una firma de aceptación por fase o a un plan
++estado de cada uno de ellos remite a su vez a una firma de aceptación por incremento o a un plan
+ concreto en \texttt{docs/verification/}.
+ 
+ \begin{table}[H]
+@@ -361,8 +354,8 @@ Los dos pendientes pertenecen a la familia \texttt{EVAL}; ningún requisito comp
+ de ellos para su propia verificación, de modo que ese trabajo futuro no invalida ninguna
+ evidencia ya cerrada.
+ 
+-La Tabla~\ref{tab:trazabilidad} enlaza cada requisito entregado con la evidencia que lo
+-respalda. La columna de evidencia remite a documentos del repositorio: firmas de aceptación
++La Tabla~\ref{tab:trazabilidad} enlaza una selección de requisitos de cada familia con la evidencia que los
++respalda; la matriz completa vive en \texttt{.planning/REQUIREMENTS.md}. La columna de evidencia remite a documentos del repositorio: firmas de aceptación
+ en \texttt{docs/verification/}, registros de decisión en \texttt{docs/adr/} e informes de
+ verificación en \texttt{.planning/phases/}.
+ 
+diff --git a/thesis/sections/05_diseno_arquitectura.tex b/thesis/sections/05_diseno_arquitectura.tex
+index 366eb38..2e76192 100644
+--- a/thesis/sections/05_diseno_arquitectura.tex
++++ b/thesis/sections/05_diseno_arquitectura.tex
+@@ -20,15 +20,15 @@ persistencia; sus módulos se separan por dominio (\texttt{catalogue}, \texttt{l
+ TypeScript en modo estricto, que renderiza en el servidor (SSR) las páginas de solo lectura; el navegador
+ solo habla con Next.js, que reenvía las llamadas al backend (Sección~\ref{sec:dis-sesion}). Los
+ trabajos de recomendación y evaluación se
+-ejecutan como comandos fuera de la petición HTTP: la aplicación publica sus resultados, pero no
++ejecutan como comandos fuera de la petición del protocolo de transferencia de hipertexto (HTTP): la aplicación publica sus resultados, pero no
+ vuelve a calcular los resultados de la evaluación en el navegador. La Figura~\ref{fig:arquitectura}
+-representa esta arquitectura por capas, y el registro de decisión ADR-001 recoge el contexto
++representa esta arquitectura por capas y el registro de decisión ADR-001 recoge el contexto
+ completo de esta elección.
+ 
+ \begin{figure}[H]
+     \centering
+     \includegraphics[width=0.8\textwidth]{figures/arquitectura.pdf}
+-    \caption{Arquitectura de SavePoint: el navegador solo habla con Next.js, que reescribe las llamadas hacia Django y DRF; los comandos de ingesta y el ejecutor de evaluación escriben en PostgreSQL fuera de la petición HTTP.}
++    \caption[Arquitectura de SavePoint]{Arquitectura de SavePoint: el navegador solo habla con Next.js, que reescribe las llamadas hacia Django y DRF; los comandos de ingesta y el ejecutor de evaluación escriben en PostgreSQL fuera de la petición HTTP.}
+     \label{fig:arquitectura}
+ \end{figure}
+ 
+@@ -59,10 +59,9 @@ y falla en PostgreSQL, o viceversa, sería un defecto del propio diseño experim
+ código. Todo el sistema se levanta, en consecuencia, con Docker Compose a partir de los tres
+ componentes de aplicación (base de datos, API y frontend), cada uno construido desde su propio
+ fichero de Docker con versiones de dependencias fijadas; junto a ellos, Compose orquesta además un contenedor de \textit{worker} independiente por cada
+-variante de recomendación que la web publica (Sección~\ref{sec:alg-publicadas}), y no por las
+-dieciséis que compara el laboratorio. Un trabajo cuyo objeto
++variante de recomendación publicada (Sección~\ref{sec:alg-publicadas}). Un trabajo cuyo objeto
+ de estudio es la reproducibilidad de una comparación de algoritmos necesita, antes que nada,
+-que el propio entorno de ejecución sea reproducible, y los contenedores eliminan esa variable
++que el propio entorno de ejecución sea reproducible y los contenedores eliminan esa variable
+ en cualquier máquina que lo levante.
+ 
+ Para el despliegue público se adoptó una topología repartida entre tres proveedores
+@@ -75,7 +74,7 @@ decisión completa.
+ \section{Decisiones de arquitectura}\label{sec:dis-adr}
+ 
+ Cada decisión de diseño con consecuencias materiales queda registrada en \texttt{docs/adr/}
+-como registro de decisión de arquitectura (ADR), con un formato fijo de contexto, alternativas,
++como ADR, con un formato fijo de contexto, alternativas,
+ decisión, evidencia, consecuencias, reversibilidad y aprobación. La
+ Tabla~\ref{tab:adr-resumen} resume el conjunto vigente; las secciones correspondientes citan
+ cada registro donde es relevante. Cada registro es citable y reversible: los límites de dominio
+@@ -107,7 +106,7 @@ y las migraciones actúan como puntos de salida si una decisión se revisa.
+     \hline
+ \end{tabularx}
+ \caption{Registros de decisión de arquitectura vigentes.}
+-\label{tab:adr-resumen}\label{tab:adr}
++\label{tab:adr-resumen}
+ \end{table}
+ 
+ \section{Modelo de datos, API y sesión}\label{sec:dis-modelo-datos}\label{sec:dis-api}\label{sec:dis-sesion}\label{sec:dis-frontera}
+@@ -152,7 +151,7 @@ de versionado del corpus, los subgéneros y las cuentas de demostración.
+ \begin{figure}[p]
+     \centering
+     \includegraphics[width=\textwidth]{figures/modelo-datos-biblioteca.pdf}
+-    \caption{Diagrama de entidades de la biblioteca personal y de las cuentas. \texttt{User}, \texttt{GameWork}, \texttt{GameRelease} y \texttt{Edition} se repiten con sus atributos mínimos como referencia.}
++    \caption[Diagrama de entidades de la biblioteca personal y de las cuentas]{Diagrama de entidades de la biblioteca personal y de las cuentas. \texttt{User}, \texttt{GameWork}, \texttt{GameRelease} y \texttt{Edition} se repiten con sus atributos mínimos como referencia.}
+     \label{fig:datos-biblioteca}
+ \end{figure}
+ 
+@@ -163,14 +162,15 @@ de versionado del corpus, los subgéneros y las cuentas de demostración.
+     \label{fig:datos-social}
+ \end{figure}
+ 
+-La API es de estilo REST, servida por DRF bajo el prefijo \texttt{/api/}. Las respuestas de
++La API es de estilo de transferencia de estado representacional (REST), servida por DRF bajo el prefijo \texttt{/api/}. Las respuestas de
+ lista están paginadas. Las vistas de escritura y las de datos personales exigen sesión. Las
+ anónimas de mayor coste llevan un límite de ritmo con ámbito propio. La
+ Tabla~\ref{tab:endpoints} recoge los puntos de acceso principales.
+ 
+ \begin{table}[htbp]
+ \centering
+-\begin{tabularx}{\textwidth}{ | L{0.39\textwidth} | C{0.14\textwidth} | Y | }
++\tablecompact
++\begin{tabularx}{\textwidth}{ | L{0.39\textwidth} | C{0.12\textwidth} | Y | }
+     \hline
+     \textbf{Método y ruta} & \textbf{Acceso} & \textbf{Función} \\
+     \hline
+@@ -192,7 +192,7 @@ Tabla~\ref{tab:endpoints} recoge los puntos de acceso principales.
+     \hline
+     \path{GET /api/social/notifications/} y \path{POST /api/social/messages/<id>/respond/} & Sesión & Notificaciones y respuesta a una recomendación recibida. \\
+     \hline
+-    \path{GET /api/library/export/collection.xlsx} & Sesión & Exportación de la colección a Excel, además del CSV. \\
++    \path{GET /api/library/export/collection.xlsx} & Sesión & Exportación de la colección a Excel, además de en valores separados por comas (CSV). \\
+     \hline
+     \path{GET /api/library/entries/} & Sesión & Biblioteca de la persona autenticada. \\
+     \hline
+@@ -202,6 +202,12 @@ Tabla~\ref{tab:endpoints} recoge los puntos de acceso principales.
+     \hline
+     \path{GET /api/recommendations/genre-taste/} & Sesión & Recomendación por afinidad de géneros de la persona autenticada. \\
+     \hline
++    \path{GET /api/recommendations/content/} y \path{snapshot/} & Sesión & Recomendaciones de una de las tres variantes publicadas y último conjunto completo de la persona, sin esperar al refresco. \\
++    \hline
++    \path{GET/POST /api/social/requests/} y \path{friendships/} & Sesión & Solicitudes de amistad, amistades y bloqueos. \\
++    \hline
++    \path{POST /api/library/import/preview/} y \path{apply/} & Sesión & Previsualización y aplicación de la importación de una colección. \\
++    \hline
+ \end{tabularx}
+ \caption{Puntos de acceso principales de la API.}
+ \label{tab:endpoints}
+@@ -210,7 +216,7 @@ Tabla~\ref{tab:endpoints} recoge los puntos de acceso principales.
+ La proyección de un perfil que ve un amigo se construye con una lista explícita de campos permitidos,
+ escrita a mano, en lugar de una serialización automática por introspección del modelo. Así,
+ exponer un campo privado nuevo requiere una decisión explícita, que es el modo de fallo
+-opuesto al de ocultarlo por olvido. Las imágenes de perfil y de portada se recortan y comprimen en el navegador, se limitan a 512~KiB, se validan en el servidor por su firma de formato y no por la extensión declarada, y solo se sirven a su titular y a sus amigos aceptados. La eliminación de la cuenta exige la contraseña y deja un evento de auditoría sin actor, porque el registro de auditoría es de solo anexado.
++opuesto al de ocultarlo por olvido. Las imágenes de perfil y de portada se recortan y comprimen en el navegador, se limitan a 512~KiB, se validan en el servidor por su firma de formato y no por la extensión declarada y solo se sirven a su titular y a sus amigos aceptados. La eliminación de la cuenta exige la contraseña y deja un evento de auditoría sin actor, porque el registro de auditoría es de solo anexado.
+ 
+ La autenticación sigue el diseño del registro ADR-004. Django emite y valida la sesión. El
+ navegador solo llama a rutas del mismo origen de Next.js, que las reescribe hacia el backend
+@@ -223,7 +229,7 @@ servidor. No hay ningún testigo de tipo \textit{bearer} accesible al código Ja
+ navegador.
+ 
+ El diseño mantiene dos fronteras explícitas. Ninguna cuenta es pública, de modo que solo los
+-amigos aceptados acceden a su contenido, y el acceso a IGDB está confinado a un comando de
++amigos aceptados acceden a su contenido y el acceso a IGDB está confinado a un comando de
+ gestión fuera de línea, sin que ninguna petición de usuario llame a un proveedor externo
+ (RN-8 y RN-9 de la Tabla~\ref{tab:reglas-negocio}).
+ 
+@@ -231,7 +237,7 @@ gestión fuera de línea, sin que ninguna petición de usuario llame a un provee
+ 
+ El diseño de la interfaz se fijó en un contrato de diseño, \texttt{01.1-UI-SPEC.md},
+ aprobado antes de implementar y validado por un subagente comprobador. El contrato define un
+-sistema de tokens de variables CSS, con juegos completos para tema claro y tema oscuro, cuya
++sistema de tokens de diseño en variables de hojas de estilo en cascada (CSS), con juegos completos para tema claro y tema oscuro, cuya
+ selección se aplica en el servidor mediante una cookie para evitar el destello al cargar. Los
+ componentes reutilizables incluyen la tarjeta de juego, las píldoras de estado y de nota, la
+ valoración por estrellas, la imagen de portada con su marcador de reserva, la barra de
+@@ -283,7 +289,7 @@ Los resultados publicados proceden de la ejecución \texttt{evaluation-400-test-
+ que su propio artefacto registra con el protocolo 15 y el conjunto de características
+ \texttt{fs-v12-curated-tags-idf}. Conviene no confundir las dos numeraciones, que son
+ independientes: el \emph{protocolo} de evaluación (v12, v14 y v15 son los tres que se ejecutaron
+-hasta el final, Sección~\ref{sec:exp-evolucion}) define cómo se mide, y el \emph{conjunto de
++hasta el final, Sección~\ref{sec:exp-evolucion}) define cómo se mide y el \emph{conjunto de
+ características} (\texttt{fs-v12}, \texttt{fs-v13}) define cómo se representa cada obra, de modo
+ que v12 y \texttt{fs-v12} no designan lo mismo. Después de esa ejecución, la revisión de los pesos
+ reales sobre el corpus llevó a \texttt{fs-v13-family-weighted-tags}, que corrige el reparto de
+@@ -291,7 +297,7 @@ peso entre familias de etiquetas (descrito más abajo) y con el que el código v
+ bajo el protocolo 16. Todavía no se ha ejecutado ni publicado una evaluación completa con
+ \texttt{fs-v13}. Por eso este apartado describe la implementación vigente (\texttt{fs-v13}),
+ mientras que todas las cifras del Capítulo~\ref{cap:resultados} corresponden a \texttt{fs-v12};
+-la Tabla~\ref{tab:pesos-familia} recoge los pesos de ambas versiones, y ninguna métrica
++la Tabla~\ref{tab:pesos-familia} recoge los pesos de ambas versiones y ninguna métrica
+ publicada de v15 se recalcula ni se reinterpreta.
+ 
+ \subsection{Representación de una obra y del perfil de la persona usuaria}\label{sec:alg-representacion}
+@@ -323,11 +329,11 @@ omite sin más; el sistema nunca imputa ni redistribuye su peso a otra familia,
+ premiaría la escasez de metadatos en lugar de ser neutral ante ella.
+ 
+ Dentro de cada familia, el peso de un valor concreto (por ejemplo, el género \texttt{rpg} o el
+-tema \texttt{cyberpunk}) se calcula con una frecuencia documental inversa suavizada, de modo
++tema \texttt{cyberpunk}) se calcula con una frecuencia inversa de documento (IDF) suavizada, de modo
+ que un valor raro dentro de su propia familia pese más que uno común. El fundamento es la
+ ponderación estadística de términos y la representación vectorial dispersa de Salton y
+ Buckley~\cite{salton1988term}: los rasgos que aparecen en casi todos los documentos
+-discriminan poco, y los infrecuentes discriminan mucho. Desde la revisión \texttt{fs-v13}, cada
++discriminan poco y los infrecuentes discriminan mucho. Desde la revisión \texttt{fs-v13}, cada
+ familia calcula su rareza sobre su propio universo de referencia, no sobre el corpus gobernado
+ completo: si \(N_f\) es el número de obras gobernadas con algún valor de la familia \(f\) y
+ \(df_t\) el número de esas obras que contienen el valor \(t\),
+@@ -375,11 +381,11 @@ descartó por ese mismo motivo.
+ 
+ \begin{table}[H]
+ \centering
+-\caption{Peso fijo \(W_f\) de cada familia de faceta en el vector de contenido, en
++\caption[Peso fijo de cada familia de faceta en el vector de contenido]{Peso fijo \(W_f\) de cada familia de faceta en el vector de contenido, en
+ \texttt{fs-v12} (versión con la que se calcularon los resultados del
+ Capítulo~\ref{cap:resultados}) y en \texttt{fs-v13} (implementación vigente). En
+ \texttt{fs-v12}, \texttt{tag} reunía género, subgénero, tema, característica y modo en un único
+-peso; en \texttt{fs-v13} agrupa solo género y subgénero. El guion indica que la familia no
++peso; en \texttt{fs-v13} agrupa solo género y subgénero. El valor \enquote{n/d} indica que la familia no
+ existía por separado. Los valores son una decisión de diseño de SavePoint, no una constante de
+ la literatura.}\label{tab:pesos-familia}
+ \begin{tabularx}{\textwidth}{@{}Yrr@{}}
+@@ -387,9 +393,9 @@ la literatura.}\label{tab:pesos-familia}
+ \hline
+ Etiqueta (\texttt{tag}) & 0,75 & 0,60 \\
+ Plataforma (\texttt{platform}) & 0,25 & 0,05 \\
+-Tema (\texttt{theme}) & -- & 0,20 \\
+-Característica (\texttt{feature}) & -- & 0,10 \\
+-Modo (\texttt{mode}) & -- & 0,05 \\
++Tema (\texttt{theme}) & n/d & 0,20 \\
++Característica (\texttt{feature}) & n/d & 0,10 \\
++Modo (\texttt{mode}) & n/d & 0,05 \\
+ Franquicia (\texttt{franchise}) & 0,02 & 0,02 \\
+ Desarrollador (\texttt{developer}) & 0,015 & 0,015 \\
+ \end{tabularx}
+@@ -400,14 +406,14 @@ entradas de biblioteca terminadas o en curso con valoración personal de al meno
+ puntos sobre diez; una entrada con valoración inferior a ese umbral no se añade al perfil
+ positivo, sino que alimenta un perfil de evidencia negativa aparte. Cada entrada \(i\) aporta
+ un peso de actividad \(entry\_weight_i = status\_weight_i + r_i^2\), donde \(status\_weight\)
+-vale 3 para una obra terminada, 2 para una obra en curso, 1 para pendiente y 0 para abandonada,
++vale 3 para una obra terminada, 2 para una obra en curso, 1 para pendiente y 0 para abandonada
+ y \(r_i\) es la valoración personal normalizada a \([0,1]\). Elevar la valoración al cuadrado
+ hace que una nota alta cuente como evidencia bastante más intensa que una simplemente
+ positiva. Esta forma de modular la contribución de cada ítem del historial es la aplicación
+ directa del principio de perfil ponderado por interés de la familia basada en
+ contenido~\cite{pazzani2007content}; los valores 3, 2, 1 y 0 y el exponente cuadrático son
+ decisión local. El perfil es la media ponderada de los vectores normalizados de las entradas
+-elegibles, y no se vuelve a normalizar globalmente después; conserva así la intensidad relativa
++elegibles y no se vuelve a normalizar globalmente después; conserva así la intensidad relativa
+ acumulada de la biblioteca. Cuando una etiqueta se repite en al menos tres entradas de baja
+ valoración, se activa como evidencia negativa. Ese umbral de tres es deliberado: una
+ penalización sin umbral convertiría una única experiencia mal valorada en un rechazo estable,
+@@ -421,7 +427,7 @@ persona; esa limitación queda declarada así en la respuesta.
+ La similitud entre el perfil de una persona y una obra candidata no aplica el coseno
+ ciegamente sobre todo el vector. Para cada familia se calculan por separado la cobertura del
+ perfil y la precisión de la candidata: si \(P_f\) y \(C_f\) son los valores de perfil y
+-candidata en la familia \(f\), y \(O_f = P_f \cap C_f\) su solapamiento,
++candidata en la familia \(f\) y \(O_f = P_f \cap C_f\) su solapamiento,
+ 
+ \[
+ cobertura_f = \frac{\sum_{t \in O_f} P_f[t]}{\sum_{t \in P_f} P_f[t]}, \qquad
+@@ -431,16 +437,16 @@ precision_f = \frac{|O_f|}{|C_f|} ,
+ y ambas cantidades se combinan con una media \(F_\beta\) con \(\beta = 0{,}5\),
+ 
+ \begin{equation}\label{eq:fbeta}
+-F_{0{,}5} = \frac{(1+0{,}5^2)\;cobertura \cdot precision}{0{,}5^2 \cdot precision + cobertura} ,
++F_{0{,}5} = \frac{(1+0{,}5^2)\;cobertura \cdot precision}{0{,}5^2 \cdot precision + cobertura} .
+ \end{equation}
+ 
+ La media \(F_\beta\) como forma canónica de equilibrar precisión y cobertura con un único
+ parámetro procede de van Rijsbergen~\cite{vanrijsbergen1979information}; el valor
+-\(\beta = 0{,}5\) es la decisión local, y da más peso a la precisión de la candidata que a la
++\(\beta = 0{,}5\) es la decisión local y da más peso a la precisión de la candidata que a la
+ cobertura del perfil, de modo que una obra que declara muchos valores de una familia no gana
+ automáticamente por enumerar más. Se consideraron dos alternativas y se descartaron por
+ motivos concretos: una media aritmética simple favorece a las candidatas con más metadatos
+-declarados, y el coseno puro sobre el vector completo, aunque más habitual, resulta menos
++declarados y el coseno puro sobre el vector completo, aunque más habitual, resulta menos
+ separable a la hora de explicar por qué se recomienda una obra y más vulnerable a las
+ candidatas con muchas facetas.
+ 
+@@ -493,7 +499,7 @@ El valor \(m=25\), el exponente cuadrático sobre la nota normalizada y el facto
+ \(n/(n+m)\) son, de nuevo, decisiones locales: el cuadrado separa mejor a las candidatas de
+ calidad alta y el factor de confianza penaliza de forma explícita el volumen de evidencia, no
+ solo la nota media. Usar la valoración en bruto se descartó por el sesgo evidente de las notas
+-extremas con poca evidencia, y volver a multiplicar por el volumen de votos también, porque ese
++extremas con poca evidencia y volver a multiplicar por el volumen de votos también, porque ese
+ volumen ya participa una vez dentro de la propia contracción. Cuando una candidata no tiene
+ valoración externa propia observada, el sistema recurre a la mediana de valoración de sus
+ etiquetas curadas y marca el resultado como una aproximación, sin presentarlo como una
+@@ -518,14 +524,15 @@ en otra fecha.
+ 
+ Con la afinidad de contenido \(C\), la calidad \(R\), la popularidad \(P\), la evidencia
+ negativa \(N\) y la recencia \(X\) ya definidas, la Tabla~\ref{tab:variantes-contenido} recoge
+-la fórmula exacta de las diez variantes basadas en contenido. Todas comparten el mismo conjunto
++la fórmula exacta de las diez variantes basadas en contenido y de la de recencia, incluidas las dos con
++reordenación por relevancia marginal máxima (\textit{maximal marginal relevance}, MMR). Todas comparten el mismo conjunto
+ de candidatas, el mismo vector de características y el mismo perfil de usuario; lo único que cambia
+ entre ellas es cómo combinan sus señales, precisamente para que la comparación aísle esa
+ decisión de diseño y no otra.
+ 
+ \begin{table}[H]
+ \centering
+-\caption{Fórmula de combinación de las diez variantes basadas en contenido.}\label{tab:variantes-contenido}
++\caption{Fórmula de combinación de las diez variantes basadas en contenido y de la de recencia.}\label{tab:variantes-contenido}
+ \small
+ \begin{tabularx}{\textwidth}{@{}>{\ttfamily\raggedright\arraybackslash}p{0.48\textwidth}>{\raggedleft\arraybackslash}X@{}}
+ \textnormal{Algoritmo} & \textnormal{Fórmula} \\
+@@ -543,7 +550,7 @@ content-cbf-mmr-v1 / -pop-v1 & MMR sobre Weighted / Weighted-Pop \\
+ \end{tabularx}
+ \end{table}
+ 
+-La existencia de estas diez variantes no responde a un afán de acumular algoritmos, sino al
++La existencia de estas variantes no responde a un afán de acumular algoritmos, sino al
+ diseño experimental: cada una aísla una única decisión de combinación manteniendo constantes
+ las candidatas, las características y las versiones inmutables, de modo que una diferencia de resultado se pueda
+ atribuir a esa decisión concreta. \texttt{content-cbf-weighted-v1} actúa como referencia del
+@@ -573,7 +580,7 @@ arranque en frío: con historial escaso, o sin vecindad suficiente, no puede inf
+ preferencia colaborativa fiable. Se descartó implementar en su lugar un colaborativo por
+ vecindad de ítems porque exige construir una matriz ítem-ítem y descansa sobre otra hipótesis
+ de generalización, mientras que la vecindad de usuarios resulta más legible con la valoración
+-explícito disponible en este corpus.
++explícita disponible en este corpus.
+ 
+ El híbrido responde al argumento de Burke~\cite{burke2002hybrid}: combinar fuentes
+ complementarias permite aprovechar las ventajas de cada una y compensar sus debilidades. Su
+@@ -583,14 +590,14 @@ de contenido y declara la alternativa de respaldo en lugar de penalizar artifici
+ nueva. El reparto 0,60/0,40 es en sí mismo una decisión local sujeta a evaluación, no una regla
+ tomada de la literatura.
+ 
+-Las dos variantes con reordenación por diversidad aplican \emph{maximal marginal relevance}
+-tal como lo formularon Carbonell y Goldstein~\cite{carbonell1998mmr}: recorren un conjunto de
++Las dos variantes con reordenación por diversidad aplican la MMR
++tal como la formularon Carbonell y Goldstein~\cite{carbonell1998mmr}: recorren un conjunto de
+ tamaño \(\max(100, 5K)\) y en cada posición eligen la candidata que maximiza
+ \(\lambda\,Rel(i) - (1-\lambda)\max_{j \in S} cosine(i,j)\), con \(Rel(i)\) la relevancia ya
+ calculada y \(S\) la lista parcial ya elegida. El valor \(\lambda = 0{,}80\) y el tamaño del
+ conjunto son decisiones locales. La motivación de fondo es la advertencia de McNee, Riedl y
+ Konstan~\cite{mcnee2006accurate} y el marco de medición de Vargas y
+-Castells~\cite{vargas2011rank}: la exactitud no agota la utilidad de una recomendación, y
++Castells~\cite{vargas2011rank}: la exactitud no agota la utilidad de una recomendación y
+ diversidad, novedad y cobertura deben medirse aparte en lugar de quedar escondidas dentro de la
+ puntuación. Por eso la diversificación se implementó como una capa de reordenación explícita y
+ no como un término más dentro de los pesos de afinidad, ni como una optimización multiobjetivo
+@@ -606,17 +613,17 @@ calidad externa ordena dentro de un mismo nivel de afinidad. La segunda añade p
+ reordenación por diversidad, para que la lista no repita variaciones del mismo juego. La
+ tercera favorece los títulos recientes y actúa como variante de descubrimiento. La selección es
+ una decisión de diseño de producto: ofrecer a la persona usuaria dieciséis listas con resultados
+-muy parecidos entre sí no aporta valor y empeora la experiencia, y mantener un proceso trabajador
++muy parecidos entre sí no aporta valor y empeora la experiencia y mantener un proceso trabajador
+ activo por cada variante supone un coste de recursos que no se justifica. Las demás variantes
+ se conservan en el laboratorio de evaluación, donde cumplen su función, que es compararlas bajo
+-un mismo protocolo, y no afectan a esta selección: el Capítulo~\ref{cap:resultados} evalúa las
++un mismo protocolo y no afectan a esta selección: el Capítulo~\ref{cap:resultados} evalúa las
+ dieciséis.
+ 
+ \subsection{Alternativas descartadas y su justificación}\label{sec:alg-alternativas}
+ 
+ Las familias implementadas son interpretables y adecuadas para una población controlada, pero
+ no agotan el espacio de recomendación. La Tabla~\ref{tab:alternativas} recoge las alternativas
+-que se consideraron de forma explícita, con su respaldo en la literatura cuando lo tienen, y el motivo
++que se consideraron de forma explícita, con su respaldo en la literatura cuando lo tienen y el motivo
+ por el que no se adoptaron en esta versión.
+ 
+ \begin{table}[H]
+@@ -627,10 +634,10 @@ por el que no se adoptaron en esta versión.
+ \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.43\textwidth}Y@{}}
+ \textnormal{Alternativa} & \textnormal{Motivo de exclusión} \\
+ \hline
+-Factorización matricial (ALS, BPR)~\cite{koren2009matrix} & Añade entrenamiento, factores latentes e hiperparámetros; dificulta atribuir un resultado a una señal concreta sobre población sintética \\
++Factorización matricial (mínimos cuadrados alternados y ranking personalizado bayesiano)~\cite{koren2009matrix} & Añade entrenamiento, factores latentes e hiperparámetros; dificulta atribuir un resultado a una señal concreta sobre población sintética \\
+ Redes neuronales, representaciones vectoriales o modelos de lenguaje & Coste, opacidad y requisitos de datos no justificados por el objetivo del trabajo \\
+ Modelos de grafos o secuenciales & El historial disponible no sostiene una hipótesis temporal que justifique esa complejidad \\
+-Colaborativo por vecindad de ítems & Exige matriz ítem-ítem y otra hipótesis de generalización; KNN de usuarios es más legible con valoración explícita \\
++Colaborativo por vecindad de ítems & Exige matriz ítem-ítem y otra hipótesis de generalización; la vecindad de usuarios es más legible con valoración explícita \\
+ Coseno puro como similitud principal & Menos separable en las explicaciones y más vulnerable a candidatas con muchas facetas \\
+ Media aritmética en lugar de \(F_{0{,}5}\) & Favorece a las candidatas que declaran más metadatos \\
+ Valoración externa en bruto & Sesgo de las notas extremas con poca evidencia; la contracción bayesiana lo corrige \\
+@@ -644,7 +651,7 @@ Estas exclusiones son decisiones de alcance y de validez, no afirmaciones de que
+ descartados sean universalmente peores. La factorización matricial, en particular, es una
+ alternativa reconocida y competitiva en recomendación colaborativa~\cite{koren2009matrix}; no
+ se incorpora porque el objetivo de este trabajo exige comparar señales legibles sobre una
+-población controlada, y un modelo de factores latentes introduciría entrenamiento y grados de
++población controlada y un modelo de factores latentes introduciría entrenamiento y grados de
+ libertad que harían mucho más difícil atribuir una diferencia de resultado a una señal
+ concreta. Cualquiera de ellas podría evaluarse en una extensión del trabajo, pero exigiría una
+ variante versionada, nuevos controles de datos y una comparación bajo el mismo protocolo.
+@@ -669,9 +676,9 @@ usuario y por $k$. La Figura~\ref{fig:pipeline-evaluacion} resume esa tubería.
+ La aplicación \texttt{evaluation} separa cuatro responsabilidades. El cargador del
+ protocolo valida las claves, el tamaño de la rejilla y el consumo único de la prueba. El módulo
+ de particiones selecciona la obra relevante retenida y comprueba que entrenamiento, validación y prueba
+-sean conjuntos disjuntos y completos. El módulo de métricas calcula P@K, R@K, nDCG@K y MAP@K
+-con fórmulas escritas y probadas en el proyecto. Por último, el ejecutor orquesta los algoritmos
+-y escribe un artefacto JSON con sus huellas y resultados.
++sean conjuntos disjuntos y completos. El módulo de métricas calcula la precisión y la exhaustividad (P@K y R@K), la ganancia acumulada descontada
++normalizada (nDCG@K) y la precisión media (MAP@K) con fórmulas escritas y probadas en el proyecto. Por último, el ejecutor orquesta los algoritmos
++y escribe un artefacto en notación de objetos de JavaScript (JSON) con sus huellas y resultados.
+ 
+ Todas las variantes comparten el conjunto de candidatos, la semántica de exclusión y el DTO
+ versionado; el modelo de contenido que usan es el descrito en la
+diff --git a/thesis/sections/06_implementacion.tex b/thesis/sections/06_implementacion.tex
+index cc37702..85881b8 100644
+--- a/thesis/sections/06_implementacion.tex
++++ b/thesis/sections/06_implementacion.tex
+@@ -7,9 +7,8 @@ código representativos, todos referenciados en el texto.
+ 
+ \section{Entorno reproducible y dependencias}\label{sec:impl-entorno}\label{sec:datos-dependencias}
+ 
+-El entorno de desarrollo y de pruebas se orquesta con Docker Compose, con tres servicios de
+-aplicación (base de datos, backend y frontend), además de los \textit{workers} de las variantes
+-de recomendación que publica la web (Sección~\ref{sec:alg-publicadas}). Las dependencias se fijan a versión exacta, con
++El entorno de desarrollo y de pruebas se orquesta con Docker Compose, tal como describe la
++Sección~\ref{sec:dis-arquitectura}. Las dependencias se fijan a versión exacta, con
+ \texttt{uv} para Python y \texttt{pnpm} para Node. Sus ficheros de bloqueo se congelan en las
+ construcciones. Las imágenes base se fijan por resumen criptográfico. La
+ Tabla~\ref{tab:stack} recoge las versiones principales.
+@@ -42,7 +41,7 @@ Tabla~\ref{tab:stack} recoge las versiones principales.
+     \hline
+ \end{tabularx}
+ \caption{Versiones principales del entorno reproducible.}
+-\label{tab:stack}\label{tab:stack-resumen}
++\label{tab:stack}
+ \end{table}
+ 
+ Toda dependencia directa nueva o cambio de versión pasa por un gate: aprobación humana
+@@ -79,7 +78,7 @@ laboratorio.
+ El corpus curado son ciento cincuenta juegos de datos estructurados de Wikidata,
+ publicados bajo la dedicación al dominio público \textit{Creative Commons Zero}
+ (CC0)~\cite{wikidata-licensing}. La adquisición se hace fuera de línea con un guion que
+-lanza una consulta filtrada por clase contra el punto de acceso SPARQL de Wikidata, resuelve
++lanza una consulta filtrada por clase contra el punto de acceso del lenguaje de consulta SPARQL de Wikidata, resuelve
+ las subconsultas de plataforma de forma dinámica y valida la estructura y la cobertura por
+ época del resultado. El guion escribe el fichero \texttt{data/raw/wikidata-games.json} con su
+ huella SHA-256, más los manifiestos de catálogo y de recursos. El registro de decisión
+@@ -153,7 +152,7 @@ presente y de reserva; y un manifiesto de revisión muestreada determinista de t
+ registros, tomando uno de cada mil cuarenta y uno por orden de identificador, con datos
+ suficientes para una comprobación humana puntual. La Tabla~\ref{tab:freeze} recoge los
+ valores medidos en la carga de la base de datos de desarrollo persistente y actualizados
+-durante la Fase 2, el 7 de septiembre de 2026.
++durante el gobierno del corpus, el 7 de septiembre de 2026.
+ 
+ \begin{table}[htp]
+ \centering
+@@ -194,7 +193,7 @@ pasadas. La versión inmutable reutilizable de la base cargada, de noventa y tre
+ versiona en el repositorio por decisión de ADR-006; se conserva fuera de él como vía de
+ restauración rápida.
+ 
+-La Fase 2 añadió una frontera de evaluación sobre este catálogo. El comando
++El laboratorio de evaluación añadió una frontera sobre este catálogo. El comando
+ \texttt{govern\_corpus} aplica las reglas D-03 de forma reversible: conserva las obras
+ fuente, pero marca como gobernadas las que son obras principales, tienen fecha de lanzamiento,
+ al menos un género y al menos una plataforma de la lista permitida de 39 plataformas. La valoración no es un criterio de
+@@ -203,9 +202,9 @@ exclusión. La ejecución documentada el 7 de septiembre dejó 193.885 obras gob
+ determinista se conservan en \texttt{docs/verification/corpus-governance-freeze.md}. La
+ Tabla~\ref{tab:freeze} y las cifras de este párrafo corresponden a esa versión. El 9 de septiembre se
+ congeló la versión \texttt{2026.09.2}, con corte temporal en esa fecha: el catálogo visible no contiene
+-obras posteriores al corte, sin fecha ni contenido descargable, y deja \textbf{190.479 obras
++obras posteriores al corte, sin fecha ni contenido descargable y deja \textbf{190.479 obras
+ gobernadas}. Es la versión con la que trabajan el laboratorio de evaluación y los resultados del
+-Capítulo~\ref{cap:resultados}, y su evidencia está en
++Capítulo~\ref{cap:resultados} y su evidencia está en
+ \texttt{docs/verification/corpus-governance-2026.09.2.json}.
+ 
+ \subsection{Valoraciones externas y aislamiento de la evaluación}\label{sec:datos-ratings}
+@@ -263,7 +262,7 @@ sobre el catálogo real.
+ El protocolo se carga desde \texttt{docs/methodology/protocol.json}. Los módulos de la
+ aplicación \texttt{evaluation} que describe la Sección~\ref{sec:dis-laboratorio} se
+ implementan con funciones deliberadamente pequeñas y explícitas.
+-\texttt{evaluation/protocol.py} rechaza una rejilla con más de 24 configuraciones y distingue
++\texttt{evaluation/protocol.py} rechaza una rejilla con más de 31 configuraciones y distingue
+ un protocolo todavía no consumido de una prueba ya ejecutada. \texttt{evaluation/metrics.py} no
+ delega la definición de P@K, R@K, nDCG@K o MAP@K en una librería externa.
+ \texttt{evaluation/splits.py} deriva la semilla del protocolo y del usuario, para que el orden
+@@ -310,18 +309,16 @@ servida por su proceso trabajador. Además, el método de referencia \texttt{ran
+ comparación. Selecciona con
+ \texttt{random.Random(seed)} sobre los candidatos gobernados que no aparecen en la biblioteca
+ de la persona usuaria. Ordenar previamente los identificadores y guardar una huella de la
+-semilla, los candidatos y el resultado hace que la misma entrada produzca exactamente el
++semilla, los candidatos y el resultado hace que la misma entrada produzca exactamente la
+ misma clasificación.
+ 
+ El modelo de contenido que usan los algoritmos, descrito en la
+ Sección~\ref{cap:algoritmos}, se apoya en \texttt{WorkFeatureVector}, una caché versionada y
+ no un modelo entrenado, que \texttt{rebuild\_feature\_vectors} rellena de forma idempotente. El
+-perfil de usuario se construye con los pesos de actividad descritos a continuación, y la
++perfil de usuario se construye con los pesos de actividad descritos a continuación y la
+ valoración se mantiene fuera del vector para poder estudiarla como una señal independiente.
+ 
+ \begin{samepage}
+-La interfaz de recomendaciones solo muestra las tres variantes del laboratorio publicadas:
+-\texttt{content-cbf-weighted-v1}, \texttt{content-cbf-mmr-pop-v1} y \texttt{recency-v1}.
+ Cada entrada de biblioteca aporta un peso de actividad a las etiquetas curadas de su obra,
+ según la fórmula del Extracto de código~\ref{cod:heuristico}. Un refactor posterior extrajo ese
+ cálculo al módulo \texttt{apps/api/recommendations/\_weights.py}, para que las variantes de
+@@ -369,20 +366,20 @@ recomendaciones. Los componentes reutilizables son los que fija el contrato de d
+ Sección~\ref{sec:dis-ui}, además del armazón de la aplicación con su barra de navegación. Las páginas de solo lectura se renderizan en el servidor; los controles de biblioteca
+ son componentes de cliente que llaman a la API del mismo origen. Las
+ Figuras~\ref{fig:catalogo} y~\ref{fig:coleccion} muestran el catálogo con sus filtros y la
+-colección de la persona usuaria.
++colección de la persona usuaria; todas las capturas de esta sección son del propio proyecto.
+ \end{samepage}
+ 
+ \begin{figure}[H]
+     \centering
+     \includegraphics[width=0.85\textwidth]{figures/02-catalogo-oscuro.png}
+-    \caption{Catálogo con tema oscuro, búsqueda y filtros por plataforma, género, año y valoración. Fuente: captura del proyecto.}
++    \caption{Catálogo con tema oscuro, búsqueda y filtros por plataforma, género, año y valoración.}
+     \label{fig:catalogo}
+ \end{figure}
+ 
+ \begin{figure}[H]
+     \centering
+     \includegraphics[width=0.85\textwidth]{figures/05-coleccion-oscuro.png}
+-    \caption{Colección de la persona usuaria con tema oscuro, con el estado y la valoración de cada juego. Fuente: captura del proyecto.}
++    \caption{Colección de la persona usuaria con tema oscuro, con el estado y la valoración de cada juego.}
+     \label{fig:coleccion}
+ \end{figure}
+ 
+@@ -416,52 +413,52 @@ de interfaz, no evidencia de calidad de clasificación ni de resultados experime
+ \begin{figure}[H]
+ \centering
+ \includegraphics[width=0.82\textwidth]{figures/06-recomendaciones-estanterias-oscuro.png}
+-\caption{Vista de recomendaciones organizada por estanterías, con tema oscuro. Fuente: captura del proyecto.}
++\caption{Vista de recomendaciones organizada por estanterías, con tema oscuro.}
+ \label{fig:recomendaciones-estanterias}
+ \end{figure}
+ 
+ \begin{figure}[H]
+ \centering
+ \includegraphics[width=0.82\textwidth]{figures/07-recomendaciones-detallada-oscuro.png}
+-\caption{Vista detallada de recomendaciones, con las señales de afinidad y tema oscuro. Fuente: captura del proyecto.}
++\caption{Vista detallada de recomendaciones, con las señales de afinidad y tema oscuro.}
+ \label{fig:recomendaciones-detallada}
+ \end{figure}
+ 
+ El módulo social y de personalización se apoya en tres pantallas. La página de amistades
+ (Figura~\ref{fig:amistades}) reúne en tres columnas la búsqueda por nombre de usuario exacto
+ y la lista de amistades, el perfil de la persona elegida, con sus favoritos y un resumen de
+-su colección, y las notificaciones de solicitudes y de recomendaciones, que pueden aceptarse,
++su colección y las notificaciones de solicitudes y de recomendaciones, que pueden aceptarse,
+ rechazarse o responderse. La página de perfil propio (Figura~\ref{fig:perfil}) organiza los
+ ajustes en cinco pestañas: cuenta, privacidad, preferencias, conexiones y seguridad. La
+-primera permite editar el nombre completo, la biografía, la foto, la portada y los favoritos,
++primera permite editar el nombre completo, la biografía, la foto, la portada y los favoritos
+ y cambiar una única vez el nombre de usuario. El acceso (Figura~\ref{fig:acceso})
+ y el registro (Figura~\ref{fig:registro}) son los únicos formularios abiertos a visitantes.
+ 
+ \begin{figure}[H]
+ \centering
+ \includegraphics[width=0.85\textwidth]{figures/09-amistades-oscuro.png}
+-\caption{Página de amistades con tema oscuro: amistades, perfil de la persona elegida y notificaciones. Fuente: captura del proyecto.}
++\caption{Página de amistades con tema oscuro: amistades, perfil de la persona elegida y notificaciones.}
+ \label{fig:amistades}
+ \end{figure}
+ 
+ \begin{figure}[H]
+ \centering
+ \includegraphics[width=0.85\textwidth]{figures/10-perfil-oscuro.png}
+-\caption{Perfil propio, pestaña de cuenta, con tema oscuro. Fuente: captura del proyecto.}
++\caption{Perfil propio, pestaña de cuenta, con tema oscuro.}
+ \label{fig:perfil}
+ \end{figure}
+ 
+ \begin{figure}[H]
+ \centering
+ \includegraphics[width=0.85\textwidth]{figures/06-iniciar-sesion-oscuro.png}
+-\caption{Página de acceso con tema oscuro. Fuente: captura del proyecto.}
++\caption{Página de acceso con tema oscuro.}
+ \label{fig:acceso}
+ \end{figure}
+ 
+ \begin{figure}[H]
+ \centering
+ \includegraphics[width=0.85\textwidth]{figures/07-registro-oscuro.png}
+-\caption{Página de registro con tema oscuro. Fuente: captura del proyecto.}
++\caption{Página de registro con tema oscuro.}
+ \label{fig:registro}
+ \end{figure}
+ 
+@@ -471,7 +468,7 @@ La verificación combina pruebas de backend contra PostgreSQL real (unitarias e
+ una única suite \texttt{pytest}, sin separarlas en conteos independientes), pruebas de
+ frontend con Vitest y un recorrido de navegador con Playwright que integra los casos de
+ accesibilidad mediante \texttt{axe}, sin un conteo aislado solo de accesibilidad. El cierre de
+-evidencia de la Fase 7, ejecutado el 14 de septiembre de 2026 y registrado en
++evidencia final, ejecutado el 14 de septiembre de 2026 y registrado en
+ \texttt{docs/verification/phase-07-launch-gate.md} y en \texttt{07-VERIFICATION.md}, deja como
+ última regresión completa 736 pruebas de backend, 70 de frontend y 56 de navegador, las tres
+ en verde y sin omitidas. Tras los cambios posteriores de interfaz, del módulo social y del despliegue, el 5 de octubre de 2026 se repitieron las suites de backend y de frontend: 788 pruebas de backend y 66 de frontend, todas en verde y sin omitidas (Tabla~\ref{tab:pru-resultados}). El recorrido de navegador no se repitió después de esos cambios. Las evidencias de seguridad, migraciones, privacidad, importación y
+@@ -542,10 +539,10 @@ informe de la propia ejecución del 5 de octubre de 2026, no de una estimación.
+ \label{tab:pru-areas}
+ \end{table}
+ 
+-La Tabla~\ref{tab:pru-trazabilidad} relaciona cada caso de uso de la Tabla~\ref{tab:casos-uso}, y por tanto
+-cada requisito funcional, con los ficheros de prueba que lo verifican y con el número de pruebas de cada uno; los
++La Tabla~\ref{tab:pru-trazabilidad} relaciona cada caso de uso de la Tabla~\ref{tab:casos-uso} con los requisitos que cubre, los ficheros de
++prueba que los verifican y el número de pruebas de cada uno; los
+ requisitos de datos y de evaluación, que verifican las suites de las áreas \texttt{catalogue} y
+-\texttt{evaluation}, se tratan en la Sección~\ref{sec:pru-fase2}.
++\texttt{evaluation}, se tratan en la Sección~\ref{sec:pru-datos}.
+ 
+ \begin{table}[htp]
+ \centering
+@@ -588,7 +585,7 @@ requisitos de datos y de evaluación, que verifican las suites de las áreas \te
+ \end{table}
+ 
+ Como ejemplo de caso de prueba concreto, la Tabla~\ref{tab:pru-cp1} describe la comprobación de que reintentar el
+-alta de una copia no crea un duplicado, y la Tabla~\ref{tab:pru-cp2} la de que una persona sin permiso no puede
++alta de una copia no crea un duplicado y la Tabla~\ref{tab:pru-cp2} la de que una persona sin permiso no puede
+ distinguir una colección privada de una que no existe. Ambas son pruebas automatizadas del repositorio y pasan en la
+ ejecución final de la Tabla~\ref{tab:pru-resultados}.
+ 
+@@ -629,7 +626,7 @@ ejecución final de la Tabla~\ref{tab:pru-resultados}.
+     \hline
+     Pasos & Como visitante y como persona sin amistad: 1) pedir la lista del propietario; 2) pedir su colección; 3) pedir la colección de un alias inexistente. \\
+     \hline
+-    Resultado esperado & Las tres peticiones responden 404, y la respuesta de la lista y de la colección del propietario es idéntica a la del alias inexistente. \\
++    Resultado esperado & Las tres peticiones responden 404 y la respuesta de la lista y de la colección del propietario es idéntica a la del alias inexistente. \\
+     \hline
+     Prueba automatizada & \path{tests/test_social_visibility.py}, \texttt{test\_\allowbreak{}anonymous\_\allowbreak{}and\_\allowbreak{}non\_\allowbreak{}friend\_\allowbreak{}get\_\allowbreak{}same\_\allowbreak{}404\_\allowbreak{}for\_\allowbreak{}direct\_\allowbreak{}collection\_\allowbreak{}and\_\allowbreak{}list}. \\
+     \hline
+@@ -640,7 +637,7 @@ ejecución final de la Tabla~\ref{tab:pru-resultados}.
+ \label{tab:pru-cp2}
+ \end{table}
+ 
+-\subsection{Verificación de los datos y del laboratorio}\label{sec:pru-fase2}
++\subsection{Verificación de los datos y del laboratorio}\label{sec:pru-datos}
+ 
+ La verificación de los datos y del laboratorio se dividió en dos grupos. El primero comprobó que los datos y
+ sus contratos eran correctos: 70 pruebas del catálogo cubrieron la importación de campos de
+@@ -670,9 +667,9 @@ Las tablas de precisión, recall, nDCG y MAP de la comparación completa, con la
+ 
+ Además de las pruebas, el repositorio tiene gates deterministas que protegen la evidencia. El
+ gate \texttt{check-secrets.ps1} escanea el árbol de Git, los paquetes de construcción, las
+-capas de las imágenes y los registros capturados en busca de cadenas con forma de credencial,
++capas de las imágenes y los registros capturados en busca de cadenas con forma de credencial
+ y se autoverifica primero contra señuelos sintéticos. El gate \texttt{check-evidence.ps1}
+-valida el registro de agentes descrito en la Sección~\ref{sec:met-ledger}, y el gate
++valida el registro de agentes descrito en la Sección~\ref{sec:met-ledger} y el gate
+ \texttt{check-dependencies.ps1} comprueba la lista permitida de dependencias de la
+ Sección~\ref{sec:impl-entorno}. Los gates \texttt{verify-igdb-*.ps1} comprueban el contenido del
+ registro de decisión de IGDB, la evidencia del sondeo y la ejecución de importación sobre una
+@@ -706,7 +703,7 @@ interfaz y los recomendadores se verificaron con cuatro de cuatro criterios. La
+ \end{table}
+ 
+ El criterio SC3, la calidad visual de producto, se cerró con la aprobación final. Empezó
+-como aprobación anticipada condicional, mientras se estaba desconectado. Quedó
++como aprobación anticipada condicional, concedida sin acceso directo al entorno. Quedó
+ confirmada sin condiciones tras una revisión remota de dieciocho capturas del entorno local
+ que cubrían las cuatro superficies principales en escritorio y en móvil, ambos temas y una
+ segunda cuenta con colección vacía como prueba visual de independencia.
+@@ -752,7 +749,7 @@ Django, que su documentación desaconseja explícitamente. Los tres se corrigier
+ con un campo de esquema nuevo y una migración, el tercero con la incorporación del servidor
+ \texttt{gunicorn}.
+ 
+-La revisión también dejó constancia de las áreas sanas: ausencia de inyección de SQL, con
++La revisión también dejó constancia de las áreas sanas: ausencia de inyección de lenguaje de consulta estructurado (SQL), con
+ todo el uso del ORM parametrizado; validación minuciosa de las consultas del catálogo;
+ acotación de propiedad en todas las vistas de datos personales; escrituras transaccionales
+ con bloqueo de fila y restricciones de unicidad como guarda real de carreras; higiene de
+@@ -799,7 +796,7 @@ Tabla~\ref{tab:topologia} recoge el contrato de cada superficie.
+ \label{tab:topologia}
+ \end{table}
+ 
+-El navegador solo ve el origen HTTPS de Vercel, que reenvía las rutas de la API como describe
++El navegador solo ve el origen seguro (HTTPS, la variante cifrada de HTTP) de Vercel, que reenvía las rutas de la API como describe
+ la Sección~\ref{sec:dis-sesion}. En Render, la cadena de arranque encadena migración e importación del
+ catálogo y de los resúmenes localizados; solo entonces cede el control al servidor
+ \texttt{gunicorn}, con cada paso idempotente y protegido con un bloqueo consultivo, de modo que
+@@ -810,26 +807,27 @@ recomendaciones en cola, el proceso bajo demanda descrito más abajo.
+ \begin{figure}[H]
+     \centering
+     \includegraphics[width=0.92\textwidth]{figures/despliegue-flujo.pdf}
+-    \caption{Topología de despliegue público, cadena de arranque en Render y procesos que cuelgan del servidor en marcha. Cada paso del arranque es idempotente y un paso fallido lo detiene. Docker Compose local (base de datos, API y frontend) construye las mismas imágenes sin depender de estos tres servicios.}
++    \caption[Topología de despliegue público y cadena de arranque]{Topología de despliegue público, cadena de arranque en Render y procesos que cuelgan del servidor en marcha. Cada paso del arranque es idempotente y un paso fallido lo detiene. Docker Compose local (base de datos, API y frontend) construye las mismas imágenes sin depender de estos tres servicios.}
+     \label{fig:despliegue-flujo}
+ \end{figure}
+ 
+ Docker Compose sigue siendo el entorno reproducible canónico
+ (Sección~\ref{sec:impl-entorno}). La equivalencia con el
+-despliegue público es funcional, de versiones, de commit y de datos, no de imagen byte a
+-byte: el frontend público lo construye Vercel de forma nativa y no ejecuta la imagen de Docker
+-del frontend, una diferencia de despliegue documentada, no una divergencia de comportamiento.
++despliegue público es funcional, de versiones y de commit, no de imagen byte a
++byte ni de datos. El frontend público lo construye Vercel de forma nativa y no ejecuta la imagen de Docker
++del frontend, una diferencia de despliegue documentada, no una divergencia de comportamiento; el corpus público
++es un subconjunto del local, como recoge la Tabla~\ref{tab:local-publico}.
+ Si cualquier servicio gratuito duerme, cambia sus términos o desaparece, el entorno local sigue
+ disponible sin conexión. Los límites conocidos del nivel gratuito se declaran de forma
+ explícita: el servicio de la API en Render duerme tras quince minutos sin tráfico, de modo que
+ un visitante puede encontrar un arranque en frío de cerca de un minuto; las cuotas mensuales de
+-los tres proveedores pueden suspender un servicio, y el nivel gratuito no promete copias de
++los tres proveedores pueden suspender un servicio y el nivel gratuito no promete copias de
+ seguridad ni restauración.
+ 
+ La demostración pública está en vivo desde el 5 de septiembre de 2026. En su primera versión servía la interfaz
+ anterior al rediseño contra el corpus curado de ciento cincuenta juegos de Wikidata. Desde el 5 de octubre de 2026 sirve
+ la interfaz rediseñada y un subconjunto del catálogo a escala real cargado en Neon, con las recomendaciones calculadas
+-por un proceso bajo demanda. No es el mismo catálogo que el del entorno local, y la
++por un proceso bajo demanda. No es el mismo catálogo que el del entorno local y la
+ Tabla~\ref{tab:local-publico} recoge la diferencia.
+ 
+ \begin{table}[H]
+@@ -844,7 +842,7 @@ Tabla~\ref{tab:local-publico} recoge la diferencia.
+     \hline
+     Vectores de características & Uno por obra gobernada, varias versiones & Uno por juego publicado, solo la versión vigente \texttt{fs-v13} \\
+     \hline
+-    Procesos de recomendación & Cuatro en paralelo (señales, ponderado, recencia y MMR con popularidad) & Uno, lanzado bajo demanda, que procesa todos los trabajos \\
++    Procesos de recomendación & Tres en paralelo, uno por cada variante publicada & Uno, lanzado bajo demanda, que procesa los trabajos de las tres variantes \\
+     \hline
+     Evaluación offline & Sí; de aquí salen los artefactos de esta memoria & No; se ejecuta solo en local \\
+     \hline
+@@ -859,23 +857,23 @@ Tabla~\ref{tab:local-publico} recoge la diferencia.
+ 
+ El subconjunto público se eligió con un criterio explícito y reproducible: juegos con valoración de IGDB o con PopScore
+ mayor que cero, junto con los DLC relacionados con ellos. Ocupa 359\,MB de la gigabyte que ofrece Neon en el nivel
+-gratuito, y los guiones que lo exportan y lo cargan están en \texttt{scripts/public-corpus/}. El corpus gobernado completo,
++gratuito y los guiones que lo exportan y lo cargan están en \texttt{scripts/public-corpus/}. El corpus gobernado completo,
+ con los índices de las tablas que usa la API, no cabe en ese límite.
+ 
+ El nivel gratuito de Neon contabiliza horas de cómputo mientras la base está despierta, por lo que un proceso que
+ consultara la cola de recomendaciones cada pocos segundos la mantendría encendida las veinticuatro horas del día y
+ agotaría la cuota del mes. Por eso el despliegue no tiene ningún proceso permanente: cuando la API encola un refresco,
+-lanza un proceso corto que vacía la cola y termina, protegido por un candado de fichero para que nunca haya dos a la vez,
++lanza un proceso corto que vacía la cola y termina, protegido por un candado de fichero para que nunca haya dos a la vez
+ y la base solo se consulta cuando alguien actúa. Se comprobó en producción con una cuenta desechable: la primera
+-recomendación de una cuenta nueva estuvo lista entre cuatro y seis minutos después, y tras nueve minutos sin ninguna
++recomendación de una cuenta nueva estuvo lista entre cuatro y seis minutos después y tras nueve minutos sin ninguna
+ petición Neon registró su suspensión.
+ 
+ Esta diferencia es una limitación del trabajo, no un detalle de despliegue. Los resultados de la evaluación offline del
+ Capítulo~\ref{cap:resultados} se calcularon sobre el corpus completo local, de modo que la web desplegada es una
+ demostración funcional del producto y no el entorno donde se midió. Las recomendaciones allí son además más lentas, porque
+-un único proceso comparte CPU y 512\,MB con la API. Los datos son de demostración: las cuentas no verifican el correo y
++un único proceso comparte procesador y 512\,MB con la API. Los datos son de demostración: las cuentas no verifican el correo y
+ las claves son de demostración. Ampliar el despliegue al corpus gobernado completo exigiría una base de datos de mayor
+-capacidad, de pago, y queda fuera del coste cero que fijó el diseño.
++capacidad, de pago y queda fuera del coste cero que fijó el diseño.
+ 
+ Este capítulo ha descrito la construcción, la verificación y el despliegue del sistema. El
+ capítulo siguiente presenta la evaluación experimental de los algoritmos de recomendación que
+diff --git a/thesis/sections/07_resultados.tex b/thesis/sections/07_resultados.tex
+index 2717611..37908fb 100644
+--- a/thesis/sections/07_resultados.tex
++++ b/thesis/sections/07_resultados.tex
+@@ -29,7 +29,7 @@ Evaluar un recomendador sin usuarios reales exige fijar por adelantado cinco dec
+ tarea concreta que se mide (recomendar los siguientes \(K\) ítems que a una persona le
+ interesarán, no predecir la nota exacta que pondría), el criterio de relevancia que separa un
+ acierto de un fallo, el conjunto de candidatas sobre el que compite cada algoritmo, la división
+-de los datos entre lo que el modelo puede ver y lo que se usa para medir, y la forma de agregar
++de los datos entre lo que el modelo puede ver y lo que se usa para medir y la forma de agregar
+ el resultado por usuario en una única cifra por algoritmo. SavePoint fija estas decisiones en
+ un protocolo versionado antes de ejecutar la comparación.
+ 
+@@ -37,9 +37,9 @@ La precisión en \(K\) mide qué proporción de los \(K\) ítems recomendados re
+ la exhaustividad en \(K\) mide qué proporción de todos los ítems relevantes aparecen entre
+ esos \(K\). Ninguna de las dos distingue la posición dentro de la lista: acertar en el primer
+ puesto cuenta igual que acertar en el último. Para corregir esa carencia se usa la ganancia
+-acumulada descontada normalizada (nDCG)~\cite{jarvelin2002cumulated}, que descuenta el valor
++acumulada descontada normalizada~\cite{jarvelin2002cumulated}, que descuenta el valor
+ de un acierto cuanto más abajo aparece y lo normaliza frente al orden ideal posible. La
+-precisión media (MAP) promedia, para cada usuario, la precisión acumulada en cada posición
++precisión media promedia, para cada usuario, la precisión acumulada en cada posición
+ donde hubo un acierto y después promedia ese valor entre usuarios; es sensible tanto a la
+ cantidad de aciertos como a su posición.
+ 
+@@ -57,9 +57,9 @@ Sección~\ref{cap:algoritmos} explica cómo SavePoint reordena sus listas para c
+ La evaluación publicada se ejecutó offline con el corpus congelado \texttt{2026.09.2} (190.479 obras
+ gobernadas, Sección~\ref{sec:datos-congelacion}) y el conjunto de
+ características \texttt{fs-v12-curated-tags-idf} (Sección~\ref{cap:algoritmos} y
+-Tabla~\ref{tab:pesos-familia}); la revisión posterior \texttt{fs-v13} no se ha evaluado. La población experimental contiene 400 usuarios sintéticos activos, generados de forma determinista; 79 cumplen la elegibilidad del split de prueba. La población se reparte en dos cohortes: \texttt{active\_history\_10\_to\_20}, con los 390 usuarios que tienen una biblioteca de entre 10 y 20 entradas, y \texttt{no\_history}, con los 10 de arranque en frío, que no tienen ítems relevantes y no se evalúan; los 79 usuarios evaluables pertenecen todos a la primera. Los perfiles se generan a partir de arquetipos (monogénero severo y generoso, omnívoro medio, completista de saga, explorador de novedades, coleccionista de pendientes, jugador ocasional con arranque en frío y veterano de biblioteca grande) que varían el número de géneros preferidos, el tamaño de la biblioteca, la generosidad al puntuar y la mezcla de estados, y llevan el marcador \texttt{synthetic-eval-user} para no contaminar el baseline de popularidad de la aplicación. No se utilizaron usuarios reales. El protocolo v15 fija semilla, versiones, snapshots, hashes, candidatas y exclusiones antes de consumir el test. La semilla permite reproducir esta ejecución, pero no sustituye un estudio de sensibilidad con múltiples semillas.
++Tabla~\ref{tab:pesos-familia}); la revisión posterior \texttt{fs-v13} no se ha evaluado. La población experimental contiene 400 usuarios de prueba sintéticos, generados de forma determinista; 79 cumplen la elegibilidad del split de prueba. La población se reparte en dos cohortes: \texttt{active\_history\_10\_to\_20}, con los 390 usuarios que tienen una biblioteca de entre 10 y 20 entradas y \texttt{no\_history}, con los 10 de arranque en frío, que no tienen ítems relevantes y no se evalúan; los 79 usuarios evaluables pertenecen todos a la primera. Los perfiles se generan a partir de nueve arquetipos: dos sin historial (diez usuarios), tres de perfil inicial (cien), tres de usuario normal (doscientos cuarenta) y uno intensivo veterano (cincuenta). Los arquetipos con historial tienen bibliotecas de entre 10 y 20 entradas y varían el número de géneros preferidos, la generosidad al puntuar y la mezcla de estados; llevan el marcador \texttt{synthetic-eval-user} para no contaminar el baseline de popularidad de la aplicación. El protocolo v15 fija semilla, versiones, snapshots, hashes, candidatas y exclusiones antes de consumir el test. La semilla permite reproducir esta ejecución, pero no sustituye un estudio de sensibilidad con múltiples semillas.
+ 
+-El protocolo vigente, v15, usa \emph{leave-fraction-out} por usuario, no
++El protocolo publicado, v15, usa \emph{leave-fraction-out} por usuario, no
+ \emph{leave-one-out}: retiene varios ítems relevantes por persona en lugar de uno solo. Una
+ obra relevante es una entrada terminada o valorada con al menos siete medios puntos, con un
+ piso adicional de calidad externa (valoración agregada de origen de al menos 70 puntos) sobre
+@@ -130,11 +130,9 @@ recoge entre las amenazas a la validez (Sección~\ref{sec:exp-amenazas}).
+ 
+ \section{Evolución del protocolo: tres intentos, no uno}\label{sec:exp-evolucion}\label{sec:exp-v15-fidelidad}
+ 
+-Los números v12, v14 y v15 de esta sección designan versiones del \emph{protocolo} de evaluación, no
+-del conjunto de características: la ejecución v15 se calculó con el conjunto \texttt{fs-v12}
+-(Sección~\ref{cap:algoritmos}), que es una numeración distinta.
+-
+-El protocolo se versiona con un número entero que sube cada vez que un cambio impide comparar sus resultados con los
++Los números de versión de esta sección designan el \emph{protocolo} de evaluación, no el conjunto de
++características (v15 se calculó con \texttt{fs-v12}, Sección~\ref{cap:algoritmos}). El protocolo se versiona con un
++número entero que sube cada vez que un cambio impide comparar sus resultados con los
+ de las versiones anteriores. La Tabla~\ref{tab:exp-versiones} resume las versiones, reconstruidas a partir del
+ historial del repositorio y de los documentos de verificación. Hasta v14 el esquema de partición fue siempre
+ \emph{leave-one-out}, con un único ítem retenido por usuario; lo que cambió fue la señal de calidad, la regla de
+@@ -150,7 +148,7 @@ son los de v12, v14 y v15.
+     \hline
+     \textbf{Versión} & \textbf{Fecha (2026)} & \textbf{Qué cambió} \\
+     \hline
+-    v1--v2 & 7--8 sep. & Congelación inicial del contrato: \emph{leave-one-out} por usuario, \(K \in \{5, 10, 20\}\) y \(nDCG@10\) como métrica titular. La versión v2 limita las candidatas a obras con valoración. Primera ejecución de prueba, con la población inicial de la Fase 2 (26 de 40 usuarios de prueba evaluables). \\
++    v1--v2 & 7--8 sep. & Congelación inicial del contrato: \emph{leave-one-out} por usuario, \(K \in \{5, 10, 20\}\) y \(nDCG@10\) como métrica titular. La versión v2 limita las candidatas a obras con valoración. Primera ejecución de prueba, con la población inicial (26 de 40 usuarios de prueba evaluables). \\
+     \hline
+     v3--v6 & 9 sep. & Similitud de contenido por facetas y señal de calidad con confianza, calibradas en varias iteraciones; v6 es la versión que congeló el documento del protocolo. \\
+     \hline
+@@ -171,14 +169,7 @@ son los de v12, v14 y v15.
+ \label{tab:exp-versiones}
+ \end{table}
+ 
+-El protocolo v15 descrito arriba no fue el primero que se congeló y se ejecutó hasta el final
+-contra la partición de prueba. Lo precedieron dos intentos completos, v12 y v14, cada uno
+-ejecutado una sola vez sobre la misma partición de prueba, con sus propios resultados publicados y
+-conservados sin alterar. Repasarlos aquí no es un ejercicio de transparencia añadido: la forma
+-concreta del protocolo v15 (retención por fracción sobre una etiqueta propia de cada usuario,
+-piso de calidad externa, población con mínimo garantizado) es la respuesta directa a dos
+-problemas reales que esos dos intentos anteriores dejaron medidos, no una elección de diseño
+-arbitraria.
++Los resultados de v15 no fueron el primer cálculo ejecutado hasta el final contra la partición de prueba: lo precedieron v12 y v14, cada uno consumido una sola vez, con sus resultados conservados sin alterar. La forma concreta de v15 (retención por fracción sobre una etiqueta propia de cada usuario, piso de calidad externa, población con mínimo garantizado) responde a dos problemas reales que esos intentos dejaron medidos, no a una elección de diseño arbitraria.
+ 
+ \textbf{El protocolo v12 (10 de septiembre de 2026)} fue el primer cálculo congelado hasta el final. Su
+ resultado no fue una comparación entre algoritmos, sino un hallazgo metodológico: el
+@@ -218,7 +209,7 @@ ganador defendible: \texttt{hybrid-weighted-cf-v1} (\(nDCG@10=0{,}1526\)) y
+ a \texttt{recency-v1}, con catorce de las ciento veinte comparaciones por pares significativas
+ tras Holm, frente a cero en v12 (\(\chi^2=105{,}28\), \(p=1{,}29\times10^{-15}\), \(n=79\)). La
+ diversidad intra-lista y la concentración de recomendaciones mejoraron en la misma medida: el
+-índice de concentración de Herfindahl-Hirschman pasó de un rango de 0,55 a 0,71 en v12, propio
++índice de concentración de Herfindahl-Hirschman (HHI) pasó de un rango de 0,55 a 0,71 en v12, propio
+ de un catálogo minúsculo de recomendaciones repetidas, a un rango de 0,005 a 0,03, consecuencia
+ directa de que el contenido ya no colapsaba a la misma alternativa de respaldo que los métodos de referencia. Aun
+ así, v14 seguía reteniendo un único ítem por usuario mediante retención de uno: cada
+@@ -240,43 +231,9 @@ reescribe los resultados de v12 o v14, los sustituye como publicación vigente p
+ corregido, de forma medida y documentada, los problemas que los dos intentos anteriores dejaron
+ al descubierto.
+ 
+-Conviene defender por qué v15 se acerca más a una prueba realista de lo que los algoritmos
+-hacen, no simplemente a un protocolo ajustado para producir números más altos. La
+-justificación no es que v15 favorezca a ningún algoritmo concreto, sino que corrige tres
+-formas en las que v12 y v14 se apartaban de cómo se evalúa la recuperación en la literatura y
+-de cómo el propio sistema puntúa.
+-
+-La primera es de encuadre metodológico. Retirar y comprobar la recuperación de un subconjunto
+-de valoraciones del historial de un usuario, en lugar de un único ítem, no es una invención de
+-este proyecto: es la generalización natural del esquema \emph{All-but-N}, ya nombrado así en
+-la literatura desde Breese, Heckerman y Kadie~\cite{breese1998empirical} y sistematizado por
+-Herlocker et al.~\cite{herlocker2004evaluating}, donde el \emph{leave-one-out} que usaban los
+-protocolos v6 a v14 (Tabla~\ref{tab:exp-versiones}) es simplemente el caso particular \(N=1\). v15 no sale de ese marco: solo
+-deja de fijar \(N\) de forma global y lo calcula por usuario, en proporción al tamaño de su
+-propio grupo de obras con esa etiqueta.
+-
+-La segunda es de fidelidad a la señal que el sistema realmente usa. \texttt{facet\_similarity()},
+-el código de puntuación que usan los dieciséis algoritmos tanto en la aplicación como en el
+-laboratorio, combina cada familia de faceta como una suma ponderada, nunca como una decisión
+-de un único rasgo ganador. Que la etiqueta retirada deje de ser la primera del perfil recalculado
+-del usuario, en el 21{,}3\,\% de los casos verificados antes de congelar el protocolo, no
+-convierte la prueba en menos válida: un perfil de contenido sigue apoyándose en esa etiqueta,
+-con menos peso relativo, exactamente igual que se apoyaría en cualquier otra bajo el mismo
+-mecanismo de puntuación~\cite{pazzani2007content}. Exigir que la etiqueta se mantuviera siempre
+-en primer lugar habría sido, de hecho, la elección menos fiel al propio sistema, porque
+-habría excluido usuarios reales para el algoritmo aunque no lo fueran para la prueba.
+-
+-La tercera es de inclusión. Un usuario para el que el mecanismo por fracción no se puede
+-construir cae al \emph{leave-one-out} simple de los protocolos anteriores en lugar de quedar
+-fuera, lo que evita el sesgo de selección contrario, el de quedarse solo con los usuarios más
+-fáciles de evaluar y llamar a eso representativo.
+-
+-Ninguno de los tres argumentos convierte v15 en evidencia sobre jugadores reales: sigue siendo
+-una evaluación sobre una población sintética y un corpus concretos, como recuerda la
+-Sección~\ref{sec:exp-amenazas}. Lo que sí establecen es que, dentro de esa simulación, v15
+-mide la pregunta que se propone medir (¿recupera el sistema contenido afín al gusto que la
+-propia biblioteca del usuario ya demuestra?) con más fidelidad al mecanismo de puntuación real
+-y con menos artefactos de diseño heredados que v12 o v14, no solo con mejores cifras.
++Conviene defender que v15 se acerca más a una prueba realista de lo que los algoritmos hacen, no que se ajusta para producir números más altos, porque corrige tres formas en las que v12 y v14 se apartaban de la literatura y del propio sistema. La primera es de encuadre: retirar y recuperar un subconjunto de valoraciones, en lugar de un único ítem, es la generalización natural del esquema \emph{All-but-N}, nombrado así desde Breese, Heckerman y Kadie~\cite{breese1998empirical} y sistematizado por Herlocker et al.~\cite{herlocker2004evaluating}, del que el \emph{leave-one-out} de los protocolos v6 a v14 (Tabla~\ref{tab:exp-versiones}) es el caso \(N=1\); v15 solo calcula \(N\) por usuario, en proporción al tamaño de su grupo de obras con la etiqueta dominante. La segunda es de fidelidad a la señal que el sistema usa: \texttt{facet\_similarity()}, el código de puntuación de los dieciséis algoritmos, combina cada familia de faceta como una suma ponderada, nunca como un único rasgo ganador, de modo que el 21{,}3\,\% de los casos verificados antes de congelar el protocolo en los que la etiqueta retirada deja de ser la primera del perfil recalculado no invalida la prueba: el perfil sigue apoyándose en ella con menos peso~\cite{pazzani2007content} y exigir lo contrario habría excluido usuarios que el sistema sí atiende. La tercera es de inclusión: el usuario para el que el mecanismo por fracción no se puede construir cae al \emph{leave-one-out} simple en lugar de quedar fuera, lo que evita quedarse solo con los usuarios más fáciles de evaluar y llamar a eso representativo.
++
++Ninguno de los tres argumentos convierte v15 en evidencia sobre jugadores reales, como recuerda la Sección~\ref{sec:exp-amenazas}. Lo que establecen es que, dentro de la simulación, v15 mide la pregunta que se propone medir (¿recupera el sistema contenido afín al gusto que la propia biblioteca del usuario ya demuestra?) con más fidelidad al mecanismo de puntuación real y con menos artefactos de diseño heredados que v12 o v14, no solo con mejores cifras.
+ 
+ \section{Resultados publicados}\label{sec:exp-resultados}\label{sec:exp-exito}
+ 
+@@ -284,11 +241,11 @@ La Tabla~\ref{tab:resultados-ndcg10} resume \(nDCG@10\), MAP@10 y el tiempo de p
+ 
+ \begin{table}[H]
+ \centering
+-\caption{Resultados v15 publicados (conjunto de características \texttt{fs-v12}) para los 79 usuarios evaluables de la cohorte \texttt{active\_history\_10\_to\_20}, con el tiempo de pared de cada algoritmo en segundos. No son resultados con usuarios reales.}\label{tab:resultados-ndcg10}
++\caption[Resultados v15 publicados para los 79 usuarios evaluables]{Resultados v15 publicados (conjunto de características \texttt{fs-v12}) para los 79 usuarios evaluables de la cohorte \texttt{active\_history\_10\_to\_20}, con el tiempo de pared de cada algoritmo en segundos. No son resultados con usuarios reales.}\label{tab:resultados-ndcg10}
+ \small
+ \renewcommand{\arraystretch}{1.2}
+ \setlength{\tabcolsep}{3pt}
+-\begin{tabularx}{\textwidth}{@{}>{\ttfamily\footnotesize\raggedright\arraybackslash}p{0.37\textwidth}Y>{\raggedleft\arraybackslash}p{0.095\textwidth}>{\raggedleft\arraybackslash}p{0.095\textwidth}>{\raggedleft\arraybackslash}p{0.12\textwidth}@{}}
++\begin{tabularx}{\textwidth}{@{}>{\ttfamily\footnotesize\raggedright\arraybackslash}p{0.385\textwidth}Y>{\raggedleft\arraybackslash}p{0.105\textwidth}>{\raggedleft\arraybackslash}p{0.105\textwidth}>{\raggedleft\arraybackslash}p{0.105\textwidth}@{}}
+ \textnormal{Algoritmo} & \textnormal{Familia} & \textnormal{\footnotesize nDCG@10} & \textnormal{\footnotesize MAP@10} & \textnormal{\footnotesize Tiempo (s)} \\
+ \hline
+ random-v1 & referencia & 0,00000 & 0,00000 & 25,1 \\
+@@ -455,7 +412,7 @@ anteriores, es que el colaborativo puro (\texttt{cf-user-knn-v1}) resulta signif
+ peor que ocho de las diez variantes de contenido, una diferenciación que la potencia
+ estadística de protocolos previos no alcanzaba a establecer con esta claridad. Esa lectura
+ tiene un matiz importante: esta prueba mide específicamente la recuperación de obras de la
+-etiqueta de contenido dominante del perfil de cada usuario, y \texttt{cf-user-knn-v1} no usa
++etiqueta de contenido dominante del perfil de cada usuario y \texttt{cf-user-knn-v1} no usa
+ etiquetas en absoluto, sino similitud de patrones de valoración entre usuarios. La diferencia
+ es real y significativa, pero mide precisamente el terreno que la señal colaborativa no
+ modela; no es evidencia de que el filtrado colaborativo sea inferior en una tarea distinta,
+@@ -465,7 +422,7 @@ dos en solitario.
+ 
+ \section{Diversidad, cobertura y amenazas a la validez}\label{sec:exp-amenazas}
+ 
+-MMR introduce un objetivo distinto de la recuperación puntual: reducir redundancia entre elementos ya seleccionados. Sus resultados deben leerse junto con diversidad intra-lista, novedad, cobertura del catálogo, cobertura de predicción y HHI cuando el artefacto los publica. Una mejora de diversidad no compensa automáticamente una pérdida de nDCG, ni la métrica de acierto debe ocultar concentración. SavePoint mantiene estas medidas separadas para que el compromiso sea auditable.
++MMR introduce un objetivo distinto de la recuperación puntual: reducir redundancia entre elementos ya seleccionados. Sus resultados deben leerse junto con diversidad intra-lista, novedad, cobertura del catálogo, cobertura de predicción y HHI cuando el artefacto los publica. Una mejora de diversidad no compensa automáticamente una pérdida de nDCG, ni la métrica de acierto debe ocultar concentración. SavePoint mantiene estas medidas separadas para que el compromiso sea auditable. Con \(K=10\), la diversidad intra-lista de \texttt{content-cbf-weighted-v1} es 0,531 y sube a 0,652 en \texttt{content-cbf-mmr-v1}, mientras que su \(nDCG@10\) baja de 0,1725 a 0,1389; en el híbrido, de 0,532 a 0,655 de diversidad y de 0,1699 a 0,1591 de \(nDCG@10\). La cobertura es baja en todos los algoritmos: la mejor variante de contenido recomienda 241 de las 13.618 obras candidatas (el 1,77\,\%) entre los 79 usuarios y la popularidad solo 11 (el 0,08\,\%), con un HHI de 0,0988 frente a 0,0132 de la variante de contenido y de 0,0765 del colaborativo, que también concentra. La cobertura de predicción es completa (1,00) en los dieciséis algoritmos.
+ 
+ Las amenazas principales son población sintética, un solo consumo de la prueba y dependencia de
+ metadatos externos gobernados. El corpus y la versión inmutable son fortalezas de reproducibilidad,
+diff --git a/thesis/sections/08_conclusiones.tex b/thesis/sections/08_conclusiones.tex
+index 04084fb..dd5547d 100644
+--- a/thesis/sections/08_conclusiones.tex
++++ b/thesis/sections/08_conclusiones.tex
+@@ -45,7 +45,7 @@ futuras, no se retroproyectó sobre la ejecución v15 ya cerrada, de modo que es
+ concreta carece de ese detalle. Tampoco se ha evaluado todavía el conjunto de características
+ \texttt{fs-v13}, posterior a esa ejecución: las cifras publicadas corresponden a \texttt{fs-v12}
+ (Sección~\ref{cap:algoritmos}). La rejilla de ajuste de hiperparámetros que el protocolo declaró para la partición de
+-validación no se ejecutó, y el protocolo cambió de versión después de ver resultados de prueba, de modo que el consumo
++validación no se ejecutó y el protocolo cambió de versión después de ver resultados de prueba, de modo que el consumo
+ único de esa partición rige dentro de cada versión y no entre ellas (Sección~\ref{sec:exp-reparto}). El despliegue público, descrito en la
+ Sección~\ref{cap:despliegue}, sirve un subconjunto del catálogo a escala real (32.550 de las 190.479 obras
+ gobernadas, el 17\,\%) y no el corpus completo, que no cabe en el nivel gratuito de la base de datos; la evaluación
+@@ -54,22 +54,22 @@ offline se midió en el entorno local, no en el desplegado.
+ El banco de pruebas que esta memoria deja construido y ya explotado habilita líneas de
+ continuación concretas, no genéricas. La primera es repetir el protocolo publicado con nuevas
+ semillas y con cohortes sintéticas adicionales, para separar lo que es una diferencia
+-consistente entre algoritmos de lo que podría ser ruido de una única muestra, y aplicar sobre la nueva ejecución la captura de entorno y consumo de recursos que el
++consistente entre algoritmos de lo que podría ser ruido de una única muestra y aplicar sobre la nueva ejecución la captura de entorno y consumo de recursos que el
+ ejecutor paralelo ya sabe registrar. La segunda es estudiar la sensibilidad del sistema a sus propios
+ hiperparámetros locales (los pesos de familia de facetas, la mezcla híbrida, el factor de
+ diversidad), en lugar de tratarlos como constantes fijadas de una vez.
+ 
+ Fuera del núcleo de recomendación, el producto deja cinco líneas abiertas. La primera es contrastar los algoritmos
+-con personas reales: la comparación publicada usa solo usuarios sintéticos, y una prueba con un grupo pequeño que
++con personas reales: la comparación publicada usa solo usuarios sintéticos y una prueba con un grupo pequeño que
+ usara la aplicación y valorara las recomendaciones daría una primera señal de hasta qué punto las conclusiones se
+ trasladan, algo que esta memoria no puede ofrecer. La segunda es completar la gestión de cuentas con verificación
+-de correo, recuperación de contraseña y una política de contraseñas común al registro y al cambio; hoy no existen,
++de correo, recuperación de contraseña y una política de contraseñas común al registro y al cambio; hoy no existen
+ y por eso las cuentas del despliegue público son de demostración. La tercera es escalar el despliegue: ampliarlo al
+ corpus gobernado completo con una base de datos de mayor capacidad, dedicar un proceso de recomendación a cada
+-algoritmo, como ya hace el entorno local, y servir las lecturas públicas del catálogo desde la caché en el borde de
++algoritmo, como ya hace el entorno local y servir las lecturas públicas del catálogo desde la caché en el borde de
+ Vercel. La cuarta es importar la colección desde una cuenta de Steam, para que quien ya tiene una biblioteca grande
+ no tenga que registrarla juego a juego; exigiría reconciliar los títulos de Steam con las obras canónicas del
+-catálogo, un problema de identidad semejante al que ya hubo que resolver entre Wikidata e IGDB, y respetar los
++catálogo, un problema de identidad semejante al que ya hubo que resolver entre Wikidata e IGDB y respetar los
+ términos de uso de la API de Steam y la privacidad del perfil. La quinta es una importación diaria del catálogo que
+ lo mantenga actualizado; como la evaluación depende de un corpus congelado, cada importación debería producir una
+ nueva versión del corpus, sin alterar las que ya usan los artefactos publicados.
+@@ -92,20 +92,20 @@ resultados se pueden volver a obtener a partir de los mismos artefactos versiona
+ 
+ \section{Valoración personal}\label{sec:conc-valoracion-personal}
+ 
+-Este trabajo me ha enseñado que construir una aplicación y comprobar de verdad que funciona bien son cosas distintas, y
++Este trabajo me ha enseñado que construir una aplicación y comprobar de verdad que funciona bien son cosas distintas y
+ que la segunda es la más difícil. De la parte web, la que más se ve, me llevo sobre todo la experiencia de hacer un
+ producto completo y usable: un catálogo con cientos de miles de juegos, una biblioteca personal con sus listas,
+ valoraciones y copias, un perfil con privacidad y un apartado de amistades. Después de una primera versión funcional,
+-rediseñé la interfaz a partir de maquetas y la adapté al móvil, y comprobé que los detalles que parecen menores, como
++rediseñé la interfaz a partir de maquetas y la adapté al móvil y comprobé que los detalles que parecen menores, como
+ que un menú no se pise con el logo o que un botón se pueda pulsar con el dedo, son los que deciden si una aplicación se
+ siente terminada. También me llevo haberla puesto en internet con herramientas gratuitas, con las limitaciones que eso
+ conlleva y que dejo explicadas en la memoria.
+ 
+ Lo que más me costó fue medir si las recomendaciones eran buenas sin engañarme: las primeras pruebas no sirvieron para
+-sacar conclusiones, hubo que repetirlas y corregir errores, y solo así llegué a resultados en los que puedo confiar. De
++sacar conclusiones, hubo que repetirlas y corregir errores y solo así llegué a resultados en los que puedo confiar. De
+ ahí me quedo con una idea que me parece lo más valioso del trabajo: es mejor decir con claridad lo que no se ha podido
+ comprobar que presentar resultados que parezcan más sólidos de lo que son.
+ 
+ Con más tiempo habría probado la aplicación con personas reales desde el principio, en lugar de depender solo de usuarios
+-simulados. Aun así, estoy satisfecho con el resultado: una aplicación que se puede abrir y usar, y unas pruebas que otra
++simulados. Aun así, estoy satisfecho con el resultado: una aplicación que se puede abrir y usar y unas pruebas que otra
+ persona puede repetir para comprobar mis cifras, que era lo que me propuse al empezar.
