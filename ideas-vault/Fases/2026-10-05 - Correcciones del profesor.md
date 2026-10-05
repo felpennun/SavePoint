@@ -91,6 +91,14 @@ correcciones (12 ficheros cambian: bibliografía y secciones 00 a 08). Aquí se 
    74 % al 0 % de historial insuficiente se midió en la ejecución v14 (que reúne la población de v13 y el piso de calidad),
    no en v13. Los números de las secciones 5.5 y 8 ya decían "v12, v14 y v15" y no cambian.
 
+9. **Capítulo 8: "se cumple en su totalidad" y luego se declaraban carencias.** Reescrito el apartado de cumplimiento de
+   objetivos (`08_conclusiones.tex`): "se cumple en lo esencial, con salvedades"; catálogo a escala real solo en local
+   (el público es un subconjunto); privacidad "resuelta en el backend" en vez de "gobernada por completo"; protocolo
+   revisado entre versiones; comparación solo con usuarios sintéticos y una semilla. Un segundo párrafo lista lo
+   pendiente: las dos piezas parciales del contrato (varias semillas, captura de entorno), la rejilla de validación no
+   ejecutada, `fs-v13` sin evaluar y el despliegue sin corpus completo. La sección de limitaciones recoge ahora la rejilla
+   de validación y la reutilización de la partición de prueba entre versiones (antes solo estaban en el cap. 7).
+
 ## Pendientes
 
 Las demás correcciones del profesor, a medida que el autor las vaya indicando.

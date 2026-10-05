@@ -122,7 +122,13 @@ Cosas que **no** hay que olvidar al reescribir: cambiar "150 juegos" por las cif
 rediseño no está desplegado (ya lo está), el recuento de pruebas (779 de backend y 66 de web) y el commit desplegado.
 Regenerar la vista previa PDF (está desactualizada desde el último reemplazo de figuras).
 
-## 3. Trabajo futuro (a discutir mañana, sin decidir todavía)
+## 3. Trabajo futuro (decidido y aplicado en la memoria el 2026-10-05)
+
+**Decisión del autor:** en `08_conclusiones.tex` entran cinco líneas fuera del núcleo: contraste con personas reales,
+gestión de cuentas (correo, recuperación, política de contraseñas), escalado del despliegue (corpus completo, un proceso
+por algoritmo, caché en el borde), importación de la colección desde Steam e importación diaria del catálogo (cada una
+como nueva versión del corpus). Quedan fuera: seguridad pendiente, app móvil/PWA/idiomas, Redis, ping y exportación de
+datos. Lista original de candidatos, conservada:
 
 Lista de candidatos para abrir la discusión de cómo y cuánto añadir (el autor no quiere secciones muy grandes):
 

@@ -7,19 +7,27 @@ limitaciones sin suavizarlas y esboza las líneas de continuidad que el sistema 
 \section{Grado de cumplimiento de los objetivos}\label{sec:conc-objetivos}
 
 El objetivo general, construir una plataforma de catalogación que funcionara también como
-banco de pruebas reproducible de recomendación, se cumple en su totalidad. El catálogo tiene
-identidad canónica propia, procedencia por obra y licencia documentada, a escala real sobre
-el catálogo importado de IGDB. Una persona usuaria puede mantener su lista de pendientes,
-valorar juegos e inventariar copias físicas y digitales con su formato y su edición, con
-privacidad de perfil y relaciones sociales gobernadas por completo en el backend. El protocolo
-de evaluación offline quedó congelado, versionado y probado antes de ejecutar ninguna
-comparación. Esa comparación se llevó a cabo: las tres familias de recomendación
+banco de pruebas reproducible de recomendación, se cumple en lo esencial, con las salvedades que se detallan a
+continuación. El catálogo tiene identidad canónica propia, procedencia por obra y licencia documentada, a escala
+real sobre el catálogo importado de IGDB en el entorno local; el despliegue público solo sirve un subconjunto de
+él. Una persona usuaria puede mantener su lista de pendientes, valorar juegos e inventariar copias físicas y
+digitales con su formato y su edición, con privacidad de perfil y relaciones sociales cuya autorización se resuelve
+en el backend. El protocolo de evaluación offline quedó congelado, versionado y probado antes de ejecutar ninguna
+comparación, aunque se revisó entre versiones después de ver resultados de la partición de prueba
+(Sección~\ref{sec:exp-evolucion}). Esa comparación se llevó a cabo: las tres familias de recomendación
 (basada en contenido, colaborativa e híbrida), descritas con su formulación completa en la
 Sección~\ref{cap:algoritmos}, se compararon bajo ese protocolo en el
-Capítulo~\ref{cap:resultados} frente a los baselines de referencia. De los objetivos específicos solo quedan pendientes, de forma parcial, dos piezas del
-contrato de evaluación, que recoge la Sección~\ref{sec:conc-limitaciones}. Cada incremento del
-sistema se cerró con sus criterios de éxito verificados de forma independiente, según la
-disciplina descrita en el Capítulo~\ref{cap:gestion}.
+Capítulo~\ref{cap:resultados} frente a los baselines de referencia, pero con usuarios sintéticos y una única
+semilla, de modo que sus conclusiones valen para esa población y no para personas reales.
+
+Por eso el cumplimiento no es íntegro. Quedan pendientes, de forma parcial, dos piezas del contrato de evaluación:
+repetir la comparación con varias semillas y retroproyectar sobre la ejecución v15 la captura de entorno y consumo de
+recursos. A ellas se suman tres carencias que la Sección~\ref{sec:conc-limitaciones} declara: la rejilla de ajuste
+de hiperparámetros prevista sobre la partición de validación no se ejecutó, el conjunto de características vigente
+(\texttt{fs-v13}) no se ha evaluado y el despliegue público no reproduce el corpus completo. Cada incremento del
+sistema se cerró con sus criterios de éxito verificados de forma independiente, según la disciplina descrita en el
+Capítulo~\ref{cap:gestion}; eso acredita que se cumplieron los criterios fijados, no que el sistema esté libre de
+las limitaciones anteriores.
 
 \section{Limitaciones y trabajo futuro}\label{sec:conc-limitaciones}\label{sec:conc-trabajo-futuro}
 
@@ -36,7 +44,9 @@ ejecución y consumo de recursos, ya disponible en el ejecutor paralelo para com
 futuras, no se retroproyectó sobre la ejecución v15 ya cerrada, de modo que esa ejecución
 concreta carece de ese detalle. Tampoco se ha evaluado todavía el conjunto de características
 \texttt{fs-v13}, posterior a esa ejecución: las cifras publicadas corresponden a \texttt{fs-v12}
-(Sección~\ref{cap:algoritmos}). El despliegue público, descrito en la
+(Sección~\ref{cap:algoritmos}). La rejilla de ajuste de hiperparámetros que el protocolo declaró para la partición de
+validación no se ejecutó, y el protocolo cambió de versión después de ver resultados de prueba, de modo que el consumo
+único de esa partición rige dentro de cada versión y no entre ellas (Sección~\ref{sec:exp-reparto}). El despliegue público, descrito en la
 Sección~\ref{cap:despliegue}, sirve un subconjunto del catálogo a escala real (32.550 de las 190.479 obras
 gobernadas, el 17\,\%) y no el corpus completo, que no cabe en el nivel gratuito de la base de datos; la evaluación
 offline se midió en el entorno local, no en el desplegado.
@@ -47,9 +57,23 @@ semillas y con cohortes sintéticas adicionales, para separar lo que es una dife
 consistente entre algoritmos de lo que podría ser ruido de una única muestra, y aplicar sobre la nueva ejecución la captura de entorno y consumo de recursos que el
 ejecutor paralelo ya sabe registrar. La segunda es estudiar la sensibilidad del sistema a sus propios
 hiperparámetros locales (los pesos de familia de facetas, la mezcla híbrida, el factor de
-diversidad), en lugar de tratarlos como constantes fijadas de una vez. La tercera, ya fuera
-del núcleo de recomendación, es ampliar el despliegue público al corpus gobernado completo, con una base de datos de
-mayor capacidad.
+diversidad), en lugar de tratarlos como constantes fijadas de una vez.
+
+Fuera del núcleo de recomendación, el producto deja cinco líneas abiertas. La primera es contrastar los algoritmos
+con personas reales: la comparación publicada usa solo usuarios sintéticos, y una prueba con un grupo pequeño que
+usara la aplicación y valorara las recomendaciones daría una primera señal de hasta qué punto las conclusiones se
+trasladan, algo que esta memoria no puede ofrecer. La segunda es completar la gestión de cuentas con verificación
+de correo, recuperación de contraseña y una política de contraseñas común al registro y al cambio; hoy no existen,
+y por eso las cuentas del despliegue público son de demostración. La tercera es escalar el despliegue: ampliarlo al
+corpus gobernado completo con una base de datos de mayor capacidad, dedicar un proceso de recomendación a cada
+algoritmo, como ya hace el entorno local, y servir las lecturas públicas del catálogo desde la caché en el borde de
+Vercel. La cuarta es importar la colección desde una cuenta de Steam, para que quien ya tiene una biblioteca grande
+no tenga que registrarla juego a juego; exigiría reconciliar los títulos de Steam con las obras canónicas del
+catálogo, un problema de identidad semejante al que ya hubo que resolver entre Wikidata e IGDB, y respetar los
+términos de uso de la API de Steam y la privacidad del perfil. La quinta es una importación diaria del catálogo que
+lo mantenga actualizado; como la evaluación depende de un corpus congelado, cada importación debería producir una
+nueva versión del corpus, sin alterar las que ya usan los artefactos publicados.
+
 Cualquier extensión de este trabajo deberá crear su propio protocolo y su propio artefacto
 versionado, sin alterar de forma retroactiva la evidencia ya publicada.
 
