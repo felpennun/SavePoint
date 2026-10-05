@@ -187,7 +187,7 @@ export function AccountSwitcher({
     setOpen(false);
     // Full page load: after logging out nothing of the previous account (header,
     // photo, cached pages) may remain on screen.
-    window.location.assign(`/${locale}`);
+    window.location.replace(`/${locale}`);
   }
 
   const triggerText = alias ? `${labels.label}: ${alias}` : labels.label;

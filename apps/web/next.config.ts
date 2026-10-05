@@ -20,11 +20,11 @@ const nextConfig: NextConfig = {
     // Covers never change: keep the optimised copies for a week (default is 60 s).
     minimumCacheTTL: 604800,
   },
-  // Client-side navigation cache: pages already visited are reused for 30 s
-  // (dynamic) / 3 min (static) so back/forward and repeated clicks are instant.
-  // Writes drop it again (components/RouterCacheGuard.tsx).
+  // Do not reuse dynamic pages after navigation: session changes and
+  // request-specific home content (such as the random game) must be fresh.
+  // Static pages can still be reused briefly for quick back/forward navigation.
   experimental: {
-    staleTimes: { dynamic: 30, static: 180 },
+    staleTimes: { dynamic: 0, static: 180 },
   },
   // Two fixes needed together for the Django proxy, both about the same
   // trailing-slash mismatch: (1) skipTrailingSlashRedirect stops Next's own

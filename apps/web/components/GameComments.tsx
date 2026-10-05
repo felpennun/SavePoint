@@ -110,6 +110,7 @@ export function GameComments({
 }) {
   const copy = COPY[locale];
   const [loading, setLoading] = useState(true);
+  const [inCollection, setInCollection] = useState(false);
   const [comments, setComments] = useState<CommentDto[]>([]);
   const [text, setText] = useState("");
   const [visibility, setVisibility] = useState<Visibility>("public");
@@ -150,10 +151,22 @@ export function GameComments({
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
+    if (isAuthenticated) {
+      apiFetch(`/api/library/entries/${workId}/configuration/`)
+        .then((response) => (response.ok ? response.json() : null))
+        .then((body: { in_collection?: unknown } | null) => {
+          if (!cancelled) setInCollection(body?.in_collection === true);
+        })
+        .catch(() => {
+          if (!cancelled) setInCollection(false);
+        });
+    } else {
+      setInCollection(false);
+    }
     return () => {
       cancelled = true;
     };
-  }, [workId]);
+  }, [workId, isAuthenticated]);
 
   if (loading) return <p aria-live="polite">{copy.loading}</p>;
 
@@ -212,7 +225,7 @@ export function GameComments({
     <section className="sp-game-comments" aria-label={copy.heading}>
       <h2 className="sp-h2">{copy.heading}</h2>
 
-      {isAuthenticated ? (
+      {isAuthenticated && inCollection ? (
         <div className="sp-copy-row">
           <div className="sp-field">
             <textarea
@@ -244,6 +257,8 @@ export function GameComments({
             </button>
           </div>
         </div>
+      ) : isAuthenticated ? (
+        <p className="sp-meta">{copy.notInCollection}</p>
       ) : (
         <p className="sp-meta">{copy.loginRequired}</p>
       )}

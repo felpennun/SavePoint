@@ -68,7 +68,7 @@ export default function RegisterPage() {
       if (response.ok) {
         // Full page load: the new session must replace everything cached.
         redirecting = true;
-        window.location.assign(`/${locale}`);
+        window.location.replace(`/${locale}`);
         return;
       }
       setPassword("");

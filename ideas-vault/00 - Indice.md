@@ -25,6 +25,7 @@ izquierda) para ver la nube completa.
 ## Auditorías
 
 - [[Auditoria de seguridad 2026-09-08]]
+- [[2026-10-06 - Invariantes de coleccion y sesion]]
 
 ## Fases
 

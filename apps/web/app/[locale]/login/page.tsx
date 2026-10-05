@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 
 const COPY = {
   es: {
@@ -31,7 +31,6 @@ const COPY = {
 
 export default function LoginPage() {
   const params = useParams<{ locale: string }>();
-  const searchParams = useSearchParams();
   const locale = params.locale === "en" ? "en" : "es";
   const copy = COPY[locale];
 
@@ -55,7 +54,6 @@ export default function LoginPage() {
         .find((row) => row.startsWith("csrftoken="))
         ?.split("=")[1];
 
-      const requestedNext = searchParams.get("next") ?? undefined;
       const response = await fetch("/api/accounts/login/", {
         method: "POST",
         credentials: "same-origin",
@@ -63,7 +61,7 @@ export default function LoginPage() {
           "Content-Type": "application/json",
           ...(csrfToken ? { "X-CSRFToken": csrfToken } : {}),
         },
-        body: JSON.stringify({ username, password, next: requestedNext }),
+        body: JSON.stringify({ username, password }),
       });
 
       if (!response.ok) {
@@ -72,13 +70,10 @@ export default function LoginPage() {
         return;
       }
 
-      const body = (await response.json()) as { next: string };
-      // Django's LoginView is locale-unaware; only trust its returned
-      // `next` when we sent an explicit, already-locale-prefixed value.
-      // A full page load, not a client-side navigation: the session changed, so
-      // the header, the cached pages and any per-user state must start fresh.
+      // The session changed, so always load the localized home page from the
+      // server with the new cookie and fresh per-user state.
       redirecting = true;
-      window.location.assign(requestedNext ? body.next : `/${locale}`);
+      window.location.replace(`/${locale}`);
     } catch {
       setError(copy.generic);
     } finally {

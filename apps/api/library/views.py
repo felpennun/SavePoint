@@ -138,7 +138,13 @@ class MyLibraryView(APIView):
             )
             .select_related("work")
             .prefetch_related("work__source_records", "work__assets", "work__releases__platform")
-            .annotate(owned_copy_count=Count("work__owned_copies", distinct=True))
+            .annotate(
+                owned_copy_count=Count(
+                    "work__owned_copies",
+                    filter=Q(work__owned_copies__user=request.user),
+                    distinct=True,
+                )
+            )
             .distinct()
             .order_by("work__original_title", "id")
         )
@@ -307,6 +313,7 @@ class LibraryConfigurationView(APIView):
                 "status": entry.current_status if entry else None,
                 "rating_half_steps": entry.rating_half_steps if entry else None,
                 "is_platinum": entry.is_platinum if entry else False,
+                "in_collection": entry is not None,
                 "copies": [
                     serialize_copy(copy)
                     for copy in OwnedCopy.objects.filter(user=request.user, work=work)
@@ -328,6 +335,7 @@ class LibraryConfigurationView(APIView):
                 "status": entry.current_status if entry else None,
                 "rating_half_steps": entry.rating_half_steps if entry else None,
                 "is_platinum": entry.is_platinum if entry else False,
+                "in_collection": entry is not None,
                 "copies": [
                     serialize_copy(copy)
                     for copy in OwnedCopy.objects.filter(user=request.user, work=work)
