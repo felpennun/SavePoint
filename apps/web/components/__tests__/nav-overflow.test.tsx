@@ -68,13 +68,11 @@ describe.each(["es", "en"])("responsive navbar accessibility (%s)", (locale) => 
     for (const width of [320, 375, 768, 1280]) {
       await page.setViewportSize({ width, height: 800 });
       expect(await header.innerHTML()).toBe(initialMarkup);
-      // Theme toggle and account trigger are icon-only (empty text); only
-      // the mobile-menu button carries a visible label. Order is stable.
-      expect(await header.getByRole("button").allTextContents()).toEqual([
-        "",
-        "",
-        dict.nav.openMenu,
-      ]);
+      // Theme toggle, account trigger and the mobile-menu button are all
+      // icon-only (empty text); the menu button is named through aria-label.
+      // Order is stable.
+      expect(await header.getByRole("button").allTextContents()).toEqual(["", "", ""]);
+      expect(await header.getByRole("button", { name: dict.nav.openMenu, exact: true }).count()).toBe(1);
       expect(await page.getByRole("dialog").count()).toBe(0);
     }
   });

@@ -6460,3 +6460,262 @@ button.sp-coll-side-row {
     max-width: none;
   }
 }
+
+/* ===========================================================================
+   Phones only (max-width: 767px, the same break as Tailwind's `md:` that the
+   header already uses). Everything below is inside this one media query, so
+   nothing here can reach tablets or desktops: it fixes the phone review of
+   2026-10-05 (overlapping header, a selector that pushed the games a screen
+   down, filter panels leaving the screen, cramped hero, wrapping tabs, small
+   tap targets and 11px labels). Keep new phone-only rules in this block.
+   =========================================================================== */
+@media (max-width: 767px) {
+  /* --- Header: logo, account and menu fit; language and theme live in the menu */
+  .sp-navbar-inner > div:last-child > .sp-lang-toggle,
+  .sp-navbar-inner > div:last-child > button[aria-pressed] {
+    display: none;
+  }
+
+  .sp-menu-btn {
+    position: relative;
+    z-index: 41;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0;
+  }
+
+  .sp-mobile-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    background: rgb(0 0 0 / 0.5);
+  }
+
+  .sp-mobile-tools {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    margin-top: var(--space-sm);
+    padding: var(--space-sm) var(--space-sm) 0;
+    border-top: 1px solid var(--color-surface-border);
+  }
+
+  .sp-mobile-tools .sp-lang-opt {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+
+  /* --- Tap targets of at least 44px for the loose links */
+  .sp-home-foot a,
+  .sp-muted > .sp-link,
+  .sp-provenance .sp-link {
+    display: inline-block;
+    padding: 0.75rem 0.5rem;
+  }
+
+  .sp-pf-camera {
+    min-width: 2.75rem;
+  }
+
+  .sp-coll-side-new {
+    min-height: 2.75rem;
+    padding: 0 var(--space-sm);
+  }
+
+  .sp-copy-add-button {
+    min-width: 2.75rem;
+  }
+
+  /* --- Labels never below 12px */
+  .sp-coll-side-caption,
+  .sp-reco-rail-code,
+  .sp-pf-count,
+  .sp-pf-eyebrow,
+  .sp-fr-eyebrow {
+    font-size: 0.75rem;
+  }
+
+  /* --- Home: smaller title and a showcase card that leaves room for its text */
+  .sp-home-hero {
+    padding: 28px 20px;
+    gap: 28px;
+  }
+
+  .sp-home-hero-text h1 {
+    font-size: 1.75rem;
+    line-height: 1.12;
+  }
+
+  .sp-home-hero-text p {
+    font-size: 16px;
+  }
+
+  .sp-home-showcase {
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+    gap: 14px;
+    padding: 14px;
+  }
+
+  .sp-home-showcase-note {
+    font-size: 13px;
+  }
+
+  /* --- Collection: the state and list selector becomes two rows of chips that
+        scroll sideways, so the games start on the first screen */
+  .sp-coll-side {
+    position: static;
+    padding: var(--space-md);
+  }
+
+  .sp-coll-side-inner {
+    gap: var(--space-md);
+  }
+
+  .sp-coll-side-titlerow,
+  .sp-coll-side-title {
+    padding-bottom: 6px;
+  }
+
+  .sp-coll-side-list {
+    flex-direction: row;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .sp-coll-side-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .sp-coll-side-row {
+    flex: 0 0 auto;
+    min-height: 2.75rem;
+    padding: 6px 14px;
+    gap: 8px;
+    border-color: var(--color-surface-border);
+    border-radius: 999px;
+  }
+
+  .sp-coll-side-name--stack + .sp-coll-side-count,
+  .sp-coll-side-row:has(.sp-coll-side-name--stack) {
+    border-radius: var(--radius-control);
+  }
+
+  /* --- Filter popovers: one panel as wide as the bar, below it, instead of a
+        box hanging from its own button (which left the screen on the right) */
+  .sp-filterbar-row {
+    position: relative;
+  }
+
+  .sp-filterbar-row > .sp-dropdown {
+    position: static;
+  }
+
+  .sp-filterbar-row > .sp-dropdown > .sp-dropdown-panel {
+    left: 0;
+    right: 0;
+    top: calc(100% + 6px);
+    width: auto;
+    min-width: 0;
+    max-width: none;
+    max-height: min(60vh, 22rem);
+  }
+
+  .sp-facet-option {
+    gap: var(--space-md);
+    padding: 0 var(--space-md);
+  }
+
+  .sp-facet-option input {
+    flex: 0 0 1.25rem;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  /* --- Profile: tabs in one row that scrolls, full-width actions and fields */
+  .sp-pf-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 0 12px;
+    scrollbar-width: none;
+  }
+
+  .sp-pf-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .sp-pf-tabs > button {
+    flex: 0 0 auto;
+    min-height: 2.75rem;
+  }
+
+  .sp-pf-head {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    padding: 0 16px;
+  }
+
+  .sp-pf-head-actions {
+    justify-content: stretch;
+    padding-top: 0;
+  }
+
+  .sp-pf-head-actions > .sp-pf-save {
+    flex: 1 1 auto;
+    min-height: 2.75rem;
+  }
+
+  .sp-pf-username-row {
+    flex-direction: column;
+  }
+
+  /* --- Recommendations: the algorithm picker becomes a row of chips without the
+        technical weights, and the layout stacks */
+  .sp-reco-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sp-reco-rail {
+    flex-direction: row;
+    gap: 8px;
+    padding: var(--space-md);
+    overflow-x: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--color-surface-border);
+    scrollbar-width: none;
+  }
+
+  .sp-reco-rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .sp-reco-rail-title,
+  .sp-reco-rail-code,
+  .sp-reco-rail-note {
+    display: none;
+  }
+
+  .sp-reco-rail-item {
+    flex: 0 0 auto;
+    min-height: 2.75rem;
+    justify-content: center;
+    padding: 8px 16px;
+    border-color: var(--color-surface-border);
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  /* --- Game page: the cover is centred instead of leaving a gap on the right */
+  .sp-cover-hero {
+    margin-inline: auto;
+  }
+}

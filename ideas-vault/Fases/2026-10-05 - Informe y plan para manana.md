@@ -34,7 +34,11 @@ Cuando la API encola un refresco de recomendaciones, lanza un proceso corto (`pr
   procesos reales: un segundo intento inmediato no lanza otro worker y, al terminar el primero, se lanza uno nuevo.
 
 **Efecto para el ping (sección 4):** ya se puede activar sin consumir horas de Neon, siempre que apunte a `/health/`.
-Pendiente de comprobar en producción tras el despliegue: que Neon pasa a suspendido a los pocos minutos de inactividad.
+**Comprobado en producción (commit `b6dd90c`, 2026-10-05 01:49-01:56):** cuenta desechable nueva, 4 juegos valorados:
+el worker arrancó solo, calculó las señales en 2 min 46 s (la primera carga de vectores desde Neon) y las 3 secciones en
+~1 min cada una; recomendación lista a los ~6 min; cuenta borrada después. Nota: durante las señales la API muestra
+"en cola" porque ese trabajo previo no cuenta como sección. Comprobación de que Neon se suspende tras ~7 min sin tráfico:
+ver el resultado anotado debajo.
 
 ## 1. Estado actual del despliegue
 
@@ -219,6 +223,98 @@ Pregunta del autor: ¿puedo hacer yo la visita y aplicar las correcciones princi
    (solapes, cortes), sin cambios de estilo no pedidos.
 5. Volver a pasar el recorrido y adjuntar antes/después; el autor revisa y decide qué más tocar.
 
+## 7 bis. Recorrido móvil: hallazgos y correcciones APLICADAS (2026-10-05, noche)
+
+**Estado: aplicado el mismo día**, a petición del autor ("solo en móvil, en PC es perfecto"). Todo el CSS nuevo está
+dentro de un único bloque `@media (max-width: 767px)` al final de `apps/web/app/globals.css` (mismo punto de corte
+`md:` que usa la barra), y el marcado nuevo solo está en el menú móvil (`MobileMenu`, que ya era `md:hidden`).
+
+Aplicado: (1) cabecera sin solapes: botón de menú con icono, idioma y tema dentro del menú, fondo atenuado al abrirlo;
+(2) selector de la colección en dos filas de chips desplazables (la página baja de 10.570 a ~10.260 px y los juegos
+empiezan en la primera pantalla); (3) paneles de filtros a ancho del bloque, dentro de la pantalla, con casillas de
+tamaño normal; (4) portada con título de 28 px y tarjeta destacada con más espacio para el texto; (5) pestañas del
+perfil en una fila desplazable, botón de guardar y campo de usuario a ancho completo; (6) zonas táctiles de 44 px en
+idioma, enlaces sueltos, cámara del perfil, "+ NUEVA" y "+" de copias; (7) etiquetas de 11 px a 12 px;
+(8) recomendaciones: selector de algoritmo en chips y sin códigos técnicos; (10) portada de la ficha centrada;
+(11) menú móvil con fondo atenuado.
+
+Medición (390 px, antes → después, mismo script): títulos de 3 o más líneas 4 → 0, texto de 11 px 8 → 1, solapes
+94 → 72 y zonas táctiles pequeñas 71 → 66 (los que quedan son sobre todo falsos positivos: casillas de paneles
+cerrados, los medios puntos de las estrellas y el carrusel desplazable a propósito). Cabecera: 0 solapes en todas las
+páginas (antes el logo se pisaba con ES/EN en todas).
+
+**Prueba de que escritorio y tableta no cambian:** 33 capturas completas (1440, 1024 y 768 px; con y sin sesión; 11
+pantallas) antes y después. Mismas dimensiones en todas; 25 idénticas píxel a píxel y 8 con diferencias confinadas al
+recuadro del juego destacado de la portada, que cambia en cada carga (repitiendo la misma página con la misma versión
+salen entre 71 y 150 píxeles distintos), más un punto de 24×7 px. Los 66 tests de la web pasan (se actualizó el de la
+barra: el botón de menú ahora es solo icono con `aria-label`).
+
+No hecho / pendiente: (9) amistades (rellenos), medios puntos de las estrellas de la ficha (19 px de ancho: es la
+propia naturaleza del control de media estrella), indicador del carrusel de relacionados, tema claro e inglés (el CSS
+es el mismo, pero no se capturó), dispositivos reales y horizontal. Repetir con
+`scripts/mobile-audit/mobile_audit.cjs` (`AUDIT_SESSION` permite usar una cookie de sesión si el origen no es de
+confianza para la API, p. ej. localhost).
+
+### Hallazgos originales (antes de aplicar)
+
+(Descripción conservada tal como se redactó antes de aplicar los cambios.)
+
+Qué se hizo: auditoría automática con Playwright (Chromium emulando un iPhone) sobre la web **desplegada**, con y sin
+sesión de `demo_user`, a 360, 390 y 430 px de ancho, tema oscuro y español: 44 mediciones (19 sin sesión, 25 con
+sesión), más capturas a 390 px de todas las pantallas, del menú, del menú de cuenta y de un filtro abierto. Script
+reutilizable: `scripts/mobile-audit/mobile_audit.cjs` (variables `AUDIT_BASE`, `AUDIT_OUT`, `AUDIT_USER`,
+`AUDIT_PASSWORD`; se repite igual después de los cambios). Las capturas están en una carpeta temporal y se regeneran
+con el script.
+
+Lo que está bien: **ninguna pantalla tiene scroll horizontal** (0 de 44), no hay errores de JavaScript, el catálogo en
+dos columnas, la ficha de juego, el login y el registro se leen bien.
+
+Problemas, por prioridad (todos confirmados con captura):
+
+**P0, se ven mal a simple vista**
+1. **Cabecera rota en todas las páginas.** El logo "SavePoint" se pisa con el selector ES/EN (ancho 360-430 px):
+   caben mal el logo, ES/EN, el icono de tema, el de cuenta y el botón "Abrir menú". Propuesta: botón de menú solo
+   con icono de hamburguesa; mover ES/EN y el tema dentro del menú (o del menú de cuenta); a menos de 380 px, logo solo
+   con el icono.
+2. **Colección: el selector de estado y listas ocupa ~1.200 px** antes de que se vea un solo juego (la página mide
+   10.570 px de alto). Propuesta: barra horizontal desplazable de píldoras (Todos 82 · Jugando 11 · Pendientes 18 ...)
+   y las listas en un desplegable o una segunda fila; los juegos empiezan en la primera pantalla.
+3. **Filtros desplegables (catálogo y colección):** el panel de "Año" se sale por la derecha (llega a 487 px en una
+   pantalla de 390), las casillas de las listas se dibujan como cuadrados grandes vacíos desalineados con su texto, y el
+   panel tapa el botón "Aplicar filtros". Propuesta: panel a ancho completo anclado a la pantalla (hoja inferior),
+   casillas de tamaño normal.
+
+**P1, tamaños mal ajustados**
+4. **Portada:** el título pasa de 36 px y ocupa 3 líneas; la tarjeta destacada pone la portada y el texto en dos
+   columnas muy estrechas (el título en 2 líneas y la nota en 5). Propuesta: título ~28 px y tarjeta en una columna
+   (portada arriba, texto debajo).
+5. **Perfil (editar):** las pestañas (Cuenta, Privacidad, Preferencias, Conexiones, Seguridad) se parten en 3 líneas;
+   "Guardar cambios" queda suelto bajo el avatar; el campo de nombre de usuario se corta ("demo_us"). Propuesta:
+   pestañas en una sola fila con scroll horizontal, botón de guardar a ancho completo, campo con ancho completo.
+6. **Zonas táctiles menores de 44 px** (recomendación táctil): ES/EN (24×40), "Fuentes" del pie, "Ver todas las
+   fuentes" y "¿No tienes cuenta?" (16 px de alto), filas del selector de estado (40 px), icono de cámara del perfil
+   (34×44). Propuesta: mínimo 44×44 solo en móvil con `padding`.
+
+**P2, pulido**
+7. **Texto de 11 px** en etiquetas pequeñas (`sp-coll-side-caption`, `sp-pf-eyebrow`, `sp-fr-eyebrow`,
+   `sp-reco-rail-code`): subir a 12 px.
+8. **Recomendaciones:** el selector de algoritmo ocupa media pantalla y enseña códigos técnicos (`WEIGHTED ·
+   0.70/0.30`, `MMR-POP · 0.35/0.20/0.25/0.20`). En móvil: chips compactos y sin códigos.
+9. **Amistades:** tres paneles apilados con mucho espacio vacío; reducir rellenos.
+10. **Ficha de juego:** la portada queda alineada a la izquierda con un hueco a la derecha; centrarla o darle el
+    ancho completo. El carrusel de contenido relacionado se sale del ancho a propósito (scroll horizontal), conviene
+    que se note con un borde recortado.
+11. **Menú móvil** abierto: cubre el contenido sin atenuar el fondo; conviene un fondo semitransparente.
+
+Qué no se probó (hay que decirlo en el informe final): tema claro, inglés, dispositivos reales (solo emulación),
+horizontal, tabletas (768-1024 px; hay reglas a 820/900/1100 px sin unificar), detalle de un perfil de amistad, listas,
+las demás pestañas de editar perfil y los diálogos.
+
+Cómo aplicarlo sin tocar escritorio: todo dentro de `@media (max-width: 767px)` (mismo punto de corte `md:` que ya
+usa la barra), más clases `md:hidden` de forma aditiva; después, repetir las capturas a 1440 px y comparar píxeles con
+las de antes (debe dar cero diferencias) y repetir el script móvil para demostrar que bajan los hallazgos.
+Esfuerzo estimado: 3-4 horas para P0+P1, 1 hora más para P2.
+
 ## 8. Pendientes heredados (no perder)
 
 - **Correcciones del profesor:** aplicar todas (el autor las traerá/indicará). Sin trabajo previo posible hasta
@@ -242,7 +338,93 @@ Pregunta del autor: ¿puedo hacer yo la visita y aplicar las correcciones princi
 1. Activar el ping de la sección 4 (el worker bajo demanda ya está hecho) y comprobar que Neon se suspende.
 2. Correcciones del profesor (primero, porque condicionan la memoria).
 3. Sección de despliegue y diferencias local/desplegado (sección 2) y trabajo futuro (sección 3, tras la discusión).
-4. Revisión visual autónoma y correcciones, empezando por móvil (secciones 6-7).
+4. Móvil: ya aplicado (sección 7 bis); queda revisar en un móvil real y decidir los pendientes de esa sección.
+5. Limpieza del repositorio y README (sección 5), con las dependencias actualizadas, y hacerlo público.
+
+Nota: se retiró la pantalla de carga de esqueleto (`loading.tsx`) a petición del autor; la precarga al pasar el ratón
+se mantiene.
+
+
+Qué se hizo: auditoría automática con Playwright (Chromium emulando un iPhone) sobre la web **desplegada**, con y sin
+sesión de `demo_user`, a 360, 390 y 430 px de ancho, tema oscuro y español: 44 mediciones (19 sin sesión, 25 con
+sesión), más capturas a 390 px de todas las pantallas, del menú, del menú de cuenta y de un filtro abierto. Script
+reutilizable: `scripts/mobile-audit/mobile_audit.cjs` (variables `AUDIT_BASE`, `AUDIT_OUT`, `AUDIT_USER`,
+`AUDIT_PASSWORD`; se repite igual después de los cambios). Las capturas están en una carpeta temporal y se regeneran
+con el script.
+
+Lo que está bien: **ninguna pantalla tiene scroll horizontal** (0 de 44), no hay errores de JavaScript, el catálogo en
+dos columnas, la ficha de juego, el login y el registro se leen bien.
+
+Problemas, por prioridad (todos confirmados con captura):
+
+**P0, se ven mal a simple vista**
+1. **Cabecera rota en todas las páginas.** El logo "SavePoint" se pisa con el selector ES/EN (ancho 360-430 px):
+   caben mal el logo, ES/EN, el icono de tema, el de cuenta y el botón "Abrir menú". Propuesta: botón de menú solo
+   con icono de hamburguesa; mover ES/EN y el tema dentro del menú (o del menú de cuenta); a menos de 380 px, logo solo
+   con el icono.
+2. **Colección: el selector de estado y listas ocupa ~1.200 px** antes de que se vea un solo juego (la página mide
+   10.570 px de alto). Propuesta: barra horizontal desplazable de píldoras (Todos 82 · Jugando 11 · Pendientes 18 ...)
+   y las listas en un desplegable o una segunda fila; los juegos empiezan en la primera pantalla.
+3. **Filtros desplegables (catálogo y colección):** el panel de "Año" se sale por la derecha (llega a 487 px en una
+   pantalla de 390), las casillas de las listas se dibujan como cuadrados grandes vacíos desalineados con su texto, y el
+   panel tapa el botón "Aplicar filtros". Propuesta: panel a ancho completo anclado a la pantalla (hoja inferior),
+   casillas de tamaño normal.
+
+**P1, tamaños mal ajustados**
+4. **Portada:** el título pasa de 36 px y ocupa 3 líneas; la tarjeta destacada pone la portada y el texto en dos
+   columnas muy estrechas (el título en 2 líneas y la nota en 5). Propuesta: título ~28 px y tarjeta en una columna
+   (portada arriba, texto debajo).
+5. **Perfil (editar):** las pestañas (Cuenta, Privacidad, Preferencias, Conexiones, Seguridad) se parten en 3 líneas;
+   "Guardar cambios" queda suelto bajo el avatar; el campo de nombre de usuario se corta ("demo_us"). Propuesta:
+   pestañas en una sola fila con scroll horizontal, botón de guardar a ancho completo, campo con ancho completo.
+6. **Zonas táctiles menores de 44 px** (recomendación táctil): ES/EN (24×40), "Fuentes" del pie, "Ver todas las
+   fuentes" y "¿No tienes cuenta?" (16 px de alto), filas del selector de estado (40 px), icono de cámara del perfil
+   (34×44). Propuesta: mínimo 44×44 solo en móvil con `padding`.
+
+**P2, pulido**
+7. **Texto de 11 px** en etiquetas pequeñas (`sp-coll-side-caption`, `sp-pf-eyebrow`, `sp-fr-eyebrow`,
+   `sp-reco-rail-code`): subir a 12 px.
+8. **Recomendaciones:** el selector de algoritmo ocupa media pantalla y enseña códigos técnicos (`WEIGHTED ·
+   0.70/0.30`, `MMR-POP · 0.35/0.20/0.25/0.20`). En móvil: chips compactos y sin códigos.
+9. **Amistades:** tres paneles apilados con mucho espacio vacío; reducir rellenos.
+10. **Ficha de juego:** la portada queda alineada a la izquierda con un hueco a la derecha; centrarla o darle el
+    ancho completo. El carrusel de contenido relacionado se sale del ancho a propósito (scroll horizontal), conviene
+    que se note con un borde recortado.
+11. **Menú móvil** abierto: cubre el contenido sin atenuar el fondo; conviene un fondo semitransparente.
+
+Qué no se probó (hay que decirlo en el informe final): tema claro, inglés, dispositivos reales (solo emulación),
+horizontal, tabletas (768-1024 px; hay reglas a 820/900/1100 px sin unificar), detalle de un perfil de amistad, listas,
+las demás pestañas de editar perfil y los diálogos.
+
+Cómo aplicarlo sin tocar escritorio: todo dentro de `@media (max-width: 767px)` (mismo punto de corte `md:` que ya
+usa la barra), más clases `md:hidden` de forma aditiva; después, repetir las capturas a 1440 px y comparar píxeles con
+las de antes (debe dar cero diferencias) y repetir el script móvil para demostrar que bajan los hallazgos.
+Esfuerzo estimado: 3-4 horas para P0+P1, 1 hora más para P2.
+
+## 8. Pendientes heredados (no perder)
+
+- **Correcciones del profesor:** aplicar todas (el autor las traerá/indicará). Sin trabajo previo posible hasta
+  conocerlas.
+- **Cambio de contraseña:** no aplica las mismas restricciones/mensajes que el registro (mostrar la misma pista y los
+  motivos concretos; rechazar nueva == actual). Detectado, sin corregir.
+- **Seguridad:** subir `next` a 16.3.6 y `urllib3` a 2.8.0 (con su registro de legitimidad); rol de base de datos sin
+  superusuario en producción; CSP con nonces; reducir la caché de fotos de amistades; **rotar la contraseña de
+  `neondb_owner` y actualizar `DATABASE_URL` en Render** (pasó por el historial de la conversación de hoy).
+- **Pruebas e2e de Playwright** (colección, social, recomendaciones, humo desplegado): adaptadas pero no ejecutadas
+  contra el diseño nuevo; necesitan cuenta de demostración.
+- **Memoria:** recompilar la vista previa PDF; actualizar cifras de pruebas y del despliegue (sección 2).
+- **Issue #77** sigue abierta (`Refs #77`); cerrar con `Closes #N` solo al cerrar un plan verificado con su SUMMARY.
+- **Neon:** decidir si se borra la rama de respaldo cuando todo esté estable (no gasta cómputo, sí algo de espacio).
+- **Cuentas públicas:** `demo_user2/3/4` están vacías; el autor las rellenará.
+- **Registro:** el primer intento del autor falló y no se pudo reproducir (curl y navegador real dan 201). Si vuelve a
+  pasar, anotar el mensaje exacto que muestra la página.
+
+## 9. Orden sugerido para mañana
+
+1. Activar el ping de la sección 4 (el worker bajo demanda ya está hecho) y comprobar que Neon se suspende.
+2. Correcciones del profesor (primero, porque condicionan la memoria).
+3. Sección de despliegue y diferencias local/desplegado (sección 2) y trabajo futuro (sección 3, tras la discusión).
+4. Móvil: ya aplicado (sección 7 bis); queda revisar en un móvil real y decidir los pendientes de esa sección.
 5. Limpieza del repositorio y README (sección 5), con las dependencias actualizadas, y hacerlo público.
 
 Nota: se retiró la pantalla de carga de esqueleto (`loading.tsx`) a petición del autor; la precarga al pasar el ratón

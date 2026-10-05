@@ -140,13 +140,17 @@ export function MobileMenu({ items, dict, locale }: { items: NavItem[]; dict: Di
       <button
         ref={triggerRef}
         type="button"
-        className="sp-btn-secondary"
+        className="sp-btn-secondary sp-menu-btn"
         aria-expanded={open}
         aria-controls="mobile-menu"
+        aria-label={open ? dict.nav.closeMenu : dict.nav.openMenu}
         onClick={() => setOpen((value) => !value)}
       >
-        {open ? dict.nav.closeMenu : dict.nav.openMenu}
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+          {open ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
+        </svg>
       </button>
+      {open ? <div className="sp-mobile-backdrop" aria-hidden="true" onClick={() => setOpen(false)} /> : null}
       {open ? (
         <div
           id="mobile-menu"
@@ -171,6 +175,11 @@ export function MobileMenu({ items, dict, locale }: { items: NavItem[]; dict: Di
               </li>
             ))}
           </ul>
+          {/* On phones the header has no room for these two, so they live here. */}
+          <div className="sp-mobile-tools">
+            <LanguageToggle locale={locale} />
+            <ThemeToggle labels={dict.theme.toggle} />
+          </div>
         </div>
       ) : null}
     </div>
