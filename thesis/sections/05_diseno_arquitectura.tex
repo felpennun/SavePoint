@@ -126,12 +126,49 @@ un recorrido de índice y no una agregación sobre cientos de miles de publicaci
 es un índice de trigramas sobre los alias normalizados, que sostiene la búsqueda tolerante
 por prefijo y por similitud.
 
+Las Figuras~\ref{fig:datos-catalogo}, \ref{fig:datos-biblioteca} y~\ref{fig:datos-social}
+recogen el diagrama de entidades de ese modelo tal como lo implementan los modelos de Django.
+A diferencia del modelo de dominio de la Figura~\ref{fig:modelo-dominio}, que solo nombra las
+entidades, cada caja es una tabla con sus atributos más relevantes: \textit{PK} marca la clave
+primaria, \textit{FK} una clave foránea, \textit{UQ} un atributo único y el signo de
+interrogación un atributo que admite valores nulos. En cada línea, \texttt{N} aparece en el
+extremo de la entidad que contiene la clave foránea y \texttt{1}, o \texttt{0..1} si la
+referencia es opcional, en el extremo de la entidad referenciada. Las dimensiones del catálogo
+(\texttt{Genre}, \texttt{Theme}, \texttt{Franchise}, \texttt{Developer}, \texttt{Publisher},
+\texttt{GameMode}, \texttt{PlayerPerspective} y \texttt{Keyword}) se relacionan con la obra de
+muchos a muchos y comparten una forma básica, por lo que se dibujan en una sola caja; las
+etiquetas curadas lo hacen a través de la entidad de evidencia \texttt{GameWorkCuratedLabel}.
+Cuando una entidad tiene dos claves foráneas hacia el usuario, como el remitente y el
+destinatario de un mensaje, se dibuja una sola línea. Se omiten las entidades de importación y
+de versionado del corpus, los subgéneros y las cuentas de demostración.
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=\textwidth]{figures/modelo-datos-catalogo.pdf}
+    \caption{Diagrama de entidades del catálogo, con las puntuaciones de corpus y el vector de características de cada obra.}
+    \label{fig:datos-catalogo}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=\textwidth]{figures/modelo-datos-biblioteca.pdf}
+    \caption{Diagrama de entidades de la biblioteca personal y de las cuentas. \texttt{User}, \texttt{GameWork}, \texttt{GameRelease} y \texttt{Edition} se repiten con sus atributos mínimos como referencia.}
+    \label{fig:datos-biblioteca}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=\textwidth]{figures/modelo-datos-social.pdf}
+    \caption{Diagrama de entidades de las amistades, los mensajes y las recomendaciones personalizadas.}
+    \label{fig:datos-social}
+\end{figure}
+
 La API es de estilo REST, servida por DRF bajo el prefijo \texttt{/api/}. Las respuestas de
 lista están paginadas. Las vistas de escritura y las de datos personales exigen sesión. Las
 anónimas de mayor coste llevan un límite de ritmo con ámbito propio. La
 Tabla~\ref{tab:endpoints} recoge los puntos de acceso principales.
 
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
 \begin{tabularx}{\textwidth}{ | L{0.39\textwidth} | C{0.14\textwidth} | Y | }
     \hline
