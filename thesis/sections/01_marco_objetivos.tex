@@ -12,7 +12,7 @@ el problema de inventario que sí plantea una consola con juegos en cartucho, di
 
 En el ámbito del videojuego, Backloggd traslada casi literalmente el modelo de
 Letterboxd~\cite{backloggd}, con buen tratamiento del backlog, pero sin inventario de
-copias ni ambición de recomendación. OpenCritic agrega puntuaciones de prensa y es una
+copias ni ambición de recomendación. OpenCritic agrega puntuaciones de prensa~\cite{opencritic} y es una
 referencia de densidad visual y de tratamiento de la nota, más que un catalogador personal.
 Steam ofrece una biblioteca personal rica, aunque acoplada a su tienda y limitada a lo
 comprado en ella. La web de IGDB expone un catálogo amplio y bien modelado, orientado a la
@@ -80,7 +80,7 @@ otro. Sin un corpus congelado, una población definida, una división conocida y
 identificables, dos ejecuciones pueden parecer comparables aunque en realidad respondan a
 experimentos distintos, con datos distintos o con criterios de éxito distintos. SavePoint
 separa por ello, de forma deliberada, la aplicación que presenta resultados a un usuario de los
-trabajos offline que construyen y evalúan esos rankings. Esa separación no es solo una decisión
+trabajos sin conexión que construyen y evalúan esas clasificaciones. Esa separación no es solo una decisión
 de arquitectura: se diseñó, implementó y validó mediante código, pruebas y evidencias
 versionadas. Es esa separación la que permite que las conclusiones del
 Capítulo~\ref{cap:resultados} de esta memoria se puedan volver a comprobar.
@@ -99,13 +99,13 @@ sintéticos y no personas reales.
 
 Los objetivos específicos son gobernar el catálogo y su procedencia de datos; modelar
 biblioteca, privacidad y relaciones sociales con el mismo nivel de cuidado que el catálogo;
-implementar tanto los algoritmos de referencia (\textit{baselines}) como las tres familias de
-recomendación descritas en el Capítulo~\ref{cap:estado-del-arte}; publicar un protocolo offline
+implementar tanto los algoritmos de referencia como las tres familias de
+recomendación descritas en el Capítulo~\ref{cap:estado-del-arte}; publicar un protocolo sin conexión
 con candidatas comunes para que la comparación entre algoritmos sea justa; y conservar hashes,
 configuraciones y artefactos que hagan auditable cada resultado. La expectativa de partida del
 trabajo no afirma la superioridad universal de ningún algoritmo: bajo el protocolo publicado,
 combinar señales de contenido, popularidad y vecindad puede mejorar la recuperación frente a
-los baselines más simples, pero esa mejora debe contrastarse sin confundir una diferencia
+los métodos de referencia más simples, pero esa mejora debe contrastarse sin confundir una diferencia
 numérica con significación estadística o con validez fuera del corpus y la población con los
 que se midió.
 
@@ -116,7 +116,7 @@ seguridad propias de un servicio con usuarios. De las dieciséis variantes de re
 evaluadas, la aplicación publica tres, según se explica en la
 Sección~\ref{sec:alg-publicadas}. El alcance de la evaluación, en cambio, se limita a
 una publicación de evidencia concreta, identificada como v15 y descrita en el
-Capítulo~\ref{cap:resultados}, con una única ejecución del test. Conviene subrayar que estos usuarios sintéticos no son personas
+Capítulo~\ref{cap:resultados}, con una única ejecución de la prueba. Conviene subrayar que estos usuarios sintéticos no son personas
 reales, sino perfiles generados de forma controlada para poder ejercitar el sistema de
 recomendación sin depender de una base de usuarios real que este TFG no tiene tiempo ni alcance
 para reunir. Los resultados, por tanto, dependen del corpus concreto, de la semilla aleatoria,

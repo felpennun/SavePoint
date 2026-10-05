@@ -17,13 +17,13 @@ preparada, que es una cuenta normal con sus datos y no un actor distinto.
 
 \begin{table}[H]
 \centering
-\begin{tabularx}{\textwidth}{ | L{0.20\textwidth} | Y | C{0.16\textwidth} | }
+\begin{tabularx}{\textwidth}{ | L{0.20\textwidth} | Y | }
     \hline
-    \textbf{Actor} & \textbf{Descripción} & \textbf{Estado} \\
+    \textbf{Actor} & \textbf{Descripción} \\
     \hline
-    Visitante & Persona no autenticada que consulta el catálogo, la ficha de un juego y la recomendación por popularidad, y que puede registrarse. & Activo \\
+    Visitante & Persona no autenticada que consulta el catálogo, la ficha de un juego y la recomendación por popularidad, y que puede registrarse. \\
     \hline
-    Persona usuaria & Titular de una cuenta registrada que inicia sesión y gestiona su lista de pendientes, valora juegos, inventaría copias y se relaciona con sus amigos. & Activo \\
+    Persona usuaria & Titular de una cuenta registrada que inicia sesión y gestiona su lista de pendientes, valora juegos, inventaría copias y se relaciona con sus amigos. \\
     \hline
 \end{tabularx}
 \caption{Actores del sistema.}
@@ -88,7 +88,7 @@ información que satisface.
     \hline
     Biblioteca & Copias en propiedad con formato, plataforma y edición. & INV-01, INV-02 \\
     \hline
-    Cuentas & Registro e inicio de sesión de las personas usuarias. & AUTH-01 \\
+    Cuentas & Relaciones de amistad y bloqueo entre personas usuarias. & SOCIAL-03 \\
     \hline
 \end{tabularx}
 \caption{Áreas del modelo de dominio y requisitos de información asociados.}
@@ -144,7 +144,7 @@ aceptación.
     \hline
     DATA-04 & API de enriquecimiento elegida mediante comparación documentada. & Completo \\
     \hline
-    REC-02 & Baseline de recomendación por popularidad. & Completo \\
+    REC-02 & Recomendación de referencia por popularidad. & Completo \\
     \hline
     REC-10 & Página de recomendaciones por géneros según la actividad propia. & Completo \\
     \hline
@@ -216,8 +216,8 @@ funcional que satisface.
 La planificación posterior a la primera demostración añadió requisitos que no se pueden
 validar únicamente recorriendo la interfaz. DATA-03 y DATA-06 exigen una frontera de corpus
 gobernada, reversible y versionada, con checksum, diccionario, informe de calidad y muestra
-determinista. DATA-05, DATA-07 y DATA-08 exigen importar ratings con procedencia, reconciliar
-fuentes externas sin fuzzy matching y conservar snapshots inmutables por versión.
+determinista. DATA-05, DATA-07 y DATA-08 exigen importar valoraciones con procedencia, reconciliar
+fuentes externas sin emparejamiento difuso y conservar una versión inmutable por cada versión del corpus.
 
 EVAL-01, EVAL-02 y EVAL-03 fijan la comparación sobre la misma partición, los mismos
 candidatos y las mismas exclusiones. EVAL-09 y EVAL-10 añaden usuarios sintéticos
@@ -225,10 +225,38 @@ parametrizados y obligan a separar la evidencia simulada de cualquier afirmació
 usuarios reales. DOC-04 exige que el protocolo, las métricas, las semillas, las versiones y
 las amenazas a la validez queden escritos antes del resultado.
 
-En recomendación, REC-01 exige un baseline aleatorio reproducible y REC-03 vectores de
-contenido dispersos, perfil de usuario y similitud. REC-06 a REC-09 describen el cold-start,
+En recomendación, REC-01 exige un método de referencia aleatorio reproducible y REC-03 vectores de
+contenido dispersos, perfil de usuario y similitud. REC-06 a REC-09 describen el arranque en frío,
 las exclusiones, la explicación por contribuciones y el DTO versionado de las variantes
 comparadas.
+
+\begin{table}[H]
+\centering
+\tablecompact
+\begin{tabularx}{\textwidth}{ | L{0.20\textwidth} | Y | L{0.20\textwidth} | }
+    \hline
+    \textbf{Área} & \textbf{Requisito de evaluación} & \textbf{Códigos} \\
+    \hline
+    Corpus & Frontera de corpus gobernada, reversible y versionada, con checksum, diccionario, informe de calidad y muestra determinista. & DATA-03, DATA-06 \\
+    \hline
+    Datos & Importación de valoraciones con procedencia, reconciliación sin emparejamiento difuso y conservación de una versión inmutable por corpus. & DATA-05, DATA-07, DATA-08 \\
+    \hline
+    Protocolo & Comparación sobre la misma partición, el mismo conjunto de candidatas y las mismas exclusiones. & EVAL-01, EVAL-02, EVAL-03 \\
+    \hline
+    Población & Usuarios sintéticos parametrizados y separación explícita entre evidencia simulada y conclusiones sobre usuarios reales. & EVAL-09, EVAL-10 \\
+    \hline
+    Documentación & Protocolo, métricas, semillas, versiones y amenazas a la validez fijados antes de conocer los resultados. & DOC-04 \\
+    \hline
+    Algoritmos & Método de referencia aleatorio reproducible. & REC-01 \\
+    \hline
+    Algoritmos & Vectores de contenido dispersos, perfil de usuario y similitud. & REC-03 \\
+    \hline
+    Algoritmos & Arranque en frío, exclusiones, explicación por contribuciones y DTO versionado de las variantes comparadas. & REC-06 a REC-09 \\
+    \hline
+\end{tabularx}
+\caption{Requisitos de la evaluación de recomendadores.}
+\label{tab:req-estudio}
+\end{table}
 
 \section{Requisitos no funcionales y reglas de negocio}\label{sec:req-no-funcionales}\label{sec:req-reglas}
 
@@ -267,7 +295,7 @@ comportamiento del sistema.
     \hline
     RN-5 & La recomendación por popularidad se calcula a partir de las señales de popularidad importadas de IGDB y nunca se presenta como personalizada. \\
     \hline
-    RN-6 & La recomendación por afinidad de géneros refleja solo la actividad de la persona autenticada y nunca cae al baseline de popularidad; sin historial suficiente, muestra un estado de bienvenida. \\
+    RN-6 & La recomendación por afinidad de géneros refleja solo la actividad de la persona autenticada y nunca recurre a la recomendación de referencia por popularidad; sin historial suficiente, muestra un estado de bienvenida. \\
     \hline
     RN-7 & Registrar de nuevo una copia con la misma clave de idempotencia devuelve la copia existente en lugar de crear un duplicado. \\
     \hline
@@ -287,7 +315,7 @@ comportamiento del sistema.
 De los ochenta y ocho requisitos identificados en el análisis, ochenta y seis están
 completos, con evidencia verificable en \texttt{docs/verification/} o en las firmas de
 aceptación por fase. Entre ellos están las tres familias de recomendación y su protocolo de evaluación
-offline, que desarrollan la Sección~\ref{cap:algoritmos} y el Capítulo~\ref{cap:resultados}.
+sin conexión, que desarrollan la Sección~\ref{cap:algoritmos} y el Capítulo~\ref{cap:resultados}.
 Los dos requisitos pendientes son parciales y pertenecen al mismo contrato de evaluación:
 repetir la comparación de algoritmos con varias semillas y retroproyectar sobre la ejecución
 v15 la captura de entorno y consumo de recursos. La Sección~\ref{sec:conc-limitaciones} los

@@ -175,7 +175,7 @@ durante la Fase 2, el 7 de septiembre de 2026.
     \hline
     Fecha de primer lanzamiento poblada & aproximadamente el 75\% de las filas \\
     \hline
-    Obras con rating de usuarios de IGDB & 27.014 (13,9330\% del corpus gobernado) \\
+    Obras con valoración de usuarios de IGDB & 27.014 (13,9330\% del corpus gobernado) \\
     \hline
     Cobertura de \texttt{total\_rating} & 15,8197\% del corpus gobernado \\
     \hline
@@ -190,19 +190,19 @@ La importación se probó además sobre una base de datos desechable, donde sobr
 interrupción abrupta tras dos lotes confirmados y reanudó hasta completar sin duplicados ni
 huecos. Una segunda pasada completa sobre la base ya poblada convergió de forma idempotente,
 con la única diferencia de dos juegos primarios que IGDB añadió en vivo entre las dos
-pasadas. El snapshot reutilizable de la base cargada, de noventa y tres megabytes, no se
+pasadas. La versión inmutable reutilizable de la base cargada, de noventa y tres megabytes, no se
 versiona en el repositorio por decisión de ADR-006; se conserva fuera de él como vía de
 restauración rápida.
 
 La Fase 2 añadió una frontera de evaluación sobre este catálogo. El comando
 \texttt{govern\_corpus} aplica las reglas D-03 de forma reversible: conserva las obras
 fuente, pero marca como gobernadas las que son obras principales, tienen fecha de lanzamiento,
-al menos un género y al menos una plataforma de la allowlist de 39 plataformas. El rating no es un criterio de
+al menos un género y al menos una plataforma de la lista permitida de 39 plataformas. La valoración no es un criterio de
 exclusión. La ejecución documentada dejó 193.885 obras gobernadas y una versión de corpus
 \texttt{2026.09.1}; el checksum, el diccionario, el informe de calidad y la muestra
 determinista se conservan en \texttt{docs/verification/corpus-governance-freeze.md}.
 
-\subsection{Ratings externos y aislamiento de la evaluación}\label{sec:datos-ratings}
+\subsection{Valoraciones externas y aislamiento de la evaluación}\label{sec:datos-ratings}
 
 Durante la reimportación de IGDB se añadieron los campos \texttt{rating},
 \texttt{rating\_count} y \texttt{total\_rating\_count}, además del resumen y los alias
@@ -215,23 +215,23 @@ la Tabla~\ref{tab:freeze}.
 El comando \texttt{snapshot\_corpus\_ratings} copia las valoraciones externas a
 \texttt{CorpusRatingSnapshot} con una operación insert-only asociada a una
 \texttt{corpus\_version}. Una reimportación puede actualizar los campos vivos que usa la
-interfaz y producir una versión posterior, pero no modifica el snapshot de una versión ya
+interfaz y producir una versión posterior, pero no modifica la versión inmutable ya
 utilizada por el laboratorio. Esta separación es la condición que permite repetir una
 comparación y explicar qué datos recibió.
 
 Como fuente secundaria se probó RAWG en una ejecución acotada a 10.000 obras seleccionadas
 por \texttt{rating\_count} de IGDB. La reconciliación fue determinista: primero se intentó
 el slug exacto y después el título normalizado junto con el año de lanzamiento. No se aplicó
-fuzzy matching; las filas no emparejadas se descartaron y se contabilizaron. El resultado
-fue de 8.575 emparejamientos y 1.425 descartes, con 8.575 snapshots RAWG insertados. La
-cobertura nueva fue cero porque las obras seleccionadas ya tenían rating de IGDB. RAWG se
+emparejamiento difuso; las filas no emparejadas se descartaron y se contabilizaron. El resultado
+fue de 8.575 emparejamientos y 1.425 descartes, con 8.575 versiones inmutables de RAWG insertadas. La
+cobertura nueva fue cero porque las obras seleccionadas ya tenían valoración de IGDB. RAWG se
 documenta, por tanto, como contraste de procedencia, no como una fuente que haya ampliado
 la cobertura del corpus.
 
 La valoración mostrada en la ficha es una decisión de producto diferente. Puede mezclar,
-con pesos limitados por la cantidad de observaciones, el rating externo y las valoraciones
+con pesos limitados por la cantidad de observaciones, la valoración externa y las valoraciones
 locales de las personas usuarias. El laboratorio no lee esa mezcla derivada ni el
-valor mutable de \texttt{GameWork}: utiliza los snapshots de la versión fijada. Esta
+valor mutable de \texttt{GameWork}: utiliza las versiones inmutables de la versión fijada. Esta
 distinción evita que una nueva valoración de una cuenta o una reimportación cambie
 retroactivamente un resultado académico.
 
@@ -248,7 +248,7 @@ cursor retroceda, de modo que una ejecución interrumpida siempre reanuda hacia 
 el progreso real. La cadena de arranque del despliegue encadena la migración y la importación del
 catálogo, como describe la Sección~\ref{cap:despliegue}.
 
-La gobernanza y los ratings externos de la Sección~\ref{cap:datos} se ejecutan con
+La gobernanza y las valoraciones externas de la Sección~\ref{cap:datos} se ejecutan con
 \texttt{govern\_corpus}, \texttt{snapshot\_corpus\_ratings} y \texttt{enrich\_rawg\_ratings}, que
 trabaja por lotes con \textit{backoff} ante respuestas transitorias.
 \texttt{backfill\_game\_aliases} reconstruye los alias normalizados para que la búsqueda sea útil
@@ -258,7 +258,7 @@ El protocolo se carga desde \texttt{docs/methodology/protocol.json}. Los módulo
 aplicación \texttt{evaluation} que describe la Sección~\ref{sec:dis-laboratorio} se
 implementan con funciones deliberadamente pequeñas y explícitas.
 \texttt{evaluation/protocol.py} rechaza una rejilla con más de 24 configuraciones y distingue
-un protocolo todavía no consumido de un test ya ejecutado. \texttt{evaluation/metrics.py} no
+un protocolo todavía no consumido de una prueba ya ejecutada. \texttt{evaluation/metrics.py} no
 delega la definición de P@K, R@K, nDCG@K o MAP@K en una librería externa.
 \texttt{evaluation/splits.py} deriva la semilla del protocolo y del usuario, para que el orden
 de las filas en la base de datos no altere la obra retenida.
@@ -282,7 +282,7 @@ ordenación que envía el cliente nunca se interpola: una clave desconocida prod
 acotado antes de tocar el ORM. El Extracto de código~\ref{cod:sort} muestra esa lista de
 ordenaciones permitidas.
 
-\begin{lstlisting}[language=Python, caption={Lista fija de ordenaciones del catálogo, con desempate por identificador canónico (\texttt{apps/api/catalogue/search.py}).}, label={cod:sort}, captionpos=b, float, floatplacement=!htp]
+\begin{lstlisting}[language=Python, caption={Lista fija de ordenaciones del catálogo, con desempate por identificador canónico (\texttt{apps/api/catalogue/search.py}).}, label={cod:sort}, captionpos=b]
 # Cada clave resuelve a una tupla de argumentos de order_by que SIEMPRE
 # termina en canonical_slug, de modo que todo orden es total y estable
 # entre llamadas. Nada derivado de la entrada del cliente llega a este
@@ -300,38 +300,31 @@ SORT_ORDERS = {
 \subsection{Recomendadores en la aplicación}\label{sec:impl-heuristico}
 
 La aplicación publica tres variantes del laboratorio (Sección~\ref{sec:alg-publicadas}), cada una
-servida por su \textit{worker}. Además, el baseline \texttt{rank\_random\_v1} es el suelo de
+servida por su proceso trabajador. Además, el método de referencia \texttt{rank\_random\_v1} es el suelo de
 comparación. Selecciona con
 \texttt{random.Random(seed)} sobre los candidatos gobernados que no aparecen en la biblioteca
 de la persona usuaria. Ordenar previamente los identificadores y guardar una huella de la
 semilla, los candidatos y el resultado hace que la misma entrada produzca exactamente el
-mismo ranking.
+misma clasificación.
 
 El modelo de contenido que usan los algoritmos, descrito en la
 Sección~\ref{cap:algoritmos}, se apoya en \texttt{WorkFeatureVector}, una caché versionada y
 no un modelo entrenado, que \texttt{rebuild\_feature\_vectors} rellena de forma idempotente. El
-perfil de usuario reutiliza la tabla de pesos del heurístico que se describe a continuación, y
-el rating se mantiene fuera del vector para poder estudiarlo como una señal independiente.
+perfil de usuario se construye con los pesos de actividad descritos a continuación, y la
+valoración se mantiene fuera del vector para poder estudiarla como una señal independiente.
 
-La página de recomendaciones se apoya en el heurístico \texttt{tag-taste-v1} (identificador
-histórico \texttt{genre-taste-v1}, renombrado tras generalizarse a etiquetas curadas más allá
-del género), descrito en el registro ADR-007. Es una agregación en tiempo de petición, sin
-estado, acotada a la persona autenticada. Cada entrada de la biblioteca de esa persona aporta
-un peso de actividad a cada género de su obra, según la fórmula del Extracto de
-código~\ref{cod:heuristico}, que un refactor posterior extrajo al módulo
-\texttt{apps/api/recommendations/\_weights.py}. Así, el propio heurístico y el perfil de
-contenido (Sección~\ref{cap:algoritmos}) usan la misma definición de peso en lugar de copiarla.
-La contribución de la valoración no es
-lineal, como explica la Sección~\ref{cap:algoritmos}. Las obras del
-catálogo no vistas y sin ser contenido descargable se ordenan por el peso sumado de los
-géneros que comparten con ese vector de gusto, con desempate por identificador canónico. Cada
-respuesta lleva una huella SHA-256 del vector de gusto y del resultado ordenado, de modo que
-dos llamadas con la misma entrada producen la misma huella. Sin actividad con género, la
-respuesta es una forma explícita de historial insuficiente que nunca cae al baseline de
-popularidad.
+\begin{samepage}
+La interfaz de recomendaciones solo muestra las tres variantes del laboratorio publicadas:
+\texttt{content-cbf-weighted-v1}, \texttt{content-cbf-mmr-pop-v1} y \texttt{recency-v1}.
+Cada entrada de biblioteca aporta un peso de actividad a las etiquetas curadas de su obra,
+según la fórmula del Extracto de código~\ref{cod:heuristico}. Un refactor posterior extrajo ese
+cálculo al módulo \texttt{apps/api/recommendations/\_weights.py}, para que las variantes de
+contenido y la construcción del perfil reutilicen una única definición en lugar de copiarla. La
+contribución de la valoración no es lineal, como explica la Sección~\ref{cap:algoritmos}; sin
+actividad suficiente, las variantes aplican sus reglas declaradas de arranque en frío.
 
-\begin{lstlisting}[language=Python, basicstyle=\small\ttfamily, caption={Cálculo del peso de actividad de una entrada de biblioteca.}, label={cod:heuristico}, captionpos=b, float, floatplacement=!htp]
-# Pesos compartidos por el heuristico y el perfil de contenido.
+\begin{lstlisting}[language=Python, basicstyle=\small\ttfamily, caption={Cálculo del peso de actividad de una entrada de biblioteca.}, label={cod:heuristico}, captionpos=b]
+# Pesos compartidos por los perfiles de contenido.
 # Una obra abandonada no aporta evidencia positiva.
 _STATUS_WEIGHTS = {
     "completed": 3.0,
@@ -357,19 +350,13 @@ def _entry_weight(status, rating_half_steps):
     status_weight = _STATUS_WEIGHTS.get(status or "", 0.0)
     return status_weight + _rating_intensity(rating_half_steps)
 \end{lstlisting}
+\end{samepage}
 
-La frontera de este heurístico es explícita. Es un conteo de frecuencia sobre una tabla, sin
-paso de entrenamiento, sin vectores latentes y sin almacén de características persistido. No
-reclama calidad predictiva y su cadena de limitación, incluida en cada respuesta, dice con
-palabras que no participa en la comparación sistemática de recomendadores que presenta el
-Capítulo~\ref{cap:resultados}. Su papel es doble: hacer que el
-producto se lea como un sitio de catalogación real y dejar un contrato de página y de punto
-de acceso ya cableado, el mismo que las familias de recomendación comparadas en esta memoria
-terminaron ocupando.
-
+\clearpage
 \section{Frontend}\label{sec:impl-frontend}\label{sec:impl-rutas}\label{sec:impl-i18n}\label{sec:impl-proxy}
 
-El frontend usa el enrutador de aplicación de Next.js, con un segmento de idioma en la raíz de
+\begin{samepage}
+La parte cliente usa el enrutador de aplicación de Next.js, con un segmento de idioma en la raíz de
 la ruta. Las rutas del sistema son la página de inicio, el catálogo, el detalle de un
 juego, la colección, las amistades, el perfil propio, el perfil de un amigo, las fuentes, el acceso, el registro y las
 recomendaciones. Los componentes reutilizables son los que fija el contrato de diseño de la
@@ -377,15 +364,16 @@ Sección~\ref{sec:dis-ui}, además del armazón de la aplicación con su barra d
 son componentes de cliente que llaman a la API del mismo origen. Las
 Figuras~\ref{fig:catalogo} y~\ref{fig:coleccion} muestran el catálogo con sus filtros y la
 colección de la persona usuaria.
+\end{samepage}
 
-\begin{figure}[htp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.85\textwidth]{figures/02-catalogo-oscuro.png}
     \caption{Catálogo con tema oscuro, búsqueda y filtros por plataforma, género, año y valoración. Fuente: captura del proyecto.}
     \label{fig:catalogo}
 \end{figure}
 
-\begin{figure}[htp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.85\textwidth]{figures/05-coleccion-oscuro.png}
     \caption{Colección de la persona usuaria con tema oscuro, con el estado y la valoración de cada juego. Fuente: captura del proyecto.}
@@ -401,7 +389,7 @@ rutas bajo \texttt{/api/} y la ruta de chequeo de salud hacia el backend, con el
 de una variable de entorno visible únicamente en el servidor. El Extracto de
 código~\ref{cod:proxy} la muestra.
 
-\begin{lstlisting}[language=javascript, caption={Reescritura del mismo origen hacia el backend (\texttt{apps/web/next.config.ts}).}, label={cod:proxy}, captionpos=b, float, floatplacement=!htp]
+\begin{lstlisting}[language=javascript, caption={Reescritura del mismo origen hacia el backend (\texttt{apps/web/next.config.ts}).}, label={cod:proxy}, captionpos=b]
 // El navegador solo habla con este origen de Next.js: las cookies de
 // sesion y CSRF que fija Django siguen siendo del mismo origen y no hace
 // falta ninguna configuracion de CORS con credenciales. API_PROXY_TARGET
@@ -417,7 +405,7 @@ async rewrites() {
 Las Figuras~\ref{fig:recomendaciones-estanterias}
 y~\ref{fig:recomendaciones-detallada} muestran las dos vistas de recomendaciones disponibles
 en el proyecto, junto a la portada ya presentada en la Figura~\ref{fig:ui-claro}; son capturas
-de interfaz, no evidencia de calidad de ranking ni de resultados experimentales.
+de interfaz, no evidencia de calidad de clasificación ni de resultados experimentales.
 
 \begin{figure}[H]
 \centering
@@ -488,7 +476,7 @@ ejecutan con \texttt{pytest} contra una instancia real de PostgreSQL 18.6, sin s
 por una base en memoria, porque el sistema depende de restricciones, transacciones y búsqueda
 de trigramas que solo se comportan igual sobre el motor real. Las pruebas del frontend usan
 \texttt{vitest} para la lógica y los componentes, con una prueba de paridad de claves de
-traducción. Las pruebas de extremo a extremo usan Playwright sobre un navegador real, con la
+traducción. Las pruebas de extremo a extremo (E2E) usan Playwright sobre un navegador real, con la
 biblioteca \texttt{axe} para las comprobaciones automáticas de accesibilidad frente a las
 Pautas de Accesibilidad para el Contenido Web (WCAG) 2.2~\cite{wcag22}. Por último, una
 prueba de humo se ejecuta contra la URL pública desplegada y rechaza un despliegue con la
@@ -502,21 +490,21 @@ píxeles y en móvil a 375 por 812 píxeles.
 
 La verificación de los datos y del laboratorio se dividió en dos grupos. El primero comprobó que los datos y
 sus contratos eran correctos: 70 pruebas del catálogo cubrieron la importación de campos de
-rating, los snapshots insert-only y la reconciliación determinista de RAWG; 54 pruebas de
+valoración, las versiones inmutables de solo inserción y la reconciliación determinista de RAWG; 54 pruebas de
 la aplicación \texttt{evaluation} cubrieron el cargador de protocolo, las particiones y las
 métricas. El segundo comprobó las primitivas de recomendación: 48 pruebas cubrieron el
-baseline aleatorio, el coseno, los vectores de contenido, el perfil de usuario, la caché
-\texttt{WorkFeatureVector} y el cálculo del perfil de rating por género.
+método de referencia aleatorio, el coseno, los vectores de contenido, el perfil de usuario, la caché
+\texttt{WorkFeatureVector} y el cálculo del perfil de valoración por género.
 
 Las propiedades relevantes se verificaron con casos pequeños y respuestas conocidas. El
-baseline aleatorio devuelve el mismo orden para la misma semilla, no devuelve obras de la
+método de referencia aleatorio devuelve el mismo orden para la misma semilla, no devuelve obras de la
 biblioteca y no sale del corpus gobernado. La similitud coseno queda acotada entre cero y
 uno, es exactamente uno para vectores iguales no nulos y vale cero para vectores ortogonales
-o sin norma. Las métricas se comparan con cálculos manuales, mientras que el split rechaza
-particiones cuyo train, validation y test no sean disjuntos y completos.
+o sin norma. Las métricas se comparan con cálculos manuales, mientras que la partición rechaza
+conjuntos de entrenamiento, validación y prueba que no sean disjuntos y completos.
 
 La prueba de datos a escala también dejó una evidencia reproducible. El enriquecimiento RAWG
-se ejecutó en 18 lotes y una repetición de un lote ya procesado insertó cero snapshots
+se ejecutó en 18 lotes y una repetición de un lote ya procesado insertó cero versiones inmutables
 adicionales. La huella de \texttt{GameWork.rating} permaneció idéntica antes y después, lo
 que demuestra que el enriquecimiento no muta el valor vivo del catálogo. Esta evidencia
 prueba integridad e idempotencia; no prueba que RAWG haya mejorado la calidad de las
@@ -556,7 +544,7 @@ interfaz y los recomendadores se verificaron con cuatro de cuatro criterios. La 
     \hline
     SC3 & La interfaz se lee como un producto de catalogación profesional. & Verificado \\
     \hline
-    SC4 & Página de recomendaciones por géneros según la actividad propia, distinta del baseline de popularidad. & Verificado \\
+    SC4 & Página de recomendaciones por géneros según la actividad propia, distinta de la recomendación de referencia por popularidad. & Verificado \\
     \hline
 \end{tabularx}
 \caption{Criterios de éxito verificados y su veredicto.}

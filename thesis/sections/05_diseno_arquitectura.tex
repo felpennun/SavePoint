@@ -28,7 +28,7 @@ completo de esta elección.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{figures/arquitectura.pdf}
-    \caption{Arquitectura de SavePoint: el navegador solo habla con Next.js, que reescribe las llamadas hacia Django y DRF; los comandos de ingesta y el runner de evaluación escriben en PostgreSQL fuera de la petición HTTP.}
+    \caption{Arquitectura de SavePoint: el navegador solo habla con Next.js, que reescribe las llamadas hacia Django y DRF; los comandos de ingesta y el ejecutor de evaluación escriben en PostgreSQL fuera de la petición HTTP.}
     \label{fig:arquitectura}
 \end{figure}
 
@@ -95,15 +95,15 @@ y las migraciones actúan como puntos de salida si una decisión se revisa.
     \hline
     ADR-004 & Sesión de Django y frontera del mismo origen. Las primitivas de sesión y de protección contra falsificación de petición en sitios cruzados las mantiene Django; ningún token accesible al código del navegador. \\
     \hline
-    ADR-005 & Docker Compose local y despliegue público repartido entre tres servicios gratuitos (Vercel, Render y Neon). Coste cero sin tarjeta, a cambio de que el frontend público no sea la misma imagen que la local. \\
+    ADR-005 & Docker Compose local y despliegue público repartido entre tres servicios gratuitos (Vercel, Render y Neon). Coste cero sin tarjeta, a cambio de que la aplicación cliente pública no sea la misma imagen que la local. \\
     \hline
     ADR-006 & IGDB como fuente del catálogo a escala real, con portadas por enlace directo. Cobertura real y modelado de género y plataforma de primera clase, a cambio de una obligación de atribución continua y de una licencia que es un acuerdo, no una dedicación al dominio público. \\
     \hline
     ADR-007 & Heurístico determinista de afinidad por géneros para la página de recomendaciones. Entrega el requisito como página real y explicable, deliberadamente al margen de la comparación sistemática de recomendadores que la Sección~\ref{cap:algoritmos} presenta más adelante. \\
     \hline
-    ADR-008 & Ratings externos gobernados por snapshot versionado, con enriquecimiento acotado desde RAWG. \\
+    ADR-008 & Valoraciones externas gobernadas por una versión inmutable versionada, con enriquecimiento acotado desde RAWG. \\
     \hline
-    ADR-009 & Familias de algoritmos de recomendación y su ejecución como \textit{workers} aislados. La web publica solo tres de las dieciséis variantes. \\
+    ADR-009 & Familias de algoritmos de recomendación y su ejecución como procesos trabajadores aislados. La web publica solo tres de las dieciséis variantes. \\
     \hline
 \end{tabularx}
 \caption{Registros de decisión de arquitectura vigentes.}
@@ -161,7 +161,7 @@ Tabla~\ref{tab:endpoints} recoge los puntos de acceso principales.
     \hline
     \path{POST /api/library/entries/<id>/status/}, \path{rating/}, \path{copies/} & Sesión & Cambio de estado, valoración y alta de copias. \\
     \hline
-    \path{GET /api/library/popularity/} & Anónimo & Baseline de popularidad a partir de las señales importadas de IGDB. \\
+    \path{GET /api/library/popularity/} & Anónimo & Recomendación de referencia por popularidad a partir de las señales importadas de IGDB. \\
     \hline
     \path{GET /api/recommendations/genre-taste/} & Sesión & Recomendación por afinidad de géneros de la persona autenticada. \\
     \hline
@@ -226,22 +226,22 @@ Esta sección detalla cómo SavePoint representa una obra y a una persona usuari
 intervienen en la puntuación de una candidata, con qué fórmulas y pesos exactos se combinan esas
 señales en cada uno de los dieciséis algoritmos comparados, qué respaldo en la literatura tiene cada
 una de esas decisiones y cuáles se descartaron y por qué. El Capítulo~\ref{cap:resultados}
-somete después esos algoritmos al protocolo de evaluación offline y presenta los resultados
+somete después esos algoritmos al protocolo de evaluación sin conexión y presenta los resultados
 obtenidos.
 
 Conviene separar desde el principio dos planos que se confunden con facilidad. La literatura
 avala las \emph{familias} de técnicas empleadas y los \emph{principios} de ponderación,
 similitud, vecindad, hibridación, diversificación y medición; no convierte en constantes
 universales los valores numéricos concretos que este proyecto fija. Los pesos por familia de
-faceta, el parámetro \(\beta\) de la media F, el factor de contracción del rating, los pesos de
+faceta, el parámetro \(\beta\) de la media F, el factor de contracción de la valoración, los pesos de
 estado de biblioteca, el umbral de evidencia negativa, el \(\lambda\) de la reordenación y los
 cortes \(K\) son decisiones explícitas de diseño para este corpus y este trabajo, tomadas y
 documentadas como tales, no resultados heredados de una publicación. Cada apartado indica qué
 parte pertenece a cada plano.
 
 Los resultados publicados proceden de la ejecución \texttt{evaluation-400-test-2026-09-12-v15},
-con el protocolo 15 y el \textit{feature set} \texttt{fs-v12-curated-tags-idf}. El código
-vigente evolucionó después al protocolo 16 y al \textit{feature set}
+con el protocolo 15 y el conjunto de características \texttt{fs-v12-curated-tags-idf}. El código
+vigente evolucionó después al protocolo 16 y al conjunto de características
 \texttt{fs-v13-family-weighted-tags}, que corrigió el reparto de peso entre familias de
 etiquetas descrito más abajo. Esa evolución permite describir con precisión la implementación
 actual, pero no recalcula ni reinterpreta las métricas ya publicadas de v15, y así se indica en
@@ -267,7 +267,7 @@ Cada obra se representa mediante un vector disperso de familias de facetas: etiq
 género y subgénero curadas, tema, característica, modo, franquicia, desarrollador y
 plataforma. Los géneros y subgéneros forman el núcleo semántico de la representación; tema,
 característica, modo, franquicia y desarrollador actúan como confirmaciones opcionales; la
-plataforma expresa compatibilidad material más que afinidad de gusto. Las \emph{keywords},
+plataforma expresa compatibilidad material más que afinidad de gusto. Las palabras clave,
 perspectivas y modos crudos que ofrece la fuente de datos no se introducen directamente en el
 vector: tienen ruido, sinónimos y semánticas heterogéneas, de modo que solo entran tras una
 curación editorial que elimina duplicados y unifica niveles. Una faceta ausente en una obra se
@@ -358,7 +358,7 @@ acumulada de la biblioteca. Cuando una etiqueta se repite en al menos tres entra
 valoración, se activa como evidencia negativa. Ese umbral de tres es deliberado: una
 penalización sin umbral convertiría una única experiencia mal valorada en un rechazo estable,
 que es precisamente el error que se quería evitar. Con menos de tres entradas positivas
-elegibles, o sin ningún vector de features disponible, el sistema entra en un modo explícito de
+elegibles, o sin ningún vector de características disponible, el sistema entra en un modo explícito de
 historial insuficiente: no inventa un perfil ni recurre silenciosamente a la biblioteca de otra
 persona; esa limitación queda declarada así en la respuesta.
 
@@ -370,14 +370,14 @@ perfil y la precisión de la candidata: si \(P_f\) y \(C_f\) son los valores de 
 candidata en la familia \(f\), y \(O_f = P_f \cap C_f\) su solapamiento,
 
 \[
-coverage_f = \frac{\sum_{t \in O_f} P_f[t]}{\sum_{t \in P_f} P_f[t]}, \qquad
+cobertura_f = \frac{\sum_{t \in O_f} P_f[t]}{\sum_{t \in P_f} P_f[t]}, \qquad
 precision_f = \frac{|O_f|}{|C_f|} ,
 \]
 
 y ambas cantidades se combinan con una media \(F_\beta\) con \(\beta = 0{,}5\),
 
 \begin{equation}\label{eq:fbeta}
-F_{0.5} = \frac{(1+0{,}5^2)\;coverage \cdot precision}{0{,}5^2 \cdot precision + coverage} ,
+F_{0{,}5} = \frac{(1+0{,}5^2)\;cobertura \cdot precision}{0{,}5^2 \cdot precision + cobertura} ,
 \end{equation}
 
 La media \(F_\beta\) como forma canónica de equilibrar precisión y cobertura con un único
@@ -395,7 +395,7 @@ cobertura casi universal, etiqueta y plataforma, ponderadas exactamente con los 
 \(W_{tag}=0{,}60\) y \(W_{platform}=0{,}05\) de la Tabla~\ref{tab:pesos-familia}:
 
 \[
-core = \frac{\sum_{f \in \{tag,\,platform\}} W_f \cdot F_{0.5,f}}{\sum_{f \in \{tag,\,platform\}} W_f \text{ activos}} .
+nucleo = \frac{\sum_{f \in \{tag,\,platform\}} W_f \cdot F_{0{,}5,f}}{\sum_{f \in \{tag,\,platform\}} W_f \text{ activos}} .
 \]
 
 Las cinco familias restantes (tema, característica, modo, franquicia y desarrollador) suman
@@ -404,13 +404,13 @@ cuando una familia falta en cualquiera de los dos lados:
 
 \begin{equation}\label{eq:bonus}
 \begin{split}
-bonus ={}& 0{,}20\,aff_{tema} + 0{,}10\,aff_{caracteristica} + 0{,}05\,aff_{modo}\\
+bono ={}& 0{,}20\,aff_{tema} + 0{,}10\,aff_{caracteristica} + 0{,}05\,aff_{modo}\\
       &+ 0{,}02\,aff_{franquicia} + 0{,}015\,aff_{desarrollador} ,
 \end{split}
 \end{equation}
 
 con \(aff_f = \min\!\big(1,\, \sum_{t \in O_f} P_f[t] / \max_{t \in P_f} P_f[t]\big)\) y la
-similitud final \(similarity = \min(1,\ core + bonus)\). Esta asimetría entre núcleo y bono es
+similitud final \(similitud = \min(1,\ nucleo + bono)\). Esta asimetría entre núcleo y bono es
 deliberada: un tema, una saga o un estudio confirman un interés ya observado en el género o la
 plataforma, pero no deben sustituir esa similitud semántica ni inflarla artificialmente cuando
 falta información secundaria. Situar franquicia o desarrollador en el núcleo se descartó por su
@@ -421,7 +421,7 @@ reordenación, donde su interpretación geométrica directa sí es exactamente l
 necesaria.
 
 La calidad externa de una candidata no usa su valoración agregada en bruto, sino que se
-estabiliza con contracción (\emph{shrinkage}) bayesiana hacia la media del corpus, para que una
+estabiliza con contracción bayesiana hacia la media del corpus, para que una
 nota extrema sostenida por pocas observaciones no domine el resultado. El fundamento es el
 principio de Empirical Bayes: las observaciones escasas se contraen hacia un prior común para
 reducir la varianza del estimador~\cite{efron2010large}. Con \(n\) valoraciones observadas,
@@ -429,7 +429,7 @@ prior del corpus \(\mu\) (la media de valoraciones ponderada por su propio volum
 un parámetro de contracción \(m=25\),
 
 \[
-rating_{bayes} = \frac{n \cdot rating + m\,\mu}{n+m}, \qquad
+valoracion_{bayes} = \frac{n \cdot valoracion + m\,\mu}{n+m}, \qquad
 rating_{final} = \left(\frac{rating_{bayes}}{100}\right)^{2} \cdot \frac{n}{n+m} .
 \]
 
@@ -446,7 +446,7 @@ observación real.
 La popularidad externa (\emph{PopScore}) tampoco usa el valor bruto de la fuente de datos: su
 escala es larga y arrastra un sesgo de popularidad conocido, así que cada una de sus cuatro
 primitivas se transforma con \(\log(1+x)\) y después se convierte en un percentil de rango
-dentro del snapshot congelado, combinándose como \(PopScore = 0{,}40\,\text{Visitas} +
+dentro de la versión inmutable congelada, combinándose como \(PopScore = 0{,}40\,\text{Visitas} +
 0{,}25\,\text{Jugando} + 0{,}25\,\text{Jugado} + 0{,}10\,\text{Quiere jugar}\). Si falta
 cualquier primitiva, no existe composición observada y las variantes que la consumen aplican un
 suelo explícito de cero, marcado como tal, sin redistribuir el peso que le correspondía. La
@@ -463,7 +463,7 @@ en otra fecha.
 Con la afinidad de contenido \(C\), la calidad \(R\), la popularidad \(P\), la evidencia
 negativa \(N\) y la recencia \(X\) ya definidas, la Tabla~\ref{tab:variantes-contenido} recoge
 la fórmula exacta de las diez variantes basadas en contenido. Todas comparten el mismo conjunto
-de candidatas, el mismo vector de features y el mismo perfil de usuario; lo único que cambia
+de candidatas, el mismo vector de características y el mismo perfil de usuario; lo único que cambia
 entre ellas es cómo combinan sus señales, precisamente para que la comparación aísle esa
 decisión de diseño y no otra.
 
@@ -489,7 +489,7 @@ content-cbf-mmr-v1 / -pop-v1 & MMR sobre Weighted / Weighted-Pop \\
 
 La existencia de estas diez variantes no responde a un afán de acumular algoritmos, sino al
 diseño experimental: cada una aísla una única decisión de combinación manteniendo constantes
-las candidatas, las features y los snapshots, de modo que una diferencia de resultado se pueda
+las candidatas, las características y las versiones inmutables, de modo que una diferencia de resultado se pueda
 atribuir a esa decisión concreta. \texttt{content-cbf-weighted-v1} actúa como referencia del
 grupo porque sus pesos son explícitos y su comportamiento es fácil de explicar: el contenido
 domina la puntuación y la calidad ordena dentro de un mismo nivel de afinidad. La variante
@@ -516,14 +516,14 @@ similitud positiva. Es explicable por los vecinos y las obras que comparten, per
 arranque en frío: con historial escaso, o sin vecindad suficiente, no puede inferir una
 preferencia colaborativa fiable. Se descartó implementar en su lugar un colaborativo por
 vecindad de ítems porque exige construir una matriz ítem-ítem y descansa sobre otra hipótesis
-de generalización, mientras que la vecindad de usuarios resulta más legible con el rating
+de generalización, mientras que la vecindad de usuarios resulta más legible con la valoración
 explícito disponible en este corpus.
 
 El híbrido responde al argumento de Burke~\cite{burke2002hybrid}: combinar fuentes
 complementarias permite aprovechar las ventajas de cada una y compensar sus debilidades. Su
 combinación es \(H(i) = 0{,}60\,\mathit{Weighted}(i) + 0{,}40\,\mathit{CF}(i)\); si el
 componente colaborativo no dispone de historial suficiente, el híbrido conserva la relevancia
-de contenido y declara el \emph{fallback} en lugar de penalizar artificialmente a una persona
+de contenido y declara la alternativa de respaldo en lugar de penalizar artificialmente a una persona
 nueva. El reparto 0,60/0,40 es en sí mismo una decisión local sujeta a evaluación, no una regla
 tomada de la literatura.
 
@@ -538,7 +538,7 @@ Castells~\cite{vargas2011rank}: la exactitud no agota la utilidad de una recomen
 diversidad, novedad y cobertura deben medirse aparte en lugar de quedar escondidas dentro de la
 puntuación. Por eso la diversificación se implementó como una capa de reordenación explícita y
 no como un término más dentro de los pesos de afinidad, ni como una optimización multiobjetivo
-del propio \emph{score}: separarlas permite estudiar el compromiso entre relevancia y
+de la propia puntuación: separarlas permite estudiar el compromiso entre relevancia y
 redundancia en lugar de ocultarlo.
 
 \subsection{Variantes publicadas en la aplicación}\label{sec:alg-publicadas}
@@ -550,7 +550,7 @@ calidad externa ordena dentro de un mismo nivel de afinidad. La segunda añade p
 reordenación por diversidad, para que la lista no repita variaciones del mismo juego. La
 tercera favorece los títulos recientes y actúa como variante de descubrimiento. La selección es
 una decisión de diseño de producto: ofrecer a la persona usuaria dieciséis listas con resultados
-muy parecidos entre sí no aporta valor y empeora la experiencia, y mantener un \textit{worker}
+muy parecidos entre sí no aporta valor y empeora la experiencia, y mantener un proceso trabajador
 activo por cada variante supone un coste de recursos que no se justifica. Las demás variantes
 se conservan en el laboratorio de evaluación, donde cumplen su función, que es compararlas bajo
 un mismo protocolo, y no afectan a esta selección: el Capítulo~\ref{cap:resultados} evalúa las
@@ -572,14 +572,14 @@ por el que no se adoptaron en esta versión.
 \textnormal{Alternativa} & \textnormal{Motivo de exclusión} \\
 \hline
 Factorización matricial (ALS, BPR)~\cite{koren2009matrix} & Añade entrenamiento, factores latentes e hiperparámetros; dificulta atribuir un resultado a una señal concreta sobre población sintética \\
-Redes neuronales, \textit{embeddings} o modelos de lenguaje & Coste, opacidad y requisitos de datos no justificados por el objetivo del trabajo \\
+Redes neuronales, representaciones vectoriales o modelos de lenguaje & Coste, opacidad y requisitos de datos no justificados por el objetivo del trabajo \\
 Modelos de grafos o secuenciales & El historial disponible no sostiene una hipótesis temporal que justifique esa complejidad \\
-Colaborativo por vecindad de ítems & Exige matriz ítem-ítem y otra hipótesis de generalización; user-KNN es más legible con rating explícito \\
+Colaborativo por vecindad de ítems & Exige matriz ítem-ítem y otra hipótesis de generalización; KNN de usuarios es más legible con valoración explícita \\
 Coseno puro como similitud principal & Menos separable en las explicaciones y más vulnerable a candidatas con muchas facetas \\
-Media aritmética en lugar de \(F_{0.5}\) & Favorece a las candidatas que declaran más metadatos \\
-Rating externo en bruto & Sesgo de las notas extremas con poca evidencia; la contracción bayesiana lo corrige \\
-PopScore en bruto & Escala larga y sesgo de popularidad; se normaliza por percentil dentro del snapshot \\
-Optimización multiobjetivo del \emph{score} & Escondería la diversidad dentro de los pesos de afinidad en lugar de permitir estudiarla \\
+Media aritmética en lugar de \(F_{0{,}5}\) & Favorece a las candidatas que declaran más metadatos \\
+Valoración externa en bruto & Sesgo de las notas extremas con poca evidencia; la contracción bayesiana lo corrige \\
+PopScore en bruto & Escala larga y sesgo de popularidad; se normaliza por percentil dentro de la versión inmutable \\
+Optimización multiobjetivo de la puntuación & Escondería la diversidad dentro de los pesos de afinidad en lugar de permitir estudiarla \\
 Métricas de error sobre la nota predicha & Miden predicción de valoración, no calidad del orden de la lista~\cite{cremonesi2010performance} \\
 \end{tabularx}
 \end{table}
@@ -597,7 +597,7 @@ variante versionada, nuevos controles de datos y una comparación bajo el mismo 
 
 El laboratorio se diseñó como una tubería fuera de línea, separada de las peticiones de
 usuario. Su entrada no es el valor mutable de \texttt{GameWork.total\_rating}, sino una
-pareja de versión de corpus y snapshot de valoraciones. A partir de ella, el runner resuelve
+pareja de versión de corpus y versión inmutable de valoraciones. A partir de ella, el ejecutor resuelve
 la partición de usuarios, construye el manifiesto de candidatos de cada usuario y ejecuta
 las variantes sobre la misma entrada. El artefacto resultante debe conservar la versión del
 código, la huella del protocolo, las semillas, la huella del manifiesto y las métricas por
@@ -606,23 +606,23 @@ usuario y por $k$. La Figura~\ref{fig:pipeline-evaluacion} resume esa tubería.
 \begin{figure}[htp]
     \centering
     \includegraphics[width=0.9\textwidth]{figures/pipeline-evaluacion.pdf}
-    \caption{Tubería de la evaluación offline, de los datos congelados al artefacto versionado.}
+    \caption{Tubería de la evaluación sin conexión, de los datos congelados al artefacto versionado.}
     \label{fig:pipeline-evaluacion}
 \end{figure}
 
 La aplicación \texttt{evaluation} separa cuatro responsabilidades. El cargador del
-protocolo valida las claves, el tamaño de la rejilla y el consumo único del test. El módulo
-de particiones selecciona la obra relevante retenida y comprueba que train, validation y test
+protocolo valida las claves, el tamaño de la rejilla y el consumo único de la prueba. El módulo
+de particiones selecciona la obra relevante retenida y comprueba que entrenamiento, validación y prueba
 sean conjuntos disjuntos y completos. El módulo de métricas calcula P@K, R@K, nDCG@K y MAP@K
-con fórmulas escritas y probadas en el proyecto. Por último, el runner orquesta los algoritmos
+con fórmulas escritas y probadas en el proyecto. Por último, el ejecutor orquesta los algoritmos
 y escribe un artefacto JSON con sus huellas y resultados.
 
 Todas las variantes comparten el conjunto de candidatos, la semántica de exclusión y el DTO
 versionado; el modelo de contenido que usan es el descrito en la
 Sección~\ref{cap:algoritmos}. Las explicaciones no generan texto libre: devuelven una tabla
-determinista de contribuciones por faceta, el valor del término de rating y si se usó el
-fallback. El parámetro \texttt{algorithm\_id} solo puede seleccionar identificadores de una
-allowlist, nunca una función o importación dinámica.
+determinista de contribuciones por faceta, el valor del término de valoración y si se usó la
+alternativa de respaldo. El parámetro \texttt{algorithm\_id} solo puede seleccionar identificadores de una
+lista permitida, nunca una función o importación dinámica.
 
 Este capítulo ha descrito cómo se diseñaron la plataforma, los algoritmos de recomendación y el
 laboratorio que los compara. El capítulo siguiente describe su implementación.

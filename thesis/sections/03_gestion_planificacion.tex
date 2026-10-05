@@ -34,7 +34,7 @@ fuente de verdad del siguiente.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.72\textwidth]{figures/ciclo-gsd.pdf}
+    \includegraphics[width=0.90\textwidth]{figures/ciclo-gsd.pdf}
     \caption{Ciclo de un incremento en el método GSD y los artefactos que produce cada paso.}
     \label{fig:ciclo-gsd}
 \end{figure}
@@ -276,7 +276,6 @@ que el proyecto usó más de un entorno de agente, con modelos distintos en el
 trabajo inicial y en el posterior, con la advertencia de que un nombre de
 modelo no basta para reproducir una salida probabilística: la evidencia reproducible son los
 artefactos versionados, los hashes, los comandos y las decisiones humanas.
-
 Los mensajes de commit siguen el estilo de \textit{Conventional Commits} y se escriben en
 inglés. 
 
@@ -289,7 +288,7 @@ las valoraciones, qué usuarios se simulan, cómo se construyen los candidatos y
 métricas se comparan las listas. Las decisiones metodológicas se tomaron antes de cualquier
 ejecución de laboratorio y se conservaron en el directorio de planes de la fase.
 
-El orden no es accidental. El corpus y el snapshot preceden al protocolo; el protocolo
+El orden no es accidental. El corpus y la versión inmutable preceden al protocolo; el protocolo
 precede a la generación de usuarios y a la implementación de variantes; y solo entonces se
 puede ejecutar una comparación con garantías de que todos los algoritmos han recibido la
 misma partición y el mismo conjunto de candidatos. Una tarea completada ha superado las
@@ -300,7 +299,7 @@ Las decisiones que bloquean una comparación posterior quedaron congeladas en
 el corpus, el significado de las valoraciones, la población sintética, la relevancia, el
 conjunto de candidatas y las métricas. Esta sección solo recoge cómo se planificó esa
 congelación; el contenido de cada decisión se describe donde se aplica. El corpus y los
-ratings, en la Sección~\ref{cap:datos}; el diseño del laboratorio, en la
+valoraciones, en la Sección~\ref{cap:datos}; el diseño del laboratorio, en la
 Sección~\ref{sec:dis-laboratorio}; y el protocolo con el que se publicaron los resultados, en
 la Sección~\ref{sec:exp-protocolo}.
 
@@ -329,7 +328,7 @@ posteriores proceden del historial del repositorio y de las firmas de cada fase.
     \hline
     H2 — Catálogo a escala real e interfaz rediseñada (Fase 01.1) & 06/09/2026 \\
     \hline
-    H3 — Contrato de evaluación offline congelado (Fase 2) & 08/09/2026 \\
+    H3 — Contrato de evaluación sin conexión congelado (Fase 2) & 08/09/2026 \\
     \hline
     H4 — Recomendadores de contenido, colaborativo e híbrido implementados & 12/09/2026 \\
     \hline
@@ -360,7 +359,7 @@ desarrollo reproducible en Docker Compose, y entregó el primer incremento de pr
 restricción explícita de tres días para una demostración pública visible, con un catálogo
 reducido, una cuenta y la recomendación por popularidad; a continuación amplió el catálogo a
 escala real e incorporó el rediseño de la interfaz. La \textbf{Iteración 3} (7 y 8 de
-septiembre) congeló el contrato de evaluación offline: corpus, población sintética, métricas y
+septiembre) congeló el contrato de evaluación sin conexión: corpus, población sintética, métricas y
 protocolo, antes de escribir ningún algoritmo de recomendación avanzado. La
 \textbf{Iteración 4} (9 al 12 de septiembre) implementó las tres familias de recomendación
 (contenido, colaborativo e híbrido) y sus dieciséis variantes, y ejecutó la publicación final de
@@ -375,8 +374,8 @@ los ajustes finales de la interfaz y del módulo social.
 El proyecto no llevó un registro de horas minuto a minuto por tarea, de modo que la estimación
 de esfuerzo que sigue se reconstruye a partir de la duración de cada iteración y de la carga de
 trabajo declarada de un estudiante que compagina el TFG con otras obligaciones académicas,
-en torno a veinticinco horas semanales durante las nueve semanas transcurridas desde el inicio
-del estudio previo hasta el cierre de la memoria, unas doscientas veinticinco horas en total. Tomando
+en torno a treinta y cuatro horas semanales durante las nueve semanas transcurridas desde el inicio
+del estudio previo hasta el cierre de la memoria, unas trescientas diez horas en total. Tomando
 como unidad el bloque de trabajo, no el incremento, la Tabla~\ref{tab:presupuesto-horas}
 reparte esas horas entre las grandes áreas del trabajo.
 
@@ -387,34 +386,35 @@ reparte esas horas entre las grandes áreas del trabajo.
     \hline
     \textbf{Bloque} & \textbf{Horas estimadas} \\
     \hline
-    Análisis, requisitos y diseño & 30 \\
+    Análisis, requisitos y diseño & 41 \\
     \hline
-    Infraestructura reproducible y despliegue & 18 \\
+    Infraestructura reproducible y despliegue & 25 \\
     \hline
-    Implementación de producto (backend y frontend) & 62 \\
+    Implementación de producto (backend y frontend) & 86 \\
     \hline
-    Adquisición y gobierno de datos & 20 \\
+    Adquisición y gobierno de datos & 28 \\
     \hline
-    Algoritmos de recomendación y protocolo de evaluación & 46 \\
+    Algoritmos de recomendación y protocolo de evaluación & 63 \\
     \hline
-    Pruebas, verificación y revisión & 23 \\
+    Pruebas, verificación y revisión & 31 \\
     \hline
-    Redacción de la memoria & 26 \\
+    Redacción de la memoria & 36 \\
     \hline
-    \textbf{Total} & \textbf{225} \\
+    \textbf{Total} & \textbf{310} \\
     \hline
 \end{tabularx}
 \end{table}
 
-El coste directo se calcula sobre esas 225 horas con una tarifa de referencia de un perfil
+El coste directo se calcula sobre esas 310 horas con una tarifa de referencia de un perfil
 junior de ingeniería del software en España, 14,00\,€/hora, una cota conservadora frente al
 coste real de contratación de un perfil equivalente. El coste material recoge la amortización
-proporcional del equipo personal empleado (un portátil de gama media, con una vida útil
-estimada de cuatro años, del que este trabajo consume dos meses); no se incluye ningún coste
-de infraestructura en la nube, porque la topología de despliegue público se diseñó
-explícitamente de coste cero (ADR-005, Sección~\ref{cap:despliegue}). El coste indirecto
-recoge la cuota proporcional de dos meses de electricidad y conexión a internet atribuible
-al proyecto. La Tabla~\ref{tab:presupuesto} resume el presupuesto total.
+proporcional del PC de torre empleado, valorado en 1.000,00\,€ y con una vida útil estimada de
+cuatro años, del que este trabajo consume dos meses. Se añade una suscripción a agentes de IA,
+estimada en 30,00\,€, empleada como apoyo al desarrollo bajo dirección y revisión humanas. No
+se incluye ningún coste de infraestructura en la nube, porque la topología de despliegue público
+se diseñó explícitamente de coste cero (ADR-005, Sección~\ref{cap:despliegue}). El coste
+indirecto recoge la cuota proporcional de dos meses de electricidad y conexión a internet
+atribuible al proyecto. La Tabla~\ref{tab:presupuesto} resume el presupuesto total.
 
 \begin{table}[H]
 \centering
@@ -422,13 +422,15 @@ al proyecto. La Tabla~\ref{tab:presupuesto} resume el presupuesto total.
     \hline
     \textbf{Concepto} & \textbf{Coste (\euro{})} \\
     \hline
-    Coste directo (225\,h a 14,00\,€/h) & 3.150,00 \\
+    Coste directo (310\,h a 14,00\,€/h) & 4.340,00 \\
     \hline
-    Coste material (amortización de equipo, 2 meses) & 37,50 \\
+    Coste material (amortización de PC de torre, 2 meses) & 41,67 \\
+    \hline
+    Suscripción a agentes de IA & 30,00 \\
     \hline
     Costes indirectos (electricidad y conexión, 2 meses) & 90,00 \\
     \hline
-    \textbf{Presupuesto total} & \textbf{3.277,50} \\
+    \textbf{Presupuesto total} & \textbf{4.501,67} \\
     \hline
 \end{tabularx}
 \caption{Estimación de esfuerzo y presupuesto del proyecto.}

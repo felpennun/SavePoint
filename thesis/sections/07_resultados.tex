@@ -1,14 +1,56 @@
 \chapter{Evaluación y resultados}\label{cap:resultados}\label{cap:experimentos}
 
 Con los dieciséis algoritmos ya formulados en la Sección~\ref{cap:algoritmos}, este capítulo los somete al protocolo de evaluación
-offline, con las métricas definidas en la Sección~\ref{sec:arte-fundamentos}, y presenta los
-resultados publicados junto con una discusión honesta de lo que permiten y de lo que no
+sin conexión y presenta los resultados publicados junto con una discusión honesta de lo que permiten y de lo que no
 permiten concluir. El énfasis no está en declarar un ganador, sino en dejar trazable cada cifra
 hasta el corpus, la semilla, el reparto y la configuración exactos que la produjeron.
 
 La evaluación se ejecuta sobre la misma plataforma descrita en los capítulos anteriores: los
 usuarios sintéticos, sus bibliotecas y el corpus gobernado viven en la misma base de datos que
 sirve la aplicación.
+
+\section{Fundamentos de evaluación}\label{sec:exp-fundamentos}
+
+La parte más delicada no es implementar los algoritmos, sino evaluarlos de forma
+comparable~\cite{herlocker2004evaluating, gunawardana2015evaluating}. La literatura señala
+varios riesgos recurrentes: ajustar los hiperparámetros sobre el conjunto de prueba, comparar
+algoritmos con repartos o candidatas distintos, medir solo la precisión y olvidar la
+cobertura, la diversidad o la novedad, o extraer conclusiones sobre personas reales a partir
+de simulaciones sintéticas. El trabajo de Cremonesi y otros mostró además que las métricas de
+error sobre la valoración predicha y las métricas de acierto sobre la lista recomendada
+pueden ordenar los algoritmos de forma distinta~\cite{cremonesi2010performance}. La respuesta
+metodológica aceptada es fijar por adelantado, de forma inmutable, el corpus, el reparto, las
+exclusiones, las métricas, las semillas y el presupuesto de ajuste, antes de comparar nada.
+El protocolo de SavePoint deja la comparación preparada y repetible, pero no debe confundirse
+con una afirmación sobre usuarios reales: los resultados de este capítulo se miden sobre un
+corpus y una población sintética concretos.
+
+Evaluar un recomendador sin usuarios reales exige fijar por adelantado cinco decisiones: la
+tarea concreta que se mide (recomendar los siguientes \(K\) ítems que a una persona le
+interesarán, no predecir la nota exacta que pondría), el criterio de relevancia que separa un
+acierto de un fallo, el conjunto de candidatas sobre el que compite cada algoritmo, la división
+de los datos entre lo que el modelo puede ver y lo que se usa para medir, y la forma de agregar
+el resultado por usuario en una única cifra por algoritmo. SavePoint fija estas decisiones en
+un protocolo versionado antes de ejecutar la comparación.
+
+La precisión en \(K\) mide qué proporción de los \(K\) ítems recomendados resultan relevantes;
+la exhaustividad en \(K\) mide qué proporción de todos los ítems relevantes aparecen entre
+esos \(K\). Ninguna de las dos distingue la posición dentro de la lista: acertar en el primer
+puesto cuenta igual que acertar en el último. Para corregir esa carencia se usa la ganancia
+acumulada descontada normalizada (nDCG)~\cite{jarvelin2002cumulated}, que descuenta el valor
+de un acierto cuanto más abajo aparece y lo normaliza frente al orden ideal posible. La
+precisión media (MAP) promedia, para cada usuario, la precisión acumulada en cada posición
+donde hubo un acierto y después promedia ese valor entre usuarios; es sensible tanto a la
+cantidad de aciertos como a su posición.
+
+Estas cuatro métricas comparten una limitación de fondo: ninguna equivale a satisfacción
+humana, porque miden coincidencia con un historial pasado, no si a la persona le va a gustar lo
+recomendado. Por eso se completan con tres métricas de otra naturaleza. La diversidad mide
+cuánto se parecen entre sí los ítems de una misma lista recomendada; la novedad mide cuánto se
+aleja la recomendación de lo obvio o ya muy popular; y la cobertura mide qué proporción del
+catálogo llega a aparecer alguna vez recomendada. Un recomendador que maximiza solo precisión
+o nDCG puede hacerlo a costa de las tres, recomendando siempre lo mismo a todo el mundo; la
+Sección~\ref{cap:algoritmos} explica cómo SavePoint reordena sus listas para compensarlo.
 
 \section{Protocolo de evaluación}\label{sec:exp-protocolo}
 
@@ -28,7 +70,7 @@ que superen el piso de calidad), el runner recurre al \emph{leave-one-out} simpl
 positivo elegible en absoluto. Sobre los setenta y nueve usuarios evaluables, este mecanismo
 retuvo doscientos dos ítems en total, una media de 2{,}56 por usuario con un rango de uno a
 cinco. Todos los algoritmos reciben el mismo manifiesto de candidatas; el diseño evita
-\emph{leakage}: ningún ítem retenido participa en la construcción del perfil, mientras que su
+filtración de datos: ningún ítem retenido participa en la construcción del perfil, mientras que su
 presencia entre las candidatas permite medir si se recupera.
 
 Se calcula \(K\in\{5,10,20\}\). Si \(R_u\) es el conjunto relevante retenido de un usuario y
@@ -36,15 +78,15 @@ Se calcula \(K\in\{5,10,20\}\). Si \(R_u\) es el conjunto relevante retenido de 
 \(Recall@K=|L_u^K\cap R_u|/|R_u|\). Al retener varios ítems por usuario, \(Recall@K\) deja de
 ser binario y se convierte en una fracción continua, lo que aporta más información por
 comparación que el \emph{leave-one-out} de una sola versión anterior del protocolo. El nDCG
-y el MAP, definidos en la Sección~\ref{sec:arte-fundamentos}, se calculan sobre la misma
+y el MAP se calculan sobre la misma
 lista. El protocolo también conserva diversidad
 intra-lista, novedad, coberturas y concentración cuando el artefacto permite estimarlas.
 
 \section{Evolución del protocolo: tres intentos, no uno}\label{sec:exp-evolucion}\label{sec:exp-v15-fidelidad}
 
 El protocolo v15 descrito arriba no fue el primero que se congeló y se ejecutó hasta el final
-contra el split de prueba. Lo precedieron dos intentos completos, v12 y v14, cada uno
-ejecutado una sola vez sobre el mismo split de test, con sus propios resultados publicados y
+contra la partición de prueba. Lo precedieron dos intentos completos, v12 y v14, cada uno
+ejecutado una sola vez sobre la misma partición de prueba, con sus propios resultados publicados y
 conservados sin alterar. Repasarlos aquí no es un ejercicio de transparencia añadido: la forma
 concreta del protocolo v15 (retención por fracción sobre una etiqueta propia de cada usuario,
 piso de calidad externa, población con mínimo garantizado) es la respuesta directa a dos
@@ -53,13 +95,13 @@ arbitraria.
 
 \textbf{El protocolo v12 (10 de septiembre de 2026)} fue el primer cálculo congelado hasta el final. Su
 resultado no fue una comparación entre algoritmos, sino un hallazgo metodológico: el
-setenta y cuatro por ciento de los setenta y tres usuarios evaluables de aquel split
+setenta y cuatro por ciento de los setenta y tres usuarios evaluables de aquella partición
 (cincuenta y cuatro de setenta y tres) caía en un modo de \enquote{historial insuficiente} del
-recomendador de contenido en cuanto el \emph{leave-one-out} retiraba su único positivo
+recomendador de contenido en cuanto el \emph{leave-one-out} uno retiraba su único positivo
 elegible, porque la población sintética de entonces no garantizaba un mínimo de positivos
 por biblioteca. En ese modo, las diez variantes de contenido y sus derivadas dejaban de usar
 similitud de etiquetas y colapsaban a la misma ordenación por valoración y popularidad que ya
-usaban los baselines, de modo que quince de los dieciséis algoritmos publicaron precisión,
+usaban los métodos de referencia, de modo que quince de los dieciséis algoritmos publicaron precisión,
 recall, nDCG y MAP exactamente en cero. La prueba de Friedman fue significativa
 (\(\chi^2=30{,}00\), \(p=0{,}0119\), \(n=73\)), pero ninguna de las ciento veinte
 comparaciones por pares sobrevivió la corrección de Holm: bajo ese protocolo, ningún
@@ -72,31 +114,31 @@ arranque en frío del recomendador de contenido.
 Corregir esa interacción exigió dos cambios sucesivos. El primero, ya con población
 rediseñada, amplió el tamaño de biblioteca sintética, ensanchó la franja de popularidad de
 origen y garantizó un mínimo de cinco positivos elegibles por biblioteca, lo que eliminó por
-completo el modo de historial insuficiente en el split de prueba: pasó de afectar al setenta y
+completo el modo de historial insuficiente en la partición de prueba: pasó de afectar al setenta y
 cuatro por ciento de los usuarios a un cero por ciento. El segundo cambio añadió, sobre esa
 población ya corregida, un piso de calidad externa (valoración agregada de origen de al menos
-setenta puntos) al ítem que el \emph{leave-one-out} podía retirar, para que el positivo
+setenta puntos) al ítem que la retención de uno podía retirar, para que el positivo
 retenido no dependiera solo del gusto personal simulado sino también de una señal de calidad
 independiente, cerrando un sesgo de popularidad conocido en la literatura de evaluación de
 recomendadores~\cite{cremonesi2010performance}.
 
 \textbf{El protocolo v14 (11 de septiembre de 2026)}, con esos dos cambios ya aplicados, sí produjo un
 ganador defendible: \texttt{hybrid-weighted-cf-v1} (\(nDCG@10=0{,}1526\)) y
-\texttt{content-cbf-weighted-v1} (\(0{,}1452\)) superaron con significación a los baselines y
+\texttt{content-cbf-weighted-v1} (\(0{,}1452\)) superaron con significación a los métodos de referencia y
 a \texttt{recency-v1}, con catorce de las ciento veinte comparaciones por pares significativas
 tras Holm, frente a cero en v12 (\(\chi^2=105{,}28\), \(p=1{,}29\times10^{-15}\), \(n=79\)). La
 diversidad intra-lista y la concentración de recomendaciones mejoraron en la misma medida: el
 índice de concentración de Herfindahl-Hirschman pasó de un rango de 0,55 a 0,71 en v12, propio
 de un catálogo minúsculo de recomendaciones repetidas, a un rango de 0,005 a 0,03, consecuencia
-directa de que el contenido ya no colapsaba al mismo \emph{fallback} que los baselines. Aun
-así, v14 seguía reteniendo un único ítem por usuario mediante \emph{leave-one-out}: cada
+directa de que el contenido ya no colapsaba a la misma alternativa de respaldo que los métodos de referencia. Aun
+así, v14 seguía reteniendo un único ítem por usuario mediante retención de uno: cada
 comparación por usuario solo podía acertar o fallar una vez, lo que limitaba cuántas
 diferencias entre algoritmos podían alcanzar significación. El colaborativo puro, por ejemplo,
 no llegó a diferenciarse de forma significativa de ningún otro algoritmo en v14, pese a tener
 un nDCG@10 más bajo que las variantes de contenido con mejor combinación.
 
 Ese límite de potencia estadística, no un defecto de v14, es lo que motivó el cambio final a
-\emph{leave-fraction-out} por etiqueta dominante propia de cada usuario que define el
+retención por fracción por etiqueta dominante propia de cada usuario que define el
 protocolo v15: retener varios positivos por persona en lugar de uno solo da a cada comparación
 más información por usuario sin necesidad de una población mayor. El resultado, ya presentado
 en la Sección~\ref{sec:exp-significacion}, fue el esperado: de catorce comparaciones
@@ -158,22 +200,22 @@ La Tabla~\ref{tab:resultados-ndcg10} resume \(nDCG@10\), MAP@10 y tiempo de pare
 \begin{tabularx}{\textwidth}{@{}>{\ttfamily\raggedright\arraybackslash}p{0.41\textwidth}Y>{\raggedleft\arraybackslash}p{0.115\textwidth}>{\raggedleft\arraybackslash}p{0.115\textwidth}@{}}
 \textnormal{Algoritmo} & \textnormal{Familia} & \textnormal{\footnotesize nDCG@10} & \textnormal{\footnotesize MAP@10} \\
 \hline
-random-v1 & baseline & 0.00000 & 0.00000 \\
-popularity-v1 & baseline & 0.00340 & 0.00098 \\
-content-cbf-weighted-v1 & contenido & 0.17245 & 0.10878 \\
-content-cbf-multiplicative-v1 & contenido & 0.08558 & 0.05934 \\
-content-cbf-twostage-v1 & contenido & 0.11724 & 0.06767 \\
-content-cbf-neg-v1 & contenido & 0.11778 & 0.07368 \\
-content-cbf-weighted-pop-v1 & contenido + popularidad & 0.15181 & 0.09826 \\
-content-cbf-multiplicative-pop-v1 & contenido + popularidad & 0.08517 & 0.05898 \\
-content-cbf-twostage-pop-v1 & contenido + popularidad & 0.11410 & 0.06551 \\
-content-cbf-neg-pop-v1 & contenido + popularidad & 0.09936 & 0.06134 \\
-recency-v1 & contenido + novedad & 0.00594 & 0.00422 \\
-content-cbf-mmr-v1 & contenido + diversidad & 0.13888 & 0.08685 \\
-content-cbf-mmr-pop-v1 & contenido + diversidad & 0.13824 & 0.09353 \\
-cf-user-knn-v1 & colaborativo & 0.02098 & 0.01099 \\
-hybrid-weighted-cf-v1 & híbrido & 0.16989 & 0.10758 \\
-hybrid-mmr-v1 & híbrido + diversidad & 0.15913 & 0.09741 \\
+random-v1 & referencia & 0,00000 & 0,00000 \\
+popularity-v1 & referencia & 0,00340 & 0,00098 \\
+content-cbf-weighted-v1 & contenido & 0,17245 & 0,10878 \\
+content-cbf-multiplicative-v1 & contenido & 0,08558 & 0,05934 \\
+content-cbf-twostage-v1 & contenido & 0,11724 & 0,06767 \\
+content-cbf-neg-v1 & contenido & 0,11778 & 0,07368 \\
+content-cbf-weighted-pop-v1 & contenido + popularidad & 0,15181 & 0,09826 \\
+content-cbf-multiplicative-pop-v1 & contenido + popularidad & 0,08517 & 0,05898 \\
+content-cbf-twostage-pop-v1 & contenido + popularidad & 0,11410 & 0,06551 \\
+content-cbf-neg-pop-v1 & contenido + popularidad & 0,09936 & 0,06134 \\
+recency-v1 & contenido + novedad & 0,00594 & 0,00422 \\
+content-cbf-mmr-v1 & contenido + diversidad & 0,13888 & 0,08685 \\
+content-cbf-mmr-pop-v1 & contenido + diversidad & 0,13824 & 0,09353 \\
+cf-user-knn-v1 & colaborativo & 0,02098 & 0,01099 \\
+hybrid-weighted-cf-v1 & híbrido & 0,16989 & 0,10758 \\
+hybrid-mmr-v1 & híbrido + diversidad & 0,15913 & 0,09741 \\
 \end{tabularx}
 \end{table}
 
@@ -186,30 +228,30 @@ La Tabla~\ref{tab:ndcg-todos-k} conserva \(nDCG\) en los tres cortes solicitados
 \begin{tabularx}{\textwidth}{@{}>{\ttfamily\raggedright\arraybackslash}p{0.45\textwidth}Yrrr@{}}
 \textnormal{Algoritmo} & \textnormal{Familia} & \textnormal{$K=5$} & \textnormal{$K=10$} & \textnormal{$K=20$} \\
 \hline
-random-v1 & baseline & 0.00000 & 0.00000 & 0.00000 \\
-popularity-v1 & baseline & 0.00191 & 0.00340 & 0.00340 \\
-content-cbf-weighted-v1 & contenido & 0.14114 & 0.17245 & 0.18987 \\
-content-cbf-multiplicative-v1 & contenido & 0.07707 & 0.08558 & 0.10241 \\
-content-cbf-twostage-v1 & contenido & 0.08827 & 0.11724 & 0.14002 \\
-content-cbf-neg-v1 & contenido & 0.09656 & 0.11778 & 0.12992 \\
-content-cbf-weighted-pop-v1 & contenido + popularidad & 0.13179 & 0.15181 & 0.17409 \\
-content-cbf-multiplicative-pop-v1 & contenido + popularidad & 0.07677 & 0.08517 & 0.10200 \\
-content-cbf-twostage-pop-v1 & contenido + popularidad & 0.08338 & 0.11410 & 0.14538 \\
-content-cbf-neg-pop-v1 & contenido + popularidad & 0.08602 & 0.09936 & 0.11582 \\
-recency-v1 & contenido + novedad & 0.00594 & 0.00594 & 0.00594 \\
-content-cbf-mmr-v1 & contenido + diversidad & 0.11600 & 0.13888 & 0.16160 \\
-content-cbf-mmr-pop-v1 & contenido + diversidad & 0.12211 & 0.13824 & 0.15362 \\
-cf-user-knn-v1 & colaborativo & 0.01585 & 0.02098 & 0.03163 \\
-hybrid-weighted-cf-v1 & híbrido & 0.14305 & 0.16989 & 0.18962 \\
-hybrid-mmr-v1 & híbrido + diversidad & 0.13195 & 0.15913 & 0.17401 \\
+random-v1 & referencia & 0,00000 & 0,00000 & 0,00000 \\
+popularity-v1 & referencia & 0,00191 & 0,00340 & 0,00340 \\
+content-cbf-weighted-v1 & contenido & 0,14114 & 0,17245 & 0,18987 \\
+content-cbf-multiplicative-v1 & contenido & 0,07707 & 0,08558 & 0,10241 \\
+content-cbf-twostage-v1 & contenido & 0,08827 & 0,11724 & 0,14002 \\
+content-cbf-neg-v1 & contenido & 0,09656 & 0,11778 & 0,12992 \\
+content-cbf-weighted-pop-v1 & contenido + popularidad & 0,13179 & 0,15181 & 0,17409 \\
+content-cbf-multiplicative-pop-v1 & contenido + popularidad & 0,07677 & 0,08517 & 0,10200 \\
+content-cbf-twostage-pop-v1 & contenido + popularidad & 0,08338 & 0,11410 & 0,14538 \\
+content-cbf-neg-pop-v1 & contenido + popularidad & 0,08602 & 0,09936 & 0,11582 \\
+recency-v1 & contenido + novedad & 0,00594 & 0,00594 & 0,00594 \\
+content-cbf-mmr-v1 & contenido + diversidad & 0,11600 & 0,13888 & 0,16160 \\
+content-cbf-mmr-pop-v1 & contenido + diversidad & 0,12211 & 0,13824 & 0,15362 \\
+cf-user-knn-v1 & colaborativo & 0,01585 & 0,02098 & 0,03163 \\
+hybrid-weighted-cf-v1 & híbrido & 0,14305 & 0,16989 & 0,18962 \\
+hybrid-mmr-v1 & híbrido + diversidad & 0,13195 & 0,15913 & 0,17401 \\
 \end{tabularx}
 \end{table}
 
-La diferencia numérica más visible en \(nDCG@10\) aparece entre \texttt{content-cbf-weighted-v1} y los baselines. El híbrido ponderado queda próximo a esa variante de contenido, mientras que el colaborativo aislado recupera menos positivos bajo este split. Esta observación es interna al artefacto: no prueba que contenido sea superior en una comunidad real, ni que los pesos del híbrido sean óptimos. De las tres variantes que publica la aplicación
+La diferencia numérica más visible en \(nDCG@10\) aparece entre \texttt{content-cbf-weighted-v1} y los métodos de referencia. El híbrido ponderado queda próximo a esa variante de contenido, mientras que el colaborativo aislado recupera menos positivos bajo esta partición. Esta observación es interna al artefacto: no prueba que contenido sea superior en una comunidad real, ni que los pesos del híbrido sean óptimos. De las tres variantes que publica la aplicación
 (Sección~\ref{sec:alg-publicadas}), \texttt{content-cbf-weighted-v1} obtiene el mejor
-\(nDCG@10\) (0.17245), \texttt{content-cbf-mmr-pop-v1} queda algo por debajo (0.13824) y
-\texttt{recency-v1} apenas llega a 0.00594, lo que es coherente con su papel de variante de
-descubrimiento, que prioriza la novedad sobre la afinidad. Para \(K=5\), \texttt{hybrid-weighted-cf-v1} publica \(nDCG=0.14305\), frente a \(0.14114\) de Weighted. Para \(K=20\), Weighted publica \(0.18987\) y el híbrido ponderado \(0.18962\). La proximidad de esas cifras ilustra por qué no basta con mirar la diferencia numérica sin contrastarla; la Sección~\ref{sec:exp-significacion} retoma esta misma comparación con una prueba estadística. El baseline aleatorio permanece en cero en la cohorte publicada; popularidad alcanza \(0.00340\) en \(nDCG@10\), lo que contextualiza la señal de contenido pero no mide utilidad subjetiva. La Figura~\ref{fig:ndcg-algoritmos} ordena los dieciséis algoritmos por \(nDCG@10\) y señala las tres variantes que publica la aplicación.
+\(nDCG@10\) (0{,}17245), \texttt{content-cbf-mmr-pop-v1} queda algo por debajo (0{,}13824) y
+\texttt{recency-v1} apenas llega a 0{,}00594, lo que es coherente con su papel de variante de
+descubrimiento, que prioriza la novedad sobre la afinidad. Para \(K=5\), \texttt{hybrid-weighted-cf-v1} publica \(nDCG=0{,}14305\), frente a \(0{,}14114\) de la variante ponderada. Para \(K=20\), la variante ponderada publica \(0{,}18987\) y el híbrido ponderado \(0{,}18962\). La proximidad de esas cifras ilustra por qué no basta con mirar la diferencia numérica sin contrastarla; la Sección~\ref{sec:exp-significacion} retoma esta misma comparación con una prueba estadística. El método de referencia aleatorio permanece en cero en la cohorte publicada; popularidad alcanza \(0{,}00340\) en \(nDCG@10\), lo que contextualiza la señal de contenido pero no mide utilidad subjetiva. La Figura~\ref{fig:ndcg-algoritmos} ordena los dieciséis algoritmos por \(nDCG@10\) y señala las tres variantes que publica la aplicación.
 
 \begin{figure}[htp]
     \centering
@@ -246,7 +288,7 @@ random-v1 & 0 & 0 (0\,\%) \\
 
 Leída así, la mejor variante de contenido devuelve al menos uno de los juegos retenidos del
 usuario, dentro de las diez primeras posiciones, casi a la mitad de las personas evaluables
-(49\,\%), frente al 9\,\% del colaborativo puro y el 3\,\% o menos de los baselines; a
+(49\,\%), frente al 9\,\% del colaborativo puro y el 3\,\% o menos de los métodos de referencia; a
 \(K=20\) esa cifra sube al 58\,\% para \texttt{content-cbf-weighted-v1} (cuarenta y seis de
 setenta y nueve usuarios). Esta tasa de éxito por usuario y el \(nDCG@10\) de la
 Tabla~\ref{tab:resultados-ndcg10} miden cosas distintas y no deben confundirse: la primera
@@ -269,8 +311,8 @@ Primero, una prueba de \textbf{Friedman} sirve de ómnibus: comprueba, con un ú
 si existe alguna diferencia entre los dieciséis algoritmos antes de gastar el presupuesto de
 comparaciones en mirar pares sueltos. Es no paramétrica (no asume que los valores de nDCG se
 distribuyan de forma normal, algo que no se puede dar por hecho con solo setenta y nueve
-observaciones) y adecuada para medidas repetidas: cada usuario aporta un ranking entre los
-dieciséis algoritmos; la prueba contrasta si esos rankings son consistentes entre sí. Sobre
+observaciones) y adecuada para medidas repetidas: cada usuario aporta una clasificación entre los
+dieciséis algoritmos; la prueba contrasta si esas clasificaciones son consistentes entre sí. Sobre
 \(nDCG@10\), rechaza la hipótesis de igualdad con \(\chi^2=258{,}07\) y
 \(p=2{,}69\times10^{-46}\).
 
@@ -291,7 +333,7 @@ dejar de controlar el error de tipo I acumulado. Cincuenta y cuatro de las cient
 comparaciones siguen siendo significativas después de este ajuste.
 
 Cuarto, además del contraste de hipótesis, el artefacto conserva un \textbf{intervalo de
-confianza por \textit{bootstrap} BCa} (\emph{bias-corrected and accelerated}, dos mil
+confianza por remuestreo BCa} (corregido por sesgo y acelerado, dos mil
 remuestreos, confianza del 95\,\%, semilla fija) para el \(nDCG@10\) de cada algoritmo, que da
 un rango de valores plausibles en lugar de una única cifra puntual y no exige asumir ninguna
 forma concreta para la distribución del estadístico. La Tabla~\ref{tab:significacion} recoge
@@ -306,16 +348,16 @@ sobre las ciento veinte comparaciones totales.}\label{tab:significacion}
 \begin{tabularx}{\textwidth}{@{}Yrr@{}}
 \textnormal{Comparación} & \textnormal{\(\Delta\) nDCG@10} & \textnormal{\(p\) ajustado} \\
 \hline
-content-cbf-weighted-v1 vs.\ random-v1 & +0{,}1725 & 0{,}00001 \\
-content-cbf-weighted-v1 vs.\ popularity-v1 & +0{,}1691 & 0{,}00001 \\
-hybrid-weighted-cf-v1 vs.\ random-v1 & +0{,}1699 & 0{,}00001 \\
-cf-user-knn-v1 vs.\ content-cbf-weighted-v1 & \(-\)0{,}1515 & 0{,}00004 \\
-cf-user-knn-v1 vs.\ hybrid-weighted-cf-v1 & \(-\)0{,}1489 & 0{,}00004 \\
+content-cbf-weighted-v1 frente a random-v1 & +0{,}1725 & 0{,}00001 \\
+content-cbf-weighted-v1 frente a popularity-v1 & +0{,}1691 & 0{,}00001 \\
+hybrid-weighted-cf-v1 frente a random-v1 & +0{,}1699 & 0{,}00001 \\
+cf-user-knn-v1 frente a content-cbf-weighted-v1 & \(-\)0{,}1515 & 0{,}00004 \\
+cf-user-knn-v1 frente a hybrid-weighted-cf-v1 & \(-\)0{,}1489 & 0{,}00004 \\
 \end{tabularx}
 \end{table}
 
 Dos lecturas se derivan de este contraste. La primera es que tanto las variantes de contenido
-como los híbridos superan a los dos baselines y a \texttt{recency-v1} con significación
+como los híbridos superan a los dos métodos de referencia y a \texttt{recency-v1} con significación
 sobrada, lo que sí permite descartar el azar como explicación de esas diferencias concretas,
 bajo este corpus y esta población. La segunda, nueva en este protocolo frente a versiones
 anteriores, es que el colaborativo puro (\texttt{cf-user-knn-v1}) resulta significativamente
@@ -334,8 +376,8 @@ dos en solitario.
 
 MMR introduce un objetivo distinto de la recuperación puntual: reducir redundancia entre elementos ya seleccionados. Sus resultados deben leerse junto con diversidad intra-lista, novedad, cobertura del catálogo, cobertura de predicción y HHI cuando el artefacto los publica. Una mejora de diversidad no compensa automáticamente una pérdida de nDCG, ni la métrica de acierto debe ocultar concentración. SavePoint mantiene estas medidas separadas para que el compromiso sea auditable.
 
-Las amenazas principales son población sintética, un solo consumo del test y dependencia de
-metadatos externos gobernados. El corpus y el snapshot son fortalezas de reproducibilidad,
+Las amenazas principales son población sintética, un solo consumo de la prueba y dependencia de
+metadatos externos gobernados. El corpus y la versión inmutable son fortalezas de reproducibilidad,
 pero acotan la generalización: la significación estadística de la Sección~\ref{sec:exp-significacion}
 respalda que las diferencias observadas no son ruido bajo este corpus y esta población, no
 que se sostengan sobre usuarios reales. Un estudio posterior debería incluir más semillas,
