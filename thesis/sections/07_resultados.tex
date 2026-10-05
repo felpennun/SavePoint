@@ -57,7 +57,7 @@ Sección~\ref{cap:algoritmos} explica cómo SavePoint reordena sus listas para c
 La evaluación publicada se ejecutó offline con el corpus congelado \texttt{2026.09.2} (190.479 obras
 gobernadas, Sección~\ref{sec:datos-congelacion}) y el conjunto de
 características \texttt{fs-v12-curated-tags-idf} (Sección~\ref{cap:algoritmos} y
-Tabla~\ref{tab:pesos-familia}); la revisión posterior \texttt{fs-v13} no se ha evaluado. La población experimental contiene 400 usuarios sintéticos activos, generados de forma determinista; 79 cumplen la elegibilidad del split de prueba. Los perfiles se generan a partir de arquetipos (monogénero severo y generoso, omnívoro medio, completista de saga, explorador de novedades, coleccionista de pendientes, jugador ocasional con arranque en frío y veterano de biblioteca grande) que varían el número de géneros preferidos, el tamaño de la biblioteca, la generosidad al puntuar y la mezcla de estados, y llevan el marcador \texttt{synthetic-eval-user} para no contaminar el baseline de popularidad de la aplicación. No se utilizaron usuarios reales. El protocolo v15 fija semilla, versiones, snapshots, hashes, candidatas y exclusiones antes de consumir el test. La semilla permite reproducir esta ejecución, pero no sustituye un estudio de sensibilidad con múltiples semillas.
+Tabla~\ref{tab:pesos-familia}); la revisión posterior \texttt{fs-v13} no se ha evaluado. La población experimental contiene 400 usuarios sintéticos activos, generados de forma determinista; 79 cumplen la elegibilidad del split de prueba. La población se reparte en dos cohortes: \texttt{active\_history\_10\_to\_20}, con los 390 usuarios que tienen una biblioteca de entre 10 y 20 entradas, y \texttt{no\_history}, con los 10 de arranque en frío, que no tienen ítems relevantes y no se evalúan; los 79 usuarios evaluables pertenecen todos a la primera. Los perfiles se generan a partir de arquetipos (monogénero severo y generoso, omnívoro medio, completista de saga, explorador de novedades, coleccionista de pendientes, jugador ocasional con arranque en frío y veterano de biblioteca grande) que varían el número de géneros preferidos, el tamaño de la biblioteca, la generosidad al puntuar y la mezcla de estados, y llevan el marcador \texttt{synthetic-eval-user} para no contaminar el baseline de popularidad de la aplicación. No se utilizaron usuarios reales. El protocolo v15 fija semilla, versiones, snapshots, hashes, candidatas y exclusiones antes de consumir el test. La semilla permite reproducir esta ejecución, pero no sustituye un estudio de sensibilidad con múltiples semillas.
 
 El protocolo vigente, v15, usa \emph{leave-fraction-out} por usuario, no
 \emph{leave-one-out}: retiene varios ítems relevantes por persona en lugar de uno solo. Una
@@ -85,11 +85,91 @@ y el MAP se calculan sobre la misma
 lista. El protocolo también conserva diversidad
 intra-lista, novedad, coberturas y concentración cuando el artefacto permite estimarlas.
 
+\subsection{Reparto de los usuarios y uso de la validación}\label{sec:exp-reparto}
+
+Los 400 usuarios sintéticos se reparten por usuario, no por ítem, en tres subconjuntos disjuntos con una semilla
+fija: 240 de entrenamiento, 80 de validación y 80 de prueba (Tabla~\ref{tab:exp-reparto}). Las métricas de este
+capítulo se calculan solo sobre los usuarios de prueba; dentro de cada uno de ellos, el protocolo v15 retira después
+la fracción de ítems relevantes descrita arriba.
+
+\begin{table}[htp]
+\centering
+\small
+\begin{tabularx}{\textwidth}{ | L{0.17\textwidth} | C{0.17\textwidth} | Y | }
+    \hline
+    \textbf{Partición} & \textbf{Usuarios} & \textbf{Papel en este capítulo} \\
+    \hline
+    Entrenamiento & 240 & Población de referencia del filtrado colaborativo por vecinos (\texttt{cf-user-knn-v1}) y base de frecuencias con la que se mide la novedad. No se evalúan. \\
+    \hline
+    Validación & 80 & Reservada para seleccionar configuraciones; no se ha utilizado para ello (véase más abajo). \\
+    \hline
+    Prueba & 80 (79 evaluados) & Comparación final de las dieciséis variantes, con un único consumo por versión del protocolo. \\
+    \hline
+\end{tabularx}
+\caption{Reparto de los 400 usuarios sintéticos y papel de cada partición.}
+\label{tab:exp-reparto}
+\end{table}
+
+\textbf{Por qué solo 79 de los 400 usuarios se evalúan.} Los 79 no son una selección de los 400 por falta de datos:
+son la partición de prueba, de 80 usuarios, menos uno que no tiene ningún ítem relevante elegible. El artefacto lo
+registra como 80 solicitados, 79 evaluados y 1 omitido. Los otros 320 usuarios, 240 de entrenamiento y 80 de
+validación, no se evalúan en la comparación final por diseño, no por ser inservibles.
+
+\textbf{Ajuste de hiperparámetros.} El protocolo declaró, antes de ejecutar nada, una rejilla de ajuste de como
+máximo 31 configuraciones que debía puntuarse solo sobre validación con \(nDCG@10\), para bloquear la ganadora antes
+de tocar la prueba. No se conserva ninguna ejecución de esa rejilla: todos los artefactos conservados corresponden a
+la partición de prueba y no hay ninguno sobre validación. Los parámetros de las dieciséis variantes (los pesos por
+familia, el \(\lambda\) de la reordenación, los pesos de PopScore y los demás) son decisiones de diseño justificadas
+en la Sección~\ref{cap:algoritmos}, no valores seleccionados sobre validación. Por tanto no se ajustó ningún
+hiperparámetro mediante una búsqueda sobre la prueba, pero tampoco se utilizó la validación para ello.
+
+Esto no equivale a un aislamiento completo de la prueba. El protocolo se modificó de v12 a v15 después de ver los
+resultados de prueba de las versiones anteriores (Sección~\ref{sec:exp-evolucion}), de modo que el consumo único de la
+partición de prueba rige dentro de cada versión del protocolo, no entre versiones. Es una limitación del estudio y se
+recoge entre las amenazas a la validez (Sección~\ref{sec:exp-amenazas}).
+
 \section{Evolución del protocolo: tres intentos, no uno}\label{sec:exp-evolucion}\label{sec:exp-v15-fidelidad}
 
 Los números v12, v14 y v15 de esta sección designan versiones del \emph{protocolo} de evaluación, no
 del conjunto de características: la ejecución v15 se calculó con el conjunto \texttt{fs-v12}
 (Sección~\ref{cap:algoritmos}), que es una numeración distinta.
+
+El protocolo se versiona con un número entero que sube cada vez que un cambio impide comparar sus resultados con los
+de las versiones anteriores. La Tabla~\ref{tab:exp-versiones} resume las versiones, reconstruidas a partir del
+historial del repositorio y de los documentos de verificación. Hasta v14 el esquema de partición fue siempre
+\emph{leave-one-out}, con un único ítem retenido por usuario; lo que cambió fue la señal de calidad, la regla de
+elegibilidad de las candidatas, el elenco de algoritmos, la población sintética y el piso de calidad. Con los 400
+usuarios se ejecutaron sobre la partición de prueba v12, v13, v14 y v15, pero la ejecución de v13 se descartó por un
+error del banco de pruebas, no del protocolo (candidatas duplicadas en las listas ordenadas): los resultados válidos
+son los de v12, v14 y v15.
+
+\begin{table}[htp]
+\centering
+\small
+\begin{tabularx}{\textwidth}{ | C{0.13\textwidth} | C{0.13\textwidth} | Y | }
+    \hline
+    \textbf{Versión} & \textbf{Fecha (2026)} & \textbf{Qué cambió} \\
+    \hline
+    v1--v2 & 7--8 sep. & Congelación inicial del contrato: \emph{leave-one-out} por usuario, \(K \in \{5, 10, 20\}\) y \(nDCG@10\) como métrica titular. La versión v2 limita las candidatas a obras con valoración. Primera ejecución de prueba, con la población inicial de la Fase 2 (26 de 40 usuarios de prueba evaluables). \\
+    \hline
+    v3--v6 & 9 sep. & Similitud de contenido por facetas y señal de calidad con confianza, calibradas en varias iteraciones; v6 es la versión que congeló el documento del protocolo. \\
+    \hline
+    v7--v9 & 9 sep. & Peso de PopScore de 0,20, valoración bayesiana (contracción hacia la media del corpus con \(m = 25\)) y regla de elegibilidad: obra gobernada, con fecha no futura, valoración de usuarios y al menos cinco valoraciones totales. \\
+    \hline
+    v10 & 10 sep. & Señal final de valoración (calidad por confianza), reordenación híbrida con MMR y rejilla de ajuste de 31 configuraciones. \\
+    \hline
+    v11--v12 & 10 sep. & Unificación de las etiquetas curadas y congelación de las entradas del cálculo. v12 es el primer cálculo completo con los 400 usuarios. \\
+    \hline
+    v13 & 11 sep. & Población sintética regenerada, con todas las bibliotecas con historial de entre 10 y 20 entradas. Su ejecución de prueba se descartó: un error del banco de pruebas duplicaba candidatas en las listas de los algoritmos de contenido y desbordaba sus métricas; se conserva marcada como inválida y no es un resultado. \\
+    \hline
+    v14 & 11 sep. & Piso de calidad externa para el ítem retenido. Segundo cálculo completo. \\
+    \hline
+    v15 & 12 sep. & \emph{Leave-fraction-out} sobre la etiqueta dominante de cada usuario. Versión publicada. \\
+    \hline
+\end{tabularx}
+\caption{Versiones del protocolo de evaluación.}
+\label{tab:exp-versiones}
+\end{table}
 
 El protocolo v15 descrito arriba no fue el primero que se congeló y se ejecutó hasta el final
 contra la partición de prueba. Lo precedieron dos intentos completos, v12 y v14, cada uno
@@ -118,10 +198,13 @@ conjunto de candidatas era idéntico para los dieciséis algoritmos), sino una i
 dos piezas congeladas por separado: el generador de población sintética y el umbral de
 arranque en frío del recomendador de contenido.
 
-Corregir esa interacción exigió dos cambios sucesivos. El primero, ya con población
+Corregir esa interacción exigió dos cambios sucesivos. El primero (protocolo v13), con la población
 rediseñada, amplió el tamaño de biblioteca sintética, ensanchó la franja de popularidad de
-origen y garantizó un mínimo de cinco positivos elegibles por biblioteca, lo que eliminó por
-completo el modo de historial insuficiente en la partición de prueba: pasó de afectar al setenta y
+origen y garantizó un mínimo de cinco positivos elegibles por biblioteca. La ejecución de prueba de v13 no es
+válida: un error del banco de pruebas duplicaba candidatas en las listas de los algoritmos de contenido (una obra
+con varias etiquetas curadas aparecía varias veces) y desbordaba sus métricas, por lo que se descartó y se conservó
+solo como evidencia del fallo. Por eso el efecto de la población rediseñada se midió en la ejecución de v14, que ya
+reúne ambos cambios: el modo de historial insuficiente dejó de afectar a la partición de prueba y pasó del setenta y
 cuatro por ciento de los usuarios a un cero por ciento. El segundo cambio añadió, sobre esa
 población ya corregida, un piso de calidad externa (valoración agregada de origen de al menos
 setenta puntos) al ítem que la retención de uno podía retirar, para que el positivo
@@ -151,7 +234,8 @@ más información por usuario sin necesidad de una población mayor. El resultad
 en la Sección~\ref{sec:exp-significacion}, fue el esperado: de catorce comparaciones
 significativas en v14 a cincuenta y cuatro en v15, con una diferenciación entre contenido y
 colaborativo puro que v12 y v14 no tenían potencia estadística suficiente para establecer.
-Los tres protocolos y sus artefactos quedan versionados sin modificar: v15 no invalida ni
+Los tres protocolos válidos y sus artefactos quedan versionados sin modificar (la ejecución descartada de v13 se
+conserva aparte, marcada como inválida): v15 no invalida ni
 reescribe los resultados de v12 o v14, los sustituye como publicación vigente por haber
 corregido, de forma medida y documentada, los problemas que los dos intentos anteriores dejaron
 al descubierto.
@@ -167,7 +251,7 @@ de valoraciones del historial de un usuario, en lugar de un único ítem, no es 
 este proyecto: es la generalización natural del esquema \emph{All-but-N}, ya nombrado así en
 la literatura desde Breese, Heckerman y Kadie~\cite{breese1998empirical} y sistematizado por
 Herlocker et al.~\cite{herlocker2004evaluating}, donde el \emph{leave-one-out} que usaban los
-protocolos v6 a v14 es simplemente el caso particular \(N=1\). v15 no sale de ese marco: solo
+protocolos v6 a v14 (Tabla~\ref{tab:exp-versiones}) es simplemente el caso particular \(N=1\). v15 no sale de ese marco: solo
 deja de fijar \(N\) de forma global y lo calcula por usuario, en proporción al tamaño de su
 propio grupo de obras con esa etiqueta.
 
@@ -196,33 +280,33 @@ y con menos artefactos de diseño heredados que v12 o v14, no solo con mejores c
 
 \section{Resultados publicados}\label{sec:exp-resultados}\label{sec:exp-exito}
 
-La Tabla~\ref{tab:resultados-ndcg10} resume \(nDCG@10\), MAP@10 y tiempo de pared de la cohorte \texttt{active\_history\_10\_to\_20} incluidos en el artefacto v15. Se muestra una tabla compacta para evitar repetir cuatro métricas por tres valores de \(K\); el artefacto versionado \texttt{evaluation-400-test-2026-09-12-v15.artifact.json} y su transcripción en \texttt{docs/verification/evaluation-cohorts-400-test-2026-09-12-v15.md} preservan la transcripción completa para \(K=5,10,20\).
+La Tabla~\ref{tab:resultados-ndcg10} resume \(nDCG@10\), MAP@10 y el tiempo de pared de cada algoritmo, en segundos, tal como los registra el artefacto v15. Las métricas son las de los 79 usuarios evaluables, que pertenecen a la cohorte \texttt{active\_history\_10\_to\_20}; esa cohorte no es el conjunto de los 79, sino los 390 usuarios sintéticos con una biblioteca de entre 10 y 20 entradas; solo se evalúan los 79 que caen en la partición de prueba y tienen al menos un ítem relevante elegible. El tiempo es la duración del proceso que ejecutó cada algoritmo, no un tiempo por usuario. Se muestra una tabla compacta para evitar repetir cuatro métricas por tres valores de \(K\); el artefacto versionado \texttt{evaluation-400-test-2026-09-12-v15.artifact.json} y su transcripción en \texttt{docs/verification/evaluation-cohorts-400-test-2026-09-12-v15.md} preservan la transcripción completa para \(K=5,10,20\).
 
 \begin{table}[H]
 \centering
-\caption{Resultados v15 publicados (conjunto de características \texttt{fs-v12}) para la cohorte indicada. No son resultados con usuarios reales.}\label{tab:resultados-ndcg10}
+\caption{Resultados v15 publicados (conjunto de características \texttt{fs-v12}) para los 79 usuarios evaluables de la cohorte \texttt{active\_history\_10\_to\_20}, con el tiempo de pared de cada algoritmo en segundos. No son resultados con usuarios reales.}\label{tab:resultados-ndcg10}
 \small
 \renewcommand{\arraystretch}{1.2}
 \setlength{\tabcolsep}{3pt}
-\begin{tabularx}{\textwidth}{@{}>{\ttfamily\raggedright\arraybackslash}p{0.41\textwidth}Y>{\raggedleft\arraybackslash}p{0.115\textwidth}>{\raggedleft\arraybackslash}p{0.115\textwidth}@{}}
-\textnormal{Algoritmo} & \textnormal{Familia} & \textnormal{\footnotesize nDCG@10} & \textnormal{\footnotesize MAP@10} \\
+\begin{tabularx}{\textwidth}{@{}>{\ttfamily\footnotesize\raggedright\arraybackslash}p{0.37\textwidth}Y>{\raggedleft\arraybackslash}p{0.095\textwidth}>{\raggedleft\arraybackslash}p{0.095\textwidth}>{\raggedleft\arraybackslash}p{0.12\textwidth}@{}}
+\textnormal{Algoritmo} & \textnormal{Familia} & \textnormal{\footnotesize nDCG@10} & \textnormal{\footnotesize MAP@10} & \textnormal{\footnotesize Tiempo (s)} \\
 \hline
-random-v1 & referencia & 0,00000 & 0,00000 \\
-popularity-v1 & referencia & 0,00340 & 0,00098 \\
-content-cbf-weighted-v1 & contenido & 0,17245 & 0,10878 \\
-content-cbf-multiplicative-v1 & contenido & 0,08558 & 0,05934 \\
-content-cbf-twostage-v1 & contenido & 0,11724 & 0,06767 \\
-content-cbf-neg-v1 & contenido & 0,11778 & 0,07368 \\
-content-cbf-weighted-pop-v1 & contenido + popularidad & 0,15181 & 0,09826 \\
-content-cbf-multiplicative-pop-v1 & contenido + popularidad & 0,08517 & 0,05898 \\
-content-cbf-twostage-pop-v1 & contenido + popularidad & 0,11410 & 0,06551 \\
-content-cbf-neg-pop-v1 & contenido + popularidad & 0,09936 & 0,06134 \\
-recency-v1 & contenido + novedad & 0,00594 & 0,00422 \\
-content-cbf-mmr-v1 & contenido + diversidad & 0,13888 & 0,08685 \\
-content-cbf-mmr-pop-v1 & contenido + diversidad & 0,13824 & 0,09353 \\
-cf-user-knn-v1 & colaborativo & 0,02098 & 0,01099 \\
-hybrid-weighted-cf-v1 & híbrido & 0,16989 & 0,10758 \\
-hybrid-mmr-v1 & híbrido + diversidad & 0,15913 & 0,09741 \\
+random-v1 & referencia & 0,00000 & 0,00000 & 25,1 \\
+popularity-v1 & referencia & 0,00340 & 0,00098 & 5,1 \\
+content-cbf-weighted-v1 & contenido & 0,17245 & 0,10878 & 492,8 \\
+content-cbf-multiplicative-v1 & contenido & 0,08558 & 0,05934 & 491,4 \\
+content-cbf-twostage-v1 & contenido & 0,11724 & 0,06767 & 488,5 \\
+content-cbf-neg-v1 & contenido & 0,11778 & 0,07368 & 488,2 \\
+content-cbf-weighted-pop-v1 & contenido + popularidad & 0,15181 & 0,09826 & 484,0 \\
+content-cbf-multiplicative-pop-v1 & contenido + popularidad & 0,08517 & 0,05898 & 480,4 \\
+content-cbf-twostage-pop-v1 & contenido + popularidad & 0,11410 & 0,06551 & 484,2 \\
+content-cbf-neg-pop-v1 & contenido + popularidad & 0,09936 & 0,06134 & 483,9 \\
+recency-v1 & contenido + novedad & 0,00594 & 0,00422 & 427,6 \\
+content-cbf-mmr-v1 & contenido + diversidad & 0,13888 & 0,08685 & 483,3 \\
+content-cbf-mmr-pop-v1 & contenido + diversidad & 0,13824 & 0,09353 & 481,7 \\
+cf-user-knn-v1 & colaborativo & 0,02098 & 0,01099 & 16,8 \\
+hybrid-weighted-cf-v1 & híbrido & 0,16989 & 0,10758 & 439,7 \\
+hybrid-mmr-v1 & híbrido + diversidad & 0,15913 & 0,09741 & 493,1 \\
 \end{tabularx}
 \end{table}
 

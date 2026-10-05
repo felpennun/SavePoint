@@ -54,6 +54,43 @@ correcciones (12 ficheros cambian: bibliografía y secciones 00 a 08). Aquí se 
    del alta de copia; CP-2 una colección ajena no revela su existencia) con su prueba automatizada real. Se actualizó
    la frase de recuentos (antes 773 backend del 4-10). Cifras verificadas ejecutando la suite con Docker.
 
+5. **Capítulo 7, Tabla 7.1: el texto decía "tiempo de pared" pero la tabla no tenía esa columna; y no quedaba claro si la
+   cohorte `active_history_10_to_20` eran los 79 usuarios.** Se añadió a la tabla la columna *Tiempo (s)* con el
+   `duration_seconds` de cada algoritmo del artefacto v15 (de 5,1 s en `popularity-v1` a 493,1 s en `hybrid-mmr-v1`; es
+   la duración del proceso de cada algoritmo, no por usuario; en total 4.297,9 s de pared con 2 procesos en paralelo).
+   Cohorte: NO son los 79. `active_history_10_to_20` son los 390 usuarios sintéticos con biblioteca no vacía de 10 a 20
+   entradas (regla `_cohort_for` de `evaluation/synthetic.py`, protocolo v13); `no_history` son los 10 de arranque en
+   frío (0 evaluables). Los 79 evaluados son los de la cohorte activa que caen en la partición de prueba y tienen algún
+   ítem relevante elegible (80 solicitados, 1 omitido). Se explica en la presentación de la tabla, en su pie y en la
+   sección del protocolo. Posible incoherencia por revisar: el texto del protocolo describe arquetipos con tamaños de
+   biblioteca distintos, mientras que desde el protocolo v13 todos los usuarios con historial tienen 10-20 entradas.
+
+6. **Capítulo 7: "los protocolos v6 a v14" se mencionaban sin haberse explicado.** Tabla nueva "Versiones del protocolo de
+   evaluación" (al abrir "Evolución del protocolo") reconstruida del historial de `docs/methodology/protocol.json`, de los
+   commits y de los documentos de verificación: v1-v2 (congelación inicial; primera ejecución con la población de la Fase 2,
+   26 de 40 evaluables), v3-v6 (similitud por facetas y señal de calidad), v7-v9 (peso de PopScore 0,20, rating bayesiano
+   m=25, regla de elegibilidad), v10 (rating final, MMR híbrido, rejilla de 31), v11-v12 (etiquetas curadas unificadas; primer
+   cálculo con 400 usuarios), v13 (población regenerada; ejecución invalidada por candidatas duplicadas), v14 (piso de
+   calidad externa), v15 (leave-fraction-out). No hay documento ni artefacto propio de v11 ni de v3-v5, por eso van agrupadas.
+   Hasta v14 la partición fue siempre leave-one-out. Las numeraciones de la Tabla de resultados cambian: ahora es la 7.3.
+7. **Capítulo 7: faltaba explicar el reparto entrenamiento/validación/prueba, por qué solo 79 de 400 son evaluables y si se
+   ajustaron hiperparámetros en validación.** Subsección nueva 7.2.1 con tabla del reparto (240/80/80 por usuario, semilla
+   fija; entrenamiento = referencia del filtrado colaborativo y base de novedad; validación reservada; prueba = comparación
+   final con un único consumo por versión). Los 79 son la partición de prueba (80 solicitados) menos 1 usuario sin ítem
+   relevante elegible; los otros 320 no se evalúan por diseño. Hiperparámetros: el protocolo declaró una rejilla de 31
+   configuraciones para puntuarse solo sobre validación, pero **no se conserva ninguna ejecución de esa rejilla** (todos los
+   artefactos son de la partición de prueba; el preflight del 2026-09-09 la deja `not_run`); los parámetros de las 16
+   variantes son decisiones de diseño (cap. 5), ni ajustados sobre prueba ni sobre validación. Limitación declarada: el
+   protocolo cambió de v12 a v15 viendo resultados de prueba, de modo que el consumo único rige por versión, no entre
+   versiones. Datos verificados en `docs/methodology/evaluation-protocol.md`, el artefacto v15 y los checkpoints.
+8. **Capítulo 7: v13 aparecía como protocolo válido.** Revisado todo el TFG: solo el cap. 7 lo nombraba. v13 se ejecutó pero
+   su ejecución de prueba quedó invalidada por un error del banco de pruebas (candidatas duplicadas por el JOIN con las
+   etiquetas curadas, que desbordaba nDCG/MAP de los algoritmos de contenido; commit `69a1b4e`, artefacto
+   `evaluation-400-test-2026-09-11.INVALID-duplicate-candidates.artifact.json`). Ahora el texto dice que los resultados
+   válidos son solo v12, v14 y v15; la tabla de versiones y la narrativa de "dos cambios sucesivos" aclaran que el paso del
+   74 % al 0 % de historial insuficiente se midió en la ejecución v14 (que reúne la población de v13 y el piso de calidad),
+   no en v13. Los números de las secciones 5.5 y 8 ya decían "v12, v14 y v15" y no cambian.
+
 ## Pendientes
 
 Las demás correcciones del profesor, a medida que el autor las vaya indicando.
