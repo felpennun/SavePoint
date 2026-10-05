@@ -54,7 +54,10 @@ Sección~\ref{cap:algoritmos} explica cómo SavePoint reordena sus listas para c
 
 \section{Protocolo de evaluación}\label{sec:exp-protocolo}
 
-La evaluación publicada se ejecutó offline con el corpus congelado \texttt{2026.09.2}. La población experimental contiene 400 usuarios sintéticos activos, generados de forma determinista; 79 cumplen la elegibilidad del split de prueba. Los perfiles se generan a partir de arquetipos (monogénero severo y generoso, omnívoro medio, completista de saga, explorador de novedades, coleccionista de pendientes, jugador ocasional con arranque en frío y veterano de biblioteca grande) que varían el número de géneros preferidos, el tamaño de la biblioteca, la generosidad al puntuar y la mezcla de estados, y llevan el marcador \texttt{synthetic-eval-user} para no contaminar el baseline de popularidad de la aplicación. No se utilizaron usuarios reales. El protocolo v15 fija semilla, versiones, snapshots, hashes, candidatas y exclusiones antes de consumir el test. La semilla permite reproducir esta ejecución, pero no sustituye un estudio de sensibilidad con múltiples semillas.
+La evaluación publicada se ejecutó offline con el corpus congelado \texttt{2026.09.2} (190.479 obras
+gobernadas, Sección~\ref{sec:datos-congelacion}) y el conjunto de
+características \texttt{fs-v12-curated-tags-idf} (Sección~\ref{cap:algoritmos} y
+Tabla~\ref{tab:pesos-familia}); la revisión posterior \texttt{fs-v13} no se ha evaluado. La población experimental contiene 400 usuarios sintéticos activos, generados de forma determinista; 79 cumplen la elegibilidad del split de prueba. Los perfiles se generan a partir de arquetipos (monogénero severo y generoso, omnívoro medio, completista de saga, explorador de novedades, coleccionista de pendientes, jugador ocasional con arranque en frío y veterano de biblioteca grande) que varían el número de géneros preferidos, el tamaño de la biblioteca, la generosidad al puntuar y la mezcla de estados, y llevan el marcador \texttt{synthetic-eval-user} para no contaminar el baseline de popularidad de la aplicación. No se utilizaron usuarios reales. El protocolo v15 fija semilla, versiones, snapshots, hashes, candidatas y exclusiones antes de consumir el test. La semilla permite reproducir esta ejecución, pero no sustituye un estudio de sensibilidad con múltiples semillas.
 
 El protocolo vigente, v15, usa \emph{leave-fraction-out} por usuario, no
 \emph{leave-one-out}: retiene varios ítems relevantes por persona en lugar de uno solo. Una
@@ -83,6 +86,10 @@ lista. El protocolo también conserva diversidad
 intra-lista, novedad, coberturas y concentración cuando el artefacto permite estimarlas.
 
 \section{Evolución del protocolo: tres intentos, no uno}\label{sec:exp-evolucion}\label{sec:exp-v15-fidelidad}
+
+Los números v12, v14 y v15 de esta sección designan versiones del \emph{protocolo} de evaluación, no
+del conjunto de características: la ejecución v15 se calculó con el conjunto \texttt{fs-v12}
+(Sección~\ref{cap:algoritmos}), que es una numeración distinta.
 
 El protocolo v15 descrito arriba no fue el primero que se congeló y se ejecutó hasta el final
 contra la partición de prueba. Lo precedieron dos intentos completos, v12 y v14, cada uno
@@ -193,7 +200,7 @@ La Tabla~\ref{tab:resultados-ndcg10} resume \(nDCG@10\), MAP@10 y tiempo de pare
 
 \begin{table}[H]
 \centering
-\caption{Resultados v15 publicados para la cohorte indicada. No son resultados con usuarios reales.}\label{tab:resultados-ndcg10}
+\caption{Resultados v15 publicados (conjunto de características \texttt{fs-v12}) para la cohorte indicada. No son resultados con usuarios reales.}\label{tab:resultados-ndcg10}
 \small
 \renewcommand{\arraystretch}{1.2}
 \setlength{\tabcolsep}{3pt}
@@ -223,7 +230,7 @@ La Tabla~\ref{tab:ndcg-todos-k} conserva \(nDCG\) en los tres cortes solicitados
 
 \begin{table}[H]
 \centering
-\caption{nDCG publicado por algoritmo y corte $K$ en v15.}\label{tab:ndcg-todos-k}
+\caption{nDCG publicado por algoritmo y corte $K$ en v15 (\texttt{fs-v12}).}\label{tab:ndcg-todos-k}
 \tablecompact
 \begin{tabularx}{\textwidth}{@{}>{\ttfamily\raggedright\arraybackslash}p{0.45\textwidth}Yrrr@{}}
 \textnormal{Algoritmo} & \textnormal{Familia} & \textnormal{$K=5$} & \textnormal{$K=10$} & \textnormal{$K=20$} \\
@@ -256,7 +263,7 @@ descubrimiento, que prioriza la novedad sobre la afinidad. Para \(K=5\), \texttt
 \begin{figure}[htp]
     \centering
     \includegraphics[width=0.9\textwidth]{figures/ndcg-algoritmos.pdf}
-    \caption{\(nDCG@10\) de los dieciséis algoritmos en la evaluación v15, por familia. El borde grueso marca las tres variantes publicadas en la aplicación.}
+    \caption{\(nDCG@10\) de los dieciséis algoritmos en la evaluación v15 (\texttt{fs-v12}), por familia. El borde grueso marca las tres variantes publicadas en la aplicación.}
     \label{fig:ndcg-algoritmos}
 \end{figure}
 

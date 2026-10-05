@@ -236,7 +236,10 @@ selección se aplica en el servidor mediante una cookie para evitar el destello 
 componentes reutilizables incluyen la tarjeta de juego, las píldoras de estado y de nota, la
 valoración por estrellas, la imagen de portada con su marcador de reserva, la barra de
 filtros, el conmutador de tema y el menú de cuenta. Las Figuras~\ref{fig:ui-claro}
-y~\ref{fig:ui-oscuro} muestran la página de inicio en ambos temas.
+y~\ref{fig:ui-oscuro} muestran la página de inicio en ambos temas. La franja inferior de ambas
+recoge las cifras del catálogo de la instalación local, que son las del corpus gobernado
+\texttt{2026.09.2} descrito en la Sección~\ref{sec:datos-congelacion}: 190.479 obras, de las que
+30.695 tienen nota de IGDB.
 
 \begin{figure}[H]
     \centering
@@ -277,12 +280,19 @@ documentadas como tales, no resultados heredados de una publicación. Cada apart
 parte pertenece a cada plano.
 
 Los resultados publicados proceden de la ejecución \texttt{evaluation-400-test-2026-09-12-v15},
-con el protocolo 15 y el conjunto de características \texttt{fs-v12-curated-tags-idf}. El código
-vigente evolucionó después al protocolo 16 y al conjunto de características
-\texttt{fs-v13-family-weighted-tags}, que corrigió el reparto de peso entre familias de
-etiquetas descrito más abajo. Esa evolución permite describir con precisión la implementación
-actual, pero no recalcula ni reinterpreta las métricas ya publicadas de v15, y así se indica en
-cada cifra que proceda de una u otra versión.
+que su propio artefacto registra con el protocolo 15 y el conjunto de características
+\texttt{fs-v12-curated-tags-idf}. Conviene no confundir las dos numeraciones, que son
+independientes: el \emph{protocolo} de evaluación (v12, v14 y v15 son los tres que se ejecutaron
+hasta el final, Sección~\ref{sec:exp-evolucion}) define cómo se mide, y el \emph{conjunto de
+características} (\texttt{fs-v12}, \texttt{fs-v13}) define cómo se representa cada obra, de modo
+que v12 y \texttt{fs-v12} no designan lo mismo. Después de esa ejecución, la revisión de los pesos
+reales sobre el corpus llevó a \texttt{fs-v13-family-weighted-tags}, que corrige el reparto de
+peso entre familias de etiquetas (descrito más abajo) y con el que el código vigente funciona
+bajo el protocolo 16. Todavía no se ha ejecutado ni publicado una evaluación completa con
+\texttt{fs-v13}. Por eso este apartado describe la implementación vigente (\texttt{fs-v13}),
+mientras que todas las cifras del Capítulo~\ref{cap:resultados} corresponden a \texttt{fs-v12};
+la Tabla~\ref{tab:pesos-familia} recoge los pesos de ambas versiones, y ninguna métrica
+publicada de v15 se recalcula ni se reinterpreta.
 
 \subsection{Representación de una obra y del perfil de la persona usuaria}\label{sec:alg-representacion}
 
@@ -293,7 +303,8 @@ descrita por Pazzani y Billsus~\cite{pazzani2007content}. Lo que este trabajo de
 cuenta es qué rasgos concretos describen un videojuego, cómo se curan y con qué intensidad
 participa cada entrada de la biblioteca.
 
-Una candidata para recomendar debe ser una obra gobernada del corpus, no contenido
+Una candidata para recomendar debe ser una obra gobernada del corpus (190.479 en la versión
+\texttt{2026.09.2} con la que se evaluó, Sección~\ref{sec:datos-congelacion}), no contenido
 descargable, publicada antes de la fecha de corte, con valoración externa disponible y al
 menos cinco valoraciones agregadas; también se excluye cualquier obra que ya aparezca en la
 biblioteca de la persona. Estas exclusiones impiden recomendar una posesión ya conocida,
@@ -330,7 +341,8 @@ en una única obra. La versión anterior, \texttt{fs-v12}, no separaba las famil
 subgénero, tema, modo y característica compartían un único presupuesto fusionado
 (\(\mathtt{tag}=0{,}75\)) con un solo cálculo de IDF entre las cinco. Eso permitía que un
 subgénero raro pesara más que el propio género por pura rareza estadística del conjunto
-fusionado. Una primera corrección, renormalizar las cinco familias juntas sin separarlas,
+fusionado. La plataforma pesaba entonces 0,25, con un reparto plano \(1/\sqrt{k}\), en lugar
+del 0,05 y del IDF propio que le da \texttt{fs-v13}. Una primera corrección, renormalizar las cinco familias juntas sin separarlas,
 se descartó porque terminaba premiando a las obras con menos metadatos en lugar de corregir el
 sesgo. La solución adoptada en \texttt{fs-v13} fue separar cada familia en su propio cálculo de
 IDF, con su propio universo de referencia \(N_f\) y su propio peso (\(\mathtt{tag}=0{,}60\),
@@ -352,7 +364,8 @@ coordenada correspondiente a un valor \(t\) es
 w(f{:}t) = W_f \cdot \frac{idf(t)}{\sqrt{\sum_{q \in T} idf(q)^2}} ,
 \end{equation}
 
-donde \(W_f\) es el peso fijo asignado a la familia \(f\) (Tabla~\ref{tab:pesos-familia}) y la
+donde \(W_f\) es el peso fijo asignado a la familia \(f\) (Tabla~\ref{tab:pesos-familia}, columna
+\texttt{fs-v13} para la implementación vigente) y la
 normalización L2 en el denominador, también procedente del modelo vectorial
 clásico~\cite{salton1988term}, evita que una obra gane afinidad solo por declarar más valores
 dentro de la misma familia. El reparto concreto de \(W_f\) es, en cambio, una decisión de
@@ -362,19 +375,23 @@ descartó por ese mismo motivo.
 
 \begin{table}[H]
 \centering
-\caption{Peso fijo \(W_f\) de cada familia de faceta en el vector de contenido,
-\texttt{fs-v13}. Los valores son una decisión de diseño de SavePoint, no una constante de la
-literatura.}\label{tab:pesos-familia}
-\begin{tabularx}{\textwidth}{@{}Yr@{}}
-\textnormal{Familia} & \textnormal{Peso \(W_f\)} \\
+\caption{Peso fijo \(W_f\) de cada familia de faceta en el vector de contenido, en
+\texttt{fs-v12} (versión con la que se calcularon los resultados del
+Capítulo~\ref{cap:resultados}) y en \texttt{fs-v13} (implementación vigente). En
+\texttt{fs-v12}, \texttt{tag} reunía género, subgénero, tema, característica y modo en un único
+peso; en \texttt{fs-v13} agrupa solo género y subgénero. El guion indica que la familia no
+existía por separado. Los valores son una decisión de diseño de SavePoint, no una constante de
+la literatura.}\label{tab:pesos-familia}
+\begin{tabularx}{\textwidth}{@{}Yrr@{}}
+\textnormal{Familia} & \textnormal{\texttt{fs-v12}} & \textnormal{\texttt{fs-v13}} \\
 \hline
-Etiqueta de género/subgénero (\texttt{tag}) & 0,60 \\
-Plataforma (\texttt{platform}) & 0,05 \\
-Tema (\texttt{theme}) & 0,20 \\
-Característica (\texttt{feature}) & 0,10 \\
-Modo (\texttt{mode}) & 0,05 \\
-Franquicia (\texttt{franchise}) & 0,02 \\
-Desarrollador (\texttt{developer}) & 0,015 \\
+Etiqueta (\texttt{tag}) & 0,75 & 0,60 \\
+Plataforma (\texttt{platform}) & 0,25 & 0,05 \\
+Tema (\texttt{theme}) & -- & 0,20 \\
+Característica (\texttt{feature}) & -- & 0,10 \\
+Modo (\texttt{mode}) & -- & 0,05 \\
+Franquicia (\texttt{franchise}) & 0,02 & 0,02 \\
+Desarrollador (\texttt{developer}) & 0,015 & 0,015 \\
 \end{tabularx}
 \end{table}
 
@@ -427,9 +444,11 @@ declarados, y el coseno puro sobre el vector completo, aunque más habitual, res
 separable a la hora de explicar por qué se recomienda una obra y más vulnerable a las
 candidatas con muchas facetas.
 
-Desde \texttt{fs-v13}, el núcleo renormalizado de la similitud se limita a las dos familias con
+En \texttt{fs-v13}, el núcleo renormalizado de la similitud se limita a las dos familias con
 cobertura casi universal, etiqueta y plataforma, ponderadas exactamente con los pesos
-\(W_{tag}=0{,}60\) y \(W_{platform}=0{,}05\) de la Tabla~\ref{tab:pesos-familia}:
+\(W_{tag}=0{,}60\) y \(W_{platform}=0{,}05\) de la Tabla~\ref{tab:pesos-familia} (en
+\texttt{fs-v12} el núcleo estaba formado por las mismas dos familias, con \(W_{tag}=0{,}75\) y
+\(W_{platform}=0{,}25\)):
 
 \[
 nucleo = \frac{\sum_{f \in \{tag,\,platform\}} W_f \cdot F_{0{,}5,f}}{\sum_{f \in \{tag,\,platform\}} W_f \text{ activos}} .
