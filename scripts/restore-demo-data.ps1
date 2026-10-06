@@ -10,11 +10,12 @@
 #>
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory = $true)][string]$Dump,
-    [string[]]$ComposeArgs = @("-f", "infra/compose.yaml")
+    [Parameter(Mandatory = $true)][string]$Dump
 )
 
 $ErrorActionPreference = "Stop"
+# Set COMPOSE_ARGS (space-separated) to use another compose file; COMPOSE_PROJECT_NAME selects another project.
+$ComposeArgs = if ($env:COMPOSE_ARGS) { $env:COMPOSE_ARGS -split " " } else { @("-f", "infra/compose.yaml") }
 $DbUser = "savepoint_test"
 $DbName = "savepoint_test"
 $InContainer = "/tmp/savepoint-demo-data.dump"
