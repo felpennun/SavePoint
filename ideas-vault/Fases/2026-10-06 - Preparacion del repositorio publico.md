@@ -48,6 +48,11 @@ gh api -X PUT $R/private-vulnerability-reporting
 
 No se exige el CI como condición de fusión en `main`, porque se trabaja con push directo y el CI se ejecuta después del push.
 
+## Repositorio público (2026-10-06)
+
+- Visibilidad cambiada a **público** por el autor, con la imagen social subida. Ajustes aplicados después: secret scanning con bloqueo de push, protección de `main` (sin pushes forzados ni borrado; el CI no es condición de fusión), aprobación de workflows de colaboradores externos y avisos de seguridad privados.
+- Comprobado sin sesión: repositorio y API accesibles, `git ls-remote` anónimo, descarga de la release (450 MB) y de su suma de verificación. 0 alertas de secretos y 0 alertas de Dependabot abiertas.
+
 ## Decisiones sobre el historial y las contraseñas demo
 
 - **Historial:** se mantiene completo, sin reescribir, por razones académicas (685 commits, líneas `Co-Authored-By` de IA, issues y PRs que cita la memoria). gitleaks no encuentra secretos reales: sus 948 avisos son falsos positivos (`seed_key` en dos manifiestos sintéticos que ya no se publican). Quedan en el historial el correo personal del autor en 136 commits (4 y 5 de septiembre), dos commits con un coautor «GPT-6» inexistente, zips antiguos de la memoria y otros ficheros retirados del árbol.
