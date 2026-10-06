@@ -305,7 +305,7 @@ la Sección~\ref{sec:exp-protocolo}.
 El trabajo se planificó como una sucesión de incrementos verticales, cada uno utilizable y
 verificado antes de abordar el siguiente, en lugar de un calendario cerrado de tareas fijado
 desde el principio. El desarrollo se organizó en seis iteraciones a lo largo de dos meses,
-desde principios de agosto hasta el 6 de octubre de 2026, agrupadas alrededor de los hitos de la
+desde principios de agosto hasta el 4 de octubre de 2026, agrupadas alrededor de los hitos de la
 Tabla~\ref{tab:hitos}. El estudio previo y las primeras pruebas de desarrollo comenzaron
 aproximadamente un mes antes del arranque sistemático del repositorio de producto: el
 repositorio se creó el 24 de agosto y el desarrollo con registros de decisión y planes por
@@ -333,7 +333,7 @@ posteriores proceden del historial del repositorio y de las firmas de cada incre
     \hline
     H6: Flujos de colección, relaciones de amistad y endurecimiento cerrados & 14/09/2026 \\
     \hline
-    H7: Memoria del TFG y despliegue completos, listos para defensa & 06/10/2026 \\
+    H7 — Memoria del TFG y despliegue completos, listos para defensa & 04/10/2026 \\
     \hline
 \end{tabularx}
 \end{table}
@@ -362,7 +362,7 @@ protocolo, antes de escribir ningún algoritmo de recomendación avanzado. La
 (contenido, colaborativo e híbrido) y sus dieciséis variantes y ejecutó la publicación final de
 resultados (v15) descrita en el Capítulo~\ref{cap:resultados}. La \textbf{Iteración 5} (13 y 14
 de septiembre) cerró los flujos completos de colección y portabilidad, las relaciones de
-amistad y el endurecimiento de seguridad. La \textbf{Iteración 6} (15 de septiembre al 6 de
+amistad y el endurecimiento de seguridad. La \textbf{Iteración 6} (15 de septiembre al 4 de
 octubre) se dedicó a la redacción, revisión y cierre de esta memoria y del despliegue, junto con
 los ajustes finales de la interfaz y del módulo social.
 
@@ -440,28 +440,29 @@ real.
 
 \section{Riesgos y mitigaciones}\label{sec:met-riesgos}
 
-La Tabla~\ref{tab:riesgos} recoge los riesgos que se identificaron y cómo se mitigaron o se
-mantienen bajo vigilancia.
+La Tabla~\ref{tab:riesgos} recoge los riesgos identificados, su probabilidad e impacto
+cualitativos y la mitigación aplicada o prevista. La escala empleada es baja, media y alta;
+la valoración expresa la exposición del proyecto en el momento de planificar cada medida.
 
 \begin{table}[H]
 \centering
-\begin{tabularx}{\textwidth}{ | L{0.36\textwidth} | Y | }
+\begin{tabularx}{\textwidth}{ | L{0.23\textwidth} | C{0.17\textwidth} | C{0.12\textwidth} | Y | }
     \hline
-    \textbf{Riesgo} & \textbf{Mitigación} \\
+    \textbf{Riesgo} & \textbf{Probabilidad} & \textbf{Impacto} & \textbf{Mitigación} \\
     \hline
-    Restricción de tres días del primer incremento público & Alcance de demostración deliberadamente estrecho: catálogo pequeño, una cuenta y recomendación por popularidad. \\
+    Restricción de tres días del primer incremento público & Alta & Alta & Alcance de demostración deliberadamente estrecho: catálogo pequeño, una cuenta y recomendación por popularidad. \\
     \hline
-    Términos legales de las fuentes de datos & Confirmación caso por caso: corpus de Wikidata bajo dominio público, términos de IGDB registrados textualmente y reconciliados en un registro de decisión. \\
+    Términos legales de las fuentes de datos & Media & Alta & Confirmación caso por caso: corpus de Wikidata bajo dominio público, términos de IGDB registrados textualmente y reconciliados en un registro de decisión. \\
     \hline
-    Volumen de IGDB en una importación larga & Importador reanudable por cursor de identificador, con checkpoint tras cada lote y resistencia probada a una interrupción. \\
+    Volumen de IGDB en una importación larga & Media & Media & Importador reanudable por cursor de identificador, con checkpoint tras cada lote y resistencia probada a una interrupción. \\
     \hline
-    Portadas por enlace directo a un tercero & Ventana de retención de treinta días asumida; ausencia o fallo de una portada cae a un marcador propio. \\
+    Portadas por enlace directo a un tercero & Media & Media & Ventana de retención de treinta días asumida; ausencia o fallo de una portada cae a un marcador propio. \\
     \hline
-    El protocolo de evaluación debe congelarse antes de comparar recomendadores & El heurístico de géneros del sistema se declaró explícitamente fuera de esa comparación desde el principio; la comparación en sí se congeló y se ejecutó más tarde, como recoge el Capítulo~\ref{cap:resultados}. \\
+    El protocolo de evaluación debe congelarse antes de comparar recomendadores & Media & Alta & El heurístico de géneros del sistema se declaró explícitamente fuera de esa comparación desde el principio; la comparación en sí se congeló y se ejecutó más tarde, como recoge el Capítulo~\ref{cap:resultados}. \\
     \hline
-    Errores del agente en trabajo dado por bueno & Verificación de objetivos independiente y revisión de código de todo el repositorio con contexto propio. \\
+    Errores del agente en trabajo dado por bueno & Media & Alta & Verificación de objetivos independiente y revisión de código de todo el repositorio con contexto propio. \\
     \hline
-    Catálogo parcial en el despliegue público & El corpus gobernado completo no cabe en el nivel gratuito de la base de datos; se publica un subconjunto con criterio explícito y el entorno local reproducible es donde se mide la evaluación (Sección~\ref{cap:despliegue}). \\
+    Catálogo parcial en el despliegue público & Alta & Media & El corpus gobernado completo no cabe en el nivel gratuito de la base de datos; se publica un subconjunto con criterio explícito y el entorno local reproducible es donde se mide la evaluación (Sección~\ref{cap:despliegue}). \\
     \hline
 \end{tabularx}
 \caption{Riesgos identificados y sus mitigaciones.}
