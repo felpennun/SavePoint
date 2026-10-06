@@ -6,8 +6,9 @@ import { useEffect } from "react";
  * Turns a vertical mouse wheel into horizontal movement while the pointer
  * is over a `.sp-shelf-track` (the recommendation / new-releases shelves).
  * The scrollbar itself is hidden in CSS -- this is the affordance that
- * replaces it. One delegated listener on `document` so it also covers
- * shelves rendered after a client-side navigation; renders nothing.
+ * replaces it. One delegated capture-phase listener on `window` so it also
+ * covers shelves rendered after client-side navigation and runs before any
+ * page-level wheel handlers; renders nothing.
  *
  * While the pointer is over a shelf the wheel is fully captured for
  * horizontal scrolling -- it does not hand back to the page even at the
@@ -26,8 +27,8 @@ export function ShelfWheelScroll() {
       event.preventDefault();
       track.scrollLeft += event.deltaY;
     }
-    document.addEventListener("wheel", onWheel, { passive: false });
-    return () => document.removeEventListener("wheel", onWheel);
+    window.addEventListener("wheel", onWheel, { passive: false, capture: true });
+    return () => window.removeEventListener("wheel", onWheel, true);
   }, []);
 
   return null;
