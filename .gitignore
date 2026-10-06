@@ -147,3 +147,15 @@ e2e/artifacts/
 /docs/methodology/agent-methodology-controls.md
 /docs/methodology/evaluation-v15-appendix.md
 /scripts/check-evidence.ps1
+
+# apps/api/*.json: only the frozen inputs the tests pin, the v15 artifact the research panel loads and
+# the v12/v13/v14 evaluation artifacts are published; the other intermediate outputs stay local.
+/apps/api/*.json
+!/apps/api/corpus-governance-2026.09.2.json
+!/apps/api/corpus-popularity-2026.09.2.json
+!/apps/api/corpus-ratings-2026.09.2.json
+!/apps/api/feature-vector-cache-2026.09.2.json
+!/apps/api/evaluation-400-test-2026-09-12-v15.artifact.json
+!/apps/api/evaluation-400-test-2026-09-10.artifact.json
+!/apps/api/evaluation-400-test-2026-09-11.INVALID-duplicate-candidates.artifact.json
+!/apps/api/evaluation-400-test-2026-09-11.artifact.json
