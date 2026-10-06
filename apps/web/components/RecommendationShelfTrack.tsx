@@ -27,12 +27,23 @@ export function RecommendationShelfTrack({
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
+    const shelf = track;
     updateControls();
     track.addEventListener("scroll", updateControls, { passive: true });
+    function onWheel(event: WheelEvent) {
+      if (shelf.scrollWidth <= shelf.clientWidth) return;
+      // Treat the vertical wheel like the native vertical scroller in the
+      // detail view, but move this recommendation rail along its x axis.
+      if (Math.abs(event.deltaX) > Math.abs(event.deltaY) || event.deltaY === 0) return;
+      event.preventDefault();
+      shelf.scrollLeft += event.deltaY;
+    }
+    track.addEventListener("wheel", onWheel, { passive: false, capture: true });
     const resizeObserver = new ResizeObserver(updateControls);
     resizeObserver.observe(track);
     return () => {
       track.removeEventListener("scroll", updateControls);
+      track.removeEventListener("wheel", onWheel, true);
       resizeObserver.disconnect();
     };
   }, [updateControls]);

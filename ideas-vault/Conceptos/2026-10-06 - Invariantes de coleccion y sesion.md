@@ -33,7 +33,7 @@ Estas reglas mantienen los datos de inventario separados por propietario, hacen 
 
 ## Navegación horizontal de recomendaciones — 2026-10-06
 
-El carril de recomendaciones ocultaba la barra nativa y dependía de convertir la rueda vertical en desplazamiento horizontal. Se añadieron botones accesibles para avanzar y retroceder por la fila, manteniendo rueda, trackpad, teclado y gestos táctiles. Al persistir el fallo de rueda en producción aunque funcionaba en local, el listener delegado se movió a fase de captura en `window` para ejecutarse antes de manejadores de página. La compilación de Next.js y el chequeo de tipos pasan. Falta confirmar el gesto interactivo en producción con una sesión válida: las credenciales demo conocidas solo sirven para local y el acceso de producción respondió 401.
+El carril de recomendaciones ocultaba la barra nativa y dependía de convertir la rueda vertical en desplazamiento horizontal. Se añadieron botones accesibles para avanzar y retroceder por la fila, manteniendo rueda, trackpad, teclado y gestos táctiles. Para que el gesto funcione como el scroll vertical de la vista detallada, la estantería normal tiene ahora un listener nativo propio que captura la rueda sobre sus tarjetas y cambia `scrollLeft`; la vista detallada no usa ese listener y mantiene su scroll vertical. El listener delegado general excluye expresamente estas estanterías. La compilación de Next.js y el chequeo de tipos pasan. Falta confirmar el gesto interactivo en producción con una sesión válida: las credenciales demo conocidas solo sirven para local y el acceso de producción respondió 401.
 
 Fuente: `apps/web/components/RecommendationShelfTrack.tsx`, `apps/web/components/RecommendationDetailView.tsx` y `apps/web/app/globals.css`.
 

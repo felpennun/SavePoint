@@ -20,6 +20,9 @@ export function ShelfWheelScroll() {
       const target = event.target as Element | null;
       const track = target?.closest?.(".sp-shelf-track") as HTMLElement | null;
       if (!track) return;
+      // Recommendation rails own their wheel behavior directly so that only
+      // the normal shelf moves horizontally; detail mode keeps vertical scroll.
+      if (track.closest(".sp-recommendation-track")) return;
       // Nothing to do if the shelf isn't actually overflowing.
       if (track.scrollWidth <= track.clientWidth) return;
       // Leave real horizontal gestures (trackpads, tilt wheels) alone.
