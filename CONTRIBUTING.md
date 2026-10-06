@@ -1,85 +1,54 @@
-# Commit and issue-tracking policy
+# Cómo contribuir a SavePoint
 
-This project is a single-author academic thesis repository. This document fixes the commit message
-format and how work is tracked so history stays legible for the tribunal and for anyone (human or
-agent) resuming work later.
+SavePoint es un proyecto académico de una sola persona (un Trabajo Fin de Grado), pero acepta
+issues y propuestas. Las reglas completas están en [`CONVENTIONS.md`](CONVENTIONS.md); aquí va lo
+mínimo para contribuir.
 
-## Issue tracking
+## Antes de empezar
 
-Work beyond a trivial fix is tracked as a GitHub Issue on
-[felpennun/SavePoint](https://github.com/felpennun/SavePoint/issues), organised on the
-[SavePoint project board](https://github.com/users/felpennun/projects/1) (Todo / In Progress / Done).
+1. Levanta el entorno local siguiendo el [`README`](README.md) (`docker compose -f infra/compose.yaml up --build --wait`).
+2. Abre una [issue](https://github.com/felpennun/SavePoint/issues) para cualquier cambio que no
+   sea un arreglo trivial, y explica el problema antes de proponer la solución.
+3. Trabaja en una rama y abre una pull request contra `main`.
 
-- `phase-01`, `phase-02`, ... label which GSD phase an issue belongs to.
-- `deployment`, `bug`, `documentation`, `enhancement`, etc. label the kind of work.
+## Pruebas
 
-### GSD planning → issue lifecycle (all agents)
+Un cambio de comportamiento lleva su prueba. Antes de abrir la PR ejecuta:
 
-This lifecycle is global: every human or LLM collaborator follows it, including manual work
-outside an active GSD command.
-
-- When a phase is planned (`gsd-plan-phase`), create one GitHub Issue per generated `*-PLAN.md` (not per
-  `<task>` block inside it — a plan with Task 1 and Task 2 is still a single issue), labelled with that
-  phase and added to the SavePoint project board.
-- During execution (`gsd-execute-phase` or manual), close each plan's issue once its `*-SUMMARY.md` is
-  written — normally via a `Closes #N` trailer on the commit that finishes the plan (see below), or
-  directly if there is no single closing commit.
-- The board should stay a live mirror of `.planning/` plan/task state, not a separate tracker that can
-  drift out of sync with it.
-- This synchronization is an automatic closing gate of `gsd-plan-phase`: every active plan must carry
-  `github_issue: <number>` in its frontmatter and have a matching board item before planning is reported
-  complete. Re-running the synchronization reconciles existing `Plan <id>:` titles instead of creating
-  duplicates.
-
-The responsible agent closes the issue automatically once the task is complete, integrated, and
-verified; no additional author instruction is required. Keep the issue open while work is
-pending or belongs to an unintegrated parallel change.
-
-## Commit message format
-
-```
-<type>(<scope>): <summary>
-
-[optional body: why, not what]
-
-[optional: Refs #<issue> | Closes #<issue>]
-[optional: Co-Authored-By: <agent name> <noreply@anthropic.com>]
+```sh
+docker compose -f infra/compose.yaml run --rm api pytest apps/api -q
+corepack pnpm --dir apps/web test --run
 ```
 
-**Type** — one of the [Conventional Commits](https://www.conventionalcommits.org/) types actually used
-in this repo's history: `feat`, `fix`, `docs`, `test`, `chore`, `build`, `refactor`.
+Los recorridos de extremo a extremo (Playwright) se lanzan con
+`corepack pnpm exec playwright test e2e/ --project=chromium`.
 
-**Scope** — the GSD plan ID when the commit closes out a plan (`01-11`, `01-12`), otherwise a short area
-name (`api`, `web`, `deploy`). Keep using the plan-ID scope for GSD-driven commits — it already ties every
-commit to its `.planning/phases/*/*-SUMMARY.md`.
+## Mensajes de commit
 
-**Summary** — imperative, lower case, no trailing period, states *why* the commit exists over *what*
-changed line-by-line (the diff already shows that).
-
-## Linking commits to issues
-
-When a commit fully resolves a tracked issue, add a trailer line:
+Formato [Conventional Commits](https://www.conventionalcommits.org/) en inglés:
 
 ```
-Closes #6
+<tipo>(<ámbito>): <resumen>
+
+[cuerpo opcional: el porqué, no el qué]
+
+[Refs #<issue> | Closes #<issue>]
 ```
 
-GitHub closes the issue automatically when that commit lands on `main`. For a commit that only makes
-progress on an issue without resolving it, use `Refs #6` instead — this links the commit in the issue's
-timeline without closing it.
+- **Tipos:** `feat`, `fix`, `docs`, `test`, `chore`, `build`, `refactor`.
+- **Resumen:** en imperativo y minúsculas, sin punto final.
+- **Issues:** `Refs #N` enlaza el commit con la issue sin cerrarla; `Closes #N` la cierra cuando el
+  commit llega a `main`. La referencia va como línea aparte, no en el resumen.
+- Si el cambio se hizo con ayuda de un asistente de IA, el commit termina con
+  `Co-Authored-By: <modelo> <noreply@anthropic.com>`.
 
-Do not put the issue reference in the summary line; keep it as a trailer so the summary line stays a
-clean, greppable description of the change on its own.
+## Qué nunca va en un commit, una issue o una PR
 
-## What never goes in a commit message, issue, or PR body
+- Cadenas de conexión, contraseñas, claves de API, tokens o cookies, ni siquiera fragmentos
+  ocultados ni nombres de host de un proveedor real (Neon, Render, Vercel).
+- Capturas o registros que no se hayan revisado antes con ese criterio.
 
-- Connection strings, passwords, API keys, tokens, or cookies — not even redacted fragments or
-  hostnames from a real provider (Neon, Render, Vercel). Use `scripts/check-secrets.ps1`'s canary
-  patterns as a reference for what counts as secret-shaped.
-- Screenshots or logs that were not first checked for the above.
+## Licencia de las contribuciones
 
-## Attribution
-
-Commits produced with AI-agent assistance end with a `Co-Authored-By:` trailer naming the agent, matching
-the existing history. This is informational, not a policy toggle — it stays on unless explicitly
-disabled for a session.
+Al enviar una contribución aceptas que se publique bajo la misma licencia que el resto del
+repositorio.

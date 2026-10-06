@@ -96,3 +96,13 @@ e2e/artifacts/
 /.github/copilot-instructions.md
 /AGENTS.md
 /CLAUDE.md
+
+# Author-only scripts (thesis figures, phase verification, evidence generation, synopsis
+# translation); kept on disk, not published.
+/scripts/thesis-figures/
+/scripts/verify-*.ps1
+/scripts/generate-phase-07-evidence.ps1
+/scripts/build_summaries_es.py
+/scripts/append_es_batch.py
+/scripts/next_es_batch.py
+/ONBOARDING.md
