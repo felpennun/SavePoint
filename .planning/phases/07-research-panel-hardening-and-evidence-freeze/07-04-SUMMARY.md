@@ -104,7 +104,7 @@ Importaciones de colección ligadas a digest, backups PostgreSQL privados con re
 Comando ejecutado:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts/restore-disposable-db.ps1 -BackupRoot 'C:\Users\Felipe\AppData\Local\Temp\savepoint-ops-450e0c4f815940b2b42ce56200d1ee37' -ManifestPath 'C:\Users\Felipe\AppData\Local\Temp\savepoint-ops-450e0c4f815940b2b42ce56200d1ee37\weekly-20260914-030113-27544.manifest.json'
+powershell -ExecutionPolicy Bypass -File scripts/restore-disposable-db.ps1 -BackupRoot '%TEMP%\savepoint-ops-450e0c4f815940b2b42ce56200d1ee37' -ManifestPath '%TEMP%\savepoint-ops-450e0c4f815940b2b42ce56200d1ee37\weekly-20260914-030113-27544.manifest.json'
 ```
 
 Salida relevante: el manifiesto y checksum pasaron, el dump se copió al contenedor y la migración terminó con `psycopg.errors.UniqueViolation`, `could not create unique index "accounts_accountprofile_admin_uuid_key"`, `Key (admin_uuid)=(a9e04b98-472b-4078-adbb-622215d75dc8) is duplicated`, seguido de `Disposable restore command failed.` y exit code `1`.
