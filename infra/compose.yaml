@@ -92,6 +92,7 @@ services:
     command: >
       sh -c "python manage.py migrate --noinput &&
       python manage.py import_catalogue &&
+      python manage.py publish_base_catalogue &&
       python manage.py load_localized_summaries &&
       python manage.py bootstrap_demo_accounts &&
       python manage.py seed_demo &&
