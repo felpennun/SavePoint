@@ -164,6 +164,7 @@ navegador solo ve un origen y las cookies de sesión no cruzan dominios.
 | [`scripts/`](scripts/) | Pasarelas de seguridad y dependencias, copia de seguridad, corpus público y auditoría móvil |
 | [`docs/`](docs/) | Decisiones de arquitectura, metodología, despliegue y verificación por fase |
 | [`TFG/`](TFG/) | Memoria del Trabajo Fin de Grado (LaTeX y PDF) |
+| [`LICENSES/`](LICENSES/) | Texto de la licencia Creative Commons de la memoria y los mockups (el código usa [`LICENSE`](LICENSE)) |
 | [`design/`](design/) | Imágenes de los mockups de diseño |
 | [`.planning/`](.planning/) y [`ideas-vault/`](ideas-vault/) | Planificación por fases y notas del proyecto, evidencia del método de trabajo |
 
@@ -198,6 +199,16 @@ SavePoint se ha desarrollado con asistentes de IA (Codex y Claude Code) siguiend
 <https://github.com/gsd-build/get-shit-done> (versión 1.12.0). El repositorio no incluye los ficheros que GSD instala en cada
 equipo (comandos, agentes, hooks) ni las instrucciones locales de cada asistente; las reglas del proyecto están reunidas en
 [`CONVENTIONS.md`](CONVENTIONS.md), y la memoria del TFG explica cómo se aplicó el método y qué controles se pusieron.
+
+## Licencia
+
+- **Código** (`apps/`, `infra/`, `scripts/`, `e2e/` y ficheros de configuración): [MIT](LICENSE).
+- **Memoria** ([`TFG/`](TFG/)) y **mockups** ([`design/`](design/)):
+  [Creative Commons Atribución-NoComercial-SinDerivadas 4.0](LICENSES/CC-BY-NC-ND-4.0.txt) (CC BY-NC-ND 4.0).
+- **Datos de terceros** (IGDB, Wikidata, Wikimedia Commons y las portadas): conservan sus propias condiciones, descritas en
+  [Datos y atribuciones](#datos-y-atribuciones).
+
+Para informar de una vulnerabilidad, consulta [`SECURITY.md`](SECURITY.md).
 
 ## Autoría
 

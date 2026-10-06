@@ -50,5 +50,5 @@ Formato [Conventional Commits](https://www.conventionalcommits.org/) en inglés:
 
 ## Licencia de las contribuciones
 
-Al enviar una contribución aceptas que se publique bajo la misma licencia que el resto del
-repositorio.
+Al enviar una contribución de código aceptas que se publique bajo la licencia MIT del repositorio
+([`LICENSE`](LICENSE)).
