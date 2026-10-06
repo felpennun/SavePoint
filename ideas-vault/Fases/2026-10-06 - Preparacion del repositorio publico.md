@@ -21,6 +21,14 @@ Estado: en curso. Criterio del autor: en GitHub solo lo que permite que la web f
 | `data/` | Se quedan `raw/`, `manifests/`, `demo/` (los lee `import_catalogue` y `seed_demo`; los tests fijan sus hashes) y `localization/summaries-es.json` (1.898 sinopsis traducidas con Claude a partir de IGDB; el arranque falla sin él). Salen `summaries-es.work.jsonl`, `provenance.json`, `curated.json` y el `HANDOFF`. Se añade al README una sección «Datos y atribuciones» (Wikidata CC0, Wikimedia, IGDB y la traducción como obra derivada). | este cambio |
 | CI (`quality-gates.yml`) | Se mantienen las pasarelas de CI. Estaba en rojo desde e8b6d25 porque `check-dependencies` aprobaba Next 16.3.4 y el catálogo de pnpm ya tenía 16.3.8; corregido en 1fd8f35 con un anexo de legitimidad. En verde desde entonces. | 1fd8f35 |
 
+## Release v1.0.0 y paquete de datos
+
+- **Release** `v1.0.0` (commit 07a2e1a) con `savepoint-demo-data-v1.0.0.dump` (430 MB, SHA-256 `2549b8c3…fbd395`) y su `.sha256`. Es un volcado saneado de la base local: catálogo completo (190.479 obras gobernadas, 331.000 registros) y datos de recomendación del catálogo, más solo `demo_user1/2/3` (contraseña `demo_user123`). Se eliminaron los otros 430 usuarios y las sesiones y la auditoría; se hizo en una base temporal restaurada desde el backup, sin tocar la base local. `demo_user1` es una copia de la cuenta del autor.
+- **Restauración:** `scripts/restore-demo-data.sh` y `.ps1` (comprueban el hash, recrean la base, restauran y arrancan). Probados desde un clon limpio de GitHub: 190.479 juegos, las cuatro cuentas entran y las recomendaciones de `demo_user1` salen listas.
+- **Clon limpio sin paquete:** `publish_base_catalogue` hace visibles los 150 juegos de Wikidata (antes el catálogo salía vacío); solo en la cadena de arranque de `compose.yaml`.
+- **Aviso legal:** el paquete redistribuye datos de IGDB con fines académicos y atribución, lo que se aparta de ADR-006 (no se redistribuye el dataset en bloque). Decisión del autor, recogida en el README y en las notas de la release.
+- **Alerta Dependabot #6:** corregida (`source-map-js` 1.2.2). Las 8 PRs de Dependabot se cerraron y `dependabot.yml` ignora saltos de versión mayor.
+
 ## Decisiones sobre el historial y las contraseñas demo
 
 - **Historial:** se mantiene completo, sin reescribir, por razones académicas (685 commits, líneas `Co-Authored-By` de IA, issues y PRs que cita la memoria). gitleaks no encuentra secretos reales: sus 948 avisos son falsos positivos (`seed_key` en dos manifiestos sintéticos que ya no se publican). Quedan en el historial el correo personal del autor en 136 commits (4 y 5 de septiembre), dos commits con un coautor «GPT-6» inexistente, zips antiguos de la memoria y otros ficheros retirados del árbol.
