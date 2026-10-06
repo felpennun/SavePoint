@@ -163,3 +163,7 @@ e2e/artifacts/
 # design/: the discarded "Cristal" logo direction (design/brand and its copy in mockups) stays local.
 /design/brand/
 /design/mockups/3-logos-y-banners/
+
+# design/mockups: only rendered-claude-design and 4-maquetas-html-fase-01-1 are published.
+/design/mockups/1-lienzos-claude-design/
+/design/mockups/2-renders-nocturne-preview/
