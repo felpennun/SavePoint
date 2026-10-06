@@ -31,6 +31,12 @@ Estas reglas mantienen los datos de inventario separados por propietario, hacen 
 - Cinco solicitudes al inicio desplegado devolvieron `no-store` y variaron el juego destacado. El login desplegado no pudo auditarse con la cuenta demo probada (HTTP 401), así que la estantería autenticada de producción queda pendiente de una cuenta válida.
 - La respuesta desplegada incluyó HSTS, CSP, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY` y `Referrer-Policy: same-origin`.
 
+## Navegación horizontal de recomendaciones — 2026-10-06
+
+El carril de recomendaciones ocultaba la barra nativa y dependía de convertir la rueda vertical en desplazamiento horizontal. Se añadieron botones accesibles para avanzar y retroceder por la fila, manteniendo rueda, trackpad, teclado y gestos táctiles. La compilación de Next.js y el chequeo de tipos pasan. Falta confirmar el comportamiento interactivo en producción con una sesión válida: las credenciales demo conocidas solo sirven para local y el acceso de producción respondió 401.
+
+Fuente: `apps/web/components/RecommendationShelfTrack.tsx`, `apps/web/components/RecommendationDetailView.tsx` y `apps/web/app/globals.css`.
+
 ## Fuentes canónicas
 
 - `apps/api/library/views.py`

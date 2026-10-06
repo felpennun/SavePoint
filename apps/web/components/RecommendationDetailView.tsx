@@ -7,6 +7,7 @@ import { CoverImage } from "@/components/CoverImage";
 import { getDictionary } from "@/i18n";
 import type { ContentRecommendationItem } from "@/lib/api";
 import { localizedGenreLabel } from "@/lib/genre-labels";
+import { RecommendationShelfTrack } from "@/components/RecommendationShelfTrack";
 
 type WeightKey = "content" | "quality" | "popularity" | "recency" | "relevance" | "diversity";
 
@@ -194,7 +195,7 @@ export function RecommendationDetailView({
         </div>
 
         {mode === "shelf" ? (
-          <ol className="sp-shelf-track" key={selected.algorithmId}>
+          <RecommendationShelfTrack key={selected.algorithmId} locale={locale} label={selected.heading}>
             {selected.items.map((item) => (
               <GameCard
                 key={item.work_id}
@@ -210,7 +211,7 @@ export function RecommendationDetailView({
                 score={item.display_rating}
               />
             ))}
-          </ol>
+          </RecommendationShelfTrack>
         ) : (
         <div className="sp-reco-tablewrap">
         <table className="sp-reco-table">
