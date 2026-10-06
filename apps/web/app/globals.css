@@ -2020,6 +2020,12 @@ a.sp-chip--active:hover {
   display: none;
 }
 
+/* Set by ShelfWheelScroll on the first wheel input: a ~100px wheel notch is
+   less than half a card, so proximity snap would pull it back to the start. */
+.sp-shelf-track[data-wheel] {
+  scroll-snap-type: none;
+}
+
 .sp-recommendation-track {
   width: 100%;
   min-width: 0;
