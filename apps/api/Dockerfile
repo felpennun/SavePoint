@@ -1,4 +1,4 @@
-FROM python:3.13.15-slim@sha256:9d2e5553305c7c7b0097999bb17187c69b921ccd6bc9d40e4bb5ebe652c00285 AS dependencies
+FROM python:3.13.15-slim@sha256:7c61056e61ac89e852de05f3dc6fa51a6dd2181797bceed46aa725dd7cb2cd3b AS dependencies
 
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_NO_CACHE_DIR=1 \
@@ -9,7 +9,7 @@ RUN python -m pip install --no-cache-dir uv==0.12.9
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --group dev --no-install-project
 
-FROM python:3.13.15-slim@sha256:9d2e5553305c7c7b0097999bb17187c69b921ccd6bc9d40e4bb5ebe652c00285 AS runner
+FROM python:3.13.15-slim@sha256:7c61056e61ac89e852de05f3dc6fa51a6dd2181797bceed46aa725dd7cb2cd3b AS runner
 
 ENV PATH="/workspace/.venv/bin:${PATH}" \
     PYTHONPATH="/workspace/apps/api" \
