@@ -2,6 +2,14 @@
 
 SavePoint es una aplicación web enfocada en el registro y seguimiento personal de videojuegos. Permite a los usuarios llevar un historial de sus partidas, calificar títulos, registrar el tiempo jugado y organizar su lista de juegos pendientes (backlog). Desarrollado como proyecto académico/tesis.
 
+## Método de desarrollo
+
+SavePoint se ha desarrollado con asistentes de IA (Claude Code, Codex y GitHub Copilot) siguiendo el método
+**Get Stuff Done (GSD)**: <https://github.com/gsd-build/get-shit-done> (versión 1.12.0). El repositorio no incluye
+los ficheros que GSD instala en cada equipo (comandos, agentes, hooks) ni las instrucciones locales de cada
+asistente; las reglas del proyecto están reunidas en [`CONVENTIONS.md`](CONVENTIONS.md) y la memoria del TFG
+(carpeta [`TFG/`](TFG/)) explica cómo se aplicó el método y qué controles se pusieron.
+
 ## Arranque local (Docker Compose)
 
 **Entorno probado:** Windows 11 (build 26200), Docker Desktop, PostgreSQL 18.6 vía imagen oficial. `docker compose` construye `db`, `api` y `web` desde el mismo `pyproject.toml`/`uv.lock` y `package.json`/`pnpm-lock.yaml` que se usan en despliegue — ningún paso de build descarga datos de catálogo ni llama a un proveedor externo; el catálogo, las imágenes de portada referenciadas y las interacciones de la demo son artefactos locales versionados bajo `data/`.

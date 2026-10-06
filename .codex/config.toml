@@ -1,8 +1,0 @@
-# GSD Agent Configuration — managed by gsd-core installer
-
-[agents]
-max_depth = 1
-
-
-[features]
-hooks = true

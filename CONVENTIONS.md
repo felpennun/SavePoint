@@ -1,124 +1,144 @@
 # Convenciones del proyecto SavePoint
 
-> Documento canónico de convenciones para **cualquier** asistente de IA que trabaje en
-> este repositorio (Claude Code, GitHub Copilot, Codex u otro), y para colaboradores
-> humanos. Si otra instrucción entra en conflicto con esta, **manda esta**.
+> Documento único de convenciones para quien trabaje en este repositorio, sea una persona o un
+> asistente de IA. Reúne las reglas de idioma, de código y commits, de dependencias y secretos,
+> y el flujo de trabajo con asistentes y con issues. Si otra instrucción entra en conflicto con
+> esta, **manda esta**.
 
 ---
 
-## 1. Idioma (regla vigente desde 2026-09-06)
+## 1. Proyecto y principios
+
+SavePoint es una aplicación web para catalogar la colección y los pendientes de videojuegos
+personales, inspirada en Goodreads y Letterboxd, y es también la plataforma de un Trabajo Fin
+de Grado (TFG) que compara recomendadores basados en contenido, colaborativos e híbridos con
+experimentos reproducibles, usuarios sintéticos y resultados explicables.
+
+**Valor central:** que los usuarios reciban recomendaciones útiles y explicables a partir de una
+colección bien organizada, y que cada resultado algorítmico siga siendo reproducible y
+defendible en la memoria.
+
+Restricciones que guían las decisiones:
+
+- **Reproducibilidad académica.** Experimentos, generación de datos sintéticos, configuraciones
+  y resultados deben poder repetirse; la comparación de recomendadores es una contribución
+  central.
+- **Legalidad y procedencia de los datos.** El uso de datasets y APIs respeta sus licencias y
+  términos, y cada fuente es trazable.
+- **Doble entrega.** Una aplicación desplegada y un entorno local documentado y reproducible.
+- **Audiencia inicial controlada.** Demostración académica con cuentas simuladas, sin operación
+  pública sin límites.
+- **Accesibilidad y diseño adaptable.** Los flujos principales funcionan en escritorio y móvil y
+  siguen prácticas de interacción accesibles.
+- **Stack justificado.** Cada tecnología se elige con evidencia y queda registrada como
+  decisión de arquitectura (ADR).
+
+---
+
+## 2. Idioma (regla vigente desde 2026-09-06)
 
 | Ámbito | Idioma | Qué incluye |
 |---|---|---|
-| **Documentación de la tesis** | **Español** | Todo `docs/` (ADRs, `docs/verification/`, `docs/methodology/`, `docs/deployment/`, firmas de fase), y cualquier prosa que forme parte del registro de evidencia de la tesis. Los documentos nuevos se redactan directamente en español. |
-| **Conversación** | **Español** | Todas las respuestas del asistente al autor. Todos los prompts que un asistente escriba para *otra* IA que trabaje en este proyecto. |
-| **Planificación GSD** | **Español** para prosa nueva | `.planning/**` (STATE, ROADMAP, PLAN/SUMMARY, RESEARCH, CONTEXT, VERIFICATION, deferred-items…). El material heredado en inglés se pasa a español cuando se toca; no hace falta un barrido retroactivo salvo que el autor lo pida. |
-| **Código** | **Inglés** | Identificadores, comentarios *de código*, mensajes de commit, nombres de tests, cadenas de log, nombres de rama. Convención estándar de software: el código se mantiene convencional y portable. |
+| **Documentación del TFG** | **Español** | La memoria y todo el registro de evidencia: decisiones de arquitectura (ADR), verificaciones, metodología, despliegue y firmas de fase. Los documentos nuevos se redactan directamente en español. |
+| **Conversación y prompts** | **Español** | Las respuestas de un asistente al autor y los prompts que un asistente escriba para *otra* IA que trabaje en este proyecto. |
+| **Planificación** | **Español** para prosa nueva | Estado, hoja de ruta, planes, resúmenes y verificaciones. El material heredado en inglés se pasa a español cuando se toca; no hace falta un barrido retroactivo. |
+| **Código** | **Inglés** | Identificadores, comentarios *de código*, mensajes de commit, nombres de tests, cadenas de log y nombres de rama. Es la convención estándar y mantiene el código portable. |
 
 ### Matices que se respetan siempre
 
-- **Citas textuales en su idioma original.** Los términos legales citados literalmente (p. ej. Twitch Developer Services Agreement, FAQ de IGDB en `docs/verification/igdb-api-probe.md` §5 y `docs/adr/ADR-006`) se conservan **en inglés** dentro de un marco de prosa en español. Traducir una cita legal destruye su valor probatorio.
-- **Tokens neutrales de idioma no se traducen:** identificadores de código, IDs de requisito (`CAT-02`, `DATA-04`…), rutas de fichero, hashes de commit, URLs, nombres de variables de entorno, comandos.
-- **Encabezados de ADR:** `scripts/check-evidence.ps1` exige exactamente estos siete en cada `docs/adr/ADR-*.md`:
-  `## Contexto`, `## Alternativas consideradas`, `## Decisión`, `## Evidencia y fuentes`,
-  `## Consecuencias`, `## Reversibilidad`, `## Aprobación y revisión` — más la cadena literal
-  `Autor de la decisión` y al menos una URL `https://`.
-- **Fotos congeladas fechadas** (p. ej. `docs/verification/phase-01-signoff.2026-09-05T10-45.md`)
-  se dejan tal cual: son registros históricos de un instante, no se re-traducen.
-- **Gates de contenido:** si traduces un documento que tiene un gate determinista
-  (`scripts/verify-igdb-adr.ps1`, `scripts/verify-igdb-probe.ps1`, el here-string de
-  `scripts/verify-igdb-fresh-import.ps1`), actualiza los patrones de ese gate en el **mismo
-  commit** para que casen el texto español. Los comentarios e identificadores del script
-  siguen en inglés; solo sus patrones de coincidencia pasan a español.
-- **Pins de hash del ledger:** `docs/methodology/agent-ledger.jsonl` fija hashes SHA-256
-  (forma LF, como los guarda Git) de artefactos concretos. Si traduces un artefacto fijado,
-  refresca su pin al nuevo hash LF (`git show HEAD:<ruta> | sha256sum`) en el mismo commit y
-  añade una entrada de ledger que lo documente (enfoque de "foto congelada", ya usado en la
-  Fase 1).
+- **Citas textuales en su idioma original.** Los términos legales citados literalmente
+  (Twitch Developer Services Agreement, FAQ de IGDB) se conservan **en inglés** dentro de prosa
+  en español. Traducir una cita legal destruye su valor probatorio.
+- **Tokens neutrales de idioma.** No se traducen los identificadores de código, los IDs de
+  requisito (`CAT-02`, `DATA-04`…), las rutas de fichero, los hashes de commit, las URLs, los
+  nombres de variables de entorno ni los comandos.
+- **Encabezados de ADR.** Cada ADR lleva exactamente estas siete secciones: `## Contexto`,
+  `## Alternativas consideradas`, `## Decisión`, `## Evidencia y fuentes`, `## Consecuencias`,
+  `## Reversibilidad` y `## Aprobación y revisión`, más la cadena `Autor de la decisión` y al
+  menos una URL `https://`.
+- **Fotos congeladas fechadas.** Los documentos que son el registro de un instante concreto se
+  dejan tal cual y no se re-traducen.
+- **Documentos con comprobación automática.** Si un documento tiene una comprobación
+  determinista de su contenido, o su hash está fijado en el registro de evidencia
+  (`agent-ledger.jsonl`), al traducirlo o editarlo se actualizan en el **mismo commit** los
+  patrones de la comprobación y el hash fijado, y se añade la entrada de registro que lo
+  documenta.
 
 ---
 
-## 2. Cómo carga cada herramienta estas convenciones (no hace falta ningún comando)
+## 3. Código, commits y calidad
 
-Cada asistente lee su fichero de instrucciones **automáticamente al empezar cada sesión**.
-No existe ni hace falta un comando para "recargar convenciones"; basta con que la regla esté
-en el fichero que cada herramienta lee, y lo está:
-
-| Herramienta | Fichero que lee automáticamente | Comando útil (opcional) |
-|---|---|---|
-| **Claude Code** | `CLAUDE.md` + `AGENTS.md` (raíz) | memoria automática con `language-conventions.md` **fijada** (pinned) → aplica en toda sesión futura sin intervención. Para forzar relectura a mitad de sesión: pídelo en lenguaje natural ("relee `CONVENTIONS.md`"). `/memory` inspecciona la memoria. |
-| **GitHub Copilot** | `.github/copilot-instructions.md` | — |
-| **Codex / otros agentes** | `AGENTS.md` (estándar cross-tool) | — |
-| **Workflows GSD** (`/gsd-*`) | `AGENTS.md` + `.planning/PROJECT.md` + `.planning/STATE.md` | `/gsd-resume-work` recarga STATE + contexto de planificación al inicio de sesión. |
-
-Si en algún momento quieres un empujón manual para *cualquier* IA, una frase sirve:
-**"Antes de empezar, lee `CONVENTIONS.md` y revisa `.planning/`."**
-
----
-
-## 3. Otras convenciones vigentes (resumen; la fuente de detalle está enlazada)
-
+- **Formato de commit:** [Conventional Commits](https://www.conventionalcommits.org/) en
+  inglés: `<tipo>(<ámbito>): <resumen>`, con los tipos `feat`, `fix`, `docs`, `test`, `chore`,
+  `build` y `refactor`. El resumen va en imperativo y minúsculas, sin punto final, y explica el
+  *porqué* más que el *qué*. El detalle está en [`CONTRIBUTING.md`](CONTRIBUTING.md).
+- **Atribución:** los commits hechos con ayuda de un asistente terminan con una línea
+  `Co-Authored-By: <modelo> <noreply@anthropic.com>`.
+- **Pruebas:** todo cambio de comportamiento lleva su prueba. Se ejecutan `pytest` para la API,
+  `vitest` para la web y Playwright para los recorridos de extremo a extremo (ver el README).
 - **Dependencias:** toda dependencia directa nueva o cambio de versión exige aprobación humana
-  explícita + fila en `docs/verification/dependency-legitimacy.md` + fila en
-  `scripts/check-dependencies.ps1` + entrada de ledger. Ver `docs/adr/ADR-006` y
-  `docs/verification/dependency-legitimacy.md`.
-- **Secretos:** nunca se imprime, loguea, commitea ni escribe un valor de credencial, token
-  o cadena de conexión. Solo por nombre de variable. Ver `docs/deployment/public-demo.md` y
-  la nota "Higiene de secretos" de `docs/verification/repo-review-2026-09-06.md`.
-- **Sin datos en bloque de IGDB en Git:** el `pg_dump` de ~93 MB en `data/snapshots/` está
-  gitignored a propósito (ADR-006 §4).
-- **Commits:** convencionales, en inglés; los mensajes de commit de un asistente terminan con
-  `Co-Authored-By: <modelo> <noreply@anthropic.com>` cuando aplique.
+  explícita, una fila en el registro de legitimidad de dependencias y su entrada en el
+  registro de evidencia.
+- **Secretos:** nunca se imprime, registra, versiona ni escribe el valor de una credencial,
+  token o cadena de conexión; solo se nombra la variable. Tampoco en issues, commits o PR, ni
+  siquiera fragmentos o nombres de host de un proveedor real (Neon, Render, Vercel).
+- **Datos de terceros:** los volcados masivos de IGDB no se versionan (`data/snapshots/` está
+  ignorado a propósito). Las portadas se enlazan, no se copian.
 
-## 4. Vault vivo de Obsidian
+---
 
-`ideas-vault/` es el registro conceptual vivo de SavePoint y su carpeta de vault para
-Obsidian. Todas las LLM y colaboradores deben consultarlo cuando comiencen una tarea y
-actualizarlo antes de terminarla si producen información nueva, una decisión, un requisito,
-un resultado experimental, una limitación o un cambio relevante de arquitectura o producto.
+## 4. Trabajo con asistentes de IA y método GSD
 
-- La nota debe colocarse en la carpeta temática adecuada (`ADR/`, `Conceptos/`, `Fases/`,
-  `Mapas/` o `Requisitos/`) y enlazarse desde una nota relacionada cuando proceda.
-- Las decisiones importantes deben enlazar a su ADR, `CONTEXT`, `DISCUSSION-LOG`, plan,
-  artefacto o evidencia canónica; el vault resume y conecta, pero no sustituye esas fuentes.
-- Los cambios del vault se conservan en Git junto con el trabajo que los motiva cuando sea
-  posible. En trabajo paralelo se evita sobrescribir notas ajenas: se añade una nota fechada
-  o se edita solo el apartado afectado.
-- Nunca se escriben en el vault secretos, cookies, tokens, credenciales, datos personales ni
-  logs brutos. Si una decisión aún es propuesta, debe marcarse como propuesta y no como
-  aceptada.
+El desarrollo se ha hecho con asistentes de IA (Claude Code, Codex y GitHub Copilot) siguiendo
+el método **Get Stuff Done (GSD)**: <https://github.com/gsd-build/get-shit-done>. La memoria del
+TFG describe cómo se aplicó, qué controles se pusieron y qué parte del trabajo es de los agentes
+y cuál del autor.
 
-La política operativa y la plantilla mínima están en `ideas-vault/README.md` y
-`ideas-vault/Conceptos/Vault vivo y sincronizacion.md`. Las fuentes canónicas siguen siendo
-`CONVENTIONS.md`, `AGENTS.md`, `docs/` y `.planning/`.
+- **Material de desarrollo local.** Lo que instala GSD (comandos, agentes, hooks, habilidades) y
+  los ficheros de instrucciones de cada asistente (`CLAUDE.md`, `AGENTS.md`,
+  `.github/copilot-instructions.md`) viven en el equipo del autor y no se publican en este
+  repositorio. Todos apuntan a este documento, que es la fuente.
+- **Carga automática.** Cada asistente lee su fichero de instrucciones al empezar la sesión; no
+  hace falta ningún comando para recargar las convenciones. Para forzarlo en cualquier
+  herramienta basta con pedir: **"Antes de empezar, lee `CONVENTIONS.md` y revisa la
+  planificación."**
+- **Planificación.** El estado del proyecto, la hoja de ruta y el par plan/resumen de cada
+  paso se guardan en `.planning/`, y la fuente de verdad operativa es ese árbol.
+- **Vault de Obsidian.** `ideas-vault/` es el registro conceptual vivo del proyecto. Se
+  consulta al empezar una tarea y se actualiza al terminarla si hay información nueva, una
+  decisión, un requisito, un resultado experimental, una limitación o un cambio relevante. Cada
+  nota enlaza con su fuente canónica (ADR, plan, evidencia): el vault resume y conecta, pero no
+  sustituye a esas fuentes. En trabajo paralelo no se sobrescriben notas ajenas: se añade una
+  nota fechada o se edita solo el apartado afectado, y lo propuesto se marca como propuesta
+  hasta su aprobación. Nunca se guardan secretos, cookies, tokens, credenciales, datos
+  personales ni registros sin revisar.
 
-## 5. Ciclo de vida global de issues de GitHub
+---
 
-La política de [`CONTRIBUTING.md`](CONTRIBUTING.md) se aplica a todas las LLM y colaboradores,
-no solo al agente que ejecuta GSD. Todo trabajo superior a un arreglo trivial debe tener una
-issue en GitHub y, cuando proceda, un elemento en el board del proyecto.
+## 5. Ciclo de vida de las issues de GitHub
 
-- En `gsd-plan-phase`, se crea o reconcilia **una issue por cada `*-PLAN.md`**, se etiqueta con
-  la fase, se añade al board y se escribe `github_issue: <number>` en el frontmatter.
+La política de [`CONTRIBUTING.md`](CONTRIBUTING.md) se aplica a todas las personas y asistentes,
+no solo al agente que ejecuta GSD. Todo trabajo superior a un arreglo trivial tiene una issue
+en GitHub y, cuando proceda, un elemento en el tablero del proyecto.
+
+- Al planificar una fase se crea o reconcilia **una issue por cada plan**, se etiqueta con la
+  fase, se añade al tablero y se escribe `github_issue: <número>` en el encabezado del plan.
 - Durante la ejecución, los commits parciales usan `Refs #N`. El commit que incorpora el
-  `*-SUMMARY.md` y cierra el plan usa `Closes #N`; si no existe un commit único de cierre, la
-  issue se cierra directamente después de verificar el resumen y sus criterios.
+  resumen del plan y lo cierra usa `Closes #N`; si no hay un commit único de cierre, la issue se
+  cierra directamente tras verificar el resumen y sus criterios.
 - Una issue no se cierra porque exista código o un resumen provisional: hay que comprobar
   integración, verificación y estado del plan. Las tareas paralelas no integradas permanecen
-  abiertas y se reconcilian antes de declarar cerrada la fase.
-- Antes de informar de una fase como cerrada, cada issue de sus planes debe estar en el estado
-  correcto y sincronizada con su elemento del board. Si GitHub no permite la operación, se
-  documenta el bloqueo y no se simula el cierre en el repositorio.
+  abiertas y se reconcilian antes de dar la fase por cerrada.
+- Antes de informar de una fase como cerrada, la issue de cada plan debe estar en el estado
+  correcto y sincronizada con el tablero. Si GitHub no permite la operación, se documenta el
+  bloqueo y no se simula el cierre.
 
-La LLM responsable debe cerrar automáticamente la issue, sin esperar una instrucción adicional
-del autor, cuando la tarea esté completada, integrada y verificada. Si el trabajo sigue
-pendiente o pertenece a una rama paralela no integrada, la issue permanece abierta.
-
-No se incluyen credenciales, tokens, cookies, logs sin revisar ni datos sensibles en issues,
-elementos del board, commits o cuerpos de PR. El detalle operativo y los trailers canónicos
-están en `CONTRIBUTING.md`.
+La persona o el asistente responsable cierra la issue sin esperar otra instrucción cuando la
+tarea está completada, integrada y verificada. Si el trabajo sigue pendiente o pertenece a una
+rama paralela no integrada, la issue permanece abierta.
 
 ---
 
-*Creado 2026-09-06. Cambiar esta convención requiere una decisión del autor y actualizar los
-punteros en `CLAUDE.md`, `AGENTS.md`, `.github/copilot-instructions.md` y `.planning/PROJECT.md`.*
+*Creado el 2026-09-06 y unificado el 2026-10-06, con las reglas que antes estaban repartidas
+entre los ficheros de instrucciones de cada asistente. Cambiar una convención requiere una
+decisión del autor.*

@@ -81,3 +81,18 @@ apps/web/CLAUDE.md
 
 # Screenshots written by the Playwright suites on every run (kept locally, not versioned).
 e2e/artifacts/
+
+# Assistant tooling (GSD installs, hooks, local settings and instruction files) stays on the
+# author's machine only; the method is described in the README and the memoria.
+/.claude/
+/.codex/
+/.agents/
+/.github/gsd-*
+/.github/.gsd-profile
+/.github/skills/
+/.github/agents/
+/.github/scripts/
+/.github/hooks/
+/.github/copilot-instructions.md
+/AGENTS.md
+/CLAUDE.md
