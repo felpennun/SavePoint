@@ -21,6 +21,12 @@ Estado: en curso. Criterio del autor: en GitHub solo lo que permite que la web f
 | `data/` | Se quedan `raw/`, `manifests/`, `demo/` (los lee `import_catalogue` y `seed_demo`; los tests fijan sus hashes) y `localization/summaries-es.json` (1.898 sinopsis traducidas con Claude a partir de IGDB; el arranque falla sin él). Salen `summaries-es.work.jsonl`, `provenance.json`, `curated.json` y el `HANDOFF`. Se añade al README una sección «Datos y atribuciones» (Wikidata CC0, Wikimedia, IGDB y la traducción como obra derivada). | este cambio |
 | CI (`quality-gates.yml`) | Se mantienen las pasarelas de CI. Estaba en rojo desde e8b6d25 porque `check-dependencies` aprobaba Next 16.3.4 y el catálogo de pnpm ya tenía 16.3.8; corregido en 1fd8f35 con un anexo de legitimidad. En verde desde entonces. | 1fd8f35 |
 
+## Decisiones sobre el historial y las contraseñas demo
+
+- **Historial:** se mantiene completo, sin reescribir, por razones académicas (685 commits, líneas `Co-Authored-By` de IA, issues y PRs que cita la memoria). gitleaks no encuentra secretos reales: sus 948 avisos son falsos positivos (`seed_key` en dos manifiestos sintéticos que ya no se publican). Quedan en el historial el correo personal del autor en 136 commits (4 y 5 de septiembre), dos commits con un coautor «GPT-6» inexistente, zips antiguos de la memoria y otros ficheros retirados del árbol.
+- **Contraseñas demo:** no se rotan ni se quitan. Irán en el README: son de cuentas de demostración sin información sensible, los profesores pueden acceder y el autor valorará ponerlo privado de nuevo cuando tenga nota.
+- **Aviso:** `check-secrets.ps1` solo admite como marcador conocido `SavePoint-Demo-2026-Visit!`; si el README lista las otras dos contraseñas demo habrá que añadirlas a esa lista para que el CI pase.
+
 ## Pendiente
 
 `docs/`, `.planning/`, `ideas-vault/`, `scripts/`, `apps/api/*.json`, `design/`, ver el informe local `.design-import/informe-repositorio-publico.md`. Antes de publicar: contraseñas demo, `LICENSE`, contenido derivado de IGDB, alerta Dependabot #6 y la decisión sobre el historial de Git.
