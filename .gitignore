@@ -78,3 +78,6 @@ data/localization/_export.err
 # next dev auto-generates these per-app agent files
 apps/web/AGENTS.md
 apps/web/CLAUDE.md
+
+# Screenshots written by the Playwright suites on every run (kept locally, not versioned).
+e2e/artifacts/
