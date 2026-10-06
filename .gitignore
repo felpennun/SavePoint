@@ -171,3 +171,8 @@ e2e/artifacts/
 # design/: only README.md and the five rendered Claude Design images are published; everything
 # else the author keeps under design/mockups/ stays local.
 /design/mockups/
+
+# data/localization: only summaries-es.json (loaded at startup) is published; the translation
+# working files stay local.
+/data/localization/*
+!/data/localization/summaries-es.json

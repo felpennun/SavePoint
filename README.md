@@ -10,6 +10,19 @@ los ficheros que GSD instala en cada equipo (comandos, agentes, hooks) ni las in
 asistente; las reglas del proyecto están reunidas en [`CONVENTIONS.md`](CONVENTIONS.md) y la memoria del TFG
 (carpeta [`TFG/`](TFG/)) explica cómo se aplicó el método y qué controles se pusieron.
 
+## Datos y atribuciones
+
+- **Catálogo base (`data/raw/`, `data/manifests/`):** 150 juegos de [Wikidata](https://www.wikidata.org/wiki/Wikidata:Licensing)
+  (licencia CC0 1.0) y los metadatos, con su licencia, de las imágenes de Wikimedia Commons que acompañan al catálogo. El
+  repositorio no redistribuye esas imágenes.
+- **Catálogo completo:** los metadatos estructurados de las más de 190.000 obras proceden de
+  [IGDB.com](https://www.igdb.com/) (Twitch), consultados a través de su API con las condiciones documentadas en
+  `docs/adr/ADR-006-igdb-source.md`. No se versiona ningún volcado de IGDB y las portadas se enlazan desde su origen. Las
+  capturas de la memoria y de los mockups muestran portadas solo como ilustración.
+- **Sinopsis en español (`data/localization/summaries-es.json`):** 1.898 sinopsis traducidas con Claude a partir de las
+  sinopsis en inglés de IGDB. El texto original pertenece a sus autores y a IGDB; la traducción es una obra derivada
+  incluida para que la demostración bilingüe funcione.
+
 ## Arranque local (Docker Compose)
 
 **Entorno probado:** Windows 11 (build 26200), Docker Desktop, PostgreSQL 18.6 vía imagen oficial. `docker compose` construye `db`, `api` y `web` desde el mismo `pyproject.toml`/`uv.lock` y `package.json`/`pnpm-lock.yaml` que se usan en despliegue — ningún paso de build descarga datos de catálogo ni llama a un proveedor externo; el catálogo, las imágenes de portada referenciadas y las interacciones de la demo son artefactos locales versionados bajo `data/`.
