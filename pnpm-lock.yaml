@@ -10,8 +10,8 @@ catalogs:
       specifier: 1.2.0
       version: 1.2.0
     '@neon/env':
-      specifier: 1.2.0
-      version: 1.2.0
+      specifier: 1.5.0
+      version: 1.5.0
     '@types/node':
       specifier: 24.13.0
       version: 24.13.0
@@ -34,7 +34,7 @@ importers:
         version: 1.2.0
       '@neon/env':
         specifier: 'catalog:'
-        version: 1.2.0
+        version: 1.5.0
       next:
         specifier: 'catalog:'
         version: 16.3.8(@playwright/test@1.62.1)(@types/node@24.13.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -362,13 +362,21 @@ packages:
     resolution: {integrity: sha512-lf/mUfX4V1FPkEkAn8BPl9zXxEDCIGVNlDszobYi4o4309wyE7RyfFKtLos2Hwm0yXta0dc5qxO8pdg9918eVw==}
     engines: {node: '>=20.19.0'}
 
-  '@neon/env@1.2.0':
-    resolution: {integrity: sha512-PgNVFHPAoCcWrqgjgwizJljEfMJElkxI4rjtREi8M0X/7lbID+HCk+7FwwG6mnUkhsZgnUM9Pzmum0EmMNub6A==}
+  '@neon/config@1.8.3':
+    resolution: {integrity: sha512-/UmkgmHrm9tTOoFd7g3DttqlFFA3KG+d6JULLk7JzhvU2CwHrUaKiRmE1OmhOQAqJ3Mm49c/G5nDVbSefyFCrw==}
+    engines: {node: '>=20.19.0'}
+
+  '@neon/env@1.5.0':
+    resolution: {integrity: sha512-XUj//QQ+HSwfFmHFCi+5tRDg/VeLl7VMjA3chlyR5z2idrjW23aB8RDdBoxNsAUzCplFd+s/iHW0Kvxu72ejxw==}
     engines: {node: '>=20.19.0'}
     hasBin: true
 
   '@neon/sdk@3.1.0':
     resolution: {integrity: sha512-yBdxG+RKWuDsEdgjZNuQUV9YfzXktaUb5pZPrzNmsUJPgNkL/jgiMKoYQorsSXDja1CNg6OvCPsEYbxYTYohZQ==}
+    engines: {node: '>=20.19.0'}
+
+  '@neon/sdk@7.0.0':
+    resolution: {integrity: sha512-hF/Om50SmpKK2PQldcwYxi6b3p7S2wlwW8fX+54jx88xHaEu7hB4dojuuuP8nwQz24qq/p/jxVm0P9DztKPoJA==}
     engines: {node: '>=20.19.0'}
 
   '@next/env@16.3.8':
@@ -1432,15 +1440,23 @@ snapshots:
       jiti: 2.7.0
       zod: 4.5.4
 
-  '@neon/env@1.2.0':
+  '@neon/config@1.8.3':
     dependencies:
-      '@neon/config': 1.2.0
+      '@neon/sdk': 7.0.0
+      jiti: 2.7.0
+      zod: 4.5.4
+
+  '@neon/env@1.5.0':
+    dependencies:
+      '@neon/config': 1.8.3
       yargs: 18.1.0
       zod: 4.5.4
     optionalDependencies:
       '@napi-rs/keyring': 1.3.0
 
   '@neon/sdk@3.1.0': {}
+
+  '@neon/sdk@7.0.0': {}
 
   '@next/env@16.3.8': {}
 
