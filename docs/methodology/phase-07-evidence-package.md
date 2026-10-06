@@ -69,7 +69,7 @@ imagen PostgreSQL 18.6 fijada por digest en Compose. Los hashes de `uv.lock` y
 La procedencia primaria del panel es la publicación v15 y su snapshot de cohortes. La
 decisión y los términos aplicables a IGDB/Twitch están documentados en
 `docs/adr/ADR-006-igdb-source.md` y `docs/verification/igdb-catalogue-freeze.md`; el
-contrato de proyección es `docs/verification/phase-07-evidence-contract.md` (no incluido en el repositorio público). La licencia
+contrato de proyección es `docs/verification/phase-07/phase-07-evidence-contract.md`. La licencia
 no se infiere desde el paquete: el autor debe revisar los términos antes de redistribuir
 datos externos.
 
@@ -108,14 +108,14 @@ con las mismas fuentes produce los mismos hashes de CSV, JSON y SVG. El proceso 
 
 ## Archivos emitidos
 
-Estos ficheros se generaron en `docs/verification/` y no incluido en el repositorio público; se conservan aquí sus huellas para poder comprobarlos en el repositorio de desarrollo.
+Estos ficheros se generaron en `docs/verification/phase-07/`; sus huellas permiten comprobarlos.
 
 | Archivo | SHA-256 |
 |---|---|
-| `docs/verification/phase-07-evidence-manifest.json` | `9f7a37a5fa33b93e92cf945d54771d4c755874a80116ea80d72d62549e6ad17d` |
-| `docs/verification/phase-07-results.csv` | `084e975c993891fc8e16565c3c5f5deed67d5d65678c5ada918bf27e4afdc52b` |
-| `docs/verification/phase-07-results.json` | `48949831e95aee76a42335b5c9ad59060a0db2d8311651f374eb1ef51b9be548` |
-| `docs/verification/phase-07-comparison.svg` | `5749cd3a0d8311382cbb9d6fb83be5f1980b4284d57902bac5eca71e6ebda573` |
+| `docs/verification/phase-07/phase-07-evidence-manifest.json` | `9f7a37a5fa33b93e92cf945d54771d4c755874a80116ea80d72d62549e6ad17d` |
+| `docs/verification/phase-07/phase-07-results.csv` | `084e975c993891fc8e16565c3c5f5deed67d5d65678c5ada918bf27e4afdc52b` |
+| `docs/verification/phase-07/phase-07-results.json` | `48949831e95aee76a42335b5c9ad59060a0db2d8311651f374eb1ef51b9be548` |
+| `docs/verification/phase-07/phase-07-comparison.svg` | `5749cd3a0d8311382cbb9d6fb83be5f1980b4284d57902bac5eca71e6ebda573` |
 
 La proyección excluye filas individuales, secretos, cookies, credenciales, logs crudos,
 dumps privados y rutas absolutas. El disclosure de IA y el reparto de responsabilidades

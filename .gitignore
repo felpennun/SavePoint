@@ -133,8 +133,6 @@ e2e/artifacts/
 !/docs/verification/dependency-legitimacy.2026-09-04T17-00.md
 !/docs/verification/dependency-legitimacy-next-16.3.8-2026-10-06.md
 !/docs/verification/evaluation-cohorts-400-test-2026-09-12-v15.json
-!/docs/verification/phase-01-signoff.md
-!/docs/verification/phase-01-signoff.2026-09-05T10-45.md
-!/docs/verification/phase-02-signoff.md
 !/docs/verification/igdb-api-probe.md
 !/docs/verification/igdb-catalogue-freeze.md
+!/docs/verification/phase-*/

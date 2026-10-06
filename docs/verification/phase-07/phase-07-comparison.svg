@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc" viewBox="0 0 760 644">
+  <title id="title">nDCG@10 por algoritmo â€” cohorte active_history_10_to_20</title>
+  <desc id="desc">ComparaciÃ³n derivada del snapshot v15. Escala fija de 0 a 1; cada etiqueta incluye el valor exacto publicado.</desc>
+  <rect width="760" height="644" fill="#161826"/>
+  <text x="12" y="24" fill="#f7f7fa" font-family="sans-serif" font-size="16">nDCG@10 Â· active_history_10_to_20 Â· v15</text>
+  <text x="640" y="24" text-anchor="end" fill="#c7c9d9" font-family="monospace" font-size="12">escala 0â€“1</text>
+  <text x="12" y="66" fill="#f7f7fa" font-family="monospace" font-size="11">cf-user-knn-v1</text>
+  <rect x="178" y="52" width="560" height="20" fill="#292b31" stroke="#5d5294" stroke-width="1"/>
+  <rect x="178" y="52" width="11.747" height="20" fill="#9184d9"><title>cf-user-knn-v1: nDCG@10 = 0.020976720000000001</title></rect>
+  <text x="748" y="66" text-anchor="end" fill="#f7f7fa" font-family="monospace" font-size="11">0.020976720000000001</text>
+  <text x="12" y="100" fill="#f7f7fa" font-family="monospace" font-size="11">content-cbf-mmr-pop-v1</text>
+  <rect x="178" y="86" width="560" height="20" fill="#292b31" stroke="#5d5294" stroke-width="1"/>
+  <rect x="178" y="86" width="77.415" height="20" fill="#9184d9"><title>content-cbf-mmr-pop-v1: nDCG@10 = 0.13824121</title></rect>
+  <text x="748" y="100" text-anchor="end" fill="#f7f7fa" font-family="monospace" font-size="11">0.13824121</text>
+  <text x="12" y="134" fill="#f7f7fa" font-family="monospace" font-size="11">content-cbf-mmr-v1</text>
+  <rect x="178" y="120" width="560" height="20" fill="#292b31" stroke="#5d5294" stroke-width="1"/>
+  <rect x="178" y="120" width="77.775" height="20" fill="#9184d9"><title>content-cbf-mmr-v1: nDCG@10 = 0.13888364</title></rect>
+  <text x="748" y="134" text-anchor="end" fill="#f7f7fa" font-family="monospace" font-size="11">0.13888364</text>
+  <text x="12" y="168" fill="#f7f7fa" font-family="monospace" font-size="11">content-cbf-multiplicative-pop-v1</text>
+  <rect x="178" y="154" width="560" height="20" fill="#292b31" stroke="#5d5294" stroke-width="1"/>
+  <rect x="178" y="154" width="47.697" height="20" fill="#9184d9"><title>content-cbf-multiplicative-pop-v1: nDCG@10 = 0.085173719999999994</title></rect>
+  <text x="748" y="168" text-anchor="end" fill="#f7f7fa" font-family="monospace" font-size="11">0.085173719999999994</text>
+  <text x="12" y="202" fill="#f7f7fa" font-family="monospace" font-size="11">content-cbf-multiplicative-v1</text>
+  <rect x="178" y="188" width="560" height="20" fill="#292b31" stroke="#5d5294" stroke-width="1"/>
+  <rect x="178" y="188" width="47.923" height="20" fill="#9184d9"><title>content-cbf-multiplicative-v1: nDCG@10 = 0.085577479999999997</title></rect>
+  <text x="748" y="202" text-anchor="end" fill="#f7f7fa" font-family="monospace" font-size="11">0.085577479999999997</text>
+  <text x="12" y="236" fill="#f7f7fa" font-family="monospace" font-size="11">content-cbf-neg-pop-v1</text>
+  <rect x="178" y="222" width="560" height="20" fill="#292b31" stroke="#5d5294" stroke-width="1"/>
+  <rect x="178" y="222" width="55.641" height="20" fill="#9184d9"><title>content-cbf-neg-pop-v1: nDCG@10 = 0.099358890000000005</title></rect>
+  <text x="748" y="236" text-anchor="end" fill="#f7f7fa" font-family="monospace" font-size="11">0.099358890000000005</text>
+  <text x="12" y="270" fill="#f7f7fa" font-family="monospace" font-size="11">content-cbf-neg-v1</text>
+  <rect x="178" y="256" width="560" height="20" fill="#292b31" stroke="#5d5294" stroke-width="1"/>
+  <rect x="178" y="256" width="65.959" height="20" fill="#9184d9"><title>content-cbf-neg-v1: nDCG@10 = 0.11778317000000001</title></rect>
+  <text x="748" y="270" text-anchor="end" fill="#f7f7fa" font-family="monospace" font-size="11">0.11778317000000001</text>
+  <text x="12" y="304" fill="#f7f7fa" font-family="monospace" font-size="11">content-cbf-twostage-pop-v1</text>
+  <rect x="178" y="290" width="560" height="20" fill="#292b31" stroke="#5d5294" stroke-width="1"/>
+  <rect x="178" y="290" width="63.894" height="20" fill="#9184d9"><title>content-cbf-twostage-pop-v1: nDCG@10 = 0.11409716</title></rect>
+  <text x="748" y="304" text-anchor="end" fill="#f7f7fa" font-family="monospace" font-size="11">0.11409716</text>
+  <text x="12" y="338" fill="#f7f7fa" font-family="monospace" font-size="11">content-cbf-twostage-v1</text>
+  <rect x="178" y="324" width="560" height="20" fill="#292b31" stroke="#5d5294" stroke-width="1"/>
+  <rect x="178" y="324" width="65.655" height="20" fill="#9184d9"><title>content-cbf-twostage-v1: nDCG@10 = 0.11724094</title></rect>
+  <text x="748" y="338" text-anchor="end" fill="#f7f7fa" font-family="monospace" font-size="11">0.11724094</text>
+  <text x="12" y="372" fill="#f7f7fa" font-family="monospace" font-size="11">content-cbf-weighted-pop-v1</text>
+  <rect x="178" y="358" width="560" height="20" fill="#292b31" stroke="#5d5294" stroke-width="1"/>
+  <rect x="178" y="358" width="85.011" height="20" fill="#9184d9"><title>content-cbf-weighted-pop-v1: nDCG@10 = 0.15180555000000001</title></rect>
+  <text x="748" y="372" text-anchor="end" fill="#f7f7fa" font-family="monospace" font-size="11">0.15180555000000001</text>
+  <text x="12" y="406" fill="#f7f7fa" font-family="monospace" font-size="11">content-cbf-weighted-v1</text>
+  <rect x="178" y="392" width="560" height="20" fill="#292b31" stroke="#5d5294" stroke-width="1"/>
+  <rect x="178" y="392" width="96.574" height="20" fill="#9184d9"><title>content-cbf-weighted-v1: nDCG@10 = 0.1724531</title></rect>
+  <text x="748" y="406" text-anchor="end" fill="#f7f7fa" font-family="monospace" font-size="11">0.1724531</text>
+  <text x="12" y="440" fill="#f7f7fa" font-family="monospace" font-size="11">hybrid-mmr-v1</text>
+  <rect x="178" y="426" width="560" height="20" fill="#292b31" stroke="#5d5294" stroke-width="1"/>
+  <rect x="178" y="426" width="89.113" height="20" fill="#9184d9"><title>hybrid-mmr-v1: nDCG@10 = 0.15912949000000001</title></rect>
+  <text x="748" y="440" text-anchor="end" fill="#f7f7fa" font-family="monospace" font-size="11">0.15912949000000001</text>
+  <text x="12" y="474" fill="#f7f7fa" font-family="monospace" font-size="11">hybrid-weighted-cf-v1</text>
+  <rect x="178" y="460" width="560" height="20" fill="#292b31" stroke="#5d5294" stroke-width="1"/>
+  <rect x="178" y="460" width="95.138" height="20" fill="#9184d9"><title>hybrid-weighted-cf-v1: nDCG@10 = 0.16988850999999999</title></rect>
+  <text x="748" y="474" text-anchor="end" fill="#f7f7fa" font-family="monospace" font-size="11">0.16988850999999999</text>
+  <text x="12" y="508" fill="#f7f7fa" font-family="monospace" font-size="11">popularity-v1</text>
+  <rect x="178" y="494" width="560" height="20" fill="#292b31" stroke="#5d5294" stroke-width="1"/>
+  <rect x="178" y="494" width="1.904" height="20" fill="#9184d9"><title>popularity-v1: nDCG@10 = 0.0033991899999999999</title></rect>
+  <text x="748" y="508" text-anchor="end" fill="#f7f7fa" font-family="monospace" font-size="11">0.0033991899999999999</text>
+  <text x="12" y="542" fill="#f7f7fa" font-family="monospace" font-size="11">random-v1</text>
+  <rect x="178" y="528" width="560" height="20" fill="#292b31" stroke="#5d5294" stroke-width="1"/>
+  <text x="748" y="542" text-anchor="end" fill="#f7f7fa" font-family="monospace" font-size="11">0</text>
+  <text x="12" y="576" fill="#f7f7fa" font-family="monospace" font-size="11">recency-v1</text>
+  <rect x="178" y="562" width="560" height="20" fill="#292b31" stroke="#5d5294" stroke-width="1"/>
+  <rect x="178" y="562" width="3.327" height="20" fill="#9184d9"><title>recency-v1: nDCG@10 = 0.0059402400000000003</title></rect>
+  <text x="748" y="576" text-anchor="end" fill="#f7f7fa" font-family="monospace" font-size="11">0.0059402400000000003</text>
+  <text x="178" y="632" fill="#c7c9d9" font-family="monospace" font-size="11">0</text>
+  <text x="738" y="632" text-anchor="end" fill="#c7c9d9" font-family="monospace" font-size="11">1</text>
+</svg>
