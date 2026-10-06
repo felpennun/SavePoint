@@ -44,7 +44,6 @@ Notas sobre el despliegue público:
 - **Recomendaciones:** estanterías de juegos recomendados por varios algoritmos, con vista detallada que explica por qué se
   recomienda cada uno y con qué pesos.
 - **Social:** perfiles públicos con privacidad configurable, solicitudes de amistad, recomendaciones entre amigos y mensajes.
-- **Panel de investigación:** resultados de la evaluación offline, para cuentas con permiso (`/research`).
 
 ## Arranque local
 
