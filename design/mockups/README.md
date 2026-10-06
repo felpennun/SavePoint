@@ -4,9 +4,8 @@ Material de diseño reunido en un solo sitio (2026-10-05). Nada de esto lo usa l
 
 | Carpeta | Qué contiene |
 |---|---|
-| `1-lienzos-claude-design/` | Los cinco lienzos de Claude Design (`*.dc.html`, se abren en el navegador): **Web** (catálogo, recomendaciones, amistades, perfil...), **Ideas v2** (incluye "Colección con listas"), **Inicio**, **Identidad** e **Ideas**. Procede de `design/brand/SavePoint visual identity system-handoff (4).zip`, que se conserva sin cambios. |
+| `1-lienzos-claude-design/` | Los cinco lienzos de Claude Design (`*.dc.html`, se abren en el navegador): **Web** (catálogo, recomendaciones, amistades, perfil...), **Ideas v2** (incluye "Colección con listas"), **Inicio**, **Identidad** e **Ideas**. |
 | `2-renders-nocturne-preview/` | 24 imágenes PNG de la primera pasada de diseño (10-09-2026), previas al rediseño: catálogo, ficha, inicio, iniciar sesión, registro y fuentes, en escritorio y móvil, oscuro y claro. |
-| `3-logos-y-banners/` | Logos, favicon y banners SVG (claro y oscuro) y su README. Copia de `design/brand/`. |
 | `4-maquetas-html-fase-01-1/` | Seis maquetas HTML del diseño anterior (fase 01.1): inicio, catálogo, ficha de juego, colección, recomendaciones e inicio de sesión. Se abren en el navegador y se enlazan entre sí. |
 | `rendered-claude-design/` | Cinco imágenes PNG renderizadas de los lienzos de `1-lienzos-claude-design/` (Web, Ideas, Ideas v2, Inicio e Identidad). |
 

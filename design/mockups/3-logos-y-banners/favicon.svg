@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
-  <title id="title">SavePoint — favicon Cristal</title>
-  <desc id="desc">Icono sobre baldosa de tema dark.</desc>
-  <!-- Geometría original trazada a mano. Wordmark dibujado como contornos; sin fuentes ni recursos externos. -->
-  <path d="M12 0 H52 Q64 0 64 12 V52 Q64 64 52 64 H12 Q0 64 0 52 V12 Q0 0 12 0 Z" fill="#17171f" fill-rule="evenodd" transform="translate(0 0) scale(1)"/>
-  <path d="M32 4 L52 28 L32 52 L12 28 Z M32 16 L22 28 L32 40 L42 28 Z M20 56 H44 V60 H20 Z" fill="#f2f2f5" fill-rule="evenodd" transform="translate(4 4) scale(0.875)"/>
-  <path d="M32 22 L38 28 L32 34 L26 28 Z" fill="#8b7cf6" fill-rule="evenodd" transform="translate(4 4) scale(0.875)"/>
-</svg>

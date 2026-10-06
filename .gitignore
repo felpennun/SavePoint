@@ -159,3 +159,7 @@ e2e/artifacts/
 !/apps/api/evaluation-400-test-2026-09-10.artifact.json
 !/apps/api/evaluation-400-test-2026-09-11.INVALID-duplicate-candidates.artifact.json
 !/apps/api/evaluation-400-test-2026-09-11.artifact.json
+
+# design/: the discarded "Cristal" logo direction (design/brand and its copy in mockups) stays local.
+/design/brand/
+/design/mockups/3-logos-y-banners/
