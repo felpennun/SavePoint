@@ -224,7 +224,6 @@ if ($IncludeDeployment) {
         "infra/render.yaml",
         "neon.ts",
         "apps/web/vercel.json",
-        "docs/deployment/public-demo.md",
         "docs/adr/ADR-005-deployment-parity.md",
         "e2e/deployed-smoke.spec.ts"
     )

@@ -35,7 +35,7 @@ Cuando el comando termina, `web` está en <http://localhost:3000/es> (o `/en`) y
 Todas las variables de entorno están documentadas en [.env.example](.env.example) — solo nombres y valores locales inocuos, nunca credenciales reales. `docker compose` las fija directamente en `infra/compose.yaml` para desarrollo local; para cualquier valor más allá de desarrollo local, usar `docker compose run -e VAR=valor` o el almacén de secretos de la plataforma de despliegue, nunca este repositorio.
 
 - `DJANGO_DEPLOY_ENV` (`local` | `production`) selecciona el perfil de seguridad en `apps/api/config/settings.py`: `local` silencia únicamente las advertencias de `check --deploy` que son la guía documentada de Django para HTTP plano sin terminador TLS (HSTS, redirección SSL, cookies seguras); `production` exige esas protecciones y una `DJANGO_SECRET_KEY` de al menos 50 caracteres, sin excepción.
-- `DEMO_USERNAME`/`DEMO_PASSWORD` son credenciales de demostración local, nunca una cuenta real (ver `docs/verification/`). Rotarlas: cambiar el valor y volver a ejecutar `bootstrap_demo_account`, que actualiza la cuenta ancla existente en vez de crear una nueva.
+- `DEMO_USERNAME`/`DEMO_PASSWORD` son credenciales de demostración local, nunca una cuenta real (ver `CONVENTIONS.md`). Rotarlas: cambiar el valor y volver a ejecutar `bootstrap_demo_account`, que actualiza la cuenta ancla existente en vez de crear una nueva.
 
 ## Rotación de la cuenta demo
 

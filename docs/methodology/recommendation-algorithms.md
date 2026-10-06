@@ -906,5 +906,5 @@ Fuentes de implementación:
 
 Documentos relacionados: [`ADR-009`](../adr/ADR-009-recommendation-algorithms-and-workers.md),
 [`evaluation-protocol.md`](./evaluation-protocol.md),
-[`similitud-curated-tags-2026-09-10.md`](../verification/similitud-curated-tags-2026-09-10.md)
-y [`recommendation-architecture-2026-09-09.md`](../verification/recommendation-architecture-2026-09-09.md).
+`similitud-curated-tags-2026-09-10.md`
+y `recommendation-architecture-2026-09-09.md` (ambos de `docs/verification/`, no incluido en el repositorio público).

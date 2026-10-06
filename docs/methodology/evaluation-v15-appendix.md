@@ -29,4 +29,4 @@ variables de entorno. No se atribuye retroactivamente a v15 porque una medición
 posterior no sería una observación histórica válida.
 
 Esta adenda complementa [`evaluation-protocol.md`](./evaluation-protocol.md) y el
-resultado citable [`evaluation-results-400-test-2026-09-12-v15.md`](../verification/evaluation-results-400-test-2026-09-12-v15.md).
+resultado citable `evaluation-results-400-test-2026-09-12-v15.md` (de `docs/verification/`, no incluido en el repositorio público).

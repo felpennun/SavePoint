@@ -69,7 +69,7 @@ imagen PostgreSQL 18.6 fijada por digest en Compose. Los hashes de `uv.lock` y
 La procedencia primaria del panel es la publicación v15 y su snapshot de cohortes. La
 decisión y los términos aplicables a IGDB/Twitch están documentados en
 `docs/adr/ADR-006-igdb-source.md` y `docs/verification/igdb-catalogue-freeze.md`; el
-contrato de proyección es `docs/verification/phase-07-evidence-contract.md`. La licencia
+contrato de proyección es `docs/verification/phase-07-evidence-contract.md` (no incluido en el repositorio público). La licencia
 no se infiere desde el paquete: el autor debe revisar los términos antes de redistribuir
 datos externos.
 
@@ -107,6 +107,8 @@ con las mismas fuentes produce los mismos hashes de CSV, JSON y SVG. El proceso 
 `run_evaluation`, no lee el marker de consumo y no escribe sobre el artefacto v15.
 
 ## Archivos emitidos
+
+Estos ficheros se generaron en `docs/verification/` y no incluido en el repositorio público; se conservan aquí sus huellas para poder comprobarlos en el repositorio de desarrollo.
 
 | Archivo | SHA-256 |
 |---|---|

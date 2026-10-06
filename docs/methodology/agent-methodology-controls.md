@@ -21,7 +21,7 @@ La comparación usa los mismos usuarios sintéticos, la misma partición leave-o
 - `apps/api/evaluation/candidates.py` es el único constructor del conjunto de candidatos.
 - `apps/api/evaluation/runner.py` comprueba que cada algoritmo recibe y devuelve el mismo universo permitido.
 - La generación de usuarios está fijada por semilla y marcada con `synthetic-eval-user`.
-- Los ocho arquetipos de `apps/api/evaluation/archetypes.py` equilibran deliberadamente los ejes de géneros preferidos, tamaño de biblioteca y generosidad al puntuar; el resultado observado se audita en `docs/verification/synthetic-users-validation.md` (Plan 02-09).
+- Los ocho arquetipos de `apps/api/evaluation/archetypes.py` equilibran deliberadamente los ejes de géneros preferidos, tamaño de biblioteca y generosidad al puntuar; el resultado observado se audita en `docs/verification/synthetic-users-validation.md` (Plan 02-09; no incluido en el repositorio público).
 - Para obras sin rating observado, `apps/api/recommendations/content/combine.py` usa la mediana marcada de los géneros como fallback y propaga `rating_term_is_fallback`; nunca introduce silenciosamente un valor imputado como si procediera de IGDB o RAWG.
 - La documentación distingue evidencia de simulación de evidencia sobre usuarios reales; la primera no se generaliza automáticamente a una población externa.
 
@@ -62,4 +62,4 @@ Los artefactos de evaluación no publican información personal innecesaria. El 
 
 La evidencia de cada ejecución se relaciona con el plan que la produce y con el commit de código que la genera. Antes de incorporar los resultados al TFG, el autor debe revisar el artefacto JSON, el protocolo, las limitaciones de simulación y la interpretación de las diferencias entre algoritmos.
 
-Referencias principales: `02-08-SUMMARY.md`, `02-09-SUMMARY.md`, `02-11-SUMMARY.md`, `02-13-PLAN.md`, `docs/methodology/protocol.json`, `docs/verification/synthetic-users-validation.md` y `docs/adr/ADR-008-external-ratings.md`.
+Referencias principales: `02-08-SUMMARY.md`, `02-09-SUMMARY.md`, `02-11-SUMMARY.md`, `02-13-PLAN.md`, `docs/methodology/protocol.json`, `docs/verification/synthetic-users-validation.md` (no incluido en el repositorio público) y `docs/adr/ADR-008-external-ratings.md`.

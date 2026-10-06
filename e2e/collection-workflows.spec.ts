@@ -7,7 +7,7 @@ import { expect, test, type Page } from "@playwright/test";
  * profile editing + favorites (05-01), per-work comments and custom lists
  * with reorder (05-02), extended copy metadata (05-03), and CSV export
  * (05-04). The backend contract for all of this is
- * docs/verification/phase-05-api-handoff.md; this suite drives it through
+ * docs/verification/phase-05-api-handoff.md (not published in the public repository); this suite drives it through
  * the real browser UI shipped in apps/web (no direct API calls except the
  * read-only ground-truth check on the CSV export, which shares the
  * browser's own session cookie via page.request).

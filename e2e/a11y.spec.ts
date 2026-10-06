@@ -22,7 +22,7 @@ test.use({ trace: "off" });
 const AXE_SCRIPT_PATH = path.join(__dirname, "..", "node_modules", "axe-core", "axe.min.js");
 
 // Plan 01.1-10 evidence artifacts. Playwright writes one deterministic PNG
-// per surface/viewport pair here; docs/verification/phase-01.1-product-review.md
+// per surface/viewport pair here; docs/verification/phase-01.1-product-review.md (not published in the public repository)
 // references these exact repo-relative paths.
 const ARTIFACT_DIR = path.join(__dirname, "artifacts", "phase-01.1");
 

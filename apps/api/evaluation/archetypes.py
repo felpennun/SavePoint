@@ -79,7 +79,7 @@ PHASE_2_ARCHETYPES: tuple[Archetype, ...] = (
 # stratification let leave-one-out routinely drop a user below the content
 # ranker's `_COLD_START_ENTRIES` (3) threshold, collapsing most content
 # variants to their non-personalised fallback for the majority of the test
-# split (documented in evaluation-results-400-test-2026-09-10.md). The three
+# split (documented in evaluation-results-400-test-2026-09-10.md, not published in the public repository). The three
 # archetypes below keep their original names and taste parameters
 # (genre_pref_range, rating_generosity, status_mix, release_bias) for
 # account-identity continuity across regenerations -- only their size range
