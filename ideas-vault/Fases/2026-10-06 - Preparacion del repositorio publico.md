@@ -29,6 +29,25 @@ Estado: en curso. Criterio del autor: en GitHub solo lo que permite que la web f
 - **Aviso legal:** el paquete redistribuye datos de IGDB con fines académicos y atribución, lo que se aparta de ADR-006 (no se redistribuye el dataset en bloque). Decisión del autor, recogida en el README y en las notas de la release.
 - **Alerta Dependabot #6:** corregida (`source-map-js` 1.2.2). Las 8 PRs de Dependabot se cerraron y `dependabot.yml` ignora saltos de versión mayor.
 
+## Licencias y ajustes de GitHub (2026-10-06)
+
+- **Licencias:** código bajo MIT (`LICENSE`, GitHub la reconoce); memoria (`TFG/`) y mockups (`design/`) bajo CC BY-NC-ND 4.0 (`LICENSES/CC-BY-NC-ND-4.0.txt` con el texto oficial y avisos en `TFG/LICENSE.md` y `design/LICENSE.md`). Los datos de terceros conservan sus condiciones. `SECURITY.md` indica cómo informar de vulnerabilidades.
+- **Aplicado ahora (repositorio privado):** alertas de Dependabot y actualizaciones de seguridad automáticas; permisos mínimos para Actions (`GITHUB_TOKEN` solo lectura, sin aprobar PRs); borrado de ramas al fusionar; wiki desactivada.
+- **Dependabot:** actualizaciones de versión en pausa (`open-pull-requests-limit: 0`); cerradas las 13 PRs que se abrieron y borradas sus ramas.
+- **Pendiente de aplicar al hacer el repositorio público** (GitHub lo rechaza en privado sin plan de pago): secret scanning con bloqueo de push, protección de `main` (sin forzar ni borrar), aprobación de workflows de externos y avisos de seguridad privados:
+
+```sh
+R=repos/felpennun/SavePoint
+gh api -X PATCH $R -f 'security_and_analysis[secret_scanning][status]=enabled' -f 'security_and_analysis[secret_scanning_push_protection][status]=enabled'
+gh api -X PUT $R/branches/main/protection --input - <<'JSON'
+{"required_status_checks":null,"enforce_admins":false,"required_pull_request_reviews":null,"restrictions":null,"allow_force_pushes":false,"allow_deletions":false}
+JSON
+gh api -X PUT $R/actions/permissions/fork-pr-contributor-approval -f approval_policy=all_external_contributors
+gh api -X PUT $R/private-vulnerability-reporting
+```
+
+No se exige el CI como condición de fusión en `main`, porque se trabaja con push directo y el CI se ejecuta después del push.
+
 ## Decisiones sobre el historial y las contraseñas demo
 
 - **Historial:** se mantiene completo, sin reescribir, por razones académicas (685 commits, líneas `Co-Authored-By` de IA, issues y PRs que cita la memoria). gitleaks no encuentra secretos reales: sus 948 avisos son falsos positivos (`seed_key` en dos manifiestos sintéticos que ya no se publican). Quedan en el historial el correo personal del autor en 136 commits (4 y 5 de septiembre), dos commits con un coautor «GPT-6» inexistente, zips antiguos de la memoria y otros ficheros retirados del árbol.
