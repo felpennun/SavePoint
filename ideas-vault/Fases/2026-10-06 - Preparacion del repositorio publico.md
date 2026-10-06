@@ -12,7 +12,9 @@ Estado: en curso. Criterio del autor: en GitHub solo lo que permite que la web f
 | `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md` | Salen de GitHub y siguen en local. Su contenido general se fusiona en `CONVENTIONS.md`, que pasa a ser el documento único (idioma ahora en §2, issues en §5). | este cambio |
 | `CONTRIBUTING.md`, `ONBOARDING.md` | `CONTRIBUTING.md` rehecho en español y sin referencias internas; `ONBOARDING.md` (plantilla sin rellenar) sale de GitHub. | este cambio |
 | `scripts/` | Salen `thesis-figures/`, los `verify-*`, `generate-phase-07-evidence` y los tres de traducción de sinopsis. Se quedan `public-corpus/`, `acquire_catalogue.py` y `mobile-audit/`. Pasarelas de CI y copias de seguridad: pendientes de decisión. | este cambio |
-| `.planning/` | Se queda en GitHub como evidencia del método; pendiente la revisión de lo que sobra dentro. | pendiente |
+| `.planning/` | Se queda en GitHub como evidencia del método. Salen la caché de investigación, el estado de máquina de GSD (`state.json`, `config.json`, `estimation-calibration.json`, `WINDOWS.md`), `codebase/` y `onboarding/`. Las 6 maquetas HTML de la fase 01.1 pasan a `design/mockups/4-maquetas-html-fase-01-1/`. Pendiente: normalizar rutas locales en los `PLAN.md`. | este cambio |
+| Copias de seguridad | Sale todo salvo `backup-postgres.ps1`. Backup manual de la base local creado el 2026-10-06 fuera del repositorio (631 MB, 331.000 obras, 433 usuarios), comprobado con su manifiesto. | este cambio |
+| CI (`quality-gates.yml`) | Se mantienen todas las pasarelas, pero llevan en rojo desde e8b6d25 (`check-dependencies` no entiende `catalog:` de pnpm). Pendiente de arreglar. | pendiente |
 
 ## Pendiente
 

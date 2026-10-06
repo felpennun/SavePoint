@@ -106,3 +106,20 @@ e2e/artifacts/
 /scripts/append_es_batch.py
 /scripts/next_es_batch.py
 /ONBOARDING.md
+
+# Backup helpers other than backup-postgres.ps1 and GSD machine state: kept on disk, not published.
+/scripts/backup-before-change.ps1
+/scripts/check-backup-manifest.ps1
+/scripts/register-daily-backup-task.ps1
+/scripts/register-monthly-restore-task.ps1
+/scripts/restore-disposable-db.ps1
+/scripts/rotate-backups.ps1
+/.planning/research/.cache/
+/.planning/state.json
+/.planning/config.json
+/.planning/estimation-calibration.json
+/.planning/phases/*/.research-plan-input.json
+/.planning/phases/*/.gitkeep
+/.planning/WINDOWS.md
+/.planning/codebase/
+/.planning/onboarding/
