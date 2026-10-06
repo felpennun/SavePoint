@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
@@ -15,6 +15,7 @@ const COPY = {
     invalid: "El nombre de usuario o la contraseña no son correctos. Comprueba los datos e inténtalo de nuevo.",
     generic: "No se pudo iniciar sesión. Inténtalo de nuevo.",
     noAccount: "¿No tienes cuenta? Crear una cuenta",
+    idle: "Tu sesión se cerró tras 30 minutos sin actividad. Inicia sesión de nuevo para continuar.",
   },
   en: {
     heading: "Log in",
@@ -26,6 +27,7 @@ const COPY = {
     invalid: "The username or password is incorrect. Check the details and try again.",
     generic: "We couldn't log you in. Try again.",
     noAccount: "No account yet? Create an account",
+    idle: "You were signed out after 30 minutes of inactivity. Log in again to continue.",
   },
 } as const;
 
@@ -38,6 +40,12 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [idleNotice, setIdleNotice] = useState(false);
+
+  // Set by IdleSessionGuard when it closes the session (?idle=1).
+  useEffect(() => {
+    setIdleNotice(new URLSearchParams(window.location.search).get("idle") === "1");
+  }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -85,6 +93,11 @@ export default function LoginPage() {
     <main className="sp-page" style={{ maxWidth: "420px" }}>
       <h1 className="sp-h1">{copy.heading}</h1>
       <p className="sp-lead">{copy.intro}</p>
+      {idleNotice ? (
+        <p role="status" data-testid="login-idle-notice" className="sp-muted">
+          {copy.idle}
+        </p>
+      ) : null}
       {/* method="post" is defense-in-depth: a pre-hydration click POSTs to
           this same page (no POST handler) instead of leaking the password
           into a GET query string. */}

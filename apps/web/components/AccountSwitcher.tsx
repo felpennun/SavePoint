@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 
 import { presetGradient } from "@/lib/avatar-presets";
 import { getSocialUnreadCount } from "@/lib/client-api";
+import { signOutAndRedirect } from "@/lib/idle-session";
 
 export function buildMessagesHref(locale: string): string {
   return `/${locale}/friends`;
@@ -170,24 +171,10 @@ export function AccountSwitcher({
   }, [open]);
 
   async function logout() {
-    try {
-      await fetch("/api/accounts/csrf/", { credentials: "same-origin" });
-      const csrfToken = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("csrftoken="))
-        ?.split("=")[1];
-      await fetch("/api/accounts/logout/", {
-        method: "POST",
-        credentials: "same-origin",
-        headers: csrfToken ? { "X-CSRFToken": csrfToken } : {},
-      });
-    } catch {
-      /* fall through to a hard navigation regardless */
-    }
     setOpen(false);
     // Full page load: after logging out nothing of the previous account (header,
     // photo, cached pages) may remain on screen.
-    window.location.replace(`/${locale}`);
+    await signOutAndRedirect(`/${locale}`);
   }
 
   const triggerText = alias ? `${labels.label}: ${alias}` : labels.label;

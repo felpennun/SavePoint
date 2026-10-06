@@ -39,6 +39,9 @@ El listener propio de la fila de recomendaciones no era la solución: el fallo r
 
 Fuente: `apps/web/components/RecommendationShelfTrack.tsx`, `apps/web/components/RecommendationDetailView.tsx` y `apps/web/app/globals.css`.
 
+## Cierre de sesión por inactividad (30 min)
+
+Una sesión iniciada se cierra tras 30 minutos sin actividad. Dos capas: (1) servidor, `SESSION_COOKIE_AGE = 30 * 60` y `SESSION_SAVE_EVERY_REQUEST = True` en `apps/api/config/settings.py` (caducidad deslizante: cada petición la renueva); (2) cliente, `IdleSessionGuard` (montado en `AppShell` solo con sesión) cuenta actividad real (puntero, teclado, rueda, scroll, táctil), la comparte entre pestañas por `localStorage`, hace un ping a `/api/accounts/me/` como mucho cada 5 min mientras hay actividad para que el servidor no la caduque por leer sin peticiones, comprueba cada 30 s y al despertar la pestaña, y al expirar cierra sesión y redirige a `/{locale}/login?idle=1`, donde se muestra el aviso. `signOutAndRedirect` (`apps/web/lib/idle-session.ts`) se comparte con el menú de cuenta. Verificado con el reloj simulado de Playwright (activo a 20 min, fuera a los 31 min de inactividad), un test de API del deslizamiento/caducidad y un test unitario del límite.
 ## Fuentes canónicas
 
 - `apps/api/library/views.py`
@@ -47,6 +50,8 @@ Fuente: `apps/web/components/RecommendationShelfTrack.tsx`, `apps/web/components
 - `apps/web/app/[locale]/register/page.tsx`
 - `apps/web/components/AccountSwitcher.tsx`
 - `apps/web/next.config.ts`
+- `apps/web/components/IdleSessionGuard.tsx`
+- `apps/web/lib/idle-session.ts`
 
 ## Enlaces relacionados
 

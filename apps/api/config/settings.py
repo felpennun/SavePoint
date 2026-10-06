@@ -199,6 +199,11 @@ USE_TZ = True
 STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# Sliding idle timeout: the session (and its cookie) expires 30 minutes after
+# the last request, and every request pushes the expiry forward. The web app
+# adds a client-side guard that pings while the person is active.
+SESSION_COOKIE_AGE = 30 * 60
+SESSION_SAVE_EVERY_REQUEST = True
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"

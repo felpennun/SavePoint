@@ -216,3 +216,30 @@ def test_repeated_failed_logins_are_throttled(demo_user) -> None:  # noqa: ANN00
     assert 429 in statuses, f"expected a throttled (429) response in the burst, got {statuses}"
     # Everything before the limit is a normal 401, never a 5xx.
     assert set(statuses) <= {401, 429}
+
+
+@pytest.mark.django_db
+def test_session_expires_after_thirty_idle_minutes_and_slides(demo_user) -> None:  # noqa: ANN001
+    from datetime import timedelta
+
+    from django.conf import settings
+    from django.contrib.sessions.models import Session
+    from django.utils import timezone
+
+    assert settings.SESSION_COOKIE_AGE == 30 * 60
+    assert settings.SESSION_SAVE_EVERY_REQUEST is True
+
+    client = APIClient()
+    assert client.login(username=USERNAME, password=PASSWORD)
+    key = client.cookies["sessionid"].value
+
+    # Pretend the session is about to lapse, then make a request: expiry slides.
+    soon = timezone.now() + timedelta(minutes=1)
+    Session.objects.filter(session_key=key).update(expire_date=soon)
+    assert client.get("/api/accounts/me/").status_code == 200
+    renewed = Session.objects.get(session_key=key).expire_date
+    assert renewed > timezone.now() + timedelta(minutes=29)
+
+    # After 30 idle minutes the same cookie is no longer accepted.
+    Session.objects.filter(session_key=key).update(expire_date=timezone.now() - timedelta(seconds=1))
+    assert client.get("/api/accounts/me/").status_code in (401, 403)

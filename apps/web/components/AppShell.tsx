@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { AccountSwitcher } from "@/components/AccountSwitcher";
 import { BrandLockup } from "@/components/BrandLockup";
 import { FriendsNavDot } from "@/components/FriendsNavDot";
+import { IdleSessionGuard } from "@/components/IdleSessionGuard";
 import { LoginIconButton } from "@/components/LoginIconButton";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { ShelfWheelScroll } from "@/components/ShelfWheelScroll";
@@ -247,6 +248,7 @@ export function AppShell({
         {children}
       </div>
       <ShelfWheelScroll />
+      {isAuthenticated ? <IdleSessionGuard locale={locale === "en" ? "en" : "es"} /> : null}
     </>
   );
 }
