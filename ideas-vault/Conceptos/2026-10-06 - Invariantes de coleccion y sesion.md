@@ -13,10 +13,23 @@ fuente: "[[../../apps/api/library/views.py]]"
 - La API expone si el juego pertenece a la colección de esa persona; la interfaz usa ese dato para ofrecer el formulario de comentario.
 - La lectura de comentarios visibles no depende de pertenecer a la colección. La API sigue exigiendo pertenencia para crear comentarios.
 - El login, el cierre de sesión y el registro recargan el inicio localizado. Las páginas dinámicas no se conservan en la caché de navegación del cliente, para refrescar la sesión y el juego aleatorio del inicio.
+- Next.js se actualizó de 16.3.4 a 16.3.8 tras detectar una vulnerabilidad crítica en `next/og`; el escaneo completo de pnpm quedó sin vulnerabilidades conocidas.
 
 ## Impacto
 
 Estas reglas mantienen los datos de inventario separados por propietario, hacen explícita la elegibilidad para comentar y evitan que una página dinámica reutilizada muestre el estado de sesión o el contenido aleatorio anterior.
+
+## Resultado de seguridad — 2026-10-06
+
+`pnpm audit` encontró inicialmente el aviso crítico GHSA-vcvr-r3jv-pc5j, que afectaba a Next.js `>=16.2.0 <16.3.6`. La aplicación no contiene importaciones de `next/og` ni `ImageResponse`, pero se actualizó igualmente a 16.3.8. El análisis OSV del lockfile Python encontró tres avisos de urllib3 duplicados como GHSA/PYSEC y afectados hasta la versión 2.8.0; `uv.lock` se actualizó de 2.7.0 a 2.8.0. Tras ambas actualizaciones, `pnpm audit` y el análisis de los 23 paquetes Python no reportan vulnerabilidades conocidas. La revisión del frontend tampoco encontró usos de `dangerouslySetInnerHTML` ni inserciones directas de HTML. La CSP actual conserva `'unsafe-inline'` para los scripts de arranque de Next; endurecerla con nonces queda como mejora separada.
+
+## Validación manual — 2026-10-06
+
+- Las 22 rutas directas en español e inglés devolvieron contenido válido; las rutas protegidas llevaron al login cuando no había sesión.
+- En local, login y logout volvieron al inicio, el logout dejó `/api/accounts/me/` sin sesión, la validación del registro rechazó contraseñas distintas y el usuario no miembro siguió viendo la sección de comentarios sin el formulario.
+- En local, la estantería de recomendaciones desplazó `scrollLeft` al recibir rueda vertical; el cambio de algoritmo y la vista detallada funcionaron. En 390 px, nueve rutas autenticadas no presentaron desbordamiento horizontal de página.
+- Cinco solicitudes al inicio desplegado devolvieron `no-store` y variaron el juego destacado. El login desplegado no pudo auditarse con la cuenta demo probada (HTTP 401), así que la estantería autenticada de producción queda pendiente de una cuenta válida.
+- La respuesta desplegada incluyó HSTS, CSP, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY` y `Referrer-Policy: same-origin`.
 
 ## Fuentes canónicas
 
