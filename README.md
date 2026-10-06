@@ -87,7 +87,8 @@ completo de IGDB, que no se incluye en el repositorio: se importa con tus propia
 
 La [release v1.0.0](https://github.com/felpennun/SavePoint/releases/tag/v1.0.0) incluye `savepoint-demo-data-v1.0.0.dump`
 (430 MB) y su suma de verificación. Es un volcado de PostgreSQL con el **catálogo completo** (190.479 obras gobernadas y
-331.000 registros contando contenidos adicionales), los datos que usan las recomendaciones y tres cuentas con su biblioteca.
+331.000 registros contando contenidos adicionales), los datos que usan las recomendaciones y tres cuentas demo (`demo_user1`
+tiene una biblioteca amplia y sus recomendaciones ya generadas).
 No contiene ningún otro usuario ni dato personal.
 
 | Usuario | Contraseña |
