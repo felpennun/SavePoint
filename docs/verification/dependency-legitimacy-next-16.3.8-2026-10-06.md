@@ -1,6 +1,6 @@
 # Legitimidad de dependencias: Next.js 16.3.4 → 16.3.8 (2026-10-06)
 
-Anexo fechado a [`dependency-legitimacy.md`](dependency-legitimacy.md), que no se modifica porque su hash está fijado en el registro de evidencia.
+Anexo fechado a [`dependency-legitimacy.md`](dependency-legitimacy.md), que no se modifica porque es un registro histórico con su hash fijado.
 
 ## Cambio
 

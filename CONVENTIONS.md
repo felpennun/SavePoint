@@ -59,8 +59,8 @@ Restricciones que guían las decisiones:
 - **Fotos congeladas fechadas.** Los documentos que son el registro de un instante concreto se
   dejan tal cual y no se re-traducen.
 - **Documentos con comprobación automática.** Si un documento tiene una comprobación
-  determinista de su contenido, o su hash está fijado en el registro de evidencia
-  (`agent-ledger.jsonl`), al traducirlo o editarlo se actualizan en el **mismo commit** los
+  determinista de su contenido, o su hash está fijado en el registro de evidencia que
+  mantiene el autor, al traducirlo o editarlo se actualizan en el **mismo commit** los
   patrones de la comprobación y el hash fijado, y se añade la entrada de registro que lo
   documenta.
 
@@ -89,7 +89,7 @@ Restricciones que guían las decisiones:
 
 ## 4. Trabajo con asistentes de IA y método GSD
 
-El desarrollo se ha hecho con asistentes de IA (Claude Code, Codex y GitHub Copilot) siguiendo
+El desarrollo se ha hecho con asistentes de IA (Codex y Claude Code) siguiendo
 el método **Get Stuff Done (GSD)**: <https://github.com/gsd-build/get-shit-done>. La memoria del
 TFG describe cómo se aplicó, qué controles se pusieron y qué parte del trabajo es de los agentes
 y cuál del autor.

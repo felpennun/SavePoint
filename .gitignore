@@ -126,7 +126,8 @@ e2e/artifacts/
 
 # docs/: only ADRs, methodology, the runtime/CI-required files and the evidence-pinned records are
 # published; the rest of docs/verification and docs/deployment stays on the author's machine.
-/docs/deployment/
+/docs/deployment/*
+!/docs/deployment/backup-recovery.md
 /docs/verification/*
 !/docs/verification/catalogue-freeze.md
 !/docs/verification/dependency-legitimacy.md
@@ -136,3 +137,13 @@ e2e/artifacts/
 !/docs/verification/igdb-api-probe.md
 !/docs/verification/igdb-catalogue-freeze.md
 !/docs/verification/phase-*/
+
+# Evidence ledger, its checker and the methodology notes merged into agent-method.md and
+# evaluation-protocol.md: kept on the author's machine, not published.
+/docs/methodology/agent-ledger.jsonl
+/docs/methodology/academic-reference-register.md
+/docs/methodology/phase-07-agent-contributions.md
+/docs/methodology/phase-07-evidence-package.md
+/docs/methodology/agent-methodology-controls.md
+/docs/methodology/evaluation-v15-appendix.md
+/scripts/check-evidence.ps1

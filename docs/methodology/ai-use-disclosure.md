@@ -1,46 +1,29 @@
-# Disclosure de uso de IA
+# Declaración de uso de IA
 
 ## Declaración
 
-SavePoint se desarrolló con asistencia de agentes bajo el método documentado en
-`docs/methodology/agent-method.md`. La asistencia se utilizó para proponer diseños,
-organizar tareas, implementar código y preparar documentación. No se almacenan en el
-repositorio conversaciones completas, prompts, cookies, credenciales, variables de
-entorno ni logs brutos.
+SavePoint se ha desarrollado con asistencia de agentes de IA, bajo el método descrito en [`agent-method.md`](agent-method.md). La asistencia se utilizó a lo largo de todo el proyecto para investigar alternativas, proponer diseños, organizar y planificar tareas, implementar y probar código, y preparar documentación. No se guardan en el repositorio conversaciones completas, prompts, cookies, credenciales, variables de entorno ni registros sin revisar.
 
-En esta tarea el runtime disponible fue Codex y la familia de modelo se registra como
-`gpt-5`; la versión exacta no fue expuesta al repositorio. Ese nombre no se presenta como
-una garantía de reconstrucción exacta de lenguaje natural. La parte reproducible del
-resultado son el script, las fuentes, los hashes, los comandos y las decisiones humanas.
+Se usaron Codex (familia `gpt-5`) y Claude Code (familia Claude), según la tarea. La versión exacta de un modelo no siempre la expone el entorno y, cuando falta, se anota como desconocida. Un nombre de modelo no garantiza reconstruir exactamente una salida en lenguaje natural: la parte reproducible del resultado son el código, las fuentes, las sumas de verificación, los comandos y las decisiones humanas.
 
 ## Separación de funciones
 
-| Categoría | Qué ocurrió | Evidencia o autoridad |
+| Categoría | Qué ocurre en el proyecto | Evidencia o autoridad |
 |---|---|---|
-| Propuesta del agente | Se propuso una forma allowlisted de transformar el run v15 en tabla, JSON y SVG, además de ordenar la documentación. | `07-05-PLAN.md`, commits de implementación y este disclosure. |
-| Check automático | PowerShell validó SHA-256 antes de escribir y produjo salidas deterministas; `check-evidence.ps1` y `git diff --check` comprueban gates concretos. | `scripts/generate-phase-07-evidence.ps1`, salidas hash-pinned y comandos registrados. |
-| Decisión del autor | Felipe debe decidir si las licencias, limitaciones, cifras y formato son adecuados para la memoria y la entrega. | Revisión humana pendiente; el agente no firma la evidencia académica. |
+| Propuesta del agente | Diseños, hipótesis, planes y cambios candidatos de código y documentación. | Los planes, los commits y los documentos de decisión que los recogen. |
+| Verificación automática | Pruebas, validadores de contrato, comprobaciones de dependencias y de secretos, y sumas de verificación que impiden cerrar una tarea si fallan. | Comandos reproducibles y su resultado para un commit concreto. |
+| Decisión del autor | Alcance, aceptación o rechazo de alternativas, licencias, límites de los resultados y formato final de la memoria. | Los puntos de control, las decisiones de arquitectura (ADR) y la revisión humana; el agente no firma la evidencia académica. |
 
 ## Controles aplicados
 
-- Las métricas se copian desde snapshots publicados; no se recalculan ni se completan con
-  estimaciones.
-- La población, el protocolo v15, las semillas, el corpus y los snapshots se conservan con
-  sus identidades; el puntero v16 solo se usa para anclajes compartidos.
-- Las salidas excluyen datos individuales, dumps, secretos, rutas absolutas y logs crudos.
-- El generador tiene una allowlist de rutas y hashes, y falla cerrado ante deriva de bytes o
-  identidad científica.
-- La diferencia entre propuestas, verificación automática y decisión humana permanece
-  explícita; un agente no se presenta como evaluador independiente.
+- Las métricas se copian de artefactos publicados y congelados; no se recalculan ni se completan con estimaciones.
+- La población, el protocolo, las semillas, el corpus y los snapshots se conservan con sus identidades, y las ejecuciones se comprueban contra ellas.
+- Los resultados que se publican excluyen datos individuales, volcados, secretos, rutas absolutas y registros sin revisar.
+- Una propuesta de un agente no es evidencia mientras no se enlace con código, una prueba, un dato inmutable o una fuente primaria.
+- La diferencia entre propuesta, verificación automática y decisión humana permanece explícita; un agente no se presenta como evaluador independiente.
 
 ## Coste, reproducibilidad y límites
 
-El paquete no introduce coste recurrente ni un servicio de pago. No se dispone de una
-medición de tokens, precio o consumo de inferencia suficientemente estable para atribuir un
-coste monetario exacto a la asistencia; por ello no se inventa una cifra. La metodología
-asistida puede reproducir controles y artefactos, pero no garantiza una reconstrucción
-idéntica de toda salida de lenguaje natural si cambian runtime, modelo o tooling.
+El uso de IA no ha introducido un coste recurrente ni un servicio de pago propio del proyecto. No se dispone de una medición estable de tokens, precio o consumo de inferencia que permita atribuir un coste monetario exacto a la asistencia, y por eso no se inventa una cifra. La metodología asistida puede reproducir controles y artefactos, pero no garantiza una reconstrucción idéntica de toda salida de lenguaje natural si cambian el entorno, el modelo o las herramientas.
 
-El resultado de evaluación sigue siendo simulación sobre usuarios sintéticos. La asistencia
-de IA no convierte esa simulación en evidencia sobre usuarios reales ni sustituye la
-revisión de amenazas a la validez, licencias, interpretación o formato universitario.
+La evaluación de los recomendadores es una simulación sobre usuarios sintéticos. La asistencia de la IA no convierte esa simulación en evidencia sobre usuarios reales ni sustituye la revisión de las amenazas a la validez, las licencias, la interpretación de los resultados ni el formato universitario.

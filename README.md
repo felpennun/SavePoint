@@ -4,7 +4,7 @@ SavePoint es una aplicación web enfocada en el registro y seguimiento personal 
 
 ## Método de desarrollo
 
-SavePoint se ha desarrollado con asistentes de IA (Claude Code, Codex y GitHub Copilot) siguiendo el método
+SavePoint se ha desarrollado con asistentes de IA (Codex y Claude Code) siguiendo el método
 **Get Stuff Done (GSD)**: <https://github.com/gsd-build/get-shit-done> (versión 1.12.0). El repositorio no incluye
 los ficheros que GSD instala en cada equipo (comandos, agentes, hooks) ni las instrucciones locales de cada
 asistente; las reglas del proyecto están reunidas en [`CONVENTIONS.md`](CONVENTIONS.md) y la memoria del TFG
